@@ -4,6 +4,7 @@
       <b-navbar-brand href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
         Portal
+        <b-badge v-if="environment" variant="warning">{{ environment }}</b-badge>
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -82,6 +83,11 @@ export default {
   data() {
     return {
       user: null
+    }
+  },
+  computed: {
+    environment() {
+      return process.env.VUE_APP_ENV
     }
   },
   methods: {

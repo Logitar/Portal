@@ -43,6 +43,11 @@ namespace Portal.Web
           .Build()); // TODO(fpion): 401 Unauthorized => redirect to /account/sign-in
       });
 
+      services.AddApplicationInsightsTelemetry();
+      services
+        .AddHealthChecks()
+        .AddDbContextCheck<PortalDbContext>();
+
       services.AddHttpContextAccessor();
 
       services.AddOpenApi();
@@ -79,6 +84,7 @@ namespace Portal.Web
         application.UseAuthentication();
         application.UseAuthorization();
         application.MapControllers();
+        application.MapHealthChecks("/health");
       }
     }
   }
