@@ -1,4 +1,5 @@
 ﻿using Portal.Infrastructure;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Portal.Web
 {
@@ -6,6 +7,8 @@ namespace Portal.Web
   {
     public static async Task Main(string[] args)
     {
+      JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
       WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
       var startup = new Startup(builder.Configuration);

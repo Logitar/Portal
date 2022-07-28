@@ -21,6 +21,7 @@ namespace Portal.Infrastructure
 
     public DbSet<ApiKey> ApiKeys { get; private set; } = null!;
     public DbSet<EventEntity> Events { get; private set; } = null!;
+    public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
     public DbSet<Realm> Realms { get; private set; } = null!;
     public DbSet<Session> Sessions { get; private set; } = null!;
     public DbSet<User> Users { get; private set; } = null!;

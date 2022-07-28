@@ -17,6 +17,6 @@ namespace Portal.Core.Realms
     }
 
     private static bool BeAlias(string? value) => value == null 
-      || value.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(c => char.IsLetterOrDigit(c)));
+      || value.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
   }
 }
