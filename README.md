@@ -1,3 +1,3 @@
-# Portal API
+# Portal
 
 Identity management platform.
