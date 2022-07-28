@@ -4,9 +4,9 @@ using Portal.Infrastructure.Entities;
 
 namespace Portal.Infrastructure.Configurations
 {
-  internal class EventEntityConfiguration : IEntityTypeConfiguration<EventEntity>
+  internal class EventConfiguration : IEntityTypeConfiguration<Event>
   {
-    public virtual void Configure(EntityTypeBuilder<EventEntity> builder)
+    public virtual void Configure(EntityTypeBuilder<Event> builder)
     {
       builder.HasKey(x => x.Sid);
       builder.HasIndex(x => x.Id).IsUnique();

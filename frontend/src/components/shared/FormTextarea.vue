@@ -9,7 +9,6 @@
         :ref="id"
         :rows="rows"
         :state="hasRules ? getValidationState(validationContext) : null"
-        :type="type"
         :value="value"
         @input="$emit('input', $event)"
       />
@@ -57,10 +56,6 @@ export default {
     rules: {
       type: Object,
       default: null
-    },
-    type: {
-      type: String,
-      default: 'text'
     },
     value: {}
   },

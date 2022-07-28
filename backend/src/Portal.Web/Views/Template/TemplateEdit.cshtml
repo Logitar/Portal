@@ -1,0 +1,17 @@
+﻿@using Portal.Core.Templates.Models;
+
+@model TemplateModel
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model?.DisplayName ?? Model?.Key ?? "Create template";
+}
+
+@if (Model == null)
+{
+  <template-edit realm="@(Context.Request.Query["realm"])"></template-edit>
+}
+else
+{
+  <template-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></template-edit>
+}

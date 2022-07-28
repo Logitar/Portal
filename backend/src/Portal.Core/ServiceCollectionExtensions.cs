@@ -6,6 +6,7 @@ using Portal.Core.ApiKeys;
 using Portal.Core.Configurations;
 using Portal.Core.Realms;
 using Portal.Core.Settings;
+using Portal.Core.Templates;
 using Portal.Core.Tokens;
 using Portal.Core.Users;
 using System.Reflection;
@@ -29,6 +30,7 @@ namespace Portal.Core
         .AddScoped<IApiKeyService, ApiKeyService>()
         .AddScoped<IConfigurationService, ConfigurationService>()
         .AddScoped<IRealmService, RealmService>()
+        .AddScoped<ITemplateService, TemplateService>()
         .AddScoped<ITokenService, TokenService>()
         .AddScoped<IUserService, UserService>();
     }

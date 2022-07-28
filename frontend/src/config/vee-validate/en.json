@@ -5,6 +5,7 @@
     "alpha_num": "The {_field_} can only contain letters and digits.",
     "confirmed": "The {target} and the {_field_} must match.",
     "email": "Please enter a valid email address.",
+    "key": "The {_field_} may only contain letters, digits and underscores (_).",
     "max": "The {_field_} cannot contain more than {length} characters.",
     "max_value": "The {_field_} must be lesser than or equal to {max}.",
     "min": "The {_field_} must contain at least {length} characters.",

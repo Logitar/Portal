@@ -28,7 +28,7 @@
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <form-datetime v-if="!apiKey" id="expiresAt" label="apiKeys.expiresAt" :minDate="new Date()" validate v-model="expiresAt" />
-        <name-field :disabled="apiKey && apiKey.isExpired" v-model="name" />
+        <name-field :disabled="apiKey && apiKey.isExpired" required v-model="name" />
         <description-field :disabled="apiKey && apiKey.isExpired" :rows="15" v-model="description" />
       </b-form>
     </validation-observer>

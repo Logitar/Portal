@@ -10,7 +10,7 @@
         </div>
         <alias-field v-if="!!realm" disabled :value="alias" />
         <alias-field v-else :name="name" required validate v-model="alias" />
-        <name-field v-model="name" />
+        <name-field required v-model="name" />
         <description-field :rows="15" v-model="description" />
       </b-form>
     </validation-observer>

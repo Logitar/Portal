@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Portal.Infrastructure.Entities
 {
-  internal class EventEntity
+  public class Event
   {
-    private EventEntity()
+    private Event()
     {
     }
 
@@ -21,7 +21,7 @@ namespace Portal.Infrastructure.Entities
     public string AggregateType { get; private set; } = null!;
     public Guid AggregateId { get; private set; }
 
-    public static IEnumerable<EventEntity> FromChanges(Aggregate aggregate)
+    public static IEnumerable<Event> FromChanges(Aggregate aggregate)
     {
       string aggregateType = aggregate?.GetType().GetName() ?? throw new ArgumentNullException(nameof(aggregate));
 
@@ -29,7 +29,7 @@ namespace Portal.Infrastructure.Entities
       {
         Type eventType = change?.GetType() ?? throw new ArgumentException($"The change collection cannot contain a null element.", nameof(aggregate));
 
-        return new EventEntity
+        return new Event
         {
           OccurredAt = change.OccurredAt,
           UserId = change.UserId,

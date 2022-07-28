@@ -3,6 +3,7 @@ import { ValidationObserver, ValidationProvider, extend, localize } from 'vee-va
 import { alpha_num, confirmed, email, max, max_value, min, min_value, required } from 'vee-validate/dist/rules'
 
 import alias from './rules/alias'
+import key from './rules/key'
 import password from './rules/password'
 import url from './rules/url'
 import username from './rules/username'
@@ -17,6 +18,7 @@ extend('alias', alias)
 extend('alpha_num', alpha_num)
 extend('confirmed', confirmed)
 extend('email', email)
+extend('key', key)
 extend('max', max)
 extend('max_value', max_value)
 extend('min', min)

@@ -9,6 +9,8 @@ export default {
   RealmEdit: () => import(/* webpackChunkName: "realmEdit" */ './Realms/RealmEdit.vue'),
   RealmList: () => import(/* webpackChunkName: "realmList" */ './Realms/RealmList.vue'),
   SignIn: () => import(/* webpackChunkName: "signIn" */ './Account/SignIn.vue'),
+  TemplateEdit: () => import(/* webpackChunkName: "templateEdit" */ './Templates/TemplateEdit.vue'),
+  TemplateList: () => import(/* webpackChunkName: "templateList" */ './Templates/TemplateList.vue'),
   UserEdit: () => import(/* webpackChunkName: "userEdit" */ './User/UserEdit.vue'),
   UserList: () => import(/* webpackChunkName: "userList" */ './User/UserList.vue')
 }

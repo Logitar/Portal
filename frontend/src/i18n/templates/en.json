@@ -1,0 +1,35 @@
+{
+  "contents": {
+    "label": "Contents",
+    "placeholder": "Enter the template contents; Razor syntax is supported"
+  },
+  "created": "The template has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following template?",
+    "success": "The template has been deleted.",
+    "title": "Delete template"
+  },
+  "displayName": {
+    "label": "Display name",
+    "placeholder": "Enter a display name"
+  },
+  "editTitle": "Edit template",
+  "empty": "This list is empty.",
+  "key": {
+    "label": "Key",
+    "placeholder": "Enter a key"
+  },
+  "metadata": "Metadata",
+  "newTitle": "Create template",
+  "noRealm": "This template is not in a realm.",
+  "sort": {
+    "options": {
+      "DisplayName": "Display name",
+      "Key": "Key",
+      "UpdatedAt": "Updated on"
+    }
+  },
+  "template": "Template",
+  "title": "Templates",
+  "updated": "The template has been updated."
+}
