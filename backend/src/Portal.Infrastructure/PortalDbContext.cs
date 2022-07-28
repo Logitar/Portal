@@ -9,7 +9,7 @@ using Portal.Infrastructure.Entities;
 
 namespace Portal.Infrastructure
 {
-  internal class PortalDbContext : DbContext
+  public class PortalDbContext : DbContext
   {
     private readonly IConfiguration _configuration;
 
@@ -19,12 +19,12 @@ namespace Portal.Infrastructure
       _configuration = configuration;
     }
 
-    public DbSet<ApiKey> ApiKeys { get; private set; } = null!;
-    public DbSet<EventEntity> Events { get; private set; } = null!;
-    public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
-    public DbSet<Realm> Realms { get; private set; } = null!;
-    public DbSet<Session> Sessions { get; private set; } = null!;
-    public DbSet<User> Users { get; private set; } = null!;
+    internal DbSet<ApiKey> ApiKeys { get; private set; } = null!;
+    internal DbSet<EventEntity> Events { get; private set; } = null!;
+    internal DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
+    internal DbSet<Realm> Realms { get; private set; } = null!;
+    internal DbSet<Session> Sessions { get; private set; } = null!;
+    internal DbSet<User> Users { get; private set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {
