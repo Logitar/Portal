@@ -16,7 +16,7 @@ namespace Portal.Core.Realms
         .MaximumLength(256);
     }
 
-    private static bool BeAValidAlias(string? value) => value == null 
+    private static bool BeAValidAlias(string? value) => value == null
       || value.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
   }
 }

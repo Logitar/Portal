@@ -24,6 +24,10 @@
               <font-awesome-icon icon="key" />
               {{ $t('apiKeys.title') }}
             </b-nav-item>
+            <b-nav-item href="/templates">
+              <font-awesome-icon icon="at" />
+              {{ $t('templates.title') }}
+            </b-nav-item>
           </template>
         </b-navbar-nav>
 

@@ -18,7 +18,7 @@ namespace Portal.Infrastructure.Repositories
 
       if (aggregate.HasChanges)
       {
-        IEnumerable<EventEntity> events = EventEntity.FromChanges(aggregate);
+        IEnumerable<Event> events = Event.FromChanges(aggregate);
 
         _dbContext.Events.AddRange(events);
         await _dbContext.SaveChangesAsync(cancellationToken);

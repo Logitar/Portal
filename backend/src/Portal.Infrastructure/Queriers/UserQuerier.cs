@@ -18,9 +18,11 @@ namespace Portal.Infrastructure.Queriers
     {
       username = username?.ToUpper() ?? throw new ArgumentNullException(nameof(username));
 
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.UsernameNormalized == username && (realm == null ? x.RealmSid == null : x.RealmSid == realm.Sid), cancellationToken);
+      IQueryable<User> query = _users.ApplyTracking(readOnly).Include(x => x.Realm);
+
+      return realm == null
+        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.UsernameNormalized == username, cancellationToken)
+        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.UsernameNormalized == username, cancellationToken);
     }
 
     public async Task<User?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)

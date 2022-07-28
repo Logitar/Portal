@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faAt,
   faBan,
   faChessRook,
   faClipboard,
@@ -22,6 +23,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
+  faAt,
   faBan,
   faChessRook,
   faClipboard,

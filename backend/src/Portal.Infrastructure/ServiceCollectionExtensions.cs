@@ -4,6 +4,7 @@ using Portal.Core;
 using Portal.Core.ApiKeys;
 using Portal.Core.Realms;
 using Portal.Core.Sessions;
+using Portal.Core.Templates;
 using Portal.Core.Tokens;
 using Portal.Core.Users;
 using Portal.Infrastructure.Queriers;
@@ -38,6 +39,7 @@ namespace Portal.Infrastructure
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()
+        .AddScoped<ITemplateQuerier, TemplateQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
     }
 
@@ -47,6 +49,7 @@ namespace Portal.Infrastructure
         .AddScoped<IRepository<ApiKey>, Repository<ApiKey>>()
         .AddScoped<IRepository<Realm>, Repository<Realm>>()
         .AddScoped<IRepository<Session>, Repository<Session>>()
+        .AddScoped<IRepository<Template>, Repository<Template>>()
         .AddScoped<IRepository<User>, Repository<User>>();
     }
   }

@@ -114,7 +114,7 @@ export default {
         picture: this.picture
       }
       if (!this.user) {
-        payload.realmId = this.realmId
+        payload.realm = this.realmId
         payload.username = this.username
         payload.password = this.password
       }

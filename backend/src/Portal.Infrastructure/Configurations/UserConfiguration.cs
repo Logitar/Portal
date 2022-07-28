@@ -13,7 +13,6 @@ namespace Portal.Infrastructure.Configurations
       builder.ToTable("Users");
 
       builder.HasIndex(x => x.Email);
-      builder.HasIndex(x => x.EmailNormalized);
       builder.HasIndex(x => x.FirstName);
       builder.HasIndex(x => x.LastName);
       builder.HasIndex(x => x.MiddleName);

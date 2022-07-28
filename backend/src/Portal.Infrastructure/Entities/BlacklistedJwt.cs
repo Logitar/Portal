@@ -1,6 +1,6 @@
 ﻿namespace Portal.Infrastructure.Entities
 {
-  internal class BlacklistedJwt
+  public class BlacklistedJwt
   {
     public BlacklistedJwt(Guid id, DateTime? expiresAt = null)
     {
