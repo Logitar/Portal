@@ -19,6 +19,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           cd ./frontend
+          npm ci
           npm run build:staging
           cd ../backend
           docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Portal.Web/Dockerfile
