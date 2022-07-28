@@ -10,8 +10,7 @@ namespace Portal.Core.Sessions.Models
     public bool IsPersistent => RenewToken != null;
 
     public DateTime? SignedOutAt { get; set; }
-    public Guid? SignedOutById { get; set; }
-    public bool IsActive => !SignedOutAt.HasValue && !SignedOutById.HasValue;
+    public bool IsActive => !SignedOutAt.HasValue;
 
     public string? IpAddress { get; set; }
     public string? AdditionalInformation { get; set; }
