@@ -9,14 +9,14 @@ namespace Portal.Core.Realms
       RuleFor(x => x.Alias)
         .NotEmpty()
         .MaximumLength(256)
-        .Must(BeAlias);
+        .Must(BeAValidAlias);
 
       RuleFor(x => x.Name)
         .NotEmpty()
         .MaximumLength(256);
     }
 
-    private static bool BeAlias(string? value) => value == null 
+    private static bool BeAValidAlias(string? value) => value == null 
       || value.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
   }
 }

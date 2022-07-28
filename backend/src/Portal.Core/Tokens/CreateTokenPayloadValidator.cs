@@ -11,7 +11,7 @@ namespace Portal.Core.Tokens
         .GreaterThan(0);
 
       RuleFor(x => x.Purpose)
-        .Must(BePurpose);
+        .Must(BeAValidPurpose);
 
       RuleFor(x => x.Email)
         .EmailAddress();
@@ -20,7 +20,7 @@ namespace Portal.Core.Tokens
         .SetValidator(new ClaimPayloadValidator());
     }
 
-    private static bool BePurpose(string? value) => value == null
+    private static bool BeAValidPurpose(string? value) => value == null
       || value.Split('_').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetter));
   }
 }
