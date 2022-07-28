@@ -31,6 +31,7 @@
     "placeholder": "Enter your last name"
   },
   "newTitle": "Create user",
+  "noRealm": "This user is not in a realm.",
   "password": {
     "changeFailed": "Password change failed!",
     "changed": "Your password has been changed.",

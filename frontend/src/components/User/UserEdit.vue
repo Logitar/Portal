@@ -11,7 +11,9 @@
           <icon-submit v-if="!!user" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <realm-select :disabled="!!user" v-model="realmId" />
+        <realm-select v-if="user && user.realm" disabled :value="realmId" />
+        <p v-else-if="!!user" v-t="'user.noRealm'" />
+        <realm-select v-else v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
         <username-field :disabled="!!user" placeholder="user.create.usernamePlaceholder" :required="!user" :validate="!user" v-model="username" />
         <b-row v-if="!user">
@@ -129,7 +131,7 @@ export default {
       this.middleName = user.middleName
       this.phoneNumber = user.phoneNumber
       this.picture = user.picture
-      this.realmId = user.realm.id
+      this.realmId = user.realm?.id ?? null
       this.username = user.username
     },
     async submit() {
