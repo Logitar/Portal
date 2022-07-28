@@ -35,12 +35,12 @@ namespace Portal.Core.Claims
       if (user.Email != null)
       {
         identity.AddClaim(new(Rfc7519ClaimTypes.Email, user.Email));
-        identity.AddClaim(new(Rfc7519ClaimTypes.EmailVerified, user.EmailConfirmed.HasValue.ToString(), ClaimValueTypes.Boolean));
+        identity.AddClaim(new(Rfc7519ClaimTypes.EmailVerified, user.EmailConfirmedAt.HasValue.ToString().ToLower(), ClaimValueTypes.Boolean));
       }
       if (user.PhoneNumber != null)
       {
         identity.AddClaim(new(Rfc7519ClaimTypes.PhoneNumber, user.PhoneNumber));
-        identity.AddClaim(new(Rfc7519ClaimTypes.PhoneNumberVerified, user.PhoneNumberConfirmed.HasValue.ToString(), ClaimValueTypes.Boolean));
+        identity.AddClaim(new(Rfc7519ClaimTypes.PhoneNumberVerified, user.PhoneNumberConfirmedAt.HasValue.ToString().ToLower(), ClaimValueTypes.Boolean));
       }
 
       if (user.FullName != null)

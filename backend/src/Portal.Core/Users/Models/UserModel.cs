@@ -9,9 +9,9 @@ namespace Portal.Core.Users.Models
     public string Username { get; set; } = null!;
 
     public string? Email { get; set; }
-    public DateTime? EmailConfirmed { get; set; }
+    public DateTime? EmailConfirmedAt { get; set; }
     public string? PhoneNumber { get; set; }
-    public DateTime? PhoneNumberConfirmed { get; set; }
+    public DateTime? PhoneNumberConfirmedAt { get; set; }
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }

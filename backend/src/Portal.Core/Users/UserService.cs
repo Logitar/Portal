@@ -59,6 +59,16 @@ namespace Portal.Core.Users
       payload.Password = string.Empty;
 
       var user = new User(payload, _userContext.ActorId, passwordHash, realm);
+
+      if (payload.ConfirmEmail)
+      {
+        user.ConfirmEmail(_userContext.ActorId);
+      }
+      if (payload.ConfirmPhoneNumber)
+      {
+        user.ConfirmPhoneNumber(_userContext.ActorId);
+      }
+
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);

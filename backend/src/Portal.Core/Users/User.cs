@@ -36,9 +36,11 @@ namespace Portal.Core.Users
       get => Email?.ToUpper();
       private set { /* EntityFrameworkCore only setter */ }
     }
-    public DateTime? EmailConfirmed { get; private set; }
+    public DateTime? EmailConfirmedAt { get; private set; }
+    public Guid? EmailConfirmedById { get; private set; }
     public string? PhoneNumber { get; private set; }
-    public DateTime? PhoneNumberConfirmed { get; private set; }
+    public DateTime? PhoneNumberConfirmedAt { get; private set; }
+    public Guid? PhoneNumberConfirmedById { get; private set; }
 
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
@@ -55,12 +57,24 @@ namespace Portal.Core.Users
 
     public List<Session> Sessions { get; private set; } = new();
 
+    public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
+    public void ConfirmPhoneNumber(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
     public void Update(UpdateUserPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
 
     public void ChangePassword(string passwordHash) => ApplyChange(new ChangedPasswordEvent(passwordHash, Id));
     public void SignIn(DateTime signedInAt) => ApplyChange(new SignedInEvent(signedInAt, Id));
 
+    protected virtual void Apply(ConfirmedEmailEvent @event)
+    {
+      EmailConfirmedAt = @event.OccurredAt;
+      EmailConfirmedById = @event.UserId;
+    }
+    protected virtual void Apply(ConfirmedPhoneNumberEvent @event)
+    {
+      PhoneNumberConfirmedAt = @event.OccurredAt;
+      PhoneNumberConfirmedById = @event.UserId;
+    }
     protected virtual void Apply(CreatedEvent @event)
     {
       Username = @event.Payload.Username;
@@ -92,8 +106,19 @@ namespace Portal.Core.Users
 
     private void Apply(SaveUserPayload payload)
     {
-      Email = payload.Email;
-      PhoneNumber = payload.PhoneNumber?.CleanTrim();
+      if (Email?.ToUpper() != payload.Email?.ToUpper())
+      {
+        Email = payload.Email;
+        EmailConfirmedAt = null;
+        EmailConfirmedById = null;
+      }
+
+      if (PhoneNumber?.ToUpper() != payload.PhoneNumber?.ToUpper())
+      {
+        PhoneNumber = payload.PhoneNumber;
+        PhoneNumberConfirmedAt = null;
+        PhoneNumberConfirmedById = null;
+      }
 
       FirstName = payload.FirstName?.CleanTrim();
       LastName = payload.LastName?.CleanTrim();
