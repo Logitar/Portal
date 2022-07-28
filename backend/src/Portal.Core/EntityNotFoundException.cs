@@ -14,6 +14,11 @@ namespace Portal.Core
     {
       Id = id ?? throw new ArgumentNullException(nameof(id));
       ParamName = paramName;
+
+      if (paramName != null)
+      {
+        Value = new { field = paramName };
+      }
     }
 
     public string Id { get; }

@@ -1,6 +1,6 @@
 ﻿namespace Portal.Core.Claims
 {
-  internal static class Rfc7519ClaimTypes
+  public static class Rfc7519ClaimTypes
   {
     public const string Address = "address";
     public const string Audience = "aud";

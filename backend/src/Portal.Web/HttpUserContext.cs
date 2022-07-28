@@ -18,5 +18,7 @@ namespace Portal.Web
     public Guid ActorId => HttpContext.GetUser()?.Id ?? HttpContext.GetApiKey()?.Id ?? Guid.Empty;
     public Guid Id => HttpContext.GetUser()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The User context item is required.");
     public Guid SessionId => HttpContext.GetSession()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The Session ID is required.");
+
+    public string BaseUrl => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
   }
 }

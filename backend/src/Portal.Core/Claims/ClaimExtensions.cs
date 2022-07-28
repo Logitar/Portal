@@ -69,5 +69,12 @@ namespace Portal.Core.Claims
     {
       return new(type, new DateTimeOffset(moment).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64);
     }
+
+    public static DateTime GetDateTime(this Claim claim)
+    {
+      ArgumentNullException.ThrowIfNull(claim);
+
+      return DateTimeOffset.FromUnixTimeSeconds(long.Parse(claim.Value)).UtcDateTime;
+    }
   }
 }

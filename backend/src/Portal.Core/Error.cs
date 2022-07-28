@@ -1,6 +1,6 @@
-﻿namespace Portal.Infrastructure.Users
+﻿namespace Portal.Core
 {
-  internal class Error
+  public class Error
   {
     public Error(string code, string? description = null)
     {
