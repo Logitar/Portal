@@ -1,0 +1,12 @@
+{
+  "code": "fr",
+  "messages": {
+    "confirmed": "Le/la {target} et le/la {_field_} doivent correspondre.",
+    "email": "Veuillez entrer une adresse courriel valide.",
+    "max": "Le/la {_field_} ne peut excéder plus de {length} caractères.",
+    "min": "Le/la {_field_} doit contenir au moins {length} caractères.",
+    "password": "Le {_field_} doit contenir au moins 1 lettre majuscule, 1 lettre minuscule, 1 chiffre et 1 caractère spécial (ex. : !@/$%&*_+-).",
+    "required": "Le/la {_field_} est requis.",
+    "url": "Veuillez entrer une URL valide. Les URLs valides débutent par http:// ou https://."
+  }
+}

@@ -1,0 +1,17 @@
+﻿@using Portal.Core.ApiKeys.Models;
+
+@model ApiKeyModel
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model?.Name ?? "Create API key";
+}
+
+@if (Model == null)
+{
+  <api-key-edit></api-key-edit>
+}
+else
+{
+  <api-key-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])" x-api-key="@(Context.Request.Query["x-api-key"])"></api-key-edit>
+}

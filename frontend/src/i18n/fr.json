@@ -1,0 +1,15 @@
+{
+  "errorToast": {
+    "body": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard ou contacter notre équipe de support.",
+    "title": "Erreur !"
+  },
+  "home": {
+    "comingSoon": "Bientôt disponible !",
+    "title": "Accueil"
+  },
+  "notFound": {
+    "help": "La page demandée n'a pas été trouvée.",
+    "lead": "Page introuvable",
+    "link": "Aller à l'accueil"
+  }
+}

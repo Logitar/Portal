@@ -1,0 +1,91 @@
+{
+  "create": {
+    "passwordPlaceholder": "Enter a password",
+    "usernamePlaceholder": "Enter a new username"
+  },
+  "created": "The user has been created.",
+  "createdAt": "Created on",
+  "delete": {
+    "confirm": "Do you really want to delete the following user?",
+    "success": "The user has been deleted.",
+    "title": "Delete user"
+  },
+  "editTitle": "Edit user",
+  "email": {
+    "confirmed": "Confirmed",
+    "label": "Email Address",
+    "placeholder": "Enter your email address"
+  },
+  "empty": "This list is empty.",
+  "firstName": {
+    "label": "First Name",
+    "placeholder": "Enter your first name"
+  },
+  "fullName": "Name",
+  "information": {
+    "authentication": "Authentication Information",
+    "personal": "Personal Information"
+  },
+  "lastName": {
+    "label": "Last Name",
+    "placeholder": "Enter your last name"
+  },
+  "newTitle": "Create user",
+  "password": {
+    "changeFailed": "Password change failed!",
+    "changed": "Your password has been changed.",
+    "changedAt": "Last changed at",
+    "confirm": {
+      "label": "Password Confirmation",
+      "placeholder": "Enter the same password again"
+    },
+    "current": {
+      "label": "Current Password",
+      "placeholder": "Enter your current password"
+    },
+    "invalidCredentials": "Please check you provided your correct current password.",
+    "label": "Password",
+    "new": {
+      "label": "New Password",
+      "placeholder": "Enter your new password"
+    },
+    "placeholder": "Enter your password",
+    "submit": "Change password"
+  },
+  "passwordChangedAt": "Password changed on",
+  "phone": {
+    "confirmed": "Confirmed",
+    "label": "Phone Number",
+    "placeholder": "Enter your phone number"
+  },
+  "profile": "Profile",
+  "signIn": {
+    "failed": "Sign in failed!",
+    "invalidCredentials": "Please check you provided the correct email address/username and password.",
+    "recoverPassword": "I forgot my password",
+    "remember": "Remember me",
+    "submit": "Sign in",
+    "title": "Sign In"
+  },
+  "signOut": "Sign Out",
+  "signedInAt": "Last signed-in on",
+  "sort": {
+    "options": {
+      "Email": "Email address",
+      "FirstMiddleLastName": "Name",
+      "LastFirstMiddleName": "Last name, then first and middle names",
+      "PasswordChangedAt": "Password changed on",
+      "PhoneNumber": "Phone number",
+      "SignedInAt": "Signed-in on",
+      "UpdatedAt": "Updated on",
+      "Username": "Username"
+    }
+  },
+  "title": "Users",
+  "updated": "The user has been updated.",
+  "updatedAt": "Last updated on",
+  "username": {
+    "label": "Username",
+    "placeholder": "Enter your username"
+  }
+}

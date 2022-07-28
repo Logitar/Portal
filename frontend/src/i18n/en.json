@@ -1,0 +1,42 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "delete": "Delete",
+    "refresh": "Refresh",
+    "save": "Save"
+  },
+  "count": "Count",
+  "description": {
+    "label": "Description",
+    "placeholder": "Enter a description"
+  },
+  "errorToast": {
+    "body": "An unexpected error occurred. Please try again later or contact our support team.",
+    "title": "Error!"
+  },
+  "name": {
+    "label": "Name",
+    "placeholder": "Enter a name"
+  },
+  "notFound": {
+    "help": "The requested page could not be found.",
+    "lead": "Page Not Found",
+    "link": "Go to Home"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Enter something to search"
+  },
+  "sort": {
+    "desc": "Descending",
+    "label": "Sort",
+    "placeholder": "Select a sort option"
+  },
+  "statusDetail": {
+    "createdAt": "Created on {date}",
+    "updatedAt": "Last updated on {date}"
+  },
+  "success": "Success!",
+  "updatedAt": "Updated on"
+}

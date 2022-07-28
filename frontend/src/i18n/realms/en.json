@@ -1,0 +1,29 @@
+{
+  "alias": {
+    "custom": "Custom",
+    "label": "Alias",
+    "placeholder": "Enter an alias"
+  },
+  "created": "The realm has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following realm?",
+    "success": "The realm has been deleted.",
+    "title": "Delete realm"
+  },
+  "editTitle": "Edit realm",
+  "empty": "This list is empty.",
+  "newTitle": "Create realm",
+  "select": {
+    "label": "Realm",
+    "placeholder": "Select a realm"
+  },
+  "sort": {
+    "options": {
+      "Alias": "Alias",
+      "Name": "Name",
+      "UpdatedAt": "Updated on"
+    }
+  },
+  "title": "Realms",
+  "updated": "The realm has been updated."
+}
