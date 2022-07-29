@@ -55,6 +55,7 @@ namespace Portal.Infrastructure
     {
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
+        .AddScoped<IMessageQuerier, MessageQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
         .AddScoped<ISenderQuerier, SenderQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()

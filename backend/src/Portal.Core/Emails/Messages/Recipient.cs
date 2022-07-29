@@ -5,13 +5,6 @@ namespace Portal.Core.Emails.Messages
 {
   public class Recipient
   {
-    public Recipient(User user, RecipientType type = RecipientType.To)
-      : this(user?.Email!, user?.FullName, type)
-    {
-      User = user ?? throw new ArgumentNullException(nameof(user));
-      UserId = user.Id;
-      Username = user.Username;
-    }
     public Recipient(string address, string? displayName, RecipientType type = RecipientType.To)
     {
       Address = address ?? throw new ArgumentNullException(nameof(address));
@@ -30,6 +23,22 @@ namespace Portal.Core.Emails.Messages
 
     [JsonIgnore]
     public User? User { get; private set; }
+
+    public static Recipient FromUser(User user, RecipientType type = RecipientType.To)
+    {
+      ArgumentNullException.ThrowIfNull(user);
+
+      if (user.Email == null)
+      {
+        throw new ArgumentException($"The {user.Email} is required.", nameof(user));
+      }
+
+      return new Recipient(user.Email, user.FullName, type)
+      {
+        UserId = user.Id,
+        Username = user.Username
+      };
+    }
 
     public override string ToString() => DisplayName == null
       ? Address

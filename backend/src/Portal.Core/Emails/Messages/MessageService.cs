@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using Portal.Core.Emails.Messages.Models;
 using Portal.Core.Emails.Messages.Payloads;
 using Portal.Core.Emails.Senders;
@@ -11,6 +12,8 @@ namespace Portal.Core.Emails.Messages
   internal class MessageService : IMessageService
   {
     private readonly IMessageHandlerFactory _handlerFactory;
+    private readonly IMapper _mapper;
+    private readonly IMessageQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Message> _repository;
     private readonly ISenderQuerier _senderQuerier;
@@ -22,6 +25,8 @@ namespace Portal.Core.Emails.Messages
 
     public MessageService(
       IMessageHandlerFactory handlerFactory,
+      IMapper mapper,
+      IMessageQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<Message> repository,
       ISenderQuerier senderQuerier,
@@ -33,6 +38,8 @@ namespace Portal.Core.Emails.Messages
     )
     {
       _handlerFactory = handlerFactory;
+      _mapper = mapper;
+      _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
       _senderQuerier = senderQuerier;
@@ -43,7 +50,27 @@ namespace Portal.Core.Emails.Messages
       _validator = validator;
     }
 
-    public async Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default)
+    public async Task<MessageModel?> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+      Message? message = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+
+      return _mapper.Map<MessageModel>(message);
+    }
+
+    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+      MessageSort? sort, bool desc,
+      int? index, int? count,
+      CancellationToken cancellationToken)
+    {
+      PagedList<Message> messages = await _querier.GetPagedAsync(hasErrors, realmId, search, succeeded, templateId,
+        sort, desc,
+        index, count,
+        readOnly: true, cancellationToken);
+
+      return ListModel<MessageSummary>.From(messages, _mapper);
+    }
+
+    public async Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
@@ -143,7 +170,7 @@ namespace Portal.Core.Emails.Messages
 
         Recipient recipient = user == null
           ? new(recipientPayload.Address!, recipientPayload.DisplayName, recipientPayload.Type)
-          : new(user);
+          : Recipient.FromUser(user, recipientPayload.Type);
 
         switch (recipientPayload.Type)
         {

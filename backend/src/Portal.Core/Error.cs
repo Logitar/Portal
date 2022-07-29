@@ -1,4 +1,6 @@
-﻿namespace Portal.Core
+﻿using System.Text.Json.Serialization;
+
+namespace Portal.Core
 {
   public class Error
   {
@@ -7,6 +9,8 @@
     {
       ArgumentNullException.ThrowIfNull(exception);
     }
+
+    [JsonConstructor]
     public Error(string code, string? description = null, IReadOnlyDictionary<string, string?>? data = null)
     {
       Code = code ?? throw new ArgumentNullException(nameof(code));
