@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Portal.Core;
 using Portal.Core.ApiKeys;
 using Portal.Core.Realms;
+using Portal.Core.Senders;
 using Portal.Core.Sessions;
 using Portal.Core.Templates;
 using Portal.Core.Users;
@@ -24,6 +25,7 @@ namespace Portal.Infrastructure
     public DbSet<Event> Events { get; private set; } = null!;
     public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
     public DbSet<Realm> Realms { get; private set; } = null!;
+    public DbSet<Sender> Senders { get; private set; } = null!;
     public DbSet<Session> Sessions { get; private set; } = null!;
     public DbSet<Template> Templates { get; private set; } = null!;
     public DbSet<User> Users { get; private set; } = null!;

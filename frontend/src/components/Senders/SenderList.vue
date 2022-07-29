@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1 v-t="'templates.title'" />
+    <h1 v-t="'senders.title'" />
     <div class="my-2">
       <icon-button class="mx-1" icon="sync-alt" :loading="loading" text="actions.refresh" variant="primary" @click="refresh()" />
       <icon-button class="mx-1" :href="createUrl" icon="plus" text="actions.create" variant="success" />
@@ -8,35 +8,49 @@
     <b-row>
       <search-field class="col" v-model="search" />
       <realm-select class="col" v-model="realmId" />
+      <provider-select class="col" v-model="provider" />
+    </b-row>
+    <b-row>
       <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
       <count-select class="col" v-model="count" />
     </b-row>
-    <template v-if="templates.length">
+    <template v-if="senders.length">
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'templates.key.label'" />
-            <th scope="col" v-t="'templates.displayName.label'" />
+            <th scope="col" v-t="'senders.emailAddress.label'" />
+            <th scope="col" v-t="'senders.displayName.label'" />
+            <th scope="col" v-t="'senders.provider.label'" />
             <th scope="col" v-t="'updatedAt'" />
             <th scope="col" />
           </tr>
         </thead>
         <tbody>
-          <tr v-for="template in templates" :key="template.id">
+          <tr v-for="sender in senders" :key="sender.id">
             <td>
-              <b-link :href="`/templates/${template.id}`">{{ template.key }}</b-link>
+              <b-link :href="`/senders/${sender.id}`">{{ sender.emailAddress }}</b-link>
             </td>
-            <td v-text="template.displayName || '—'" />
-            <td>{{ $d(new Date(template.updatedAt || template.createdAt), 'medium') }}</td>
+            <td v-text="sender.displayName || '—'" />
+            <td>{{ $t(`senders.provider.options.${sender.provider}`) }}</td>
+            <td>{{ $d(new Date(sender.updatedAt || sender.createdAt), 'medium') }}</td>
             <td>
-              <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
+              <icon-button v-if="sender.isDefault" class="mx-1" disabled icon="star" text="senders.default" variant="info" />
+              <icon-button v-else class="mx-1" icon="star" :loading="loading" text="senders.default" variant="warning" @click="onSetDefault(sender)" />
+              <icon-button
+                class="mx-1"
+                :disabled="sender.isDefault && senders.length > 1"
+                icon="trash-alt"
+                text="actions.delete"
+                variant="danger"
+                v-b-modal="`delete_${sender.id}`"
+              />
               <delete-modal
-                confirm="templates.delete.confirm"
-                :displayName="template.displayName ? `${template.displayName} (${template.key})` : template.key"
-                :id="`delete_${template.id}`"
+                confirm="senders.delete.confirm"
+                :displayName="sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress"
+                :id="`delete_${sender.id}`"
                 :loading="loading"
-                title="templates.delete.title"
-                @ok="onDelete(template, $event)"
+                title="senders.delete.title"
+                @ok="onDelete(sender, $event)"
               />
             </td>
           </tr>
@@ -44,18 +58,20 @@
       </table>
       <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
     </template>
-    <p v-else v-t="'templates.empty'" />
+    <p v-else v-t="'senders.empty'" />
   </b-container>
 </template>
 
 <script>
+import ProviderSelect from './ProviderSelect.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
-import { deleteTemplate, getTemplates } from '@/api/templates'
+import { deleteSender, getSenders, setDefault } from '@/api/senders'
 import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
-  name: 'TemplateList',
+  name: 'SenderList',
   components: {
+    ProviderSelect,
     RealmSelect
   },
   data() {
@@ -64,19 +80,21 @@ export default {
       desc: false,
       loading: false,
       page: 1,
+      provider: null,
       realmId: null,
       search: null,
       sort: 'DisplayName',
       total: 0,
-      templates: []
+      senders: []
     }
   },
   computed: {
     createUrl() {
-      return '/create-template' + getQueryString({ realm: this.realmId })
+      return '/create-sender' + getQueryString({ provider: this.provider, realm: this.realmId })
     },
     params() {
       return {
+        provider: this.provider,
         realmId: this.realmId,
         search: this.search,
         sort: this.sort,
@@ -87,7 +105,7 @@ export default {
     },
     sortOptions() {
       return this.orderBy(
-        Object.entries(this.$i18n.t('templates.sort.options')).map(([value, text]) => ({ text, value })),
+        Object.entries(this.$i18n.t('senders.sort.options')).map(([value, text]) => ({ text, value })),
         'text'
       )
     }
@@ -98,9 +116,9 @@ export default {
         this.loading = true
         let refresh = false
         try {
-          await deleteTemplate(id)
+          await deleteSender(id)
           refresh = true
-          this.toast('success', 'templates.delete.success')
+          this.toast('success', 'senders.delete.success')
           if (typeof callback === 'function') {
             callback()
           }
@@ -117,12 +135,30 @@ export default {
         callback()
       }
     },
+    async onSetDefault({ id }) {
+      let refresh = false
+      if (!this.loading) {
+        this.loading = true
+        try {
+          await setDefault(id)
+          refresh = true
+          this.toast('success', 'senders.updated')
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+      }
+      if (refresh) {
+        this.refresh()
+      }
+    },
     async refresh(params = null) {
       if (!this.loading) {
         this.loading = true
         try {
-          const { data } = await getTemplates(params ?? this.params)
-          this.templates = data.items
+          const { data } = await getSenders(params ?? this.params)
+          this.senders = data.items
           this.total = data.total
         } catch (e) {
           this.handleError(e)
@@ -140,7 +176,10 @@ export default {
         if (
           newValue?.index &&
           oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
+          (newValue.provider !== oldValue.provider ||
+            newValue.realmId !== oldValue.realmId ||
+            newValue.search !== oldValue.search ||
+            newValue.count !== oldValue.count)
         ) {
           this.page = 1
           await this.refresh()

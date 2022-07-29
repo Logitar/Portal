@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Portal.Core;
 using Portal.Core.ApiKeys;
 using Portal.Core.Realms;
+using Portal.Core.Senders;
 using Portal.Core.Sessions;
 using Portal.Core.Templates;
 using Portal.Core.Tokens;
@@ -38,6 +39,7 @@ namespace Portal.Infrastructure
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
+        .AddScoped<ISenderQuerier, SenderQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()
         .AddScoped<ITemplateQuerier, TemplateQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
@@ -48,6 +50,7 @@ namespace Portal.Infrastructure
       return services
         .AddScoped<IRepository<ApiKey>, Repository<ApiKey>>()
         .AddScoped<IRepository<Realm>, Repository<Realm>>()
+        .AddScoped<IRepository<Sender>, Repository<Sender>>()
         .AddScoped<IRepository<Session>, Repository<Session>>()
         .AddScoped<IRepository<Template>, Repository<Template>>()
         .AddScoped<IRepository<User>, Repository<User>>();

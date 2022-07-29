@@ -71,6 +71,7 @@
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import { deleteUser, getUsers } from '@/api/users'
+import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
   name: 'UserList',
@@ -92,7 +93,7 @@ export default {
   },
   computed: {
     createUrl() {
-      return `/create-user${this.realmId ? `?realm=${this.realmId}` : ''}`
+      return '/create-user' + getQueryString({ realm: this.realmId })
     },
     params() {
       return {
