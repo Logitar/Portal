@@ -138,7 +138,7 @@ namespace Portal.Core.Emails.Messages
 
         IEnumerable<Recipient> recipients = new[] { recipient }.Concat(cc).Concat(bcc);
 
-        var message = new Message(payload.Subject, body, recipients, sender, template, _userContext.ActorId, realm, variables);
+        var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables);
 
         // TODO(fpion): send message
 

@@ -22,7 +22,8 @@
               </template>
               <content-type-select class="col" required v-model="contentType" />
             </b-row>
-            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required v-model="contents" />
+            <form-field id="subject" label="templates.subject.label" :maxLength="256" placeholder="templates.subject.placeholder" required v-model="subject" />
+            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required :rows="20" v-model="contents" />
           </b-tab>
           <b-tab :title="$t('templates.metadata')">
             <name-field id="displayName" label="templates.displayName.label" placeholder="templates.displayName.placeholder" v-model="displayName" />
@@ -70,6 +71,7 @@ export default {
       key: null,
       loading: false,
       realmId: null,
+      subject: null,
       template: null
     }
   },
@@ -79,6 +81,7 @@ export default {
         (!this.template && this.realmId) ||
         (!this.template && this.key) ||
         (this.contentType ?? '') !== (this.template?.contentType ?? '') ||
+        (this.subject ?? '') !== (this.template?.subject ?? '') ||
         (this.contents ?? '') !== (this.template?.contents ?? '') ||
         (this.displayName ?? '') !== (this.template?.displayName ?? '') ||
         (this.description ?? '') !== (this.template?.description ?? '')
@@ -86,6 +89,7 @@ export default {
     },
     payload() {
       const payload = {
+        subject: this.subject,
         contentType: this.contentType,
         contents: this.contents,
         displayName: this.displayName,
@@ -107,6 +111,7 @@ export default {
       this.displayName = template.displayName
       this.key = template.key
       this.realmId = template.realm?.id ?? null
+      this.subject = template.subject
     },
     async submit() {
       if (!this.loading) {

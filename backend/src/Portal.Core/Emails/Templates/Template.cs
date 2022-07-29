@@ -27,6 +27,7 @@ namespace Portal.Core.Emails.Templates
       private set { /* EntityFrameworkCore only setter */ }
     }
 
+    public string Subject { get; private set; } = null!;
     public string ContentType { get; private set; } = null!;
     public string Contents { get; private set; } = null!;
 
@@ -52,6 +53,7 @@ namespace Portal.Core.Emails.Templates
 
     private void Apply(SaveTemplatePayload payload)
     {
+      Subject = payload.Subject.Trim();
       ContentType = payload.ContentType;
       Contents = payload.Contents.Trim();
 

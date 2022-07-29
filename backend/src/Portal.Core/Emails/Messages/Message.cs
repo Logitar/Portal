@@ -8,23 +8,22 @@ namespace Portal.Core.Emails.Messages
 {
   public class Message : Aggregate
   {
-    public Message(string subject, string body, IEnumerable<Recipient> recipients, Sender sender,
+    public Message(string body, IEnumerable<Recipient> recipients, Sender sender,
       Template template, Guid userId, Realm? realm = null, Dictionary<string, string?>? variables = null)
     {
       ArgumentNullException.ThrowIfNull(sender);
       ArgumentNullException.ThrowIfNull(template);
 
-      ApplyChange(new CreatedEvent(subject, body, recipients,
+      ApplyChange(new CreatedEvent(body, recipients,
         realm?.Id, realm?.Alias, realm?.Name,
         sender.Id, sender.IsDefault, sender.Provider, sender.EmailAddress, sender.DisplayName,
-        template.Id, template.Key, template.ContentType, template.DisplayName,
+        template.Id, template.Key, template.Subject, template.ContentType, template.DisplayName,
         variables, userId));
     }
     private Message()
     {
     }
 
-    public string Subject { get; private set; } = null!;
     public string Body { get; private set; } = null!;
 
     public IEnumerable<Recipient> Recipients { get; private set; } = null!;
@@ -46,12 +45,12 @@ namespace Portal.Core.Emails.Messages
 
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; } = null!;
+    public string TemplateSubject { get; private set; } = null!;
     public string TemplateContentType { get; private set; } = null!;
     public string? TemplateDisplayName { get; private set; }
 
     protected virtual void Apply(CreatedEvent @event)
     {
-      Subject = @event.Subject.Trim();
       Body = @event.Body.Trim();
 
       Recipients = @event.Recipients;
@@ -68,10 +67,11 @@ namespace Portal.Core.Emails.Messages
 
       TemplateId = @event.TemplateId;
       TemplateKey = @event.TemplateKey;
+      TemplateSubject = @event.TemplateSubject;
       TemplateContentType = @event.TemplateContentType;
       TemplateDisplayName = @event.TemplateDisplayName;
     }
 
-    public override string ToString() => $"{Subject} | {base.ToString()}";
+    public override string ToString() => $"{TemplateSubject} | {base.ToString()}";
   }
 }

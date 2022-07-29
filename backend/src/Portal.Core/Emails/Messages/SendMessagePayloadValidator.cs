@@ -10,10 +10,6 @@ namespace Portal.Core.Emails.Messages
       RuleFor(x => x.Template)
         .NotEmpty();
 
-      RuleFor(x => x.Subject)
-        .NotEmpty()
-        .MaximumLength(256);
-
       RuleFor(x => x.Recipients)
         .Must(x => x.Any(y => y.Type == RecipientType.To));
       RuleForEach(x => x.Recipients)

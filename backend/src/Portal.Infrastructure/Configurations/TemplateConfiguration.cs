@@ -19,6 +19,7 @@ namespace Portal.Infrastructure.Configurations
       builder.Property(x => x.DisplayName).HasMaxLength(256);
       builder.Property(x => x.Key).HasMaxLength(256);
       builder.Property(x => x.KeyNormalized).HasMaxLength(256);
+      builder.Property(x => x.Subject).HasMaxLength(256);
     }
   }
 }

@@ -4,10 +4,10 @@ namespace Portal.Core.Emails.Messages.Events
 {
   public class CreatedEvent : CreatedEventBase
   {
-    public CreatedEvent(string subject, string body, IEnumerable<Recipient> recipients,
+    public CreatedEvent(string body, IEnumerable<Recipient> recipients,
       Guid? realmId, string? realmAlias, string? realmName,
       Guid senderId, bool senderIsDefault, ProviderType senderProvider, string senderAddress, string? senderDisplayName,
-      Guid templateId, string templateKey, string templateContentType, string? templateDisplayName,
+      Guid templateId, string templateKey, string templateSubject, string templateContentType, string? templateDisplayName,
       Dictionary<string, string?>? variables, Guid userId) : base(userId)
     {
       Body = body ?? throw new ArgumentNullException(nameof(body));
@@ -20,11 +20,11 @@ namespace Portal.Core.Emails.Messages.Events
       SenderId = senderId;
       SenderIsDefault = senderIsDefault;
       SenderProvider = senderProvider;
-      Subject = subject ?? throw new ArgumentNullException(nameof(subject));
       TemplateContentType = templateContentType ?? throw new ArgumentNullException(nameof(templateContentType));
       TemplateDisplayName = templateDisplayName;
       TemplateId = templateId;
       TemplateKey = templateKey ?? throw new ArgumentNullException(nameof(templateKey));
+      TemplateSubject = templateSubject ?? throw new ArgumentNullException(nameof(templateSubject));
       Variables = variables;
     }
 
@@ -38,9 +38,9 @@ namespace Portal.Core.Emails.Messages.Events
     public Guid SenderId { get; private set; }
     public bool SenderIsDefault { get; private set; }
     public ProviderType SenderProvider { get; private set; }
-    public string Subject { get; private set; }
     public string TemplateContentType { get; private set; }
     public string? TemplateDisplayName { get; private set; }
+    public string TemplateSubject { get; private set; }
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; }
     public Dictionary<string, string?>? Variables { get; private set; }

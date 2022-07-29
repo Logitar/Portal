@@ -9,7 +9,7 @@
   },
   "contents": {
     "label": "Contents",
-    "placeholder": "Enter the template contents; Razor syntax is supported"
+    "placeholder": "Enter the contents of the message; Razor syntax is supported"
   },
   "created": "The template has been created.",
   "delete": {
@@ -36,6 +36,10 @@
       "Key": "Key",
       "UpdatedAt": "Updated on"
     }
+  },
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter the subject of the message"
   },
   "template": "Template",
   "title": "Templates",

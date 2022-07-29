@@ -8,6 +8,7 @@ namespace Portal.Core.Emails.Templates.Models
 
     public string Key { get; set; } = null!;
 
+    public string Subject { get; set; } = null!;
     public string ContentType { get; set; } = null!;
     public string Contents { get; set; } = null!;
 

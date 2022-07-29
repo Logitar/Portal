@@ -6,7 +6,6 @@
     public string Template { get; set; } = null!;
     public Guid? SenderId { get; set; }
 
-    public string Subject { get; set; } = null!;
     public IEnumerable<RecipientPayload> Recipients { get; set; } = null!;
 
     public IEnumerable<VariablePayload>? Variables { get; set; }
