@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Portal.Core.Senders;
+using Portal.Core.Emails.Senders;
 
 namespace Portal.Infrastructure.Configurations
 {

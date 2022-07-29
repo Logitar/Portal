@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Portal.Core;
+using Portal.Core.Emails.Senders;
 using Portal.Core.Realms;
-using Portal.Core.Senders;
 
 namespace Portal.Infrastructure.Queriers
 {

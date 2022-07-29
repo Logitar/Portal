@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Portal.Core;
 using Portal.Core.ApiKeys;
+using Portal.Core.Emails.Senders;
+using Portal.Core.Emails.Templates;
 using Portal.Core.Realms;
-using Portal.Core.Senders;
 using Portal.Core.Sessions;
-using Portal.Core.Templates;
 using Portal.Core.Users;
 using Portal.Infrastructure.Entities;
 
