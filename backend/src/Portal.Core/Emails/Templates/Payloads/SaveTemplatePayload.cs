@@ -2,6 +2,7 @@
 {
   public abstract class SaveTemplatePayload
   {
+    public string ContentType { get; set; } = null!;
     public string Contents { get; set; } = null!;
 
     public string? DisplayName { get; set; }
