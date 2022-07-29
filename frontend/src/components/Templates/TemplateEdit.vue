@@ -97,7 +97,7 @@ export default {
       this.description = template.description
       this.displayName = template.displayName
       this.key = template.key
-      this.realmId = template.realm?.id
+      this.realmId = template.realm?.id ?? null
     },
     async submit() {
       if (!this.loading) {

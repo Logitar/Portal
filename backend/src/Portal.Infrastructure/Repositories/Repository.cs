@@ -16,12 +16,30 @@ namespace Portal.Infrastructure.Repositories
     {
       ArgumentNullException.ThrowIfNull(aggregate);
 
+      Save(aggregate);
+
+      await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SaveAsync(IEnumerable<T> aggregates, CancellationToken cancellationToken = default)
+    {
+      ArgumentNullException.ThrowIfNull(aggregates);
+
+      foreach (T aggregate in aggregates)
+      {
+        Save(aggregate);
+      }
+
+      await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private void Save(T aggregate)
+    {
       if (aggregate.HasChanges)
       {
         IEnumerable<Event> events = Event.FromChanges(aggregate);
 
         _dbContext.Events.AddRange(events);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         aggregate.ClearChanges();
       }
@@ -38,8 +56,6 @@ namespace Portal.Infrastructure.Repositories
       {
         _dbContext.Add(aggregate);
       }
-
-      await _dbContext.SaveChangesAsync(cancellationToken);
     }
   }
 }

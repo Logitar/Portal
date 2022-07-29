@@ -1,12 +1,19 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Portal.Web
 {
   internal static class ModelSerializer
   {
-    public static string? Serialize<T>(T model) => JsonSerializer.Serialize(model, new JsonSerializerOptions
+    private static readonly JsonSerializerOptions _options;
+
+    static ModelSerializer()
     {
-      PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    });
+      _options = new JsonSerializerOptions();
+      _options.Converters.Add(new JsonStringEnumConverter());
+      _options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    }
+
+    public static string? Serialize<T>(T model) => JsonSerializer.Serialize(model, _options);
   }
 }

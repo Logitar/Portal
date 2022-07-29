@@ -8,6 +8,8 @@ export default {
   Profile: () => import(/* webpackChunkName: "profile" */ './Account/Profile.vue'),
   RealmEdit: () => import(/* webpackChunkName: "realmEdit" */ './Realms/RealmEdit.vue'),
   RealmList: () => import(/* webpackChunkName: "realmList" */ './Realms/RealmList.vue'),
+  SenderEdit: () => import(/* webpackChunkName: "senderEdit" */ './Senders/SenderEdit.vue'),
+  SenderList: () => import(/* webpackChunkName: "senderList" */ './Senders/SenderList.vue'),
   SignIn: () => import(/* webpackChunkName: "signIn" */ './Account/SignIn.vue'),
   TemplateEdit: () => import(/* webpackChunkName: "templateEdit" */ './Templates/TemplateEdit.vue'),
   TemplateList: () => import(/* webpackChunkName: "templateList" */ './Templates/TemplateList.vue'),

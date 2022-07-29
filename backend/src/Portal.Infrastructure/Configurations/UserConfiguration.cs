@@ -10,8 +10,6 @@ namespace Portal.Infrastructure.Configurations
     {
       base.Configure(builder);
 
-      builder.ToTable("Users");
-
       builder.HasIndex(x => x.Email);
       builder.HasIndex(x => x.FirstName);
       builder.HasIndex(x => x.LastName);

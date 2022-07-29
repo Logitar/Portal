@@ -1,9 +1,9 @@
 <template>
   <form-field
-    id="email"
-    label="user.email.label"
+    :id="id"
+    :label="label"
     :maxLength="validate ? 256 : null"
-    placeholder="user.email.placeholder"
+    :placeholder="placeholder"
     :required="required"
     :rules="{ email: validate }"
     type="email"
@@ -16,6 +16,18 @@
 export default {
   name: 'EmailField',
   props: {
+    id: {
+      type: String,
+      default: 'email'
+    },
+    label: {
+      type: String,
+      default: 'user.email.label'
+    },
+    placeholder: {
+      type: String,
+      default: 'user.email.placeholder'
+    },
     required: {
       type: Boolean,
       default: false
