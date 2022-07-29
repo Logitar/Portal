@@ -14,11 +14,10 @@ namespace Portal.Core.Emails.Messages
       ArgumentNullException.ThrowIfNull(sender);
       ArgumentNullException.ThrowIfNull(template);
 
-      ApplyChange(new CreatedEvent(subject, body, string.Empty, // template.ContentType, // TODO(fpion): implement
-        recipients,
+      ApplyChange(new CreatedEvent(subject, body, recipients,
         realm?.Id, realm?.Alias, realm?.Name,
         sender.Id, sender.IsDefault, sender.Provider, sender.EmailAddress, sender.DisplayName,
-        template.Id, template.Key, template.DisplayName,
+        template.Id, template.Key, template.ContentType, template.DisplayName,
         variables, userId));
     }
     private Message()
@@ -27,7 +26,6 @@ namespace Portal.Core.Emails.Messages
 
     public string Subject { get; private set; } = null!;
     public string Body { get; private set; } = null!;
-    public string ContentType { get; private set; } = null!;
 
     public IEnumerable<Recipient> Recipients { get; private set; } = null!;
     public string RecipientsSerialized
@@ -48,13 +46,13 @@ namespace Portal.Core.Emails.Messages
 
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; } = null!;
+    public string TemplateContentType { get; private set; } = null!;
     public string? TemplateDisplayName { get; private set; }
 
     protected virtual void Apply(CreatedEvent @event)
     {
       Subject = @event.Subject.Trim();
       Body = @event.Body.Trim();
-      ContentType = @event.ContentType;
 
       Recipients = @event.Recipients;
 
@@ -70,6 +68,7 @@ namespace Portal.Core.Emails.Messages
 
       TemplateId = @event.TemplateId;
       TemplateKey = @event.TemplateKey;
+      TemplateContentType = @event.TemplateContentType;
       TemplateDisplayName = @event.TemplateDisplayName;
     }
 

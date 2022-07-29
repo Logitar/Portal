@@ -4,15 +4,13 @@ namespace Portal.Core.Emails.Messages.Events
 {
   public class CreatedEvent : CreatedEventBase
   {
-    public CreatedEvent(string subject, string body, string contentType,
-      IEnumerable<Recipient> recipients,
+    public CreatedEvent(string subject, string body, IEnumerable<Recipient> recipients,
       Guid? realmId, string? realmAlias, string? realmName,
       Guid senderId, bool senderIsDefault, ProviderType senderProvider, string senderAddress, string? senderDisplayName,
-      Guid templateId, string templateKey, string? templateDisplayName,
+      Guid templateId, string templateKey, string templateContentType, string? templateDisplayName,
       Dictionary<string, string?>? variables, Guid userId) : base(userId)
     {
       Body = body ?? throw new ArgumentNullException(nameof(body));
-      ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
       RealmAlias = realmAlias;
       RealmId = realmId;
       RealmName = realmName;
@@ -23,6 +21,7 @@ namespace Portal.Core.Emails.Messages.Events
       SenderIsDefault = senderIsDefault;
       SenderProvider = senderProvider;
       Subject = subject ?? throw new ArgumentNullException(nameof(subject));
+      TemplateContentType = templateContentType ?? throw new ArgumentNullException(nameof(templateContentType));
       TemplateDisplayName = templateDisplayName;
       TemplateId = templateId;
       TemplateKey = templateKey ?? throw new ArgumentNullException(nameof(templateKey));
@@ -30,7 +29,6 @@ namespace Portal.Core.Emails.Messages.Events
     }
 
     public string Body { get; private set; }
-    public string ContentType { get; private set; }
     public string? RealmAlias { get; private set; }
     public Guid? RealmId { get; private set; }
     public string? RealmName { get; private set; }
@@ -41,6 +39,7 @@ namespace Portal.Core.Emails.Messages.Events
     public bool SenderIsDefault { get; private set; }
     public ProviderType SenderProvider { get; private set; }
     public string Subject { get; private set; }
+    public string TemplateContentType { get; private set; }
     public string? TemplateDisplayName { get; private set; }
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; }
