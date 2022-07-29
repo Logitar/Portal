@@ -31,7 +31,7 @@ namespace Portal.Core.Emails.Senders
     public string? SettingsSerialized
     {
       get => Settings.Any() ? JsonSerializer.Serialize(Settings) : null;
-      set
+      private set
       {
         Settings.Clear();
 

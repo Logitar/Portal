@@ -32,6 +32,16 @@ namespace Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
+    public async Task<IEnumerable<User>> GetAsync(IEnumerable<Guid> ids, bool readOnly = false, CancellationToken cancellationToken = default)
+    {
+      ArgumentNullException.ThrowIfNull(ids);
+
+      return await _users.ApplyTracking(readOnly)
+        .Include(x => x.Realm)
+        .Where(x => ids.Contains(x.Id))
+        .ToArrayAsync(cancellationToken);
+    }
+
     public async Task<PagedList<User>> GetPagedAsync(Guid? realmId, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
