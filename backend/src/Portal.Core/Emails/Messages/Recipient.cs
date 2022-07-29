@@ -11,7 +11,6 @@ namespace Portal.Core.Emails.Messages
       User = user ?? throw new ArgumentNullException(nameof(user));
       UserId = user.Id;
       Username = user.Username;
-      Locale = user.Locale;
     }
     public Recipient(string address, string? displayName, RecipientType type = RecipientType.To)
     {
@@ -28,7 +27,6 @@ namespace Portal.Core.Emails.Messages
 
     public Guid? UserId { get; private set; }
     public string? Username { get; private set; }
-    public string? Locale { get; private set; }
 
     [JsonIgnore]
     public User? User { get; private set; }

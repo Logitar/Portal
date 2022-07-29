@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Portal.Core.Emails.Messages.Models;
 using Portal.Core.Emails.Messages.Payloads;
 using Portal.Core.Emails.Senders;
 using Portal.Core.Emails.Templates;
@@ -9,6 +10,7 @@ namespace Portal.Core.Emails.Messages
 {
   internal class MessageService : IMessageService
   {
+    private readonly IMessageHandlerFactory _handlerFactory;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Message> _repository;
     private readonly ISenderQuerier _senderQuerier;
@@ -19,6 +21,7 @@ namespace Portal.Core.Emails.Messages
     private readonly IValidator<SendMessagePayload> _validator;
 
     public MessageService(
+      IMessageHandlerFactory handlerFactory,
       IRealmQuerier realmQuerier,
       IRepository<Message> repository,
       ISenderQuerier senderQuerier,
@@ -29,6 +32,7 @@ namespace Portal.Core.Emails.Messages
       IValidator<SendMessagePayload> validator
     )
     {
+      _handlerFactory = handlerFactory;
       _realmQuerier = realmQuerier;
       _repository = repository;
       _senderQuerier = senderQuerier;
@@ -39,12 +43,13 @@ namespace Portal.Core.Emails.Messages
       _validator = validator;
     }
 
-    public async Task SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default)
+    public async Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
       _validator.ValidateAndThrow(payload);
 
+      /* ---------------------------------------- Realm ----------------------------------------- */
       Realm? realm = null;
       if (payload.Realm != null)
       {
@@ -54,15 +59,17 @@ namespace Portal.Core.Emails.Messages
         ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
+      /* -------------------------------------- Template ---------------------------------------- */
       Template template = (Guid.TryParse(payload.Template, out Guid templateId)
         ? await _templateQuerier.GetAsync(templateId, readOnly: true, cancellationToken)
         : await _templateQuerier.GetAsync(key: payload.Template, realm, readOnly: true, cancellationToken)
       ) ?? throw new EntityNotFoundException<Template>(payload.Template, nameof(payload.Template));
       if (realm?.Sid != template.RealmSid)
       {
-        throw new NotImplementedException(); // TODO(fpion): implement
+        throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
       }
 
+      /* --------------------------------------- Sender ----------------------------------------- */
       Sender sender;
       if (payload.SenderId.HasValue)
       {
@@ -76,30 +83,62 @@ namespace Portal.Core.Emails.Messages
       }
       if (realm?.Sid != sender.RealmSid)
       {
-        throw new NotImplementedException(); // TODO(fpion): implement
+        throw new SenderNotInRealmException(sender, realm, nameof(payload.SenderId));
       }
+      IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
-      IEnumerable<Guid> userIds = payload.Recipients.Where(x => x.UserId.HasValue).Select(x => x.UserId!.Value);
-      Dictionary<Guid, User> users = (await _userQuerier.GetAsync(userIds, readOnly: true, cancellationToken))
+      /* ------------------------------------- Recipients --------------------------------------- */
+      var userIds = new List<Guid>(capacity: payload.Recipients.Count());
+      var usernames = new List<string>(userIds.Capacity);
+      foreach (RecipientPayload recipient in payload.Recipients)
+      {
+        if (recipient.User != null)
+        {
+          if (Guid.TryParse(recipient.User, out Guid userId))
+          {
+            userIds.Add(userId);
+          }
+          else
+          {
+            usernames.Add(recipient.User);
+          }
+        }
+      }
+      
+      Dictionary<Guid, User> usersById = (await _userQuerier.GetAsync(userIds, readOnly: true, cancellationToken))
         .ToDictionary(x => x.Id, x => x);
+      Dictionary<string, User> usersByUsername = (await _userQuerier.GetAsync(usernames, realm, readOnly: true, cancellationToken))
+        .ToDictionary(x => x.UsernameNormalized, x => x);
 
-      var missingUsers = new List<Guid>(capacity: payload.Recipients.Count());
-      var to = new List<Recipient>(capacity: missingUsers.Count);
-      var cc = new List<Recipient>(capacity: missingUsers.Count);
-      var bcc = new List<Recipient>(capacity: missingUsers.Count);
+      var missingUsers = new List<string>(userIds.Capacity);
+      var notInRealm = new List<Guid>(userIds.Capacity);
+      var to = new List<Recipient>(userIds.Capacity);
+      var cc = new List<Recipient>(userIds.Capacity);
+      var bcc = new List<Recipient>(userIds.Capacity);
       foreach (RecipientPayload recipientPayload in payload.Recipients)
       {
         User? user = null;
-        if (recipientPayload.UserId.HasValue && (!users.TryGetValue(recipientPayload.UserId.Value, out user)))
+        if (recipientPayload.User != null)
         {
-          missingUsers.Add(recipientPayload.UserId.Value);
+          if (Guid.TryParse(recipientPayload.User, out Guid userId))
+          {
+            usersById.TryGetValue(userId, out user);
+          }
+          else
+          {
+            usersByUsername.TryGetValue(recipientPayload.User.ToUpper(), out user);
+          }
 
-          continue;
-        }
-
-        if (user != null && realm?.Sid != user.RealmSid)
-        {
-          throw new NotImplementedException(); // TODO(fpion): implement
+          if (user == null)
+          {
+            missingUsers.Add(recipientPayload.User);
+            continue;
+          }
+          else if (realm?.Sid != user.RealmSid)
+          {
+            notInRealm.Add(user.Id);
+            continue;
+          }
         }
 
         Recipient recipient = user == null
@@ -125,7 +164,12 @@ namespace Portal.Core.Emails.Messages
       {
         throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
       }
+      if (notInRealm.Any())
+      {
+        throw new UsersNotInRealmException(notInRealm, realm, nameof(payload.Recipients));
+      }
 
+      /* -------------------------------------- Messages ---------------------------------------- */
       Dictionary<string, string?>? variables = payload.Variables
         ?.GroupBy(x => x.Key)
         .ToDictionary(x => x.Key, x => x.FirstOrDefault(y => y.Value != null)?.Value);
@@ -140,14 +184,26 @@ namespace Portal.Core.Emails.Messages
 
         var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables);
 
-        // TODO(fpion): send message
+        try
+        {
+          SendMessageResult result = await handler.SendAsync(message, cancellationToken);
+          message.Succeed(result, _userContext.Id);
+        }
+        catch (ErrorException exception)
+        {
+          message.Fail(exception.Error, _userContext.Id);
+        }
+        catch (Exception exception)
+        {
+          message.Fail(new Error(exception), _userContext.Id);
+        }
 
         messages.Add(message);
       }
 
       await _repository.SaveAsync(messages, cancellationToken);
 
-      // TODO(fpion): response; differentiate success/failures
+      return new SentMessagesModel(messages);
     }
   }
 }

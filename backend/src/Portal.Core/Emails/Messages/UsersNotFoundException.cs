@@ -5,22 +5,22 @@ namespace Portal.Core.Emails.Messages
 {
   internal class UsersNotFoundException : ApiException
   {
-    public UsersNotFoundException(IEnumerable<Guid> ids, string paramName)
+    public UsersNotFoundException(IEnumerable<string> ids, string paramName)
       : base(HttpStatusCode.NotFound, GetMessage(ids, paramName))
     {
       Ids = ids ?? throw new ArgumentNullException(nameof(ids));
       ParamName = paramName ?? throw new ArgumentNullException(nameof(paramName));
 
-      Value = new Dictionary<string, IEnumerable<Guid>>
+      Value = new Dictionary<string, object?>
       {
         [paramName] = ids
       };
     }
 
-    public IEnumerable<Guid> Ids { get; }
+    public IEnumerable<string> Ids { get; }
     public string ParamName { get; }
 
-    private static string GetMessage(IEnumerable<Guid> ids, string paramName)
+    private static string GetMessage(IEnumerable<string> ids, string paramName)
     {
       var message = new StringBuilder();
 

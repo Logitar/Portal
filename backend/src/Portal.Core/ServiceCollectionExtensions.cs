@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Portal.Core.Accounts;
 using Portal.Core.ApiKeys;
 using Portal.Core.Configurations;
+using Portal.Core.Emails.Messages;
 using Portal.Core.Emails.Senders;
 using Portal.Core.Emails.Templates;
 using Portal.Core.Realms;
@@ -27,9 +28,17 @@ namespace Portal.Core
         .AddAutoMapper(assembly)
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
         .AddSingleton(userSettings)
+        .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
+        .AddDomainServices();
+    }
+
+    private static IServiceCollection AddDomainServices(this IServiceCollection services)
+    {
+      return services
         .AddScoped<IAccountService, AccountService>()
         .AddScoped<IApiKeyService, ApiKeyService>()
         .AddScoped<IConfigurationService, ConfigurationService>()
+        .AddScoped<IMessageService, MessageService>()
         .AddScoped<IRealmService, RealmService>()
         .AddScoped<ISenderService, SenderService>()
         .AddScoped<ITemplateService, TemplateService>()

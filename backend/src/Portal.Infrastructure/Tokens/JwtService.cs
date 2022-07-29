@@ -97,10 +97,7 @@ namespace Portal.Infrastructure.Tokens
       }
       catch (SecurityTokenException exception)
       {
-        return ValidateTokenResult.Failed(new Error(
-          code: exception.GetType().Name.Replace("Exception", string.Empty),
-          description: exception.Message
-        ));
+        return ValidateTokenResult.Failed(new Error(exception));
       }
     }
   }

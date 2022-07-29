@@ -26,7 +26,7 @@ namespace Portal.Core.Emails.Messages
 
     public string Body { get; private set; } = null!;
 
-    public IEnumerable<Recipient> Recipients { get; private set; } = null!;
+    public IEnumerable<Recipient> Recipients { get; private set; } = Enumerable.Empty<Recipient>();
     public string RecipientsSerialized
     {
       get => JsonSerializer.Serialize(Recipients);
@@ -49,6 +49,46 @@ namespace Portal.Core.Emails.Messages
     public string TemplateContentType { get; private set; } = null!;
     public string? TemplateDisplayName { get; private set; }
 
+    public IEnumerable<Error> Errors { get; private set; } = Enumerable.Empty<Error>();
+    public string? ErrorsSerialized
+    {
+      get => Errors.Any() ? JsonSerializer.Serialize(Errors) : null;
+      private set => Errors = (value == null ? null : JsonSerializer.Deserialize<IEnumerable<Error>>(value)) ?? Enumerable.Empty<Error>();
+    }
+    public bool HasErrors
+    {
+      get => Errors.Any();
+      private set { /* EntityFrameworkCore only setter */ }
+    }
+
+    public SendMessageResult? Result { get; private set; }
+    public string? ResultSerialized
+    {
+      get => Result?.Any() == true ? JsonSerializer.Serialize(Result) : null;
+      private set => Result = value == null ? null : JsonSerializer.Deserialize<SendMessageResult>(value);
+    }
+    public bool Succeeded
+    {
+      get => !HasErrors && Result != null;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
+
+    public Dictionary<string, string?>? Variables { get; private set; }
+    public string? VariablesSerialized
+    {
+      get => Variables?.Any() == true ? JsonSerializer.Serialize(Variables) : null;
+      private set => Variables = value == null ? null : JsonSerializer.Deserialize<Dictionary<string, string?>>(value);
+    }
+
+    public void Fail(Error error, Guid userId)
+    {
+      ApplyChange(new FailedEvent(new[] { error }, userId));
+    }
+    public void Succeed(SendMessageResult result, Guid userId)
+    {
+      ApplyChange(new SucceededEvent(result, userId));
+    }
+
     protected virtual void Apply(CreatedEvent @event)
     {
       Body = @event.Body.Trim();
@@ -70,6 +110,16 @@ namespace Portal.Core.Emails.Messages
       TemplateSubject = @event.TemplateSubject;
       TemplateContentType = @event.TemplateContentType;
       TemplateDisplayName = @event.TemplateDisplayName;
+
+      Variables = @event.Variables;
+    }
+    protected virtual void Apply(FailedEvent @event)
+    {
+      Errors = @event.Errors;
+    }
+    protected virtual void Apply(SucceededEvent @event)
+    {
+      Result = @event.Result;
     }
 
     public override string ToString() => $"{TemplateSubject} | {base.ToString()}";

@@ -11,7 +11,7 @@ namespace Portal.Core.Emails.Senders
       ActorId = actorId;
       Id = id;
 
-      Value = new { code = "CannotDeleteDefaultSender" };
+      Value = new { code = nameof(CannotDeleteDefaultSenderException).Remove(nameof(Exception)) };
     }
 
     public Guid ActorId { get; }

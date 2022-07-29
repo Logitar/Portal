@@ -25,6 +25,18 @@ namespace Portal.Infrastructure.Queriers
         : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.UsernameNormalized == username, cancellationToken);
     }
 
+    public async Task<IEnumerable<User>> GetAsync(IEnumerable<string> usernames, Realm? realm, bool readOnly, CancellationToken cancellationToken)
+    {
+      usernames = usernames?.Select(x => x.ToUpper()) ?? throw new ArgumentNullException(nameof(usernames));
+
+      IQueryable<User> query = _users.ApplyTracking(readOnly).Include(x => x.Realm);
+
+      return await (realm == null
+        ? query.Where(x => x.RealmSid == null && usernames.Contains(x.UsernameNormalized))
+        : query.Where(x => x.RealmSid == realm.Sid && usernames.Contains(x.UsernameNormalized))
+      ).ToArrayAsync(cancellationToken);
+    }
+
     public async Task<User?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
     {
       return await _users.ApplyTracking(readOnly)
@@ -32,7 +44,7 @@ namespace Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<User>> GetAsync(IEnumerable<Guid> ids, bool readOnly = false, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<User>> GetAsync(IEnumerable<Guid> ids, bool readOnly, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(ids);
 

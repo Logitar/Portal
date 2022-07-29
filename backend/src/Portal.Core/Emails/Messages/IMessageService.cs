@@ -1,9 +1,10 @@
-﻿using Portal.Core.Emails.Messages.Payloads;
+﻿using Portal.Core.Emails.Messages.Models;
+using Portal.Core.Emails.Messages.Payloads;
 
 namespace Portal.Core.Emails.Messages
 {
   public interface IMessageService
   {
-    Task SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default);
+    Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default);
   }
 }

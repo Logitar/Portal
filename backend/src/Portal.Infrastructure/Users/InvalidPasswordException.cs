@@ -14,7 +14,7 @@ namespace Portal.Infrastructure.Users
 
       Value = new
       {
-        code = "InvalidPassword",
+        code = nameof(InvalidPasswordException).Remove(nameof(Exception)),
         errors
       };
     }

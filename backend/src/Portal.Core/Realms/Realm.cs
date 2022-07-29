@@ -24,7 +24,7 @@ namespace Portal.Core.Realms
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
 
-    public ICollection<User> Users { get; private set; } = new List<User>();
+    public List<User> Users { get; private set; } = new();
 
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
     public void Update(UpdateRealmPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));

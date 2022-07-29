@@ -9,20 +9,14 @@ namespace Portal.Core.Emails.Messages
     {
       When(x => x.Type == RecipientType.To, () =>
       {
-        RuleFor(x => x.UserId).NotNull();
+        RuleFor(x => x.User).NotEmpty();
         RuleFor(x => x.Address).Null();
         RuleFor(x => x.DisplayName).Null();
       });
 
       When(x => x.Type != RecipientType.To, () =>
       {
-        When(x => x.UserId.HasValue, () =>
-        {
-          RuleFor(x => x.Address).Null();
-          RuleFor(x => x.DisplayName).Null();
-        });
-
-        When(x => !x.UserId.HasValue, () =>
+        When(x => x.User == null, () =>
         {
           RuleFor(x => x.Address)
             .NotEmpty()
@@ -31,6 +25,12 @@ namespace Portal.Core.Emails.Messages
 
           RuleFor(x => x.DisplayName)
             .MaximumLength(256);
+        });
+
+        When(x => x.User != null, () =>
+        {
+          RuleFor(x => x.Address).Null();
+          RuleFor(x => x.DisplayName).Null();
         });
       });
     }
