@@ -24,7 +24,7 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div v-if="!apiKey || !apiKey.isExpired" class="my-2">
-          <icon-submit v-if="!!apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <form-datetime v-if="!apiKey" id="expiresAt" label="apiKeys.expiresAt" :minDate="new Date()" validate v-model="expiresAt" />
@@ -67,7 +67,7 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.apiKey && !!this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
+        (!this.apiKey && this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
       )
     },
     payload() {

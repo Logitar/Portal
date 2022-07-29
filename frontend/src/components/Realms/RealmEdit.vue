@@ -5,10 +5,10 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">
-          <icon-submit v-if="!!realm" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="realm" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <alias-field v-if="!!realm" disabled :value="alias" />
+        <alias-field v-if="realm" disabled :value="alias" />
         <alias-field v-else :name="name" required validate v-model="alias" />
         <name-field required v-model="name" />
         <description-field :rows="15" v-model="description" />

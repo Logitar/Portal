@@ -5,25 +5,28 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">
-          <icon-submit v-if="!!template" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="template" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('templates.template')">
-            <b-row v-if="!!template">
-              <realm-select v-if="!!realmId" class="col" disabled :value="realmId" />
-              <p v-else class="col" v-t="'templates.noRealm'" />
-              <key-field class="col" disabled :value="key" />
+            <p v-if="template && !realmId" v-t="'templates.noRealm'" />
+            <b-row>
+              <template v-if="template">
+                <realm-select v-if="realmId" class="col" disabled :value="realmId" />
+                <key-field class="col" disabled :value="key" />
+              </template>
+              <template v-else>
+                <realm-select class="col" v-model="realmId" />
+                <key-field class="col" required validate v-model="key" />
+              </template>
+              <content-type-select class="col" required v-model="contentType" />
             </b-row>
-            <b-row v-else>
-              <realm-select class="col" v-model="realmId" />
-              <key-field class="col" required validate v-model="key" />
-            </b-row>
-            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required :rows="20" v-model="contents" />
+            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required v-model="contents" />
           </b-tab>
           <b-tab :title="$t('templates.metadata')">
             <name-field id="displayName" label="templates.displayName.label" placeholder="templates.displayName.placeholder" v-model="displayName" />
-            <description-field :rows="20" v-model="description" />
+            <description-field :rows="15" v-model="description" />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+import ContentTypeSelect from './ContentTypeSelect.vue'
 import KeyField from './KeyField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import { createTemplate, updateTemplate } from '@/api/templates'
@@ -39,6 +43,7 @@ import { createTemplate, updateTemplate } from '@/api/templates'
 export default {
   name: 'TemplateEdit',
   components: {
+    ContentTypeSelect,
     KeyField,
     RealmSelect
   },
@@ -58,6 +63,7 @@ export default {
   },
   data() {
     return {
+      contentType: null,
       contents: null,
       description: null,
       displayName: null,
@@ -70,8 +76,9 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.template && !!this.realmId) ||
-        (!this.template && !!this.key) ||
+        (!this.template && this.realmId) ||
+        (!this.template && this.key) ||
+        (this.contentType ?? '') !== (this.template?.contentType ?? '') ||
         (this.contents ?? '') !== (this.template?.contents ?? '') ||
         (this.displayName ?? '') !== (this.template?.displayName ?? '') ||
         (this.description ?? '') !== (this.template?.description ?? '')
@@ -79,6 +86,7 @@ export default {
     },
     payload() {
       const payload = {
+        contentType: this.contentType,
         contents: this.contents,
         displayName: this.displayName,
         description: this.description
@@ -93,6 +101,7 @@ export default {
   methods: {
     setModel(template) {
       this.template = template
+      this.contentType = template.contentType
       this.contents = template.contents
       this.description = template.description
       this.displayName = template.displayName

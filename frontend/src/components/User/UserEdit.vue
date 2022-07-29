@@ -8,14 +8,14 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">
-          <icon-submit v-if="!!user" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="user" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <realm-select v-if="user && user.realm" disabled :value="realmId" />
-        <p v-else-if="!!user" v-t="'user.noRealm'" />
+        <p v-else-if="user" v-t="'user.noRealm'" />
         <realm-select v-else v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
-        <username-field :disabled="!!user" placeholder="user.create.usernamePlaceholder" :required="!user" :validate="!user" v-model="username" />
+        <username-field :disabled="Boolean(user)" placeholder="user.create.usernamePlaceholder" :required="!user" :validate="!user" v-model="username" />
         <b-row v-if="!user">
           <password-field class="col" placeholder="user.create.passwordPlaceholder" required validate v-model="password" />
           <password-field
@@ -97,7 +97,7 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.user && !!this.username) ||
+        (!this.user && this.username) ||
         (this.email ?? '') !== (this.user?.email ?? '') ||
         (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
         (this.lastName ?? '') !== (this.user?.lastName ?? '')

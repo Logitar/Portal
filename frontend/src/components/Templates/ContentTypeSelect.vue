@@ -1,10 +1,9 @@
 <template>
   <form-select
-    :disabled="disabled"
-    id="type"
-    label="type.label"
+    id="contentType"
+    label="templates.contentType.label"
     :options="options"
-    placeholder="type.placeholder"
+    placeholder="templates.contentType.placeholder"
     :required="required"
     :value="value"
     @input="$emit('input', $event)"
@@ -13,12 +12,8 @@
 
 <script>
 export default {
-  name: 'TypeSelect',
+  name: 'ContentTypeSelect',
   props: {
-    disabled: {
-      type: Boolean,
-      default: false
-    },
     required: {
       type: Boolean,
       default: false
@@ -28,7 +23,7 @@ export default {
   computed: {
     options() {
       return this.orderBy(
-        Object.entries(this.$i18n.t('type.options')).map(([value, text]) => ({ text, value })),
+        Object.entries(this.$i18n.t('templates.contentType.options')).map(([value, text]) => ({ text, value })),
         'text'
       )
     }

@@ -1,4 +1,12 @@
 {
+  "contentType": {
+    "label": "Content type",
+    "options": {
+      "text/plain": "Plain text",
+      "text/html": "HTML"
+    },
+    "placeholder": "Select a content type"
+  },
   "contents": {
     "label": "Contents",
     "placeholder": "Enter the template contents; Razor syntax is supported"

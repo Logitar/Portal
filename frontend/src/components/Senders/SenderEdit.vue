@@ -5,19 +5,20 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">
-          <icon-submit v-if="!!sender" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="sender" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <b-row v-if="!!sender">
+        <p v-if="sender && !realmId" v-t="'senders.noRealm'" />
+        <b-row v-if="sender">
           <realm-select v-if="realmId" class="col" disabled :value="realmId" />
-          <p v-else class="col" v-t="'senders.noRealm'" />
-          <provider-select class="col" disabled :value="selectedProvider" />
+          <provider-select v-if="realmId" class="col" disabled :value="selectedProvider" />
         </b-row>
         <b-row v-else>
           <realm-select class="col" v-model="realmId" />
           <provider-select class="col" required v-model="selectedProvider" />
         </b-row>
         <b-row>
+          <provider-select v-if="sender && !realmId" class="col" disabled :value="selectedProvider" />
           <email-field
             class="col"
             id="emailAddress"
@@ -83,8 +84,8 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.sender && !!this.realmId) ||
-        (!this.sender && !!this.selectedProvider) ||
+        (!this.sender && this.realmId) ||
+        (!this.sender && this.selectedProvider) ||
         (this.emailAddress ?? '') !== (this.sender?.emailAddress ?? '') ||
         (this.displayName ?? '') !== (this.sender?.displayName ?? '') ||
         JSON.stringify(this.settings ?? {}) !== JSON.stringify(this.providerSettings ?? {})
