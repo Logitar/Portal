@@ -1,9 +1,8 @@
 ﻿using Portal.Core.Emails.Senders;
-using Portal.Core.Realms;
 using System.Net;
 using System.Text;
 
-namespace Portal.Core.Emails.Messages
+namespace Portal.Core.Realms
 {
   internal class SenderNotInRealmException : ApiException
   {

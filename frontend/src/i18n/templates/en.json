@@ -35,6 +35,10 @@
   "result": {
     "viewDetail": "View detail"
   },
+  "select": {
+    "label": "Template",
+    "placeholder": "Select a template"
+  },
   "sendToMe": "Send to me",
   "sort": {
     "options": {

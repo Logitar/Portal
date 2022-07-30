@@ -55,11 +55,7 @@
   },
   "subject": "Subject",
   "successData": "Success data",
-  "template": {
-    "format": "This message contents were generated from the template",
-    "label": "Template",
-    "placeholder": "Select a template"
-  },
+  "templateFormat": "This message contents were generated from the template",
   "title": "Messages",
   "viewTitle": "View message"
 }

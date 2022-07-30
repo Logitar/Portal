@@ -1,4 +1,6 @@
-﻿using Portal.Core.Realms.Events;
+﻿using Portal.Core.Emails.Senders;
+using Portal.Core.Emails.Templates;
+using Portal.Core.Realms.Events;
 using Portal.Core.Realms.Payloads;
 using Portal.Core.Users;
 
@@ -26,6 +28,25 @@ namespace Portal.Core.Realms
 
     public bool RequireConfirmedAccount { get; private set; }
     public string? Url { get; private set; }
+
+    public Sender? PasswordRecoverySender
+    {
+      get => PasswordRecoverySenderRelation?.Sender;
+      set => PasswordRecoverySenderRelation = value == null ? null : new PasswordRecoverySender(this, value);
+    }
+    /// <summary>
+    /// EntityFrameworkCore only property
+    /// </summary>
+    public PasswordRecoverySender? PasswordRecoverySenderRelation { get; private set; }
+    public Template? PasswordRecoveryTemplate
+    {
+      get => PasswordRecoveryTemplateRelation?.Template;
+      set => PasswordRecoveryTemplateRelation = value == null ? null : new PasswordRecoveryTemplate(this, value);
+    }
+    /// <summary>
+    /// EntityFrameworkCore only property
+    /// </summary>
+    public PasswordRecoveryTemplate? PasswordRecoveryTemplateRelation { get; private set; }
 
     public List<User> Users { get; private set; } = new();
 
