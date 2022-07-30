@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Portal.Core.Emails.Senders;
+using Portal.Core.Emails.Templates;
 using Portal.Core.Realms.Models;
 using Portal.Core.Realms.Payloads;
 
@@ -10,6 +12,8 @@ namespace Portal.Core.Realms
     private readonly IMapper _mapper;
     private readonly IRealmQuerier _querier;
     private readonly IRepository<Realm> _repository;
+    private readonly ISenderQuerier _senderQuerier;
+    private readonly ITemplateQuerier _templateQuerier;
     private readonly IUserContext _userContext;
     private readonly IValidator<Realm> _validator;
 
@@ -17,6 +21,8 @@ namespace Portal.Core.Realms
       IMapper mapper,
       IRealmQuerier querier,
       IRepository<Realm> repository,
+      ISenderQuerier senderQuerier,
+      ITemplateQuerier templateQuerier,
       IUserContext userContext,
       IValidator<Realm> validator
     )
@@ -24,6 +30,8 @@ namespace Portal.Core.Realms
       _mapper = mapper;
       _querier = querier;
       _repository = repository;
+      _senderQuerier = senderQuerier;
+      _templateQuerier = templateQuerier;
       _userContext = userContext;
       _validator = validator;
     }
@@ -38,6 +46,7 @@ namespace Portal.Core.Realms
       }
 
       var realm = new Realm(payload, _userContext.ActorId);
+      await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 
       await _repository.SaveAsync(realm, cancellationToken);
@@ -87,11 +96,49 @@ namespace Portal.Core.Realms
         ?? throw new EntityNotFoundException<Realm>(id);
 
       realm.Update(payload, _userContext.ActorId);
+      await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 
       await _repository.SaveAsync(realm, cancellationToken);
 
       return _mapper.Map<RealmModel>(realm);
+    }
+
+    private async Task UpdatePasswordRecoverySettingsAsync(Realm realm, SaveRealmPayload payload, CancellationToken cancellationToken)
+    {
+      if (payload.PasswordRecoverySenderId.HasValue)
+      {
+        Sender passwordRecoverySender = await _senderQuerier.GetAsync(payload.PasswordRecoverySenderId.Value, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Sender>(payload.PasswordRecoverySenderId.Value, nameof(payload.PasswordRecoverySenderId));
+
+        if (realm.Sid != passwordRecoverySender.RealmSid)
+        {
+          throw new SenderNotInRealmException(passwordRecoverySender, realm, nameof(payload.PasswordRecoverySenderId));
+        }
+
+        realm.PasswordRecoverySender = passwordRecoverySender;
+      }
+      else
+      {
+        realm.PasswordRecoverySender = null;
+      }
+
+      if (payload.PasswordRecoveryTemplateId.HasValue)
+      {
+        Template passwordRecoveryTemplate = await _templateQuerier.GetAsync(payload.PasswordRecoveryTemplateId.Value, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Template>(payload.PasswordRecoveryTemplateId.Value, nameof(payload.PasswordRecoveryTemplateId));
+
+        if (realm.Sid != passwordRecoveryTemplate.RealmSid)
+        {
+          throw new TemplateNotInRealmException(passwordRecoveryTemplate, realm, nameof(payload.PasswordRecoveryTemplateId));
+        }
+
+        realm.PasswordRecoveryTemplate = passwordRecoveryTemplate;
+      }
+      else
+      {
+        realm.PasswordRecoveryTemplate = null;
+      }
     }
   }
 }

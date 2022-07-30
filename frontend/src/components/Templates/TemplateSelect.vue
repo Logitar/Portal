@@ -1,12 +1,5 @@
 <template>
-  <form-select
-    id="template"
-    label="messages.template.label"
-    :options="options"
-    placeholder="messages.template.placeholder"
-    :value="value"
-    @input="$emit('input', $event)"
-  />
+  <form-select :id="id" :label="label" :options="options" :placeholder="placeholder" :required="required" :value="value" @input="$emit('input', $event)" />
 </template>
 
 <script>
@@ -15,7 +8,23 @@ import { getTemplates } from '@/api/templates'
 export default {
   name: 'TemplateSelect',
   props: {
+    id: {
+      type: String,
+      default: 'template'
+    },
+    label: {
+      type: String,
+      default: 'templates.select.label'
+    },
+    placeholder: {
+      type: String,
+      default: 'templates.select.placeholder'
+    },
     realmId: {},
+    required: {
+      type: Boolean,
+      default: false
+    },
     value: {}
   },
   data() {

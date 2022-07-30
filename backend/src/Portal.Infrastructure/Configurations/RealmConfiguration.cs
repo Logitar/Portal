@@ -14,6 +14,9 @@ namespace Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.AliasNormalized).IsUnique();
       builder.HasIndex(x => x.Name);
 
+      builder.Ignore(x => x.PasswordRecoverySender);
+      builder.Ignore(x => x.PasswordRecoveryTemplate);
+
       builder.Property(x => x.Alias).HasMaxLength(256);
       builder.Property(x => x.AliasNormalized).HasMaxLength(256);
       builder.Property(x => x.Name).HasMaxLength(256);

@@ -34,6 +34,19 @@
             <b-form-group>
               <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
             </b-form-group>
+            <div v-if="realm">
+              <h5 v-t="'realms.passwordRecovery.title'" />
+              <b-row>
+                <sender-select
+                  class="col"
+                  id="passwordRecoverySenderId"
+                  placeholder="realms.passwordRecovery.senderPlaceholder"
+                  :realmId="realm.id"
+                  v-model="passwordRecoverySenderId"
+                />
+                <template-select class="col" id="passwordRecoveryTemplateId" :realmId="realm.id" v-model="passwordRecoveryTemplateId" />
+              </b-row>
+            </div>
           </b-tab>
         </b-tabs>
       </b-form>
@@ -43,12 +56,16 @@
 
 <script>
 import AliasField from './AliasField.vue'
+import SenderSelect from '@/components/Senders/SenderSelect.vue'
+import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
 export default {
   name: 'RealmEdit',
   components: {
-    AliasField
+    AliasField,
+    SenderSelect,
+    TemplateSelect
   },
   props: {
     json: {
@@ -66,6 +83,8 @@ export default {
       description: null,
       loading: false,
       name: null,
+      passwordRecoverySenderId: null,
+      passwordRecoveryTemplateId: null,
       realm: null,
       requireConfirmedAccount: false,
       url: null
@@ -78,15 +97,19 @@ export default {
         (this.name ?? '') !== (this.realm?.name ?? '') ||
         (this.url ?? '') !== (this.realm?.url ?? '') ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
-        this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false)
+        this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
+        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
+        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId
       )
     },
     payload() {
       const payload = {
         name: this.name,
+        url: this.url,
         description: this.description,
         requireConfirmedAccount: this.requireConfirmedAccount,
-        url: this.url
+        passwordRecoverySenderId: this.passwordRecoverySenderId,
+        passwordRecoveryTemplateId: this.passwordRecoveryTemplateId
       }
       if (!this.realm) {
         payload.alias = this.alias
@@ -101,6 +124,8 @@ export default {
       this.alias = realm.alias
       this.description = realm.description
       this.name = realm.name
+      this.passwordRecoverySenderId = realm.passwordRecoverySenderId
+      this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
       this.requireConfirmedAccount = realm.requireConfirmedAccount
       this.url = realm.url
     },

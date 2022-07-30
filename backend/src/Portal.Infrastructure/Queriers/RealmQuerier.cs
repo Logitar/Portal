@@ -18,12 +18,16 @@ namespace Portal.Infrastructure.Queriers
       alias = alias?.ToUpper() ?? throw new ArgumentNullException(nameof(alias));
 
       return await _realms.ApplyTracking(readOnly)
+        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
+        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
         .SingleOrDefaultAsync(x => x.AliasNormalized == alias, cancellationToken);
     }
 
     public async Task<Realm?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
     {
       return await _realms.ApplyTracking(readOnly)
+        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
+        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 

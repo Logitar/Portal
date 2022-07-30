@@ -1,7 +1,7 @@
 <template>
   <b-tab :title="$t('messages.contents.label')">
     <p>
-      {{ $t('messages.template.format') }}
+      {{ $t('messages.templateFormat') }}
       <b-link v-if="template" :href="`/templates/${template.id}`" target="_blank"
         ><strong>{{ template.displayName ? `${template.displayName} (${template.key})` : template.key }}</strong></b-link
       >

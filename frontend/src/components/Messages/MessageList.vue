@@ -65,7 +65,7 @@
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusSelect from './StatusSelect.vue'
-import TemplateSelect from './TemplateSelect.vue'
+import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
 import { getMessages } from '@/api/messages'
 
 export default {
