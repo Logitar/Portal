@@ -84,7 +84,7 @@ namespace Portal.Core.Tokens
       return new ValidatedTokenModel(result);
     }
 
-    private string GetAudience(Realm? realm) => (realm == null ? _userContext.BaseUrl : realm.Alias).ToLower();
+    private string GetAudience(Realm? realm) => (realm?.Url ?? realm?.Alias ?? _userContext.BaseUrl).ToLower();
     private string GetIssuer(Realm? realm) => (realm == null ? _userContext.BaseUrl : $"{_userContext.BaseUrl}/realms/{realm.Alias}").ToLower();
   }
 }

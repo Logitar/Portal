@@ -43,6 +43,7 @@ namespace Portal.Core.Users
       RuleFor(x => x.Locale)
         .Must(BeAValidCulture);
       RuleFor(x => x.Picture)
+        .MaximumLength(2048)
         .Must(ValidationRules.BeAValidUrl);
     }
 
