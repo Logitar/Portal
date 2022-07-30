@@ -1,4 +1,6 @@
-﻿@using Portal.Core.Templates.Models;
+﻿@using Portal.Core.Emails.Templates.Models;
+@using Portal.Core.Users;
+@using Portal.Web.Models.Users;
 
 @model TemplateModel
 @{
@@ -7,11 +9,29 @@
   ViewBag.Title = Model?.DisplayName ?? Model?.Key ?? "Create template";
 }
 
+@functions {
+  private UserSummary UserSummary
+  {
+    get
+    {
+      User? user = Context.GetUser();
+
+      return new UserSummary
+      {
+        IsAuthenticated = user != null,
+        Email = user?.Email,
+        Name = user?.FullName,
+        Picture = user?.Picture
+      };
+    }
+  }
+}
+
 @if (Model == null)
 {
   <template-edit realm="@(Context.Request.Query["realm"])"></template-edit>
 }
 else
 {
-  <template-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></template-edit>
+  <template-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(UserSummary))"></template-edit>
 }

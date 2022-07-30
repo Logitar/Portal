@@ -1,0 +1,65 @@
+{
+  "contentFormat": "content",
+  "contents": {
+    "label": "Contents",
+    "noVariable": "No variable was used in this message.",
+    "variables": "Variables",
+    "viewAsHtml": "View as HTML",
+    "warning": "The following section may contain sensitive information."
+  },
+  "demo": {
+    "label": "Demo",
+    "text": "This message is a demo message."
+  },
+  "empty": "This list is empty.",
+  "failureData": "Failure data",
+  "noRealm": "This message was not sent through a realm.",
+  "noResult": "No data to display.",
+  "realmFormat": "This message was sent through the realm",
+  "recipient": {
+    "address": "Email address",
+    "displayName": "Display name",
+    "type": {
+      "label": "Type",
+      "options": {
+        "Bcc": "Bcc",
+        "CC": "CC",
+        "To": "To"
+      }
+    },
+    "user": "Associated user"
+  },
+  "recipients": "Recipients",
+  "sender": {
+    "default": "Default",
+    "format1": "This message was sent be the sent by",
+    "format2": "using the provider",
+    "label": "Sender"
+  },
+  "sentAt": "Sent on",
+  "sort": {
+    "options": {
+      "SentAt": "Sent on",
+      "Subject": "Subject"
+    }
+  },
+  "status": {
+    "format": "Status:",
+    "label": "Status",
+    "options": {
+      "Failed": "Failed",
+      "Sent": "Sent",
+      "Unsent": "Unsent"
+    },
+    "placeholder": "Select a status"
+  },
+  "subject": "Subject",
+  "successData": "Success data",
+  "template": {
+    "format": "This message contents were generated from the template",
+    "label": "Template",
+    "placeholder": "Select a template"
+  },
+  "title": "Messages",
+  "viewTitle": "View message"
+}

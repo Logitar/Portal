@@ -89,7 +89,7 @@ namespace Portal.Infrastructure.Migrations
                     b.ToTable("ApiKeys");
                 });
 
-            modelBuilder.Entity("Portal.Core.Realms.Realm", b =>
+            modelBuilder.Entity("Portal.Core.Emails.Messages.Message", b =>
                 {
                     b.Property<int>("Sid")
                         .ValueGeneratedOnAdd()
@@ -97,15 +97,9 @@ namespace Portal.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
 
-                    b.Property<string>("Alias")
+                    b.Property<string>("Body")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("AliasNormalized")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -117,15 +111,80 @@ namespace Portal.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                    b.Property<string>("ErrorsSerialized")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Errors");
+
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<string>("Name")
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RealmAlias")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid?>("RealmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RealmName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("RecipientsSerialized")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Recipients");
+
+                    b.Property<string>("ResultSerialized")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Result");
+
+                    b.Property<string>("SenderAddress")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("SenderDisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("SenderIsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SenderProvider")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("Succeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TemplateContentType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateDisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("TemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TemplateKey")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -136,6 +195,10 @@ namespace Portal.Infrastructure.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("VariablesSerialized")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Variables");
+
                     b.Property<int>("Version")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -143,20 +206,43 @@ namespace Portal.Infrastructure.Migrations
 
                     b.HasKey("Sid");
 
-                    b.HasIndex("Alias");
-
-                    b.HasIndex("AliasNormalized")
-                        .IsUnique();
+                    b.HasIndex("HasErrors");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("Name");
+                    b.HasIndex("IsDemo");
 
-                    b.ToTable("Realms");
+                    b.HasIndex("RealmAlias");
+
+                    b.HasIndex("RealmId");
+
+                    b.HasIndex("RealmName");
+
+                    b.HasIndex("SenderAddress");
+
+                    b.HasIndex("SenderDisplayName");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("SenderProvider");
+
+                    b.HasIndex("Subject");
+
+                    b.HasIndex("Succeeded");
+
+                    b.HasIndex("TemplateContentType");
+
+                    b.HasIndex("TemplateDisplayName");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("TemplateKey");
+
+                    b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Portal.Core.Senders.Sender", b =>
+            modelBuilder.Entity("Portal.Core.Emails.Senders.Sender", b =>
                 {
                     b.Property<int>("Sid")
                         .ValueGeneratedOnAdd()
@@ -234,6 +320,158 @@ namespace Portal.Infrastructure.Migrations
                     b.ToTable("Senders");
                 });
 
+            modelBuilder.Entity("Portal.Core.Emails.Templates.Template", b =>
+                {
+                    b.Property<int>("Sid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasDefaultValue("text/plain");
+
+                    b.Property<string>("Contents")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CreatedById")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("KeyNormalized")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int?>("RealmSid")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Sid");
+
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Key");
+
+                    b.HasIndex("RealmSid", "KeyNormalized")
+                        .IsUnique();
+
+                    b.ToTable("Templates");
+                });
+
+            modelBuilder.Entity("Portal.Core.Realms.Realm", b =>
+                {
+                    b.Property<int>("Sid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("AliasNormalized")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CreatedById")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Sid");
+
+                    b.HasIndex("Alias");
+
+                    b.HasIndex("AliasNormalized")
+                        .IsUnique();
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Realms");
+                });
+
             modelBuilder.Entity("Portal.Core.Sessions.Session", b =>
                 {
                     b.Property<int>("Sid")
@@ -305,79 +543,6 @@ namespace Portal.Infrastructure.Migrations
                     b.HasIndex("UserSid");
 
                     b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("Portal.Core.Templates.Template", b =>
-                {
-                    b.Property<int>("Sid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
-
-                    b.Property<string>("Contents")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<Guid>("CreatedById")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DisplayName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("KeyNormalized")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<int?>("RealmSid")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Version")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("Sid");
-
-                    b.HasIndex("DisplayName");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("Key");
-
-                    b.HasIndex("RealmSid", "KeyNormalized")
-                        .IsUnique();
-
-                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("Portal.Core.Users.User", b =>
@@ -574,7 +739,16 @@ namespace Portal.Infrastructure.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Portal.Core.Senders.Sender", b =>
+            modelBuilder.Entity("Portal.Core.Emails.Senders.Sender", b =>
+                {
+                    b.HasOne("Portal.Core.Realms.Realm", "Realm")
+                        .WithMany()
+                        .HasForeignKey("RealmSid");
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("Portal.Core.Emails.Templates.Template", b =>
                 {
                     b.HasOne("Portal.Core.Realms.Realm", "Realm")
                         .WithMany()
@@ -592,15 +766,6 @@ namespace Portal.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Portal.Core.Templates.Template", b =>
-                {
-                    b.HasOne("Portal.Core.Realms.Realm", "Realm")
-                        .WithMany()
-                        .HasForeignKey("RealmSid");
-
-                    b.Navigation("Realm");
                 });
 
             modelBuilder.Entity("Portal.Core.Users.User", b =>

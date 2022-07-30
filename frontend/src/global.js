@@ -3,7 +3,6 @@ import Gravatar from 'vue-gravatar'
 import CountSelect from './components/shared/CountSelect.vue'
 import DeleteModal from './components/shared/DeleteModal.vue'
 import DescriptionField from './components/shared/DescriptionField.vue'
-import EffectField from './components/shared/EffectField.vue'
 import FormDateTime from './components/shared/FormDateTime.vue'
 import FormField from './components/shared/FormField.vue'
 import FormSelect from './components/shared/FormSelect.vue'
@@ -11,19 +10,15 @@ import FormTextarea from './components/shared/FormTextarea.vue'
 import IconButton from './components/shared/IconButton.vue'
 import IconSubmit from './components/shared/IconSubmit.vue'
 import NameField from './components/shared/NameField.vue'
-import ReferenceField from './components/shared/ReferenceField.vue'
-import RegionSelect from './components/shared/RegionSelect.vue'
 import SearchField from './components/shared/SearchField.vue'
 import SortSelect from './components/shared/SortSelect.vue'
 import StatusDetail from './components/shared/StatusDetail.vue'
-import TypeSelect from './components/shared/TypeSelect.vue'
 
 Vue.component('v-gravatar', Gravatar)
 
 Vue.component('count-select', CountSelect)
 Vue.component('delete-modal', DeleteModal)
 Vue.component('description-field', DescriptionField)
-Vue.component('effect-field', EffectField)
 Vue.component('form-datetime', FormDateTime)
 Vue.component('form-field', FormField)
 Vue.component('form-select', FormSelect)
@@ -31,12 +26,9 @@ Vue.component('form-textarea', FormTextarea)
 Vue.component('icon-button', IconButton)
 Vue.component('icon-submit', IconSubmit)
 Vue.component('name-field', NameField)
-Vue.component('reference-field', ReferenceField)
-Vue.component('region-select', RegionSelect)
 Vue.component('search-field', SearchField)
 Vue.component('sort-select', SortSelect)
 Vue.component('status-detail', StatusDetail)
-Vue.component('type-select', TypeSelect)
 
 Vue.mixin({
   methods: {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Portal.Core.Senders;
-using Portal.Core.Senders.Models;
+using Portal.Core.Emails.Senders;
+using Portal.Core.Emails.Senders.Models;
 
 namespace Portal.Web.Controllers
 {

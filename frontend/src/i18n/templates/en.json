@@ -1,7 +1,15 @@
 {
+  "contentType": {
+    "label": "Content type",
+    "options": {
+      "text/plain": "Plain text",
+      "text/html": "HTML"
+    },
+    "placeholder": "Select a content type"
+  },
   "contents": {
     "label": "Contents",
-    "placeholder": "Enter the template contents; Razor syntax is supported"
+    "placeholder": "Enter the contents of the message; Razor syntax is supported"
   },
   "created": "The template has been created.",
   "delete": {
@@ -9,11 +17,13 @@
     "success": "The template has been deleted.",
     "title": "Delete template"
   },
+  "demo": "Demo",
   "displayName": {
     "label": "Display name",
     "placeholder": "Enter a display name"
   },
   "editTitle": "Edit template",
+  "emailRequired": "You need an email address to send a demo message.",
   "empty": "This list is empty.",
   "key": {
     "label": "Key",
@@ -22,6 +32,10 @@
   "metadata": "Metadata",
   "newTitle": "Create template",
   "noRealm": "This template is not in a realm.",
+  "result": {
+    "viewDetail": "View detail"
+  },
+  "sendToMe": "Send to me",
   "sort": {
     "options": {
       "DisplayName": "Display name",
@@ -29,7 +43,24 @@
       "UpdatedAt": "Updated on"
     }
   },
+  "status": {
+    "Failed": "The message was not sent due to an unexpected failure.",
+    "Sent": "The message has been successfully sent.",
+    "Unsent": "The message has not been sent yet."
+  },
+  "statusFormat": "{status}!",
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter the subject of the message"
+  },
   "template": "Template",
   "title": "Templates",
-  "updated": "The template has been updated."
+  "updated": "The template has been updated.",
+  "variables": {
+    "add": "Add variable",
+    "keyName": "key",
+    "keyPlaceholder": "Key",
+    "label": "Variables",
+    "valuePlaceholder": "Value"
+  }
 }

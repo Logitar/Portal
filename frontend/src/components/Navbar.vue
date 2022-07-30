@@ -32,6 +32,10 @@
               <font-awesome-icon icon="paper-plane" />
               {{ $t('senders.title') }}
             </b-nav-item>
+            <b-nav-item href="/messages">
+              <font-awesome-icon icon="envelope" />
+              {{ $t('messages.title') }}
+            </b-nav-item>
           </template>
         </b-navbar-nav>
 

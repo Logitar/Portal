@@ -26,13 +26,13 @@ export default {
   computed: {
     settings() {
       return {
-        apiKey: this.apiKey
+        ApiKey: this.apiKey
       }
     }
   },
   methods: {
     setModel(settings) {
-      this.apiKey = settings.apiKey
+      this.apiKey = settings.ApiKey
     }
   },
   watch: {

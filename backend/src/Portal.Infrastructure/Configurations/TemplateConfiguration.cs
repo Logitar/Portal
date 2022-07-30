@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Portal.Core.Templates;
+using Portal.Core.Emails.Templates;
+using System.Net.Mime;
 
 namespace Portal.Infrastructure.Configurations
 {
@@ -14,9 +15,11 @@ namespace Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.Key);
       builder.HasIndex(x => new { x.RealmSid, x.KeyNormalized }).IsUnique();
 
+      builder.Property(x => x.ContentType).HasMaxLength(256).HasDefaultValue(MediaTypeNames.Text.Plain);
       builder.Property(x => x.DisplayName).HasMaxLength(256);
       builder.Property(x => x.Key).HasMaxLength(256);
       builder.Property(x => x.KeyNormalized).HasMaxLength(256);
+      builder.Property(x => x.Subject).HasMaxLength(256);
     }
   }
 }

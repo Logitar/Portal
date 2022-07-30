@@ -17,6 +17,7 @@
           <tr>
             <th scope="col" v-t="'templates.key.label'" />
             <th scope="col" v-t="'templates.displayName.label'" />
+            <th scope="col" v-t="'templates.contentType.label'" />
             <th scope="col" v-t="'updatedAt'" />
             <th scope="col" />
           </tr>
@@ -27,6 +28,7 @@
               <b-link :href="`/templates/${template.id}`">{{ template.key }}</b-link>
             </td>
             <td v-text="template.displayName || '—'" />
+            <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
             <td>{{ $d(new Date(template.updatedAt || template.createdAt), 'medium') }}</td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />

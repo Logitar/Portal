@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Portal.Core;
-using Portal.Core.Templates;
-using Portal.Core.Templates.Models;
-using Portal.Core.Templates.Payloads;
+using Portal.Core.Emails.Templates;
+using Portal.Core.Emails.Templates.Models;
+using Portal.Core.Emails.Templates.Payloads;
 
 namespace Portal.Web.Controllers.Api
 {

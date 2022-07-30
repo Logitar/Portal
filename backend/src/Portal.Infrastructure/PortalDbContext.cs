@@ -2,10 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Portal.Core;
 using Portal.Core.ApiKeys;
+using Portal.Core.Emails.Messages;
+using Portal.Core.Emails.Senders;
+using Portal.Core.Emails.Templates;
 using Portal.Core.Realms;
-using Portal.Core.Senders;
 using Portal.Core.Sessions;
-using Portal.Core.Templates;
 using Portal.Core.Users;
 using Portal.Infrastructure.Entities;
 
@@ -24,6 +25,7 @@ namespace Portal.Infrastructure
     public DbSet<ApiKey> ApiKeys { get; private set; } = null!;
     public DbSet<Event> Events { get; private set; } = null!;
     public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
+    public DbSet<Message> Messages { get; private set; } = null!;
     public DbSet<Realm> Realms { get; private set; } = null!;
     public DbSet<Sender> Senders { get; private set; } = null!;
     public DbSet<Session> Sessions { get; private set; } = null!;

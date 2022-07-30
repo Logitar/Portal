@@ -5,11 +5,10 @@ namespace Portal.Web
 {
   internal static class ModelSerializer
   {
-    private static readonly JsonSerializerOptions _options;
+    private static readonly JsonSerializerOptions _options = new();
 
     static ModelSerializer()
     {
-      _options = new JsonSerializerOptions();
       _options.Converters.Add(new JsonStringEnumConverter());
       _options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     }
