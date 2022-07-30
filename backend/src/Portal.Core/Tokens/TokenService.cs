@@ -37,8 +37,8 @@ namespace Portal.Core.Tokens
       if (payload.Realm != null)
       {
         realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
+          ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
+          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
         ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
@@ -73,8 +73,8 @@ namespace Portal.Core.Tokens
       if (payload.Realm != null)
       {
         realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
+          ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
+          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
         ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 

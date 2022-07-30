@@ -23,7 +23,8 @@ import {
   faTrashAlt,
   faUser,
   faUserAltSlash,
-  faUsers
+  faUsers,
+  faVial
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -50,7 +51,8 @@ library.add(
   faTrashAlt,
   faUser,
   faUserAltSlash,
-  faUsers
+  faUsers,
+  faVial
 )
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
