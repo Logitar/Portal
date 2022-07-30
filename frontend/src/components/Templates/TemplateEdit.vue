@@ -29,6 +29,11 @@
             <name-field id="displayName" label="templates.displayName.label" placeholder="templates.displayName.placeholder" v-model="displayName" />
             <description-field :rows="15" v-model="description" />
           </b-tab>
+          <b-tab v-if="template" :title="$t('templates.demo')">
+            <!-- TODO(fpion): validate user has an Email address -->
+            <icon-button :disabled="loading" icon="paper-plane" :loading="loading" text="templates.sendToMe" variant="primary" @click="send" />
+            <!-- TODO(fpion): variables -->
+          </b-tab>
         </b-tabs>
       </b-form>
     </validation-observer>
@@ -40,6 +45,7 @@ import ContentTypeSelect from './ContentTypeSelect.vue'
 import KeyField from './KeyField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import { createTemplate, updateTemplate } from '@/api/templates'
+import { sendDemoMessage } from '@/api/messages'
 
 export default {
   name: 'TemplateEdit',
@@ -103,6 +109,19 @@ export default {
     }
   },
   methods: {
+    async send() {
+      if (!this.loading) {
+        this.loading = true
+        try {
+          const { data } = await sendDemoMessage({ templateId: this.template.id })
+          console.log(data) // TODO(fpion): implement
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+      }
+    },
     setModel(template) {
       this.template = template
       this.contentType = template.contentType

@@ -11,5 +11,6 @@ namespace Portal.Core.Emails.Messages
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);
     Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default);
+    Task<MessageModel> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken = default);
   }
 }

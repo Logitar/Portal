@@ -25,6 +25,12 @@ namespace Portal.Web.Controllers.Api
       return Ok(await _messageService.SendAsync(payload, cancellationToken));
     }
 
+    [HttpPost("demo")]
+    public async Task<ActionResult<MessageModel>> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken)
+    {
+      return Ok(await _messageService.SendDemoAsync(payload, cancellationToken));
+    }
+
     [HttpGet]
     public async Task<ActionResult<ListModel<MessageSummary>>> GetAsync(bool? hasErrors, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
       MessageSort? sort, bool desc,

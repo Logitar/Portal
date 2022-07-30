@@ -16,12 +16,13 @@ namespace Portal.Core.Emails.Messages
     private readonly IMessageQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Message> _repository;
+    private readonly IValidator<SendDemoMessagePayload> _sendDemoMessageValidator;
+    private readonly IValidator<SendMessagePayload> _sendMessageValidator;
     private readonly ISenderQuerier _senderQuerier;
     private readonly ITemplateCompiler _templateCompiler;
     private readonly ITemplateQuerier _templateQuerier;
     private readonly IUserContext _userContext;
     private readonly IUserQuerier _userQuerier;
-    private readonly IValidator<SendMessagePayload> _validator;
 
     public MessageService(
       IMessageHandlerFactory handlerFactory,
@@ -29,12 +30,13 @@ namespace Portal.Core.Emails.Messages
       IMessageQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<Message> repository,
+      IValidator<SendDemoMessagePayload> sendDemoMessageValidator,
+      IValidator<SendMessagePayload> sendMessageValidator,
       ISenderQuerier senderQuerier,
       ITemplateCompiler templateCompiler,
       ITemplateQuerier templateQuerier,
       IUserContext userContext,
-      IUserQuerier userQuerier,
-      IValidator<SendMessagePayload> validator
+      IUserQuerier userQuerier
     )
     {
       _handlerFactory = handlerFactory;
@@ -42,12 +44,13 @@ namespace Portal.Core.Emails.Messages
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
+      _sendDemoMessageValidator = sendDemoMessageValidator;
+      _sendMessageValidator = sendMessageValidator;
       _senderQuerier = senderQuerier;
       _templateCompiler = templateCompiler;
       _templateQuerier = templateQuerier;
       _userContext = userContext;
       _userQuerier = userQuerier;
-      _validator = validator;
     }
 
     public async Task<MessageModel?> GetAsync(Guid id, CancellationToken cancellationToken)
@@ -74,64 +77,153 @@ namespace Portal.Core.Emails.Messages
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      _validator.ValidateAndThrow(payload);
+      _sendMessageValidator.ValidateAndThrow(payload);
 
-      /* ---------------------------------------- Realm ----------------------------------------- */
-      Realm? realm = null;
-      if (payload.Realm != null)
-      {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
-      }
+      Realm? realm = payload.Realm == null ? null : await ResolveRealmAsync(payload.Realm, nameof(payload.Realm), cancellationToken);
 
-      /* -------------------------------------- Template ---------------------------------------- */
-      Template template = (Guid.TryParse(payload.Template, out Guid templateId)
-        ? await _templateQuerier.GetAsync(templateId, readOnly: true, cancellationToken)
-        : await _templateQuerier.GetAsync(key: payload.Template, realm, readOnly: true, cancellationToken)
-      ) ?? throw new EntityNotFoundException<Template>(payload.Template, nameof(payload.Template));
-      if (realm?.Sid != template.RealmSid)
-      {
-        throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
-      }
+      Recipients allRecipients = await ResolveRecipientsAsync(payload.Recipients, realm, nameof(payload.Recipients), cancellationToken);
+      Sender sender = await ResolveSenderAsync(payload.SenderId, realm, nameof(payload.SenderId), cancellationToken);
+      Template template = await ResolveTemplateAsync(payload.Template, realm, nameof(payload.Template), cancellationToken);
+      Dictionary<string, string?>? variables = payload.Variables == null ? null : GetVariables(payload.Variables);
 
-      /* --------------------------------------- Sender ----------------------------------------- */
-      Sender sender;
-      if (payload.SenderId.HasValue)
-      {
-        sender = await _senderQuerier.GetAsync(payload.SenderId.Value, readOnly: true, cancellationToken)
-          ?? throw new EntityNotFoundException<Sender>(payload.SenderId.Value, nameof(payload.SenderId));
-      }
-      else
-      {
-        sender = await _senderQuerier.GetDefaultAsync(realm, readOnly: true, cancellationToken)
-          ?? throw new DefaultSenderRequiredException(realm);
-      }
-      if (realm?.Sid != sender.RealmSid)
-      {
-        throw new SenderNotInRealmException(sender, realm, nameof(payload.SenderId));
-      }
       IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
-      /* ------------------------------------- Recipients --------------------------------------- */
-      var userIds = new List<Guid>(capacity: payload.Recipients.Count());
-      var usernames = new List<string>(userIds.Capacity);
-      foreach (RecipientPayload recipient in payload.Recipients)
+      var messages = new List<Message>(capacity: allRecipients.To.Count);
+      foreach (Recipient recipient in allRecipients.To)
       {
-        if (recipient.User != null)
+        string body = _templateCompiler.Compile(template, recipient.User, variables);
+
+        IEnumerable<Recipient> recipients = new[] { recipient }
+          .Concat(allRecipients.CC)
+          .Concat(allRecipients.Bcc);
+
+        Message message = await CreateAndSendAsync(body,
+          handler,
+          realm,
+          recipients,
+          sender,
+          template,
+          variables,
+          cancellationToken);
+
+        messages.Add(message);
+      }
+
+      await _repository.SaveAsync(messages, cancellationToken);
+
+      return new SentMessagesModel(messages);
+    }
+
+    public async Task<MessageModel> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken)
+    {
+      ArgumentNullException.ThrowIfNull(payload);
+
+      _sendDemoMessageValidator.ValidateAndThrow(payload);
+
+      User user = await _userQuerier.GetAsync(_userContext.Id, readOnly: true, cancellationToken)
+        ?? throw new InvalidOperationException($"The user 'Id={_userContext.Id}' could not be found.");
+      if (user.Email == null)
+      {
+        throw new UserEmailRequiredException(user.Id);
+      }
+      var recipients = new Recipient[] { new(user) };
+
+      Template template = await _templateQuerier.GetAsync(payload.TemplateId, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<Template>(payload.TemplateId, nameof(payload.TemplateId));
+      Realm? realm = template.Realm;
+
+      Sender sender = await _senderQuerier.GetDefaultAsync(realm, readOnly: true, cancellationToken)
+        ?? throw new DefaultSenderRequiredException(realm);
+
+      IMessageHandler handler = _handlerFactory.GetHandler(sender);
+
+      string body = _templateCompiler.Compile(template, user);
+
+      Message message = await CreateAndSendAsync(body,
+        handler,
+        realm,
+        recipients,
+        sender,
+        template,
+        variables: null,
+        cancellationToken);
+
+      await _repository.SaveAsync(message, cancellationToken);
+
+      return _mapper.Map<MessageModel>(message);
+    }
+
+    private async Task<Message> CreateAndSendAsync(string body,
+      IMessageHandler handler,
+      Realm? realm,
+      IEnumerable<Recipient> recipients,
+      Sender sender,
+      Template template,
+      Dictionary<string, string?>? variables,
+      CancellationToken cancellationToken
+    )
+    {
+      var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables);
+
+      try
+      {
+        SendMessageResult result = await handler.SendAsync(message, cancellationToken);
+        message.Succeed(result, _userContext.Id);
+      }
+      catch (ErrorException exception)
+      {
+        message.Fail(exception.Error, _userContext.Id);
+      }
+      catch (Exception exception)
+      {
+        message.Fail(new Error(exception), _userContext.Id);
+      }
+
+      return message;
+    }
+
+    private static Dictionary<string, string?>? GetVariables(IEnumerable<VariablePayload> payloads)
+    {
+      ArgumentNullException.ThrowIfNull(payloads);
+
+      Dictionary<string, string?>? variables = payloads
+        ?.GroupBy(x => x.Key)
+        .ToDictionary(x => x.Key, x => x.FirstOrDefault(y => y.Value != null)?.Value);
+
+      return variables;
+    }
+
+    private async Task<Realm?> ResolveRealmAsync(string id, string paramName, CancellationToken cancellationToken)
+    {
+      Realm realm = (Guid.TryParse(id, out Guid guid)
+        ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
+        : await _realmQuerier.GetAsync(alias: id, readOnly: true, cancellationToken)
+      ) ?? throw new EntityNotFoundException<Realm>(id, paramName);
+
+      return realm;
+    }
+
+    private async Task<Recipients> ResolveRecipientsAsync(IEnumerable<RecipientPayload> payloads, Realm? realm, string paramName, CancellationToken cancellationToken)
+    {
+      ArgumentNullException.ThrowIfNull(payloads);
+
+      var userIds = new List<Guid>(capacity: payloads.Count());
+      var usernames = new List<string>(userIds.Capacity);
+      foreach (RecipientPayload payload in payloads)
+      {
+        if (payload.User != null)
         {
-          if (Guid.TryParse(recipient.User, out Guid userId))
+          if (Guid.TryParse(payload.User, out Guid userId))
           {
             userIds.Add(userId);
           }
           else
           {
-            usernames.Add(recipient.User);
+            usernames.Add(payload.User);
           }
         }
       }
-      
+
       Dictionary<Guid, User> usersById = (await _userQuerier.GetAsync(userIds, readOnly: true, cancellationToken))
         .ToDictionary(x => x.Id, x => x);
       Dictionary<string, User> usersByUsername = (await _userQuerier.GetAsync(usernames, realm, readOnly: true, cancellationToken))
@@ -139,10 +231,11 @@ namespace Portal.Core.Emails.Messages
 
       var missingUsers = new List<string>(userIds.Capacity);
       var notInRealm = new List<Guid>(userIds.Capacity);
+      var missingEmails = new List<Guid>(userIds.Capacity);
       var to = new List<Recipient>(userIds.Capacity);
       var cc = new List<Recipient>(userIds.Capacity);
       var bcc = new List<Recipient>(userIds.Capacity);
-      foreach (RecipientPayload recipientPayload in payload.Recipients)
+      foreach (RecipientPayload recipientPayload in payloads)
       {
         User? user = null;
         if (recipientPayload.User != null)
@@ -166,6 +259,10 @@ namespace Portal.Core.Emails.Messages
             notInRealm.Add(user.Id);
             continue;
           }
+          else if (user.Email == null)
+          {
+            missingEmails.Add(user.Id);
+          }
         }
 
         Recipient recipient = user == null
@@ -187,50 +284,60 @@ namespace Portal.Core.Emails.Messages
             throw new NotSupportedException($"The recipient type '{recipientPayload.Type}' is not supported.");
         }
       }
+
       if (missingUsers.Any())
       {
-        throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
+        throw new UsersNotFoundException(missingUsers, paramName);
       }
+
       if (notInRealm.Any())
       {
-        throw new UsersNotInRealmException(notInRealm, realm, nameof(payload.Recipients));
+        throw new UsersNotInRealmException(notInRealm, realm, paramName);
       }
 
-      /* -------------------------------------- Messages ---------------------------------------- */
-      Dictionary<string, string?>? variables = payload.Variables
-        ?.GroupBy(x => x.Key)
-        .ToDictionary(x => x.Key, x => x.FirstOrDefault(y => y.Value != null)?.Value);
-
-      var messages = new List<Message>(capacity: to.Count);
-
-      foreach (Recipient recipient in to)
+      if (missingEmails.Any())
       {
-        string body = _templateCompiler.Compile(template, recipient.User, variables);
-
-        IEnumerable<Recipient> recipients = new[] { recipient }.Concat(cc).Concat(bcc);
-
-        var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables);
-
-        try
-        {
-          SendMessageResult result = await handler.SendAsync(message, cancellationToken);
-          message.Succeed(result, _userContext.Id);
-        }
-        catch (ErrorException exception)
-        {
-          message.Fail(exception.Error, _userContext.Id);
-        }
-        catch (Exception exception)
-        {
-          message.Fail(new Error(exception), _userContext.Id);
-        }
-
-        messages.Add(message);
+        throw new UsersEmailRequiredException(missingEmails, paramName);
       }
 
-      await _repository.SaveAsync(messages, cancellationToken);
+      return new Recipients(to, cc, bcc);
+    }
 
-      return new SentMessagesModel(messages);
+    private async Task<Sender> ResolveSenderAsync(Guid? id, Realm? realm, string paramName, CancellationToken cancellationToken)
+    {
+      Sender sender;
+      if (id.HasValue)
+      {
+        sender = await _senderQuerier.GetAsync(id.Value, readOnly: true, cancellationToken)
+          ?? throw new EntityNotFoundException<Sender>(id.Value, paramName);
+      }
+      else
+      {
+        sender = await _senderQuerier.GetDefaultAsync(realm, readOnly: true, cancellationToken)
+          ?? throw new DefaultSenderRequiredException(realm);
+      }
+
+      if (realm?.Sid != sender.RealmSid)
+      {
+        throw new SenderNotInRealmException(sender, realm, paramName);
+      }
+
+      return sender;
+    }
+
+    private async Task<Template> ResolveTemplateAsync(string id, Realm? realm, string paramName, CancellationToken cancellationToken)
+    {
+      Template template = (Guid.TryParse(id, out Guid templateId)
+        ? await _templateQuerier.GetAsync(templateId, readOnly: true, cancellationToken)
+        : await _templateQuerier.GetAsync(key: id, realm, readOnly: true, cancellationToken)
+      ) ?? throw new EntityNotFoundException<Template>(id, paramName);
+
+      if (realm?.Sid != template.RealmSid)
+      {
+        throw new TemplateNotInRealmException(template, realm, paramName);
+      }
+
+      return template;
     }
   }
 }
