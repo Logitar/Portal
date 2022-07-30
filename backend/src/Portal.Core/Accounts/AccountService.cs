@@ -129,6 +129,10 @@ namespace Portal.Core.Accounts
       {
         throw new InvalidCredentialsException();
       }
+      else if (realm?.RequireConfirmedAccount == true && !user.IsAccountConfirmed)
+      {
+        throw new AccountNotConfirmedException(user.Id);
+      }
 
       byte[]? keyBytes = null;
       string? keyHash = null;

@@ -42,6 +42,10 @@ namespace Portal.Core.Users
     public DateTime? PhoneNumberConfirmedAt { get; private set; }
     public Guid? PhoneNumberConfirmedById { get; private set; }
 
+    public bool IsAccountConfirmed => IsEmailConfirmed || IsPhoneNumberConfirmed;
+    public bool IsEmailConfirmed => EmailConfirmedAt.HasValue && EmailConfirmedById.HasValue;
+    public bool IsPhoneNumberConfirmed => PhoneNumberConfirmedAt.HasValue && PhoneNumberConfirmedById.HasValue;
+
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
     public string? LastName { get; private set; }
@@ -58,7 +62,7 @@ namespace Portal.Core.Users
     public List<Session> Sessions { get; private set; } = new();
 
     public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
-    public void ConfirmPhoneNumber(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
+    public void ConfirmPhoneNumber(Guid? userId = null) => ApplyChange(new ConfirmedPhoneNumberEvent(userId ?? Id));
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
     public void Update(UpdateUserPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
 
