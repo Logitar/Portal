@@ -4,6 +4,8 @@ namespace Portal.Core.Emails.Messages.Models
 {
   public class MessageModel : AggregateModel
   {
+    public bool IsDemo { get; set; }
+
     public string Subject { get; set; } = null!;
     public string Body { get; set; } = null!;
 

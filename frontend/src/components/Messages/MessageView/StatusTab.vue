@@ -33,6 +33,10 @@
       </template>
       <br />
       {{ $t('messages.status.format') }} <status-badge :message="message" />
+      <template v-if="message.isDemo">
+        <br />
+        <b-badge variant="info">{{ $t('messages.demo.label') }}</b-badge> <i class="text-info" v-t="'messages.demo.text'" />
+      </template>
     </p>
     <div v-if="status === 'Sent'">
       <h3 v-t="'messages.successData'" />

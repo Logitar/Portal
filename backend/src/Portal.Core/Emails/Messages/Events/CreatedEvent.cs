@@ -8,9 +8,10 @@ namespace Portal.Core.Emails.Messages.Events
       Guid? realmId, string? realmAlias, string? realmName,
       Guid senderId, bool senderIsDefault, ProviderType senderProvider, string senderAddress, string? senderDisplayName,
       Guid templateId, string templateKey, string templateSubject, string templateContentType, string? templateDisplayName,
-      Dictionary<string, string?>? variables, Guid userId) : base(userId)
+      Dictionary<string, string?>? variables, bool isDemo, Guid userId) : base(userId)
     {
       Body = body ?? throw new ArgumentNullException(nameof(body));
+      IsDemo = isDemo;
       RealmAlias = realmAlias;
       RealmId = realmId;
       RealmName = realmName;
@@ -29,6 +30,7 @@ namespace Portal.Core.Emails.Messages.Events
     }
 
     public string Body { get; private set; }
+    public bool IsDemo { get; private set; }
     public string? RealmAlias { get; private set; }
     public Guid? RealmId { get; private set; }
     public string? RealmName { get; private set; }

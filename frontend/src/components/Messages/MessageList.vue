@@ -6,7 +6,11 @@
         <icon-button class="mx-1" icon="sync-alt" :loading="loading" text="actions.refresh" variant="primary" @click="refresh()" />
       </div>
       <b-row>
-        <status-select class="col" v-model="status" />
+        <status-select class="col" v-model="status">
+          <template #after>
+            <b-form-checkbox id="isDemo" v-model="isDemo">{{ $t('messages.demo.label') }}</b-form-checkbox>
+          </template>
+        </status-select>
         <realm-select class="col" v-model="realmId" />
         <template-select class="col" :realmId="realmId" v-model="templateId" />
       </b-row>
@@ -33,6 +37,8 @@
           <tr v-for="message in messages" :key="message.id">
             <td>
               <b-link :href="`/messages/${message.id}`">{{ message.subject }}</b-link>
+              &nbsp;
+              <b-badge v-if="message.isDemo" variant="info">{{ $t('messages.demo.label') }}</b-badge>
             </td>
             <td v-text="message.recipients" />
             <td>
@@ -74,6 +80,7 @@ export default {
     return {
       count: 10,
       desc: true,
+      isDemo: false,
       loading: false,
       messages: [],
       page: 1,
@@ -92,6 +99,7 @@ export default {
     params() {
       return {
         hasErrors: this.hasErrors,
+        isDemo: this.isDemo,
         realmId: this.realmId,
         search: this.search,
         succeeded: this.succeeded,
@@ -136,7 +144,12 @@ export default {
         if (
           newValue?.index &&
           oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
+          (newValue.hasErrors !== oldValue.hasErrors ||
+            newValue.isDemo !== oldValue.isDemo ||
+            newValue.realmId !== oldValue.realmId ||
+            newValue.search !== oldValue.search ||
+            newValue.templateId !== oldValue.templateId ||
+            newValue.count !== oldValue.count)
         ) {
           this.page = 1
           await this.refresh()

@@ -9,7 +9,7 @@ namespace Portal.Core.Emails.Messages
   public class Message : Aggregate
   {
     public Message(string body, IEnumerable<Recipient> recipients, Sender sender,
-      Template template, Guid userId, Realm? realm = null, Dictionary<string, string?>? variables = null)
+      Template template, Guid userId, Realm? realm = null, Dictionary<string, string?>? variables = null, bool isDemo = false)
     {
       ArgumentNullException.ThrowIfNull(sender);
       ArgumentNullException.ThrowIfNull(template);
@@ -18,11 +18,13 @@ namespace Portal.Core.Emails.Messages
         realm?.Id, realm?.Alias, realm?.Name,
         sender.Id, sender.IsDefault, sender.Provider, sender.EmailAddress, sender.DisplayName,
         template.Id, template.Key, template.Subject, template.ContentType, template.DisplayName,
-        variables, userId));
+        variables, isDemo, userId));
     }
     private Message()
     {
     }
+
+    public bool IsDemo { get; private set; }
 
     public string Subject { get; private set; } = null!;
     public string Body { get; private set; } = null!;
@@ -91,6 +93,8 @@ namespace Portal.Core.Emails.Messages
 
     protected virtual void Apply(CreatedEvent @event)
     {
+      IsDemo = @event.IsDemo;
+
       Subject = @event.TemplateSubject;
       Body = @event.Body.Trim();
 

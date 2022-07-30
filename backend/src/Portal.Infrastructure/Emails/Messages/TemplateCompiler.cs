@@ -13,7 +13,7 @@ namespace Portal.Infrastructure.Emails.Messages
       ArgumentNullException.ThrowIfNull(template);
 
       var model = new TemplateModel(user, variables);
-      string name = string.Join('_', template.Realm?.Alias, template.Key);
+      string name = Guid.NewGuid().ToString("N");
 
       return Engine.Razor.RunCompile(template.Contents, name, typeof(TemplateModel), model);
     }

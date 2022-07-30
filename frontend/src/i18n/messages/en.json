@@ -7,6 +7,10 @@
     "viewAsHtml": "View as HTML",
     "warning": "The following section may contain sensitive information."
   },
+  "demo": {
+    "label": "Demo",
+    "text": "This message is a demo message."
+  },
   "empty": "This list is empty.",
   "failureData": "Failure data",
   "noRealm": "This message was not sent through a realm.",

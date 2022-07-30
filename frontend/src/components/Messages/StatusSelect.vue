@@ -6,7 +6,11 @@
     placeholder="messages.status.placeholder"
     :value="value"
     @input="$emit('input', $event)"
-  />
+  >
+    <template #after>
+      <slot name="after" />
+    </template>
+  </form-select>
 </template>
 
 <script>

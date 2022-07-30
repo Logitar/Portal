@@ -19,7 +19,7 @@ namespace Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<PagedList<Message>> GetPagedAsync(bool? hasErrors, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+    public async Task<PagedList<Message>> GetPagedAsync(bool? hasErrors, bool? isDemo, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
       MessageSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
@@ -30,6 +30,10 @@ namespace Portal.Infrastructure.Queriers
       if (hasErrors.HasValue)
       {
         query = query.Where(x => x.HasErrors == hasErrors.Value);
+      }
+      if (isDemo.HasValue)
+      {
+        query = query.Where(x => x.IsDemo == isDemo.Value);
       }
       if (search != null)
       {

@@ -60,12 +60,12 @@ namespace Portal.Core.Emails.Messages
       return _mapper.Map<MessageModel>(message);
     }
 
-    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, bool? isDemo, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
       MessageSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      PagedList<Message> messages = await _querier.GetPagedAsync(hasErrors, realmId, search, succeeded, templateId,
+      PagedList<Message> messages = await _querier.GetPagedAsync(hasErrors, isDemo, realmId, search, succeeded, templateId,
         sort, desc,
         index, count,
         readOnly: true, cancellationToken);
@@ -104,6 +104,7 @@ namespace Portal.Core.Emails.Messages
           sender,
           template,
           variables,
+          isDemo: false,
           cancellationToken);
 
         messages.Add(message);
@@ -135,6 +136,8 @@ namespace Portal.Core.Emails.Messages
       Sender sender = await _senderQuerier.GetDefaultAsync(realm, readOnly: true, cancellationToken)
         ?? throw new DefaultSenderRequiredException(realm);
 
+      Dictionary<string, string?>? variables = payload.Variables == null ? null : GetVariables(payload.Variables);
+
       IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
       string body = _templateCompiler.Compile(template, user);
@@ -145,7 +148,8 @@ namespace Portal.Core.Emails.Messages
         recipients,
         sender,
         template,
-        variables: null,
+        variables,
+        isDemo: true,
         cancellationToken);
 
       await _repository.SaveAsync(message, cancellationToken);
@@ -160,10 +164,11 @@ namespace Portal.Core.Emails.Messages
       Sender sender,
       Template template,
       Dictionary<string, string?>? variables,
+      bool isDemo,
       CancellationToken cancellationToken
     )
     {
-      var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables);
+      var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables, isDemo);
 
       try
       {

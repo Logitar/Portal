@@ -30,9 +30,8 @@
             <description-field :rows="15" v-model="description" />
           </b-tab>
           <b-tab v-if="template" :title="$t('templates.demo')">
-            <!-- TODO(fpion): validate user has an Email address -->
-            <icon-button :disabled="loading" icon="paper-plane" :loading="loading" text="templates.sendToMe" variant="primary" @click="send" />
-            <!-- TODO(fpion): variables -->
+            <demo-form v-if="hasEmail" :template="template" />
+            <p v-else class="text-danger" v-t="'templates.emailRequired'" />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -42,15 +41,16 @@
 
 <script>
 import ContentTypeSelect from './ContentTypeSelect.vue'
+import DemoForm from './DemoForm.vue'
 import KeyField from './KeyField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import { createTemplate, updateTemplate } from '@/api/templates'
-import { sendDemoMessage } from '@/api/messages'
 
 export default {
   name: 'TemplateEdit',
   components: {
     ContentTypeSelect,
+    DemoForm,
     KeyField,
     RealmSelect
   },
@@ -66,6 +66,10 @@ export default {
     status: {
       type: String,
       default: ''
+    },
+    user: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -78,7 +82,8 @@ export default {
       loading: false,
       realmId: null,
       subject: null,
-      template: null
+      template: null,
+      userSummary: null
     }
   },
   computed: {
@@ -92,6 +97,9 @@ export default {
         (this.displayName ?? '') !== (this.template?.displayName ?? '') ||
         (this.description ?? '') !== (this.template?.description ?? '')
       )
+    },
+    hasEmail() {
+      return Boolean(this.userSummary.email)
     },
     payload() {
       const payload = {
@@ -109,19 +117,6 @@ export default {
     }
   },
   methods: {
-    async send() {
-      if (!this.loading) {
-        this.loading = true
-        try {
-          const { data } = await sendDemoMessage({ templateId: this.template.id })
-          console.log(data) // TODO(fpion): implement
-        } catch (e) {
-          this.handleError(e)
-        } finally {
-          this.loading = false
-        }
-      }
-    },
     setModel(template) {
       this.template = template
       this.contentType = template.contentType
@@ -164,6 +159,9 @@ export default {
     }
     if (this.status === 'created') {
       this.toast('success', 'templates.created')
+    }
+    if (this.user) {
+      this.userSummary = JSON.parse(this.user)
     }
   }
 }

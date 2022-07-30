@@ -11,6 +11,7 @@ namespace Portal.Infrastructure.Configurations
       base.Configure(builder);
 
       builder.HasIndex(x => x.HasErrors);
+      builder.HasIndex(x => x.IsDemo);
       builder.HasIndex(x => x.RealmAlias);
       builder.HasIndex(x => x.RealmId);
       builder.HasIndex(x => x.RealmName);

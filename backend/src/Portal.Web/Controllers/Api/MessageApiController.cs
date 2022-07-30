@@ -32,12 +32,12 @@ namespace Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<MessageSummary>>> GetAsync(bool? hasErrors, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+    public async Task<ActionResult<ListModel<MessageSummary>>> GetAsync(bool? hasErrors, bool? isDemo, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
       MessageSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      return Ok(await _messageService.GetAsync(hasErrors, realmId, search, succeeded, templateId,
+      return Ok(await _messageService.GetAsync(hasErrors, isDemo, realmId, search, succeeded, templateId,
         sort, desc,
         index, count,
         cancellationToken));
