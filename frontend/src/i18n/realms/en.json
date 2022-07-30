@@ -12,11 +12,14 @@
   },
   "editTitle": "Edit realm",
   "empty": "This list is empty.",
+  "general": "General",
   "newTitle": "Create realm",
+  "requireConfirmedAccount": "Require confirmed account",
   "select": {
     "label": "Realm",
     "placeholder": "Select a realm"
   },
+  "settings": "Settings",
   "sort": {
     "options": {
       "Alias": "Alias",
@@ -27,7 +30,7 @@
   "title": "Realms",
   "updated": "The realm has been updated.",
   "url": {
-    "label": "URL",
+    "label": "Application URL",
     "placeholder": "Enter the web address (URL) of the application corresponding to this realm"
   }
 }

@@ -8,17 +8,34 @@
           <icon-submit v-if="realm" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <b-row>
-          <alias-field class="col" v-if="realm" disabled :value="alias" />
-          <alias-field class="col" v-else :name="name" required validate v-model="alias" />
-          <name-field class="col" required v-model="name" />
-        </b-row>
-        <form-field id="url" label="realms.url.label" :maxLength="2048" placeholder="realms.url.placeholder" :rules="{ url: true }" type="url" v-model="url">
-          <b-input-group-append>
-            <icon-button :disabled="!url" :href="url" icon="external-link-alt" target="_blank" variant="info" />
-          </b-input-group-append>
-        </form-field>
-        <description-field :rows="15" v-model="description" />
+        <b-tabs content-class="mt-3">
+          <b-tab :title="$t('realms.general')">
+            <b-row>
+              <name-field class="col" required v-model="name" />
+              <alias-field class="col" v-if="realm" disabled :value="alias" />
+              <alias-field class="col" v-else :name="name" required validate v-model="alias" />
+            </b-row>
+            <form-field
+              id="url"
+              label="realms.url.label"
+              :maxLength="2048"
+              placeholder="realms.url.placeholder"
+              :rules="{ url: true }"
+              type="url"
+              v-model="url"
+            >
+              <b-input-group-append>
+                <icon-button :disabled="!url" :href="url" icon="external-link-alt" target="_blank" variant="info" />
+              </b-input-group-append>
+            </form-field>
+            <description-field :rows="15" v-model="description" />
+          </b-tab>
+          <b-tab :title="$t('realms.settings')">
+            <b-form-group>
+              <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
+            </b-form-group>
+          </b-tab>
+        </b-tabs>
       </b-form>
     </validation-observer>
   </b-container>
@@ -50,6 +67,7 @@ export default {
       loading: false,
       name: null,
       realm: null,
+      requireConfirmedAccount: false,
       url: null
     }
   },
@@ -59,13 +77,15 @@ export default {
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
         (this.name ?? '') !== (this.realm?.name ?? '') ||
         (this.url ?? '') !== (this.realm?.url ?? '') ||
-        (this.description ?? '') !== (this.realm?.description ?? '')
+        (this.description ?? '') !== (this.realm?.description ?? '') ||
+        this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false)
       )
     },
     payload() {
       const payload = {
         name: this.name,
         description: this.description,
+        requireConfirmedAccount: this.requireConfirmedAccount,
         url: this.url
       }
       if (!this.realm) {
@@ -81,6 +101,7 @@ export default {
       this.alias = realm.alias
       this.description = realm.description
       this.name = realm.name
+      this.requireConfirmedAccount = realm.requireConfirmedAccount
       this.url = realm.url
     },
     async submit() {
