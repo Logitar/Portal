@@ -4,6 +4,7 @@ namespace Portal.Core.Emails.Messages.Models
 {
   public class MessageModel : AggregateModel
   {
+    public string Subject { get; set; } = null!;
     public string Body { get; set; } = null!;
 
     public IEnumerable<RecipientModel> Recipients { get; set; } = null!;
@@ -20,7 +21,6 @@ namespace Portal.Core.Emails.Messages.Models
 
     public Guid TemplateId { get; set; }
     public string TemplateKey { get; set; } = null!;
-    public string TemplateSubject { get; set; } = null!;
     public string TemplateContentType { get; set; } = null!;
     public string? TemplateDisplayName { get; set; }
 

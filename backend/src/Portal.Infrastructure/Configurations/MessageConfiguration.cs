@@ -18,12 +18,12 @@ namespace Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.SenderDisplayName);
       builder.HasIndex(x => x.SenderId);
       builder.HasIndex(x => x.SenderProvider);
+      builder.HasIndex(x => x.Subject);
       builder.HasIndex(x => x.Succeeded);
       builder.HasIndex(x => x.TemplateContentType);
       builder.HasIndex(x => x.TemplateDisplayName);
       builder.HasIndex(x => x.TemplateId);
       builder.HasIndex(x => x.TemplateKey);
-      builder.HasIndex(x => x.TemplateSubject);
 
       builder.Ignore(x => x.Errors);
       builder.Ignore(x => x.Recipients);
@@ -37,10 +37,10 @@ namespace Portal.Infrastructure.Configurations
       builder.Property(x => x.ResultSerialized).HasColumnName(nameof(Message.Result)).HasColumnType("jsonb");
       builder.Property(x => x.SenderAddress).HasMaxLength(256);
       builder.Property(x => x.SenderDisplayName).HasMaxLength(256);
+      builder.Property(x => x.Subject).HasMaxLength(256);
       builder.Property(x => x.TemplateContentType).HasMaxLength(256);
       builder.Property(x => x.TemplateDisplayName).HasMaxLength(256);
       builder.Property(x => x.TemplateKey).HasMaxLength(256);
-      builder.Property(x => x.TemplateSubject).HasMaxLength(256);
       builder.Property(x => x.VariablesSerialized).HasColumnName(nameof(Message.Variables)).HasColumnType("jsonb");
     }
   }

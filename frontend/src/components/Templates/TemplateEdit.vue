@@ -136,7 +136,7 @@ export default {
       }
     }
   },
-  async created() {
+  created() {
     if (this.json) {
       this.setModel(JSON.parse(this.json))
     }

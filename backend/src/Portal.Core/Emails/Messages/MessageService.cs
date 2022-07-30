@@ -170,7 +170,7 @@ namespace Portal.Core.Emails.Messages
 
         Recipient recipient = user == null
           ? new(recipientPayload.Address!, recipientPayload.DisplayName, recipientPayload.Type)
-          : Recipient.FromUser(user, recipientPayload.Type);
+          : new(user, recipientPayload.Type);
 
         switch (recipientPayload.Type)
         {

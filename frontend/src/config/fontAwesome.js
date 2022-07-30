@@ -7,6 +7,7 @@ import {
   faClipboard,
   faCog,
   faDice,
+  faEnvelope,
   faHome,
   faIdCard,
   faKey,
@@ -20,6 +21,7 @@ import {
   faTimes,
   faTrashAlt,
   faUser,
+  faUserAltSlash,
   faUsers
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -31,6 +33,7 @@ library.add(
   faClipboard,
   faCog,
   faDice,
+  faEnvelope,
   faHome,
   faIdCard,
   faKey,
@@ -44,6 +47,7 @@ library.add(
   faTimes,
   faTrashAlt,
   faUser,
+  faUserAltSlash,
   faUsers
 )
 

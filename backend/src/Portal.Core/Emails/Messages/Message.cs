@@ -24,6 +24,7 @@ namespace Portal.Core.Emails.Messages
     {
     }
 
+    public string Subject { get; private set; } = null!;
     public string Body { get; private set; } = null!;
 
     public IEnumerable<Recipient> Recipients { get; private set; } = Enumerable.Empty<Recipient>();
@@ -45,7 +46,6 @@ namespace Portal.Core.Emails.Messages
 
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; } = null!;
-    public string TemplateSubject { get; private set; } = null!;
     public string TemplateContentType { get; private set; } = null!;
     public string? TemplateDisplayName { get; private set; }
 
@@ -91,6 +91,7 @@ namespace Portal.Core.Emails.Messages
 
     protected virtual void Apply(CreatedEvent @event)
     {
+      Subject = @event.TemplateSubject;
       Body = @event.Body.Trim();
 
       Recipients = @event.Recipients;
@@ -107,7 +108,6 @@ namespace Portal.Core.Emails.Messages
 
       TemplateId = @event.TemplateId;
       TemplateKey = @event.TemplateKey;
-      TemplateSubject = @event.TemplateSubject;
       TemplateContentType = @event.TemplateContentType;
       TemplateDisplayName = @event.TemplateDisplayName;
 
@@ -122,6 +122,6 @@ namespace Portal.Core.Emails.Messages
       Result = @event.Result;
     }
 
-    public override string ToString() => $"{TemplateSubject} | {base.ToString()}";
+    public override string ToString() => $"{Subject} | {base.ToString()}";
   }
 }

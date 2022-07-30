@@ -34,7 +34,7 @@ namespace Portal.Infrastructure.Emails.Providers.SendGrid.Payloads
       Contents = new[] { new ContentPayload(message) };
       Personalizations = new[] { new PersonalizationPayload(to, cc, bcc) };
       Sender = new SenderPayload(message);
-      Subject = message.TemplateSubject;
+      Subject = message.Subject;
     }
 
     [JsonPropertyName("content")]

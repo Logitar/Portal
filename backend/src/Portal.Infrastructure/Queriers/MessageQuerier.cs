@@ -40,8 +40,8 @@ namespace Portal.Infrastructure.Queriers
             string pattern = $"%{term}%";
 
             query = query.Where(x => EF.Functions.ILike(x.SenderAddress, pattern)
+              || EF.Functions.ILike(x.Subject, pattern)
               || EF.Functions.ILike(x.TemplateKey, pattern)
-              || EF.Functions.ILike(x.TemplateSubject, pattern)
               || (x.RealmAlias != null && EF.Functions.ILike(x.RealmAlias, pattern))
               || (x.RealmName != null && EF.Functions.ILike(x.RealmName, pattern))
               || (x.SenderDisplayName != null && EF.Functions.ILike(x.SenderDisplayName, pattern))
@@ -65,7 +65,7 @@ namespace Portal.Infrastructure.Queriers
         query = sort.Value switch
         {
           MessageSort.SentAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
-          MessageSort.Subject => desc ? query.OrderByDescending(x => x.TemplateSubject) : query.OrderBy(x => x.TemplateSubject),
+          MessageSort.Subject => desc ? query.OrderByDescending(x => x.Subject) : query.OrderBy(x => x.Subject),
           _ => throw new ArgumentException($"The message sort '{sort}' is not valid.", nameof(sort)),
         };
       }
