@@ -8,9 +8,16 @@
           <icon-submit v-if="realm" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <alias-field v-if="realm" disabled :value="alias" />
-        <alias-field v-else :name="name" required validate v-model="alias" />
-        <name-field required v-model="name" />
+        <b-row>
+          <alias-field class="col" v-if="realm" disabled :value="alias" />
+          <alias-field class="col" v-else :name="name" required validate v-model="alias" />
+          <name-field class="col" required v-model="name" />
+        </b-row>
+        <form-field id="url" label="realms.url.label" :maxLength="2048" placeholder="realms.url.placeholder" :rules="{ url: true }" type="url" v-model="url">
+          <b-input-group-append>
+            <icon-button :disabled="!url" :href="url" icon="external-link-alt" target="_blank" variant="info" />
+          </b-input-group-append>
+        </form-field>
         <description-field :rows="15" v-model="description" />
       </b-form>
     </validation-observer>
@@ -42,7 +49,8 @@ export default {
       description: null,
       loading: false,
       name: null,
-      realm: null
+      realm: null,
+      url: null
     }
   },
   computed: {
@@ -50,13 +58,15 @@ export default {
       return (
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
         (this.name ?? '') !== (this.realm?.name ?? '') ||
+        (this.url ?? '') !== (this.realm?.url ?? '') ||
         (this.description ?? '') !== (this.realm?.description ?? '')
       )
     },
     payload() {
       const payload = {
         name: this.name,
-        description: this.description
+        description: this.description,
+        url: this.url
       }
       if (!this.realm) {
         payload.alias = this.alias
@@ -65,11 +75,13 @@ export default {
     }
   },
   methods: {
+    browse() {},
     setModel(realm) {
       this.realm = realm
       this.alias = realm.alias
       this.description = realm.description
       this.name = realm.name
+      this.url = realm.url
     },
     async submit() {
       if (!this.loading) {

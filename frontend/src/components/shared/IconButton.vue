@@ -1,5 +1,5 @@
 <template>
-  <b-button :disabled="disabled" :href="href" :size="size" :type="type" :variant="variant" @click="$emit('click', $event)">
+  <b-button :disabled="disabled" :href="href" :size="size" :target="target" :type="type" :variant="variant" @click="$emit('click', $event)">
     <b-spinner v-if="loading" small />
     <font-awesome-icon v-else :icon="icon" />
     {{ $t(text) }}
@@ -26,6 +26,10 @@ export default {
       default: false
     },
     size: {
+      type: String,
+      default: ''
+    },
+    target: {
       type: String,
       default: ''
     },

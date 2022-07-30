@@ -14,6 +14,10 @@ namespace Portal.Core.Realms
       RuleFor(x => x.Name)
         .NotEmpty()
         .MaximumLength(256);
+
+      RuleFor(x => x.Url)
+        .MaximumLength(2048)
+        .Must(ValidationRules.BeAValidUrl);
     }
 
     private static bool BeAValidAlias(string? value) => value == null

@@ -25,5 +25,9 @@
     }
   },
   "title": "Realms",
-  "updated": "The realm has been updated."
+  "updated": "The realm has been updated.",
+  "url": {
+    "label": "URL",
+    "placeholder": "Enter the web address (URL) of the application corresponding to this realm"
+  }
 }

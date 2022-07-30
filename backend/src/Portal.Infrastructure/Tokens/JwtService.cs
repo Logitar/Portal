@@ -89,7 +89,10 @@ namespace Portal.Infrastructure.Tokens
 
         if (consume)
         {
-          DateTime? expiresAt = principal.FindFirst(Rfc7519ClaimTypes.Expires)?.GetDateTime();
+          DateTime? expiresAt = principal.FindFirst(Rfc7519ClaimTypes.Expires)
+            ?.GetDateTime()
+            .Add(validationParameters.ClockSkew);
+
           await _blacklist.BlacklistAsync(ids, expiresAt, cancellationToken);
         }
 

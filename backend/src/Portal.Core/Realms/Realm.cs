@@ -24,6 +24,8 @@ namespace Portal.Core.Realms
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
 
+    public string? Url { get; private set; }
+
     public List<User> Users { get; private set; } = new();
 
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
@@ -47,6 +49,8 @@ namespace Portal.Core.Realms
     {
       Name = payload.Name.Trim();
       Description = payload.Description?.CleanTrim();
+
+      Url = payload.Url;
     }
 
     public override string ToString() => $"{Name} | {base.ToString()}";
