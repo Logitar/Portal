@@ -8,7 +8,7 @@ namespace Portal.Core.Emails.Messages
     public Recipient(User user, RecipientType type = RecipientType.To)
       : this(type, user?.Email ?? string.Empty, user?.FullName, user?.Id, user?.Username)
     {
-      ArgumentNullException.ThrowIfNull(user);
+      User = user ?? throw new ArgumentNullException(nameof(user));
     }
     public Recipient(string address, string? displayName, RecipientType type = RecipientType.To)
       : this(type, address, displayName, userId: null, username: null)

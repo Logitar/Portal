@@ -27,6 +27,22 @@ namespace Portal.Web.Controllers.Api
       return Ok(await _accountService.ChangePasswordAsync(payload, cancellationToken));
     }
 
+    [HttpPost("password/recover")]
+    public async Task<ActionResult> RecoverPasswordAsync([FromBody] RecoverPasswordPayload payload, CancellationToken cancellationToken)
+    {
+      await _accountService.RecoverPasswordAsync(payload, cancellationToken);
+
+      return NoContent();
+    }
+
+    [HttpPost("password/reset")]
+    public async Task<ActionResult> ResetPasswordAsync([FromBody] ResetPasswordPayload payload, CancellationToken cancellationToken)
+    {
+      await _accountService.ResetPasswordAsync(payload, cancellationToken);
+
+      return NoContent();
+    }
+
     [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
     [HttpGet("profile")]
     public async Task<ActionResult<UserModel>> GetProfileAsync(CancellationToken cancellationToken)

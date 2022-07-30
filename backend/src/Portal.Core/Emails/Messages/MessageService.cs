@@ -140,7 +140,7 @@ namespace Portal.Core.Emails.Messages
 
       IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
-      string body = _templateCompiler.Compile(template, user);
+      string body = _templateCompiler.Compile(template, user, variables);
 
       Message message = await CreateAndSendAsync(body,
         handler,
@@ -173,15 +173,15 @@ namespace Portal.Core.Emails.Messages
       try
       {
         SendMessageResult result = await handler.SendAsync(message, cancellationToken);
-        message.Succeed(result, _userContext.Id);
+        message.Succeed(result, _userContext.ActorId);
       }
       catch (ErrorException exception)
       {
-        message.Fail(exception.Error, _userContext.Id);
+        message.Fail(exception.Error, _userContext.ActorId);
       }
       catch (Exception exception)
       {
-        message.Fail(new Error(exception), _userContext.Id);
+        message.Fail(new Error(exception), _userContext.ActorId);
       }
 
       return message;
@@ -267,6 +267,7 @@ namespace Portal.Core.Emails.Messages
           else if (user.Email == null)
           {
             missingEmails.Add(user.Id);
+            continue;
           }
         }
 
