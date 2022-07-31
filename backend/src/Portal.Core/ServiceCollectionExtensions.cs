@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portal.Core.Accounts;
 using Portal.Core.ApiKeys;
@@ -8,7 +7,6 @@ using Portal.Core.Emails.Messages;
 using Portal.Core.Emails.Senders;
 using Portal.Core.Emails.Templates;
 using Portal.Core.Realms;
-using Portal.Core.Settings;
 using Portal.Core.Tokens;
 using Portal.Core.Users;
 using System.Reflection;
@@ -17,17 +15,13 @@ namespace Portal.Core
 {
   public static class ServiceCollectionExtensions
   {
-    public static IServiceCollection AddPortalCore(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPortalCore(this IServiceCollection services)
     {
       Assembly assembly = typeof(ServiceCollectionExtensions).Assembly;
-
-      IConfigurationSection identity = configuration.GetSection("Identity");
-      var userSettings = identity.GetSection("User").Get<UserSettings>() ?? new();
 
       return services
         .AddAutoMapper(assembly)
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
-        .AddSingleton(userSettings)
         .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
         .AddDomainServices();
     }

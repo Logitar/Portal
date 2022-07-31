@@ -9,13 +9,21 @@
     type="email"
     :value="value"
     @input="$emit('input', $event)"
-  />
+  >
+    <b-input-group-append v-if="confirmed">
+      <b-input-group-text class="bg-info text-white">{{ $t('user.email.confirmed') }}</b-input-group-text>
+    </b-input-group-append>
+  </form-field>
 </template>
 
 <script>
 export default {
   name: 'EmailField',
   props: {
+    confirmed: {
+      type: Boolean,
+      default: false
+    },
     id: {
       type: String,
       default: 'email'

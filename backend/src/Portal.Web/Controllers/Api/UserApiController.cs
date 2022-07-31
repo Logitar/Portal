@@ -35,12 +35,12 @@ namespace Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(Guid? realmId, string? search,
+    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(bool? isConfirmed, bool? isDisabled, Guid? realmId, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _userService.GetAsync(realmId, search,
+      return Ok(await _userService.GetAsync(isConfirmed, isDisabled, realmId, search,
         sort, desc,
         index, count,
         cancellationToken));
@@ -62,6 +62,18 @@ namespace Portal.Web.Controllers.Api
     public async Task<ActionResult<UserModel>> UpdateAsync(Guid id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _userService.UpdateAsync(id, payload, cancellationToken));
+    }
+
+    [HttpPatch("{id}/disable")]
+    public async Task<ActionResult<UserModel>> DisableAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return Ok(await _userService.DisableAsync(id, cancellationToken));
+    }
+
+    [HttpPatch("{id}/enable")]
+    public async Task<ActionResult<UserModel>> EnableAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return Ok(await _userService.EnableAsync(id, cancellationToken));
     }
   }
 }

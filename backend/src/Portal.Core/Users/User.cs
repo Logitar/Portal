@@ -38,13 +38,24 @@ namespace Portal.Core.Users
     }
     public DateTime? EmailConfirmedAt { get; private set; }
     public Guid? EmailConfirmedById { get; private set; }
+    public bool IsEmailConfirmed
+    {
+      get => EmailConfirmedAt.HasValue && EmailConfirmedById.HasValue;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
     public string? PhoneNumber { get; private set; }
     public DateTime? PhoneNumberConfirmedAt { get; private set; }
     public Guid? PhoneNumberConfirmedById { get; private set; }
-
-    public bool IsAccountConfirmed => IsEmailConfirmed || IsPhoneNumberConfirmed;
-    public bool IsEmailConfirmed => EmailConfirmedAt.HasValue && EmailConfirmedById.HasValue;
-    public bool IsPhoneNumberConfirmed => PhoneNumberConfirmedAt.HasValue && PhoneNumberConfirmedById.HasValue;
+    public bool IsPhoneNumberConfirmed
+    {
+      get => PhoneNumberConfirmedAt.HasValue && PhoneNumberConfirmedById.HasValue;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
+    public bool IsAccountConfirmed
+    {
+      get => IsEmailConfirmed || IsPhoneNumberConfirmed;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
 
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
@@ -59,6 +70,14 @@ namespace Portal.Core.Users
     public DateTime? PasswordChangedAt { get; private set; }
     public DateTime? SignedInAt { get; private set; }
 
+    public DateTime? DisabledAt { get; private set; }
+    public Guid? DisabledById { get; private set; }
+    public bool IsDisabled
+    {
+      get => DisabledAt.HasValue && DisabledById.HasValue;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
+
     public List<Session> Sessions { get; private set; } = new();
 
     public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
@@ -68,6 +87,9 @@ namespace Portal.Core.Users
 
     public void ChangePassword(string passwordHash) => ApplyChange(new ChangedPasswordEvent(passwordHash, Id));
     public void SignIn(DateTime signedInAt) => ApplyChange(new SignedInEvent(signedInAt, Id));
+
+    public void Disable(Guid userId) => ApplyChange(new DisabledEvent(userId));
+    public void Enable(Guid userId) => ApplyChange(new EnabledEvent(userId));
 
     protected virtual void Apply(ConfirmedEmailEvent @event)
     {
@@ -98,6 +120,16 @@ namespace Portal.Core.Users
     }
     protected virtual void Apply(DeletedEvent @event)
     {
+    }
+    protected virtual void Apply(DisabledEvent @event)
+    {
+      DisabledAt = @event.OccurredAt;
+      DisabledById = @event.UserId;
+    }
+    protected virtual void Apply(EnabledEvent @event)
+    {
+      DisabledAt = null;
+      DisabledById = null;
     }
     protected virtual void Apply(SignedInEvent @event)
     {

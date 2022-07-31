@@ -7,8 +7,26 @@
         <icon-button class="mx-1" :href="createUrl" icon="plus" text="actions.create" variant="success" />
       </div>
       <b-row>
-        <search-field class="col" v-model="search" />
         <realm-select class="col" v-model="realmId" />
+        <form-select
+          class="col"
+          id="isConfirmed"
+          label="user.confirmed.label"
+          :options="yesNoOptions"
+          placeholder="user.confirmed.placeholder"
+          v-model="isConfirmed"
+        />
+        <form-select
+          class="col"
+          id="isDisabled"
+          label="user.disabled.label"
+          :options="yesNoOptions"
+          placeholder="user.disabled.placeholder"
+          v-model="isDisabled"
+        />
+      </b-row>
+      <b-row>
+        <search-field class="col" v-model="search" />
         <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
         <count-select class="col" v-model="count" />
       </b-row>
@@ -40,17 +58,19 @@
             <td v-text="user.fullName || '—'" />
             <td>
               {{ user.email || '—' }}
-              <b-badge v-if="user.emailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
+              <b-badge v-if="user.isEmailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
             </td>
             <td>
               {{ user.phoneNumber || '—' }}
-              <b-badge v-if="user.phoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
+              <b-badge v-if="user.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
             </td>
             <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
             <td>{{ $d(new Date(user.updatedAt || user.createdAt), 'medium') }}</td>
             <td>
-              <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${user.id}`" />
+              <icon-button class="mx-1" v-if="user.isDisabled" icon="unlock" :loading="loading" text="actions.enable" variant="warning" @click="enable(user)" />
+              <icon-button class="mx-1" v-else icon="lock" :loading="loading" text="actions.disable" variant="warning" @click="disable(user)" />
+              <icon-button class="mx-1" icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${user.id}`" />
               <delete-modal
                 confirm="user.delete.confirm"
                 :displayName="user.fullName ? `${user.fullName} (${user.username})` : user.username"
@@ -70,7 +90,7 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
-import { deleteUser, getUsers } from '@/api/users'
+import { deleteUser, disableUser, enableUser, getUsers } from '@/api/users'
 import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
@@ -82,6 +102,8 @@ export default {
     return {
       count: 10,
       desc: false,
+      isConfirmed: null,
+      isDisabled: null,
       loading: false,
       page: 1,
       realmId: null,
@@ -97,6 +119,8 @@ export default {
     },
     params() {
       return {
+        isConfirmed: this.isConfirmed,
+        isDisabled: this.isDisabled,
         realmId: this.realmId,
         search: this.search,
         sort: this.sort,
@@ -110,9 +134,51 @@ export default {
         Object.entries(this.$i18n.t('user.sort.options')).map(([value, text]) => ({ text, value })),
         'text'
       )
+    },
+    yesNoOptions() {
+      return [
+        { text: this.$i18n.t('yes'), value: 'true' },
+        { text: this.$i18n.t('no'), value: 'false' }
+      ]
     }
   },
   methods: {
+    async disable({ id }) {
+      if (!this.loading) {
+        this.loading = true
+        let refresh = false
+        try {
+          await disableUser(id)
+          refresh = true
+          this.toast('success', 'user.disabled.success')
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+        if (refresh) {
+          await this.refresh()
+        }
+      }
+    },
+    async enable({ id }) {
+      if (!this.loading) {
+        this.loading = true
+        let refresh = false
+        try {
+          await enableUser(id)
+          refresh = true
+          this.toast('success', 'user.enabled')
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+        if (refresh) {
+          await this.refresh()
+        }
+      }
+    },
     async onDelete({ id }, callback = null) {
       if (!this.loading) {
         this.loading = true
@@ -160,7 +226,11 @@ export default {
         if (
           newValue?.index &&
           oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
+          (newValue.isConfirmed !== oldValue.isConfirmed ||
+            newValue.isDisabled !== oldValue.isDisabled ||
+            newValue.realmId !== oldValue.realmId ||
+            newValue.search !== oldValue.search ||
+            newValue.count !== oldValue.count)
         ) {
           this.page = 1
           await this.refresh()

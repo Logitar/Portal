@@ -1,4 +1,8 @@
 {
+  "confirmed": {
+    "label": "Confirmed",
+    "placeholder": "Select an option"
+  },
   "create": {
     "passwordPlaceholder": "Enter a password",
     "usernamePlaceholder": "Enter a new username"
@@ -10,6 +14,13 @@
     "success": "The user has been deleted.",
     "title": "Delete user"
   },
+  "disabled": {
+    "label": "Disabled",
+    "placeholder": "Select an option",
+    "success": "The user has been disabled."
+  },
+  "disabledAt": "Disabled on",
+  "enabled": "The user has been enabled.",
   "editTitle": "Edit user",
   "email": {
     "confirmed": "Confirmed",

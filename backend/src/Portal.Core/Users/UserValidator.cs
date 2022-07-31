@@ -1,19 +1,18 @@
 ﻿using FluentValidation;
-using Portal.Core.Settings;
 using System.Globalization;
 
 namespace Portal.Core.Users
 {
   internal class UserValidator : AbstractValidator<User>
   {
-    public UserValidator(UserSettings settings)
-    {
-      ArgumentNullException.ThrowIfNull(settings);
+    private const string AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 
+    public UserValidator()
+    {
       RuleFor(x => x.Username)
         .NotEmpty()
         .MaximumLength(256)
-        .Must(x => x.All(c => settings.AllowedUserNameCharacters.Contains(c)));
+        .Must(x => x.All(c => AllowedUserNameCharacters.Contains(c)));
 
       When(x => x.PasswordHash == null, () => RuleFor(x => x.PasswordChangedAt).Null());
 
@@ -27,7 +26,29 @@ namespace Portal.Core.Users
         RuleFor(x => x.EmailConfirmedById).Null();
       });
 
+      When(x => x.IsEmailConfirmed, () =>
+      {
+        RuleFor(x => x.EmailConfirmedAt).NotNull();
+        RuleFor(x => x.EmailConfirmedById).NotNull();
+      });
+      When(x => !x.IsEmailConfirmed, () =>
+      {
+        RuleFor(x => x.EmailConfirmedAt).Null();
+        RuleFor(x => x.EmailConfirmedById).Null();
+      });
+
       When(x => x.PhoneNumber == null, () =>
+      {
+        RuleFor(x => x.PhoneNumberConfirmedAt).Null();
+        RuleFor(x => x.PhoneNumberConfirmedById).Null();
+      });
+
+      When(x => x.IsPhoneNumberConfirmed, () =>
+      {
+        RuleFor(x => x.PhoneNumberConfirmedAt).NotNull();
+        RuleFor(x => x.PhoneNumberConfirmedById).NotNull();
+      });
+      When(x => !x.IsPhoneNumberConfirmed, () =>
       {
         RuleFor(x => x.PhoneNumberConfirmedAt).Null();
         RuleFor(x => x.PhoneNumberConfirmedById).Null();
@@ -45,6 +66,17 @@ namespace Portal.Core.Users
       RuleFor(x => x.Picture)
         .MaximumLength(2048)
         .Must(ValidationRules.BeAValidUrl);
+
+      When(x => x.IsDisabled, () =>
+      {
+        RuleFor(x => x.DisabledAt).NotNull();
+        RuleFor(x => x.DisabledById).NotNull();
+      });
+      When(x => !x.IsDisabled, () =>
+      {
+        RuleFor(x => x.DisabledAt).Null();
+        RuleFor(x => x.DisabledById).Null();
+      });
     }
 
     private static bool BeAValidCulture(string? value) => value == null || CultureInfo.GetCultureInfo(value).LCID != 4096;
