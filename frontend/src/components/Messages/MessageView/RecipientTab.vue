@@ -27,6 +27,7 @@
                 />
                 <v-gravatar v-else-if="users[recipient.userId].email" class="rounded-circle" :email="users[recipient.userId].email" :size="24" />
                 {{ users[recipient.userId].username }}
+                <font-awesome-icon icon="external-link-alt" />
               </b-link>
             </template>
             <template v-else>

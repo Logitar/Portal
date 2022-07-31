@@ -4,17 +4,21 @@
     <p>
       <template v-if="realm"
         >{{ $t('messages.realmFormat') }}
-        <b-link :href="`/realms/${realm.alias}`" target="_blank"><strong v-text="`${realm.name} (${realm.alias})`" /></b-link>.</template
-      >
+        <b-link :href="`/realms/${realm.alias}`" target="_blank">
+          <strong v-text="`${realm.name} (${realm.alias})`" /> <font-awesome-icon icon="external-link-alt" /> </b-link
+        >.
+      </template>
       <template v-else-if="message.realmId">{{ $t('messages.realmFormat') }} <strong v-text="`${message.realmName} (${message.realmAlias})`" />.</template>
       <template v-else>{{ $t('messages.noRealm') }}</template>
       <br />
       <template v-if="sender">
         {{ $t('messages.sender.format1') }}
-        <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank"
-          ><strong> {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt;</strong></b-link
-        >
-        <b-link v-else :href="`/senders/${sender.id}`" target="_blank"><strong v-text="sender.emailAddress" /></b-link>
+        <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank">
+          <strong> {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt;</strong> <font-awesome-icon icon="external-link-alt" />
+        </b-link>
+        <b-link v-else :href="`/senders/${sender.id}`" target="_blank">
+          <strong v-text="sender.emailAddress" /> <font-awesome-icon icon="external-link-alt" />
+        </b-link>
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}

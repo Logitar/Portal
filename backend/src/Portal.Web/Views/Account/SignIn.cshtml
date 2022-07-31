@@ -4,4 +4,4 @@
   ViewBag.Title = "Sign In";
 }
 
-<sign-in></sign-in>
+<sign-in return-url="@(Context.Request.Query["returnUrl"])"></sign-in>
