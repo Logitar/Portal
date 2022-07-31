@@ -4,12 +4,17 @@
     <template v-if="user">
       <status-detail :createdAt="new Date(user.createdAt)" :updatedAt="user.updatedAt ? new Date(user.updatedAt) : null" />
       <p v-if="user.signedInAt">{{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}</p>
+      <p v-if="user.isDisabled" class="text-danger">{{ $t('user.disabledAt') }} {{ $d(new Date(user.disabledAt), 'medium') }}</p>
     </template>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">
-          <icon-submit v-if="user" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
-          <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
+          <template v-if="user">
+            <icon-submit class="mx-1" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+            <icon-button class="mx-1" v-if="user.isDisabled" icon="unlock" :loading="loading" text="actions.enable" variant="warning" @click="enable" />
+            <icon-button class="mx-1" v-else icon="lock" :loading="loading" text="actions.disable" variant="warning" @click="disable" />
+          </template>
+          <icon-submit class="mx-1" v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <realm-select v-if="user && user.realm" disabled :value="realmId" />
         <p v-else-if="user" v-t="'user.noRealm'" />
@@ -34,7 +39,7 @@
         </template>
         <h3 v-t="'user.information.personal'" />
         <b-row>
-          <email-field class="col" validate v-model="email" />
+          <email-field class="col" :confirmed="user && user.isEmailConfirmed" validate v-model="email" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
@@ -52,7 +57,7 @@ import LastNameField from './LastNameField.vue'
 import PasswordField from './PasswordField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import UsernameField from './UsernameField.vue'
-import { createUser, updateUser } from '@/api/users'
+import { createUser, disableUser, enableUser, updateUser } from '@/api/users'
 
 export default {
   name: 'UserEdit',
@@ -122,6 +127,34 @@ export default {
     }
   },
   methods: {
+    async disable() {
+      if (!this.loading) {
+        this.loading = true
+        try {
+          const { data } = await disableUser(this.user.id)
+          this.setModel(data)
+          this.toast('success', 'user.disabled.success')
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+      }
+    },
+    async enable() {
+      if (!this.loading) {
+        this.loading = true
+        try {
+          const { data } = await enableUser(this.user.id)
+          this.setModel(data)
+          this.toast('success', 'user.enabled')
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+      }
+    },
     setModel(user) {
       this.user = user
       this.email = user.email

@@ -3,6 +3,8 @@
     "cancel": "Cancel",
     "create": "Create",
     "delete": "Delete",
+    "disable": "Disable",
+    "enable": "Enable",
     "refresh": "Refresh",
     "save": "Save"
   },
@@ -19,6 +21,7 @@
     "label": "Name",
     "placeholder": "Enter a name"
   },
+  "no": "No",
   "notFound": {
     "help": "The requested page could not be found.",
     "lead": "Page Not Found",
@@ -38,5 +41,6 @@
     "updatedAt": "Last updated on {date}"
   },
   "success": "Success!",
-  "updatedAt": "Updated on"
+  "updatedAt": "Updated on",
+  "yes": "Yes"
 }

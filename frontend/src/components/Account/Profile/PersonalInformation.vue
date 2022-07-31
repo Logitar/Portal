@@ -11,14 +11,14 @@
           <th scope="row" v-t="'user.email.label'" />
           <td>
             {{ profile.email }}
-            <b-badge v-if="profile.emailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
+            <b-badge v-if="profile.isEmailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
           </td>
         </tr>
         <tr v-if="profile.phoneNumber">
           <th scope="row" v-t="'user.phone.label'" />
           <td>
             {{ profile.phoneNumber }}
-            <b-badge v-if="profile.phoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
+            <b-badge v-if="profile.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
           </td>
         </tr>
         <tr>

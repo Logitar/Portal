@@ -7,8 +7,10 @@ namespace Portal.Core.Users
   {
     Task<UserModel> CreateAsync(CreateUserPayload payload, CancellationToken cancellationToken = default);
     Task<UserModel> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<UserModel> DisableAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<UserModel> EnableAsync(Guid id, CancellationToken cancellationToken = default);
     Task<UserModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<ListModel<UserModel>> GetAsync(Guid? realmId = null, string? search = null,
+    Task<ListModel<UserModel>> GetAsync(bool? isConfirmed = null, bool? isDisabled = null, Guid? realmId = null, string? search = null,
       UserSort? sort = null, bool desc = false,
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);

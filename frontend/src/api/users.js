@@ -1,4 +1,4 @@
-import { _delete, get, post, put } from '.'
+import { _delete, get, patch, post, put } from '.'
 import { getQueryString } from '@/helpers/queryUtils'
 
 export async function createUser(payload) {
@@ -7,6 +7,14 @@ export async function createUser(payload) {
 
 export async function deleteUser(id) {
   return await _delete(`/api/users/${id}`)
+}
+
+export async function disableUser(id) {
+  return await patch(`/api/users/${id}/disable`)
+}
+
+export async function enableUser(id) {
+  return await patch(`/api/users/${id}/enable`)
 }
 
 export async function getUser(id) {

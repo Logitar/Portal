@@ -23,7 +23,11 @@ namespace Portal.Web
       base.ConfigureServices(services);
 
       services
-        .AddControllersWithViews(options => options.Filters.Add<ApiExceptionFilterAttribute>())
+        .AddControllersWithViews(options =>
+        {
+          options.Filters.Add<ApiExceptionFilterAttribute>();
+          options.Filters.Add<ValidationExceptionFilterAttribute>();
+        })
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
       services
@@ -60,7 +64,7 @@ namespace Portal.Web
         })
         .AddDistributedMemoryCache();
 
-      services.AddPortalCore(_configuration);
+      services.AddPortalCore();
       services.AddPortalInfrastructure(_configuration);
 
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
