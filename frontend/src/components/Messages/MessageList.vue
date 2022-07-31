@@ -28,7 +28,7 @@
             <th scope="col" v-t="'messages.subject'" />
             <th scope="col" v-t="'messages.recipients'" />
             <th scope="col" v-t="'messages.sender.label'" />
-            <th scope="col" v-t="'messages.template.label'" />
+            <th scope="col" v-t="'templates.select.label'" />
             <th scope="col" v-t="'messages.status.label'" />
             <th scope="col" v-t="'messages.sentAt'" />
           </tr>

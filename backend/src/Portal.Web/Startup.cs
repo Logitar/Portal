@@ -40,11 +40,11 @@ namespace Portal.Web
         options.AddPolicy(Constants.Policies.AuthenticatedUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new UserAuthorizationRequirement())
-          .Build()); // TODO(fpion): 401 Unauthorized => redirect to /account/sign-in
+          .Build());
         options.AddPolicy(Constants.Policies.PortalIdentity, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new PortalIdentityAuthorizationRequirement())
-          .Build()); // TODO(fpion): 401 Unauthorized => redirect to /account/sign-in
+          .Build());
       });
 
       services.AddApplicationInsightsTelemetry();
@@ -85,6 +85,7 @@ namespace Portal.Web
         application.UseStaticFiles();
         application.UseSession();
         application.UseMiddleware<RenewSession>();
+        application.UseMiddleware<RedirectUnauthorized>();
         application.UseAuthentication();
         application.UseAuthorization();
         application.MapControllers();

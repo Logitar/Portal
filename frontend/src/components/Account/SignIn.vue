@@ -29,6 +29,12 @@ export default {
     PasswordField,
     UsernameField
   },
+  props: {
+    returnUrl: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       invalidCredentials: false,
@@ -57,7 +63,7 @@ export default {
             await signIn(this.payload)
             this.password = null
             this.$refs.form.reset()
-            window.location.replace('/user/profile')
+            window.location.replace(this.returnUrl || '/user/profile')
           }
         } catch (e) {
           this.password = null
