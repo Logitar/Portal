@@ -56,10 +56,15 @@
         <h3 v-t="'user.information.personal'" />
         <b-row>
           <email-field class="col" :confirmed="user && user.isEmailConfirmed" validate v-model="email" />
+          <phone-field class="col" :confirmed="user && user.isPhoneNumberConfirmed" validate v-model="phoneNumber" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
           <last-name-field class="col" validate v-model="lastName" />
+        </b-row>
+        <b-row>
+          <locale-select class="col" v-model="locale" />
+          <picture-field class="col" validate v-model="picture" />
         </b-row>
       </b-form>
     </validation-observer>
@@ -70,7 +75,10 @@
 import EmailField from './EmailField.vue'
 import FirstNameField from './FirstNameField.vue'
 import LastNameField from './LastNameField.vue'
+import LocaleSelect from './LocaleSelect.vue'
 import PasswordField from './PasswordField.vue'
+import PhoneField from './PhoneField.vue'
+import PictureField from './PictureField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import UsernameField from './UsernameField.vue'
 import { createUser, disableUser, enableUser, updateUser } from '@/api/users'
@@ -82,7 +90,10 @@ export default {
     EmailField,
     FirstNameField,
     LastNameField,
+    LocaleSelect,
     PasswordField,
+    PhoneField,
+    PictureField,
     RealmSelect,
     UsernameField
   },
@@ -105,6 +116,7 @@ export default {
       email: null,
       firstName: null,
       lastName: null,
+      locale: null,
       loading: false,
       middleName: null,
       password: null,
@@ -125,20 +137,23 @@ export default {
         this.password ||
         this.passwordConfirmation ||
         (this.email ?? '') !== (this.user?.email ?? '') ||
+        (this.phoneNumber ?? '') !== (this.user?.phoneNumber ?? '') ||
         (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
-        (this.lastName ?? '') !== (this.user?.lastName ?? '')
+        (this.lastName ?? '') !== (this.user?.lastName ?? '') ||
+        (this.locale ?? '') !== (this.user?.locale ?? '') ||
+        (this.picture ?? '') !== (this.user?.picture ?? '')
       )
     },
     payload() {
       const payload = {
         password: this.password || null,
-        email: this.email,
-        phoneNumber: this.phoneNumber,
+        email: this.email || null,
+        phoneNumber: this.phoneNumber || null,
         firstName: this.firstName,
         lastName: this.lastName,
         middleName: this.middleName,
-        locale: this.$i18n.locale,
-        picture: this.picture
+        locale: this.locale,
+        picture: this.picture || null
       }
       if (!this.user) {
         payload.realm = this.realmId

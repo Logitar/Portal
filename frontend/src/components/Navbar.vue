@@ -59,12 +59,11 @@
           <template v-if="user.isAuthenticated">
             <b-nav-item-dropdown right>
               <template #button-content>
-                <img v-if="user.picture" :src="user.picture" alt="Avatar" class="rounded-circle" width="24" height="24" />
-                <v-gravatar v-else class="rounded-circle" :email="user.email" :size="24" />
+                <user-avatar :user="user" :size="24" />
               </template>
               <b-dropdown-item href="/user/profile">
                 <font-awesome-icon icon="user" />
-                {{ user.name }}
+                {{ user.fullName || user.username }}
               </b-dropdown-item>
               <b-dropdown-item href="/user/sign-out">
                 <font-awesome-icon icon="sign-out-alt" />
@@ -85,8 +84,13 @@
 </template>
 
 <script>
+import UserAvatar from '@/components/User/UserAvatar.vue'
+
 export default {
   name: 'Navbar',
+  components: {
+    UserAvatar
+  },
   props: {
     json: {
       type: String,

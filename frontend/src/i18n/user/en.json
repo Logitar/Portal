@@ -41,12 +41,16 @@
     "label": "Last Name",
     "placeholder": "Enter your last name"
   },
+  "locale": {
+    "label": "Locale",
+    "placeholder": "Select a locale"
+  },
   "newTitle": "Create user",
   "noRealm": "This user is not in a realm.",
   "password": {
     "changeFailed": "Password change failed!",
     "changed": "Your password has been changed.",
-    "changedAt": "Last changed at",
+    "changedAt": "Last changed on",
     "confirm": {
       "label": "Password Confirmation",
       "placeholder": "Enter the same password again"
@@ -70,7 +74,14 @@
     "label": "Phone Number",
     "placeholder": "Enter your phone number"
   },
-  "profile": "Profile",
+  "picture": {
+    "label": "Picture URL",
+    "placeholder": "Paste the picture URL of the user"
+  },
+  "profile": {
+    "title": "Profile",
+    "updated": "Your profile has been updated."
+  },
   "signIn": {
     "failed": "Sign in failed!",
     "invalidCredentials": "Please check you provided the correct email address/username and password.",
