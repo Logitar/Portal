@@ -8,9 +8,9 @@ namespace Portal.Core.Users
 {
   public class User : Aggregate
   {
-    public User(CreateUserPayload payload, Guid userId, string? passwordHash = null, Realm? realm = null)
+    public User(CreateUserSecurePayload payload, Guid userId, Realm? realm = null)
     {
-      ApplyChange(new CreatedEvent(payload, userId, passwordHash));
+      ApplyChange(new CreatedEvent(payload, userId));
 
       Realm = realm;
       RealmSid = realm?.Sid;
@@ -83,7 +83,7 @@ namespace Portal.Core.Users
     public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
     public void ConfirmPhoneNumber(Guid? userId = null) => ApplyChange(new ConfirmedPhoneNumberEvent(userId ?? Id));
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
-    public void Update(UpdateUserPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
+    public void Update(UpdateUserSecurePayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
 
     public void ChangePassword(string passwordHash) => ApplyChange(new ChangedPasswordEvent(passwordHash, Id));
     public void SignIn(DateTime signedInAt) => ApplyChange(new SignedInEvent(signedInAt, Id));
@@ -105,11 +105,8 @@ namespace Portal.Core.Users
     {
       Username = @event.Payload.Username;
 
-      if (@event.PasswordHash != null)
-      {
-        PasswordChangedAt = @event.OccurredAt;
-        PasswordHash = @event.PasswordHash;
-      }
+      PasswordChangedAt = @event.OccurredAt;
+      PasswordHash = @event.Payload.PasswordHash;
 
       Apply(@event.Payload);
     }
@@ -137,6 +134,12 @@ namespace Portal.Core.Users
     }
     protected virtual void Apply(UpdatedEvent @event)
     {
+      if (@event.Payload.PasswordHash != null)
+      {
+        PasswordChangedAt = @event.OccurredAt;
+        PasswordHash = @event.Payload.PasswordHash;
+      }
+
       Apply(@event.Payload);
     }
 

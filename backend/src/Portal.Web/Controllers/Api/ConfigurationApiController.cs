@@ -24,17 +24,16 @@ namespace Portal.Web.Controllers.Api
     [HttpPost]
     public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
     {
-      var signInPayload = new SignInPayload
-      {
-        Username = payload.User.Username,
-        Password = payload.User.Password
-      };
-
       await _configurationService.InitializeAsync(payload, cancellationToken);
 
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
       string? additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
+      var signInPayload = new SignInPayload
+      {
+        Username = payload.User.Username,
+        Password = payload.User.Password
+      };
       SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, ipAddress, additionalInformation, cancellationToken);
       HttpContext.SetSession(session);
 

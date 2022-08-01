@@ -28,21 +28,30 @@
           :validate="!user"
           v-model="username"
         />
-        <b-row v-if="!user">
-          <password-field class="col" placeholder="user.create.passwordPlaceholder" :realm="selectedRealm" required validate v-model="password" />
-          <password-field
-            class="col"
-            id="confirm"
-            label="user.password.confirm.label"
-            placeholder="user.password.confirm.placeholder"
-            required
-            :rules="{ confirmed: 'password' }"
-            v-model="passwordConfirmation"
-          />
-        </b-row>
-        <template v-else-if="user.passwordChangedAt">
-          <h5 v-t="'user.password.label'" />
-          <p>{{ $t('user.password.changedAt') }} {{ $d(new Date(user.passwordChangedAt), 'medium') }}</p>
+        <template v-if="!user || user.passwordChangedAt">
+          <h5 v-if="user" v-t="'user.password.label'" />
+          <p v-if="user && user.passwordChangedAt">{{ $t('user.password.changedAt') }} {{ $d(new Date(user.passwordChangedAt), 'medium') }}</p>
+          <b-row>
+            <password-field
+              v-if="user"
+              class="col"
+              label="user.password.new.label"
+              placeholder="user.password.new.placeholder"
+              :realm="selectedRealm"
+              validate
+              v-model="password"
+            />
+            <password-field v-else class="col" placeholder="user.create.passwordPlaceholder" :realm="selectedRealm" required validate v-model="password" />
+            <password-field
+              class="col"
+              id="confirm"
+              label="user.password.confirm.label"
+              placeholder="user.password.confirm.placeholder"
+              :required="!user || Boolean(password)"
+              :rules="{ confirmed: 'password' }"
+              v-model="passwordConfirmation"
+            />
+          </b-row>
         </template>
         <h3 v-t="'user.information.personal'" />
         <b-row>
@@ -111,7 +120,10 @@ export default {
   computed: {
     hasChanges() {
       return (
+        (!this.user && this.realmId) ||
         (!this.user && this.username) ||
+        this.password ||
+        this.passwordConfirmation ||
         (this.email ?? '') !== (this.user?.email ?? '') ||
         (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
         (this.lastName ?? '') !== (this.user?.lastName ?? '')
@@ -119,6 +131,7 @@ export default {
     },
     payload() {
       const payload = {
+        password: this.password || null,
         email: this.email,
         phoneNumber: this.phoneNumber,
         firstName: this.firstName,
@@ -130,7 +143,6 @@ export default {
       if (!this.user) {
         payload.realm = this.realmId
         payload.username = this.username
-        payload.password = this.password
       }
       return payload
     }
@@ -171,6 +183,8 @@ export default {
       this.lastName = user.lastName
       this.locale = user.locale
       this.middleName = user.middleName
+      this.password = null
+      this.passwordConfirmation = null
       this.phoneNumber = user.phoneNumber
       this.picture = user.picture
       this.realmId = user.realm?.id ?? null

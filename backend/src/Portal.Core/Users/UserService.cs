@@ -68,10 +68,9 @@ namespace Portal.Core.Users
         throw new EmailAlreadyUsedException(payload.Email, nameof(payload.Email));
       }
 
-      string passwordHash = _passwordService.Hash(payload.Password);
-      payload.Password = string.Empty;
-
-      var user = new User(payload, _userContext.ActorId, passwordHash, realm);
+      var securePayload = _mapper.Map<CreateUserSecurePayload>(payload);
+      securePayload.PasswordHash = _passwordService.Hash(payload.Password);
+      var user = new User(securePayload, _userContext.ActorId, realm);
 
       if (payload.ConfirmEmail)
       {
@@ -173,7 +172,15 @@ namespace Portal.Core.Users
       User user = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<User>(id);
 
-      user.Update(payload, _userContext.ActorId);
+      var securePayload = _mapper.Map<UpdateUserSecurePayload>(payload);
+
+      if (payload.Password != null)
+      {
+        _passwordService.ValidateAndThrow(payload.Password, user.Realm);
+        securePayload.PasswordHash = _passwordService.Hash(payload.Password);
+      }
+
+      user.Update(securePayload, _userContext.ActorId);
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);

@@ -76,7 +76,7 @@ namespace Portal.Core.Accounts
         throw new InvalidCredentialsException();
       }
 
-      var passwordHash = _passwordService.Hash(payload.Password);
+      string passwordHash = _passwordService.Hash(payload.Password);
       user.ChangePassword(passwordHash);
       await _userRepository.SaveAsync(user, cancellationToken);
 
@@ -213,7 +213,7 @@ namespace Portal.Core.Accounts
       User user = await _userQuerier.GetAsync(userId, readOnly: false, cancellationToken)
         ?? throw new InvalidOperationException($"The user 'Id={userId}' could not be found.");
 
-      var passwordHash = _passwordService.Hash(payload.Password);
+      string passwordHash = _passwordService.Hash(payload.Password);
       user.ChangePassword(passwordHash);
       await _userRepository.SaveAsync(user, cancellationToken);
     }
