@@ -1,5 +1,9 @@
-const allowedUserNameCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+import { extend } from 'vee-validate'
 
-export default function (value) {
-  return typeof value === 'string' && [...value].every(c => allowedUserNameCharacters.includes(c))
-}
+const allowedUserNameCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+' // TODO(fpion): use Realm configuration
+
+extend('alias', {
+  validate(value) {
+    return typeof value === 'string' && [...value].every(c => allowedUserNameCharacters.includes(c))
+  }
+})

@@ -46,8 +46,6 @@ namespace Portal.Core.Users
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      _passwordService.ValidateAndThrow(payload.Password);
-
       Realm? realm = null;
       if (payload.Realm != null)
       {
@@ -56,6 +54,8 @@ namespace Portal.Core.Users
           : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
         ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
+
+      _passwordService.ValidateAndThrow(payload.Password, realm);
 
       if (await _querier.GetAsync(payload.Username, realm, readOnly: true, cancellationToken) != null)
       {

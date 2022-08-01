@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Portal.Core.Users;
 
 namespace Portal.Core.Realms
 {
@@ -18,6 +19,9 @@ namespace Portal.Core.Realms
       RuleFor(x => x.Url)
         .MaximumLength(2048)
         .Must(ValidationRules.BeAValidUrl);
+
+      When(x => x.PasswordSettings != null, () => RuleFor(x => x.PasswordSettings!)
+        .SetValidator(new PasswordSettingsValidator()));
     }
 
     private static bool BeAValidAlias(string? value) => value == null

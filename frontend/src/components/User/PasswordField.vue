@@ -44,10 +44,16 @@ export default {
   },
   computed: {
     allRules() {
-      return {
-        ...this.rules,
-        password: this.validate
+      const rules = { ...this.rules }
+      if (this.validate) {
+        // TODO(fpion): use Realm configuration
+        rules.require_digit = true
+        rules.require_lowercase = true
+        rules.require_non_alphanumeric = true
+        rules.require_uppercase = true
+        rules.required_unique_chars = 8
       }
+      return rules
     }
   },
   methods: {

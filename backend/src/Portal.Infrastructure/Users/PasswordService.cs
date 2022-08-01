@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Portal.Core;
+using Portal.Core.Realms;
 using Portal.Core.Users;
-using Portal.Infrastructure.Settings;
 using System.Security.Cryptography;
 
 namespace Portal.Infrastructure.Users
@@ -14,12 +14,8 @@ namespace Portal.Infrastructure.Users
 
     private readonly RandomNumberGenerator _generator = RandomNumberGenerator.Create();
 
-    private readonly PasswordSettings _settings;
-
-    public PasswordService(PasswordSettings settings)
-    {
-      _settings = settings;
-    }
+    private readonly PasswordSettings _settings = new(requiredLength: 8, requiredUniqueChars: 8,
+      requireNonAlphanumeric: true, requireLowercase: true, requireUppercase: true, requireDigit: true);
 
     public void Dispose()
     {
@@ -69,14 +65,28 @@ namespace Portal.Infrastructure.Users
         && password?.IsMatch(passwordString) == true;
     }
 
-    public void ValidateAndThrow(string passwordString)
+    public void ValidateAndThrow(string passwordString, Realm? realm)
     {
       ArgumentNullException.ThrowIfNull(passwordString);
 
-      var errors = new List<Error>(capacity: 6);
-      if (passwordString.Length < _settings.RequiredLength)
+      PasswordSettings settings;
+      if (realm == null)
       {
-        errors.Add(new Error("PasswordTooShort", $"Passwords must be at least {_settings.RequiredLength} characters."));
+        settings = _settings;
+      }
+      else if (realm.PasswordSettings == null)
+      {
+        return;
+      }
+      else
+      {
+        settings = realm.PasswordSettings;
+      }
+
+      var errors = new List<Error>(capacity: 6);
+      if (passwordString.Length < settings.RequiredLength)
+      {
+        errors.Add(new Error("PasswordTooShort", $"Passwords must be at least {settings.RequiredLength} characters."));
       }
 
       var chars = new Dictionary<char, int>(capacity: passwordString.Length);
@@ -92,18 +102,18 @@ namespace Portal.Infrastructure.Users
         }
       }
 
-      if (chars.Count < _settings.RequiredUniqueChars)
+      if (chars.Count < settings.RequiredUniqueChars)
       {
-        errors.Add(new Error("PasswordRequiresUniqueChars", $"Passwords must use at least {_settings.RequiredUniqueChars} different characters."));
+        errors.Add(new Error("PasswordRequiresUniqueChars", $"Passwords must use at least {settings.RequiredUniqueChars} different characters."));
       }
 
-      if (_settings.RequireNonAlphanumeric && chars.Keys.All(char.IsLetterOrDigit))
+      if (settings.RequireNonAlphanumeric && chars.Keys.All(char.IsLetterOrDigit))
         errors.Add(new Error("PasswordRequiresNonAlphanumeric", "Passwords must have at least one non alphanumeric character."));
-      if (_settings.RequireLowercase && !chars.Keys.Any(char.IsLower))
+      if (settings.RequireLowercase && !chars.Keys.Any(char.IsLower))
         errors.Add(new Error("PasswordRequiresLower", "Passwords must have at least one lowercase ('a'-'z')."));
-      if (_settings.RequireUppercase && !chars.Keys.Any(char.IsUpper))
+      if (settings.RequireUppercase && !chars.Keys.Any(char.IsUpper))
         errors.Add(new Error("PasswordRequiresUpper", "Passwords must have at least one uppercase ('A'-'Z')."));
-      if (_settings.RequireDigit && !chars.Keys.Any(char.IsDigit))
+      if (settings.RequireDigit && !chars.Keys.Any(char.IsDigit))
         errors.Add(new Error("PasswordRequiresDigit", "Passwords must have at least one digit ('0'-'9')."));
 
       if (errors.Any())

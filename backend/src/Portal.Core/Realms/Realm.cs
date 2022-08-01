@@ -3,6 +3,8 @@ using Portal.Core.Emails.Templates;
 using Portal.Core.Realms.Events;
 using Portal.Core.Realms.Payloads;
 using Portal.Core.Users;
+using Portal.Core.Users.Payloads;
+using System.Text.Json;
 
 namespace Portal.Core.Realms
 {
@@ -50,6 +52,13 @@ namespace Portal.Core.Realms
     /// </summary>
     public PasswordRecoveryTemplate? PasswordRecoveryTemplateRelation { get; private set; }
 
+    public PasswordSettings? PasswordSettings { get; private set; }
+    public string? PasswordSettingsSerialized
+    {
+      get => PasswordSettings == null ? null : JsonSerializer.Serialize(PasswordSettings);
+      private set => PasswordSettings = value == null ? null : JsonSerializer.Deserialize<PasswordSettings>(value);
+    }
+
     public List<User> Users { get; private set; } = new();
 
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
@@ -80,6 +89,12 @@ namespace Portal.Core.Realms
       RequireConfirmedAccount = payload.RequireConfirmedAccount;
       RequireUniqueEmail = payload.RequireUniqueEmail;
       Url = payload.Url;
+
+      PasswordSettingsPayload? password = payload.PasswordSettings;
+      PasswordSettings = password == null
+        ? null
+        : new PasswordSettings(password.RequiredLength, password.RequiredUniqueChars,
+            password.RequireNonAlphanumeric, password.RequireLowercase, password.RequireUppercase, password.RequireDigit);
     }
 
     public override string ToString() => $"{Name} | {base.ToString()}";

@@ -9,6 +9,7 @@ namespace Portal.Core.Users
     {
       CreateMap<User, UserModel>()
         .IncludeBase<Aggregate, AggregateModel>();
+      CreateMap<PasswordSettings, PasswordSettingsModel>();
     }
   }
 }

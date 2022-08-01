@@ -32,10 +32,10 @@
           </b-tab>
           <b-tab :title="$t('realms.settings')">
             <b-form-group>
-              <b-form-checkbox id="requireUniqueEmail" v-model="requireUniqueEmail">{{ $t('realms.requireUniqueEmail') }}</b-form-checkbox>
+              <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
+              <b-form-checkbox id="requireUniqueEmail" v-model="requireUniqueEmail">{{ $t('realms.requireUniqueEmail') }}</b-form-checkbox>
             </b-form-group>
             <form-field
               id="allowedUsernameCharacters"
@@ -43,6 +43,7 @@
               placeholder="realms.allowedUsernameCharacters.placeholder"
               v-model="allowedUsernameCharacters"
             />
+            <password-settings v-model="passwordSettings" />
             <div v-if="realm">
               <h5 v-t="'realms.passwordRecovery.title'" />
               <b-row>
@@ -64,7 +65,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import AliasField from './AliasField.vue'
+import PasswordSettings from './PasswordSettings.vue'
 import SenderSelect from '@/components/Senders/SenderSelect.vue'
 import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
 import { createRealm, updateRealm } from '@/api/realms'
@@ -73,6 +76,7 @@ export default {
   name: 'RealmEdit',
   components: {
     AliasField,
+    PasswordSettings,
     SenderSelect,
     TemplateSelect
   },
@@ -95,6 +99,14 @@ export default {
       name: null,
       passwordRecoverySenderId: null,
       passwordRecoveryTemplateId: null,
+      passwordSettings: {
+        requireDigit: false,
+        requireLowercase: false,
+        requireNonAlphanumeric: false,
+        requireUppercase: null,
+        requiredLength: null,
+        requiredUniqueChars: null
+      },
       realm: null,
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
@@ -105,26 +117,33 @@ export default {
     hasChanges() {
       return (
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
-        (this.name ?? '') !== (this.realm?.name ?? '') ||
-        (this.url ?? '') !== (this.realm?.url ?? '') ||
+        (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
+        (this.name ?? '') !== (this.realm?.name ?? '') ||
+        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
+        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
+        this.passwordSettings.requireDigit !== (this.realm?.passwordSettings?.requireDigit ?? false) ||
+        this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings?.requireLowercase ?? false) ||
+        this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings?.requireNonAlphanumeric ?? false) ||
+        this.passwordSettings.requireUppercase !== (this.realm?.passwordSettings?.requireUppercase ?? false) ||
+        (this.passwordSettings.requiredLength ?? 0) !== (this.realm?.passwordSettings?.requiredLength ?? 0) ||
+        (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings?.requiredUniqueChars ?? 0) ||
         this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
-        (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
-        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
-        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId
+        (this.url ?? '') !== (this.realm?.url ?? '')
       )
     },
     payload() {
       const payload = {
-        name: this.name,
-        url: this.url,
-        description: this.description,
-        requireUniqueEmail: this.requireUniqueEmail,
-        requireConfirmedAccount: this.requireConfirmedAccount,
         allowedUsernameCharacters: this.allowedUsernameCharacters,
+        description: this.description,
+        name: this.name,
         passwordRecoverySenderId: this.passwordRecoverySenderId,
-        passwordRecoveryTemplateId: this.passwordRecoveryTemplateId
+        passwordRecoveryTemplateId: this.passwordRecoveryTemplateId,
+        passwordSettings: { ...this.passwordSettings },
+        requireConfirmedAccount: this.requireConfirmedAccount,
+        requireUniqueEmail: this.requireUniqueEmail,
+        url: this.url
       }
       if (!this.realm) {
         payload.alias = this.alias
@@ -142,6 +161,12 @@ export default {
       this.name = realm.name
       this.passwordRecoverySenderId = realm.passwordRecoverySenderId
       this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
+      Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings?.requireDigit ?? false)
+      Vue.set(this.passwordSettings, 'requireLowercase', realm.passwordSettings?.requireLowercase ?? false)
+      Vue.set(this.passwordSettings, 'requireNonAlphanumeric', realm.passwordSettings?.requireNonAlphanumeric ?? false)
+      Vue.set(this.passwordSettings, 'requireUppercase', realm.passwordSettings?.requireUppercase ?? false)
+      Vue.set(this.passwordSettings, 'requiredLength', realm.passwordSettings?.requiredLength ?? 0)
+      Vue.set(this.passwordSettings, 'requiredUniqueChars', realm.passwordSettings?.requiredUniqueChars ?? 0)
       this.requireConfirmedAccount = realm.requireConfirmedAccount
       this.requireUniqueEmail = realm.requireUniqueEmail
       this.url = realm.url
