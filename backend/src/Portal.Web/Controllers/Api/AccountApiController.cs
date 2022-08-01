@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Portal.Core.Accounts;
 using Portal.Core.Accounts.Payloads;
-using Portal.Core.Sessions.Models;
 using Portal.Core.Users.Models;
 using Portal.Core.Users.Payloads;
-using System.Text.Json;
 
 namespace Portal.Web.Controllers.Api
 {
@@ -27,22 +25,6 @@ namespace Portal.Web.Controllers.Api
       return Ok(await _accountService.ChangePasswordAsync(payload, cancellationToken));
     }
 
-    [HttpPost("password/recover")]
-    public async Task<ActionResult> RecoverPasswordAsync([FromBody] RecoverPasswordPayload payload, CancellationToken cancellationToken)
-    {
-      await _accountService.RecoverPasswordAsync(payload, cancellationToken);
-
-      return NoContent();
-    }
-
-    [HttpPost("password/reset")]
-    public async Task<ActionResult> ResetPasswordAsync([FromBody] ResetPasswordPayload payload, CancellationToken cancellationToken)
-    {
-      await _accountService.ResetPasswordAsync(payload, cancellationToken);
-
-      return NoContent();
-    }
-
     [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
     [HttpGet("profile")]
     public async Task<ActionResult<UserModel>> GetProfileAsync(CancellationToken cancellationToken)
@@ -57,41 +39,7 @@ namespace Portal.Web.Controllers.Api
       return Ok(await _accountService.SaveProfileAsync(payload, cancellationToken));
     }
 
-    [HttpPost("renew")]
-    public async Task<ActionResult<SessionModel>> RenewSessionAsync(RenewSessionPayload payload, CancellationToken cancellationToken)
-    {
-      string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      string? additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
-
-      SessionModel session = await _accountService.RenewSessionAsync(payload, ipAddress, additionalInformation, cancellationToken);
-      if (session.User?.Realm == null)
-      {
-        HttpContext.SetSession(session);
-
-        return NoContent();
-      }
-
-      return Ok(session);
-    }
-
-    [HttpPost("sign/in")]
-    public async Task<ActionResult<SessionModel>> SignInAsync([FromBody] SignInPayload payload, CancellationToken cancellationToken)
-    {
-      string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      string? additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
-
-      SessionModel session = await _accountService.SignInAsync(payload, ipAddress, additionalInformation, cancellationToken);
-      if (session.User?.Realm == null)
-      {
-        HttpContext.SetSession(session);
-
-        return NoContent();
-      }
-
-      return Ok(session);
-    }
-
-    [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
+    [Authorize(Policy = Constants.Policies.Session)]
     [HttpPost("sign/out")]
     public async Task<ActionResult> SignOutAsync(CancellationToken cancellationToken)
     {

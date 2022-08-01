@@ -35,7 +35,7 @@ namespace Portal.Web.Controllers.Api
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
       string? additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
-      SessionModel session = await _accountService.SignInAsync(signInPayload, ipAddress, additionalInformation, cancellationToken);
+      SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, ipAddress, additionalInformation, cancellationToken);
       HttpContext.SetSession(session);
 
       return NoContent();

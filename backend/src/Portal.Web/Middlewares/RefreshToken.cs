@@ -29,7 +29,7 @@ namespace Portal.Web.Middlewares
             {
               RenewToken = renewToken
             };
-            SessionModel session = await accountService.RenewSessionAsync(payload, ipAddress, additionalInformation);
+            SessionModel session = await accountService.RenewSessionAsync(payload, realm: null, ipAddress, additionalInformation);
             context.SetSession(session);
           }
           catch (Exception)
