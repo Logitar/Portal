@@ -5,5 +5,5 @@ export async function changePassword(payload) {
 }
 
 export async function signIn(payload) {
-  return await post('/api/account/sign/in', payload)
+  return await post('/api/portal/account/sign/in', payload)
 }

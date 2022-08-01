@@ -37,6 +37,10 @@ namespace Portal.Web
 
       services.AddAuthorization(options =>
       {
+        options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new ApiKeyAuthorizationRequirement())
+          .Build());
         options.AddPolicy(Constants.Policies.AuthenticatedUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new UserAuthorizationRequirement())
@@ -44,6 +48,10 @@ namespace Portal.Web
         options.AddPolicy(Constants.Policies.PortalIdentity, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new PortalIdentityAuthorizationRequirement())
+          .Build());
+        options.AddPolicy(Constants.Policies.Session, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new SessionAuthorizationRequirement())
           .Build());
       });
 
@@ -67,7 +75,9 @@ namespace Portal.Web
       services.AddPortalCore();
       services.AddPortalInfrastructure(_configuration);
 
+      services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
+      services.AddSingleton<IAuthorizationHandler, SessionAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
       services.AddSingleton<IUserContext, HttpUserContext>();
     }

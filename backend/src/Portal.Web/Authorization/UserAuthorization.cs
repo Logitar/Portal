@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Portal.Core.Users;
 
 namespace Portal.Web.Authorization
 {
@@ -20,8 +19,7 @@ namespace Portal.Web.Authorization
     {
       if (_httpContextAccessor.HttpContext != null)
       {
-        User? user = _httpContextAccessor.HttpContext.GetUser();
-        if (user == null)
+        if (_httpContextAccessor.HttpContext.GetUser() == null)
         {
           context.Fail(new AuthorizationFailureReason(this, "The User is required."));
         }
