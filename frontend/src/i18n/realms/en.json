@@ -4,6 +4,10 @@
     "label": "Alias",
     "placeholder": "Enter an alias"
   },
+  "allowedUsernameCharacters": {
+    "label": "Allowed username characters",
+    "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
+  },
   "created": "The realm has been created.",
   "delete": {
     "confirm": "Do you really want to delete the following realm?",
@@ -19,6 +23,7 @@
     "title": "Password recovery"
   },
   "requireConfirmedAccount": "Require confirmed account",
+  "requireUniqueEmail": "Require unique email address",
   "select": {
     "label": "Realm",
     "placeholder": "Select a realm"

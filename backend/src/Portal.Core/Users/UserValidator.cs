@@ -5,14 +5,17 @@ namespace Portal.Core.Users
 {
   internal class UserValidator : AbstractValidator<User>
   {
-    private const string AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-
     public UserValidator()
     {
       RuleFor(x => x.Username)
         .NotEmpty()
         .MaximumLength(256)
-        .Must(x => x.All(c => AllowedUserNameCharacters.Contains(c)));
+        .Must((user, username, context) =>
+        {
+          string? allowedUsernameCharacters = context.GetAllowedUsernameCharacters();
+
+          return allowedUsernameCharacters == null || username.All(c => allowedUsernameCharacters.Contains(c));
+        });
 
       When(x => x.PasswordHash == null, () => RuleFor(x => x.PasswordChangedAt).Null());
 

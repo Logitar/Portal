@@ -26,7 +26,9 @@ namespace Portal.Core.Realms
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
 
+    public string? AllowedUsernameCharacters { get; private set; }
     public bool RequireConfirmedAccount { get; private set; }
+    public bool RequireUniqueEmail { get; private set; }
     public string? Url { get; private set; }
 
     public Sender? PasswordRecoverySender
@@ -72,7 +74,11 @@ namespace Portal.Core.Realms
       Name = payload.Name.Trim();
       Description = payload.Description?.CleanTrim();
 
+      AllowedUsernameCharacters = payload.AllowedUsernameCharacters == null
+        ? null
+        : new string(payload.AllowedUsernameCharacters.ToCharArray().Distinct().ToArray());
       RequireConfirmedAccount = payload.RequireConfirmedAccount;
+      RequireUniqueEmail = payload.RequireUniqueEmail;
       Url = payload.Url;
     }
 

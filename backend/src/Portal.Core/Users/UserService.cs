@@ -61,6 +61,12 @@ namespace Portal.Core.Users
       {
         throw new UsernameAlreadyUsedException(payload.Username, nameof(payload.Username));
       }
+      else if (realm?.RequireUniqueEmail == true
+        && payload.Email != null
+        && (await _querier.GetByEmailAsync(payload.Email, realm, readOnly: true, cancellationToken)).Any())
+      {
+        throw new EmailAlreadyUsedException(payload.Email, nameof(payload.Email));
+      }
 
       string passwordHash = _passwordService.Hash(payload.Password);
       payload.Password = string.Empty;
@@ -76,7 +82,9 @@ namespace Portal.Core.Users
         user.ConfirmPhoneNumber(_userContext.ActorId);
       }
 
-      _validator.ValidateAndThrow(user);
+      var context = ValidationContext<User>.CreateWithOptions(user, options => options.ThrowOnFailures());
+      context.SetAllowedUsernameCharacters(realm?.AllowedUsernameCharacters);
+      _validator.Validate(context);
 
       await _repository.SaveAsync(user, cancellationToken);
 

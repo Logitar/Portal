@@ -20,6 +20,8 @@ namespace Portal.Infrastructure.Configurations
       builder.Property(x => x.Alias).HasMaxLength(256);
       builder.Property(x => x.AliasNormalized).HasMaxLength(256);
       builder.Property(x => x.Name).HasMaxLength(256);
+      builder.Property(x => x.RequireConfirmedAccount).HasDefaultValue(false);
+      builder.Property(x => x.RequireUniqueEmail).HasDefaultValue(false);
       builder.Property(x => x.Url).HasMaxLength(2048);
     }
   }

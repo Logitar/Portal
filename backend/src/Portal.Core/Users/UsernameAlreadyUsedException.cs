@@ -8,8 +8,8 @@ namespace Portal.Core.Users
     public UsernameAlreadyUsedException(string username, string paramName)
       : base(HttpStatusCode.Conflict, GetMessage(username, paramName))
     {
-      Username = username ?? throw new ArgumentNullException(nameof(username));
       ParamName = paramName ?? throw new ArgumentNullException(nameof(paramName));
+      Username = username ?? throw new ArgumentNullException(nameof(username));
 
       Value = new { field = paramName };
     }
@@ -21,7 +21,7 @@ namespace Portal.Core.Users
     {
       var message = new StringBuilder();
 
-      message.AppendLine($"The alias '{alias}' is already used.");
+      message.AppendLine($"The username '{alias}' is already used.");
       message.AppendLine($"ParamName: {paramName}");
 
       return message.ToString();

@@ -11,8 +11,8 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
+          <b-nav-item v-if="environment === 'development'" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
           <template v-if="user.isAuthenticated">
-            <b-nav-item v-if="environment === 'development'" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
             <b-nav-item href="/users">
               <font-awesome-icon icon="users" />
               {{ $t('user.title') }}
