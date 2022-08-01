@@ -177,18 +177,12 @@ namespace Portal.Core.Accounts
         throw new InvalidCredentialsException();
       }
 
-      byte[]? keyBytes = null;
-      string? keyHash = null;
-      if (session.KeyHash != null)
-      {
-        keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out keyBytes);
-      }
-
+      string keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out byte[] keyBytes);
       session.Update(keyHash, ipAddress, additionalInformation);
       await _sessionRepository.SaveAsync(session, cancellationToken);
 
       var model = _mapper.Map<SessionModel>(session);
-      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
+      model.RenewToken = new SecureToken(model.Id, keyBytes).ToString();
 
       return model;
     }

@@ -17,24 +17,22 @@ namespace Portal.Infrastructure.Queriers
     public async Task<User?> GetAsync(string username, Realm? realm, bool readOnly, CancellationToken cancellationToken)
     {
       username = username?.ToUpper() ?? throw new ArgumentNullException(nameof(username));
+      int? realmSid = realm?.Sid;
 
-      IQueryable<User> query = _users.ApplyTracking(readOnly).Include(x => x.Realm);
-
-      return realm == null
-        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.UsernameNormalized == username, cancellationToken)
-        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.UsernameNormalized == username, cancellationToken);
+      return await _users.ApplyTracking(readOnly)
+        .Include(x => x.Realm)
+        .SingleOrDefaultAsync(x => x.RealmSid == realmSid && x.UsernameNormalized == username, cancellationToken);
     }
 
     public async Task<IEnumerable<User>> GetAsync(IEnumerable<string> usernames, Realm? realm, bool readOnly, CancellationToken cancellationToken)
     {
       usernames = usernames?.Select(x => x.ToUpper()) ?? throw new ArgumentNullException(nameof(usernames));
+      int? realmSid = realm?.Sid;
 
-      IQueryable<User> query = _users.ApplyTracking(readOnly).Include(x => x.Realm);
-
-      return await (realm == null
-        ? query.Where(x => x.RealmSid == null && usernames.Contains(x.UsernameNormalized))
-        : query.Where(x => x.RealmSid == realm.Sid && usernames.Contains(x.UsernameNormalized))
-      ).ToArrayAsync(cancellationToken);
+      return await _users.ApplyTracking(readOnly)
+        .Include(x => x.Realm)
+        .Where(x => x.RealmSid == realmSid && usernames.Contains(x.UsernameNormalized))
+        .ToArrayAsync(cancellationToken);
     }
 
     public async Task<User?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
@@ -51,6 +49,17 @@ namespace Portal.Infrastructure.Queriers
       return await _users.ApplyTracking(readOnly)
         .Include(x => x.Realm)
         .Where(x => ids.Contains(x.Id))
+        .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<User>> GetByEmailAsync(string email, Realm? realm, bool readOnly, CancellationToken cancellationToken)
+    {
+      email = email?.ToUpper() ?? throw new ArgumentNullException(nameof(email));
+      int? realmSid = realm?.Sid;
+
+      return await _users.ApplyTracking(readOnly)
+        .Include(x => x.Realm)
+        .Where(x => x.RealmSid == realmSid && x.EmailNormalized == email)
         .ToArrayAsync(cancellationToken);
     }
 

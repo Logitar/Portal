@@ -32,8 +32,17 @@
           </b-tab>
           <b-tab :title="$t('realms.settings')">
             <b-form-group>
+              <b-form-checkbox id="requireUniqueEmail" v-model="requireUniqueEmail">{{ $t('realms.requireUniqueEmail') }}</b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
               <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
             </b-form-group>
+            <form-field
+              id="allowedUsernameCharacters"
+              label="realms.allowedUsernameCharacters.label"
+              placeholder="realms.allowedUsernameCharacters.placeholder"
+              v-model="allowedUsernameCharacters"
+            />
             <div v-if="realm">
               <h5 v-t="'realms.passwordRecovery.title'" />
               <b-row>
@@ -80,6 +89,7 @@ export default {
   data() {
     return {
       alias: null,
+      allowedUsernameCharacters: null,
       description: null,
       loading: false,
       name: null,
@@ -87,6 +97,7 @@ export default {
       passwordRecoveryTemplateId: null,
       realm: null,
       requireConfirmedAccount: false,
+      requireUniqueEmail: false,
       url: null
     }
   },
@@ -97,7 +108,9 @@ export default {
         (this.name ?? '') !== (this.realm?.name ?? '') ||
         (this.url ?? '') !== (this.realm?.url ?? '') ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
+        this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
+        (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
         this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
         this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId
       )
@@ -107,7 +120,9 @@ export default {
         name: this.name,
         url: this.url,
         description: this.description,
+        requireUniqueEmail: this.requireUniqueEmail,
         requireConfirmedAccount: this.requireConfirmedAccount,
+        allowedUsernameCharacters: this.allowedUsernameCharacters,
         passwordRecoverySenderId: this.passwordRecoverySenderId,
         passwordRecoveryTemplateId: this.passwordRecoveryTemplateId
       }
@@ -122,11 +137,13 @@ export default {
     setModel(realm) {
       this.realm = realm
       this.alias = realm.alias
+      this.allowedUsernameCharacters = realm.allowedUsernameCharacters
       this.description = realm.description
       this.name = realm.name
       this.passwordRecoverySenderId = realm.passwordRecoverySenderId
       this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
       this.requireConfirmedAccount = realm.requireConfirmedAccount
+      this.requireUniqueEmail = realm.requireUniqueEmail
       this.url = realm.url
     },
     async submit() {

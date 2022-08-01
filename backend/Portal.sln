@@ -9,15 +9,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.Core", "src\Portal.Core\Portal.Core.csproj", "{D4C0C8F2-4607-4812-A222-828B5A3E9B95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.Infrastructure", "src\Portal.Infrastructure\Portal.Infrastructure.csproj", "{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.Infrastructure", "src\Portal.Infrastructure\Portal.Infrastructure.csproj", "{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.Web", "src\Portal.Web\Portal.Web.csproj", "{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal.Web", "src\Portal.Web\Portal.Web.csproj", "{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
