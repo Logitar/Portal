@@ -83,9 +83,9 @@ export default {
       provider: null,
       realmId: null,
       search: null,
+      senders: [],
       sort: 'DisplayName',
-      total: 0,
-      senders: []
+      total: 0
     }
   },
   computed: {

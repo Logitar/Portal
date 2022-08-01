@@ -148,6 +148,7 @@ export default {
             newValue.isDemo !== oldValue.isDemo ||
             newValue.realmId !== oldValue.realmId ||
             newValue.search !== oldValue.search ||
+            newValue.succeeded !== oldValue.succeeded ||
             newValue.templateId !== oldValue.templateId ||
             newValue.count !== oldValue.count)
         ) {

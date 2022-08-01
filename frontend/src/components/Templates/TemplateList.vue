@@ -69,8 +69,8 @@ export default {
       realmId: null,
       search: null,
       sort: 'DisplayName',
-      total: 0,
-      templates: []
+      templates: [],
+      total: 0
     }
   },
   computed: {

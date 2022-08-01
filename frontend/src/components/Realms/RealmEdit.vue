@@ -128,8 +128,8 @@ export default {
         this.passwordSettings.requireUppercase !== (this.realm?.passwordSettings?.requireUppercase ?? false) ||
         (this.passwordSettings.requiredLength ?? 0) !== (this.realm?.passwordSettings?.requiredLength ?? 0) ||
         (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings?.requiredUniqueChars ?? 0) ||
-        this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
+        this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         (this.url ?? '') !== (this.realm?.url ?? '')
       )
     },
