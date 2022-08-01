@@ -59,7 +59,7 @@
     "label": "Password",
     "new": {
       "label": "New Password",
-      "placeholder": "Enter your new password"
+      "placeholder": "Enter a new password"
     },
     "placeholder": "Enter your password",
     "submit": "Change password"
