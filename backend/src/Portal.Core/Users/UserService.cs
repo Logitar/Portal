@@ -9,6 +9,8 @@ namespace Portal.Core.Users
 {
   internal class UserService : IUserService
   {
+    private const string AllowedUsernameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+
     private readonly IMapper _mapper;
     private readonly IPasswordService _passwordService;
     private readonly IUserQuerier _querier;
@@ -83,7 +85,7 @@ namespace Portal.Core.Users
       }
 
       var context = ValidationContext<User>.CreateWithOptions(user, options => options.ThrowOnFailures());
-      context.SetAllowedUsernameCharacters(realm?.AllowedUsernameCharacters);
+      context.SetAllowedUsernameCharacters(realm == null ? AllowedUsernameCharacters : realm.AllowedUsernameCharacters);
       _validator.Validate(context);
 
       await _repository.SaveAsync(user, cancellationToken);

@@ -17,6 +17,6 @@
     "required": "The {_field_} is required.",
     "required_unique_chars": "The {_field_} must contain at least {count} different characters.",
     "url": "Please enter a valid URL. Valid URLs start with http:// or https://.",
-    "username": "The {_field_} may only contain letters, digits and the following special characters: -._@+."
+    "username": "The {_field_} may only contain the following characters: {allowedCharacters}"
   }
 }
