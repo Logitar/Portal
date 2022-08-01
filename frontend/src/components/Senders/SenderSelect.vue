@@ -20,7 +20,7 @@ export default {
       type: String,
       default: 'senders.select.placeholder'
     },
-    realmId: {},
+    realm: {},
     required: {
       type: Boolean,
       default: false
@@ -41,10 +41,10 @@ export default {
     }
   },
   methods: {
-    async refresh(realmId) {
+    async refresh(realm) {
       try {
         const { data } = await getSenders({
-          realmId,
+          realm,
           sort: 'EmailAddress',
           desc: false
         })
@@ -55,10 +55,10 @@ export default {
     }
   },
   watch: {
-    realmId: {
+    realm: {
       immediate: true,
-      handler(realmId) {
-        this.refresh(realmId)
+      handler(realm) {
+        this.refresh(realm)
       }
     }
   }

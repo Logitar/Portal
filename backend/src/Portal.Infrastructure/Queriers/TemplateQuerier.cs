@@ -16,13 +16,11 @@ namespace Portal.Infrastructure.Queriers
 
     public async Task<Template?> GetAsync(string key, Realm? realm, bool readOnly, CancellationToken cancellationToken)
     {
-      key = key?.ToUpper() ?? throw new ArgumentNullException(nameof(key));
+      ArgumentNullException.ThrowIfNull(key);
 
-      IQueryable<Template> query = _templates.ApplyTracking(readOnly).Include(x => x.Realm);
-
-      return realm == null
-        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.KeyNormalized == key, cancellationToken)
-        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.KeyNormalized == key, cancellationToken);
+      return Guid.TryParse(key, out Guid id)
+        ? await GetAsync(id, readOnly, cancellationToken)
+        : await GetByKeyAsync(key, realm, readOnly, cancellationToken);
     }
 
     public async Task<Template?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
@@ -32,14 +30,35 @@ namespace Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<PagedList<Template>> GetPagedAsync(Guid? realmId, string? search,
+    public async Task<Template?> GetByKeyAsync(string key, Realm? realm, bool readOnly, CancellationToken cancellationToken)
+    {
+      key = key?.ToUpper() ?? throw new ArgumentNullException(nameof(key));
+
+      IQueryable<Template> query = _templates.ApplyTracking(readOnly).Include(x => x.Realm);
+
+      return realm == null
+        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.KeyNormalized == key, cancellationToken)
+        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.KeyNormalized == key, cancellationToken);
+    }
+
+    public async Task<PagedList<Template>> GetPagedAsync(string? realm, string? search,
       TemplateSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
     {
       IQueryable<Template> query = _templates.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => realmId.HasValue ? (x.Realm != null && x.Realm.Id == realmId.Value) : x.Realm == null);
+        .Include(x => x.Realm);
+
+      if (realm == null)
+      {
+        query = query.Where(x => x.RealmSid == null);
+      }
+      else
+      {
+        query = Guid.TryParse(realm, out Guid realmId)
+          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
+          : query.Where(x => x.Realm != null && x.Realm.Alias == realm.ToUpper());
+      }
 
       if (search != null)
       {

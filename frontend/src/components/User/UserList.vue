@@ -7,7 +7,7 @@
         <icon-button class="mx-1" :href="createUrl" icon="plus" text="actions.create" variant="success" />
       </div>
       <b-row>
-        <realm-select class="col" v-model="realmId" />
+        <realm-select class="col" v-model="realm" />
         <form-select
           class="col"
           id="isConfirmed"
@@ -106,7 +106,7 @@ export default {
       isDisabled: null,
       loading: false,
       page: 1,
-      realmId: null,
+      realm: null,
       search: null,
       sort: 'Username',
       total: 0,
@@ -115,13 +115,13 @@ export default {
   },
   computed: {
     createUrl() {
-      return '/create-user' + getQueryString({ realm: this.realmId })
+      return '/create-user' + getQueryString({ realm: this.realm })
     },
     params() {
       return {
         isConfirmed: this.isConfirmed,
         isDisabled: this.isDisabled,
-        realmId: this.realmId,
+        realm: this.realm,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -228,7 +228,7 @@ export default {
           oldValue &&
           (newValue.isConfirmed !== oldValue.isConfirmed ||
             newValue.isDisabled !== oldValue.isDisabled ||
-            newValue.realmId !== oldValue.realmId ||
+            newValue.realm !== oldValue.realm ||
             newValue.search !== oldValue.search ||
             newValue.count !== oldValue.count)
         ) {

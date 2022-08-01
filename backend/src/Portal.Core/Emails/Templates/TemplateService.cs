@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Portal.Core.Realms;
 using Portal.Core.Emails.Templates.Models;
 using Portal.Core.Emails.Templates.Payloads;
+using Portal.Core.Realms;
 
 namespace Portal.Core.Emails.Templates
 {
@@ -39,13 +39,11 @@ namespace Portal.Core.Emails.Templates
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
-      if (await _querier.GetAsync(payload.Key, realm, readOnly: true, cancellationToken) != null)
+      if (await _querier.GetByKeyAsync(payload.Key, realm, readOnly: true, cancellationToken) != null)
       {
         throw new KeyAlreadyUsedException(payload.Key, nameof(payload.Key));
       }
@@ -77,12 +75,12 @@ namespace Portal.Core.Emails.Templates
       return _mapper.Map<TemplateModel>(template);
     }
 
-    public async Task<ListModel<TemplateModel>> GetAsync(Guid? realmId, string? search,
+    public async Task<ListModel<TemplateModel>> GetAsync(string? realm, string? search,
       TemplateSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      PagedList<Template> templates = await _querier.GetPagedAsync(realmId, search,
+      PagedList<Template> templates = await _querier.GetPagedAsync(realm, search,
         sort, desc,
         index, count,
         readOnly: true, cancellationToken);

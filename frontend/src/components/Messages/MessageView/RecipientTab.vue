@@ -61,7 +61,7 @@ export default {
   },
   async created() {
     try {
-      const { data } = await getUsers({ realmId: this.message.realmId })
+      const { data } = await getUsers({ realm: this.message.realmId })
       data.items.forEach(user => Vue.set(this.users, user.id, user))
     } catch (e) {
       this.handleError(e)

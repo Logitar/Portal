@@ -51,10 +51,10 @@
                   class="col"
                   id="passwordRecoverySenderId"
                   placeholder="realms.passwordRecovery.senderPlaceholder"
-                  :realmId="realm.id"
+                  :realm="realm.id"
                   v-model="passwordRecoverySenderId"
                 />
-                <template-select class="col" id="passwordRecoveryTemplateId" :realmId="realm.id" v-model="passwordRecoveryTemplateId" />
+                <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
           </b-tab>
@@ -128,8 +128,8 @@ export default {
         this.passwordSettings.requireUppercase !== (this.realm?.passwordSettings?.requireUppercase ?? false) ||
         (this.passwordSettings.requiredLength ?? 0) !== (this.realm?.passwordSettings?.requiredLength ?? 0) ||
         (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings?.requiredUniqueChars ?? 0) ||
-        this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
+        this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
         (this.url ?? '') !== (this.realm?.url ?? '')
       )
     },

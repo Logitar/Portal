@@ -63,14 +63,24 @@ namespace Portal.Infrastructure.Queriers
         .ToArrayAsync(cancellationToken);
     }
 
-    public async Task<PagedList<User>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, Guid? realmId, string? search,
+    public async Task<PagedList<User>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
     {
       IQueryable<User> query = _users.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => realmId.HasValue ? (x.Realm != null && x.Realm.Id == realmId.Value) : x.Realm == null);
+        .Include(x => x.Realm);
+
+      if (realm == null)
+      {
+        query = query.Where(x => x.RealmSid == null);
+      }
+      else
+      {
+        query = Guid.TryParse(realm, out Guid realmId)
+          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
+          : query.Where(x => x.Realm != null && x.Realm.Alias == realm.ToUpper());
+      }
 
       if (isConfirmed.HasValue)
       {

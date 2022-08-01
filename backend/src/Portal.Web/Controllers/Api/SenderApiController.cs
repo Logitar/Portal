@@ -35,12 +35,12 @@ namespace Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<SenderModel>>> GetAsync(ProviderType? provider, Guid? realmId, string? search,
+    public async Task<ActionResult<ListModel<SenderModel>>> GetAsync(ProviderType? provider, string? realm, string? search,
       SenderSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _senderService.GetAsync(provider, realmId, search,
+      return Ok(await _senderService.GetAsync(provider, realm, search,
         sort, desc,
         index, count,
         cancellationToken));

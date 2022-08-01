@@ -40,7 +40,7 @@ namespace Portal.Core.Realms
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      if (await _querier.GetAsync(payload.Alias, readOnly: true, cancellationToken) != null)
+      if (await _querier.GetByAliasAsync(payload.Alias, readOnly: true, cancellationToken) != null)
       {
         throw new AliasAlreadyUsedException(payload.Alias, nameof(payload.Alias));
       }
@@ -68,9 +68,7 @@ namespace Portal.Core.Realms
 
     public async Task<RealmModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      Realm? realm = Guid.TryParse(id, out Guid guid)
-        ? await _querier.GetAsync(guid, readOnly: true, cancellationToken)
-        : await _querier.GetAsync(alias: id, readOnly: true, cancellationToken);
+      Realm? realm = await _querier.GetAsync(id, readOnly: true, cancellationToken);
 
       return _mapper.Map<RealmModel>(realm);
     }

@@ -60,17 +60,15 @@ export default {
       desc: false,
       loading: false,
       page: 1,
-      realmId: null,
+      realms: [],
       search: null,
       sort: 'Name',
-      total: 0,
-      realms: []
+      total: 0
     }
   },
   computed: {
     params() {
       return {
-        realmId: this.realmId,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -130,11 +128,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (
-          newValue?.index &&
-          oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
-        ) {
+        if (newValue?.index && oldValue && (newValue.search !== oldValue.search || newValue.count !== oldValue.count)) {
           this.page = 1
           await this.refresh()
         } else {

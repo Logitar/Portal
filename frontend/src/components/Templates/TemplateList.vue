@@ -7,7 +7,7 @@
     </div>
     <b-row>
       <search-field class="col" v-model="search" />
-      <realm-select class="col" v-model="realmId" />
+      <realm-select class="col" v-model="realm" />
       <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
       <count-select class="col" v-model="count" />
     </b-row>
@@ -66,20 +66,20 @@ export default {
       desc: false,
       loading: false,
       page: 1,
-      realmId: null,
+      realm: null,
       search: null,
       sort: 'DisplayName',
-      total: 0,
-      templates: []
+      templates: [],
+      total: 0
     }
   },
   computed: {
     createUrl() {
-      return '/create-template' + getQueryString({ realm: this.realmId })
+      return '/create-template' + getQueryString({ realm: this.realm })
     },
     params() {
       return {
-        realmId: this.realmId,
+        realm: this.realm,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -139,11 +139,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (
-          newValue?.index &&
-          oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
-        ) {
+        if (newValue?.index && oldValue && (newValue.realm !== oldValue.realm || newValue.search !== oldValue.search || newValue.count !== oldValue.count)) {
           this.page = 1
           await this.refresh()
         } else {
