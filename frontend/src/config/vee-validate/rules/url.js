@@ -1,6 +1,6 @@
 import { extend } from 'vee-validate'
 
-extend('alias', {
+extend('url', {
   validate(value) {
     if (typeof value !== 'string') {
       return false
