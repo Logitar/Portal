@@ -17,15 +17,7 @@
           <td v-if="recipient.userId">
             <template v-if="users[recipient.userId]">
               <b-link :href="`/users/${recipient.userId}`" target="_blank">
-                <img
-                  v-if="users[recipient.userId].picture"
-                  :src="users[recipient.userId].picture"
-                  :alt="`${users[recipient.userId].username}'s avatar`"
-                  class="rounded-circle"
-                  width="24"
-                  height="24"
-                />
-                <v-gravatar v-else-if="users[recipient.userId].email" class="rounded-circle" :email="users[recipient.userId].email" :size="24" />
+                <user-avatar :user="users[recipient.userId]" />
                 {{ users[recipient.userId].username }}
                 <font-awesome-icon icon="external-link-alt" />
               </b-link>
@@ -44,10 +36,14 @@
 
 <script>
 import Vue from 'vue'
+import UserAvatar from '@/components/User/UserAvatar.vue'
 import { getUsers } from '@/api/users'
 
 export default {
   name: 'RecipientTab',
+  components: {
+    UserAvatar
+  },
   props: {
     message: {
       type: Object,

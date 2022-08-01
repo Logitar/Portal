@@ -6,16 +6,16 @@
         <icon-button class="mx-1" icon="sync-alt" :loading="loading" text="actions.refresh" variant="primary" @click="refresh()" />
       </div>
       <b-row>
+        <search-field class="col" v-model="search" />
+        <realm-select class="col" v-model="realm" />
+        <template-select class="col" :realm="realm" v-model="template" />
+      </b-row>
+      <b-row>
         <status-select class="col" v-model="status">
           <template #after>
             <b-form-checkbox id="isDemo" v-model="isDemo">{{ $t('messages.demo.label') }}</b-form-checkbox>
           </template>
         </status-select>
-        <realm-select class="col" v-model="realm" />
-        <template-select class="col" :realm="realm" v-model="template" />
-      </b-row>
-      <b-row>
-        <search-field class="col" v-model="search" />
         <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
         <count-select class="col" v-model="count" />
       </b-row>

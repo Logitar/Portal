@@ -12,8 +12,9 @@
       {
         IsAuthenticated = user != null,
         Email = user?.Email,
-        Name = user?.FullName,
-        Picture = user?.Picture
+        FullName = user?.FullName,
+        Picture = user?.Picture,
+        Username = user?.Username
       };
     }
   }

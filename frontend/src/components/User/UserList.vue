@@ -7,6 +7,7 @@
         <icon-button class="mx-1" :href="createUrl" icon="plus" text="actions.create" variant="success" />
       </div>
       <b-row>
+        <search-field class="col" v-model="search" />
         <realm-select class="col" v-model="realm" />
         <form-select
           class="col"
@@ -16,6 +17,8 @@
           placeholder="user.confirmed.placeholder"
           v-model="isConfirmed"
         />
+      </b-row>
+      <b-row>
         <form-select
           class="col"
           id="isDisabled"
@@ -24,9 +27,6 @@
           placeholder="user.disabled.placeholder"
           v-model="isDisabled"
         />
-      </b-row>
-      <b-row>
-        <search-field class="col" v-model="search" />
         <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
         <count-select class="col" v-model="count" />
       </b-row>
@@ -49,11 +49,7 @@
         <tbody>
           <tr v-for="user in users" :key="user.id">
             <td>
-              <b-link :href="`/users/${user.id}`">
-                <img v-if="user.picture" :src="user.picture" :alt="`${user.username}'s avatar`" class="rounded-circle" width="24" height="24" />
-                <v-gravatar v-else-if="user.email" class="rounded-circle" :email="user.email" :size="24" />
-                {{ user.username }}
-              </b-link>
+              <b-link :href="`/users/${user.id}`"><user-avatar :user="user" /> {{ user.username }}</b-link>
             </td>
             <td v-text="user.fullName || '—'" />
             <td>
@@ -90,13 +86,15 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import UserAvatar from './UserAvatar.vue'
 import { deleteUser, disableUser, enableUser, getUsers } from '@/api/users'
 import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
   name: 'UserList',
   components: {
-    RealmSelect
+    RealmSelect,
+    UserAvatar
   },
   data() {
     return {

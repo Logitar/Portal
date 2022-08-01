@@ -15,19 +15,7 @@
               <alias-field class="col" v-if="realm" disabled :value="alias" />
               <alias-field class="col" v-else :name="name" required validate v-model="alias" />
             </b-row>
-            <form-field
-              id="url"
-              label="realms.url.label"
-              :maxLength="2048"
-              placeholder="realms.url.placeholder"
-              :rules="{ url: true }"
-              type="url"
-              v-model="url"
-            >
-              <b-input-group-append>
-                <icon-button :disabled="!url" :href="url" icon="external-link-alt" target="_blank" variant="info" />
-              </b-input-group-append>
-            </form-field>
+            <form-url id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
             <description-field :rows="15" v-model="description" />
           </b-tab>
           <b-tab :title="$t('realms.settings')">
