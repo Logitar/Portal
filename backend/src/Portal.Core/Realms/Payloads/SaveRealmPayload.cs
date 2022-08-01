@@ -1,4 +1,6 @@
-﻿namespace Portal.Core.Realms.Payloads
+﻿using Portal.Core.Users.Payloads;
+
+namespace Portal.Core.Realms.Payloads
 {
   public class SaveRealmPayload
   {
@@ -12,5 +14,7 @@
 
     public Guid? PasswordRecoverySenderId { get; set; }
     public Guid? PasswordRecoveryTemplateId { get; set; }
+
+    public PasswordSettingsPayload? PasswordSettings { get; set; }
   }
 }

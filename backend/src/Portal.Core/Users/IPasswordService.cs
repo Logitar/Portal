@@ -1,4 +1,6 @@
-﻿namespace Portal.Core.Users
+﻿using Portal.Core.Realms;
+
+namespace Portal.Core.Users
 {
   public interface IPasswordService
   {
@@ -6,6 +8,6 @@
     string Hash(string password);
     bool IsMatch(User user, string password);
     bool IsMatch(string hash, byte[] password);
-    void ValidateAndThrow(string password);
+    void ValidateAndThrow(string password, Realm? realm = null);
   }
 }

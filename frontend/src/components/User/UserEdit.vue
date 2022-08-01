@@ -20,9 +20,16 @@
         <p v-else-if="user" v-t="'user.noRealm'" />
         <realm-select v-else v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
-        <username-field :disabled="Boolean(user)" placeholder="user.create.usernamePlaceholder" :required="!user" :validate="!user" v-model="username" />
+        <username-field
+          :disabled="Boolean(user)"
+          placeholder="user.create.usernamePlaceholder"
+          :realm="selectedRealm"
+          :required="!user"
+          :validate="!user"
+          v-model="username"
+        />
         <b-row v-if="!user">
-          <password-field class="col" placeholder="user.create.passwordPlaceholder" required validate v-model="password" />
+          <password-field class="col" placeholder="user.create.passwordPlaceholder" :realm="selectedRealm" required validate v-model="password" />
           <password-field
             class="col"
             id="confirm"
@@ -58,6 +65,7 @@ import PasswordField from './PasswordField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import UsernameField from './UsernameField.vue'
 import { createUser, disableUser, enableUser, updateUser } from '@/api/users'
+import { getRealm } from '@/api/realms'
 
 export default {
   name: 'UserEdit',
@@ -95,6 +103,7 @@ export default {
       phoneNumber: null,
       picture: null,
       realmId: null,
+      selectedRealm: null,
       user: null,
       username: null
     }
@@ -199,6 +208,20 @@ export default {
     }
     if (this.status === 'created') {
       this.toast('success', 'user.created')
+    }
+  },
+  watch: {
+    async realmId(id) {
+      if (id) {
+        try {
+          const { data } = await getRealm(id)
+          this.selectedRealm = data
+        } catch (e) {
+          this.handleError(e)
+        }
+      } else {
+        this.selectedRealm = null
+      }
     }
   }
 }

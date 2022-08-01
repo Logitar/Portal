@@ -2,7 +2,6 @@
   <form-field
     :id="id"
     :label="label"
-    :minLength="validate ? 8 : null"
     :placeholder="placeholder"
     :ref="id"
     :required="required"
@@ -28,6 +27,10 @@ export default {
       type: String,
       default: 'user.password.placeholder'
     },
+    realm: {
+      type: Object,
+      default: null
+    },
     required: {
       type: Boolean,
       default: false
@@ -44,10 +47,29 @@ export default {
   },
   computed: {
     allRules() {
-      return {
-        ...this.rules,
-        password: this.validate
+      const rules = { ...this.rules }
+      if (this.validate) {
+        const passwordSettings = this.realm
+          ? this.realm.passwordSettings
+          : {
+              requireDigit: true,
+              requireLowercase: true,
+              requireNonAlphanumeric: true,
+              requireUppercase: true,
+              requiredLength: 8,
+              requiredUniqueChars: 8
+            }
+        if (passwordSettings) {
+          const { requireDigit, requireLowercase, requireNonAlphanumeric, requireUppercase, requiredLength, requiredUniqueChars } = passwordSettings
+          rules.min = requiredLength
+          rules.require_digit = requireDigit
+          rules.require_lowercase = requireLowercase
+          rules.require_non_alphanumeric = requireNonAlphanumeric
+          rules.require_uppercase = requireUppercase
+          rules.required_unique_chars = requiredUniqueChars
+        }
       }
+      return rules
     }
   },
   methods: {

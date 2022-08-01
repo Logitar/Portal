@@ -1,4 +1,6 @@
-﻿namespace Portal.Core.Realms.Models
+﻿using Portal.Core.Users.Models;
+
+namespace Portal.Core.Realms.Models
 {
   public class RealmModel : AggregateModel
   {
@@ -14,5 +16,7 @@
 
     public Guid? PasswordRecoverySenderId { get; set; }
     public Guid? PasswordRecoveryTemplateId { get; set; }
+
+    public PasswordSettingsModel? PasswordSettings { get; set; }
   }
 }

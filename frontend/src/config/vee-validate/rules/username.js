@@ -1,5 +1,8 @@
-const allowedUserNameCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+import { extend } from 'vee-validate'
 
-export default function (value) {
-  return typeof value === 'string' && [...value].every(c => allowedUserNameCharacters.includes(c))
-}
+extend('username', {
+  validate(value, { allowedCharacters }) {
+    return typeof value === 'string' && [...value].every(c => allowedCharacters.includes(c))
+  },
+  params: ['allowedCharacters']
+})

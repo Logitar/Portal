@@ -18,6 +18,15 @@
   "empty": "This list is empty.",
   "general": "General",
   "newTitle": "Create realm",
+  "password": {
+    "requireDigit": "Require digit",
+    "requireLowercase": "Require lowercase",
+    "requireNonAlphanumeric": "Require non alphanumeric",
+    "requireUppercase": "Require uppercase",
+    "requiredLength": "Required length",
+    "requiredUniqueChars": "Required unique characters",
+    "title": "Password"
+  },
   "passwordRecovery": {
     "senderPlaceholder": "Use default sender",
     "title": "Password recovery"

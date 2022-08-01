@@ -16,10 +16,12 @@ namespace Portal.Infrastructure.Configurations
 
       builder.Ignore(x => x.PasswordRecoverySender);
       builder.Ignore(x => x.PasswordRecoveryTemplate);
+      builder.Ignore(x => x.PasswordSettings);
 
       builder.Property(x => x.Alias).HasMaxLength(256);
       builder.Property(x => x.AliasNormalized).HasMaxLength(256);
       builder.Property(x => x.Name).HasMaxLength(256);
+      builder.Property(x => x.PasswordSettingsSerialized).HasColumnName(nameof(Realm.PasswordSettings)).HasColumnType("jsonb");
       builder.Property(x => x.RequireConfirmedAccount).HasDefaultValue(false);
       builder.Property(x => x.RequireUniqueEmail).HasDefaultValue(false);
       builder.Property(x => x.Url).HasMaxLength(2048);

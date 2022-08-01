@@ -66,10 +66,10 @@ namespace Portal.Core.Accounts
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      _passwordService.ValidateAndThrow(payload.Password);
-
       User user = await _userQuerier.GetAsync(_userContext.Id, readOnly: false, cancellationToken)
         ?? throw new InvalidOperationException($"The user 'Id={_userContext.Id}' could not be found.");
+
+      _passwordService.ValidateAndThrow(payload.Password, user.Realm);
 
       if (!_passwordService.IsMatch(user, payload.Current))
       {
@@ -191,12 +191,12 @@ namespace Portal.Core.Accounts
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      _passwordService.ValidateAndThrow(payload.Password);
-
       Realm realm = (Guid.TryParse(payload.Realm, out Guid realmId)
         ? await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
         : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
       ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+
+      _passwordService.ValidateAndThrow(payload.Password, realm);
 
       var validateTokenPayload = new ValidateTokenPayload
       {

@@ -28,12 +28,10 @@ namespace Portal.Infrastructure
     public static IServiceCollection AddPortalInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
       Assembly assembly = typeof(ServiceCollectionExtensions).Assembly;
-      IConfigurationSection identity = configuration.GetSection("Identity");
 
       return services
         .AddDbContext<PortalDbContext>()
         .AddSingleton(configuration.GetSection("Jwt").Get<JwtSettings>() ?? new())
-        .AddSingleton(identity.GetSection("Password").Get<PasswordSettings>() ?? new())
         .AddSingleton<IPasswordService, PasswordService>()
         .AddSingleton<ITemplateCompiler, TemplateCompiler>()
         .AddScoped<IDatabaseService, DatabaseService>()

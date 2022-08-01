@@ -6,7 +6,7 @@
     :maxLength="validate ? 256 : null"
     :placeholder="placeholder"
     :required="required"
-    :rules="{ username: validate }"
+    :rules="allRules"
     :value="value"
     @input="$emit('input', $event)"
   />
@@ -28,6 +28,10 @@ export default {
       type: String,
       default: 'user.username.placeholder'
     },
+    realm: {
+      type: Object,
+      default: null
+    },
     required: {
       type: Boolean,
       default: false
@@ -37,6 +41,19 @@ export default {
       default: false
     },
     value: {}
+  },
+  computed: {
+    allRules() {
+      const rules = {}
+      if (this.validate) {
+        if (this.realm?.allowedUsernameCharacters) {
+          rules.username = this.realm.allowedUsernameCharacters
+        } else if (!this.realm) {
+          rules.username = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+        }
+      }
+      return rules
+    }
   }
 }
 </script>
