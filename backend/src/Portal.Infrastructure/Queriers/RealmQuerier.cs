@@ -13,14 +13,13 @@ namespace Portal.Infrastructure.Queriers
       _realms = dbContext.Realms;
     }
 
-    public async Task<Realm?> GetAsync(string alias, bool readOnly, CancellationToken cancellationToken)
+    public async Task<Realm?> GetAsync(string key, bool readOnly, CancellationToken cancellationToken)
     {
-      alias = alias?.ToUpper() ?? throw new ArgumentNullException(nameof(alias));
+      ArgumentNullException.ThrowIfNull(key);
 
-      return await _realms.ApplyTracking(readOnly)
-        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
-        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
-        .SingleOrDefaultAsync(x => x.AliasNormalized == alias, cancellationToken);
+      return Guid.TryParse(key, out Guid id)
+        ? await GetAsync(id, readOnly, cancellationToken)
+        : await GetByAliasAsync(key, readOnly, cancellationToken);
     }
 
     public async Task<Realm?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
@@ -29,6 +28,16 @@ namespace Portal.Infrastructure.Queriers
         .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
         .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public async Task<Realm?> GetByAliasAsync(string alias, bool readOnly, CancellationToken cancellationToken)
+    {
+      alias = alias?.ToUpper() ?? throw new ArgumentNullException(nameof(alias));
+
+      return await _realms.ApplyTracking(readOnly)
+        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
+        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
+        .SingleOrDefaultAsync(x => x.AliasNormalized == alias, cancellationToken);
     }
 
     public async Task<PagedList<Realm>> GetPagedAsync(string? search,

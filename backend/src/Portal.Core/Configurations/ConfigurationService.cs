@@ -27,7 +27,7 @@ namespace Portal.Core.Configurations
 
     public async Task<bool> IsInitializedAsync(CancellationToken cancellationToken = default)
     {
-      ListModel<UserModel> users = await _userService.GetAsync(realmId: null, count: 1, cancellationToken: cancellationToken);
+      ListModel<UserModel> users = await _userService.GetAsync(realm: null, count: 1, cancellationToken: cancellationToken);
 
       return users.Items.Any();
     }

@@ -11,8 +11,8 @@
             <b-form-checkbox id="isDemo" v-model="isDemo">{{ $t('messages.demo.label') }}</b-form-checkbox>
           </template>
         </status-select>
-        <realm-select class="col" v-model="realmId" />
-        <template-select class="col" :realmId="realmId" v-model="templateId" />
+        <realm-select class="col" v-model="realm" />
+        <template-select class="col" :realm="realm" v-model="template" />
       </b-row>
       <b-row>
         <search-field class="col" v-model="search" />
@@ -84,11 +84,11 @@ export default {
       loading: false,
       messages: [],
       page: 1,
-      realmId: null,
+      realm: null,
       search: null,
       sort: 'SentAt',
       status: null,
-      templateId: null,
+      template: null,
       total: 0
     }
   },
@@ -100,10 +100,10 @@ export default {
       return {
         hasErrors: this.hasErrors,
         isDemo: this.isDemo,
-        realmId: this.realmId,
+        realm: this.realm,
         search: this.search,
         succeeded: this.succeeded,
-        templateId: this.templateId,
+        template: this.template,
         sort: this.sort,
         desc: this.desc,
         index: (this.page - 1) * this.count,
@@ -146,10 +146,10 @@ export default {
           oldValue &&
           (newValue.hasErrors !== oldValue.hasErrors ||
             newValue.isDemo !== oldValue.isDemo ||
-            newValue.realmId !== oldValue.realmId ||
+            newValue.realm !== oldValue.realm ||
             newValue.search !== oldValue.search ||
             newValue.succeeded !== oldValue.succeeded ||
-            newValue.templateId !== oldValue.templateId ||
+            newValue.template !== oldValue.template ||
             newValue.count !== oldValue.count)
         ) {
           this.page = 1

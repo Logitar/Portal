@@ -15,9 +15,9 @@ namespace Portal.Core.Emails.Messages
       ArgumentNullException.ThrowIfNull(template);
 
       ApplyChange(new CreatedEvent(body, recipients,
-        realm?.Id, realm?.Alias, realm?.Name,
+        realm?.Id, realm?.AliasNormalized, realm?.Name,
         sender.Id, sender.IsDefault, sender.Provider, sender.EmailAddress, sender.DisplayName,
-        template.Id, template.Key, template.Subject, template.ContentType, template.DisplayName,
+        template.Id, template.KeyNormalized, template.Subject, template.ContentType, template.DisplayName,
         variables, isDemo, userId));
     }
     private Message()

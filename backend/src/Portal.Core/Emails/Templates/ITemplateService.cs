@@ -8,7 +8,7 @@ namespace Portal.Core.Emails.Templates
     Task<TemplateModel> CreateAsync(CreateTemplatePayload payload, CancellationToken cancellationToken = default);
     Task<TemplateModel> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     Task<TemplateModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<ListModel<TemplateModel>> GetAsync(Guid? realmId = null, string? search = null,
+    Task<ListModel<TemplateModel>> GetAsync(string? realm = null, string? search = null,
       TemplateSort? sort = null, bool desc = false,
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);

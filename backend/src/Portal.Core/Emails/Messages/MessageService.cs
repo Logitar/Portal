@@ -60,12 +60,12 @@ namespace Portal.Core.Emails.Messages
       return _mapper.Map<MessageModel>(message);
     }
 
-    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, bool? isDemo, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
       MessageSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      PagedList<Message> messages = await _querier.GetPagedAsync(hasErrors, isDemo, realmId, search, succeeded, templateId,
+      PagedList<Message> messages = await _querier.GetPagedAsync(hasErrors, isDemo, realm, search, succeeded, template,
         sort, desc,
         index, count,
         readOnly: true, cancellationToken);
@@ -200,10 +200,8 @@ namespace Portal.Core.Emails.Messages
 
     private async Task<Realm?> ResolveRealmAsync(string id, string paramName, CancellationToken cancellationToken)
     {
-      Realm realm = (Guid.TryParse(id, out Guid guid)
-        ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
-        : await _realmQuerier.GetAsync(alias: id, readOnly: true, cancellationToken)
-      ) ?? throw new EntityNotFoundException<Realm>(id, paramName);
+      Realm realm = await _realmQuerier.GetAsync(id, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<Realm>(id, paramName);
 
       return realm;
     }
@@ -333,10 +331,8 @@ namespace Portal.Core.Emails.Messages
 
     private async Task<Template> ResolveTemplateAsync(string id, Realm? realm, string paramName, CancellationToken cancellationToken)
     {
-      Template template = (Guid.TryParse(id, out Guid templateId)
-        ? await _templateQuerier.GetAsync(templateId, readOnly: true, cancellationToken)
-        : await _templateQuerier.GetAsync(key: id, realm, readOnly: true, cancellationToken)
-      ) ?? throw new EntityNotFoundException<Template>(id, paramName);
+      Template template = await _templateQuerier.GetAsync(id, realm, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<Template>(id, paramName);
 
       if (realm?.Sid != template.RealmSid)
       {

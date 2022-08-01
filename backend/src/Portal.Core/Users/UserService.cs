@@ -51,10 +51,8 @@ namespace Portal.Core.Users
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
       _passwordService.ValidateAndThrow(payload.Password, realm);
@@ -155,12 +153,12 @@ namespace Portal.Core.Users
       return _mapper.Map<UserModel>(user);
     }
 
-    public async Task<ListModel<UserModel>> GetAsync(bool? isConfirmed, bool? isDisabled, Guid? realmId, string? search,
+    public async Task<ListModel<UserModel>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      PagedList<User> users = await _querier.GetPagedAsync(isConfirmed, isDisabled, realmId, search,
+      PagedList<User> users = await _querier.GetPagedAsync(isConfirmed, isDisabled, realm, search,
         sort, desc,
         index, count,
         readOnly: true, cancellationToken);

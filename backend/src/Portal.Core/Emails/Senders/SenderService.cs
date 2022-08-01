@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Portal.Core.Realms;
 using Portal.Core.Emails.Senders.Models;
 using Portal.Core.Emails.Senders.Payloads;
+using Portal.Core.Realms;
 
 namespace Portal.Core.Emails.Senders
 {
@@ -39,10 +39,8 @@ namespace Portal.Core.Emails.Senders
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: false, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
       bool isDefault = await _querier.GetDefaultAsync(realm, readOnly: true, cancellationToken) == null;
@@ -62,7 +60,7 @@ namespace Portal.Core.Emails.Senders
 
       if (sender.IsDefault)
       {
-        PagedList<Sender> senders = await _querier.GetPagedAsync(realmId: sender.Realm?.Id, readOnly: true, cancellationToken: cancellationToken);
+        PagedList<Sender> senders = await _querier.GetPagedAsync(realm: sender.Realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken);
         if (senders.Count > 1)
         {
           throw new CannotDeleteDefaultSenderException(id, _userContext.ActorId);
@@ -83,12 +81,12 @@ namespace Portal.Core.Emails.Senders
       return _mapper.Map<SenderModel>(sender);
     }
 
-    public async Task<ListModel<SenderModel>> GetAsync(ProviderType? provider, Guid? realmId, string? search,
+    public async Task<ListModel<SenderModel>> GetAsync(ProviderType? provider, string? realm, string? search,
       SenderSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      PagedList<Sender> senders = await _querier.GetPagedAsync(provider, realmId, search,
+      PagedList<Sender> senders = await _querier.GetPagedAsync(provider, realm, search,
         sort, desc,
         index, count,
         readOnly: true, cancellationToken);

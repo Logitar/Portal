@@ -19,13 +19,23 @@ namespace Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<PagedList<Message>> GetPagedAsync(bool? hasErrors, bool? isDemo, Guid? realmId, string? search, bool? succeeded, Guid? templateId,
+    public async Task<PagedList<Message>> GetPagedAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
       MessageSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
     {
-      IQueryable<Message> query = _messages.ApplyTracking(readOnly)
-        .Where(x => realmId.HasValue ? x.RealmId == realmId.Value : x.RealmId == null);
+      IQueryable<Message> query = _messages.ApplyTracking(readOnly);
+
+      if (realm == null)
+      {
+        query = query.Where(x => x.RealmId == null);
+      }
+      else
+      {
+        query = Guid.TryParse(realm, out Guid realmId)
+          ? query.Where(x => x.RealmId == realmId)
+          : query.Where(x => x.RealmAlias == realm.ToUpper());
+      }
 
       if (hasErrors.HasValue)
       {
@@ -57,9 +67,11 @@ namespace Portal.Infrastructure.Queriers
       {
         query = query.Where(x => x.Succeeded == succeeded.Value);
       }
-      if (templateId.HasValue)
+      if (template != null)
       {
-        query = query.Where(x => x.TemplateId == templateId.Value);
+        query = Guid.TryParse(template, out Guid templateId)
+          ? query.Where(x => x.TemplateId == templateId)
+          : query.Where(x => x.TemplateKey == template.ToUpper());
       }
 
       long total = await query.LongCountAsync(cancellationToken);

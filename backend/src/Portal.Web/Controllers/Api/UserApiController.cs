@@ -35,12 +35,12 @@ namespace Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(bool? isConfirmed, bool? isDisabled, Guid? realmId, string? search,
+    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _userService.GetAsync(isConfirmed, isDisabled, realmId, search,
+      return Ok(await _userService.GetAsync(isConfirmed, isDisabled, realm, search,
         sort, desc,
         index, count,
         cancellationToken));

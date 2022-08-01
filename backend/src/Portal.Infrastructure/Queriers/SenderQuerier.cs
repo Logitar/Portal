@@ -30,14 +30,24 @@ namespace Portal.Infrastructure.Queriers
         : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.IsDefault, cancellationToken);
     }
 
-    public async Task<PagedList<Sender>> GetPagedAsync(ProviderType? provider, Guid? realmId, string? search,
+    public async Task<PagedList<Sender>> GetPagedAsync(ProviderType? provider, string? realm, string? search,
       SenderSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
     {
       IQueryable<Sender> query = _senders.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => realmId.HasValue ? (x.Realm != null && x.Realm.Id == realmId.Value) : x.Realm == null);
+        .Include(x => x.Realm);
+
+      if (realm == null)
+      {
+        query = query.Where(x => x.RealmSid == null);
+      }
+      else
+      {
+        query = Guid.TryParse(realm, out Guid realmId)
+          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
+          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
+      }
 
       if (search != null)
       {

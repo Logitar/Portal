@@ -51,10 +51,10 @@
                   class="col"
                   id="passwordRecoverySenderId"
                   placeholder="realms.passwordRecovery.senderPlaceholder"
-                  :realmId="realm.id"
+                  :realm="realm.id"
                   v-model="passwordRecoverySenderId"
                 />
-                <template-select class="col" id="passwordRecoveryTemplateId" :realmId="realm.id" v-model="passwordRecoveryTemplateId" />
+                <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
           </b-tab>

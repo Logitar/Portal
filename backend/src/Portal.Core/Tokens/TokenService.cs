@@ -36,10 +36,8 @@ namespace Portal.Core.Tokens
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: true, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
       var identity = new ClaimsIdentity();
@@ -72,10 +70,8 @@ namespace Portal.Core.Tokens
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = (Guid.TryParse(payload.Realm, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: true, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: payload.Realm, readOnly: true, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
+        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: true, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
       ValidateTokenResult result = await _securityTokenService

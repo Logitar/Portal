@@ -93,10 +93,8 @@ namespace Portal.Core.Accounts
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      Realm realm = (Guid.TryParse(realmId, out Guid id)
-        ? await _realmQuerier.GetAsync(id, readOnly: true, cancellationToken)
-        : await _realmQuerier.GetAsync(alias: realmId, readOnly: true, cancellationToken)
-      ) ?? throw new EntityNotFoundException<Realm>(realmId);
+      Realm realm = await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<Realm>(realmId);
 
       User user = await _userQuerier.GetAsync(payload.Username, realm, readOnly: true, cancellationToken)
         ?? throw new EntityNotFoundException<User>(payload.Username, nameof(payload.Username));
@@ -169,10 +167,8 @@ namespace Portal.Core.Accounts
       Realm? realm = null;
       if (realmId != null)
       {
-        realm = (Guid.TryParse(realmId, out Guid id)
-          ? await _realmQuerier.GetAsync(id, readOnly: true, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: realmId, readOnly: true, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(realmId);
+        realm = await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(realmId);
       }
 
       if (!SecureToken.TryParse(payload.RenewToken, out SecureToken? secureToken) || secureToken == null)
@@ -196,14 +192,12 @@ namespace Portal.Core.Accounts
       return model;
     }
 
-    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmIdOrAlias, CancellationToken cancellationToken = default)
+    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken = default)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
-      Realm realm = (Guid.TryParse(realmIdOrAlias, out Guid realmId)
-        ? await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
-        : await _realmQuerier.GetAsync(alias: realmIdOrAlias, readOnly: true, cancellationToken)
-      ) ?? throw new EntityNotFoundException<Realm>(realmIdOrAlias);
+      Realm realm = await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<Realm>(realmId);
 
       _passwordService.ValidateAndThrow(payload.Password, realm);
 
@@ -238,10 +232,8 @@ namespace Portal.Core.Accounts
       Realm? realm = null;
       if (realmId != null)
       {
-        realm = (Guid.TryParse(realmId, out Guid guid)
-          ? await _realmQuerier.GetAsync(guid, readOnly: false, cancellationToken)
-          : await _realmQuerier.GetAsync(alias: realmId, readOnly: false, cancellationToken)
-        ) ?? throw new EntityNotFoundException<Realm>(realmId);
+        realm = await _realmQuerier.GetAsync(realmId, readOnly: true, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(realmId);
       }
 
       User? user = await _userQuerier.GetAsync(payload.Username, realm, readOnly: false, cancellationToken);

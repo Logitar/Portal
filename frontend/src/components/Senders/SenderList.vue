@@ -7,7 +7,7 @@
     </div>
     <b-row>
       <search-field class="col" v-model="search" />
-      <realm-select class="col" v-model="realmId" />
+      <realm-select class="col" v-model="realm" />
       <provider-select class="col" v-model="provider" />
     </b-row>
     <b-row>
@@ -81,7 +81,7 @@ export default {
       loading: false,
       page: 1,
       provider: null,
-      realmId: null,
+      realm: null,
       search: null,
       senders: [],
       sort: 'DisplayName',
@@ -90,12 +90,12 @@ export default {
   },
   computed: {
     createUrl() {
-      return '/create-sender' + getQueryString({ provider: this.provider, realm: this.realmId })
+      return '/create-sender' + getQueryString({ provider: this.provider, realm: this.realm })
     },
     params() {
       return {
         provider: this.provider,
-        realmId: this.realmId,
+        realm: this.realm,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -177,7 +177,7 @@ export default {
           newValue?.index &&
           oldValue &&
           (newValue.provider !== oldValue.provider ||
-            newValue.realmId !== oldValue.realmId ||
+            newValue.realm !== oldValue.realm ||
             newValue.search !== oldValue.search ||
             newValue.count !== oldValue.count)
         ) {
