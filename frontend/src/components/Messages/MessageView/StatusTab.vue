@@ -2,11 +2,9 @@
   <b-tab :title="$t('messages.status.label')">
     <status-detail :createdAt="new Date(message.createdAt)" :updatedAt="message.updatedAt ? new Date(message.updatedAt) : null" />
     <p>
-      <template v-if="realm"
-        >{{ $t('messages.realmFormat') }}
-        <b-link :href="`/realms/${realm.alias}`" target="_blank">
-          <strong v-text="`${realm.name} (${realm.alias})`" /> <font-awesome-icon icon="external-link-alt" /> </b-link
-        >.
+      <template v-if="realm">
+        {{ $t('messages.realmFormat') }}
+        <b-link :href="`/realms/${realm.alias}`" target="_blank">{{ `${realm.name} (${realm.alias})` }} <font-awesome-icon icon="external-link-alt" /></b-link>.
       </template>
       <template v-else-if="message.realmId">{{ $t('messages.realmFormat') }} <strong v-text="`${message.realmName} (${message.realmAlias})`" />.</template>
       <template v-else>{{ $t('messages.noRealm') }}</template>
@@ -14,16 +12,14 @@
       <template v-if="sender">
         {{ $t('messages.sender.format1') }}
         <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank">
-          <strong> {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt;</strong> <font-awesome-icon icon="external-link-alt" />
+          {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt; <font-awesome-icon icon="external-link-alt" />
         </b-link>
-        <b-link v-else :href="`/senders/${sender.id}`" target="_blank">
-          <strong v-text="sender.emailAddress" /> <font-awesome-icon icon="external-link-alt" />
-        </b-link>
+        <b-link v-else :href="`/senders/${sender.id}`" target="_blank"> {{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /> </b-link>
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}
-        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong
-        >.
+        {{ $t(`senders.provider.options.${message.senderProvider}`) }}
+        .
       </template>
       <template v-else>
         {{ $t('messages.sender.format1') }}
@@ -32,8 +28,8 @@
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}
-        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong
-        >.
+        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong>
+        .
       </template>
       <br />
       {{ $t('messages.status.format') }} <status-badge :message="message" />

@@ -94,6 +94,20 @@ namespace Portal.Core.Emails.Senders
       return ListModel<SenderModel>.From(senders, _mapper);
     }
 
+    public async Task<SenderModel?> GetDefaultAsync(string? realmId, CancellationToken cancellationToken)
+    {
+      Realm? realm = null;
+      if (realmId != null)
+      {
+        realm = await _realmQuerier.GetAsync(realmId, readOnly: false, cancellationToken)
+          ?? throw new EntityNotFoundException<Realm>(realmId);
+      }
+
+      Sender? sender = await _querier.GetDefaultAsync(realm, readOnly: true, cancellationToken);
+
+      return _mapper.Map<SenderModel>(sender);
+    }
+
     public async Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default)
     {
       Sender sender = await _querier.GetAsync(id, readOnly: false, cancellationToken)

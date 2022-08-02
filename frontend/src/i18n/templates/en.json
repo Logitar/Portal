@@ -12,6 +12,7 @@
     "placeholder": "Enter the contents of the message; Razor syntax is supported"
   },
   "created": "The template has been created.",
+  "defaultSenderRequired": "You need to configure a default sender to send a demo message.",
   "delete": {
     "confirm": "Do you really want to delete the following template?",
     "success": "The template has been deleted.",
@@ -40,6 +41,7 @@
     "placeholder": "Select a template"
   },
   "sendToMe": "Send to me",
+  "senderFormat": "The message will be sent from ",
   "sort": {
     "options": {
       "DisplayName": "Display name",

@@ -18,7 +18,7 @@
             <template v-if="users[recipient.userId]">
               <b-link :href="`/users/${recipient.userId}`" target="_blank">
                 <user-avatar :user="users[recipient.userId]" />
-                {{ users[recipient.userId].username }}
+                {{ users[recipient.userId].fullName || users[recipient.userId].username }}
                 <font-awesome-icon icon="external-link-alt" />
               </b-link>
             </template>

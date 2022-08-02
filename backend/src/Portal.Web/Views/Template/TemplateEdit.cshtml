@@ -1,12 +1,19 @@
-﻿@using Portal.Core.Emails.Templates.Models;
+﻿@using Portal.Core.Emails.Senders;
+@using Portal.Core.Emails.Senders.Models;
+@using Portal.Core.Emails.Templates.Models;
 @using Portal.Core.Users;
 @using Portal.Web.Models.Users;
+
+@inject ISenderService _senderService;
 
 @model TemplateModel
 @{
   Layout = "_Layout";
 
   ViewBag.Title = Model?.DisplayName ?? Model?.Key ?? "Create template";
+
+  SenderModel? sender = await _senderService.GetDefaultAsync(Model?.Realm?.Id.ToString());
+  string? senderJson = sender == null ? null : ModelSerializer.Serialize(sender);
 }
 
 @functions {
@@ -34,5 +41,5 @@
 }
 else
 {
-  <template-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(UserSummary))"></template-edit>
+  <template-edit json="@(ModelSerializer.Serialize(Model))" sender="@(senderJson)" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(UserSummary))"></template-edit>
 }

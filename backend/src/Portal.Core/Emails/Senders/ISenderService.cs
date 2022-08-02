@@ -12,6 +12,7 @@ namespace Portal.Core.Emails.Senders
       SenderSort? sort = null, bool desc = false,
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);
+    Task<SenderModel?> GetDefaultAsync(string? realm = null, CancellationToken cancellationToken = default);
     Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default);
     Task<SenderModel> UpdateAsync(Guid id, UpdateSenderPayload payload, CancellationToken cancellationToken = default);
   }

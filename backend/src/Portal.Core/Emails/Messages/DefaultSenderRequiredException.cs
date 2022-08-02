@@ -10,7 +10,7 @@ namespace Portal.Core.Emails.Messages
     {
       Realm = realm;
 
-      Value = new { code = nameof(SenderNotInRealmException).Remove(nameof(Exception)) };
+      Value = new { code = nameof(DefaultSenderRequiredException).Remove(nameof(Exception)) };
     }
 
     public Realm? Realm { get; }

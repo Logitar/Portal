@@ -46,6 +46,18 @@ namespace Portal.Web.Controllers.Api
         cancellationToken));
     }
 
+    [HttpGet("default")]
+    public async Task<ActionResult<SenderModel>> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
+    {
+      SenderModel? sender = await _senderService.GetDefaultAsync(realm, cancellationToken);
+      if (sender == null)
+      {
+        return NotFound();
+      }
+
+      return Ok(sender);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<SenderModel>> GetAsync(Guid id, CancellationToken cancellationToken)
     {
