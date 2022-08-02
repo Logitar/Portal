@@ -3,7 +3,7 @@ import { ValidationObserver, ValidationProvider, extend, localize } from 'vee-va
 import { alpha_num, confirmed, email, max, max_value, min, min_value, required } from 'vee-validate/dist/rules'
 
 import './rules/alias'
-import './rules/key'
+import './rules/identifier'
 import './rules/requireDigit'
 import './rules/requireLowercase'
 import './rules/requireNonAlphanumeric'

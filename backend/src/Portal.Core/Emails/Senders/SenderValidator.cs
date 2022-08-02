@@ -16,10 +16,8 @@ namespace Portal.Core.Emails.Senders
 
       RuleForEach(x => x.Settings.Keys)
         .NotEmpty()
-        .Must(BeAValidIdentifier);
+        .MaximumLength(256)
+        .Must(ValidationRules.BeAValidIdentifier);
     }
-
-    private static bool BeAValidIdentifier(string? value) => string.IsNullOrEmpty(value)
-      || (!char.IsDigit(value.First()) && value.All(c => char.IsLetterOrDigit(c) || c == '_'));
   }
 }
