@@ -10,7 +10,7 @@ WORKDIR /src
 COPY ["src/Logitar.Portal.Web/Logitar.Portal.Web.csproj", "src/Logitar.Portal.Web/"]
 RUN dotnet restore "src/Logitar.Portal.Web/Logitar.Portal.Web.csproj"
 COPY . .
-WORKDIR "/src/src/Logitar.Portal.Web"
+WORKDIR "/src/Logitar.Portal.Web"
 RUN dotnet build "Logitar.Portal.Web.csproj" -c Release -o /app/build
 
 FROM build AS publish
