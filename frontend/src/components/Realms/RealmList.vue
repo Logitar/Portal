@@ -23,9 +23,7 @@
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <b-link :href="`/realms/${realm.alias.toLowerCase()}`">
-                {{ realm.alias }}
-              </b-link>
+              <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
             </td>
             <td v-text="realm.name" />
             <td>{{ $d(new Date(realm.updatedAt || realm.createdAt), 'medium') }}</td>
