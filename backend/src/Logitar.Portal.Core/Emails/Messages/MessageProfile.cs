@@ -19,9 +19,6 @@ namespace Logitar.Portal.Core.Emails.Messages
           Key = pair.Key,
           Value = pair.Value
         })));
-      CreateMap<Message, MessageSummary>()
-        .ForMember(x => x.Recipients, x => x.MapFrom(y => y.Recipients.Count()))
-        .ForMember(x => x.SentAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
       CreateMap<Recipient, RecipientModel>();
     }
   }

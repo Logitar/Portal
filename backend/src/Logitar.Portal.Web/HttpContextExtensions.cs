@@ -2,6 +2,7 @@
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Sessions.Models;
 using Logitar.Portal.Core.Users;
+using Logitar.Portal.Web.Models.Users;
 
 namespace Logitar.Portal.Web
 {
@@ -11,6 +12,8 @@ namespace Logitar.Portal.Web
     private const string SessionIdKey = "SessionId";
     private const string SessionKey = nameof(Session);
     private const string UserKey = nameof(User);
+
+    public static CurrentUser GetCurrentUser(this HttpContext context) => new(context.GetUser());
 
     public static ApiKey? GetApiKey(this HttpContext context) => context.GetItem<ApiKey>(ApiKeyKey);
     public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);

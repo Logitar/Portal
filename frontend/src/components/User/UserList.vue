@@ -62,7 +62,7 @@
             </td>
             <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
-            <td>{{ $d(new Date(user.updatedAt || user.createdAt), 'medium') }}</td>
+            <td>{{ $d(new Date(user.updatedAt), 'medium') }}</td>
             <td>
               <icon-button class="mx-1" v-if="user.isDisabled" icon="unlock" :loading="loading" text="actions.enable" variant="warning" @click="enable(user)" />
               <icon-button class="mx-1" v-else icon="lock" :loading="loading" text="actions.disable" variant="warning" @click="disable(user)" />

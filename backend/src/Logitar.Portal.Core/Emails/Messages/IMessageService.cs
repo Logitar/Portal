@@ -6,7 +6,7 @@ namespace Logitar.Portal.Core.Emails.Messages
   public interface IMessageService
   {
     Task<MessageModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors = null, bool? isDemo = null, string? realm = null, string? search = null, bool? succeeded = null, string? template = null,
+    Task<ListModel<MessageModel>> GetAsync(bool? hasErrors = null, bool? isDemo = null, string? realm = null, string? search = null, bool? succeeded = null, string? template = null,
       MessageSort? sort = null, bool desc = false,
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);

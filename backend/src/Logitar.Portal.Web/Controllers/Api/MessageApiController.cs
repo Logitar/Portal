@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
+using Logitar.Portal.Web.Models.Api.Message;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -12,10 +14,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/messages")]
   public class MessageApiController : ControllerBase
   {
+    private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
 
-    public MessageApiController(IMessageService messageService)
+    public MessageApiController(IMapper mapper, IMessageService messageService)
     {
+      _mapper = mapper;
       _messageService = messageService;
     }
 
@@ -37,10 +41,12 @@ namespace Logitar.Portal.Web.Controllers.Api
       int? index, int? count,
       CancellationToken cancellationToken)
     {
-      return Ok(await _messageService.GetAsync(hasErrors, isDemo, realm, search, succeeded, template,
+      ListModel<MessageModel> messages = await _messageService.GetAsync(hasErrors, isDemo, realm, search, succeeded, template,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<MessageSummary>.From(messages, _mapper));
     }
 
     [HttpGet("{id}")]

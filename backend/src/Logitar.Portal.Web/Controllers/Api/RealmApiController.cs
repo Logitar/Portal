@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Realms.Models;
 using Logitar.Portal.Core.Realms.Payloads;
+using Logitar.Portal.Web.Models.Api.Realm;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -12,10 +14,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/realms")]
   public class RealmApiController : ControllerBase
   {
+    private readonly IMapper _mapper;
     private readonly IRealmService _realmService;
 
-    public RealmApiController(IRealmService realmService)
+    public RealmApiController(IMapper mapper, IRealmService realmService)
     {
+      _mapper = mapper;
       _realmService = realmService;
     }
 
@@ -35,15 +39,17 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<RealmModel>>> GetAsync(string? search,
+    public async Task<ActionResult<ListModel<RealmSummary>>> GetAsync(string? search,
       RealmSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _realmService.GetAsync(search,
+      ListModel<RealmModel> realms = await _realmService.GetAsync(search,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<RealmSummary>.From(realms, _mapper));
     }
 
     [HttpGet("{id}")]

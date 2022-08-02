@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Senders.Models;
 using Logitar.Portal.Core.Emails.Senders.Payloads;
+using Logitar.Portal.Web.Models.Api.Sender;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -12,10 +14,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/senders")]
   public class SenderApiController : ControllerBase
   {
+    private readonly IMapper _mapper;
     private readonly ISenderService _senderService;
 
-    public SenderApiController(ISenderService senderService)
+    public SenderApiController(IMapper mapper, ISenderService senderService)
     {
+      _mapper = mapper;
       _senderService = senderService;
     }
 
@@ -35,15 +39,17 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<SenderModel>>> GetAsync(ProviderType? provider, string? realm, string? search,
+    public async Task<ActionResult<ListModel<SenderSummary>>> GetAsync(ProviderType? provider, string? realm, string? search,
       SenderSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _senderService.GetAsync(provider, realm, search,
+      ListModel<SenderModel> senders = await _senderService.GetAsync(provider, realm, search,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<SenderSummary>.From(senders, _mapper));
     }
 
     [HttpGet("default")]
