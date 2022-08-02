@@ -88,6 +88,11 @@ namespace Logitar.Portal.Core.Users
       User user = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<User>(id);
 
+      if (user.Id == _userContext.ActorId)
+      {
+        throw new UserCannotDeleteHerselfException(user);
+      }
+
       user.Delete(_userContext.ActorId);
 
       await _repository.SaveAsync(user, cancellationToken);
@@ -103,6 +108,10 @@ namespace Logitar.Portal.Core.Users
       if (user.IsDisabled)
       {
         throw new UserAlreadyDisabledException(user);
+      }
+      else if (user.Id == _userContext.ActorId)
+      {
+        throw new UserCannotDisableHerselfException(user);
       }
 
       user.Disable(_userContext.ActorId);
