@@ -110,6 +110,14 @@ namespace Portal.Web.Authentication
           {
             return AuthenticateResult.Fail($"The session 'Id={session.Id}' has ended.");
           }
+          else if (session.User == null)
+          {
+            return AuthenticateResult.Fail($"The User was null for session 'Id={session.Id}'.");
+          }
+          else if (session.User.IsDisabled)
+          {
+            return AuthenticateResult.Fail($"The User is disabled for session 'Id={session.Id}'.");
+          }
 
           if (!Context.SetSession(session))
           {

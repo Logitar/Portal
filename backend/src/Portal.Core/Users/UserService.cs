@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Portal.Core.Realms;
-using Portal.Core.Sessions;
 using Portal.Core.Users.Models;
 using Portal.Core.Users.Payloads;
 
@@ -16,8 +15,6 @@ namespace Portal.Core.Users
     private readonly IUserQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<User> _repository;
-    private readonly ISessionQuerier _sessionQuerier;
-    private readonly IRepository<Session> _sessionRepository;
     private readonly IUserContext _userContext;
     private readonly IValidator<User> _validator;
 
@@ -27,8 +24,6 @@ namespace Portal.Core.Users
       IUserQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<User> repository,
-      ISessionQuerier sessionQuerier,
-      IRepository<Session> sessionRepository,
       IUserContext userContext,
       IValidator<User> validator
     )
@@ -38,8 +33,6 @@ namespace Portal.Core.Users
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
-      _sessionQuerier = sessionQuerier;
-      _sessionRepository = sessionRepository;
       _userContext = userContext;
       _validator = validator;
     }
@@ -116,13 +109,6 @@ namespace Portal.Core.Users
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);
-
-      IEnumerable<Session> sessions = await _sessionQuerier.GetActiveAsync(user, readOnly: false, cancellationToken);
-      foreach (Session session in sessions)
-      {
-        session.SignOut(_userContext.ActorId);
-      }
-      await _sessionRepository.SaveAsync(sessions, cancellationToken);
 
       return _mapper.Map<UserModel>(user);
     }

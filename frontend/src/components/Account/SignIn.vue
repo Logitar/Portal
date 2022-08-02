@@ -1,6 +1,10 @@
 <template>
   <b-container>
     <h1 v-t="'user.signIn.title'" />
+    <b-alert dismissible variant="warning" v-model="accountIsDisabled">
+      <strong v-t="'user.signIn.failed'" />
+      {{ $t('user.signIn.accountIsDisabled') }}
+    </b-alert>
     <b-alert dismissible variant="warning" v-model="invalidCredentials">
       <strong v-t="'user.signIn.failed'" />
       {{ $t('user.signIn.invalidCredentials') }}
@@ -37,6 +41,7 @@ export default {
   },
   data() {
     return {
+      accountIsDisabled: false,
       invalidCredentials: false,
       loading: false,
       password: null,
@@ -57,6 +62,7 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.accountIsDisabled = false
         this.invalidCredentials = false
         try {
           if (await this.$refs.form.validate()) {
@@ -69,8 +75,12 @@ export default {
           this.password = null
           this.$refs.password.focus()
           const { data, status } = e
-          if (status === 400 && data?.code === 'InvalidCredentials') {
-            this.invalidCredentials = true
+          if (status === 400) {
+            if (data?.code === 'AccountIsDisabled') {
+              this.accountIsDisabled = true
+            } else if (data?.code === 'InvalidCredentials') {
+              this.invalidCredentials = true
+            }
           } else {
             this.handleError(e)
           }
