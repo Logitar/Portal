@@ -4,4 +4,4 @@
   ViewBag.Title = "Users";
 }
 
-<user-list></user-list>
+<user-list user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></user-list>

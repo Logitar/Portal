@@ -64,9 +64,34 @@
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
             <td>{{ $d(new Date(user.updatedAt), 'medium') }}</td>
             <td>
-              <icon-button class="mx-1" v-if="user.isDisabled" icon="unlock" :loading="loading" text="actions.enable" variant="warning" @click="enable(user)" />
-              <icon-button class="mx-1" v-else icon="lock" :loading="loading" text="actions.disable" variant="warning" @click="disable(user)" />
-              <icon-button class="mx-1" icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${user.id}`" />
+              <icon-button
+                class="mx-1"
+                v-if="user.isDisabled"
+                :disabled="loading"
+                icon="unlock"
+                :loading="loading"
+                text="actions.enable"
+                variant="warning"
+                @click="enable(user)"
+              />
+              <icon-button
+                class="mx-1"
+                v-else
+                icon="lock"
+                :disabled="loading || user.username === currentUser.username"
+                :loading="loading"
+                text="actions.disable"
+                variant="warning"
+                @click="disable(user)"
+              />
+              <icon-button
+                class="mx-1"
+                :disabled="user.username === currentUser.username"
+                icon="trash-alt"
+                text="actions.delete"
+                variant="danger"
+                v-b-modal="`delete_${user.id}`"
+              />
               <delete-modal
                 confirm="user.delete.confirm"
                 :displayName="user.fullName ? `${user.fullName} (${user.username})` : user.username"
@@ -96,9 +121,16 @@ export default {
     RealmSelect,
     UserAvatar
   },
+  props: {
+    user: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       count: 10,
+      currentUser: null,
       desc: false,
       isConfirmed: null,
       isDisabled: null,
@@ -215,6 +247,9 @@ export default {
         }
       }
     }
+  },
+  created() {
+    this.currentUser = JSON.parse(this.user)
   },
   watch: {
     params: {
