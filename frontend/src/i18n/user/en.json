@@ -83,6 +83,7 @@
     "updated": "Your profile has been updated."
   },
   "signIn": {
+    "accountIsDisabled": "Your account is disabled.",
     "failed": "Sign in failed!",
     "invalidCredentials": "Please check you provided the correct email address/username and password.",
     "recoverPassword": "I forgot my password",

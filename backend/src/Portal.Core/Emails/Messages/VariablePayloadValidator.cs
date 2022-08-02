@@ -8,7 +8,9 @@ namespace Portal.Core.Emails.Messages
     public VariablePayloadValidator()
     {
       RuleFor(x => x.Key)
-        .NotEmpty();
+        .NotEmpty()
+        .MaximumLength(256)
+        .Must(ValidationRules.BeAValidIdentifier);
     }
   }
 }

@@ -245,6 +245,10 @@ namespace Portal.Core.Accounts
       {
         throw new AccountNotConfirmedException(user.Id);
       }
+      else if (user.IsDisabled)
+      {
+        throw new AccountIsDisabledException(user.Id);
+      }
 
       byte[]? keyBytes = null;
       string? keyHash = null;

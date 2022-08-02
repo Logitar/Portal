@@ -6,7 +6,7 @@
     :maxLength="validate ? 100 : null"
     placeholder="templates.key.placeholder"
     :required="required"
-    :rules="{ key: validate }"
+    :rules="{ identifier: validate }"
     :value="value"
     @input="$emit('input', $event)"
   />

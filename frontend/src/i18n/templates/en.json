@@ -64,9 +64,8 @@
   "updated": "The template has been updated.",
   "variables": {
     "add": "Add variable",
-    "keyName": "key",
-    "keyPlaceholder": "Key",
+    "key": "Key",
     "label": "Variables",
-    "valuePlaceholder": "Value"
+    "value": "Value"
   }
 }

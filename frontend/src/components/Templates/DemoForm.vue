@@ -21,14 +21,20 @@
       <form-field
         class="col"
         :id="`key_${index}`"
-        placeholder="templates.variables.keyPlaceholder"
+        label="templates.variables.key"
+        :maxLength="256"
+        placeholder="templates.variables.key"
+        :rules="{ identifier: true }"
+        hideLabel
         :value="variable.key"
         @input="setVariable(index, $event, variable.value)"
       />
       <form-field
         class="col"
         :id="`key_${index}`"
-        placeholder="templates.variables.valuePlaceholder"
+        label="templates.variables.value"
+        placeholder="templates.variables.value"
+        hideLabel
         :value="variable.value"
         @input="setVariable(index, variable.key, $event)"
       >
@@ -40,6 +46,7 @@
 
 <script>
 import Vue from 'vue'
+import { isIdentifier } from '@/helpers/stringUtils'
 import { sendDemoMessage } from '@/api/messages'
 
 export default {
@@ -94,7 +101,7 @@ export default {
         try {
           const { data } = await sendDemoMessage({
             templateId: this.template.id,
-            variables: this.variables.filter(({ key }) => Boolean(key))
+            variables: this.variables.filter(({ key }) => isIdentifier(key))
           })
           this.message = data
           this.showResult = true

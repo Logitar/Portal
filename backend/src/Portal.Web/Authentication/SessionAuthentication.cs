@@ -32,24 +32,36 @@ namespace Portal.Web.Authentication
       if (sessionId.HasValue)
       {
         Session? session = await _sessionQuerier.GetAsync(sessionId.Value, readOnly: true);
+        AuthenticateResult? failure = null;
         if (session == null)
         {
-          Context.Session.Clear();
-
-          return AuthenticateResult.Fail($"The session 'Id={sessionId}' could not be found.");
+          failure = AuthenticateResult.Fail($"The session 'Id={sessionId}' could not be found.");
         }
         else if (!session.IsActive)
         {
+          failure = AuthenticateResult.Fail($"The session 'Id={session.Id}' has ended.");
+        }
+        else if (session.User == null)
+        {
+          failure = AuthenticateResult.Fail($"The User was null for session 'Id={session.Id}'.");
+        }
+        else if (session.User.IsDisabled)
+        {
+          failure = AuthenticateResult.Fail($"The User is disabled for session 'Id={session.Id}'.");
+        }
+
+        if (failure != null)
+        {
           Context.Session.Clear();
 
-          return AuthenticateResult.Fail($"The session 'Id={sessionId}' has ended.");
+          return failure;
         }
 
         if (!Context.SetSession(session))
         {
           throw new InvalidOperationException("The Session context item could not be set.");
         }
-        if (!Context.SetUser(session.User))
+        if (!Context.SetUser(session!.User))
         {
           throw new InvalidOperationException("The User context item could not be set.");
         }
