@@ -7,8 +7,13 @@
       :maxLength="100"
       placeholder="senders.sendGrid.apiKey.placeholder"
       required
+      :type="showApiKey ? 'text' : 'password'"
       v-model="apiKey"
-    />
+    >
+      <b-input-group-append>
+        <icon-button icon="eye" variant="info" @click="showApiKey = !showApiKey" />
+      </b-input-group-append>
+    </form-field>
   </div>
 </template>
 
@@ -20,7 +25,8 @@ export default {
   },
   data() {
     return {
-      apiKey: null
+      apiKey: null,
+      showApiKey: false
     }
   },
   computed: {
