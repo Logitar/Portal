@@ -2,9 +2,9 @@
 
 namespace Logitar.Portal.Web.Models.Api.Culture
 {
-  public class LocaleModel
+  public class LocaleSummary
   {
-    public LocaleModel(CultureInfo culture)
+    public LocaleSummary(CultureInfo culture)
     {
       ArgumentNullException.ThrowIfNull(culture);
 

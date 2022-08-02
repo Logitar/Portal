@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Emails.Templates.Models;
 using Logitar.Portal.Core.Emails.Templates.Payloads;
+using Logitar.Portal.Web.Models.Api.Template;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -12,10 +14,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/templates")]
   public class TemplateApiController : ControllerBase
   {
+    private readonly IMapper _mapper;
     private readonly ITemplateService _templateService;
 
-    public TemplateApiController(ITemplateService templateService)
+    public TemplateApiController(IMapper mapper, ITemplateService templateService)
     {
+      _mapper = mapper;
       _templateService = templateService;
     }
 
@@ -35,15 +39,17 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<TemplateModel>>> GetAsync(string? realm, string? search,
+    public async Task<ActionResult<ListModel<TemplateSummary>>> GetAsync(string? realm, string? search,
       TemplateSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _templateService.GetAsync(realm, search,
+      ListModel<TemplateModel> templates = await _templateService.GetAsync(realm, search,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<TemplateSummary>.From(templates, _mapper));
     }
 
     [HttpGet("{id}")]

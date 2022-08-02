@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Core;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
 using Logitar.Portal.Web.Filters;
 using Logitar.Portal.Web.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web
@@ -74,6 +74,8 @@ namespace Logitar.Portal.Web
 
       services.AddPortalCore();
       services.AddPortalInfrastructure(_configuration);
+
+      services.AddAutoMapper(typeof(Startup).Assembly);
 
       services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();

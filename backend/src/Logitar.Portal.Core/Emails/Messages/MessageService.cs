@@ -60,7 +60,7 @@ namespace Logitar.Portal.Core.Emails.Messages
       return _mapper.Map<MessageModel>(message);
     }
 
-    public async Task<ListModel<MessageSummary>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
+    public async Task<ListModel<MessageModel>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
       MessageSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ namespace Logitar.Portal.Core.Emails.Messages
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<MessageSummary>.From(messages, _mapper);
+      return ListModel<MessageModel>.From(messages, _mapper);
     }
 
     public async Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;
+using Logitar.Portal.Web.Models.Api.User;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -12,10 +14,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/users")]
   public class UserApiController : ControllerBase
   {
+    private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
-    public UserApiController(IUserService userService)
+    public UserApiController(IMapper mapper, IUserService userService)
     {
+      _mapper = mapper;
       _userService = userService;
     }
 
@@ -35,15 +39,17 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
+    public async Task<ActionResult<ListModel<UserSummary>>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _userService.GetAsync(isConfirmed, isDisabled, realm, search,
+      ListModel<UserModel> users = await _userService.GetAsync(isConfirmed, isDisabled, realm, search,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<UserSummary>.From(users, _mapper));
     }
 
     [HttpGet("{id}")]

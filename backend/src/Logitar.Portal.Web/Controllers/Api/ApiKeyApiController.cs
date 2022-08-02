@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.ApiKeys.Models;
 using Logitar.Portal.Core.ApiKeys.Payloads;
+using Logitar.Portal.Web.Models.Api.ApiKey;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -13,10 +15,12 @@ namespace Logitar.Portal.Web.Controllers.Api
   public class ApiKeyApiController : ControllerBase
   {
     private readonly IApiKeyService _apiKeyService;
+    private readonly IMapper _mapper;
 
-    public ApiKeyApiController(IApiKeyService apiKeyService)
+    public ApiKeyApiController(IApiKeyService apiKeyService, IMapper mapper)
     {
       _apiKeyService = apiKeyService;
+      _mapper = mapper;
     }
 
     [HttpPost]
@@ -35,15 +39,17 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<ApiKeyModel>>> GetAsync(bool? isExpired, string? search,
+    public async Task<ActionResult<ListModel<ApiKeySummary>>> GetAsync(bool? isExpired, string? search,
       ApiKeySort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      return Ok(await _apiKeyService.GetAsync(isExpired, search,
+      ListModel<ApiKeyModel> apiKeys = await _apiKeyService.GetAsync(isExpired, search,
         sort, desc,
         index, count,
-        cancellationToken));
+        cancellationToken);
+
+      return Ok(ListModel<ApiKeySummary>.From(apiKeys, _mapper));
     }
 
     [HttpGet("{id}")]

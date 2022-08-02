@@ -13,6 +13,13 @@ namespace Logitar.Portal.Core
     public IEnumerable<T> Items { get; }
     public long Total { get; }
 
+    public static ListModel<T> From<TSource>(ListModel<TSource> list, IMapper mapper)
+    {
+      ArgumentNullException.ThrowIfNull(list);
+      ArgumentNullException.ThrowIfNull(mapper);
+
+      return new ListModel<T>(mapper.Map<IEnumerable<T>>(list.Items), list.Total);
+    }
     public static ListModel<T> From<TSource>(PagedList<TSource> list, IMapper mapper)
     {
       ArgumentNullException.ThrowIfNull(list);

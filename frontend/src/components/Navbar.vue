@@ -12,7 +12,7 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item v-if="environment === 'development'" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
-          <template v-if="user.isAuthenticated">
+          <template v-if="currentUser.isAuthenticated">
             <b-nav-item href="/users">
               <font-awesome-icon icon="users" />
               {{ $t('user.title') }}
@@ -56,14 +56,14 @@
             </b-dropdown-item>
           </b-nav-item-dropdown> -->
 
-          <template v-if="user.isAuthenticated">
+          <template v-if="currentUser.isAuthenticated">
             <b-nav-item-dropdown right>
               <template #button-content>
-                <user-avatar :user="user" :size="24" />
+                <user-avatar :user="currentUser" :size="24" />
               </template>
               <b-dropdown-item href="/user/profile">
                 <font-awesome-icon icon="user" />
-                {{ user.fullName || user.username }}
+                {{ currentUser.fullName || currentUser.username }}
               </b-dropdown-item>
               <b-dropdown-item href="/user/sign-out">
                 <font-awesome-icon icon="sign-out-alt" />
@@ -92,14 +92,14 @@ export default {
     UserAvatar
   },
   props: {
-    json: {
+    user: {
       type: String,
       required: true
     }
   },
   data() {
     return {
-      user: null
+      currentUser: null
     }
   },
   computed: {
@@ -108,12 +108,12 @@ export default {
     }
   },
   methods: {
-    setModel(user) {
-      this.user = user
+    setModel(currentUser) {
+      this.currentUser = currentUser
     }
   },
   created() {
-    this.setModel(JSON.parse(this.json))
+    this.setModel(JSON.parse(this.user))
   }
 }
 </script>
