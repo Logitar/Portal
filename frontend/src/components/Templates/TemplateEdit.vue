@@ -30,8 +30,9 @@
             <description-field :rows="15" v-model="description" />
           </b-tab>
           <b-tab v-if="template" :title="$t('templates.demo')">
-            <demo-form v-if="hasEmail" :template="template" />
-            <p v-else class="text-danger" v-t="'templates.emailRequired'" />
+            <p v-if="!hasEmail" class="text-danger" v-t="'templates.emailRequired'" />
+            <p v-if="!defaultSender" class="text-danger" v-t="'templates.defaultSenderRequired'" />
+            <demo-form v-else :sender="defaultSender" :template="template" />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -63,6 +64,10 @@ export default {
       type: String,
       default: ''
     },
+    sender: {
+      type: String,
+      default: ''
+    },
     status: {
       type: String,
       default: ''
@@ -76,6 +81,7 @@ export default {
     return {
       contentType: null,
       contents: null,
+      defaultSender: null,
       description: null,
       displayName: null,
       key: null,
@@ -156,6 +162,9 @@ export default {
     }
     if (this.realm) {
       this.realmId = this.realm
+    }
+    if (this.sender) {
+      this.defaultSender = JSON.parse(this.sender)
     }
     if (this.status === 'created') {
       this.toast('success', 'templates.created')

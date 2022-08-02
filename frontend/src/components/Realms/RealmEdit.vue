@@ -91,9 +91,9 @@ export default {
         requireDigit: false,
         requireLowercase: false,
         requireNonAlphanumeric: false,
-        requireUppercase: null,
-        requiredLength: null,
-        requiredUniqueChars: null
+        requireUppercase: false,
+        requiredLength: 1,
+        requiredUniqueChars: 1
       },
       realm: null,
       requireConfirmedAccount: false,
