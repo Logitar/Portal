@@ -1,0 +1,46 @@
+﻿@using Logitar.Portal.Core.Users;
+@using Logitar.Portal.Web.Models.Users;
+
+@functions {
+  private UserSummary UserSummary
+  {
+    get
+    {
+      User? user = Context.GetUser();
+
+      return new UserSummary
+      {
+        IsAuthenticated = user != null,
+        Email = user?.Email,
+        FullName = user?.FullName,
+        Picture = user?.Picture,
+        Username = user?.Username
+      };
+    }
+  }
+}
+
+<!DOCTYPE html>
+<html lang="@Thread.CurrentThread.CurrentUICulture.Name">
+<head>
+  <title>@ViewBag.Title &mdash; Portal</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="~/dist/chunk-vendors.css">
+  <style>
+    a.disabled,
+    button:disabled {
+      cursor: not-allowed;
+      pointer-events: all !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <navbar json="@(ModelSerializer.Serialize(UserSummary))"></navbar>
+    @RenderBody()
+  </div>
+  <script src="~/dist/app.js"></script>
+  <script src="~/dist/chunk-vendors.js"></script>
+</body>
+</html>

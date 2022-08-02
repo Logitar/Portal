@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{068B079B-0F05-4800-87D6-1AEC50106F24}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Core", "src\Logitar.Portal.Core\Logitar.Portal.Core.csproj", "{D4C0C8F2-4607-4812-A222-828B5A3E9B95}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4C0C8F2-4607-4812-A222-828B5A3E9B95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4C0C8F2-4607-4812-A222-828B5A3E9B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4C0C8F2-4607-4812-A222-828B5A3E9B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4C0C8F2-4607-4812-A222-828B5A3E9B95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C2D6542-6711-42BC-A3D8-A2EE79164DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C146666-FD7B-4F71-BC68-FFF2AF5068F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {55C506C2-F420-403F-B2E6-A47E2DF4C4B6}
+	EndGlobalSection
+EndGlobal
