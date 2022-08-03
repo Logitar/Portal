@@ -22,6 +22,9 @@ namespace Logitar.Portal.Core.Realms
 
       When(x => x.PasswordSettings != null, () => RuleFor(x => x.PasswordSettings!)
         .SetValidator(new PasswordSettingsValidator()));
+
+      RuleFor(x => x.GoogleClientId)
+        .MaximumLength(256);
     }
 
     private static bool BeAValidAlias(string? value) => value == null

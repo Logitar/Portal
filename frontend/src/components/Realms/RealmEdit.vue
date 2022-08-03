@@ -56,6 +56,14 @@
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
+            <h5 v-t="'realms.googleAuth.title'" />
+            <form-field
+              id="googleClientId"
+              label="realms.googleAuth.id.label"
+              :maxLength="256"
+              placeholder="realms.googleAuth.id.placeholder"
+              v-model="googleClientId"
+            />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -95,6 +103,7 @@ export default {
       aliasConflict: false,
       allowedUsernameCharacters: null,
       description: null,
+      googleClientId: null,
       loading: false,
       name: null,
       passwordRecoverySenderId: null,
@@ -119,6 +128,7 @@ export default {
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
         (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
+        (this.googleClientId ?? '') !== (this.realm?.googleClientId ?? '') ||
         (this.name ?? '') !== (this.realm?.name ?? '') ||
         this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
         this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
@@ -137,6 +147,7 @@ export default {
       const payload = {
         allowedUsernameCharacters: this.allowedUsernameCharacters,
         description: this.description,
+        googleClientId: this.googleClientId,
         name: this.name,
         passwordRecoverySenderId: this.passwordRecoverySenderId,
         passwordRecoveryTemplateId: this.passwordRecoveryTemplateId,
@@ -158,6 +169,7 @@ export default {
       this.alias = realm.alias
       this.allowedUsernameCharacters = realm.allowedUsernameCharacters
       this.description = realm.description
+      this.googleClientId = realm.googleClientId
       this.name = realm.name
       this.passwordRecoverySenderId = realm.passwordRecoverySenderId
       this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
