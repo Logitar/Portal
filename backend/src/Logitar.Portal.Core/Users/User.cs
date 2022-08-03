@@ -105,10 +105,7 @@ namespace Logitar.Portal.Core.Users
     {
       Username = @event.Payload.Username;
 
-      PasswordChangedAt = @event.OccurredAt;
-      PasswordHash = @event.Payload.PasswordHash;
-
-      Apply(@event.Payload);
+      Apply(@event.Payload, @event.OccurredAt);
     }
     protected virtual void Apply(ChangedPasswordEvent @event)
     {
@@ -134,17 +131,17 @@ namespace Logitar.Portal.Core.Users
     }
     protected virtual void Apply(UpdatedEvent @event)
     {
-      if (@event.Payload.PasswordHash != null)
-      {
-        PasswordChangedAt = @event.OccurredAt;
-        PasswordHash = @event.Payload.PasswordHash;
-      }
-
-      Apply(@event.Payload);
+      Apply(@event.Payload, @event.OccurredAt);
     }
 
-    private void Apply(SaveUserPayload payload)
+    private void Apply(SaveUserSecurePayload payload, DateTime occurredAt)
     {
+      if (payload.PasswordHash != null)
+      {
+        PasswordChangedAt = occurredAt;
+        PasswordHash = payload.PasswordHash;
+      }
+
       if (Email?.ToUpper() != payload.Email?.ToUpper())
       {
         Email = payload.Email;

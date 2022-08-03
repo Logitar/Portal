@@ -1,7 +1,6 @@
 ﻿namespace Logitar.Portal.Core.Users.Payloads
 {
-  public class UpdateUserSecurePayload : SaveUserPayload
+  public class UpdateUserSecurePayload : SaveUserSecurePayload
   {
-    public string? PasswordHash { get; set; }
   }
 }

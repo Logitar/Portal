@@ -48,8 +48,6 @@ namespace Logitar.Portal.Core.Users
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
-      _passwordService.ValidateAndThrow(payload.Password, realm);
-
       if (await _querier.GetAsync(payload.Username, realm, readOnly: true, cancellationToken) != null)
       {
         throw new UsernameAlreadyUsedException(payload.Username, nameof(payload.Username));
@@ -62,9 +60,14 @@ namespace Logitar.Portal.Core.Users
       }
 
       var securePayload = _mapper.Map<CreateUserSecurePayload>(payload);
-      securePayload.PasswordHash = _passwordService.Hash(payload.Password);
-      var user = new User(securePayload, _userContext.ActorId, realm);
 
+      if (payload.Password != null)
+      {
+        _passwordService.ValidateAndThrow(payload.Password, realm);
+        securePayload.PasswordHash = _passwordService.Hash(payload.Password);
+      }
+
+      var user = new User(securePayload, _userContext.ActorId, realm);
       if (payload.ConfirmEmail)
       {
         user.ConfirmEmail(_userContext.ActorId);
