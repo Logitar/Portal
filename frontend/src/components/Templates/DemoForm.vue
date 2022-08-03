@@ -31,7 +31,7 @@
       />
       <form-field
         class="col"
-        :id="`key_${index}`"
+        :id="`value_${index}`"
         label="templates.variables.value"
         placeholder="templates.variables.value"
         hideLabel

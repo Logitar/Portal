@@ -1,0 +1,36 @@
+{
+  "claims": {
+    "add": "Add claim",
+    "label": "Claims",
+    "type": "Type",
+    "value": "Value",
+    "valueType": "Value Type"
+  },
+  "create": "Create",
+  "error": {
+    "code": "Code",
+    "description": "Description"
+  },
+  "lifetime": "Lifetime (seconds)",
+  "purpose": {
+    "label": "Purpose",
+    "placeholder": "Enter a token purpose claim"
+  },
+  "result": {
+    "errors": "Errors",
+    "label": "Result"
+  },
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter a subject claim, typically an ID"
+  },
+  "title": "Tokens",
+  "token": {
+    "clipboard": "Copy to clipboard",
+    "decoder": "Go to decoder",
+    "heading": "Your new token",
+    "label": "Token",
+    "placeholder": "Paste your token"
+  },
+  "validate": "Validate"
+}

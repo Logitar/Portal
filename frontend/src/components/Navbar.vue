@@ -37,6 +37,10 @@
               <font-awesome-icon icon="envelope" />
               {{ $t('messages.title') }}
             </b-nav-item>
+            <b-nav-item href="/tokens">
+              <font-awesome-icon icon="id-card" />
+              {{ $t('tokens.title') }}
+            </b-nav-item>
           </template>
         </b-navbar-nav>
 

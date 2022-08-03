@@ -1,7 +1,7 @@
 {
   "code": "en",
   "messages": {
-    "alias": "The {_field_} must be composed of non-empty alphanumeric characters.",
+    "alias": "The {_field_} must be composed of non-empty alphanumeric words separated by hyphens (-).",
     "alpha_num": "The {_field_} can only contain letters and digits.",
     "confirmed": "The {target} and the {_field_} must match.",
     "email": "Please enter a valid email address.",
@@ -10,6 +10,7 @@
     "max_value": "The {_field_} must be lesser than or equal to {max}.",
     "min": "The {_field_} must contain at least {length} characters.",
     "min_value": "The {_field_} must be greater than or equal to {min}.",
+    "purpose": "The {_field_} must be composed of non-empty words separated by underscores (_).",
     "require_digit": "The {_field_} must contain at least one digit (0-9).",
     "require_lowercase": "The {_field_} must contain at least one lowercase letter (a-z).",
     "require_non_alphanumeric": "The {_field_} must contain at least one special character (e.g. !@/$%&*_+-).",
