@@ -5,14 +5,16 @@
       {{ $t(`templates.status.${status}`) }}
       <b-link :href="`/messages/${message.id}`" target="_blank">{{ $t('templates.result.viewDetail') }} <font-awesome-icon icon="external-link-alt" /></b-link>
     </b-alert>
-    <div class="my-2">
-      <icon-button :disabled="loading" icon="paper-plane" :loading="loading" text="templates.sendToMe" variant="primary" @click="sendDemo" />
-      {{ $t('templates.senderFormat') }}
-      <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank">
-        {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt; <font-awesome-icon icon="external-link-alt"
-      /></b-link>
-      <b-link v-else :href="`/senders/${sender.id}`" target="_blank">{{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /></b-link>.
-    </div>
+    <p>
+      <i>
+        {{ $t('templates.senderFormat') }}
+        <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank">
+          {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt; <font-awesome-icon icon="external-link-alt"
+        /></b-link>
+        <b-link v-else :href="`/senders/${sender.id}`" target="_blank">{{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /></b-link>.
+      </i>
+    </p>
+    <icon-button :disabled="loading" icon="paper-plane" :loading="loading" text="templates.sendToMe" variant="primary" @click="sendDemo" />
     <h3 v-t="'templates.variables.label'" />
     <div class="my-2">
       <icon-button icon="plus" text="templates.variables.add" variant="success" @click="addVariable" />

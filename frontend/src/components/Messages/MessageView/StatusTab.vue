@@ -7,18 +7,18 @@
         <b-link :href="`/realms/${realm.alias}`" target="_blank">{{ `${realm.name} (${realm.alias})` }} <font-awesome-icon icon="external-link-alt" /></b-link>.
       </template>
       <template v-else-if="message.realmId">{{ $t('messages.realmFormat') }} <strong v-text="`${message.realmName} (${message.realmAlias})`" />.</template>
-      <template v-else>{{ $t('messages.noRealm') }}</template>
+      <template v-else>{{ $t('messages.noRealm.part1') }} <strong v-t="'messages.noRealm.part2'" />.</template>
       <br />
       <template v-if="sender">
         {{ $t('messages.sender.format1') }}
         <b-link v-if="sender.displayName" :href="`/senders/${sender.id}`" target="_blank">
           {{ sender.displayName }} &lt;{{ sender.emailAddress }}&gt; <font-awesome-icon icon="external-link-alt" />
         </b-link>
-        <b-link v-else :href="`/senders/${sender.id}`" target="_blank"> {{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /> </b-link>
+        <b-link v-else :href="`/senders/${sender.id}`" target="_blank">{{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /></b-link>
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}
-        {{ $t(`senders.provider.options.${message.senderProvider}`) }}
+        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong>
         .
       </template>
       <template v-else>

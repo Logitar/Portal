@@ -100,10 +100,10 @@ export default {
     payload() {
       return {
         lifetime: this.lifetime || null,
-        purpose: this.purpose,
+        purpose: this.purpose || null,
         realm: this.realm,
-        email: this.email,
-        subject: this.subject,
+        email: this.email || null,
+        subject: this.subject || null,
         claims: this.claims.filter(({ type }) => Boolean(type))
       }
     }

@@ -9,7 +9,7 @@
   },
   "contents": {
     "label": "Contents",
-    "placeholder": "Enter the contents of the message; Razor syntax is supported"
+    "placeholder": "Enter the contents of the messages sent using this template. You can use the Razor language syntax."
   },
   "created": "The template has been created.",
   "defaultSenderRequired": "You need to configure a default sender to send a demo message.",
@@ -28,11 +28,10 @@
   "empty": "This list is empty.",
   "key": {
     "label": "Key",
-    "placeholder": "Enter a key"
+    "placeholder": "Enter an unique key"
   },
   "metadata": "Metadata",
   "newTitle": "Create template",
-  "noRealm": "This template is not in a realm.",
   "result": {
     "viewDetail": "View detail"
   },
@@ -57,7 +56,7 @@
   "statusFormat": "{status}!",
   "subject": {
     "label": "Subject",
-    "placeholder": "Enter the subject of the message"
+    "placeholder": "Enter the subject of the messages sent using this template"
   },
   "template": "Template",
   "title": "Templates",

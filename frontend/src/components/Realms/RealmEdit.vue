@@ -20,10 +20,18 @@
           </b-tab>
           <b-tab :title="$t('realms.settings')">
             <b-form-group>
-              <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">{{ $t('realms.requireConfirmedAccount') }}</b-form-checkbox>
+              <b-form-checkbox id="requireConfirmedAccount" v-model="requireConfirmedAccount">
+                <span v-b-tooltip.hover :title="$t('realms.requireConfirmedAccount.help')">
+                  {{ $t('realms.requireConfirmedAccount.label') }} <font-awesome-icon icon="info-circle" />
+                </span>
+              </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox id="requireUniqueEmail" v-model="requireUniqueEmail">{{ $t('realms.requireUniqueEmail') }}</b-form-checkbox>
+              <b-form-checkbox id="requireUniqueEmail" v-model="requireUniqueEmail">
+                <span v-b-tooltip.hover :title="$t('realms.requireUniqueEmail.help')">
+                  {{ $t('realms.requireUniqueEmail.label') }} <font-awesome-icon icon="info-circle" />
+                </span>
+              </b-form-checkbox>
             </b-form-group>
             <form-field
               id="allowedUsernameCharacters"

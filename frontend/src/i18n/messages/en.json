@@ -2,7 +2,7 @@
   "contentFormat": "content",
   "contents": {
     "label": "Contents",
-    "noVariable": "No variable was used in this message.",
+    "noVariable": "No variable were specified in this message.",
     "variables": "Variables",
     "viewAsHtml": "View as HTML",
     "warning": "The following section may contain sensitive information."
@@ -13,7 +13,10 @@
   },
   "empty": "This list is empty.",
   "failureData": "Failure data",
-  "noRealm": "This message was not sent through a realm.",
+  "noRealm": {
+    "part1": "This message was sent through the",
+    "part2": "Portal (no realm)"
+  },
   "noResult": "No data to display.",
   "realmFormat": "This message was sent through the realm",
   "recipient": {
@@ -32,7 +35,7 @@
   "recipients": "Recipients",
   "sender": {
     "default": "Default",
-    "format1": "This message was sent be the sent by",
+    "format1": "This message was sent from",
     "format2": "using the provider",
     "label": "Sender"
   },
@@ -55,7 +58,7 @@
   },
   "subject": "Subject",
   "successData": "Success data",
-  "templateFormat": "This message contents were generated from the template",
+  "templateFormat": "This message contents were generated using the template",
   "title": "Messages",
   "viewTitle": "View message"
 }

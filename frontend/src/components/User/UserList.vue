@@ -64,29 +64,10 @@
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
             <td>{{ $d(new Date(user.updatedAt), 'medium') }}</td>
             <td>
+              <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
               <icon-button
                 class="mx-1"
-                v-if="user.isDisabled"
-                :disabled="loading"
-                icon="unlock"
-                :loading="loading"
-                text="actions.enable"
-                variant="warning"
-                @click="enable(user)"
-              />
-              <icon-button
-                class="mx-1"
-                v-else
-                icon="lock"
-                :disabled="loading || user.username === currentUser.username"
-                :loading="loading"
-                text="actions.disable"
-                variant="warning"
-                @click="disable(user)"
-              />
-              <icon-button
-                class="mx-1"
-                :disabled="user.username === currentUser.username"
+                :disabled="user.id === current"
                 icon="trash-alt"
                 text="actions.delete"
                 variant="danger"
@@ -111,18 +92,20 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import ToggleStatus from './ToggleStatus.vue'
 import UserAvatar from './UserAvatar.vue'
-import { deleteUser, disableUser, enableUser, getUsers } from '@/api/users'
+import { deleteUser, getUsers } from '@/api/users'
 import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
   name: 'UserList',
   components: {
     RealmSelect,
+    ToggleStatus,
     UserAvatar
   },
   props: {
-    user: {
+    current: {
       type: String,
       required: true
     }
@@ -130,7 +113,6 @@ export default {
   data() {
     return {
       count: 10,
-      currentUser: null,
       desc: false,
       isConfirmed: null,
       isDisabled: null,
@@ -173,42 +155,6 @@ export default {
     }
   },
   methods: {
-    async disable({ id }) {
-      if (!this.loading) {
-        this.loading = true
-        let refresh = false
-        try {
-          await disableUser(id)
-          refresh = true
-          this.toast('success', 'user.disabled.success')
-        } catch (e) {
-          this.handleError(e)
-        } finally {
-          this.loading = false
-        }
-        if (refresh) {
-          await this.refresh()
-        }
-      }
-    },
-    async enable({ id }) {
-      if (!this.loading) {
-        this.loading = true
-        let refresh = false
-        try {
-          await enableUser(id)
-          refresh = true
-          this.toast('success', 'user.enabled')
-        } catch (e) {
-          this.handleError(e)
-        } finally {
-          this.loading = false
-        }
-        if (refresh) {
-          await this.refresh()
-        }
-      }
-    },
     async onDelete({ id }, callback = null) {
       if (!this.loading) {
         this.loading = true
@@ -247,9 +193,6 @@ export default {
         }
       }
     }
-  },
-  created() {
-    this.currentUser = JSON.parse(this.user)
   },
   watch: {
     params: {

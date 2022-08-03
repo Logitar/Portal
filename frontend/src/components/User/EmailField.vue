@@ -1,5 +1,6 @@
 <template>
   <form-field
+    :disabled="disabled"
     :id="id"
     :label="label"
     :maxLength="validate ? 256 : null"
@@ -21,6 +22,10 @@ export default {
   name: 'EmailField',
   props: {
     confirmed: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     },

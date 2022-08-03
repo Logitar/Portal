@@ -10,16 +10,9 @@
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('templates.template')">
-            <p v-if="template && !realmId" v-t="'templates.noRealm'" />
             <b-row>
-              <template v-if="template">
-                <realm-select v-if="realmId" class="col" disabled :value="realmId" />
-                <key-field class="col" disabled :value="key" />
-              </template>
-              <template v-else>
-                <realm-select class="col" v-model="realmId" />
-                <key-field class="col" required validate v-model="key" />
-              </template>
+              <realm-select class="col" :disabled="Boolean(template)" :required="!realmId" v-model="realmId" />
+              <key-field class="col" :disabled="Boolean(template)" :required="!template" :validate="!template" v-model="key" />
               <content-type-select class="col" required v-model="contentType" />
             </b-row>
             <form-field id="subject" label="templates.subject.label" :maxLength="256" placeholder="templates.subject.placeholder" required v-model="subject" />

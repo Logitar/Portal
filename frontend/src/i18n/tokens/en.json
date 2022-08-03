@@ -14,7 +14,7 @@
   "lifetime": "Lifetime (seconds)",
   "purpose": {
     "label": "Purpose",
-    "placeholder": "Enter a token purpose claim"
+    "placeholder": "Enter a token purpose (only letters and '_')"
   },
   "result": {
     "errors": "Errors",

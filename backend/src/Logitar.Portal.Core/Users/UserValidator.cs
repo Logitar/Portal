@@ -14,7 +14,7 @@ namespace Logitar.Portal.Core.Users
         {
           string? allowedUsernameCharacters = context.GetAllowedUsernameCharacters();
 
-          return allowedUsernameCharacters == null || username.All(c => allowedUsernameCharacters.Contains(c));
+          return string.IsNullOrEmpty(allowedUsernameCharacters) || username.All(c => allowedUsernameCharacters.Contains(c));
         });
 
       When(x => x.PasswordHash == null, () => RuleFor(x => x.PasswordChangedAt).Null());
