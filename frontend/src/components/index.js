@@ -1,8 +1,10 @@
+import AppFooter from './AppFooter.vue'
 import Navbar from './Navbar.vue'
 
 export default {
   ApiKeyEdit: () => import(/* webpackChunkName: "apiKeyEdit" */ './ApiKeys/ApiKeyEdit.vue'),
   ApiKeyList: () => import(/* webpackChunkName: "apiKeyList" */ './ApiKeys/ApiKeyList.vue'),
+  AppFooter,
   Home: () => import(/* webpackChunkName: "home" */ './Home.vue'),
   MessageList: () => import(/* webpackChunkName: "messageList" */ './Messages/MessageList.vue'),
   MessageView: () => import(/* webpackChunkName: "messageView" */ './Messages/MessageView.vue'),

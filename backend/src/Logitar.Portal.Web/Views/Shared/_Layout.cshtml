@@ -7,12 +7,22 @@
   <title>@ViewBag.Title &mdash; Portal</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="~/dist/app.css">
   <link rel="stylesheet" href="~/dist/chunk-vendors.css">
   <style>
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+
+    body {
+        margin-bottom: 76px;
+    }
+
     a.disabled,
     button:disabled {
-      cursor: not-allowed;
-      pointer-events: all !important;
+        cursor: not-allowed;
+        pointer-events: all !important;
     }
   </style>
 </head>
@@ -20,6 +30,7 @@
   <div id="app">
     <navbar user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
     @RenderBody()
+    <app-footer></app-footer>
   </div>
   <script src="~/dist/app.js"></script>
   <script src="~/dist/chunk-vendors.js"></script>
