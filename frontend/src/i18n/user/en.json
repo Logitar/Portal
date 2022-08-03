@@ -25,12 +25,12 @@
   "email": {
     "confirmed": "Confirmed",
     "label": "Email Address",
-    "placeholder": "Enter your email address"
+    "placeholder": "Enter an email address"
   },
   "empty": "This list is empty.",
   "firstName": {
     "label": "First Name",
-    "placeholder": "Enter your first name"
+    "placeholder": "Enter a first name"
   },
   "fullName": "Name",
   "information": {
@@ -39,7 +39,7 @@
   },
   "lastName": {
     "label": "Last Name",
-    "placeholder": "Enter your last name"
+    "placeholder": "Enter a last name"
   },
   "locale": {
     "label": "Locale",
@@ -72,7 +72,7 @@
   "phone": {
     "confirmed": "Confirmed",
     "label": "Phone Number",
-    "placeholder": "Enter your phone number"
+    "placeholder": "Enter a phone number"
   },
   "picture": {
     "label": "Picture URL",
@@ -110,6 +110,6 @@
   "updatedAt": "Last updated on",
   "username": {
     "label": "Username",
-    "placeholder": "Enter your username"
+    "placeholder": "Enter an username"
   }
 }

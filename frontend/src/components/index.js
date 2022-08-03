@@ -17,6 +17,7 @@ export default {
   SignIn: () => import(/* webpackChunkName: "signIn" */ './Account/SignIn.vue'),
   TemplateEdit: () => import(/* webpackChunkName: "templateEdit" */ './Templates/TemplateEdit.vue'),
   TemplateList: () => import(/* webpackChunkName: "templateList" */ './Templates/TemplateList.vue'),
+  Tokens: () => import(/* webpackChunkName: "tokens" */ './Tokens/Tokens.vue'),
   UserEdit: () => import(/* webpackChunkName: "userEdit" */ './User/UserEdit.vue'),
   UserList: () => import(/* webpackChunkName: "userList" */ './User/UserList.vue')
 }

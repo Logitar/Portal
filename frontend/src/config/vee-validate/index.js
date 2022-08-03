@@ -4,6 +4,7 @@ import { alpha_num, confirmed, email, max, max_value, min, min_value, required }
 
 import './rules/alias'
 import './rules/identifier'
+import './rules/purpose'
 import './rules/requireDigit'
 import './rules/requireLowercase'
 import './rules/requireNonAlphanumeric'

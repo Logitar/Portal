@@ -5,6 +5,7 @@ import messages from './messages/en.json'
 import realms from './realms/en.json'
 import senders from './senders/en.json'
 import templates from './templates/en.json'
+import tokens from './tokens/en.json'
 import user from './user/en.json'
 
 export default {
@@ -15,5 +16,6 @@ export default {
   realms,
   senders,
   templates,
+  tokens,
   user
 }

@@ -82,7 +82,7 @@ export default {
     }
   },
   methods: {
-    async copyToClipboard() {
+    copyToClipboard() {
       this.$refs.input.focus()
       navigator.clipboard.writeText(this.xApiKey)
     },
