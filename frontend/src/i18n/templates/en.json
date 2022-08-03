@@ -27,6 +27,7 @@
   "emailRequired": "You need an email address to send a demo message.",
   "empty": "This list is empty.",
   "key": {
+    "conflict": "This key is already used by another template.",
     "label": "Key",
     "placeholder": "Enter an unique key"
   },

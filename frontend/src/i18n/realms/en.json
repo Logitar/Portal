@@ -1,5 +1,6 @@
 {
   "alias": {
+    "conflict": "This alias is already used by another realm.",
     "custom": "Custom",
     "label": "Alias",
     "placeholder": "Enter an unique alias"

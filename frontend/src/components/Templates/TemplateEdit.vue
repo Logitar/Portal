@@ -10,9 +10,12 @@
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('templates.template')">
+            <b-alert dismissible variant="warning" v-model="keyConflict">
+              <strong v-t="'templates.key.conflict'" />
+            </b-alert>
             <b-row>
-              <realm-select class="col" :disabled="Boolean(template)" :required="!realmId" v-model="realmId" />
-              <key-field class="col" :disabled="Boolean(template)" :required="!template" :validate="!template" v-model="key" />
+              <realm-select class="col" :disabled="Boolean(template)" v-model="realmId" />
+              <key-field class="col" :disabled="Boolean(template)" ref="key" :required="!template" :validate="!template" v-model="key" />
               <content-type-select class="col" required v-model="contentType" />
             </b-row>
             <form-field id="subject" label="templates.subject.label" :maxLength="256" placeholder="templates.subject.placeholder" required v-model="subject" />
@@ -78,6 +81,7 @@ export default {
       description: null,
       displayName: null,
       key: null,
+      keyConflict: false,
       loading: false,
       realmId: null,
       subject: null,
@@ -129,6 +133,7 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.keyConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.template) {
@@ -142,6 +147,12 @@ export default {
             }
           }
         } catch (e) {
+          const { data, status } = e
+          if (status === 409 && data?.field?.toLowerCase() === 'key') {
+            this.keyConflict = true
+            this.$refs.key.focus()
+            return
+          }
           this.handleError(e)
         } finally {
           this.loading = false

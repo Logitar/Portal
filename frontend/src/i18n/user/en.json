@@ -29,6 +29,10 @@
   "editTitle": "Edit user",
   "email": {
     "confirmed": "Confirmed",
+    "conflict": {
+      "detail": "The realm {name} requires users to have unique email addresses.",
+      "header": "This email address is already used by another user."
+    },
     "label": "Email Address",
     "placeholder": "Enter an email address"
   },
@@ -120,6 +124,7 @@
   "updated": "The user has been updated.",
   "updatedAt": "Last updated on",
   "username": {
+    "conflict": "This username is already used by another user.",
     "label": "Username",
     "placeholder": "Enter an username"
   }

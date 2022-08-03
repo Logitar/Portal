@@ -1,10 +1,11 @@
 <template>
   <form-field
     :disabled="disabled"
-    id="username"
+    :id="id"
     :label="label"
     :maxLength="validate ? 256 : null"
     :placeholder="placeholder"
+    :ref="id"
     :required="required"
     :rules="allRules"
     :value="value"
@@ -19,6 +20,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    id: {
+      type: String,
+      default: 'username'
     },
     label: {
       type: String,
@@ -53,6 +58,11 @@ export default {
         }
       }
       return rules
+    }
+  },
+  methods: {
+    focus() {
+      this.$refs[this.id].focus()
     }
   }
 }

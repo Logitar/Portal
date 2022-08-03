@@ -17,10 +17,14 @@
         </div>
         <realm-select :disabled="Boolean(user)" v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
+        <b-alert dismissible variant="warning" v-model="usernameConflict">
+          <strong v-t="'user.username.conflict'" />
+        </b-alert>
         <username-field
           :disabled="Boolean(user)"
           placeholder="user.create.usernamePlaceholder"
           :realm="selectedRealm"
+          ref="username"
           :required="!user"
           :validate="!user"
           v-model="username"
@@ -54,11 +58,15 @@
           </b-row>
         </template>
         <h3 v-t="'user.information.personal'" />
+        <b-alert dismissible variant="warning" v-model="emailConflict">
+          <strong v-t="'user.email.conflict.header'" />
+          <template v-if="selectedRealm">{{ ` ${$t('user.email.conflict.detail', { name: selectedRealm.name })}` }}</template>
+        </b-alert>
         <p v-if="user && (user.isEmailConfirmed || user.isPhoneNumberConfirmed)" class="text-warning">
           <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.confirmed.warning'" />
         </p>
         <b-row>
-          <email-field class="col" :confirmed="user && user.isEmailConfirmed" validate v-model="email" />
+          <email-field class="col" :confirmed="user && user.isEmailConfirmed" ref="email" validate v-model="email" />
           <phone-field class="col" :confirmed="user && user.isPhoneNumberConfirmed" validate v-model="phoneNumber" />
         </b-row>
         <b-row>
@@ -124,6 +132,7 @@ export default {
     return {
       currentUser: null,
       email: null,
+      emailConflict: null,
       firstName: null,
       lastName: null,
       locale: null,
@@ -136,7 +145,8 @@ export default {
       realmId: null,
       selectedRealm: null,
       user: null,
-      username: null
+      username: null,
+      usernameConflict: false
     }
   },
   computed: {
@@ -190,6 +200,8 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.emailConflict = false
+        this.usernameConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.user) {
@@ -203,6 +215,18 @@ export default {
             }
           }
         } catch (e) {
+          const { data, status } = e
+          if (status === 409) {
+            if (data?.field?.toLowerCase() === 'username') {
+              this.usernameConflict = true
+              this.$refs.username.focus()
+              return
+            } else if (data?.field?.toLowerCase() === 'email') {
+              this.emailConflict = true
+              this.$refs.email.focus()
+              return
+            }
+          }
           this.handleError(e)
         } finally {
           this.loading = false

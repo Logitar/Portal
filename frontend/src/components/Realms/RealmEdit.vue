@@ -10,10 +10,13 @@
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('realms.general')">
+            <b-alert dismissible variant="warning" v-model="aliasConflict">
+              <strong v-t="'realms.alias.conflict'" />
+            </b-alert>
             <b-row>
               <name-field class="col" required v-model="name" />
               <alias-field class="col" v-if="realm" disabled :value="alias" />
-              <alias-field class="col" v-else :name="name" required validate v-model="alias" />
+              <alias-field class="col" v-else :name="name" ref="alias" required validate v-model="alias" />
             </b-row>
             <form-url id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
             <description-field :rows="15" v-model="description" />
@@ -89,6 +92,7 @@ export default {
   data() {
     return {
       alias: null,
+      aliasConflict: false,
       allowedUsernameCharacters: null,
       description: null,
       loading: false,
@@ -170,6 +174,7 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.aliasConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.realm) {
@@ -183,6 +188,13 @@ export default {
             }
           }
         } catch (e) {
+          const { data, status } = e
+          if (status === 409 && data?.field?.toLowerCase() === 'alias') {
+            this.aliasConflict = true
+            this.$refs.alias.customize()
+            Vue.nextTick(() => this.$refs.alias.focus())
+            return
+          }
           this.handleError(e)
         } finally {
           this.loading = false

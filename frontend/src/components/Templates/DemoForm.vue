@@ -19,36 +19,39 @@
     <div class="my-2">
       <icon-button icon="plus" text="templates.variables.add" variant="success" @click="addVariable" />
     </div>
-    <b-row v-for="(variable, index) in variables" :key="index">
-      <form-field
-        class="col"
-        :id="`key_${index}`"
-        label="templates.variables.key"
-        :maxLength="256"
-        placeholder="templates.variables.key"
-        :rules="{ identifier: true }"
-        hideLabel
-        :value="variable.key"
-        @input="setVariable(index, $event, variable.value)"
-      />
-      <form-field
-        class="col"
-        :id="`value_${index}`"
-        label="templates.variables.value"
-        placeholder="templates.variables.value"
-        hideLabel
-        :value="variable.value"
-        @input="setVariable(index, variable.key, $event)"
-      >
-        <icon-button class="mx-3" icon="times" variant="danger" @click="removeVariable(index)" />
-      </form-field>
-    </b-row>
+    <validation-observer ref="variables">
+      <b-row v-for="(variable, index) in variables" :key="index">
+        <form-field
+          class="col"
+          hideLabel
+          :id="`key_${index}`"
+          label="templates.variables.key"
+          :maxLength="256"
+          placeholder="templates.variables.key"
+          required
+          :rules="{ identifier: true }"
+          :value="variable.key"
+          @input="setVariable(index, $event, variable.value)"
+        />
+        <form-field
+          class="col"
+          hideLabel
+          :id="`value_${index}`"
+          label="templates.variables.value"
+          placeholder="templates.variables.value"
+          required
+          :value="variable.value"
+          @input="setVariable(index, variable.key, $event)"
+        >
+          <icon-button class="mx-3" icon="times" variant="danger" @click="removeVariable(index)" />
+        </form-field>
+      </b-row>
+    </validation-observer>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
-import { isIdentifier } from '@/helpers/stringUtils'
 import { sendDemoMessage } from '@/api/messages'
 
 export default {
@@ -101,12 +104,15 @@ export default {
       if (!this.loading) {
         this.loading = true
         try {
-          const { data } = await sendDemoMessage({
-            templateId: this.template.id,
-            variables: this.variables.filter(({ key }) => isIdentifier(key))
-          })
-          this.message = data
-          this.showResult = true
+          if (await this.$refs.variables.validate()) {
+            const { data } = await sendDemoMessage({
+              templateId: this.template.id,
+              variables: [...this.variables]
+            })
+            this.message = data
+            this.showResult = true
+            this.$refs.variables.reset()
+          }
         } catch (e) {
           this.handleError(e)
         } finally {
