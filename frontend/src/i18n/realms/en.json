@@ -1,8 +1,9 @@
 {
   "alias": {
+    "conflict": "This alias is already used by another realm.",
     "custom": "Custom",
     "label": "Alias",
-    "placeholder": "Enter an alias"
+    "placeholder": "Enter an unique alias"
   },
   "allowedUsernameCharacters": {
     "label": "Allowed username characters",
@@ -31,11 +32,17 @@
     "senderPlaceholder": "Use default sender",
     "title": "Password recovery"
   },
-  "requireConfirmedAccount": "Require confirmed account",
-  "requireUniqueEmail": "Require unique email address",
+  "requireConfirmedAccount": {
+    "help": "By enabling this setting, a confirmed email address or phone number will be required for users to sign-in and manage their account.",
+    "label": "Require confirmed account"
+  },
+  "requireUniqueEmail": {
+    "help": "By enabling this setting, email address uniqueness will be enforced upon user creation & update.",
+    "label": "Require unique email address"
+  },
   "select": {
     "label": "Realm",
-    "placeholder": "Select a realm"
+    "placeholder": "Portal (no realm)"
   },
   "settings": "Settings",
   "sort": {

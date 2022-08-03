@@ -3,11 +3,10 @@
     "cancel": "Cancel",
     "create": "Create",
     "delete": "Delete",
-    "disable": "Disable",
-    "enable": "Enable",
     "refresh": "Refresh",
     "save": "Save"
   },
+  "copyright": "© Portal 2022.",
   "count": "Count",
   "description": {
     "label": "Description",

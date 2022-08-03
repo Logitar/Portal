@@ -3,7 +3,8 @@
     <h1 v-t="'configuration.initialization.title'" />
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
-        <h3 v-t="'configuration.initialization.user'" />
+        <h3 v-t="'configuration.initialization.user.label'" />
+        <p><font-awesome-icon icon="info-circle" /> <i v-t="'configuration.initialization.user.help'" /></p>
         <b-row>
           <email-field class="col" required validate v-model="user.email" />
           <username-field class="col" required validate v-model="user.username" />

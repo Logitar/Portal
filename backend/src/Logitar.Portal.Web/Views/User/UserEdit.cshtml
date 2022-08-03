@@ -13,5 +13,5 @@
 }
 else
 {
-  <user-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></user-edit>
+  <user-edit current="@(Context.GetUser()?.Id)" json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></user-edit>
 }

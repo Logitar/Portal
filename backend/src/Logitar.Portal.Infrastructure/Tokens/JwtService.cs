@@ -98,7 +98,7 @@ namespace Logitar.Portal.Infrastructure.Tokens
 
         return ValidateTokenResult.Success(principal);
       }
-      catch (SecurityTokenException exception)
+      catch (Exception exception)
       {
         return ValidateTokenResult.Failed(new Error(exception));
       }

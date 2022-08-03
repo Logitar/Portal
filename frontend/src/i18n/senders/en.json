@@ -17,7 +17,6 @@
   },
   "empty": "This list is empty.",
   "newTitle": "Create sender",
-  "noRealm": "This sender is not in a realm.",
   "provider": {
     "label": "Provider",
     "options": {
@@ -32,7 +31,7 @@
   "sendGrid": {
     "apiKey": {
       "label": "API key",
-      "placeholder": "Enter your SendGrid API key"
+      "placeholder": "Paste your SendGrid API key"
     },
     "title": "SendGrid Settings"
   },

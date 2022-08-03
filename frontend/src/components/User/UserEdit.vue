@@ -11,19 +11,20 @@
         <div class="my-2">
           <template v-if="user">
             <icon-submit class="mx-1" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
-            <icon-button class="mx-1" v-if="user.isDisabled" icon="unlock" :loading="loading" text="actions.enable" variant="warning" @click="enable" />
-            <icon-button class="mx-1" v-else icon="lock" :loading="loading" text="actions.disable" variant="warning" @click="disable" />
+            <toggle-status :disabled="user.id === current" :user="user" @updated="setModel" />
           </template>
           <icon-submit class="mx-1" v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <realm-select v-if="user && user.realm" disabled :value="realmId" />
-        <p v-else-if="user" v-t="'user.noRealm'" />
-        <realm-select v-else v-model="realmId" />
+        <realm-select :disabled="Boolean(user)" v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
+        <b-alert dismissible variant="warning" v-model="usernameConflict">
+          <strong v-t="'user.username.conflict'" />
+        </b-alert>
         <username-field
           :disabled="Boolean(user)"
           placeholder="user.create.usernamePlaceholder"
           :realm="selectedRealm"
+          ref="username"
           :required="!user"
           :validate="!user"
           v-model="username"
@@ -31,6 +32,9 @@
         <template v-if="!user || user.passwordChangedAt">
           <h5 v-if="user" v-t="'user.password.label'" />
           <p v-if="user && user.passwordChangedAt">{{ $t('user.password.changedAt') }} {{ $d(new Date(user.passwordChangedAt), 'medium') }}</p>
+          <p v-if="user && (password || passwordConfirmation)" class="text-warning">
+            <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.password.warning'" />
+          </p>
           <b-row>
             <password-field
               v-if="user"
@@ -54,8 +58,15 @@
           </b-row>
         </template>
         <h3 v-t="'user.information.personal'" />
+        <b-alert dismissible variant="warning" v-model="emailConflict">
+          <strong v-t="'user.email.conflict.header'" />
+          <template v-if="selectedRealm">{{ ` ${$t('user.email.conflict.detail', { name: selectedRealm.name })}` }}</template>
+        </b-alert>
+        <p v-if="user && (user.isEmailConfirmed || user.isPhoneNumberConfirmed)" class="text-warning">
+          <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.confirmed.warning'" />
+        </p>
         <b-row>
-          <email-field class="col" :confirmed="user && user.isEmailConfirmed" validate v-model="email" />
+          <email-field class="col" :confirmed="user && user.isEmailConfirmed" ref="email" validate v-model="email" />
           <phone-field class="col" :confirmed="user && user.isPhoneNumberConfirmed" validate v-model="phoneNumber" />
         </b-row>
         <b-row>
@@ -80,8 +91,9 @@ import PasswordField from './PasswordField.vue'
 import PhoneField from './PhoneField.vue'
 import PictureField from './PictureField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import ToggleStatus from './ToggleStatus.vue'
 import UsernameField from './UsernameField.vue'
-import { createUser, disableUser, enableUser, updateUser } from '@/api/users'
+import { createUser, updateUser } from '@/api/users'
 import { getRealm } from '@/api/realms'
 
 export default {
@@ -95,9 +107,14 @@ export default {
     PhoneField,
     PictureField,
     RealmSelect,
+    ToggleStatus,
     UsernameField
   },
   props: {
+    current: {
+      type: String,
+      default: ''
+    },
     json: {
       type: String,
       default: ''
@@ -113,7 +130,9 @@ export default {
   },
   data() {
     return {
+      currentUser: null,
       email: null,
+      emailConflict: null,
       firstName: null,
       lastName: null,
       locale: null,
@@ -126,7 +145,8 @@ export default {
       realmId: null,
       selectedRealm: null,
       user: null,
-      username: null
+      username: null,
+      usernameConflict: false
     }
   },
   computed: {
@@ -163,34 +183,6 @@ export default {
     }
   },
   methods: {
-    async disable() {
-      if (!this.loading) {
-        this.loading = true
-        try {
-          const { data } = await disableUser(this.user.id)
-          this.setModel(data)
-          this.toast('success', 'user.disabled.success')
-        } catch (e) {
-          this.handleError(e)
-        } finally {
-          this.loading = false
-        }
-      }
-    },
-    async enable() {
-      if (!this.loading) {
-        this.loading = true
-        try {
-          const { data } = await enableUser(this.user.id)
-          this.setModel(data)
-          this.toast('success', 'user.enabled')
-        } catch (e) {
-          this.handleError(e)
-        } finally {
-          this.loading = false
-        }
-      }
-    },
     setModel(user) {
       this.user = user
       this.email = user.email
@@ -208,6 +200,8 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.emailConflict = false
+        this.usernameConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.user) {
@@ -221,6 +215,18 @@ export default {
             }
           }
         } catch (e) {
+          const { data, status } = e
+          if (status === 409) {
+            if (data?.field?.toLowerCase() === 'username') {
+              this.usernameConflict = true
+              this.$refs.username.focus()
+              return
+            } else if (data?.field?.toLowerCase() === 'email') {
+              this.emailConflict = true
+              this.$refs.email.focus()
+              return
+            }
+          }
           this.handleError(e)
         } finally {
           this.loading = false

@@ -29,21 +29,22 @@
         <b-row v-for="(claim, index) in claims" :key="index">
           <form-field
             class="col"
+            hideLabel
             :id="`type_${index}`"
             label="tokens.claims.type"
             :maxLength="256"
             placeholder="tokens.claims.type"
-            :rules="{ identifier: true }"
-            hideLabel
+            required
             :value="claim.type"
             @input="setClaim(index, $event, claim.value)"
           />
           <form-field
             class="col"
+            hideLabel
             :id="`value_${index}`"
             label="tokens.claims.value"
             placeholder="tokens.claims.value"
-            hideLabel
+            required
             :value="claim.value"
             @input="setClaim(index, claim.type, $event)"
           >
@@ -100,11 +101,11 @@ export default {
     payload() {
       return {
         lifetime: this.lifetime || null,
-        purpose: this.purpose,
+        purpose: this.purpose || null,
         realm: this.realm,
-        email: this.email,
-        subject: this.subject,
-        claims: this.claims.filter(({ type }) => Boolean(type))
+        email: this.email || null,
+        subject: this.subject || null,
+        claims: [...this.claims]
       }
     }
   },
@@ -127,6 +128,7 @@ export default {
         this.loading = true
         try {
           if (await this.$refs.form.validate()) {
+            alert('FLAG')
             const { data } = await createToken(this.payload)
             this.token = data.token
             this.$refs.form.reset()

@@ -1,10 +1,11 @@
 <template>
   <form-field
     :disabled="disabled"
-    id="key"
-    label="templates.key.label"
+    :id="id"
+    :label="label"
     :maxLength="validate ? 100 : null"
-    placeholder="templates.key.placeholder"
+    :placeholder="placeholder"
+    :ref="id"
     :required="required"
     :rules="{ identifier: validate }"
     :value="value"
@@ -20,6 +21,18 @@ export default {
       type: Boolean,
       default: false
     },
+    id: {
+      type: String,
+      default: 'key'
+    },
+    label: {
+      type: String,
+      default: 'templates.key.label'
+    },
+    placeholder: {
+      type: String,
+      default: 'templates.key.placeholder'
+    },
     required: {
       type: Boolean,
       default: false
@@ -29,6 +42,11 @@ export default {
       default: false
     },
     value: {}
+  },
+  methods: {
+    focus() {
+      this.$refs[this.id].focus()
+    }
   }
 }
 </script>

@@ -3,7 +3,7 @@
     <b-container fluid>
       <b-link class="text-light" href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
-        &copy; Portal 2022
+        {{ $t('copyright') }}
       </b-link>
     </b-container>
   </footer>

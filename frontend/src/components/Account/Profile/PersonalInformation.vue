@@ -35,6 +35,9 @@
         </tr>
       </tbody>
     </table>
+    <p v-if="profile.isEmailConfirmed || profile.isPhoneNumberConfirmed" class="text-warning">
+      <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.confirmed.warning'" />
+    </p>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <b-row>

@@ -1,9 +1,11 @@
 <template>
   <form-field
+    :disabled="disabled"
     :id="id"
     :label="label"
     :maxLength="validate ? 256 : null"
     :placeholder="placeholder"
+    :ref="id"
     :required="required"
     :rules="{ email: validate }"
     type="email"
@@ -21,6 +23,10 @@ export default {
   name: 'EmailField',
   props: {
     confirmed: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     },
@@ -45,6 +51,11 @@ export default {
       default: false
     },
     value: {}
+  },
+  methods: {
+    focus() {
+      this.$refs[this.id].focus()
+    }
   }
 }
 </script>

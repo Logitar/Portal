@@ -1,7 +1,8 @@
 {
   "confirmed": {
     "label": "Confirmed",
-    "placeholder": "Select an option"
+    "placeholder": "Select an option",
+    "warning": "Changing the email address or phone number will remove its confirmed status."
   },
   "create": {
     "passwordPlaceholder": "Enter a password",
@@ -14,20 +15,34 @@
     "success": "The user has been deleted.",
     "title": "Delete user"
   },
+  "disable": {
+    "confirm": "Do you really want to disable the following user? All access to its account and services will be revoked.",
+    "submit": "Disable",
+    "success": "The user has been disabled.",
+    "title": "Disable user"
+  },
   "disabled": {
     "label": "Disabled",
-    "placeholder": "Select an option",
-    "success": "The user has been disabled."
+    "placeholder": "Select an option"
   },
   "disabledAt": "Disabled on",
-  "enabled": "The user has been enabled.",
   "editTitle": "Edit user",
   "email": {
     "confirmed": "Confirmed",
+    "conflict": {
+      "detail": "The realm {name} requires users to have unique email addresses.",
+      "header": "This email address is already used by another user."
+    },
     "label": "Email Address",
     "placeholder": "Enter an email address"
   },
   "empty": "This list is empty.",
+  "enable": {
+    "confirm": "Do you really want to enable the following user? All access to its account and services will be restored.",
+    "submit": "Enable",
+    "success": "The user has been enabled.",
+    "title": "Enable user"
+  },
   "firstName": {
     "label": "First Name",
     "placeholder": "Enter a first name"
@@ -46,7 +61,6 @@
     "placeholder": "Select a locale"
   },
   "newTitle": "Create user",
-  "noRealm": "This user is not in a realm.",
   "password": {
     "changeFailed": "Password change failed!",
     "changed": "Your password has been changed.",
@@ -66,7 +80,8 @@
       "placeholder": "Enter a new password"
     },
     "placeholder": "Enter your password",
-    "submit": "Change password"
+    "submit": "Change password",
+    "warning": "Avoid changing an user's password without its consent."
   },
   "passwordChangedAt": "Password changed on",
   "phone": {
@@ -109,6 +124,7 @@
   "updated": "The user has been updated.",
   "updatedAt": "Last updated on",
   "username": {
+    "conflict": "This username is already used by another user.",
     "label": "Username",
     "placeholder": "Enter an username"
   }

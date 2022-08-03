@@ -167,6 +167,15 @@ namespace Logitar.Portal.Core.Users
       User user = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<User>(id);
 
+      if (user.Realm?.RequireUniqueEmail == true && payload.Email != null)
+      {
+        IEnumerable<User> users = await _querier.GetByEmailAsync(payload.Email, user.Realm, readOnly: true, cancellationToken);
+        if (users.Any(x => !x.Equals(user)))
+        {
+          throw new EmailAlreadyUsedException(payload.Email, nameof(payload.Email));
+        }
+      }
+
       var securePayload = _mapper.Map<UpdateUserSecurePayload>(payload);
 
       if (payload.Password != null)
