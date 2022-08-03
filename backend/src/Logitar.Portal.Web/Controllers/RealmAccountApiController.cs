@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Core.Accounts;
+﻿using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Accounts.Payloads;
 using Logitar.Portal.Core.Sessions.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace Logitar.Portal.Web.Controllers
@@ -26,6 +26,7 @@ namespace Logitar.Portal.Web.Controllers
 
       return NoContent();
     }
+
     [HttpPost("password/reset")]
     public async Task<ActionResult> ResetPasswordAsync(string id, [FromBody] ResetPasswordPayload payload, CancellationToken cancellationToken)
     {

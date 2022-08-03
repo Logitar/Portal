@@ -98,6 +98,7 @@ namespace Logitar.Portal.Core.Accounts
 
       User user = await _userQuerier.GetAsync(payload.Username, realm, readOnly: true, cancellationToken)
         ?? throw new EntityNotFoundException<User>(payload.Username, nameof(payload.Username));
+      EnsureIsTrusted(user, realm);
 
       if (realm.PasswordRecoveryTemplate == null)
       {
@@ -177,10 +178,12 @@ namespace Logitar.Portal.Core.Accounts
       }
 
       Session? session = await _sessionQuerier.GetAsync(secureToken.Id, readOnly: false, cancellationToken);
-      if (session?.KeyHash == null || !session.IsActive || !_passwordService.IsMatch(session.KeyHash, secureToken.Key) || session.User?.RealmSid != realm?.Sid)
+      if (session?.KeyHash == null || !session.IsActive || !_passwordService.IsMatch(session.KeyHash, secureToken.Key)
+        || session.User == null || session.User.RealmSid != realm?.Sid)
       {
         throw new InvalidCredentialsException();
       }
+      EnsureIsTrusted(session.User, realm);
 
       string keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out byte[] keyBytes);
       session.Update(keyHash, ipAddress, additionalInformation);
@@ -212,6 +215,7 @@ namespace Logitar.Portal.Core.Accounts
 
       User user = await _userQuerier.GetAsync(userId, readOnly: false, cancellationToken)
         ?? throw new InvalidOperationException($"The user 'Id={userId}' could not be found.");
+      EnsureIsTrusted(user, realm);
 
       string passwordHash = _passwordService.Hash(payload.Password);
       user.ChangePassword(passwordHash);
@@ -241,14 +245,7 @@ namespace Logitar.Portal.Core.Accounts
       {
         throw new InvalidCredentialsException();
       }
-      else if (realm?.RequireConfirmedAccount == true && !user.IsAccountConfirmed)
-      {
-        throw new AccountNotConfirmedException(user.Id);
-      }
-      else if (user.IsDisabled)
-      {
-        throw new AccountIsDisabledException(user.Id);
-      }
+      EnsureIsTrusted(user, realm);
 
       byte[]? keyBytes = null;
       string? keyHash = null;
@@ -276,6 +273,18 @@ namespace Logitar.Portal.Core.Accounts
 
       session.SignOut();
       await _sessionRepository.SaveAsync(session, cancellationToken);
+    }
+
+    private static void EnsureIsTrusted(User user, Realm? realm)
+    {
+      if (realm?.RequireConfirmedAccount == true && !user.IsAccountConfirmed)
+      {
+        throw new AccountNotConfirmedException(user.Id);
+      }
+      else if (user.IsDisabled)
+      {
+        throw new AccountIsDisabledException(user.Id);
+      }
     }
   }
 }
