@@ -21,14 +21,13 @@ namespace Logitar.Portal.Core.Accounts
     private const int PasswordResetLifetime = 7 * 24 * 60 * 60; // 7 days
     private const string PasswordResetPurpose = "reset_password";
 
-    private const int SessionKeyLength = 32;
-
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IPasswordService _passwordService;
     private readonly IRealmQuerier _realmQuerier;
     private readonly ISessionQuerier _sessionQuerier;
     private readonly IRepository<Session> _sessionRepository;
+    private readonly ISessionService _sessionService;
     private readonly ITokenService _tokenService;
     private readonly IUserContext _userContext;
     private readonly IUserQuerier _userQuerier;
@@ -42,6 +41,7 @@ namespace Logitar.Portal.Core.Accounts
       IRealmQuerier realmQuerier,
       ISessionQuerier sessionQuerier,
       IRepository<Session> sessionRepository,
+      ISessionService sessionService,
       ITokenService tokenService,
       IUserContext userContext,
       IUserQuerier userQuerier,
@@ -55,6 +55,7 @@ namespace Logitar.Portal.Core.Accounts
       _realmQuerier = realmQuerier;
       _sessionQuerier = sessionQuerier;
       _sessionRepository = sessionRepository;
+      _sessionService = sessionService;
       _tokenService = tokenService;
       _userContext = userContext;
       _userQuerier = userQuerier;
@@ -185,14 +186,7 @@ namespace Logitar.Portal.Core.Accounts
       }
       EnsureIsTrusted(session.User, realm);
 
-      string keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out byte[] keyBytes);
-      session.Update(keyHash, ipAddress, additionalInformation);
-      await _sessionRepository.SaveAsync(session, cancellationToken);
-
-      var model = _mapper.Map<SessionModel>(session);
-      model.RenewToken = new SecureToken(model.Id, keyBytes).ToString();
-
-      return model;
+      return await _sessionService.RenewAsync(session, ipAddress, additionalInformation, cancellationToken);
     }
 
     public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken = default)
@@ -247,23 +241,7 @@ namespace Logitar.Portal.Core.Accounts
       }
       EnsureIsTrusted(user, realm);
 
-      byte[]? keyBytes = null;
-      string? keyHash = null;
-      if (payload.Remember)
-      {
-        keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out keyBytes);
-      }
-
-      var session = new Session(user, keyHash, ipAddress, additionalInformation);
-      await _sessionRepository.SaveAsync(session, cancellationToken);
-
-      user.SignIn(session.CreatedAt);
-      await _userRepository.SaveAsync(user, cancellationToken);
-
-      var model = _mapper.Map<SessionModel>(session);
-      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
-
-      return model;
+      return await _sessionService.SignInAsync(user, payload.Remember, ipAddress, additionalInformation, cancellationToken);
     }
 
     public async Task SignOutAsync(CancellationToken cancellationToken)

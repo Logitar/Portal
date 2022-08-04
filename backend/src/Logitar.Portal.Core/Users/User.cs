@@ -78,6 +78,7 @@ namespace Logitar.Portal.Core.Users
       private set { /* EntityFrameworkCore only setter */ }
     }
 
+    public List<ExternalProvider> ExternalProviders { get; private set; } = new();
     public List<Session> Sessions { get; private set; } = new();
 
     public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
@@ -90,6 +91,9 @@ namespace Logitar.Portal.Core.Users
 
     public void Disable(Guid userId) => ApplyChange(new DisabledEvent(userId));
     public void Enable(Guid userId) => ApplyChange(new EnabledEvent(userId));
+
+    public void AddExternalProvider(string key, string value, Guid userId, string? displayName = null)
+      => ApplyChange(new AddExternalProviderEvent(key, value, displayName, userId));
 
     protected virtual void Apply(ConfirmedEmailEvent @event)
     {
@@ -132,6 +136,11 @@ namespace Logitar.Portal.Core.Users
     protected virtual void Apply(UpdatedEvent @event)
     {
       Apply(@event.Payload, @event.OccurredAt);
+    }
+
+    protected virtual void Apply(AddExternalProviderEvent @event)
+    {
+      ExternalProviders.Add(new ExternalProvider(this, @event.Key, @event.Value, @event.OccurredAt, @event.UserId, @event.DisplayName));
     }
 
     private void Apply(SaveUserSecurePayload payload, DateTime occurredAt)

@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Core;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
@@ -20,6 +20,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       int? realmSid = realm?.Sid;
 
       return await _users.ApplyTracking(readOnly)
+        .Include(x => x.ExternalProviders)
         .Include(x => x.Realm)
         .SingleOrDefaultAsync(x => x.RealmSid == realmSid && x.UsernameNormalized == username, cancellationToken);
     }
@@ -38,6 +39,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<User?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
     {
       return await _users.ApplyTracking(readOnly)
+        .Include(x => x.ExternalProviders)
         .Include(x => x.Realm)
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
@@ -61,6 +63,19 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Realm)
         .Where(x => x.RealmSid == realmSid && x.EmailNormalized == email)
         .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<User?> GetByExternalProviderAsync(Realm realm, string providerKey, string providerValue, bool readOnly, CancellationToken cancellationToken = default)
+    {
+      ArgumentNullException.ThrowIfNull(realm);
+      ArgumentNullException.ThrowIfNull(providerKey);
+      ArgumentNullException.ThrowIfNull(providerValue);
+
+      return await _users.ApplyTracking(readOnly)
+        .Include(x => x.ExternalProviders)
+        .Include(x => x.Realm)
+        .Where(x => x.RealmSid == realm.Sid && x.ExternalProviders.Any(y => y.Key == providerKey && y.Value == providerValue))
+        .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<PagedList<User>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
