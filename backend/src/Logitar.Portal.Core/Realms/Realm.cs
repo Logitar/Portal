@@ -59,6 +59,8 @@ namespace Logitar.Portal.Core.Realms
       private set => PasswordSettings = value == null ? null : JsonSerializer.Deserialize<PasswordSettings>(value);
     }
 
+    public string? GoogleClientId { get; private set; }
+
     public List<User> Users { get; private set; } = new();
 
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
@@ -95,6 +97,8 @@ namespace Logitar.Portal.Core.Realms
         ? null
         : new PasswordSettings(password.RequiredLength, password.RequiredUniqueChars,
             password.RequireNonAlphanumeric, password.RequireLowercase, password.RequireUppercase, password.RequireDigit);
+
+      GoogleClientId = payload.GoogleClientId?.CleanTrim();
     }
 
     public override string ToString() => $"{Name} | {base.ToString()}";

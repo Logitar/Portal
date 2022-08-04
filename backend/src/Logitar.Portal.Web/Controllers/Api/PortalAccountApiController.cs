@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Core.Accounts;
+﻿using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers.Api
 {
   [ApiController]
   [Route("api/portal/account")]
@@ -21,9 +20,9 @@ namespace Logitar.Portal.Web.Controllers
     public async Task<ActionResult> SignInAsync([FromBody] SignInPayload payload, CancellationToken cancellationToken)
     {
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      string? additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
+      string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
-      SessionModel session = await _accountService.SignInAsync(payload, realm: null, ipAddress, additionalInformation, cancellationToken);
+      var session = await _accountService.SignInAsync(payload, realm: null, ipAddress, additionalInformation, cancellationToken);
       HttpContext.SetSession(session);
 
       return NoContent();

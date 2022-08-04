@@ -1,8 +1,8 @@
 ﻿namespace Logitar.Portal.Core.Users.Payloads
 {
-  public abstract class SaveUserPayload
+  public abstract class SaveUserSecurePayload
   {
-    public string? Password { get; set; }
+    public string? PasswordHash { get; set; }
 
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }

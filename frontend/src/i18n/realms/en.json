@@ -18,6 +18,13 @@
   "editTitle": "Edit realm",
   "empty": "This list is empty.",
   "general": "General",
+  "googleAuth": {
+    "id": {
+      "label": "Google Client ID",
+      "placeholder": "Paste your Google Client ID"
+    },
+    "title": "Google Authentication"
+  },
   "newTitle": "Create realm",
   "password": {
     "requireDigit": "Require digit",

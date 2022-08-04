@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.Configurations;
@@ -7,8 +6,10 @@ using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Tokens;
 using Logitar.Portal.Core.Users;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Logitar.Portal.Core
@@ -32,9 +33,11 @@ namespace Logitar.Portal.Core
         .AddScoped<IAccountService, AccountService>()
         .AddScoped<IApiKeyService, ApiKeyService>()
         .AddScoped<IConfigurationService, ConfigurationService>()
+        .AddScoped<IGoogleService, GoogleService>()
         .AddScoped<IMessageService, MessageService>()
         .AddScoped<IRealmService, RealmService>()
         .AddScoped<ISenderService, SenderService>()
+        .AddScoped<ISessionService, SessionService>()
         .AddScoped<ITemplateService, TemplateService>()
         .AddScoped<ITokenService, TokenService>()
         .AddScoped<IUserService, UserService>();

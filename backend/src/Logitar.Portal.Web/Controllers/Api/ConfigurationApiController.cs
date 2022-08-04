@@ -24,6 +24,11 @@ namespace Logitar.Portal.Web.Controllers.Api
     [HttpPost]
     public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
     {
+      if (payload.User.Password == null)
+      {
+        return BadRequest(new { code = "PasswordIsRequired" });
+      }
+
       await _configurationService.InitializeAsync(payload, cancellationToken);
 
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();

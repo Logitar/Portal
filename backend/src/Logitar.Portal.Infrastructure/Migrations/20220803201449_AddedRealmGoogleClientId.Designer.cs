@@ -3,6 +3,7 @@ using System;
 using Logitar.Portal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.Infrastructure.Migrations
 {
     [DbContext(typeof(PortalDbContext))]
-    partial class PortalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220803201449_AddedRealmGoogleClientId")]
+    partial class AddedRealmGoogleClientId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -600,58 +602,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Sessions");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.Core.Users.ExternalProvider", b =>
-                {
-                    b.Property<int>("Sid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<Guid>("AddedById")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
-
-                    b.Property<string>("DisplayName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<int?>("UserSid")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Sid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UserSid");
-
-                    b.HasIndex("Key", "Value");
-
-                    b.ToTable("ExternalProvider");
-                });
-
             modelBuilder.Entity("Logitar.Portal.Core.Users.User", b =>
                 {
                     b.Property<int>("Sid")
@@ -693,11 +643,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
-
-                    b.Property<bool>("HasPassword")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -948,15 +893,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.Core.Users.ExternalProvider", b =>
-                {
-                    b.HasOne("Logitar.Portal.Core.Users.User", "User")
-                        .WithMany("ExternalProviders")
-                        .HasForeignKey("UserSid");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Logitar.Portal.Core.Users.User", b =>
                 {
                     b.HasOne("Logitar.Portal.Core.Realms.Realm", "Realm")
@@ -977,8 +913,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             modelBuilder.Entity("Logitar.Portal.Core.Users.User", b =>
                 {
-                    b.Navigation("ExternalProviders");
-
                     b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618

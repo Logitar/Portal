@@ -16,5 +16,7 @@ namespace Logitar.Portal.Core.Realms.Payloads
     public Guid? PasswordRecoveryTemplateId { get; set; }
 
     public PasswordSettingsPayload? PasswordSettings { get; set; }
+
+    public string? GoogleClientId { get; set; }
   }
 }

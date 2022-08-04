@@ -1,7 +1,12 @@
 ﻿namespace Logitar.Portal.Core.Users.Payloads
 {
-  public class CreateUserSecurePayload : CreateUserPayloadBase
+  public class CreateUserSecurePayload : SaveUserSecurePayload
   {
-    public string PasswordHash { get; set; } = null!;
+    public string? Realm { get; set; }
+
+    public string Username { get; set; } = null!;
+
+    public bool ConfirmEmail { get; set; }
+    public bool ConfirmPhoneNumber { get; set; }
   }
 }

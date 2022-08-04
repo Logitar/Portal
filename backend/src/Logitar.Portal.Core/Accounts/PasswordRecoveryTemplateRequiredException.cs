@@ -6,7 +6,7 @@ namespace Logitar.Portal.Core.Accounts
   internal class PasswordRecoveryTemplateRequiredException : ApiException
   {
     public PasswordRecoveryTemplateRequiredException(Realm realm)
-      : base(HttpStatusCode.BadRequest, $"The password recovery template is required for the realm '{realm}'.")
+      : base(HttpStatusCode.BadRequest, $"The realm '{realm}' does not have a configured password recovery.")
     {
       Realm = realm ?? throw new ArgumentNullException(nameof(realm));
       Value = new { code = nameof(PasswordRecoveryTemplateRequiredException).Remove(nameof(Exception)) };

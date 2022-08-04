@@ -28,7 +28,14 @@ namespace Logitar.Portal.Core.Users
       get => Username.ToUpper();
       private set { /* EntityFrameworkCore only setter */ }
     }
+
+    public DateTime? PasswordChangedAt { get; private set; }
     public string? PasswordHash { get; private set; }
+    public bool HasPassword
+    {
+      get => PasswordChangedAt.HasValue && PasswordHash != null;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
 
     public string? Email { get; private set; }
     public string? EmailNormalized
@@ -67,7 +74,6 @@ namespace Logitar.Portal.Core.Users
     public string? Locale { get; private set; }
     public string? Picture { get; private set; }
 
-    public DateTime? PasswordChangedAt { get; private set; }
     public DateTime? SignedInAt { get; private set; }
 
     public DateTime? DisabledAt { get; private set; }
@@ -78,6 +84,7 @@ namespace Logitar.Portal.Core.Users
       private set { /* EntityFrameworkCore only setter */ }
     }
 
+    public List<ExternalProvider> ExternalProviders { get; private set; } = new();
     public List<Session> Sessions { get; private set; } = new();
 
     public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
@@ -90,6 +97,9 @@ namespace Logitar.Portal.Core.Users
 
     public void Disable(Guid userId) => ApplyChange(new DisabledEvent(userId));
     public void Enable(Guid userId) => ApplyChange(new EnabledEvent(userId));
+
+    public void AddExternalProvider(string key, string value, Guid userId, string? displayName = null)
+      => ApplyChange(new AddExternalProviderEvent(key, value, displayName, userId));
 
     protected virtual void Apply(ConfirmedEmailEvent @event)
     {
@@ -105,10 +115,7 @@ namespace Logitar.Portal.Core.Users
     {
       Username = @event.Payload.Username;
 
-      PasswordChangedAt = @event.OccurredAt;
-      PasswordHash = @event.Payload.PasswordHash;
-
-      Apply(@event.Payload);
+      Apply(@event.Payload, @event.OccurredAt);
     }
     protected virtual void Apply(ChangedPasswordEvent @event)
     {
@@ -134,17 +141,22 @@ namespace Logitar.Portal.Core.Users
     }
     protected virtual void Apply(UpdatedEvent @event)
     {
-      if (@event.Payload.PasswordHash != null)
-      {
-        PasswordChangedAt = @event.OccurredAt;
-        PasswordHash = @event.Payload.PasswordHash;
-      }
-
-      Apply(@event.Payload);
+      Apply(@event.Payload, @event.OccurredAt);
     }
 
-    private void Apply(SaveUserPayload payload)
+    protected virtual void Apply(AddExternalProviderEvent @event)
     {
+      ExternalProviders.Add(new ExternalProvider(this, @event.Key, @event.Value, @event.OccurredAt, @event.UserId, @event.DisplayName));
+    }
+
+    private void Apply(SaveUserSecurePayload payload, DateTime occurredAt)
+    {
+      if (payload.PasswordHash != null)
+      {
+        PasswordChangedAt = occurredAt;
+        PasswordHash = payload.PasswordHash;
+      }
+
       if (Email?.ToUpper() != payload.Email?.ToUpper())
       {
         Email = payload.Email;
