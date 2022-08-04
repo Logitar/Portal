@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Web.Models.Api.Message
+﻿namespace Logitar.Portal.Core.Emails.Messages.Models
 {
   public class MessageSummary
   {

@@ -1,6 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Senders;
-
-namespace Logitar.Portal.Web.Models.Api.Sender
+﻿namespace Logitar.Portal.Core.Emails.Senders.Models
 {
   public class SenderSummary
   {

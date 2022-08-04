@@ -3,7 +3,6 @@ using Logitar.Portal.Core;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Realms.Models;
 using Logitar.Portal.Core.Realms.Payloads;
-using Logitar.Portal.Web.Models.Api.Realm;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

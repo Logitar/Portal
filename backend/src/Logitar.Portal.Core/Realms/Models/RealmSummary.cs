@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Web.Models.Api.Realm
+﻿namespace Logitar.Portal.Core.Realms.Models
 {
   public class RealmSummary
   {

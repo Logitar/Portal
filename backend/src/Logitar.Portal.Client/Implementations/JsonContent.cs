@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Logitar.Portal.Client
+namespace Logitar.Portal.Client.Implementations
 {
   internal class JsonContent : StringContent
   {

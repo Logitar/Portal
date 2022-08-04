@@ -14,6 +14,8 @@ namespace Logitar.Portal.Core.Emails.Senders
           Key = pair.Key,
           Value = pair.Value
         })));
+      CreateMap<SenderModel, SenderSummary>()
+        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
     }
   }
 }

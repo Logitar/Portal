@@ -5,8 +5,9 @@ using Logitar.Portal.Core.Users.Payloads;
 
 namespace Logitar.Portal.Client
 {
-  public interface IAccountClient
+  public interface IAccountService
   {
+    Task<SessionModel> AuthenticateWithGoogleAsync(string realm, AuthenticateWithGooglePayload payload, CancellationToken cancellationToken = default);
     Task<UserModel> ChangePasswordAsync(Guid sessionId, ChangePasswordPayload payload, CancellationToken cancellationToken = default);
     Task<UserModel> GetProfileAsync(Guid sessionId, CancellationToken cancellationToken = default);
     Task RecoverPasswordAsync(string realm, RecoverPasswordPayload payload, CancellationToken cancellationToken = default);

@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Web.Models.Api.Template
+﻿namespace Logitar.Portal.Core.Emails.Templates.Models
 {
   public class TemplateSummary
   {
