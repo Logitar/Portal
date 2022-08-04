@@ -69,6 +69,7 @@ namespace Logitar.Portal.Core.Accounts
 
       User user = await _userQuerier.GetAsync(_userContext.Id, readOnly: false, cancellationToken)
         ?? throw new InvalidOperationException($"The user 'Id={_userContext.Id}' could not be found.");
+      EnsureHasPassword(user);
 
       _passwordService.ValidateAndThrow(payload.Password, user.Realm);
 
@@ -100,6 +101,7 @@ namespace Logitar.Portal.Core.Accounts
       User user = await _userQuerier.GetAsync(payload.Username, realm, readOnly: true, cancellationToken)
         ?? throw new EntityNotFoundException<User>(payload.Username, nameof(payload.Username));
       EnsureIsTrusted(user, realm);
+      EnsureHasPassword(user);
 
       if (realm.PasswordRecoveryTemplate == null)
       {
@@ -251,6 +253,14 @@ namespace Logitar.Portal.Core.Accounts
 
       session.SignOut();
       await _sessionRepository.SaveAsync(session, cancellationToken);
+    }
+
+    private static void EnsureHasPassword(User user)
+    {
+      if (!user.HasPassword)
+      {
+        throw new UserHasNoPasswordException(user);
+      }
     }
 
     private static void EnsureIsTrusted(User user, Realm? realm)

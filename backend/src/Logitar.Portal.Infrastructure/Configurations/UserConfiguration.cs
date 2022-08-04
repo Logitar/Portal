@@ -23,6 +23,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.Property(x => x.Email).HasMaxLength(256);
       builder.Property(x => x.EmailNormalized).HasMaxLength(256);
       builder.Property(x => x.FirstName).HasMaxLength(128);
+      builder.Property(x => x.HasPassword).HasDefaultValue(false);
       builder.Property(x => x.IsAccountConfirmed).HasDefaultValue(false);
       builder.Property(x => x.IsDisabled).HasDefaultValue(false);
       builder.Property(x => x.IsEmailConfirmed).HasDefaultValue(false);

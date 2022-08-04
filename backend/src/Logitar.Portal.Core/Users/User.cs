@@ -28,7 +28,14 @@ namespace Logitar.Portal.Core.Users
       get => Username.ToUpper();
       private set { /* EntityFrameworkCore only setter */ }
     }
+
+    public DateTime? PasswordChangedAt { get; private set; }
     public string? PasswordHash { get; private set; }
+    public bool HasPassword
+    {
+      get => PasswordChangedAt.HasValue && PasswordHash != null;
+      private set { /* EntityFrameworkCore only setter */ }
+    }
 
     public string? Email { get; private set; }
     public string? EmailNormalized
@@ -67,7 +74,6 @@ namespace Logitar.Portal.Core.Users
     public string? Locale { get; private set; }
     public string? Picture { get; private set; }
 
-    public DateTime? PasswordChangedAt { get; private set; }
     public DateTime? SignedInAt { get; private set; }
 
     public DateTime? DisabledAt { get; private set; }
