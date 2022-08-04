@@ -1,16 +1,14 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
-
-namespace Logitar.Portal.Infrastructure.Emails.Providers
+﻿namespace Logitar.Portal.Client
 {
   internal static class HttpResponseMessageExtensions
   {
-    public static async Task<SendMessageResult> GetSendMessageResultAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default)
+    public static async Task<IReadOnlyDictionary<string, string?>> GetDataAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default)
     {
       ArgumentNullException.ThrowIfNull(response);
 
       string? content = await response.TryReadContentAsStringAsync(cancellationToken);
 
-      return new SendMessageResult
+      return new Dictionary<string, string?>
       {
         [nameof(response.Content)] = content,
         [nameof(response.ReasonPhrase)] = response.ReasonPhrase,
