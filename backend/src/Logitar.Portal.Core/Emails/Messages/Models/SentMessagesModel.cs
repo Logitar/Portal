@@ -2,6 +2,15 @@
 {
   public class SentMessagesModel
   {
+    /// <summary>
+    /// Public constructor for deserialization
+    /// </summary>
+    public SentMessagesModel()
+    {
+      Success = Enumerable.Empty<Guid>();
+      Error = Enumerable.Empty<Guid>();
+      Unsent = Enumerable.Empty<Guid>();
+    }
     public SentMessagesModel(IEnumerable<Message> messages)
     {
       ArgumentNullException.ThrowIfNull(messages);
@@ -31,8 +40,8 @@
       Unsent = unsent;
     }
 
-    public IEnumerable<Guid> Success { get; }
-    public IEnumerable<Guid> Error { get; }
-    public IEnumerable<Guid> Unsent { get; }
+    public IEnumerable<Guid> Success { get; set; }
+    public IEnumerable<Guid> Error { get; set; }
+    public IEnumerable<Guid> Unsent { get; set; }
   }
 }

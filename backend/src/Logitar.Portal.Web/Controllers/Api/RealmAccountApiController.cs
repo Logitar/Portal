@@ -41,13 +41,7 @@ namespace Logitar.Portal.Web.Controllers.Api
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
       string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
-      var session = await _accountService.RenewSessionAsync(payload, id, ipAddress, additionalInformation, cancellationToken);
-      if (session.User?.Realm == null)
-      {
-        HttpContext.SetSession(session);
-
-        return NoContent();
-      }
+      SessionModel session = await _accountService.RenewSessionAsync(payload, id, ipAddress, additionalInformation, cancellationToken);
 
       return Ok(session);
     }
@@ -55,8 +49,8 @@ namespace Logitar.Portal.Web.Controllers.Api
     [HttpPost("sign/in")]
     public async Task<ActionResult<SessionModel>> SignInAsync(string id, [FromBody] SignInPayload payload, CancellationToken cancellationToken)
     {
-      var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      var additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
+      string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+      string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
       return Ok(await _accountService.SignInAsync(payload, id, ipAddress, additionalInformation, cancellationToken));
     }

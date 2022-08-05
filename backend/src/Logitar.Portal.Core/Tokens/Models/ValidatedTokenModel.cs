@@ -5,6 +5,13 @@ namespace Logitar.Portal.Core.Tokens.Models
 {
   public class ValidatedTokenModel
   {
+    /// <summary>
+    /// Empty constructor for deserialization
+    /// </summary>
+    public ValidatedTokenModel()
+    {
+      Errors = Enumerable.Empty<Error>();
+    }
     public ValidatedTokenModel(ValidateTokenResult result)
     {
       ArgumentNullException.ThrowIfNull(result);
@@ -39,12 +46,12 @@ namespace Logitar.Portal.Core.Tokens.Models
       }
     }
 
-    public IEnumerable<Error> Errors { get; }
+    public IEnumerable<Error> Errors { get; set; }
     public bool Succeeded => !Errors.Any();
 
-    public string? Email { get; }
-    public string? Subject { get; }
+    public string? Email { get; set; }
+    public string? Subject { get; set; }
 
-    public IEnumerable<ClaimModel>? Claims { get; }
+    public IEnumerable<ClaimModel>? Claims { get; set; }
   }
 }

@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Web.Models.Api.ApiKey
+﻿namespace Logitar.Portal.Core.ApiKeys.Models
 {
   public class ApiKeySummary
   {

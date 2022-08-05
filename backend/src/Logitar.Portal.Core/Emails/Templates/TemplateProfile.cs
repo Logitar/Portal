@@ -9,6 +9,8 @@ namespace Logitar.Portal.Core.Emails.Templates
     {
       CreateMap<Template, TemplateModel>()
         .IncludeBase<Aggregate, AggregateModel>();
+      CreateMap<TemplateModel, TemplateSummary>()
+        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
     }
   }
 }

@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Accounts.Payloads;
+using Logitar.Portal.Core.Sessions.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -22,7 +23,7 @@ namespace Logitar.Portal.Web.Controllers.Api
       string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
       string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
 
-      var session = await _accountService.SignInAsync(payload, realm: null, ipAddress, additionalInformation, cancellationToken);
+      SessionModel session = await _accountService.SignInAsync(payload, realm: null, ipAddress, additionalInformation, cancellationToken);
       HttpContext.SetSession(session);
 
       return NoContent();

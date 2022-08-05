@@ -3,7 +3,6 @@ using Logitar.Portal.Core;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.ApiKeys.Models;
 using Logitar.Portal.Core.ApiKeys.Payloads;
-using Logitar.Portal.Web.Models.Api.ApiKey;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

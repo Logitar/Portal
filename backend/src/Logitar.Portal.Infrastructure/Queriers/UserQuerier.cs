@@ -94,7 +94,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = Guid.TryParse(realm, out Guid realmId)
           ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
-          : query.Where(x => x.Realm != null && x.Realm.Alias == realm.ToUpper());
+          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
       }
 
       if (isConfirmed.HasValue)

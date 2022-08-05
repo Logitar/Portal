@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Web.Models.Api.User
+﻿namespace Logitar.Portal.Core.Users.Models
 {
   public class UserSummary
   {

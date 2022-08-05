@@ -3,7 +3,6 @@ using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
-using Logitar.Portal.Web.Models.Api.Message;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

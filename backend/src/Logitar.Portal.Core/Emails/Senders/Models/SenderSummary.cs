@@ -1,6 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Senders;
-
-namespace Logitar.Portal.Web.Models.Api.Sender
+﻿namespace Logitar.Portal.Core.Emails.Senders.Models
 {
   public class SenderSummary
   {
@@ -10,7 +8,7 @@ namespace Logitar.Portal.Web.Models.Api.Sender
     public string EmailAddress { get; set; } = null!;
     public string? DisplayName { get; set; }
 
-    public bool IsDefault { get; private set; }
+    public bool IsDefault { get; set; }
     public ProviderType Provider { get; set; }
   }
 }

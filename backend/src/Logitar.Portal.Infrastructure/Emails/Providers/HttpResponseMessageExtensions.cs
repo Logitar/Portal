@@ -15,7 +15,7 @@ namespace Logitar.Portal.Infrastructure.Emails.Providers
         [nameof(response.Content)] = content,
         [nameof(response.ReasonPhrase)] = response.ReasonPhrase,
         [nameof(response.StatusCode)] = ((int)response.StatusCode).ToString(),
-        [nameof(response.Version)] = response.Version.ToString(),
+        [nameof(response.Version)] = response.Version.ToString()
       };
     }
 
