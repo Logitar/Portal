@@ -39,11 +39,18 @@ namespace Logitar.Portal.Client.Implementations
       return await GetAsync<ListModel<SenderSummary>>($"{BasePath}?{query}", cancellationToken);
     }
 
-    public async Task<SenderModel> GetDefaultAsync(CancellationToken cancellationToken = default)
-      => await GetAsync<SenderModel>($"{BasePath}/default", cancellationToken);
+    public async Task<SenderModel> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
+    {
+      string query = GetQueryString(new Dictionary<string, object?>
+      {
+        [nameof(realm)] = realm
+      });
 
-    public async Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default)
-      => await PatchAsync<SenderModel>($"{BasePath}/{id}", cancellationToken);
+      return await GetAsync<SenderModel>($"{BasePath}/default?{query}", cancellationToken);
+    }
+
+    public async Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
+      => await PatchAsync<SenderModel>($"{BasePath}/{id}/default", cancellationToken);
 
     public async Task<SenderModel> UpdateAsync(Guid id, UpdateSenderPayload payload, CancellationToken cancellationToken)
       => await PutAsync<SenderModel>($"{BasePath}/{id}", payload, cancellationToken);

@@ -207,6 +207,10 @@ namespace Logitar.Portal.Core.Accounts
         Realm = realm.Id.ToString()
       };
       ValidatedTokenModel token = await _tokenService.ValidateAsync(validateTokenPayload, consume: true, cancellationToken);
+      if (!token.Succeeded)
+      {
+        throw new NotImplementedException(); // TODO(fpion): implement
+      }
       Guid userId = Guid.Parse(token.Subject!);
 
       User user = await _userQuerier.GetAsync(userId, readOnly: false, cancellationToken)

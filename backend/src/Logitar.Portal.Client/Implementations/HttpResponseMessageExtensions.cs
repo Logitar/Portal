@@ -63,7 +63,7 @@ namespace Logitar.Portal.Client.Implementations
       }
       catch (Exception innerException)
       {
-        var error = new Error(response.StatusCode.ToString(), description: null, data);
+        var error = new Error(response.StatusCode.ToString(), description: null, data); // TODO(fpion): add a description
         throw new ErrorException(error, innerException);
       }
 

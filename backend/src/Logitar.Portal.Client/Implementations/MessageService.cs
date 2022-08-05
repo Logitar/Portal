@@ -8,7 +8,7 @@ namespace Logitar.Portal.Client.Implementations
 {
   internal class MessageService : HttpService, IMessageService
   {
-    private const string BasePath = "/tokens";
+    private const string BasePath = "/messages";
 
     public MessageService(HttpClient client, IOptions<PortalSettings> settings) : base(client, settings)
     {

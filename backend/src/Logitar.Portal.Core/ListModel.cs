@@ -9,6 +9,7 @@ namespace Logitar.Portal.Core
     /// </summary>
     public ListModel()
     {
+      Items = Enumerable.Empty<T>();
     }
     private ListModel(IEnumerable<T> items, long total)
     {
@@ -16,7 +17,7 @@ namespace Logitar.Portal.Core
       Total = total;
     }
 
-    public IEnumerable<T> Items { get; set; } = null!;
+    public IEnumerable<T> Items { get; set; }
     public long Total { get; set; }
 
     public static ListModel<T> From<TSource>(ListModel<TSource> list, IMapper mapper)

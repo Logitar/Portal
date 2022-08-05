@@ -8,7 +8,7 @@
     public string EmailAddress { get; set; } = null!;
     public string? DisplayName { get; set; }
 
-    public bool IsDefault { get; private set; }
+    public bool IsDefault { get; set; }
     public ProviderType Provider { get; set; }
   }
 }
