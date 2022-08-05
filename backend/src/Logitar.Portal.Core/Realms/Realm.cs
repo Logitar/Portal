@@ -61,6 +61,8 @@ namespace Logitar.Portal.Core.Realms
 
     public string? GoogleClientId { get; private set; }
 
+    public List<Sender> Senders { get; private set; } = new();
+    public List<Template> Templates { get; private set; } = new();
     public List<User> Users { get; private set; } = new();
 
     public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));

@@ -15,6 +15,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.IsDefault);
       builder.HasIndex(x => x.Provider);
 
+      builder.HasOne(x => x.Realm).WithMany(x => x.Senders).OnDelete(DeleteBehavior.NoAction);
+
       builder.Ignore(x => x.Settings);
 
       builder.Property(x => x.DisplayName).HasMaxLength(256);

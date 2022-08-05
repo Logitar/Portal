@@ -39,11 +39,10 @@ namespace Logitar.Portal.Core.Sessions
 
     private Guid UserId => User?.Id ?? throw new InvalidOperationException($"The {nameof(User)} is required.");
 
+    public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
+    public void Update(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null) => ApplyChange(new UpdatedEvent(UserId, keyHash, ipAddress, additionalInformation));
+
     public void SignOut(Guid? userId = null) => ApplyChange(new SignedOutEvent(userId ?? UserId));
-    public void Update(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null)
-    {
-      ApplyChange(new UpdatedEvent(UserId, keyHash, ipAddress, additionalInformation));
-    }
 
     protected virtual void Apply(CreatedEvent @event)
     {
@@ -51,6 +50,9 @@ namespace Logitar.Portal.Core.Sessions
 
       IpAddress = @event.IpAddress;
       AdditionalInformation = @event.AdditionalInformation;
+    }
+    protected virtual void Apply(DeletedEvent @event)
+    {
     }
     protected virtual void Apply(SignedOutEvent @event)
     {

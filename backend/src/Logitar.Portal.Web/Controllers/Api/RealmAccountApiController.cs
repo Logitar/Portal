@@ -3,7 +3,6 @@ using Logitar.Portal.Core.Accounts.Payloads;
 using Logitar.Portal.Core.Sessions.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -38,10 +37,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     [HttpPost("renew")]
     public async Task<ActionResult<SessionModel>> RenewSessionAsync(string id, RenewSessionPayload payload, CancellationToken cancellationToken)
     {
-      string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
-
-      SessionModel session = await _accountService.RenewSessionAsync(payload, id, ipAddress, additionalInformation, cancellationToken);
+      SessionModel session = await _accountService.RenewSessionAsync(payload, id, cancellationToken);
 
       return Ok(session);
     }
@@ -49,10 +45,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     [HttpPost("sign/in")]
     public async Task<ActionResult<SessionModel>> SignInAsync(string id, [FromBody] SignInPayload payload, CancellationToken cancellationToken)
     {
-      string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-      string additionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
-
-      return Ok(await _accountService.SignInAsync(payload, id, ipAddress, additionalInformation, cancellationToken));
+      return Ok(await _accountService.SignInAsync(payload, id, cancellationToken));
     }
   }
 }

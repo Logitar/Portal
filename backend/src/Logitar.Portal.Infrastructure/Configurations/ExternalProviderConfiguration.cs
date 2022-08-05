@@ -8,9 +8,13 @@ namespace Logitar.Portal.Infrastructure.Configurations
   {
     public void Configure(EntityTypeBuilder<ExternalProvider> builder)
     {
+      builder.ToTable("ExternalProviders");
+
       builder.HasKey(x => x.Sid);
       builder.HasIndex(x => x.Id).IsUnique();
       builder.HasIndex(x => new { x.Key, x.Value });
+
+      builder.HasOne(x => x.User).WithMany(x => x.ExternalProviders).OnDelete(DeleteBehavior.Cascade);
 
       builder.Property(x => x.AddedAt).HasDefaultValueSql("now()");
       builder.Property(x => x.AddedById).HasDefaultValue(Guid.Empty);

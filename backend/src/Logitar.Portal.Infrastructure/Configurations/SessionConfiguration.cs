@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Core.Sessions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Logitar.Portal.Core.Sessions;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
@@ -9,6 +9,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
     public override void Configure(EntityTypeBuilder<Session> builder)
     {
       base.Configure(builder);
+
+      builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.NoAction);
 
       builder.Property(x => x.AdditionalInformation).HasColumnType("jsonb");
       builder.Property(x => x.IpAddress).HasMaxLength(40);

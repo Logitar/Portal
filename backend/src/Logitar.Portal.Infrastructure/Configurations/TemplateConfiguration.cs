@@ -15,6 +15,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.Key);
       builder.HasIndex(x => new { x.RealmSid, x.KeyNormalized }).IsUnique();
 
+      builder.HasOne(x => x.Realm).WithMany(x => x.Templates).OnDelete(DeleteBehavior.NoAction);
+
       builder.Property(x => x.ContentType).HasMaxLength(256).HasDefaultValue(MediaTypeNames.Text.Plain);
       builder.Property(x => x.DisplayName).HasMaxLength(256);
       builder.Property(x => x.Key).HasMaxLength(256);

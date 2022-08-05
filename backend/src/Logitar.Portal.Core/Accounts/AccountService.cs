@@ -164,7 +164,7 @@ namespace Logitar.Portal.Core.Accounts
       }
     }
 
-    public async Task<SessionModel> RenewSessionAsync(RenewSessionPayload payload, string? realmId, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
+    public async Task<SessionModel> RenewSessionAsync(RenewSessionPayload payload, string? realmId, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
@@ -188,7 +188,7 @@ namespace Logitar.Portal.Core.Accounts
       }
       EnsureIsTrusted(session.User, realm);
 
-      return await _sessionService.RenewAsync(session, ipAddress, additionalInformation, cancellationToken);
+      return await _sessionService.RenewAsync(session, payload.IpAddress, payload.AdditionalInformation, cancellationToken);
     }
 
     public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken = default)
@@ -209,7 +209,8 @@ namespace Logitar.Portal.Core.Accounts
       ValidatedTokenModel token = await _tokenService.ValidateAsync(validateTokenPayload, consume: true, cancellationToken);
       if (!token.Succeeded)
       {
-        throw new NotImplementedException(); // TODO(fpion): implement
+        Exception? innerException = token.Errors.Count() == 1 ? new ErrorException(token.Errors.Single()) : null;
+        throw new InvalidCredentialsException(innerException);
       }
       Guid userId = Guid.Parse(token.Subject!);
 
@@ -229,7 +230,7 @@ namespace Logitar.Portal.Core.Accounts
       return await _userService.UpdateAsync(_userContext.Id, payload, cancellationToken);
     }
 
-    public async Task<SessionModel> SignInAsync(SignInPayload payload, string? realmId, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
+    public async Task<SessionModel> SignInAsync(SignInPayload payload, string? realmId, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
@@ -247,7 +248,7 @@ namespace Logitar.Portal.Core.Accounts
       }
       EnsureIsTrusted(user, realm);
 
-      return await _sessionService.SignInAsync(user, payload.Remember, ipAddress, additionalInformation, cancellationToken);
+      return await _sessionService.SignInAsync(user, payload.Remember, payload.IpAddress, payload.AdditionalInformation, cancellationToken);
     }
 
     public async Task SignOutAsync(CancellationToken cancellationToken)

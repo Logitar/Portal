@@ -20,6 +20,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.Username);
       builder.HasIndex(x => new { x.RealmSid, x.UsernameNormalized }).IsUnique();
 
+      builder.HasOne(x => x.Realm).WithMany(x => x.Users).OnDelete(DeleteBehavior.NoAction);
+
       builder.Property(x => x.Email).HasMaxLength(256);
       builder.Property(x => x.EmailNormalized).HasMaxLength(256);
       builder.Property(x => x.FirstName).HasMaxLength(128);

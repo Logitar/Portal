@@ -3,6 +3,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAt,
   faBan,
+  faCheck,
   faChessRook,
   faClipboard,
   faCog,
@@ -36,6 +37,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
   faAt,
   faBan,
+  faCheck,
   faChessRook,
   faClipboard,
   faCog,

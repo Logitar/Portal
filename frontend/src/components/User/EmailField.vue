@@ -13,7 +13,7 @@
     @input="$emit('input', $event)"
   >
     <b-input-group-append v-if="confirmed">
-      <b-input-group-text class="bg-info text-white">{{ $t('user.email.confirmed') }}</b-input-group-text>
+      <b-input-group-text class="bg-info text-white"><font-awesome-icon icon="check" />&nbsp;{{ $t('user.email.confirmed') }}</b-input-group-text>
     </b-input-group-append>
   </form-field>
 </template>
