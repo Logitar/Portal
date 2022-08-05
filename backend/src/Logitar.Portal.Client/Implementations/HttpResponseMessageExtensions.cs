@@ -63,7 +63,7 @@ namespace Logitar.Portal.Client.Implementations
       }
       catch (Exception innerException)
       {
-        var error = new Error(response.StatusCode.ToString(), description: null, data); // TODO(fpion): add a description
+        var error = new Error(response.StatusCode.ToString(), "The remote API did not return a success status code.", data);
         throw new ErrorException(error, innerException);
       }
 

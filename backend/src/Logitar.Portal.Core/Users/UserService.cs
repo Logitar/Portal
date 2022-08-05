@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;
 
@@ -15,6 +16,8 @@ namespace Logitar.Portal.Core.Users
     private readonly IUserQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<User> _repository;
+    private readonly ISessionQuerier _sessionQuerier;
+    private readonly IRepository<Session> _sessionRepository;
     private readonly IUserContext _userContext;
     private readonly IValidator<User> _validator;
 
@@ -24,6 +27,8 @@ namespace Logitar.Portal.Core.Users
       IUserQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<User> repository,
+      ISessionQuerier sessionQuerier,
+      IRepository<Session> sessionRepository,
       IUserContext userContext,
       IValidator<User> validator
     )
@@ -33,6 +38,8 @@ namespace Logitar.Portal.Core.Users
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
+      _sessionQuerier = sessionQuerier;
+      _sessionRepository = sessionRepository;
       _userContext = userContext;
       _validator = validator;
     }
@@ -95,6 +102,13 @@ namespace Logitar.Portal.Core.Users
       {
         throw new UserCannotDeleteHerselfException(user);
       }
+
+      PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
+      foreach (Session session in sessions)
+      {
+        session.Delete(_userContext.ActorId);
+      }
+      await _sessionRepository.SaveAsync(sessions, cancellationToken);
 
       user.Delete(_userContext.ActorId);
 

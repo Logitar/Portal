@@ -22,14 +22,13 @@ namespace Logitar.Portal.Web.Middlewares
         {
           try
           {
-            string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            string? additionalInformation = JsonSerializer.Serialize(context.Request.Headers);
-
             var payload = new RenewSessionPayload
             {
+              AdditionalInformation = JsonSerializer.Serialize(context.Request.Headers),
+              IpAddress = context.Connection.RemoteIpAddress?.ToString(),
               RenewToken = renewToken
             };
-            SessionModel session = await accountService.RenewSessionAsync(payload, realm: null, ipAddress, additionalInformation);
+            SessionModel session = await accountService.RenewSessionAsync(payload);
             context.SetSession(session);
           }
           catch (Exception)

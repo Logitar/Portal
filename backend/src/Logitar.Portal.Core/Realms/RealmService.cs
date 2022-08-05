@@ -3,12 +3,14 @@ using FluentValidation;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
+using Logitar.Portal.Core.Realms.Mutations;
 using Logitar.Portal.Core.Realms.Payloads;
 
 namespace Logitar.Portal.Core.Realms
 {
   internal class RealmService : IRealmService
   {
+    private readonly DeleteRealmMutationHandler _deleteRealmMutationHandler;
     private readonly IMapper _mapper;
     private readonly IRealmQuerier _querier;
     private readonly IRepository<Realm> _repository;
@@ -18,6 +20,7 @@ namespace Logitar.Portal.Core.Realms
     private readonly IValidator<Realm> _validator;
 
     public RealmService(
+      DeleteRealmMutationHandler deleteRealmMutationHandler,
       IMapper mapper,
       IRealmQuerier querier,
       IRepository<Realm> repository,
@@ -27,6 +30,7 @@ namespace Logitar.Portal.Core.Realms
       IValidator<Realm> validator
     )
     {
+      _deleteRealmMutationHandler = deleteRealmMutationHandler;
       _mapper = mapper;
       _querier = querier;
       _repository = repository;
@@ -55,16 +59,7 @@ namespace Logitar.Portal.Core.Realms
     }
 
     public async Task<RealmModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-      Realm realm = await _querier.GetAsync(id, readOnly: false, cancellationToken)
-        ?? throw new EntityNotFoundException<Realm>(id);
-
-      realm.Delete(_userContext.ActorId);
-
-      await _repository.SaveAsync(realm, cancellationToken);
-
-      return _mapper.Map<RealmModel>(realm);
-    }
+      => await _deleteRealmMutationHandler.Handle(new DeleteRealmMutation(id), cancellationToken);
 
     public async Task<RealmModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
