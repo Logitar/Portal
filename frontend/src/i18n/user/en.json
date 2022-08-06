@@ -97,13 +97,23 @@
     "title": "Profile",
     "updated": "Your profile has been updated."
   },
+  "select": {
+    "label": "User",
+    "placeholder": "Select an user"
+  },
   "session": {
     "active": {
       "label": "Active",
       "placeholder": "Select an option"
     },
+    "additionalInformation": {
+      "empty": "No additional information to show.",
+      "title": "Additional Information"
+    },
     "confirm": "Do you really want to sign out the current session? You will be signed out of the application.",
-    "confirmAll": "Do you really want to sign out all your sessions? You will be signed out of the application and any other device using this application.",
+    "confirmAll": "Do you really want to sign out all the sessions of this user?",
+    "confirmAllCurrent": "You will be signed out of the application and any other device using this application.",
+    "confirmAllOther": "The user will be signed out of any application using the Portal.",
     "empty": "This list is empty.",
     "ipAddress": "IP Address",
     "persistent": {
@@ -111,6 +121,7 @@
       "placeholder": "Select an option"
     },
     "signOut": "Sign out",
+    "signOutAll": "Sign out all",
     "signedOutAt": "Signed out on",
     "sort": {
       "options": {
@@ -120,9 +131,11 @@
       }
     },
     "success": "The session has been signed out.",
+    "successAll": "The sessions have been signed out.",
     "title": "Sessions",
     "user": "User",
-    "view": "View sessions"
+    "view": "View sessions",
+    "viewTitle": "View session"
   },
   "signIn": {
     "accountIsDisabled": "Your account is disabled.",

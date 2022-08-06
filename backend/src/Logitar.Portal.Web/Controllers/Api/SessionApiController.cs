@@ -41,5 +41,11 @@ namespace Logitar.Portal.Web.Controllers.Api
     {
       return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
     }
+
+    [HttpPatch("/api/users/{id}/sessions/sign/out")]
+    public async Task<ActionResult<IEnumerable<SessionModel>>> SignOutAllAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return Ok(await _sessionService.SignOutAllAsync(id, cancellationToken));
+    }
   }
 }

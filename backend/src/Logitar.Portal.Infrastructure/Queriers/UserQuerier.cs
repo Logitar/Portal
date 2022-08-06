@@ -74,7 +74,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       return await _users.ApplyTracking(readOnly)
         .Include(x => x.ExternalProviders)
         .Include(x => x.Realm)
-        .Where(x => x.RealmSid == realm.Sid && x.ExternalProviders.Any(y => y.Key == providerKey && y.Value == providerValue))
+        .Where(x => x.ExternalProviders.Any(y => y.RealmSid == realm.Sid && y.Key == providerKey && y.Value == providerValue))
         .SingleOrDefaultAsync(cancellationToken);
     }
 

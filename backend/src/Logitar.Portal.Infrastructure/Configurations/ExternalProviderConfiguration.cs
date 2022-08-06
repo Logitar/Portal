@@ -12,7 +12,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.Sid);
       builder.HasIndex(x => x.Id).IsUnique();
-      builder.HasIndex(x => new { x.Key, x.Value });
+      builder.HasIndex(x => new { x.RealmSid, x.Key, x.Value }).IsUnique();
 
       builder.HasOne(x => x.User).WithMany(x => x.ExternalProviders).OnDelete(DeleteBehavior.Cascade);
 

@@ -3,7 +3,10 @@
     <h1 v-t="'user.session.title'" />
     <div class="my-2">
       <icon-button class="mx-1" icon="sync-alt" :loading="loading" text="actions.refresh" variant="primary" @click="refresh()" />
-      <!-- TODO(fpion): Sign out all? -->
+      <template v-if="selectedUser">
+        <icon-button :disabled="sessions.every(s => !s.isActive)" icon="sign-out-alt" text="user.session.signOutAll" variant="danger" v-b-modal.signOutAll />
+        <sign-out-all-modal :isCurrent="isCurrent" :loading="loading" :user="selectedUser" @ok="signOutAll" />
+      </template>
     </div>
     <b-row>
       <form-select
@@ -15,7 +18,7 @@
         v-model="isActive"
       />
       <realm-select class="col" v-model="selectedRealm" />
-      <!-- TODO(fpion): UserSelect -->
+      <user-select class="col" :realm="selectedRealm" v-model="userId" />
     </b-row>
     <b-row>
       <form-select
@@ -84,16 +87,21 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import SignOutAllModal from '@/components/Sessions/SignOutAllModal.vue'
 import SignOutModal from '@/components/Sessions/SignOutModal.vue'
 import UserAvatar from '@/components/User/UserAvatar.vue'
-import { getSessions, signOut } from '@/api/sessions'
+import UserSelect from '@/components/User/UserSelect.vue'
+import { getSessions, signOut, signOutAll } from '@/api/sessions'
+import { getUser } from '@/api/users'
 
 export default {
   name: 'SessionList',
   components: {
     RealmSelect,
+    SignOutAllModal,
     SignOutModal,
-    UserAvatar
+    UserAvatar,
+    UserSelect
   },
   props: {
     realm: {
@@ -118,6 +126,7 @@ export default {
       loading: false,
       page: 1,
       selectedRealm: null,
+      selectedUser: null,
       sort: 'UpdatedAt',
       sessions: [],
       total: 0,
@@ -125,6 +134,9 @@ export default {
     }
   },
   computed: {
+    isCurrent() {
+      return this.sessions.some(({ id }) => id === this.session)
+    },
     params() {
       return {
         isActive: this.isActive,
@@ -189,6 +201,31 @@ export default {
           await this.refresh()
         }
       }
+    },
+    async signOutAll(callback) {
+      if (!this.loading) {
+        this.loading = true
+        let refresh = false
+        try {
+          await signOutAll(this.userId)
+          if (this.isCurrent) {
+            window.location.replace('/user/sign-in')
+          } else {
+            refresh = true
+            this.toast('success', 'user.session.successAll')
+            if (typeof callback === 'function') {
+              callback()
+            }
+          }
+        } catch (e) {
+          this.handleError(e)
+        } finally {
+          this.loading = false
+        }
+        if (refresh) {
+          await this.refresh()
+        }
+      }
     }
   },
   created() {
@@ -204,6 +241,12 @@ export default {
     params: {
       deep: true,
       async handler(newValue, oldValue) {
+        if (newValue?.realm !== oldValue?.realm) {
+          this.userId = null
+          await this.refresh()
+          return
+        }
+
         if (
           newValue?.index &&
           oldValue &&
@@ -215,9 +258,22 @@ export default {
         ) {
           this.page = 1
           await this.refresh()
-        } else {
-          await this.refresh(newValue)
+          return
         }
+
+        await this.refresh(newValue)
+      }
+    },
+    async userId(id) {
+      if (id) {
+        try {
+          const { data } = await getUser(id)
+          this.selectedUser = data
+        } catch (e) {
+          this.handleError(e)
+        }
+      } else {
+        this.selectedUser = null
       }
     }
   }

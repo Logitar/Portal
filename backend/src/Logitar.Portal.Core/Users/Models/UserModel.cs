@@ -10,11 +10,11 @@ namespace Logitar.Portal.Core.Users.Models
 
     public string? Email { get; set; }
     public DateTime? EmailConfirmedAt { get; set; }
-    public bool IsEmailConfirmed => EmailConfirmedAt.HasValue;
+    public bool IsEmailConfirmed { get; set; }
     public string? PhoneNumber { get; set; }
     public DateTime? PhoneNumberConfirmedAt { get; set; }
-    public bool IsPhoneNumberConfirmed => PhoneNumberConfirmedAt.HasValue;
-    public bool IsAccountConfirmed => IsEmailConfirmed || IsPhoneNumberConfirmed;
+    public bool IsPhoneNumberConfirmed { get; set; }
+    public bool IsAccountConfirmed { get; set; }
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -28,6 +28,8 @@ namespace Logitar.Portal.Core.Users.Models
     public DateTime? SignedInAt { get; set; }
 
     public DateTime? DisabledAt { get; set; }
-    public bool IsDisabled => DisabledAt.HasValue;
+    public bool IsDisabled { get; set; }
+
+    public IEnumerable<ExternalProviderModel> ExternalProviders { get; set; } = Enumerable.Empty<ExternalProviderModel>();
   }
 }

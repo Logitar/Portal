@@ -12,6 +12,7 @@ namespace Logitar.Portal.Core.Sessions
       CancellationToken cancellationToken = default);
     Task<SessionModel> RenewAsync(Session session, string? ipAddress = null, string? additionalInformation = null, CancellationToken cancellationToken = default);
     Task<SessionModel> SignInAsync(User user, bool remember = false, string? ipAddress = null, string? additionalInformation = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<SessionModel>> SignOutAllAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<SessionModel> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
   }
 }
