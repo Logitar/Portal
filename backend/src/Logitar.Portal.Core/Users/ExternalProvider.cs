@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Core.Users
+﻿using Logitar.Portal.Core.Realms;
+
+namespace Logitar.Portal.Core.Users
 {
   public class ExternalProvider
   {
@@ -9,8 +11,11 @@
       AddedAt = addedAt;
       AddedById = addedById;
 
-      User = user ?? throw new ArgumentNullException(nameof(user));
+      User = user;
       UserSid = user.Sid;
+
+      Realm = user.Realm ?? throw new ArgumentException($"The {nameof(user.Realm)} is required.", nameof(user));
+      RealmSid = user.Realm.Sid;
 
       Key = key ?? throw new ArgumentNullException(nameof(key));
       Value = value ?? throw new ArgumentNullException(nameof(value));
@@ -27,8 +32,11 @@
     public DateTime AddedAt { get; private set; }
     public Guid AddedById { get; private set; }
 
+    public Realm? Realm { get; private set; }
+    public int RealmSid { get; private set; }
+
     public User? User { get; private set; }
-    public int? UserSid { get; private set; }
+    public int UserSid { get; private set; }
 
     public string Key { get; private set; } = null!;
     public string Value { get; private set; } = null!;

@@ -105,7 +105,6 @@ export default {
   },
   methods: {
     format(valueType) {
-      console.log(valueType)
       const index = valueType.indexOf('#')
       return index < 0 ? valueType : valueType.substring(index + 1)
     },

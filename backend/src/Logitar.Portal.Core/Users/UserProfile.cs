@@ -8,6 +8,7 @@ namespace Logitar.Portal.Core.Users
   {
     public UserProfile()
     {
+      CreateMap<ExternalProvider, ExternalProviderModel>();
       CreateMap<User, UserModel>()
         .IncludeBase<Aggregate, AggregateModel>();
       CreateMap<UserModel, UserSummary>()

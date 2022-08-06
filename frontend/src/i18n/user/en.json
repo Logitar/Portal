@@ -43,6 +43,12 @@
     "success": "The user has been enabled.",
     "title": "Enable user"
   },
+  "externalProviders": {
+    "addedAt": "Added on",
+    "empty": "This list is empty.",
+    "name": "Name",
+    "title": "External Providers"
+  },
   "firstName": {
     "label": "First Name",
     "placeholder": "Enter a first name"
@@ -96,6 +102,46 @@
   "profile": {
     "title": "Profile",
     "updated": "Your profile has been updated."
+  },
+  "select": {
+    "label": "User",
+    "placeholder": "Select an user"
+  },
+  "session": {
+    "active": {
+      "label": "Active",
+      "placeholder": "Select an option"
+    },
+    "additionalInformation": {
+      "empty": "No additional information to show.",
+      "title": "Additional Information"
+    },
+    "confirm": "Do you really want to sign out the current session? You will be signed out of the application.",
+    "confirmAll": "Do you really want to sign out all the sessions of this user?",
+    "confirmAllCurrent": "You will be signed out of the application and any other device using this application.",
+    "confirmAllOther": "The user will be signed out of any application using the Portal.",
+    "empty": "This list is empty.",
+    "ipAddress": "IP Address",
+    "persistent": {
+      "label": "Persistent",
+      "placeholder": "Select an option"
+    },
+    "signOut": "Sign out",
+    "signOutAll": "Sign out all",
+    "signedOutAt": "Signed out on",
+    "sort": {
+      "options": {
+        "IpAddress": "IP Address",
+        "SignedOutAt": "Signed out on",
+        "UpdatedAt": "Updated on"
+      }
+    },
+    "success": "The session has been signed out.",
+    "successAll": "The sessions have been signed out.",
+    "title": "Sessions",
+    "user": "User",
+    "view": "View sessions",
+    "viewTitle": "View session"
   },
   "signIn": {
     "accountIsDisabled": "Your account is disabled.",

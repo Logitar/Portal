@@ -29,9 +29,11 @@ import {
   faUnlock,
   faUser,
   faUserAltSlash,
+  faUserClock,
   faUsers,
   faVial
 } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
@@ -46,6 +48,7 @@ library.add(
   faExclamationTriangle,
   faExternalLinkAlt,
   faEye,
+  faGoogle,
   faHome,
   faIdCard,
   faInfoCircle,
@@ -62,6 +65,7 @@ library.add(
   faTrashAlt,
   faUnlock,
   faUser,
+  faUserClock,
   faUserAltSlash,
   faUsers,
   faVial

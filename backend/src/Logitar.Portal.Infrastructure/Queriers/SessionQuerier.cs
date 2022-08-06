@@ -20,7 +20,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<PagedList<Session>> GetPagedAsync(bool? isActive, bool? isPersistent, string? realm, string? search, Guid? userId,
+    public async Task<PagedList<Session>> GetPagedAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
       SessionSort? sort, bool desc,
       int? index, int? count,
       bool readOnly, CancellationToken cancellationToken)
@@ -47,19 +47,6 @@ namespace Logitar.Portal.Infrastructure.Queriers
       if (isPersistent.HasValue)
       {
         query = query.Where(x => x.IsPersistent == isPersistent.Value);
-      }
-      if (search != null)
-      {
-        foreach (string term in search.Split())
-        {
-          if (!string.IsNullOrEmpty(term))
-          {
-            string pattern = $"%{term}%";
-
-            query = query.Where(x => (x.IpAddress != null && EF.Functions.ILike(x.IpAddress, pattern))
-              || (x.AdditionalInformation != null && EF.Functions.ILike(x.AdditionalInformation, pattern)));
-          }
-        }
       }
       if (userId.HasValue)
       {

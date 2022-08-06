@@ -14,6 +14,8 @@ export default {
   RealmList: () => import(/* webpackChunkName: "realmList" */ './Realms/RealmList.vue'),
   SenderEdit: () => import(/* webpackChunkName: "senderEdit" */ './Senders/SenderEdit.vue'),
   SenderList: () => import(/* webpackChunkName: "senderList" */ './Senders/SenderList.vue'),
+  SessionList: () => import(/* webpackChunkName: "sessionList" */ './Sessions/SessionList.vue'),
+  SessionView: () => import(/* webpackChunkName: "sessionView" */ './Sessions/SessionView.vue'),
   SignIn: () => import(/* webpackChunkName: "signIn" */ './Account/SignIn.vue'),
   TemplateEdit: () => import(/* webpackChunkName: "templateEdit" */ './Templates/TemplateEdit.vue'),
   TemplateList: () => import(/* webpackChunkName: "templateList" */ './Templates/TemplateList.vue'),

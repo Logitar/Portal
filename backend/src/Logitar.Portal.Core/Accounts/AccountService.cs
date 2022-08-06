@@ -26,7 +26,6 @@ namespace Logitar.Portal.Core.Accounts
     private readonly IPasswordService _passwordService;
     private readonly IRealmQuerier _realmQuerier;
     private readonly ISessionQuerier _sessionQuerier;
-    private readonly IRepository<Session> _sessionRepository;
     private readonly ISessionService _sessionService;
     private readonly ITokenService _tokenService;
     private readonly IUserContext _userContext;
@@ -40,7 +39,6 @@ namespace Logitar.Portal.Core.Accounts
       IPasswordService passwordService,
       IRealmQuerier realmQuerier,
       ISessionQuerier sessionQuerier,
-      IRepository<Session> sessionRepository,
       ISessionService sessionService,
       ITokenService tokenService,
       IUserContext userContext,
@@ -54,7 +52,6 @@ namespace Logitar.Portal.Core.Accounts
       _passwordService = passwordService;
       _realmQuerier = realmQuerier;
       _sessionQuerier = sessionQuerier;
-      _sessionRepository = sessionRepository;
       _sessionService = sessionService;
       _tokenService = tokenService;
       _userContext = userContext;
@@ -191,7 +188,7 @@ namespace Logitar.Portal.Core.Accounts
       return await _sessionService.RenewAsync(session, payload.IpAddress, payload.AdditionalInformation, cancellationToken);
     }
 
-    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken = default)
+    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
@@ -253,11 +250,7 @@ namespace Logitar.Portal.Core.Accounts
 
     public async Task SignOutAsync(CancellationToken cancellationToken)
     {
-      Session session = await _sessionQuerier.GetAsync(_userContext.SessionId, readOnly: false, cancellationToken)
-        ?? throw new InvalidOperationException($"The session 'Id={_userContext.SessionId}' could not be found.");
-
-      session.SignOut();
-      await _sessionRepository.SaveAsync(session, cancellationToken);
+      await _sessionService.SignOutAsync(_userContext.SessionId, cancellationToken);
     }
 
     private static void EnsureHasPassword(User user)

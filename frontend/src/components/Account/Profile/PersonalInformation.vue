@@ -31,7 +31,11 @@
         </tr>
         <tr v-if="profile.signedInAt">
           <th scope="row" v-t="'user.signedInAt'" />
-          <td>{{ $d(new Date(profile.signedInAt), 'medium') }}</td>
+          <td>
+            {{ $d(new Date(profile.signedInAt), 'medium') }}
+            <br />
+            <b-link :href="`/sessions?user=${profile.id}`">{{ $t('user.session.view') }}</b-link>
+          </td>
         </tr>
       </tbody>
     </table>

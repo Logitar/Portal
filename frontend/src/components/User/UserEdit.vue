@@ -3,7 +3,11 @@
     <h1 v-t="user ? 'user.editTitle' : 'user.newTitle'" />
     <template v-if="user">
       <status-detail :createdAt="new Date(user.createdAt)" :updatedAt="user.updatedAt ? new Date(user.updatedAt) : null" />
-      <p v-if="user.signedInAt">{{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}</p>
+      <p v-if="user.signedInAt">
+        {{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}
+        <br />
+        <b-link :href="viewSessionsUrl">{{ $t('user.session.view') }}</b-link>
+      </p>
       <p v-if="user.isDisabled" class="text-danger">{{ $t('user.disabledAt') }} {{ $d(new Date(user.disabledAt), 'medium') }}</p>
     </template>
     <validation-observer ref="form">
@@ -77,6 +81,25 @@
           <locale-select class="col" v-model="locale" />
           <picture-field class="col" validate v-model="picture" />
         </b-row>
+        <h3 v-t="'user.externalProviders.title'" />
+        <table class="table table-striped" v-if="user.externalProviders.length">
+          <thead>
+            <tr>
+              <th scope="col" v-t="'user.externalProviders.name'" />
+              <th scope="col" v-t="'user.externalProviders.addedAt'" />
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="externalProvider in user.externalProviders" :key="externalProvider.id">
+              <td>
+                {{ externalProvider.displayName || externalProvider.key }}
+                <font-awesome-icon v-if="externalProvider.key === 'Google'" :icon="['fab', 'google']" />
+              </td>
+              <td>{{ $d(new Date(externalProvider.addedAt), 'medium') }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else v-t="'user.externalProviders.empty'" />
       </b-form>
     </validation-observer>
   </b-container>
@@ -94,6 +117,7 @@ import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import ToggleStatus from './ToggleStatus.vue'
 import UsernameField from './UsernameField.vue'
 import { createUser, updateUser } from '@/api/users'
+import { getQueryString } from '@/helpers/queryUtils'
 import { getRealm } from '@/api/realms'
 
 export default {
@@ -180,6 +204,9 @@ export default {
         payload.username = this.username
       }
       return payload
+    },
+    viewSessionsUrl() {
+      return '/sessions' + getQueryString({ realm: this.user.realm?.id ?? null, user: this.user.id })
     }
   },
   methods: {
