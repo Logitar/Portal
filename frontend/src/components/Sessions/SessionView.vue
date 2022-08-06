@@ -5,24 +5,24 @@
     <table class="table table-striped">
       <tbody>
         <tr>
-          <th scope="col" v-t="'user.session.user'" />
+          <th scope="row" v-t="'user.session.user'" />
           <td>
             <b-link :href="`/users/${session.user.id}`"><user-avatar :user="session.user" /> {{ session.user.fullName || session.user.username }}</b-link>
           </td>
         </tr>
         <tr>
-          <th scope="col" v-t="'user.session.persistent.label'" />
+          <th scope="row" v-t="'user.session.persistent.label'" />
           <td v-text="$t(session.isPersistent ? 'yes' : 'no')" />
         </tr>
         <tr>
-          <th scope="col" v-t="'user.session.signedOutAt'" />
+          <th scope="row" v-t="'user.session.signedOutAt'" />
           <td>
             <template v-if="session.signedOutAt">{{ $d(new Date(session.signedOutAt), 'medium') }}</template>
             <b-badge v-else-if="session.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
           </td>
         </tr>
         <tr v-if="session.ipAddress">
-          <th scope="col" v-t="'user.session.ipAddress'" />
+          <th scope="row" v-t="'user.session.ipAddress'" />
           <td v-text="session.ipAddress" />
         </tr>
       </tbody>

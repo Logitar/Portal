@@ -81,6 +81,25 @@
           <locale-select class="col" v-model="locale" />
           <picture-field class="col" validate v-model="picture" />
         </b-row>
+        <h3 v-t="'user.externalProviders.title'" />
+        <table class="table table-striped" v-if="user.externalProviders.length">
+          <thead>
+            <tr>
+              <th scope="col" v-t="'user.externalProviders.name'" />
+              <th scope="col" v-t="'user.externalProviders.addedAt'" />
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="externalProvider in user.externalProviders" :key="externalProvider.id">
+              <td>
+                {{ externalProvider.displayName || externalProvider.key }}
+                <font-awesome-icon v-if="externalProvider.key === 'Google'" :icon="['fab', 'google']" />
+              </td>
+              <td>{{ $d(new Date(externalProvider.addedAt), 'medium') }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else v-t="'user.externalProviders.empty'" />
       </b-form>
     </validation-observer>
   </b-container>

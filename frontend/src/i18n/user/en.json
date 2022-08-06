@@ -43,6 +43,12 @@
     "success": "The user has been enabled.",
     "title": "Enable user"
   },
+  "externalProviders": {
+    "addedAt": "Added on",
+    "empty": "This list is empty.",
+    "name": "Name",
+    "title": "External Providers"
+  },
   "firstName": {
     "label": "First Name",
     "placeholder": "Enter a first name"
