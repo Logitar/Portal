@@ -41,6 +41,10 @@
               <font-awesome-icon icon="id-card" />
               {{ $t('tokens.title') }}
             </b-nav-item>
+            <b-nav-item href="/sessions">
+              <font-awesome-icon icon="user-clock" />
+              {{ $t('user.session.title') }}
+            </b-nav-item>
           </template>
         </b-navbar-nav>
 

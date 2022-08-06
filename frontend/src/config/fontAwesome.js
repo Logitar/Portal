@@ -29,6 +29,7 @@ import {
   faUnlock,
   faUser,
   faUserAltSlash,
+  faUserClock,
   faUsers,
   faVial
 } from '@fortawesome/free-solid-svg-icons'
@@ -62,6 +63,7 @@ library.add(
   faTrashAlt,
   faUnlock,
   faUser,
+  faUserClock,
   faUserAltSlash,
   faUsers,
   faVial

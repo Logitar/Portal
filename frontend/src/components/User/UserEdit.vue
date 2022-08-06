@@ -3,7 +3,11 @@
     <h1 v-t="user ? 'user.editTitle' : 'user.newTitle'" />
     <template v-if="user">
       <status-detail :createdAt="new Date(user.createdAt)" :updatedAt="user.updatedAt ? new Date(user.updatedAt) : null" />
-      <p v-if="user.signedInAt">{{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}</p>
+      <p v-if="user.signedInAt">
+        {{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}
+        <br />
+        <b-link :href="viewSessionsUrl">{{ $t('user.session.view') }}</b-link>
+      </p>
       <p v-if="user.isDisabled" class="text-danger">{{ $t('user.disabledAt') }} {{ $d(new Date(user.disabledAt), 'medium') }}</p>
     </template>
     <validation-observer ref="form">
@@ -94,6 +98,7 @@ import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import ToggleStatus from './ToggleStatus.vue'
 import UsernameField from './UsernameField.vue'
 import { createUser, updateUser } from '@/api/users'
+import { getQueryString } from '@/helpers/queryUtils'
 import { getRealm } from '@/api/realms'
 
 export default {
@@ -180,6 +185,9 @@ export default {
         payload.username = this.username
       }
       return payload
+    },
+    viewSessionsUrl() {
+      return '/sessions' + getQueryString({ realm: this.user.realm?.id ?? null, user: this.user.id })
     }
   },
   methods: {

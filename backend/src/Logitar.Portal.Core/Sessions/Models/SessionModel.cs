@@ -7,10 +7,10 @@ namespace Logitar.Portal.Core.Sessions.Models
     public UserModel? User { get; set; }
 
     public string? RenewToken { get; set; }
-    public bool IsPersistent => RenewToken != null;
+    public bool IsPersistent { get; set; }
 
     public DateTime? SignedOutAt { get; set; }
-    public bool IsActive => !SignedOutAt.HasValue;
+    public bool IsActive { get; set; }
 
     public string? IpAddress { get; set; }
     public string? AdditionalInformation { get; set; }

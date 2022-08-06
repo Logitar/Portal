@@ -97,6 +97,33 @@
     "title": "Profile",
     "updated": "Your profile has been updated."
   },
+  "session": {
+    "active": {
+      "label": "Active",
+      "placeholder": "Select an option"
+    },
+    "confirm": "Do you really want to sign out the current session? You will be signed out of the application.",
+    "confirmAll": "Do you really want to sign out all your sessions? You will be signed out of the application and any other device using this application.",
+    "empty": "This list is empty.",
+    "ipAddress": "IP Address",
+    "persistent": {
+      "label": "Persistent",
+      "placeholder": "Select an option"
+    },
+    "signOut": "Sign out",
+    "signedOutAt": "Signed out on",
+    "sort": {
+      "options": {
+        "IpAddress": "IP Address",
+        "SignedOutAt": "Signed out on",
+        "UpdatedAt": "Updated on"
+      }
+    },
+    "success": "The session has been signed out.",
+    "title": "Sessions",
+    "user": "User",
+    "view": "View sessions"
+  },
   "signIn": {
     "accountIsDisabled": "Your account is disabled.",
     "failed": "Sign in failed!",

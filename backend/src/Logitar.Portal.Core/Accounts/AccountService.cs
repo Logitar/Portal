@@ -91,6 +91,17 @@ namespace Logitar.Portal.Core.Accounts
         ?? throw new InvalidOperationException($"The user 'Id={_userContext.Id}' could not be found.");
     }
 
+    public async Task<ListModel<SessionModel>> GetSessionsAsync(bool? isActive, bool? isPersistent,
+      SessionSort? sort, bool desc,
+      int? index, int? count,
+      CancellationToken cancellationToken)
+    {
+      return await _sessionService.GetAsync(isActive, isPersistent, realm: null, userId: _userContext.Id,
+        sort, desc,
+        index, count,
+        cancellationToken: cancellationToken);
+    }
+
     public async Task RecoverPasswordAsync(RecoverPasswordPayload payload, string realmId, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
@@ -191,7 +202,7 @@ namespace Logitar.Portal.Core.Accounts
       return await _sessionService.RenewAsync(session, payload.IpAddress, payload.AdditionalInformation, cancellationToken);
     }
 
-    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken = default)
+    public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realmId, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(payload);
 
@@ -258,6 +269,34 @@ namespace Logitar.Portal.Core.Accounts
 
       session.SignOut();
       await _sessionRepository.SaveAsync(session, cancellationToken);
+    }
+
+    public async Task SignOutAsync(Guid id, CancellationToken cancellationToken)
+    {
+      Session session = await _sessionQuerier.GetAsync(id, readOnly: false, cancellationToken)
+        ?? throw new EntityNotFoundException<Session>(id);
+
+      if (session.User?.Id != _userContext.Id)
+      {
+        throw new SessionNotBelongingToUserException(session, _userContext.Id);
+      }
+
+      session.SignOut();
+
+      await _sessionRepository.SaveAsync(session, cancellationToken);
+    }
+
+    public async Task SignOutAllAsync(CancellationToken cancellationToken)
+    {
+      PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(isActive: true, userId: _userContext.Id,
+        readOnly: false, cancellationToken: cancellationToken);
+
+      foreach (Session session in sessions)
+      {
+        session.SignOut();
+      }
+
+      await _sessionRepository.SaveAsync(sessions, cancellationToken);
     }
 
     private static void EnsureHasPassword(User user)
