@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Logitar.Portal.Core.Accounts;
+using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys.Models;
 using Logitar.Portal.Core.ApiKeys.Payloads;
 using Logitar.Portal.Core.Users;
@@ -11,6 +12,7 @@ namespace Logitar.Portal.Core.ApiKeys
   {
     private const int ApiKeySecretLength = 32;
 
+    private readonly IActorService _actorService;
     private readonly IMapper _mapper;
     private readonly IPasswordService _passwordService;
     private readonly IApiKeyQuerier _querier;
@@ -19,6 +21,7 @@ namespace Logitar.Portal.Core.ApiKeys
     private readonly IValidator<ApiKey> _validator;
 
     public ApiKeyService(
+      IActorService actorService,
       IMapper mapper,
       IPasswordService passwordService,
       IApiKeyQuerier querier,
@@ -27,6 +30,7 @@ namespace Logitar.Portal.Core.ApiKeys
       IValidator<ApiKey> validator
     )
     {
+      _actorService = actorService;
       _mapper = mapper;
       _passwordService = passwordService;
       _querier = querier;
@@ -60,6 +64,7 @@ namespace Logitar.Portal.Core.ApiKeys
       apiKey.Delete(_userContext.ActorId);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
+      await _actorService.SaveAsync(apiKey, cancellationToken);
 
       return _mapper.Map<ApiKeyModel>(apiKey);
     }
@@ -95,6 +100,7 @@ namespace Logitar.Portal.Core.ApiKeys
       _validator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
+      await _actorService.SaveAsync(apiKey, cancellationToken);
 
       return _mapper.Map<ApiKeyModel>(apiKey);
     }

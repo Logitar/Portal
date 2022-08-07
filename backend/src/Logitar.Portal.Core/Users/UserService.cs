@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users.Models;
@@ -11,6 +12,7 @@ namespace Logitar.Portal.Core.Users
   {
     private const string AllowedUsernameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 
+    private readonly IActorService _actorService;
     private readonly IMapper _mapper;
     private readonly IPasswordService _passwordService;
     private readonly IUserQuerier _querier;
@@ -22,6 +24,7 @@ namespace Logitar.Portal.Core.Users
     private readonly IValidator<User> _validator;
 
     public UserService(
+      IActorService actorService,
       IMapper mapper,
       IPasswordService passwordService,
       IUserQuerier querier,
@@ -33,6 +36,7 @@ namespace Logitar.Portal.Core.Users
       IValidator<User> validator
     )
     {
+      _actorService = actorService;
       _mapper = mapper;
       _passwordService = passwordService;
       _querier = querier;
@@ -113,6 +117,7 @@ namespace Logitar.Portal.Core.Users
       user.Delete(_userContext.ActorId);
 
       await _repository.SaveAsync(user, cancellationToken);
+      await _actorService.SaveAsync(user, cancellationToken);
 
       return _mapper.Map<UserModel>(user);
     }
@@ -205,6 +210,7 @@ namespace Logitar.Portal.Core.Users
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);
+      await _actorService.SaveAsync(user, cancellationToken);
 
       return _mapper.Map<UserModel>(user);
     }

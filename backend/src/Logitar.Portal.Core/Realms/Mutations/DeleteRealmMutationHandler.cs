@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
@@ -23,6 +24,8 @@ namespace Logitar.Portal.Core.Realms.Mutations
     private readonly IRepository<Template> _templateRepository;
     private readonly IRepository<User> _userRepository;
 
+    private readonly IActorService _actorService;
+
     private readonly IUserContext _userContext;
     
     public DeleteRealmMutationHandler(
@@ -37,6 +40,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       IRepository<Session> sessionRepository,
       IRepository<Template> templateRepository,
       IRepository<User> userRepository,
+      IActorService actorService,
       IUserContext userContext
     )
     {
@@ -51,6 +55,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       _sessionRepository = sessionRepository;
       _templateRepository = templateRepository;
       _userRepository = userRepository;
+      _actorService = actorService;
       _userContext = userContext;
     }
 
@@ -110,6 +115,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
         user.Delete(_userContext.ActorId);
       }
       await _userRepository.SaveAsync(users, cancellationToken);
+      await _actorService.SaveAsync(users, cancellationToken);
     }
   }
 }

@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Senders;
@@ -9,6 +8,8 @@ using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Logitar.Portal.Infrastructure
 {
@@ -22,6 +23,7 @@ namespace Logitar.Portal.Infrastructure
       _configuration = configuration;
     }
 
+    public DbSet<Actor> Actors { get; private set; } = null!;
     public DbSet<ApiKey> ApiKeys { get; private set; } = null!;
     public DbSet<Event> Events { get; private set; } = null!;
     public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
