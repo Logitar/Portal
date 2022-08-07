@@ -168,20 +168,20 @@ namespace Logitar.Portal.Core.Emails.Messages
       CancellationToken cancellationToken
     )
     {
-      var message = new Message(body, recipients, sender, template, _userContext.ActorId, realm, variables, isDemo);
+      var message = new Message(body, recipients, sender, template, _userContext.Actor.Id, realm, variables, isDemo);
 
       try
       {
         SendMessageResult result = await handler.SendAsync(message, cancellationToken);
-        message.Succeed(result, _userContext.ActorId);
+        message.Succeed(result, _userContext.Actor.Id);
       }
       catch (ErrorException exception)
       {
-        message.Fail(exception.Error, _userContext.ActorId);
+        message.Fail(exception.Error, _userContext.Actor.Id);
       }
       catch (Exception exception)
       {
-        message.Fail(new Error(exception), _userContext.ActorId);
+        message.Fail(new Error(exception), _userContext.Actor.Id);
       }
 
       return message;

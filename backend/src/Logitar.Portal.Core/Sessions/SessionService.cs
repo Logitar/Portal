@@ -96,7 +96,7 @@ namespace Logitar.Portal.Core.Sessions
       
       foreach (Session session in sessions)
       {
-        session.SignOut(_userContext.ActorId);
+        session.SignOut(_userContext.Actor.Id);
       }
 
       await _repository.SaveAsync(sessions, cancellationToken);

@@ -49,7 +49,7 @@ namespace Logitar.Portal.Core.Realms
         throw new AliasAlreadyUsedException(payload.Alias, nameof(payload.Alias));
       }
 
-      var realm = new Realm(payload, _userContext.ActorId);
+      var realm = new Realm(payload, _userContext.Actor.Id);
       await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 
@@ -88,7 +88,7 @@ namespace Logitar.Portal.Core.Realms
       Realm realm = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(id);
 
-      realm.Update(payload, _userContext.ActorId);
+      realm.Update(payload, _userContext.Actor.Id);
       await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 

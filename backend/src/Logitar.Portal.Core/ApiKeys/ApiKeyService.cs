@@ -45,7 +45,7 @@ namespace Logitar.Portal.Core.ApiKeys
 
       string keyHash = _passwordService.GenerateAndHash(ApiKeySecretLength, out byte[] secretBytes);
 
-      var apiKey = new ApiKey(keyHash, payload, _userContext.ActorId);
+      var apiKey = new ApiKey(keyHash, payload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
@@ -61,7 +61,7 @@ namespace Logitar.Portal.Core.ApiKeys
       ApiKey apiKey = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<ApiKey>(id);
 
-      apiKey.Delete(_userContext.ActorId);
+      apiKey.Delete(_userContext.Actor.Id);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
       await _actorService.SaveAsync(apiKey, cancellationToken);
@@ -96,7 +96,7 @@ namespace Logitar.Portal.Core.ApiKeys
       ApiKey apiKey = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<ApiKey>(id);
 
-      apiKey.Update(payload, _userContext.ActorId);
+      apiKey.Update(payload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);

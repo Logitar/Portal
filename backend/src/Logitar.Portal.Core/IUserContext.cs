@@ -1,8 +1,11 @@
-﻿namespace Logitar.Portal.Core
+﻿using Logitar.Portal.Core.Actors;
+
+namespace Logitar.Portal.Core
 {
   public interface IUserContext
   {
-    Guid ActorId { get; }
+    Actor Actor { get; }
+
     Guid Id { get; }
     Guid SessionId { get; }
 

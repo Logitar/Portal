@@ -48,7 +48,7 @@ namespace Logitar.Portal.Core.Emails.Templates
         throw new KeyAlreadyUsedException(payload.Key, nameof(payload.Key));
       }
 
-      var template = new Template(payload, _userContext.ActorId, realm);
+      var template = new Template(payload, _userContext.Actor.Id, realm);
       _validator.ValidateAndThrow(template);
 
       await _repository.SaveAsync(template, cancellationToken);
@@ -61,7 +61,7 @@ namespace Logitar.Portal.Core.Emails.Templates
       Template template = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Template>(id);
 
-      template.Delete(_userContext.ActorId);
+      template.Delete(_userContext.Actor.Id);
 
       await _repository.SaveAsync(template, cancellationToken);
 
@@ -95,7 +95,7 @@ namespace Logitar.Portal.Core.Emails.Templates
       Template template = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Template>(id);
 
-      template.Update(payload, _userContext.ActorId);
+      template.Update(payload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(template);
 
       await _repository.SaveAsync(template, cancellationToken);

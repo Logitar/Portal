@@ -78,14 +78,14 @@ namespace Logitar.Portal.Core.Users
         securePayload.PasswordHash = _passwordService.Hash(payload.Password);
       }
 
-      var user = new User(securePayload, _userContext.ActorId, realm);
+      var user = new User(securePayload, _userContext.Actor.Id, realm);
       if (payload.ConfirmEmail)
       {
-        user.ConfirmEmail(_userContext.ActorId);
+        user.ConfirmEmail(_userContext.Actor.Id);
       }
       if (payload.ConfirmPhoneNumber)
       {
-        user.ConfirmPhoneNumber(_userContext.ActorId);
+        user.ConfirmPhoneNumber(_userContext.Actor.Id);
       }
 
       var context = ValidationContext<User>.CreateWithOptions(user, options => options.ThrowOnFailures());
@@ -102,7 +102,7 @@ namespace Logitar.Portal.Core.Users
       User user = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<User>(id);
 
-      if (user.Id == _userContext.ActorId)
+      if (user.Id == _userContext.Actor.Id)
       {
         throw new UserCannotDeleteHerselfException(user);
       }
@@ -110,11 +110,11 @@ namespace Logitar.Portal.Core.Users
       PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
       foreach (Session session in sessions)
       {
-        session.Delete(_userContext.ActorId);
+        session.Delete(_userContext.Actor.Id);
       }
       await _sessionRepository.SaveAsync(sessions, cancellationToken);
 
-      user.Delete(_userContext.ActorId);
+      user.Delete(_userContext.Actor.Id);
 
       await _repository.SaveAsync(user, cancellationToken);
       await _actorService.SaveAsync(user, cancellationToken);
@@ -131,12 +131,12 @@ namespace Logitar.Portal.Core.Users
       {
         throw new UserAlreadyDisabledException(user);
       }
-      else if (user.Id == _userContext.ActorId)
+      else if (user.Id == _userContext.Actor.Id)
       {
         throw new UserCannotDisableHerselfException(user);
       }
 
-      user.Disable(_userContext.ActorId);
+      user.Disable(_userContext.Actor.Id);
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);
@@ -154,7 +154,7 @@ namespace Logitar.Portal.Core.Users
         throw new UserNotDisabledException(user);
       }
 
-      user.Enable(_userContext.ActorId);
+      user.Enable(_userContext.Actor.Id);
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);
@@ -206,7 +206,7 @@ namespace Logitar.Portal.Core.Users
         securePayload.PasswordHash = _passwordService.Hash(payload.Password);
       }
 
-      user.Update(securePayload, _userContext.ActorId);
+      user.Update(securePayload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(user);
 
       await _repository.SaveAsync(user, cancellationToken);

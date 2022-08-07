@@ -80,10 +80,10 @@ namespace Logitar.Portal.Core.Accounts
               Username = googlePayload.Email
             };
 
-            user = new User(userPayload, _userContext.ActorId, realm);
+            user = new User(userPayload, _userContext.Actor.Id, realm);
             if (userPayload.ConfirmEmail)
             {
-              user.ConfirmEmail(_userContext.ActorId);
+              user.ConfirmEmail(_userContext.Actor.Id);
             }
 
             var context = ValidationContext<User>.CreateWithOptions(user, options => options.ThrowOnFailures());
@@ -94,7 +94,7 @@ namespace Logitar.Portal.Core.Accounts
           }
         }
 
-        user.AddExternalProvider(ExternalProviders.Google, googlePayload.Subject, _userContext.ActorId, ExternalProviders.Google);
+        user.AddExternalProvider(ExternalProviders.Google, googlePayload.Subject, _userContext.Actor.Id, ExternalProviders.Google);
 
         await _userRepository.SaveAsync(user, cancellationToken);
       }

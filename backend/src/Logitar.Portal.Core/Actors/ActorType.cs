@@ -2,7 +2,8 @@
 {
   public enum ActorType
   {
-    User = 0,
-    ApiKey = 1
+    System = 0,
+    User = 1,
+    ApiKey = 2
   }
 }

@@ -45,7 +45,7 @@ namespace Logitar.Portal.Core.Emails.Senders
 
       bool isDefault = await _querier.GetDefaultAsync(realm, readOnly: true, cancellationToken) == null;
 
-      var sender = new Sender(payload, _userContext.ActorId, isDefault, realm);
+      var sender = new Sender(payload, _userContext.Actor.Id, isDefault, realm);
       _validator.ValidateAndThrow(sender);
 
       await _repository.SaveAsync(sender, cancellationToken);
@@ -63,11 +63,11 @@ namespace Logitar.Portal.Core.Emails.Senders
         PagedList<Sender> senders = await _querier.GetPagedAsync(realm: sender.Realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken);
         if (senders.Count > 1)
         {
-          throw new CannotDeleteDefaultSenderException(id, _userContext.ActorId);
+          throw new CannotDeleteDefaultSenderException(id, _userContext.Actor.Id);
         }
       }
 
-      sender.Delete(_userContext.ActorId);
+      sender.Delete(_userContext.Actor.Id);
 
       await _repository.SaveAsync(sender, cancellationToken);
 
@@ -118,8 +118,8 @@ namespace Logitar.Portal.Core.Emails.Senders
 
       if (!sender.Equals(@default))
       {
-        @default.SetDefault(_userContext.ActorId, isDefault: false);
-        sender.SetDefault(_userContext.ActorId, isDefault: true);
+        @default.SetDefault(_userContext.Actor.Id, isDefault: false);
+        sender.SetDefault(_userContext.Actor.Id, isDefault: true);
 
         await _repository.SaveAsync(new[] { @default, sender }, cancellationToken);
       }
@@ -134,7 +134,7 @@ namespace Logitar.Portal.Core.Emails.Senders
       Sender sender = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Sender>(id);
 
-      sender.Update(payload, _userContext.ActorId);
+      sender.Update(payload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(sender);
 
       await _repository.SaveAsync(sender, cancellationToken);

@@ -32,6 +32,12 @@ namespace Logitar.Portal.Core.Actors
     {
     }
 
+    public static Actor System => new()
+    {
+      Type = ActorType.System,
+      Name = nameof(System)
+    };
+
     public Guid Id { get; private set; }
     public int Sid { get; private set; }
 

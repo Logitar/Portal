@@ -70,7 +70,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       await DeleteSendersAsync(realm, cancellationToken);
       await DeleteTemplatesAsync(realm, cancellationToken);
 
-      realm.Delete(_userContext.ActorId);
+      realm.Delete(_userContext.Actor.Id);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
 
@@ -82,7 +82,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Sender> senders = await _senderQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Sender sender in senders)
       {
-        sender.Delete(_userContext.ActorId);
+        sender.Delete(_userContext.Actor.Id);
       }
       await _senderRepository.SaveAsync(senders, cancellationToken);
     }
@@ -92,7 +92,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Session session in sessions)
       {
-        session.Delete(_userContext.ActorId);
+        session.Delete(_userContext.Actor.Id);
       }
       await _sessionRepository.SaveAsync(sessions, cancellationToken);
     }
@@ -102,7 +102,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Template> templates = await _templateQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Template template in templates)
       {
-        template.Delete(_userContext.ActorId);
+        template.Delete(_userContext.Actor.Id);
       }
       await _templateRepository.SaveAsync(templates, cancellationToken);
     }
@@ -112,7 +112,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<User> users = await _userQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (User user in users)
       {
-        user.Delete(_userContext.ActorId);
+        user.Delete(_userContext.Actor.Id);
       }
       await _userRepository.SaveAsync(users, cancellationToken);
       await _actorService.SaveAsync(users, cancellationToken);
