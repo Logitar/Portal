@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Messages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
@@ -80,8 +80,8 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          MessageSort.SentAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
           MessageSort.Subject => desc ? query.OrderByDescending(x => x.Subject) : query.OrderBy(x => x.Subject),
+          MessageSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
           _ => throw new ArgumentException($"The message sort '{sort}' is not valid.", nameof(sort)),
         };
       }

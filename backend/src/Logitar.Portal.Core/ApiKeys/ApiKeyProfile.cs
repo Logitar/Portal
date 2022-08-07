@@ -10,7 +10,7 @@ namespace Logitar.Portal.Core.ApiKeys
       CreateMap<ApiKey, ApiKeyModel>()
         .IncludeBase<Aggregate, AggregateModel>();
       CreateMap<ApiKeyModel, ApiKeySummary>()
-        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
+        .IncludeBase<AggregateModel, AggregateSummary>();
     }
   }
 }

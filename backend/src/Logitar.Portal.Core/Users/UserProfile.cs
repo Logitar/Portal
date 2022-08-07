@@ -12,7 +12,7 @@ namespace Logitar.Portal.Core.Users
       CreateMap<User, UserModel>()
         .IncludeBase<Aggregate, AggregateModel>();
       CreateMap<UserModel, UserSummary>()
-        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
+        .IncludeBase<AggregateModel, AggregateSummary>();
 
       CreateMap<PasswordSettings, PasswordSettingsModel>();
 

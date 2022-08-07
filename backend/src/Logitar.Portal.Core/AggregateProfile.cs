@@ -7,6 +7,9 @@ namespace Logitar.Portal.Core
     public AggregateProfile()
     {
       CreateMap<Aggregate, AggregateModel>();
+      CreateMap<AggregateModel, AggregateSummary>()
+        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt))
+        .ForMember(x => x.UpdatedBy, x => x.MapFrom(y => y.UpdatedBy ?? y.CreatedBy));
     }
   }
 }
