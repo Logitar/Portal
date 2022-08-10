@@ -23,6 +23,7 @@ namespace Logitar.Portal.Core
       return services
         .AddAutoMapper(assembly)
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
+        .AddScoped<IMappingService, MappingService>()
         .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
         .AddScoped<Realms.Mutations.DeleteRealmMutationHandler>()
         .AddDomainServices();

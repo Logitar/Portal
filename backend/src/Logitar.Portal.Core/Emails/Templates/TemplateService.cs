@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Logitar.Portal.Core.Emails.Templates.Models;
 using Logitar.Portal.Core.Emails.Templates.Payloads;
 using Logitar.Portal.Core.Realms;
@@ -8,7 +7,7 @@ namespace Logitar.Portal.Core.Emails.Templates
 {
   internal class TemplateService : ITemplateService
   {
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly ITemplateQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Template> _repository;
@@ -16,7 +15,7 @@ namespace Logitar.Portal.Core.Emails.Templates
     private readonly IValidator<Template> _validator;
 
     public TemplateService(
-      IMapper mapper,
+      IMappingService mappingService,
       ITemplateQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<Template> repository,
@@ -24,7 +23,7 @@ namespace Logitar.Portal.Core.Emails.Templates
       IValidator<Template> validator
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
@@ -53,7 +52,7 @@ namespace Logitar.Portal.Core.Emails.Templates
 
       await _repository.SaveAsync(template, cancellationToken);
 
-      return _mapper.Map<TemplateModel>(template);
+      return await _mappingService.MapAsync<TemplateModel>(template, cancellationToken);
     }
 
     public async Task<TemplateModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -65,14 +64,18 @@ namespace Logitar.Portal.Core.Emails.Templates
 
       await _repository.SaveAsync(template, cancellationToken);
 
-      return _mapper.Map<TemplateModel>(template);
+      return await _mappingService.MapAsync<TemplateModel>(template, cancellationToken);
     }
 
     public async Task<TemplateModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       Template? template = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (template == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<TemplateModel>(template);
+      return await _mappingService.MapAsync<TemplateModel>(template, cancellationToken);
     }
 
     public async Task<ListModel<TemplateModel>> GetAsync(string? realm, string? search,
@@ -85,7 +88,7 @@ namespace Logitar.Portal.Core.Emails.Templates
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<TemplateModel>.From(templates, _mapper);
+      return await _mappingService.MapAsync<Template, TemplateModel>(templates, cancellationToken);
     }
 
     public async Task<TemplateModel> UpdateAsync(Guid id, UpdateTemplatePayload payload, CancellationToken cancellationToken)
@@ -100,7 +103,7 @@ namespace Logitar.Portal.Core.Emails.Templates
 
       await _repository.SaveAsync(template, cancellationToken);
 
-      return _mapper.Map<TemplateModel>(template);
+      return await _mappingService.MapAsync<TemplateModel>(template, cancellationToken);
     }
   }
 }

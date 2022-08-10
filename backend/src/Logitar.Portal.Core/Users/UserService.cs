@@ -14,6 +14,7 @@ namespace Logitar.Portal.Core.Users
 
     private readonly IActorService _actorService;
     private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IPasswordService _passwordService;
     private readonly IUserQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
@@ -26,6 +27,7 @@ namespace Logitar.Portal.Core.Users
     public UserService(
       IActorService actorService,
       IMapper mapper,
+      IMappingService mappingService,
       IPasswordService passwordService,
       IUserQuerier querier,
       IRealmQuerier realmQuerier,
@@ -38,6 +40,7 @@ namespace Logitar.Portal.Core.Users
     {
       _actorService = actorService;
       _mapper = mapper;
+      _mappingService = mappingService;
       _passwordService = passwordService;
       _querier = querier;
       _realmQuerier = realmQuerier;
@@ -94,7 +97,7 @@ namespace Logitar.Portal.Core.Users
 
       await _repository.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<UserModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -119,7 +122,7 @@ namespace Logitar.Portal.Core.Users
       await _repository.SaveAsync(user, cancellationToken);
       await _actorService.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<UserModel> DisableAsync(Guid id, CancellationToken cancellationToken = default)
@@ -141,7 +144,7 @@ namespace Logitar.Portal.Core.Users
 
       await _repository.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<UserModel> EnableAsync(Guid id, CancellationToken cancellationToken = default)
@@ -159,14 +162,18 @@ namespace Logitar.Portal.Core.Users
 
       await _repository.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<UserModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       User? user = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (user == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<ListModel<UserModel>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
@@ -179,7 +186,7 @@ namespace Logitar.Portal.Core.Users
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<UserModel>.From(users, _mapper);
+      return await _mappingService.MapAsync<User, UserModel>(users, cancellationToken);
     }
 
     public async Task<UserModel> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken)
@@ -212,7 +219,7 @@ namespace Logitar.Portal.Core.Users
       await _repository.SaveAsync(user, cancellationToken);
       await _actorService.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
   }
 }

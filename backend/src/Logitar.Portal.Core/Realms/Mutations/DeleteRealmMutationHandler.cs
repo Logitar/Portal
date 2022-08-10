@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Logitar.Portal.Core.Actors;
+﻿using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
@@ -10,7 +9,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
 {
   internal class DeleteRealmMutationHandler
   {
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
 
     private readonly IRealmQuerier _realmQuerier;
     private readonly ISenderQuerier _senderQuerier;
@@ -29,7 +28,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
     private readonly IUserContext _userContext;
     
     public DeleteRealmMutationHandler(
-      IMapper mapper,
+      IMappingService mappingService,
       IRealmQuerier realmQuerier,
       ISenderQuerier senderQuerier,
       ISessionQuerier sessionQuerier,
@@ -44,7 +43,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       IUserContext userContext
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _realmQuerier = realmQuerier;
       _senderQuerier = senderQuerier;
       _sessionQuerier = sessionQuerier;
@@ -74,7 +73,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
 
-      return _mapper.Map<RealmModel>(realm);
+      return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
     private async Task DeleteSendersAsync(Realm realm, CancellationToken cancellationToken)

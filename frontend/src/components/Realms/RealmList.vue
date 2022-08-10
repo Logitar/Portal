@@ -16,7 +16,7 @@
           <tr>
             <th scope="col" v-t="'realms.alias.label'" />
             <th scope="col" v-t="'name.label'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -26,7 +26,7 @@
               <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
             </td>
             <td v-text="realm.name" />
-            <td>{{ $d(new Date(realm.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="realm.updatedBy" :date="realm.updatedAt" />
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal

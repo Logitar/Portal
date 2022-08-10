@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Core.Configurations;
+﻿using Logitar.Portal.Core.Configurations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers
 {

@@ -14,6 +14,21 @@ namespace Logitar.Portal.Infrastructure.Actors
       _dbContext = dbContext;
     }
 
+    public async Task<Actor?> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return await _dbContext.Actors.AsNoTracking()
+        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Actor>> GetAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+      ArgumentNullException.ThrowIfNull(ids);
+
+      return await _dbContext.Actors.AsNoTracking()
+        .Where(x => ids.Contains(x.Id))
+        .ToArrayAsync(cancellationToken);
+    }
+
     public async Task SaveAsync(ApiKey apiKey, CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(apiKey);

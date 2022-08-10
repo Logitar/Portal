@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <h1 v-t="template ? 'templates.editTitle' : 'templates.newTitle'" />
-    <status-detail v-if="template" :createdAt="new Date(template.createdAt)" :updatedAt="template.updatedAt ? new Date(template.updatedAt) : null" />
+    <status-detail v-if="template" :model="template" />
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div class="my-2">

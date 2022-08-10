@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys.Models;
@@ -13,7 +12,7 @@ namespace Logitar.Portal.Core.ApiKeys
     private const int ApiKeySecretLength = 32;
 
     private readonly IActorService _actorService;
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IPasswordService _passwordService;
     private readonly IApiKeyQuerier _querier;
     private readonly IRepository<ApiKey> _repository;
@@ -22,7 +21,7 @@ namespace Logitar.Portal.Core.ApiKeys
 
     public ApiKeyService(
       IActorService actorService,
-      IMapper mapper,
+      IMappingService mappingService,
       IPasswordService passwordService,
       IApiKeyQuerier querier,
       IRepository<ApiKey> repository,
@@ -31,7 +30,7 @@ namespace Logitar.Portal.Core.ApiKeys
     )
     {
       _actorService = actorService;
-      _mapper = mapper;
+      _mappingService = mappingService;
       _passwordService = passwordService;
       _querier = querier;
       _repository = repository;
@@ -50,7 +49,7 @@ namespace Logitar.Portal.Core.ApiKeys
 
       await _repository.SaveAsync(apiKey, cancellationToken);
 
-      var model = _mapper.Map<ApiKeyModel>(apiKey);
+      var model = await _mappingService.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
       model.XApiKey = new SecureToken(apiKey.Id, secretBytes).ToString();
 
       return model;
@@ -66,14 +65,18 @@ namespace Logitar.Portal.Core.ApiKeys
       await _repository.SaveAsync(apiKey, cancellationToken);
       await _actorService.SaveAsync(apiKey, cancellationToken);
 
-      return _mapper.Map<ApiKeyModel>(apiKey);
+      return await _mappingService.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
     }
 
     public async Task<ApiKeyModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       ApiKey? apiKey = await _querier.GetAsync(id, readOnly: false, cancellationToken);
+      if (apiKey == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<ApiKeyModel>(apiKey);
+      return await _mappingService.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
     }
 
     public async Task<ListModel<ApiKeyModel>> GetAsync(bool? isExpired, string? search,
@@ -86,7 +89,7 @@ namespace Logitar.Portal.Core.ApiKeys
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<ApiKeyModel>.From(apiKeys, _mapper);
+      return await _mappingService.MapAsync<ApiKey, ApiKeyModel>(apiKeys, cancellationToken);
     }
 
     public async Task<ApiKeyModel> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
@@ -102,7 +105,7 @@ namespace Logitar.Portal.Core.ApiKeys
       await _repository.SaveAsync(apiKey, cancellationToken);
       await _actorService.SaveAsync(apiKey, cancellationToken);
 
-      return _mapper.Map<ApiKeyModel>(apiKey);
+      return await _mappingService.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
     }
   }
 }

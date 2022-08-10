@@ -13,7 +13,7 @@
       {{ $t('apiKeys.string.warning') }}
     </b-alert>
     <template v-if="apiKey">
-      <status-detail :createdAt="new Date(apiKey.createdAt)" :updatedAt="apiKey.updatedAt ? new Date(apiKey.updatedAt) : null" />
+      <status-detail :model="apiKey" />
       <p v-if="apiKey.expiresAt" :class="{ 'text-danger': apiKey.isExpired }">
         <template v-if="apiKey.isExpired">{{ $t('apiKeys.expiredAt') }}</template>
         <template v-else>{{ $t('apiKeys.expiresAt') }}</template>

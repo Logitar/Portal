@@ -1,6 +1,6 @@
 <template>
   <b-tab :title="$t('messages.status.label')">
-    <status-detail :createdAt="new Date(message.createdAt)" :updatedAt="message.updatedAt ? new Date(message.updatedAt) : null" />
+    <status-detail :model="message" />
     <p>
       <template v-if="realm">
         {{ $t('messages.realmFormat') }}

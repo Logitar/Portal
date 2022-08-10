@@ -48,7 +48,7 @@ namespace Logitar.Portal.Web.Controllers.Api
         index, count,
         cancellationToken);
 
-      return Ok(ListModel<RealmSummary>.From(realms, _mapper));
+      return Ok(realms.To<RealmModel, RealmSummary>(_mapper));
     }
 
     [HttpGet("{id}")]

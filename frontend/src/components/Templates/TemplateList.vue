@@ -18,7 +18,7 @@
             <th scope="col" v-t="'templates.key.label'" />
             <th scope="col" v-t="'templates.displayName.label'" />
             <th scope="col" v-t="'templates.contentType.label'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -29,7 +29,7 @@
             </td>
             <td v-text="template.displayName || '—'" />
             <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
-            <td>{{ $d(new Date(template.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="template.updatedBy" :date="template.updatedAt" />
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
               <delete-modal

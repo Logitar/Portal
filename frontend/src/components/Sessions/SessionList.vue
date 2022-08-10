@@ -36,7 +36,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" v-t="'user.session.user'" />
             <th scope="col" v-t="'user.session.signedOutAt'" />
             <th scope="col" v-t="'user.session.persistent.label'" />
@@ -50,10 +50,10 @@
               <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedAt), 'medium') }}</b-link>
             </td>
             <td>
-              <b-link :href="`/users/${sessionItem.user.id}`" target="_blank">
-                <user-avatar :user="sessionItem.user" /> {{ sessionItem.user.fullName || sessionItem.user.username }}
-                <font-awesome-icon icon="external-link-alt" />
-              </b-link>
+              <b-link :href="`/users/${sessionItem.user.id}`" target="_blank" class="mx-1"><user-avatar :user="sessionItem.user" /></b-link>
+              <b-link :href="`/users/${sessionItem.user.id}`" target="_blank"
+                >{{ sessionItem.user.fullName || sessionItem.user.username }} <font-awesome-icon icon="external-link-alt"
+              /></b-link>
             </td>
             <td>
               <template v-if="sessionItem.signedOutAt">{{ $d(new Date(sessionItem.signedOutAt), 'medium') }}</template>

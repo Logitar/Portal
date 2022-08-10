@@ -42,14 +42,15 @@
             <th scope="col" v-t="'user.phone.label'" />
             <th scope="col" v-t="'user.passwordChangedAt'" />
             <th scope="col" v-t="'user.signedInAt'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.id">
             <td>
-              <b-link :href="`/users/${user.id}`"><user-avatar :user="user" /> {{ user.username }}</b-link>
+              <b-link :href="`/users/${user.id}`" class="mx-1"><user-avatar :user="user" /></b-link>
+              <b-link :href="`/users/${user.id}`">{{ user.username }}</b-link>
             </td>
             <td v-text="user.fullName || '—'" />
             <td>
@@ -62,7 +63,7 @@
             </td>
             <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
-            <td>{{ $d(new Date(user.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="user.updatedBy" :date="user.updatedAt" />
             <td>
               <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
               <icon-button

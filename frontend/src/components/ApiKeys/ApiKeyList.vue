@@ -17,7 +17,7 @@
           <tr>
             <th scope="col" v-t="'name.label'" />
             <th scope="col" v-t="'apiKeys.expiresAt'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -30,7 +30,7 @@
               {{ apiKey.expiresAt ? $d(new Date(apiKey.expiresAt), 'medium') : $t('apiKeys.neverExpires') }}
               <b-badge v-if="apiKey.isExpired" variant="danger">{{ $t('apiKeys.expired') }}</b-badge>
             </td>
-            <td>{{ $d(new Date(apiKey.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="apiKey.updatedBy" :date="apiKey.updatedAt" />
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${apiKey.id}`" />
               <delete-modal

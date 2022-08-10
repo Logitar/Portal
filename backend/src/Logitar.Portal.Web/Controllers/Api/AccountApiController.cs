@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Accounts;
+﻿using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Sessions.Models;
 using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;
 using Microsoft.AspNetCore.Authorization;

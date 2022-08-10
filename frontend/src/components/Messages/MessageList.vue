@@ -52,7 +52,7 @@
             <td>
               <status-badge :message="message" />
             </td>
-            <td>{{ $d(new Date(message.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="message.updatedBy" :date="message.updatedAt" />
           </tr>
         </tbody>
       </table>

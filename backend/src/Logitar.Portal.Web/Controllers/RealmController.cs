@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Core.Realms;
+﻿using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Realms.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers
 {

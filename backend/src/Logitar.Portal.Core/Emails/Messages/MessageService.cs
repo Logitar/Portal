@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
 using Logitar.Portal.Core.Emails.Senders;
@@ -12,7 +11,7 @@ namespace Logitar.Portal.Core.Emails.Messages
   internal class MessageService : IMessageService
   {
     private readonly IMessageHandlerFactory _handlerFactory;
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IMessageQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Message> _repository;
@@ -26,7 +25,7 @@ namespace Logitar.Portal.Core.Emails.Messages
 
     public MessageService(
       IMessageHandlerFactory handlerFactory,
-      IMapper mapper,
+      IMappingService mapper,
       IMessageQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<Message> repository,
@@ -40,7 +39,7 @@ namespace Logitar.Portal.Core.Emails.Messages
     )
     {
       _handlerFactory = handlerFactory;
-      _mapper = mapper;
+      _mappingService = mapper;
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
@@ -56,8 +55,12 @@ namespace Logitar.Portal.Core.Emails.Messages
     public async Task<MessageModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       Message? message = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (message == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<MessageModel>(message);
+      return await _mappingService.MapAsync<MessageModel>(message, cancellationToken);
     }
 
     public async Task<ListModel<MessageModel>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
@@ -70,7 +73,7 @@ namespace Logitar.Portal.Core.Emails.Messages
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<MessageModel>.From(messages, _mapper);
+      return await _mappingService.MapAsync<Message, MessageModel>(messages, cancellationToken);
     }
 
     public async Task<SentMessagesModel> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)
@@ -154,7 +157,7 @@ namespace Logitar.Portal.Core.Emails.Messages
 
       await _repository.SaveAsync(message, cancellationToken);
 
-      return _mapper.Map<MessageModel>(message);
+      return await _mappingService.MapAsync<MessageModel>(message, cancellationToken);
     }
 
     private async Task<Message> CreateAndSendAsync(string body,
