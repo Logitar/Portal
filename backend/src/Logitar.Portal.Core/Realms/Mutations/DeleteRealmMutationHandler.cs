@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
@@ -9,7 +9,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
 {
   internal class DeleteRealmMutationHandler
   {
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
 
     private readonly IRealmQuerier _realmQuerier;
     private readonly ISenderQuerier _senderQuerier;
@@ -23,10 +23,12 @@ namespace Logitar.Portal.Core.Realms.Mutations
     private readonly IRepository<Template> _templateRepository;
     private readonly IRepository<User> _userRepository;
 
+    private readonly IActorService _actorService;
+
     private readonly IUserContext _userContext;
     
     public DeleteRealmMutationHandler(
-      IMapper mapper,
+      IMappingService mappingService,
       IRealmQuerier realmQuerier,
       ISenderQuerier senderQuerier,
       ISessionQuerier sessionQuerier,
@@ -37,10 +39,11 @@ namespace Logitar.Portal.Core.Realms.Mutations
       IRepository<Session> sessionRepository,
       IRepository<Template> templateRepository,
       IRepository<User> userRepository,
+      IActorService actorService,
       IUserContext userContext
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _realmQuerier = realmQuerier;
       _senderQuerier = senderQuerier;
       _sessionQuerier = sessionQuerier;
@@ -51,6 +54,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       _sessionRepository = sessionRepository;
       _templateRepository = templateRepository;
       _userRepository = userRepository;
+      _actorService = actorService;
       _userContext = userContext;
     }
 
@@ -65,11 +69,11 @@ namespace Logitar.Portal.Core.Realms.Mutations
       await DeleteSendersAsync(realm, cancellationToken);
       await DeleteTemplatesAsync(realm, cancellationToken);
 
-      realm.Delete(_userContext.ActorId);
+      realm.Delete(_userContext.Actor.Id);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
 
-      return _mapper.Map<RealmModel>(realm);
+      return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
     private async Task DeleteSendersAsync(Realm realm, CancellationToken cancellationToken)
@@ -77,7 +81,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Sender> senders = await _senderQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Sender sender in senders)
       {
-        sender.Delete(_userContext.ActorId);
+        sender.Delete(_userContext.Actor.Id);
       }
       await _senderRepository.SaveAsync(senders, cancellationToken);
     }
@@ -87,7 +91,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Session session in sessions)
       {
-        session.Delete(_userContext.ActorId);
+        session.Delete(_userContext.Actor.Id);
       }
       await _sessionRepository.SaveAsync(sessions, cancellationToken);
     }
@@ -97,7 +101,7 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<Template> templates = await _templateQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (Template template in templates)
       {
-        template.Delete(_userContext.ActorId);
+        template.Delete(_userContext.Actor.Id);
       }
       await _templateRepository.SaveAsync(templates, cancellationToken);
     }
@@ -107,9 +111,10 @@ namespace Logitar.Portal.Core.Realms.Mutations
       PagedList<User> users = await _userQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
       foreach (User user in users)
       {
-        user.Delete(_userContext.ActorId);
+        user.Delete(_userContext.Actor.Id);
       }
       await _userRepository.SaveAsync(users, cancellationToken);
+      await _actorService.SaveAsync(users, cancellationToken);
     }
   }
 }

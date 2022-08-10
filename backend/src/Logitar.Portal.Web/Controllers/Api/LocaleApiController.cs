@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Logitar.Portal.Web.Models.Api.Culture;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Web.Models.Api.Culture;
 using System.Globalization;
 
 namespace Logitar.Portal.Web.Controllers.Api

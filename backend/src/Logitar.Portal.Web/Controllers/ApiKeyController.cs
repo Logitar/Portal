@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Logitar.Portal.Core.ApiKeys;
+﻿using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.ApiKeys.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers
 {

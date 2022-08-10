@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
@@ -11,7 +10,7 @@ namespace Logitar.Portal.Core.Realms
   internal class RealmService : IRealmService
   {
     private readonly DeleteRealmMutationHandler _deleteRealmMutationHandler;
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IRealmQuerier _querier;
     private readonly IRepository<Realm> _repository;
     private readonly ISenderQuerier _senderQuerier;
@@ -21,7 +20,7 @@ namespace Logitar.Portal.Core.Realms
 
     public RealmService(
       DeleteRealmMutationHandler deleteRealmMutationHandler,
-      IMapper mapper,
+      IMappingService mappingService,
       IRealmQuerier querier,
       IRepository<Realm> repository,
       ISenderQuerier senderQuerier,
@@ -31,7 +30,7 @@ namespace Logitar.Portal.Core.Realms
     )
     {
       _deleteRealmMutationHandler = deleteRealmMutationHandler;
-      _mapper = mapper;
+      _mappingService = mappingService;
       _querier = querier;
       _repository = repository;
       _senderQuerier = senderQuerier;
@@ -49,13 +48,13 @@ namespace Logitar.Portal.Core.Realms
         throw new AliasAlreadyUsedException(payload.Alias, nameof(payload.Alias));
       }
 
-      var realm = new Realm(payload, _userContext.ActorId);
+      var realm = new Realm(payload, _userContext.Actor.Id);
       await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 
       await _repository.SaveAsync(realm, cancellationToken);
 
-      return _mapper.Map<RealmModel>(realm);
+      return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
     public async Task<RealmModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -64,8 +63,12 @@ namespace Logitar.Portal.Core.Realms
     public async Task<RealmModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
       Realm? realm = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (realm == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<RealmModel>(realm);
+      return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
     public async Task<ListModel<RealmModel>> GetAsync(string? search,
@@ -78,7 +81,7 @@ namespace Logitar.Portal.Core.Realms
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<RealmModel>.From(realms, _mapper);
+      return await _mappingService.MapAsync<Realm, RealmModel>(realms, cancellationToken);
     }
 
     public async Task<RealmModel> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
@@ -88,13 +91,13 @@ namespace Logitar.Portal.Core.Realms
       Realm realm = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(id);
 
-      realm.Update(payload, _userContext.ActorId);
+      realm.Update(payload, _userContext.Actor.Id);
       await UpdatePasswordRecoverySettingsAsync(realm, payload, cancellationToken);
       _validator.ValidateAndThrow(realm);
 
       await _repository.SaveAsync(realm, cancellationToken);
 
-      return _mapper.Map<RealmModel>(realm);
+      return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
     private async Task UpdatePasswordRecoverySettingsAsync(Realm realm, SaveRealmPayload payload, CancellationToken cancellationToken)

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Logitar.Portal.Core.Accounts;
+﻿using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Sessions.Models;
 using Logitar.Portal.Core.Users;
 
@@ -9,7 +8,7 @@ namespace Logitar.Portal.Core.Sessions
   {
     private const int SessionKeyLength = 32;
 
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IPasswordService _passwordService;
     private readonly ISessionQuerier _querier;
     private readonly IRepository<Session> _repository;
@@ -17,7 +16,7 @@ namespace Logitar.Portal.Core.Sessions
     private readonly IRepository<User> _userRepository;
 
     public SessionService(
-      IMapper mapper,
+      IMappingService mappingService,
       IPasswordService passwordService,
       ISessionQuerier querier,
       IRepository<Session> repository,
@@ -25,7 +24,7 @@ namespace Logitar.Portal.Core.Sessions
       IRepository<User> userRepository
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _passwordService = passwordService;
       _querier = querier;
       _repository = repository;
@@ -33,11 +32,15 @@ namespace Logitar.Portal.Core.Sessions
       _userRepository = userRepository;
     }
 
-    public async Task<SessionModel> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<SessionModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       Session? session = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (session == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<SessionModel>(session);
+      return await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
     }
 
     public async Task<ListModel<SessionModel>> GetAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
@@ -50,7 +53,7 @@ namespace Logitar.Portal.Core.Sessions
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<SessionModel>.From(sessions, _mapper);
+      return await _mappingService.MapAsync<Session, SessionModel>(sessions, cancellationToken);
     }
 
     public async Task<SessionModel> RenewAsync(Session session, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
@@ -61,7 +64,7 @@ namespace Logitar.Portal.Core.Sessions
       session.Update(keyHash, ipAddress, additionalInformation);
       await _repository.SaveAsync(session, cancellationToken);
 
-      var model = _mapper.Map<SessionModel>(session);
+      var model = await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
       model.RenewToken = new SecureToken(model.Id, keyBytes).ToString();
 
       return model;
@@ -84,7 +87,7 @@ namespace Logitar.Portal.Core.Sessions
       user.SignIn(session.CreatedAt);
       await _userRepository.SaveAsync(user, cancellationToken);
 
-      var model = _mapper.Map<SessionModel>(session);
+      var model = await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
       model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
 
       return model;
@@ -93,15 +96,15 @@ namespace Logitar.Portal.Core.Sessions
     public async Task<IEnumerable<SessionModel>> SignOutAllAsync(Guid userId, CancellationToken cancellationToken)
     {
       PagedList<Session> sessions = await _querier.GetPagedAsync(userId: userId, readOnly: false, cancellationToken: cancellationToken);
-      
+
       foreach (Session session in sessions)
       {
-        session.SignOut(_userContext.ActorId);
+        session.SignOut(_userContext.Actor.Id);
       }
 
       await _repository.SaveAsync(sessions, cancellationToken);
 
-      return _mapper.Map<IEnumerable<SessionModel>>(sessions);
+      return (await _mappingService.MapAsync<Session, SessionModel>(sessions, cancellationToken)).Items;
     }
 
     public async Task<SessionModel> SignOutAsync(Guid id, CancellationToken cancellationToken)
@@ -113,7 +116,7 @@ namespace Logitar.Portal.Core.Sessions
 
       await _repository.SaveAsync(session, cancellationToken);
 
-      return _mapper.Map<SessionModel>(session);
+      return await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
     }
   }
 }

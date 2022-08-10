@@ -2,13 +2,13 @@
   <b-container>
     <h1 v-t="user ? 'user.editTitle' : 'user.newTitle'" />
     <template v-if="user">
-      <status-detail :createdAt="new Date(user.createdAt)" :updatedAt="user.updatedAt ? new Date(user.updatedAt) : null" />
+      <status-detail :model="user" />
       <p v-if="user.signedInAt">
         {{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}
         <br />
         <b-link :href="viewSessionsUrl">{{ $t('user.session.view') }}</b-link>
       </p>
-      <p v-if="user.isDisabled" class="text-danger">{{ $t('user.disabledAt') }} {{ $d(new Date(user.disabledAt), 'medium') }}</p>
+      <p v-if="user.isDisabled" class="text-danger"><status-info :actor="user.disabledBy" :date="new Date(user.disabledAt)" dateFormat="user.disabledAt" /></p>
     </template>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">

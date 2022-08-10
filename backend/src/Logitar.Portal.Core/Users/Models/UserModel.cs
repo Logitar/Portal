@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Realms.Models;
+﻿using Logitar.Portal.Core.Actors.Models;
+using Logitar.Portal.Core.Realms.Models;
 
 namespace Logitar.Portal.Core.Users.Models
 {
@@ -28,6 +29,7 @@ namespace Logitar.Portal.Core.Users.Models
     public DateTime? SignedInAt { get; set; }
 
     public DateTime? DisabledAt { get; set; }
+    public ActorModel? DisabledBy { get; set; }
     public bool IsDisabled { get; set; }
 
     public IEnumerable<ExternalProviderModel> ExternalProviders { get; set; } = Enumerable.Empty<ExternalProviderModel>();

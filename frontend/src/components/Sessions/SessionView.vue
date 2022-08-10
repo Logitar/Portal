@@ -7,7 +7,8 @@
         <tr>
           <th scope="row" v-t="'user.session.user'" />
           <td>
-            <b-link :href="`/users/${session.user.id}`"><user-avatar :user="session.user" /> {{ session.user.fullName || session.user.username }}</b-link>
+            <b-link :href="`/users/${session.user.id}`" class="mx-1"><user-avatar :user="session.user" /></b-link>
+            <b-link :href="`/users/${session.user.id}`">{{ session.user.fullName || session.user.username }}</b-link>
           </td>
         </tr>
         <tr>

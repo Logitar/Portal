@@ -48,7 +48,7 @@ namespace Logitar.Portal.Web.Controllers.Api
         index, count,
         cancellationToken);
 
-      return Ok(ListModel<TemplateSummary>.From(templates, _mapper));
+      return Ok(templates.To<TemplateModel, TemplateSummary>(_mapper));
     }
 
     [HttpGet("{id}")]

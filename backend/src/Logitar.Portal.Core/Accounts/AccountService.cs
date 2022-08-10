@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Logitar.Portal.Core.Accounts.Payloads;
+﻿using Logitar.Portal.Core.Accounts.Payloads;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
@@ -21,7 +20,7 @@ namespace Logitar.Portal.Core.Accounts
     private const int PasswordResetLifetime = 7 * 24 * 60 * 60; // 7 days
     private const string PasswordResetPurpose = "reset_password";
 
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly IMessageService _messageService;
     private readonly IPasswordService _passwordService;
     private readonly IRealmQuerier _realmQuerier;
@@ -34,7 +33,7 @@ namespace Logitar.Portal.Core.Accounts
     private readonly IUserService _userService;
 
     public AccountService(
-      IMapper mapper,
+      IMappingService mappingService,
       IMessageService messageService,
       IPasswordService passwordService,
       IRealmQuerier realmQuerier,
@@ -47,7 +46,7 @@ namespace Logitar.Portal.Core.Accounts
       IUserService userService
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _messageService = messageService;
       _passwordService = passwordService;
       _realmQuerier = realmQuerier;
@@ -79,7 +78,7 @@ namespace Logitar.Portal.Core.Accounts
       user.ChangePassword(passwordHash);
       await _userRepository.SaveAsync(user, cancellationToken);
 
-      return _mapper.Map<UserModel>(user);
+      return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
 
     public async Task<UserModel> GetProfileAsync(CancellationToken cancellationToken)

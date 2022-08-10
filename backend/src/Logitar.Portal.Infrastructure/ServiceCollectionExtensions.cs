@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Logitar.Portal.Core;
+using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Providers;
@@ -11,14 +10,16 @@ using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Tokens;
 using Logitar.Portal.Core.Users;
+using Logitar.Portal.Infrastructure.Actors;
 using Logitar.Portal.Infrastructure.Emails.Messages;
 using Logitar.Portal.Infrastructure.Queriers;
 using Logitar.Portal.Infrastructure.Repositories;
 using Logitar.Portal.Infrastructure.Settings;
 using Logitar.Portal.Infrastructure.Tokens;
 using Logitar.Portal.Infrastructure.Users;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-
 using Providers = Logitar.Portal.Infrastructure.Emails.Providers;
 
 namespace Logitar.Portal.Infrastructure
@@ -34,6 +35,7 @@ namespace Logitar.Portal.Infrastructure
         .AddSingleton(configuration.GetSection("Jwt").Get<JwtSettings>() ?? new())
         .AddSingleton<IPasswordService, PasswordService>()
         .AddSingleton<ITemplateCompiler, TemplateCompiler>()
+        .AddScoped<IActorService, ActorService>()
         .AddScoped<IDatabaseService, DatabaseService>()
         .AddScoped<IJwtBlacklist, JwtBlacklist>()
         .AddScoped<ISecurityTokenService, JwtService>()

@@ -16,11 +16,10 @@
           <td v-text="recipient.displayName || '—'" />
           <td v-if="recipient.userId">
             <template v-if="users[recipient.userId]">
-              <b-link :href="`/users/${recipient.userId}`" target="_blank">
-                <user-avatar :user="users[recipient.userId]" />
-                {{ users[recipient.userId].fullName || users[recipient.userId].username }}
-                <font-awesome-icon icon="external-link-alt" />
-              </b-link>
+              <b-link :href="`/users/${recipient.userId}`" target="_blank" class="mx-1"><user-avatar :user="users[recipient.userId]" /></b-link>
+              <b-link :href="`/users/${recipient.userId}`" target="_blank"
+                >{{ users[recipient.userId].fullName || users[recipient.userId].username }}<font-awesome-icon icon="external-link-alt"
+              /></b-link>
             </template>
             <template v-else>
               <font-awesome-icon icon="user-alt-slash" />

@@ -1,10 +1,7 @@
 ﻿namespace Logitar.Portal.Core.Emails.Senders.Models
 {
-  public class SenderSummary
+  public class SenderSummary : AggregateSummary
   {
-    public Guid Id { get; set; }
-    public DateTime UpdatedAt { get; set; }
-
     public string EmailAddress { get; set; } = null!;
     public string? DisplayName { get; set; }
 

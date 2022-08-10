@@ -6,6 +6,7 @@
     "refresh": "Refresh",
     "save": "Save"
   },
+  "by": "By",
   "copyright": "© Portal 2022.",
   "count": "Count",
   "description": {
@@ -36,10 +37,12 @@
     "placeholder": "Select a sort option"
   },
   "statusDetail": {
+    "by": "by",
     "createdAt": "Created on {date}",
     "updatedAt": "Last updated on {date}"
   },
   "success": "Success!",
-  "updatedAt": "Updated on",
+  "system": "System",
+  "updated": "Updated",
   "yes": "Yes"
 }

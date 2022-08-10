@@ -1,4 +1,7 @@
 ﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Actors;
+using Logitar.Portal.Core.ApiKeys;
+using Logitar.Portal.Core.Users;
 using System.Net;
 
 namespace Logitar.Portal.Web
@@ -15,7 +18,26 @@ namespace Logitar.Portal.Web
     private HttpContext HttpContext => _httpContextAccessor.HttpContext
       ?? throw new InvalidOperationException($"The {nameof(HttpContext)} is required.");
 
-    public Guid ActorId => HttpContext.GetUser()?.Id ?? HttpContext.GetApiKey()?.Id ?? Guid.Empty;
+    public Actor Actor
+    {
+      get
+      {
+        User? user = HttpContext.GetUser();
+        if (user != null)
+        {
+          return new Actor(user);
+        }
+
+        ApiKey? apiKey = HttpContext.GetApiKey();
+        if (apiKey != null)
+        {
+          return new Actor(apiKey);
+        }
+
+        return Actor.System;
+      }
+    }
+
     public Guid Id => HttpContext.GetUser()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The User context item is required.");
     public Guid SessionId => HttpContext.GetSession()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The Session ID is required.");
 

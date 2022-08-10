@@ -2,7 +2,7 @@
 {
   public enum MessageSort
   {
-    SentAt = 0,
+    UpdatedAt = 0,
     Subject = 1
   }
 }

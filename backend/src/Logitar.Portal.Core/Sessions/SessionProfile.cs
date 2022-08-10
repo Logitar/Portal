@@ -11,7 +11,7 @@ namespace Logitar.Portal.Core.Sessions
       CreateMap<Session, SessionModel>()
         .IncludeBase<Aggregate, AggregateModel>();
       CreateMap<SessionModel, SessionSummary>()
-        .ForMember(x => x.UpdatedAt, x => x.MapFrom(y => y.UpdatedAt ?? y.CreatedAt));
+        .IncludeBase<AggregateModel, AggregateSummary>();
       CreateMap<UserModel, SessionUserSummary>();
     }
   }

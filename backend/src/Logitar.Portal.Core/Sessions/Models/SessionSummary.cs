@@ -1,11 +1,8 @@
 ﻿namespace Logitar.Portal.Core.Sessions.Models
 {
-  public class SessionSummary
+  public class SessionSummary : AggregateSummary
   {
     public SessionUserSummary? User { get; set; }
-
-    public Guid Id { get; set; }
-    public DateTime UpdatedAt { get; set; }
 
     public bool IsPersistent { get; set; }
 

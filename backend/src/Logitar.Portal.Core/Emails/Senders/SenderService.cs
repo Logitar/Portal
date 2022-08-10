@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Logitar.Portal.Core.Emails.Senders.Models;
 using Logitar.Portal.Core.Emails.Senders.Payloads;
 using Logitar.Portal.Core.Realms;
@@ -8,7 +7,7 @@ namespace Logitar.Portal.Core.Emails.Senders
 {
   internal class SenderService : ISenderService
   {
-    private readonly IMapper _mapper;
+    private readonly IMappingService _mappingService;
     private readonly ISenderQuerier _querier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly IRepository<Sender> _repository;
@@ -16,7 +15,7 @@ namespace Logitar.Portal.Core.Emails.Senders
     private readonly IValidator<Sender> _validator;
 
     public SenderService(
-      IMapper mapper,
+      IMappingService mappingService,
       ISenderQuerier querier,
       IRealmQuerier realmQuerier,
       IRepository<Sender> repository,
@@ -24,7 +23,7 @@ namespace Logitar.Portal.Core.Emails.Senders
       IValidator<Sender> validator
     )
     {
-      _mapper = mapper;
+      _mappingService = mappingService;
       _querier = querier;
       _realmQuerier = realmQuerier;
       _repository = repository;
@@ -45,12 +44,12 @@ namespace Logitar.Portal.Core.Emails.Senders
 
       bool isDefault = await _querier.GetDefaultAsync(realm, readOnly: true, cancellationToken) == null;
 
-      var sender = new Sender(payload, _userContext.ActorId, isDefault, realm);
+      var sender = new Sender(payload, _userContext.Actor.Id, isDefault, realm);
       _validator.ValidateAndThrow(sender);
 
       await _repository.SaveAsync(sender, cancellationToken);
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
     public async Task<SenderModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -63,22 +62,26 @@ namespace Logitar.Portal.Core.Emails.Senders
         PagedList<Sender> senders = await _querier.GetPagedAsync(realm: sender.Realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken);
         if (senders.Count > 1)
         {
-          throw new CannotDeleteDefaultSenderException(id, _userContext.ActorId);
+          throw new CannotDeleteDefaultSenderException(id, _userContext.Actor.Id);
         }
       }
 
-      sender.Delete(_userContext.ActorId);
+      sender.Delete(_userContext.Actor.Id);
 
       await _repository.SaveAsync(sender, cancellationToken);
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
     public async Task<SenderModel?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
       Sender? sender = await _querier.GetAsync(id, readOnly: true, cancellationToken);
+      if (sender == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
     public async Task<ListModel<SenderModel>> GetAsync(ProviderType? provider, string? realm, string? search,
@@ -91,7 +94,7 @@ namespace Logitar.Portal.Core.Emails.Senders
         index, count,
         readOnly: true, cancellationToken);
 
-      return ListModel<SenderModel>.From(senders, _mapper);
+      return await _mappingService.MapAsync<Sender, SenderModel>(senders, cancellationToken);
     }
 
     public async Task<SenderModel?> GetDefaultAsync(string? realmId, CancellationToken cancellationToken)
@@ -104,8 +107,12 @@ namespace Logitar.Portal.Core.Emails.Senders
       }
 
       Sender? sender = await _querier.GetDefaultAsync(realm, readOnly: true, cancellationToken);
+      if (sender == null)
+      {
+        return null;
+      }
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
     public async Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default)
@@ -118,13 +125,13 @@ namespace Logitar.Portal.Core.Emails.Senders
 
       if (!sender.Equals(@default))
       {
-        @default.SetDefault(_userContext.ActorId, isDefault: false);
-        sender.SetDefault(_userContext.ActorId, isDefault: true);
+        @default.SetDefault(_userContext.Actor.Id, isDefault: false);
+        sender.SetDefault(_userContext.Actor.Id, isDefault: true);
 
         await _repository.SaveAsync(new[] { @default, sender }, cancellationToken);
       }
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
     public async Task<SenderModel> UpdateAsync(Guid id, UpdateSenderPayload payload, CancellationToken cancellationToken)
@@ -134,12 +141,12 @@ namespace Logitar.Portal.Core.Emails.Senders
       Sender sender = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Sender>(id);
 
-      sender.Update(payload, _userContext.ActorId);
+      sender.Update(payload, _userContext.Actor.Id);
       _validator.ValidateAndThrow(sender);
 
       await _repository.SaveAsync(sender, cancellationToken);
 
-      return _mapper.Map<SenderModel>(sender);
+      return await _mappingService.MapAsync<SenderModel>(sender, cancellationToken);
     }
   }
 }

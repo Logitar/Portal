@@ -21,7 +21,7 @@
             <th scope="col" v-t="'senders.emailAddress.label'" />
             <th scope="col" v-t="'senders.displayName.label'" />
             <th scope="col" v-t="'senders.provider.label'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -32,7 +32,7 @@
             </td>
             <td v-text="sender.displayName || '—'" />
             <td>{{ $t(`senders.provider.options.${sender.provider}`) }}</td>
-            <td>{{ $d(new Date(sender.updatedAt), 'medium') }}</td>
+            <updated-cell :actor="sender.updatedBy" :date="sender.updatedAt" />
             <td>
               <icon-button v-if="sender.isDefault" class="mx-1" disabled icon="star" text="senders.default" variant="info" />
               <icon-button v-else class="mx-1" icon="star" :loading="loading" text="senders.default" variant="warning" @click="onSetDefault(sender)" />

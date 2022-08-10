@@ -1,10 +1,7 @@
 ﻿namespace Logitar.Portal.Core.Users.Models
 {
-  public class UserSummary
+  public class UserSummary : AggregateSummary
   {
-    public Guid Id { get; set; }
-    public DateTime UpdatedAt { get; set; }
-
     public string Username { get; set; } = null!;
 
     public string? Email { get; set; }

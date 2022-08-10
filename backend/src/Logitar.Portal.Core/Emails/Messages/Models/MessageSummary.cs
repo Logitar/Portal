@@ -1,10 +1,7 @@
 ﻿namespace Logitar.Portal.Core.Emails.Messages.Models
 {
-  public class MessageSummary
+  public class MessageSummary : AggregateSummary
   {
-    public Guid Id { get; set; }
-    public DateTime SentAt { get; set; }
-
     public bool IsDemo { get; set; }
 
     public string Subject { get; set; } = null!;

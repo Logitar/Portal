@@ -25,7 +25,7 @@
     "label": "Disabled",
     "placeholder": "Select an option"
   },
-  "disabledAt": "Disabled on",
+  "disabledAt": "Disabled on {date}",
   "editTitle": "Edit user",
   "email": {
     "confirmed": "Confirmed",

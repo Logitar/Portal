@@ -33,7 +33,7 @@ namespace Logitar.Portal.Web.Controllers.Api
         index, count,
         cancellationToken);
 
-      return Ok(ListModel<SessionSummary>.From(sessions, _mapper));
+      return Ok(sessions.To<SessionModel, SessionSummary>(_mapper));
     }
 
     [HttpPatch("{id}/sign/out")]
