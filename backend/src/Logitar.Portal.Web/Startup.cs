@@ -2,7 +2,6 @@
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
-using Logitar.Portal.Web.Filters;
 using Logitar.Portal.Web.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
@@ -23,11 +22,7 @@ namespace Logitar.Portal.Web
       base.ConfigureServices(services);
 
       services
-        .AddControllersWithViews(options =>
-        {
-          options.Filters.Add<ApiExceptionFilterAttribute>();
-          options.Filters.Add<ValidationExceptionFilterAttribute>();
-        })
+        .AddControllersWithViews()
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
       services
@@ -96,6 +91,7 @@ namespace Logitar.Portal.Web
         application.UseHttpsRedirection();
         application.UseStaticFiles();
         application.UseSession();
+        application.UseMiddleware<Logging>();
         application.UseMiddleware<RenewSession>();
         application.UseMiddleware<RedirectUnauthorized>();
         application.UseAuthentication();
