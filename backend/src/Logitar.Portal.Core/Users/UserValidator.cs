@@ -82,6 +82,16 @@ namespace Logitar.Portal.Core.Users
       });
     }
 
-    private static bool BeAValidCulture(string? value) => value == null || CultureInfo.GetCultureInfo(value).LCID != 4096;
+    private static bool BeAValidCulture(string? value)
+    {
+      try
+      {
+        return value == null || CultureInfo.GetCultureInfo(value).LCID != 4096;
+      }
+      catch (CultureNotFoundException)
+      {
+        return false;
+      }
+    }
   }
 }
