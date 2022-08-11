@@ -62,10 +62,6 @@
     "label": "Last Name",
     "placeholder": "Enter a last name"
   },
-  "locale": {
-    "label": "Locale",
-    "placeholder": "Select a locale"
-  },
   "newTitle": "Create user",
   "password": {
     "changeFailed": "Password change failed!",

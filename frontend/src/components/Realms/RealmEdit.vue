@@ -18,7 +18,10 @@
               <alias-field class="col" v-if="realm" disabled :value="alias" />
               <alias-field class="col" v-else :name="name" ref="alias" required validate v-model="alias" />
             </b-row>
-            <form-url id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
+            <b-row>
+              <locale-select class="col" label="realms.defaultLocale" v-model="defaultLocale" />
+              <form-url class="col" id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
+            </b-row>
             <description-field :rows="15" v-model="description" />
           </b-tab>
           <b-tab :title="$t('realms.settings')">
@@ -102,6 +105,7 @@ export default {
       alias: null,
       aliasConflict: false,
       allowedUsernameCharacters: null,
+      defaultLocale: null,
       description: null,
       googleClientId: null,
       loading: false,
@@ -127,6 +131,7 @@ export default {
       return (
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
         (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
+        (this.defaultLocale !== this.realm?.defaultLocale ?? null) ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
         (this.googleClientId ?? '') !== (this.realm?.googleClientId ?? '') ||
         (this.name ?? '') !== (this.realm?.name ?? '') ||
@@ -146,6 +151,7 @@ export default {
     payload() {
       const payload = {
         allowedUsernameCharacters: this.allowedUsernameCharacters,
+        defaultLocale: this.defaultLocale,
         description: this.description,
         googleClientId: this.googleClientId,
         name: this.name,
@@ -168,6 +174,7 @@ export default {
       this.realm = realm
       this.alias = realm.alias
       this.allowedUsernameCharacters = realm.allowedUsernameCharacters
+      this.defaultLocale = realm.defaultLocale
       this.description = realm.description
       this.googleClientId = realm.googleClientId
       this.name = realm.name

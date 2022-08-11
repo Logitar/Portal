@@ -17,6 +17,10 @@
     "body": "An unexpected error occurred. Please try again later or contact our support team.",
     "title": "Error!"
   },
+  "locale": {
+    "label": "Locale",
+    "placeholder": "Select a locale"
+  },
   "name": {
     "label": "Name",
     "placeholder": "Enter a name"

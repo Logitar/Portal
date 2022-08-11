@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Core.Emails.Senders;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Logitar.Portal.Core.Emails.Senders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {

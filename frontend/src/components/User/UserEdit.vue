@@ -109,7 +109,6 @@
 import EmailField from './EmailField.vue'
 import FirstNameField from './FirstNameField.vue'
 import LastNameField from './LastNameField.vue'
-import LocaleSelect from './LocaleSelect.vue'
 import PasswordField from './PasswordField.vue'
 import PhoneField from './PhoneField.vue'
 import PictureField from './PictureField.vue'
@@ -126,7 +125,6 @@ export default {
     EmailField,
     FirstNameField,
     LastNameField,
-    LocaleSelect,
     PasswordField,
     PhoneField,
     PictureField,

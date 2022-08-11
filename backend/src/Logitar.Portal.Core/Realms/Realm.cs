@@ -4,6 +4,7 @@ using Logitar.Portal.Core.Realms.Events;
 using Logitar.Portal.Core.Realms.Payloads;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Payloads;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Logitar.Portal.Core.Realms
@@ -31,6 +32,9 @@ namespace Logitar.Portal.Core.Realms
     public string? AllowedUsernameCharacters { get; private set; }
     public bool RequireConfirmedAccount { get; private set; }
     public bool RequireUniqueEmail { get; private set; }
+
+    public CultureInfo? DefaultCulture => DefaultLocale == null ? null : CultureInfo.GetCultureInfo(DefaultLocale);
+    public string? DefaultLocale { get; private set; }
     public string? Url { get; private set; }
 
     public Sender? PasswordRecoverySender
@@ -92,6 +96,8 @@ namespace Logitar.Portal.Core.Realms
         : new string(payload.AllowedUsernameCharacters.ToCharArray().Distinct().ToArray());
       RequireConfirmedAccount = payload.RequireConfirmedAccount;
       RequireUniqueEmail = payload.RequireUniqueEmail;
+
+      DefaultLocale = payload.DefaultLocale;
       Url = payload.Url;
 
       PasswordSettingsPayload? password = payload.PasswordSettings;

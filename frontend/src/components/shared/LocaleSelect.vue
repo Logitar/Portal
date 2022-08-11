@@ -1,5 +1,5 @@
 <template>
-  <form-select id="locale" label="user.locale.label" :options="options" placeholder="user.locale.placeholder" :value="value" @input="$emit('input', $event)" />
+  <form-select :id="id" :label="label" :options="options" :placeholder="placeholder" :value="value" @input="$emit('input', $event)" />
 </template>
 
 <script>
@@ -8,6 +8,18 @@ import { getLocales } from '@/api/locales'
 export default {
   name: 'LocaleSelect',
   props: {
+    id: {
+      type: String,
+      default: 'locale'
+    },
+    label: {
+      type: String,
+      default: 'locale.label'
+    },
+    placeholder: {
+      type: String,
+      default: 'locale.placeholder'
+    },
     value: {}
   },
   data() {
