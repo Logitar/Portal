@@ -32,7 +32,7 @@
             </td>
             <td v-text="sender.displayName || '—'" />
             <td>{{ $t(`senders.provider.options.${sender.provider}`) }}</td>
-            <updated-cell :actor="sender.updatedBy" :date="sender.updatedAt" />
+            <td><status-cell :actor="sender.updatedBy" :date="sender.updatedAt" /></td>
             <td>
               <icon-button v-if="sender.isDefault" class="mx-1" disabled icon="star" text="senders.default" variant="info" />
               <icon-button v-else class="mx-1" icon="star" :loading="loading" text="senders.default" variant="warning" @click="onSetDefault(sender)" />

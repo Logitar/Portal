@@ -18,7 +18,7 @@
         <tr>
           <th scope="row" v-t="'user.session.signedOutAt'" />
           <td>
-            <template v-if="session.signedOutAt">{{ $d(new Date(session.signedOutAt), 'medium') }}</template>
+            <status-cell v-if="session.signedOutAt" :actor="session.signedOutBy" :date="new Date(session.signedOutAt)" />
             <b-badge v-else-if="session.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
           </td>
         </tr>

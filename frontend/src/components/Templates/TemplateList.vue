@@ -29,7 +29,7 @@
             </td>
             <td v-text="template.displayName || '—'" />
             <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
-            <updated-cell :actor="template.updatedBy" :date="template.updatedAt" />
+            <td><status-cell :actor="template.updatedBy" :date="template.updatedAt" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
               <delete-modal

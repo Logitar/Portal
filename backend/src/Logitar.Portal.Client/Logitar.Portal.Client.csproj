@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Francis Pion</Authors>
     <Company>Logitar</Company>
     <Description>Client integration of the Logitar Portal.</Description>
@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/Utar94/Portal</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Utar94/Portal</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added SignedOutBy to SessionModel and SessionSummary.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>portal;api;http;client;net6.0;asp;net</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

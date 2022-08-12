@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Users.Models;
+﻿using Logitar.Portal.Core.Actors.Models;
+using Logitar.Portal.Core.Users.Models;
 
 namespace Logitar.Portal.Core.Sessions.Models
 {
@@ -10,6 +11,7 @@ namespace Logitar.Portal.Core.Sessions.Models
     public bool IsPersistent { get; set; }
 
     public DateTime? SignedOutAt { get; set; }
+    public ActorModel? SignedOutBy { get; set; }
     public bool IsActive { get; set; }
 
     public string? IpAddress { get; set; }

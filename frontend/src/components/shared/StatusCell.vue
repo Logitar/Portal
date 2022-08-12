@@ -1,5 +1,5 @@
 <template>
-  <td class="d-flex">
+  <div class="d-flex">
     <template v-if="actor">
       <div class="d-flex">
         <div class="d-flex align-content-center flex-wrap mx-1">
@@ -22,14 +22,14 @@
       </div>
     </template>
     <template v-else>{{ $d(new Date(date), 'medium') }}</template>
-  </td>
+  </div>
 </template>
 
 <script>
 import UserAvatar from '@/components/User/UserAvatar.vue'
 
 export default {
-  name: 'UpdatedCell',
+  name: 'StatusCell',
   components: {
     UserAvatar
   },

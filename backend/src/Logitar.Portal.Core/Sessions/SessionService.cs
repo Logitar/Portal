@@ -13,6 +13,7 @@ namespace Logitar.Portal.Core.Sessions
     private readonly ISessionQuerier _querier;
     private readonly IRepository<Session> _repository;
     private readonly IUserContext _userContext;
+    private readonly IUserQuerier _userQuerier;
     private readonly IRepository<User> _userRepository;
 
     public SessionService(
@@ -21,6 +22,7 @@ namespace Logitar.Portal.Core.Sessions
       ISessionQuerier querier,
       IRepository<Session> repository,
       IUserContext userContext,
+      IUserQuerier userQuerier,
       IRepository<User> userRepository
     )
     {
@@ -29,6 +31,7 @@ namespace Logitar.Portal.Core.Sessions
       _querier = querier;
       _repository = repository;
       _userContext = userContext;
+      _userQuerier = userQuerier;
       _userRepository = userRepository;
     }
 
@@ -53,7 +56,7 @@ namespace Logitar.Portal.Core.Sessions
         index, count,
         readOnly: true, cancellationToken);
 
-      return await _mappingService.MapAsync<Session, SessionModel>(sessions, cancellationToken);
+      return await _mappingService.MapAsync<SessionModel>(sessions, cancellationToken);
     }
 
     public async Task<SessionModel> RenewAsync(Session session, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
@@ -95,7 +98,10 @@ namespace Logitar.Portal.Core.Sessions
 
     public async Task<IEnumerable<SessionModel>> SignOutAllAsync(Guid userId, CancellationToken cancellationToken)
     {
-      PagedList<Session> sessions = await _querier.GetPagedAsync(userId: userId, readOnly: false, cancellationToken: cancellationToken);
+      User user = await _userQuerier.GetAsync(userId, readOnly: true, cancellationToken)
+        ?? throw new EntityNotFoundException<User>(userId);
+
+      PagedList<Session> sessions = await _querier.GetPagedAsync(isActive: true, userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
 
       foreach (Session session in sessions)
       {
@@ -104,13 +110,18 @@ namespace Logitar.Portal.Core.Sessions
 
       await _repository.SaveAsync(sessions, cancellationToken);
 
-      return (await _mappingService.MapAsync<Session, SessionModel>(sessions, cancellationToken)).Items;
+      return (await _mappingService.MapAsync<SessionModel>(sessions, cancellationToken)).Items;
     }
 
     public async Task<SessionModel> SignOutAsync(Guid id, CancellationToken cancellationToken)
     {
       Session session = await _querier.GetAsync(id, readOnly: false, cancellationToken)
         ?? throw new EntityNotFoundException<Session>(id);
+
+      if (!session.IsActive)
+      {
+        throw new SessionAlreadySignedOutException(session);
+      }
 
       session.SignOut();
 
