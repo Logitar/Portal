@@ -118,6 +118,8 @@ namespace Logitar.Portal.Core.Accounts
         Realm = realm.Id.ToString(),
         Template = realm.PasswordRecoveryTemplate.Id.ToString(),
         SenderId = realm.PasswordRecoverySender?.Id,
+        IgnoreUserLocale = payload.IgnoreUserLocale,
+        Locale = payload.Locale,
         Recipients = new[] { new RecipientPayload { User = user.Id.ToString() } },
         Variables = new[] { new VariablePayload { Key = "Token", Value = token.Token } }
       };

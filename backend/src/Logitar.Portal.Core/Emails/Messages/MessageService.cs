@@ -1,15 +1,18 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
+using System.Globalization;
 
 namespace Logitar.Portal.Core.Emails.Messages
 {
   internal class MessageService : IMessageService
   {
+    private readonly IDictionaryQuerier _dictionaryQuerier;
     private readonly IMessageHandlerFactory _handlerFactory;
     private readonly IMappingService _mappingService;
     private readonly IMessageQuerier _querier;
@@ -24,6 +27,7 @@ namespace Logitar.Portal.Core.Emails.Messages
     private readonly IUserQuerier _userQuerier;
 
     public MessageService(
+      IDictionaryQuerier dictionaryQuerier,
       IMessageHandlerFactory handlerFactory,
       IMappingService mapper,
       IMessageQuerier querier,
@@ -38,6 +42,7 @@ namespace Logitar.Portal.Core.Emails.Messages
       IUserQuerier userQuerier
     )
     {
+      _dictionaryQuerier = dictionaryQuerier;
       _handlerFactory = handlerFactory;
       _mappingService = mapper;
       _querier = querier;
@@ -87,14 +92,33 @@ namespace Logitar.Portal.Core.Emails.Messages
       Recipients allRecipients = await ResolveRecipientsAsync(payload.Recipients, realm, nameof(payload.Recipients), cancellationToken);
       Sender sender = await ResolveSenderAsync(payload.SenderId, realm, nameof(payload.SenderId), cancellationToken);
       Template template = await ResolveTemplateAsync(payload.Template, realm, nameof(payload.Template), cancellationToken);
+
+      Dictionary<CultureInfo, Dictionary> allDictionaries = (await _dictionaryQuerier
+        .GetPagedAsync(realm: realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken)
+      ).ToDictionary(x => x.Culture, x => x);
+      Dictionary? defaultDictionary = null;
+      if (realm?.DefaultCulture != null)
+      {
+        allDictionaries.TryGetValue(realm.DefaultCulture, out defaultDictionary);
+      }
+
       Dictionary<string, string?>? variables = payload.Variables == null ? null : GetVariables(payload.Variables);
 
       IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
+      Dictionaries? dictionaries = payload.IgnoreUserLocale
+        ? GetDictionaries(payload.Locale, defaultDictionary, allDictionaries)
+        : null;
+
       var messages = new List<Message>(capacity: allRecipients.To.Count);
       foreach (Recipient recipient in allRecipients.To)
       {
-        string body = _templateCompiler.Compile(template, recipient.User, variables);
+        Dictionaries? userDictionaries = (!payload.IgnoreUserLocale && recipient.UserLocale != null)
+          ? GetDictionaries(recipient.UserLocale, defaultDictionary, allDictionaries)
+          : null;
+
+        string subject = (userDictionaries ?? dictionaries)?.GetEntry(template.Subject) ?? template.Subject;
+        string body = _templateCompiler.Compile(template, userDictionaries ?? dictionaries, recipient.User, variables);
 
         IEnumerable<Recipient> recipients = new[] { recipient }
           .Concat(allRecipients.CC)
@@ -102,9 +126,12 @@ namespace Logitar.Portal.Core.Emails.Messages
 
         Message message = await CreateAndSendAsync(body,
           handler,
+          ignoreUserLocale: payload.IgnoreUserLocale,
+          locale: payload.IgnoreUserLocale ? payload.Locale : (recipient.UserLocale ?? payload.Locale),
           realm,
           recipients,
           sender,
+          subject,
           template,
           variables,
           isDemo: false,
@@ -139,17 +166,31 @@ namespace Logitar.Portal.Core.Emails.Messages
       Sender sender = await _senderQuerier.GetDefaultAsync(realm, readOnly: true, cancellationToken)
         ?? throw new DefaultSenderRequiredException(realm);
 
+      Dictionary<CultureInfo, Dictionary> allDictionaries = (await _dictionaryQuerier
+        .GetPagedAsync(realm: realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken)
+      ).ToDictionary(x => x.Culture, x => x);
+      Dictionary? defaultDictionary = null;
+      if (realm?.DefaultCulture != null)
+      {
+        allDictionaries.TryGetValue(realm.DefaultCulture, out defaultDictionary);
+      }
+      Dictionaries dictionaries = GetDictionaries(payload.Locale ?? user.Locale, defaultDictionary, allDictionaries);
+
       Dictionary<string, string?>? variables = payload.Variables == null ? null : GetVariables(payload.Variables);
 
       IMessageHandler handler = _handlerFactory.GetHandler(sender);
 
-      string body = _templateCompiler.Compile(template, user, variables);
+      string subject = dictionaries.GetEntry(template.Subject) ?? template.Subject;
+      string body = _templateCompiler.Compile(template, dictionaries, user, variables);
 
       Message message = await CreateAndSendAsync(body,
         handler,
+        ignoreUserLocale: payload.Locale != null,
+        payload.Locale ?? user.Locale,
         realm,
         recipients,
         sender,
+        subject,
         template,
         variables,
         isDemo: true,
@@ -162,16 +203,19 @@ namespace Logitar.Portal.Core.Emails.Messages
 
     private async Task<Message> CreateAndSendAsync(string body,
       IMessageHandler handler,
+      bool ignoreUserLocale,
+      string? locale,
       Realm? realm,
       IEnumerable<Recipient> recipients,
       Sender sender,
+      string subject,
       Template template,
       Dictionary<string, string?>? variables,
       bool isDemo,
       CancellationToken cancellationToken
     )
     {
-      var message = new Message(body, recipients, sender, template, _userContext.Actor.Id, realm, variables, isDemo);
+      var message = new Message(subject, body, recipients, sender, template, _userContext.Actor.Id, realm, ignoreUserLocale, locale, variables, isDemo);
 
       try
       {
@@ -188,6 +232,25 @@ namespace Logitar.Portal.Core.Emails.Messages
       }
 
       return message;
+    }
+
+    private static Dictionaries GetDictionaries(string? locale, Dictionary? defaultDictionary, Dictionary<CultureInfo, Dictionary> dictionaries)
+    {
+      Dictionary? preferredDictionary = null;
+      Dictionary? fallbackDictionary = null;
+
+      if (locale != null)
+      {
+        var preferred = CultureInfo.GetCultureInfo(locale);
+        dictionaries.TryGetValue(preferred, out preferredDictionary);
+
+        if (preferred.Parent != null)
+        {
+          dictionaries.TryGetValue(preferred.Parent, out fallbackDictionary);
+        }
+      }
+
+      return new Dictionaries(defaultDictionary, fallbackDictionary, preferredDictionary);
     }
 
     private static Dictionary<string, string?>? GetVariables(IEnumerable<VariablePayload> payloads)

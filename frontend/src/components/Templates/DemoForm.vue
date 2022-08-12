@@ -14,6 +14,7 @@
         <b-link v-else :href="`/senders/${sender.id}`" target="_blank">{{ sender.emailAddress }} <font-awesome-icon icon="external-link-alt" /></b-link>.
       </i>
     </p>
+    <locale-select v-model="locale" />
     <icon-button :disabled="loading" icon="paper-plane" :loading="loading" text="templates.sendToMe" variant="primary" @click="sendDemo" />
     <h3 v-t="'templates.variables.label'" />
     <div class="my-2">
@@ -69,12 +70,20 @@ export default {
   data() {
     return {
       loading: false,
+      locale: null,
       message: null,
       showResult: false,
       variables: []
     }
   },
   computed: {
+    payload() {
+      return {
+        templateId: this.template.id,
+        locale: this.locale,
+        variables: [...this.variables]
+      }
+    },
     resultVariant() {
       switch (this.status) {
         case 'Failed':
@@ -103,12 +112,10 @@ export default {
     async sendDemo() {
       if (!this.loading) {
         this.loading = true
+        this.showResult = false
         try {
           if (await this.$refs.variables.validate()) {
-            const { data } = await sendDemoMessage({
-              templateId: this.template.id,
-              variables: [...this.variables]
-            })
+            const { data } = await sendDemoMessage(this.payload)
             this.message = data
             this.showResult = true
             this.$refs.variables.reset()

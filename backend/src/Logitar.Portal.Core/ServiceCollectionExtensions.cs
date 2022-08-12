@@ -2,6 +2,7 @@
 using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.Configurations;
+using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
@@ -35,6 +36,7 @@ namespace Logitar.Portal.Core
         .AddScoped<IAccountService, AccountService>()
         .AddScoped<IApiKeyService, ApiKeyService>()
         .AddScoped<IConfigurationService, ConfigurationService>()
+        .AddScoped<IDictionaryService, DictionaryService>()
         .AddScoped<IGoogleService, GoogleService>()
         .AddScoped<IMessageService, MessageService>()
         .AddScoped<IRealmService, RealmService>()

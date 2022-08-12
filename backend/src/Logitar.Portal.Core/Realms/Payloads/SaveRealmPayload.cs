@@ -10,6 +10,8 @@ namespace Logitar.Portal.Core.Realms.Payloads
     public string? AllowedUsernameCharacters { get; set; }
     public bool RequireConfirmedAccount { get; set; }
     public bool RequireUniqueEmail { get; set; }
+
+    public string? DefaultLocale { get; set; }
     public string? Url { get; set; }
 
     public Guid? PasswordRecoverySenderId { get; set; }

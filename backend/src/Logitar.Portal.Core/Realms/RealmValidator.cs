@@ -16,6 +16,9 @@ namespace Logitar.Portal.Core.Realms
         .NotEmpty()
         .MaximumLength(256);
 
+      RuleFor(x => x.DefaultLocale)
+        .Must(ValidationRules.BeAValidCulture);
+
       RuleFor(x => x.Url)
         .MaximumLength(2048)
         .Must(ValidationRules.BeAValidUrl);

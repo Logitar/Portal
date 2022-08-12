@@ -10,6 +10,7 @@ import FormTextarea from './components/shared/FormTextarea.vue'
 import FormUrl from './components/shared/FormUrl.vue'
 import IconButton from './components/shared/IconButton.vue'
 import IconSubmit from './components/shared/IconSubmit.vue'
+import LocaleSelect from './components/shared/LocaleSelect.vue'
 import NameField from './components/shared/NameField.vue'
 import SearchField from './components/shared/SearchField.vue'
 import SortSelect from './components/shared/SortSelect.vue'
@@ -27,6 +28,7 @@ Vue.component('form-textarea', FormTextarea)
 Vue.component('form-url', FormUrl)
 Vue.component('icon-button', IconButton)
 Vue.component('icon-submit', IconSubmit)
+Vue.component('locale-select', LocaleSelect)
 Vue.component('name-field', NameField)
 Vue.component('search-field', SearchField)
 Vue.component('sort-select', SortSelect)
@@ -46,7 +48,9 @@ Vue.mixin({
       this.toast('errorToast.title', 'errorToast.body', 'danger')
     },
     orderBy(items, key = null) {
-      return key ? [...items].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0)) : [...items].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+      return typeof key !== 'undefined' && key !== null
+        ? [...items].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0))
+        : [...items].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     },
     roll(roll) {
       const dice = roll.split('d')

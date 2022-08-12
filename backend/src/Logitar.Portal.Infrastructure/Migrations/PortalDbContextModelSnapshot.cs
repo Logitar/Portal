@@ -129,6 +129,63 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("ApiKeys");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Core.Dictionaries.Dictionary", b =>
+                {
+                    b.Property<int>("Sid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Sid"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CreatedById")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
+
+                    b.Property<string>("EntriesSerialized")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Entries");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<int?>("RealmSid")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Sid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("RealmSid", "Locale")
+                        .IsUnique();
+
+                    b.ToTable("Dictionaries");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Core.Emails.Messages.Message", b =>
                 {
                     b.Property<int>("Sid")
@@ -163,8 +220,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<bool>("IgnoreUserLocale")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDemo")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
 
                     b.Property<string>("RealmAlias")
                         .HasMaxLength(256)
@@ -505,6 +569,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValue(new Guid("00000000-0000-0000-0000-000000000000"));
+
+                    b.Property<string>("DefaultLocale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -1003,6 +1071,16 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Logs");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Core.Dictionaries.Dictionary", b =>
+                {
+                    b.HasOne("Logitar.Portal.Core.Realms.Realm", "Realm")
+                        .WithMany("Dictionaries")
+                        .HasForeignKey("RealmSid")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Realm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Core.Emails.Senders.Sender", b =>
                 {
                     b.HasOne("Logitar.Portal.Core.Realms.Realm", "Realm")
@@ -1103,6 +1181,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             modelBuilder.Entity("Logitar.Portal.Core.Realms.Realm", b =>
                 {
+                    b.Navigation("Dictionaries");
+
                     b.Navigation("PasswordRecoverySenderRelation");
 
                     b.Navigation("PasswordRecoveryTemplateRelation");

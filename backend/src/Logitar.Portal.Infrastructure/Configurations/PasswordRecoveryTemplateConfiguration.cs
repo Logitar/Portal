@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Core.Realms;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Logitar.Portal.Core.Realms;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {

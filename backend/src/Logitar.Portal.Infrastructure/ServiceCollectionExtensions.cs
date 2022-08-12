@@ -2,6 +2,7 @@
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys;
+using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Providers;
 using Logitar.Portal.Core.Emails.Senders;
@@ -55,6 +56,7 @@ namespace Logitar.Portal.Infrastructure
     {
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
+        .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
         .AddScoped<IMessageQuerier, MessageQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
         .AddScoped<ISenderQuerier, SenderQuerier>()
@@ -67,6 +69,7 @@ namespace Logitar.Portal.Infrastructure
     {
       return services
         .AddScoped<IRepository<ApiKey>, Repository<ApiKey>>()
+        .AddScoped<IRepository<Dictionary>, Repository<Dictionary>>()
         .AddScoped<IRepository<Message>, Repository<Message>>()
         .AddScoped<IRepository<Realm>, Repository<Realm>>()
         .AddScoped<IRepository<Sender>, Repository<Sender>>()

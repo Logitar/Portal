@@ -6,12 +6,12 @@ namespace Logitar.Portal.Core.Emails.Messages
   public class Recipient
   {
     public Recipient(User user, RecipientType type = RecipientType.To)
-      : this(type, user?.Email ?? string.Empty, user?.FullName, user?.Id, user?.Username)
+      : this(type, user?.Email ?? string.Empty, user?.FullName, user?.Id, user?.Locale, user?.Username)
     {
       User = user ?? throw new ArgumentNullException(nameof(user));
     }
     public Recipient(string address, string? displayName, RecipientType type = RecipientType.To)
-      : this(type, address, displayName, userId: null, username: null)
+      : this(type, address, displayName, userId: null, userLocale: null, username: null)
     {
       Address = address ?? throw new ArgumentNullException(nameof(address));
       DisplayName = displayName;
@@ -29,7 +29,7 @@ namespace Logitar.Portal.Core.Emails.Messages
     /// <param name="username"></param>
     /// <exception cref="ArgumentNullException"></exception>
     [JsonConstructor]
-    public Recipient(RecipientType type, string address, string? displayName, Guid? userId, string? username)
+    public Recipient(RecipientType type, string address, string? displayName, Guid? userId, string? userLocale, string? username)
     {
       Type = type;
 
@@ -37,6 +37,7 @@ namespace Logitar.Portal.Core.Emails.Messages
       DisplayName = displayName;
 
       UserId = userId;
+      UserLocale = userLocale;
       Username = username;
     }
 
@@ -46,6 +47,7 @@ namespace Logitar.Portal.Core.Emails.Messages
     public string? DisplayName { get; private set; }
 
     public Guid? UserId { get; private set; }
+    public string? UserLocale { get; private set; }
     public string? Username { get; private set; }
 
     [JsonIgnore]

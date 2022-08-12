@@ -68,7 +68,6 @@
 import EmailField from '@/components/User/EmailField.vue'
 import FirstNameField from '@/components/User/FirstNameField.vue'
 import LastNameField from '@/components/User/LastNameField.vue'
-import LocaleSelect from '@/components/User/LocaleSelect.vue'
 import PhoneField from '@/components/User/PhoneField.vue'
 import PictureField from '@/components/User/PictureField.vue'
 import { saveProfile } from '@/api/account'
@@ -79,7 +78,6 @@ export default {
     EmailField,
     FirstNameField,
     LastNameField,
-    LocaleSelect,
     PhoneField,
     PictureField
   },

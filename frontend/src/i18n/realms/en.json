@@ -10,6 +10,7 @@
     "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
   },
   "created": "The realm has been created.",
+  "defaultLocale": "Default Locale",
   "delete": {
     "confirm": "Do you really want to delete the following realm?",
     "success": "The realm has been deleted.",

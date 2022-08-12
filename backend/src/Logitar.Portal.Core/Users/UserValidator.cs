@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System.Globalization;
 
 namespace Logitar.Portal.Core.Users
 {
@@ -65,7 +64,7 @@ namespace Logitar.Portal.Core.Users
         .MaximumLength(128);
 
       RuleFor(x => x.Locale)
-        .Must(BeAValidCulture);
+        .Must(ValidationRules.BeAValidCulture);
       RuleFor(x => x.Picture)
         .MaximumLength(2048)
         .Must(ValidationRules.BeAValidUrl);
@@ -80,18 +79,6 @@ namespace Logitar.Portal.Core.Users
         RuleFor(x => x.DisabledAt).Null();
         RuleFor(x => x.DisabledById).Null();
       });
-    }
-
-    private static bool BeAValidCulture(string? value)
-    {
-      try
-      {
-        return value == null || CultureInfo.GetCultureInfo(value).LCID != 4096;
-      }
-      catch (CultureNotFoundException)
-      {
-        return false;
-      }
     }
   }
 }

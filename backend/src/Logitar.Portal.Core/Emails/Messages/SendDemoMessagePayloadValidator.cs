@@ -7,6 +7,9 @@ namespace Logitar.Portal.Core.Emails.Messages
   {
     public SendDemoMessagePayloadValidator()
     {
+      RuleFor(x => x.Locale)
+        .Must(ValidationRules.BeAValidCulture);
+
       RuleForEach(x => x.Variables)
         .SetValidator(new VariablePayloadValidator());
     }

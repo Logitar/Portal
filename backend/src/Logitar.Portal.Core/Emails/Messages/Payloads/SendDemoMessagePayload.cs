@@ -4,6 +4,8 @@
   {
     public Guid TemplateId { get; set; }
 
+    public string? Locale { get; set; }
+
     public IEnumerable<VariablePayload>? Variables { get; set; }
   }
 }

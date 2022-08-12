@@ -29,6 +29,20 @@
       </b-card>
       <b-card no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
+          <b-link class="nav-link" v-b-toggle.localization>{{ $t('messages.contents.localization') }}</b-link>
+        </b-card-header>
+        <b-collapse id="localization" accordion="contents-accordion" role="tabpanel">
+          <b-card-body>
+            <b-form-group>
+              <b-form-checkbox :checked="message.ignoreUserLocale" disabled>{{ $t('messages.contents.ignoreUserLocale') }}</b-form-checkbox>
+            </b-form-group>
+            <locale-select v-if="message.locale" disabled :value="message.locale" />
+            <p v-else v-t="'messages.contents.noLocale'" />
+          </b-card-body>
+        </b-collapse>
+      </b-card>
+      <b-card no-body class="mb-1">
+        <b-card-header header-tag="header" class="p-1" role="tab">
           <b-link class="nav-link" v-b-toggle.variables>{{ $t('messages.contents.variables') }}</b-link>
         </b-card-header>
         <b-collapse id="variables" accordion="contents-accordion" role="tabpanel">

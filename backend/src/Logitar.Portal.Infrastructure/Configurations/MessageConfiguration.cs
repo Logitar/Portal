@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Core.Emails.Messages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Logitar.Portal.Core.Emails.Messages;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
@@ -32,6 +32,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.Ignore(x => x.Variables);
 
       builder.Property(x => x.ErrorsSerialized).HasColumnName(nameof(Message.Errors)).HasColumnType("jsonb");
+      builder.Property(x => x.Locale).HasMaxLength(16);
       builder.Property(x => x.RealmAlias).HasMaxLength(256);
       builder.Property(x => x.RealmName).HasMaxLength(256);
       builder.Property(x => x.RecipientsSerialized).HasColumnName(nameof(Message.Recipients)).HasColumnType("jsonb");

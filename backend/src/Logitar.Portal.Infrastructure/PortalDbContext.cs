@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Core;
 using Logitar.Portal.Core.Actors;
 using Logitar.Portal.Core.ApiKeys;
+using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Emails.Messages;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
@@ -25,6 +26,7 @@ namespace Logitar.Portal.Infrastructure
 
     public DbSet<Actor> Actors { get; private set; } = null!;
     public DbSet<ApiKey> ApiKeys { get; private set; } = null!;
+    public DbSet<Dictionary> Dictionaries { get; private set; } = null!;
     public DbSet<Event> Events { get; private set; } = null!;
     public DbSet<BlacklistedJwt> JwtBlacklist { get; private set; } = null!;
     public DbSet<Log> Logs { get; private set; } = null!;

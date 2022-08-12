@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Core.Actors;
+using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Models;
@@ -11,12 +12,14 @@ namespace Logitar.Portal.Core.Realms.Mutations
   {
     private readonly IMappingService _mappingService;
 
+    private readonly IDictionaryQuerier _dictionaryQuerier;
     private readonly IRealmQuerier _realmQuerier;
     private readonly ISenderQuerier _senderQuerier;
     private readonly ISessionQuerier _sessionQuerier;
     private readonly ITemplateQuerier _templateQuerier;
     private readonly IUserQuerier _userQuerier;
 
+    private readonly IRepository<Dictionary> _dictionaryRepository;
     private readonly IRepository<Realm> _realmRepository;
     private readonly IRepository<Sender> _senderRepository;
     private readonly IRepository<Session> _sessionRepository;
@@ -26,14 +29,16 @@ namespace Logitar.Portal.Core.Realms.Mutations
     private readonly IActorService _actorService;
 
     private readonly IUserContext _userContext;
-    
+
     public DeleteRealmMutationHandler(
       IMappingService mappingService,
+      IDictionaryQuerier dictionaryQuerier,
       IRealmQuerier realmQuerier,
       ISenderQuerier senderQuerier,
       ISessionQuerier sessionQuerier,
       ITemplateQuerier templateQuerier,
       IUserQuerier userQuerier,
+      IRepository<Dictionary> dictionaryRepository,
       IRepository<Realm> realmRepository,
       IRepository<Sender> senderRepository,
       IRepository<Session> sessionRepository,
@@ -44,11 +49,13 @@ namespace Logitar.Portal.Core.Realms.Mutations
     )
     {
       _mappingService = mappingService;
+      _dictionaryQuerier = dictionaryQuerier;
       _realmQuerier = realmQuerier;
       _senderQuerier = senderQuerier;
       _sessionQuerier = sessionQuerier;
       _templateQuerier = templateQuerier;
       _userQuerier = userQuerier;
+      _dictionaryRepository = dictionaryRepository;
       _realmRepository = realmRepository;
       _senderRepository = senderRepository;
       _sessionRepository = sessionRepository;
@@ -65,15 +72,27 @@ namespace Logitar.Portal.Core.Realms.Mutations
 
       await DeleteSessionsAsync(realm, cancellationToken);
       await DeleteUsersAsync(realm, cancellationToken);
-      
+
       await DeleteSendersAsync(realm, cancellationToken);
       await DeleteTemplatesAsync(realm, cancellationToken);
+
+      await DeleteDictionariesAsync(realm, cancellationToken);
 
       realm.Delete(_userContext.Actor.Id);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
 
       return await _mappingService.MapAsync<RealmModel>(realm, cancellationToken);
+    }
+
+    private async Task DeleteDictionariesAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      PagedList<Dictionary> dictionaries = await _dictionaryQuerier.GetPagedAsync(realm: realm.Id.ToString(), readOnly: false, cancellationToken: cancellationToken);
+      foreach (Dictionary dictionary in dictionaries)
+      {
+        dictionary.Delete(_userContext.Actor.Id);
+      }
+      await _dictionaryRepository.SaveAsync(dictionaries, cancellationToken);
     }
 
     private async Task DeleteSendersAsync(Realm realm, CancellationToken cancellationToken)
