@@ -12,7 +12,7 @@ namespace Logitar.Portal.Web
       return services.AddSwaggerGen(config =>
       {
         config.AddSecurity();
-        config.SwaggerDoc(name: "v1", new OpenApiInfo
+        config.SwaggerDoc(name: $"v{Constants.Version.Split('.').First()}", new OpenApiInfo
         {
           Contact = new OpenApiContact
           {
@@ -27,7 +27,7 @@ namespace Logitar.Portal.Web
             Url = new Uri("https://github.com/Utar94/Portal/blob/main/LICENSE")
           },
           Title = "Portal API",
-          Version = "v1.0"
+          Version = $"v{Constants.Version}"
         });
       });
     }

@@ -3,7 +3,7 @@
     <b-container fluid>
       <b-link class="text-light" href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
-        {{ $t('copyright') }}
+        {{ $t('copyright', { version }) }}
       </b-link>
     </b-container>
   </footer>
@@ -11,7 +11,13 @@
 
 <script>
 export default {
-  name: 'AppFooter'
+  name: 'AppFooter',
+  props: {
+    version: {
+      type: String,
+      required: true
+    }
+  }
 }
 </script>
 

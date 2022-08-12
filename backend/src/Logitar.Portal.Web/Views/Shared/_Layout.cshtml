@@ -30,7 +30,7 @@
   <div id="app">
     <navbar user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
     @RenderBody()
-    <app-footer></app-footer>
+    <app-footer version="v@(Constants.Version)"></app-footer>
   </div>
   <script src="~/dist/app.js"></script>
   <script src="~/dist/chunk-vendors.js"></script>
