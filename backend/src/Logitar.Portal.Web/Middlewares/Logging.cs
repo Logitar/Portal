@@ -2,6 +2,7 @@
 using Logitar.Portal.Core;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Infrastructure.Entities;
+using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Text.Json;
 
@@ -9,16 +10,30 @@ namespace Logitar.Portal.Web.Middlewares
 {
   internal class Logging
   {
-    private readonly ILogger<Logging> _logger;
     private readonly RequestDelegate _next;
 
-    public Logging(ILogger<Logging> logger, RequestDelegate next)
+    private readonly IHostEnvironment _environment;
+    private readonly ILogger<Logging> _logger;
+    private readonly LoggingSettings _settings;
+    private readonly IUserContext _userContext;
+
+    public Logging(
+      RequestDelegate next,
+      IHostEnvironment environment,
+      ILogger<Logging> logger,
+      LoggingSettings settings,
+      IUserContext userContext
+    )
     {
-      _logger = logger;
       _next = next;
+
+      _environment = environment;
+      _logger = logger;
+      _settings = settings;
+      _userContext = userContext;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext, PortalDbContext dbContext, IHostEnvironment environment, IUserContext userContext)
+    public async Task InvokeAsync(HttpContext httpContext, PortalDbContext dbContext)
     {
       HttpRequest request = httpContext.Request;
       HttpResponse response = httpContext.Response;
@@ -27,15 +42,18 @@ namespace Logitar.Portal.Web.Middlewares
       var log = new Log(request.Method, request.GetDisplayUrl(), ipAddress);
 
       bool added = false;
-      try
+      if (_settings.Enabled)
       {
-        dbContext.Logs.Add(log);
-        await dbContext.SaveChangesAsync();
-        added = true;
-      }
-      catch (Exception exception)
-      {
-        _logger.LogError(exception, "{message}", exception.Message);
+        try
+        {
+          dbContext.Logs.Add(log);
+          await dbContext.SaveChangesAsync();
+          added = true;
+        }
+        catch (Exception exception)
+        {
+          _logger.LogError(exception, "{message}", exception.Message);
+        }
       }
 
       try
@@ -83,14 +101,14 @@ namespace Logitar.Portal.Web.Middlewares
 
         response.StatusCode = StatusCodes.Status500InternalServerError;
 
-        if (environment.IsDevelopment())
+        if (_environment.IsDevelopment())
         {
           await response.WriteAsJsonAsync(error);
         }
       }
       finally
       {
-        log.Complete(response.StatusCode, userContext.Actor, httpContext.GetSession(), httpContext.GetUser());
+        log.Complete(response.StatusCode, _userContext.Actor, httpContext.GetSession(), httpContext.GetUser());
 
         if (log.HasErrors)
         {
@@ -116,22 +134,25 @@ namespace Logitar.Portal.Web.Middlewares
           }
         }
 
-        try
+        if (_settings.Enabled)
         {
-          if (added)
+          try
           {
-            dbContext.Update(log);
-          }
-          else
-          {
-            dbContext.Add(log);
-          }
+            if (added)
+            {
+              dbContext.Update(log);
+            }
+            else
+            {
+              dbContext.Add(log);
+            }
 
-          await dbContext.SaveChangesAsync();
-        }
-        catch (Exception exception)
-        {
-          _logger.LogError(exception, "{message}", exception.Message);
+            await dbContext.SaveChangesAsync();
+          }
+          catch (Exception exception)
+          {
+            _logger.LogError(exception, "{message}", exception.Message);
+          }
         }
       }
     }
