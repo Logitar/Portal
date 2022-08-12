@@ -107,7 +107,7 @@ namespace Logitar.Portal.Core.Users
 
       if (user.Id == _userContext.Actor.Id)
       {
-        throw new UserCannotDeleteHerselfException(user);
+        throw new UserCannotDeleteItselfException(user);
       }
 
       PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
@@ -136,7 +136,7 @@ namespace Logitar.Portal.Core.Users
       }
       else if (user.Id == _userContext.Actor.Id)
       {
-        throw new UserCannotDisableHerselfException(user);
+        throw new UserCannotDisableItselfException(user);
       }
 
       user.Disable(_userContext.Actor.Id);

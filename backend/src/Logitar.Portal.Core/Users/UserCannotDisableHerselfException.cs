@@ -2,13 +2,13 @@
 
 namespace Logitar.Portal.Core.Users
 {
-  internal class UserCannotDisableHerselfException : ApiException
+  internal class UserCannotDisableItselfException : ApiException
   {
-    public UserCannotDisableHerselfException(User user)
-      : base(HttpStatusCode.BadRequest, $"The user '{user}' cannot disable herself.")
+    public UserCannotDisableItselfException(User user)
+      : base(HttpStatusCode.BadRequest, $"The user '{user}' cannot disable itself.")
     {
       User = user ?? throw new ArgumentNullException(nameof(user));
-      Value = new { code = nameof(UserCannotDisableHerselfException).Remove(nameof(Exception)) };
+      Value = new { code = nameof(UserCannotDisableItselfException).Remove(nameof(Exception)) };
     }
 
     public User User { get; }
