@@ -4,14 +4,16 @@ namespace Logitar.Portal.Core.Emails.Messages.Events
 {
   public class CreatedEvent : CreatedEventBase
   {
-    public CreatedEvent(string body, IEnumerable<Recipient> recipients,
+    public CreatedEvent(string subject, string body, IEnumerable<Recipient> recipients,
       Guid? realmId, string? realmAlias, string? realmName,
       Guid senderId, bool senderIsDefault, ProviderType senderProvider, string senderAddress, string? senderDisplayName,
-      Guid templateId, string templateKey, string templateSubject, string templateContentType, string? templateDisplayName,
-      Dictionary<string, string?>? variables, bool isDemo, Guid userId) : base(userId)
+      Guid templateId, string templateKey, string templateContentType, string? templateDisplayName,
+      bool ignoreUserLocale, string? locale, Dictionary<string, string?>? variables, bool isDemo, Guid userId) : base(userId)
     {
       Body = body ?? throw new ArgumentNullException(nameof(body));
+      IgnoreUserLocale = ignoreUserLocale;
       IsDemo = isDemo;
+      Locale = locale;
       RealmAlias = realmAlias;
       RealmId = realmId;
       RealmName = realmName;
@@ -21,16 +23,18 @@ namespace Logitar.Portal.Core.Emails.Messages.Events
       SenderId = senderId;
       SenderIsDefault = senderIsDefault;
       SenderProvider = senderProvider;
+      Subject = subject ?? throw new ArgumentNullException(nameof(subject));
       TemplateContentType = templateContentType ?? throw new ArgumentNullException(nameof(templateContentType));
       TemplateDisplayName = templateDisplayName;
       TemplateId = templateId;
       TemplateKey = templateKey ?? throw new ArgumentNullException(nameof(templateKey));
-      TemplateSubject = templateSubject ?? throw new ArgumentNullException(nameof(templateSubject));
       Variables = variables;
     }
 
     public string Body { get; private set; }
+    public bool IgnoreUserLocale { get; private set; }
     public bool IsDemo { get; private set; }
+    public string? Locale { get; set; }
     public string? RealmAlias { get; private set; }
     public Guid? RealmId { get; private set; }
     public string? RealmName { get; private set; }
@@ -40,9 +44,9 @@ namespace Logitar.Portal.Core.Emails.Messages.Events
     public Guid SenderId { get; private set; }
     public bool SenderIsDefault { get; private set; }
     public ProviderType SenderProvider { get; private set; }
+    public string Subject { get; private set; }
     public string TemplateContentType { get; private set; }
     public string? TemplateDisplayName { get; private set; }
-    public string TemplateSubject { get; private set; }
     public Guid TemplateId { get; private set; }
     public string TemplateKey { get; private set; }
     public Dictionary<string, string?>? Variables { get; private set; }

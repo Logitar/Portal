@@ -8,17 +8,18 @@ namespace Logitar.Portal.Core.Emails.Messages
 {
   public class Message : Aggregate
   {
-    public Message(string body, IEnumerable<Recipient> recipients, Sender sender,
-      Template template, Guid userId, Realm? realm = null, Dictionary<string, string?>? variables = null, bool isDemo = false)
+    public Message(string subject, string body, IEnumerable<Recipient> recipients, Sender sender, Template template,
+      Guid userId, Realm? realm = null, bool ignoreUserLocale = false, string? locale = null,
+      Dictionary<string, string?>? variables = null, bool isDemo = false)
     {
       ArgumentNullException.ThrowIfNull(sender);
       ArgumentNullException.ThrowIfNull(template);
 
-      ApplyChange(new CreatedEvent(body, recipients,
+      ApplyChange(new CreatedEvent(subject, body, recipients,
         realm?.Id, realm?.AliasNormalized, realm?.Name,
         sender.Id, sender.IsDefault, sender.Provider, sender.EmailAddress, sender.DisplayName,
-        template.Id, template.KeyNormalized, template.Subject, template.ContentType, template.DisplayName,
-        variables, isDemo, userId));
+        template.Id, template.KeyNormalized, template.ContentType, template.DisplayName,
+        ignoreUserLocale, locale, variables, isDemo, userId));
     }
     private Message()
     {
@@ -51,6 +52,16 @@ namespace Logitar.Portal.Core.Emails.Messages
     public string TemplateContentType { get; private set; } = null!;
     public string? TemplateDisplayName { get; private set; }
 
+    public bool IgnoreUserLocale { get; private set; }
+    public string? Locale { get; private set; }
+
+    public Dictionary<string, string?>? Variables { get; private set; }
+    public string? VariablesSerialized
+    {
+      get => Variables?.Any() == true ? JsonSerializer.Serialize(Variables) : null;
+      private set => Variables = value == null ? null : JsonSerializer.Deserialize<Dictionary<string, string?>>(value);
+    }
+
     public IEnumerable<Error> Errors { get; private set; } = Enumerable.Empty<Error>();
     public string? ErrorsSerialized
     {
@@ -75,13 +86,6 @@ namespace Logitar.Portal.Core.Emails.Messages
       private set { /* EntityFrameworkCore only setter */ }
     }
 
-    public Dictionary<string, string?>? Variables { get; private set; }
-    public string? VariablesSerialized
-    {
-      get => Variables?.Any() == true ? JsonSerializer.Serialize(Variables) : null;
-      private set => Variables = value == null ? null : JsonSerializer.Deserialize<Dictionary<string, string?>>(value);
-    }
-
     public void Fail(Error error, Guid userId)
     {
       ApplyChange(new FailedEvent(new[] { error }, userId));
@@ -95,7 +99,7 @@ namespace Logitar.Portal.Core.Emails.Messages
     {
       IsDemo = @event.IsDemo;
 
-      Subject = @event.TemplateSubject;
+      Subject = @event.Subject;
       Body = @event.Body.Trim();
 
       Recipients = @event.Recipients;
@@ -114,6 +118,9 @@ namespace Logitar.Portal.Core.Emails.Messages
       TemplateKey = @event.TemplateKey;
       TemplateContentType = @event.TemplateContentType;
       TemplateDisplayName = @event.TemplateDisplayName;
+
+      IgnoreUserLocale = @event.IgnoreUserLocale;
+      Locale = @event.Locale;
 
       Variables = @event.Variables;
     }

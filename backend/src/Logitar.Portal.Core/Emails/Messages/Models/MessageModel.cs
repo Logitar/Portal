@@ -26,12 +26,15 @@ namespace Logitar.Portal.Core.Emails.Messages.Models
     public string TemplateContentType { get; set; } = null!;
     public string? TemplateDisplayName { get; set; }
 
+    public bool IgnoreUserLocale { get; private set; }
+    public string? Locale { get; private set; }
+
+    public IEnumerable<VariableModel> Variables { get; set; } = null!;
+
     public IEnumerable<ErrorModel> Errors { get; set; } = null!;
     public bool HasErrors => Errors.Any();
 
     public IEnumerable<ResultDataModel> Result { get; set; } = null!;
     public bool Succeeded => !HasErrors && Result != null;
-
-    public IEnumerable<VariableModel> Variables { get; set; } = null!;
   }
 }

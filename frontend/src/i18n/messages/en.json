@@ -1,7 +1,10 @@
 {
   "contentFormat": "content",
   "contents": {
+    "ignoreUserLocale": "Ignore user locale",
     "label": "Contents",
+    "localization": "Localization",
+    "noLocale": "No locale were specified in this message.",
     "noVariable": "No variable were specified in this message.",
     "variables": "Variables",
     "viewAsHtml": "View as HTML",

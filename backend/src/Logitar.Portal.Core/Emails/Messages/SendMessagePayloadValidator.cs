@@ -10,6 +10,9 @@ namespace Logitar.Portal.Core.Emails.Messages
       RuleFor(x => x.Template)
         .NotEmpty();
 
+      RuleFor(x => x.Locale)
+        .Must(ValidationRules.BeAValidCulture);
+
       RuleFor(x => x.Recipients)
         .Must(x => x.Any(y => y.Type == RecipientType.To));
       RuleForEach(x => x.Recipients)
