@@ -4,13 +4,15 @@
       <b-navbar-brand href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
         Portal
+        <b-badge v-if="environment" variant="warning">{{ environment }}</b-badge>
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <template v-if="user.isAuthenticated">
+          <b-nav-item v-if="environment === 'development'" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
+          <template v-if="currentUser.isAuthenticated">
             <b-nav-item href="/users">
               <font-awesome-icon icon="users" />
               {{ $t('user.title') }}
@@ -22,6 +24,30 @@
             <b-nav-item href="/api-keys">
               <font-awesome-icon icon="key" />
               {{ $t('apiKeys.title') }}
+            </b-nav-item>
+            <b-nav-item href="/templates">
+              <font-awesome-icon icon="at" />
+              {{ $t('templates.title') }}
+            </b-nav-item>
+            <b-nav-item href="/senders">
+              <font-awesome-icon icon="paper-plane" />
+              {{ $t('senders.title') }}
+            </b-nav-item>
+            <b-nav-item href="/messages">
+              <font-awesome-icon icon="envelope" />
+              {{ $t('messages.title') }}
+            </b-nav-item>
+            <b-nav-item href="/tokens">
+              <font-awesome-icon icon="id-card" />
+              {{ $t('tokens.title') }}
+            </b-nav-item>
+            <b-nav-item href="/sessions">
+              <font-awesome-icon icon="user-clock" />
+              {{ $t('user.session.title') }}
+            </b-nav-item>
+            <b-nav-item href="/dictionaries">
+              <font-awesome-icon icon="language" />
+              {{ $t('dictionaries.title') }}
             </b-nav-item>
           </template>
         </b-navbar-nav>
@@ -42,15 +68,14 @@
             </b-dropdown-item>
           </b-nav-item-dropdown> -->
 
-          <template v-if="user.isAuthenticated">
+          <template v-if="currentUser.isAuthenticated">
             <b-nav-item-dropdown right>
               <template #button-content>
-                <img v-if="user.picture" :src="user.picture" alt="Avatar" class="rounded-circle" width="24" height="24" />
-                <v-gravatar v-else class="rounded-circle" :email="user.email" :size="24" />
+                <user-avatar :user="currentUser" :size="24" />
               </template>
               <b-dropdown-item href="/user/profile">
                 <font-awesome-icon icon="user" />
-                {{ user.name }}
+                {{ currentUser.fullName || currentUser.username }}
               </b-dropdown-item>
               <b-dropdown-item href="/user/sign-out">
                 <font-awesome-icon icon="sign-out-alt" />
@@ -71,26 +96,36 @@
 </template>
 
 <script>
+import UserAvatar from '@/components/User/UserAvatar.vue'
+
 export default {
   name: 'Navbar',
+  components: {
+    UserAvatar
+  },
   props: {
-    json: {
+    user: {
       type: String,
       required: true
     }
   },
   data() {
     return {
-      user: null
+      currentUser: null
+    }
+  },
+  computed: {
+    environment() {
+      return process.env.VUE_APP_ENV
     }
   },
   methods: {
-    setModel(user) {
-      this.user = user
+    setModel(currentUser) {
+      this.currentUser = currentUser
     }
   },
   created() {
-    this.setModel(JSON.parse(this.json))
+    this.setModel(JSON.parse(this.user))
   }
 }
 </script>

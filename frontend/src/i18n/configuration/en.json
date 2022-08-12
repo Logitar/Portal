@@ -2,6 +2,9 @@
   "initialization": {
     "initialize": "Initialize",
     "title": "Initialization",
-    "user": "User"
+    "user": {
+      "help": "Fill the form below to create the first administrator account.",
+      "label": "User"
+    }
   }
 }

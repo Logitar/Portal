@@ -1,10 +1,11 @@
 <template>
   <form-field
     :disabled="disabled || !custom"
-    id="alias"
-    label="realms.alias.label"
+    :id="id"
+    :label="label"
     :maxLength="validate ? 100 : null"
-    placeholder="realms.alias.placeholder"
+    :placeholder="placeholder"
+    :ref="id"
     :required="required"
     :rules="{ alias: validate }"
     :value="value"
@@ -26,9 +27,21 @@ export default {
       type: Boolean,
       default: false
     },
+    id: {
+      type: String,
+      default: 'alias'
+    },
+    label: {
+      type: String,
+      default: 'realms.alias.label'
+    },
     name: {
       type: String,
       default: ''
+    },
+    placeholder: {
+      type: String,
+      default: 'realms.alias.placeholder'
     },
     required: {
       type: Boolean,
@@ -63,6 +76,12 @@ export default {
         words.push(word)
       }
       return words.join('-').toLowerCase()
+    },
+    customize() {
+      this.custom = true
+    },
+    focus() {
+      this.$refs[this.id].focus()
     }
   },
   watch: {

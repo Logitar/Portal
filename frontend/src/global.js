@@ -1,42 +1,40 @@
 import Vue from 'vue'
-import Gravatar from 'vue-gravatar'
+
 import CountSelect from './components/shared/CountSelect.vue'
 import DeleteModal from './components/shared/DeleteModal.vue'
 import DescriptionField from './components/shared/DescriptionField.vue'
-import EffectField from './components/shared/EffectField.vue'
 import FormDateTime from './components/shared/FormDateTime.vue'
 import FormField from './components/shared/FormField.vue'
 import FormSelect from './components/shared/FormSelect.vue'
 import FormTextarea from './components/shared/FormTextarea.vue'
+import FormUrl from './components/shared/FormUrl.vue'
 import IconButton from './components/shared/IconButton.vue'
 import IconSubmit from './components/shared/IconSubmit.vue'
+import LocaleSelect from './components/shared/LocaleSelect.vue'
 import NameField from './components/shared/NameField.vue'
-import ReferenceField from './components/shared/ReferenceField.vue'
-import RegionSelect from './components/shared/RegionSelect.vue'
 import SearchField from './components/shared/SearchField.vue'
 import SortSelect from './components/shared/SortSelect.vue'
+import StatusCell from './components/shared/StatusCell.vue'
 import StatusDetail from './components/shared/StatusDetail.vue'
-import TypeSelect from './components/shared/TypeSelect.vue'
-
-Vue.component('v-gravatar', Gravatar)
+import StatusInfo from './components/shared/StatusInfo.vue'
 
 Vue.component('count-select', CountSelect)
 Vue.component('delete-modal', DeleteModal)
 Vue.component('description-field', DescriptionField)
-Vue.component('effect-field', EffectField)
 Vue.component('form-datetime', FormDateTime)
 Vue.component('form-field', FormField)
 Vue.component('form-select', FormSelect)
 Vue.component('form-textarea', FormTextarea)
+Vue.component('form-url', FormUrl)
 Vue.component('icon-button', IconButton)
 Vue.component('icon-submit', IconSubmit)
+Vue.component('locale-select', LocaleSelect)
 Vue.component('name-field', NameField)
-Vue.component('reference-field', ReferenceField)
-Vue.component('region-select', RegionSelect)
 Vue.component('search-field', SearchField)
 Vue.component('sort-select', SortSelect)
+Vue.component('status-cell', StatusCell)
 Vue.component('status-detail', StatusDetail)
-Vue.component('type-select', TypeSelect)
+Vue.component('status-info', StatusInfo)
 
 Vue.mixin({
   methods: {
@@ -50,7 +48,9 @@ Vue.mixin({
       this.toast('errorToast.title', 'errorToast.body', 'danger')
     },
     orderBy(items, key = null) {
-      return key ? [...items].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0)) : [...items].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+      return typeof key !== 'undefined' && key !== null
+        ? [...items].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0))
+        : [...items].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     },
     roll(roll) {
       const dice = roll.split('d')

@@ -37,7 +37,7 @@
             v-model="confirm"
           />
         </b-row>
-        <icon-submit :disabled="loading" icon="key" :loading="loading" text="user.password.submit" variant="primary" />
+        <icon-submit :disabled="!hasChanges || loading" icon="key" :loading="loading" text="user.password.submit" variant="primary" />
       </b-form>
     </validation-observer>
   </div>
@@ -68,6 +68,9 @@ export default {
     }
   },
   computed: {
+    hasChanges() {
+      return Boolean(this.current) || Boolean(this.password) || Boolean(this.confirm)
+    },
     payload() {
       return {
         current: this.current,

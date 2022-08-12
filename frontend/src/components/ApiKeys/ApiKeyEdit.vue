@@ -13,7 +13,7 @@
       {{ $t('apiKeys.string.warning') }}
     </b-alert>
     <template v-if="apiKey">
-      <status-detail :createdAt="new Date(apiKey.createdAt)" :updatedAt="apiKey.updatedAt ? new Date(apiKey.updatedAt) : null" />
+      <status-detail :model="apiKey" />
       <p v-if="apiKey.expiresAt" :class="{ 'text-danger': apiKey.isExpired }">
         <template v-if="apiKey.isExpired">{{ $t('apiKeys.expiredAt') }}</template>
         <template v-else>{{ $t('apiKeys.expiresAt') }}</template>
@@ -24,11 +24,11 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <div v-if="!apiKey || !apiKey.isExpired" class="my-2">
-          <icon-submit v-if="!!apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
+          <icon-submit v-if="apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <form-datetime v-if="!apiKey" id="expiresAt" label="apiKeys.expiresAt" :minDate="new Date()" validate v-model="expiresAt" />
-        <name-field :disabled="apiKey && apiKey.isExpired" v-model="name" />
+        <name-field :disabled="apiKey && apiKey.isExpired" required v-model="name" />
         <description-field :disabled="apiKey && apiKey.isExpired" :rows="15" v-model="description" />
       </b-form>
     </validation-observer>
@@ -67,7 +67,7 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.apiKey && !!this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
+        (!this.apiKey && this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
       )
     },
     payload() {
@@ -82,7 +82,7 @@ export default {
     }
   },
   methods: {
-    async copyToClipboard() {
+    copyToClipboard() {
       this.$refs.input.focus()
       navigator.clipboard.writeText(this.xApiKey)
     },
@@ -115,7 +115,7 @@ export default {
       }
     }
   },
-  async created() {
+  created() {
     if (this.json) {
       this.setModel(JSON.parse(this.json))
     }

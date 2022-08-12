@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1 v-t="'user.profile'" />
+    <h1 v-t="'user.profile.title'" />
     <personal-information :profile="profile" />
     <authentication-information :profile="profile" @updated="setModel" />
   </b-container>

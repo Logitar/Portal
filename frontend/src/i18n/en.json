@@ -6,6 +6,8 @@
     "refresh": "Refresh",
     "save": "Save"
   },
+  "by": "By",
+  "copyright": "© Portal {version} 2022.",
   "count": "Count",
   "description": {
     "label": "Description",
@@ -15,10 +17,15 @@
     "body": "An unexpected error occurred. Please try again later or contact our support team.",
     "title": "Error!"
   },
+  "locale": {
+    "label": "Locale",
+    "placeholder": "Select a locale"
+  },
   "name": {
     "label": "Name",
     "placeholder": "Enter a name"
   },
+  "no": "No",
   "notFound": {
     "help": "The requested page could not be found.",
     "lead": "Page Not Found",
@@ -34,9 +41,12 @@
     "placeholder": "Select a sort option"
   },
   "statusDetail": {
+    "by": "by",
     "createdAt": "Created on {date}",
     "updatedAt": "Last updated on {date}"
   },
   "success": "Success!",
-  "updatedAt": "Updated on"
+  "system": "System",
+  "updated": "Updated",
+  "yes": "Yes"
 }

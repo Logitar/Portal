@@ -20,6 +20,9 @@ async function execute(method, url, data = null) {
     }
   }
   if (!response.ok) {
+    if (response.status === 401) {
+      window.location.replace(`/user/sign-in?returnUrl=${window.location.pathname}`)
+    }
     throw result
   }
   return result

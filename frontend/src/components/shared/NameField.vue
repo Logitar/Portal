@@ -5,7 +5,7 @@
     :label="label"
     :maxLength="maxLength"
     :placeholder="placeholder"
-    required
+    :required="required"
     :value="value"
     @input="$emit('input', $event)"
   />
@@ -34,6 +34,10 @@ export default {
     placeholder: {
       type: String,
       default: 'name.placeholder'
+    },
+    required: {
+      type: Boolean,
+      default: false
     },
     value: {}
   }

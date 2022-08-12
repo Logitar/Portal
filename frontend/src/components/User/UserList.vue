@@ -8,7 +8,25 @@
       </div>
       <b-row>
         <search-field class="col" v-model="search" />
-        <realm-select class="col" v-model="realmId" />
+        <realm-select class="col" v-model="realm" />
+        <form-select
+          class="col"
+          id="isConfirmed"
+          label="user.confirmed.label"
+          :options="yesNoOptions"
+          placeholder="user.confirmed.placeholder"
+          v-model="isConfirmed"
+        />
+      </b-row>
+      <b-row>
+        <form-select
+          class="col"
+          id="isDisabled"
+          label="user.disabled.label"
+          :options="yesNoOptions"
+          placeholder="user.disabled.placeholder"
+          v-model="isDisabled"
+        />
         <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
         <count-select class="col" v-model="count" />
       </b-row>
@@ -24,33 +42,38 @@
             <th scope="col" v-t="'user.phone.label'" />
             <th scope="col" v-t="'user.passwordChangedAt'" />
             <th scope="col" v-t="'user.signedInAt'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.id">
             <td>
-              <b-link :href="`/users/${user.id}`">
-                <img v-if="user.picture" :src="user.picture" :alt="`${user.username}'s avatar`" class="rounded-circle" width="24" height="24" />
-                <v-gravatar v-else-if="user.email" class="rounded-circle" :email="user.email" :size="24" />
-                {{ user.username }}
-              </b-link>
+              <b-link :href="`/users/${user.id}`" class="mx-1"><user-avatar :user="user" /></b-link>
+              <b-link :href="`/users/${user.id}`">{{ user.username }}</b-link>
             </td>
             <td v-text="user.fullName || '—'" />
             <td>
               {{ user.email || '—' }}
-              <b-badge v-if="user.emailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
+              <b-badge v-if="user.isEmailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
             </td>
             <td>
               {{ user.phoneNumber || '—' }}
-              <b-badge v-if="user.phoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
+              <b-badge v-if="user.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
             </td>
             <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
             <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
-            <td>{{ $d(new Date(user.updatedAt || user.createdAt), 'medium') }}</td>
+            <td><status-cell :actor="user.updatedBy" :date="user.updatedAt" /></td>
             <td>
-              <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${user.id}`" />
+              <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
+              <icon-button
+                class="mx-1"
+                :disabled="user.id === current"
+                icon="trash-alt"
+                text="actions.delete"
+                variant="danger"
+                v-b-modal="`delete_${user.id}`"
+              />
               <delete-modal
                 confirm="user.delete.confirm"
                 :displayName="user.fullName ? `${user.fullName} (${user.username})` : user.username"
@@ -70,20 +93,33 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import ToggleStatus from './ToggleStatus.vue'
+import UserAvatar from './UserAvatar.vue'
 import { deleteUser, getUsers } from '@/api/users'
+import { getQueryString } from '@/helpers/queryUtils'
 
 export default {
   name: 'UserList',
   components: {
-    RealmSelect
+    RealmSelect,
+    ToggleStatus,
+    UserAvatar
+  },
+  props: {
+    current: {
+      type: String,
+      required: true
+    }
   },
   data() {
     return {
       count: 10,
       desc: false,
+      isConfirmed: null,
+      isDisabled: null,
       loading: false,
       page: 1,
-      realmId: null,
+      realm: null,
       search: null,
       sort: 'Username',
       total: 0,
@@ -92,11 +128,13 @@ export default {
   },
   computed: {
     createUrl() {
-      return `/create-user${this.realmId ? `?realm=${this.realmId}` : ''}`
+      return '/create-user' + getQueryString({ realm: this.realm })
     },
     params() {
       return {
-        realmId: this.realmId,
+        isConfirmed: this.isConfirmed,
+        isDisabled: this.isDisabled,
+        realm: this.realm,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -109,6 +147,12 @@ export default {
         Object.entries(this.$i18n.t('user.sort.options')).map(([value, text]) => ({ text, value })),
         'text'
       )
+    },
+    yesNoOptions() {
+      return [
+        { text: this.$i18n.t('yes'), value: 'true' },
+        { text: this.$i18n.t('no'), value: 'false' }
+      ]
     }
   },
   methods: {
@@ -159,7 +203,11 @@ export default {
         if (
           newValue?.index &&
           oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
+          (newValue.isConfirmed !== oldValue.isConfirmed ||
+            newValue.isDisabled !== oldValue.isDisabled ||
+            newValue.realm !== oldValue.realm ||
+            newValue.search !== oldValue.search ||
+            newValue.count !== oldValue.count)
         ) {
           this.page = 1
           await this.refresh()

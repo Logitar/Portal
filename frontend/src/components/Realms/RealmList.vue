@@ -16,19 +16,17 @@
           <tr>
             <th scope="col" v-t="'realms.alias.label'" />
             <th scope="col" v-t="'name.label'" />
-            <th scope="col" v-t="'updatedAt'" />
+            <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
         </thead>
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <b-link :href="`/realms/${realm.alias.toLowerCase()}`">
-                {{ realm.alias }}
-              </b-link>
+              <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
             </td>
             <td v-text="realm.name" />
-            <td>{{ $d(new Date(realm.updatedAt || realm.createdAt), 'medium') }}</td>
+            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedAt" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal
@@ -60,17 +58,15 @@ export default {
       desc: false,
       loading: false,
       page: 1,
-      realmId: null,
+      realms: [],
       search: null,
       sort: 'Name',
-      total: 0,
-      realms: []
+      total: 0
     }
   },
   computed: {
     params() {
       return {
-        realmId: this.realmId,
         search: this.search,
         sort: this.sort,
         desc: this.desc,
@@ -130,11 +126,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (
-          newValue?.index &&
-          oldValue &&
-          (newValue.realmId !== oldValue.realmId || newValue.search !== oldValue.search || newValue.count !== oldValue.count)
-        ) {
+        if (newValue?.index && oldValue && (newValue.search !== oldValue.search || newValue.count !== oldValue.count)) {
           this.page = 1
           await this.refresh()
         } else {
