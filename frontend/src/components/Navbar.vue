@@ -45,6 +45,10 @@
               <font-awesome-icon icon="user-clock" />
               {{ $t('user.session.title') }}
             </b-nav-item>
+            <b-nav-item href="/dictionaries">
+              <font-awesome-icon icon="language" />
+              {{ $t('dictionaries.title') }}
+            </b-nav-item>
           </template>
         </b-navbar-nav>
 

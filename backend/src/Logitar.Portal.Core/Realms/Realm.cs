@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Emails.Senders;
+﻿using Logitar.Portal.Core.Dictionaries;
+using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Templates;
 using Logitar.Portal.Core.Realms.Events;
 using Logitar.Portal.Core.Realms.Payloads;
@@ -65,6 +66,7 @@ namespace Logitar.Portal.Core.Realms
 
     public string? GoogleClientId { get; private set; }
 
+    public List<Dictionary> Dictionaries { get; private set; } = new();
     public List<Sender> Senders { get; private set; } = new();
     public List<Template> Templates { get; private set; } = new();
     public List<User> Users { get; private set; } = new();
