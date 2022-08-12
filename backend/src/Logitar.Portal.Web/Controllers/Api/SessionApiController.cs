@@ -21,9 +21,8 @@ namespace Logitar.Portal.Web.Controllers.Api
       _sessionService = sessionService;
     }
 
-    [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
     [HttpGet]
-    public async Task<ActionResult<ListModel<SessionSummary>>> GetSessionsAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
+    public async Task<ActionResult<ListModel<SessionSummary>>> GetAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
       SessionSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken)
@@ -36,16 +35,28 @@ namespace Logitar.Portal.Web.Controllers.Api
       return Ok(sessions.To<SessionModel, SessionSummary>(_mapper));
     }
 
-    [HttpPatch("{id}/sign/out")]
-    public async Task<ActionResult<SessionModel>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<SessionModel>> GetAsync(Guid id, CancellationToken cancellationToken)
     {
-      return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
+      SessionModel? session = await _sessionService.GetAsync(id, cancellationToken);
+      if (session == null)
+      {
+        return NotFound(session);
+      }
+
+      return Ok(session);
     }
 
     [HttpPatch("/api/users/{id}/sessions/sign/out")]
     public async Task<ActionResult<IEnumerable<SessionModel>>> SignOutAllAsync(Guid id, CancellationToken cancellationToken)
     {
       return Ok(await _sessionService.SignOutAllAsync(id, cancellationToken));
+    }
+
+    [HttpPatch("{id}/sign/out")]
+    public async Task<ActionResult<SessionModel>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
     }
   }
 }
