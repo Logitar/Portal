@@ -52,7 +52,7 @@
             <td>
               <status-badge :message="message" />
             </td>
-            <updated-cell :actor="message.updatedBy" :date="message.updatedAt" />
+            <td><status-cell :actor="message.updatedBy" :date="message.updatedAt" /></td>
           </tr>
         </tbody>
       </table>
