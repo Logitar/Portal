@@ -33,9 +33,11 @@ namespace Logitar.Portal.Client
         .AddHttpClient()
         .AddScoped<IAccountService, AccountService>()
         .AddScoped<IApiKeyService, ApiKeyService>()
+        .AddScoped<IDictionaryService, DictionaryService>()
         .AddScoped<IMessageService, MessageService>()
         .AddScoped<IRealmService, RealmService>()
         .AddScoped<ISenderService, SenderService>()
+        .AddScoped<ISessionService, SessionService>()
         .AddScoped<ITemplateService, TemplateService>()
         .AddScoped<ITokenService, TokenService>()
         .AddScoped<IUserService, UserService>();
