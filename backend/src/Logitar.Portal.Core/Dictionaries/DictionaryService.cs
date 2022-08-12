@@ -42,6 +42,11 @@ namespace Logitar.Portal.Core.Dictionaries
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
+      if ((await _querier.GetPagedAsync(locale: payload.Locale, realm: realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken)).Any())
+      {
+        throw new DictionaryAlreadyExistingException(realm?.Id, payload.Locale);
+      }
+
       var dictionary = new Dictionary(payload, _userContext.Actor.Id, realm);
       _validator.ValidateAndThrow(dictionary);
 
