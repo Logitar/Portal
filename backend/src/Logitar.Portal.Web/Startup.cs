@@ -71,8 +71,6 @@ namespace Logitar.Portal.Web
       services.AddPortalCore();
       services.AddPortalInfrastructure(_configuration);
 
-      services.AddAutoMapper(typeof(Startup).Assembly);
-
       services.AddSingleton(_configuration.GetSection("Logging").Get<LoggingSettings>() ?? new());
       services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
