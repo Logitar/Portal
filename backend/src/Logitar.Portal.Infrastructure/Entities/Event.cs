@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Domain;
 using System.Text.Json;
 
 namespace Logitar.Portal.Infrastructure.Entities

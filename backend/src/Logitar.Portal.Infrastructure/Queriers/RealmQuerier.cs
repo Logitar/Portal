@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Domain.Realms;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {

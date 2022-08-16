@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
+﻿using Logitar.Portal.Domain.Emails.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

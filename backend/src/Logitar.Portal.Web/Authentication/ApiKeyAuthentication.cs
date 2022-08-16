@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Logitar.Portal.Application.Accounts;
+using Logitar.Portal.Application.ApiKeys;
+using Logitar.Portal.Application.Claims;
+using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Sessions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Logitar.Portal.Core.Accounts;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.Claims;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Users;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 

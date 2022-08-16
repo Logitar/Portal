@@ -1,8 +1,8 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Logitar.Portal.Application.Claims;
+using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Core;
-using Logitar.Portal.Core.Claims;
-using Logitar.Portal.Core.Tokens;
 using Logitar.Portal.Infrastructure.Settings;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

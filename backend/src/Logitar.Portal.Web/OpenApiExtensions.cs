@@ -35,7 +35,7 @@ namespace Logitar.Portal.Web
     public static void UseOpenApi(this WebApplication application)
     {
       application.UseSwagger();
-      application.UseSwaggerUI(config => config.SwaggerEndpoint("/swagger/v1/swagger.json", "Portal API v1.0"));
+      application.UseSwaggerUI(config => config.SwaggerEndpoint("/swagger/v1/swagger.json", $"Portal API v{Constants.Version}"));
     }
 
     private static void AddSecurity(this SwaggerGenOptions options)

@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Core.ApiKeys;
+using Logitar.Portal.Domain.ApiKeys;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {

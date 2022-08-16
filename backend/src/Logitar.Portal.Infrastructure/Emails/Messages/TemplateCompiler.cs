@@ -1,6 +1,6 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Core.Emails.Templates;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Domain.Emails.Templates;
+using Logitar.Portal.Domain.Users;
 using RazorEngine;
 using RazorEngine.Templating;
 

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+﻿using Logitar.Portal.Application.Users;
 using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Users;
+using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Users;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
 
 namespace Logitar.Portal.Infrastructure.Users

@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Actors;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Users;
+using Logitar.Portal.Domain.Actors;
+using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Users;
 using System.Text.Json;
 
 namespace Logitar.Portal.Infrastructure.Entities

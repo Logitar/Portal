@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Realms;
+﻿using Logitar.Portal.Domain.Realms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

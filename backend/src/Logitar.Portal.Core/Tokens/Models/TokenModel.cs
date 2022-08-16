@@ -2,11 +2,6 @@
 {
   public class TokenModel
   {
-    public TokenModel(string token)
-    {
-      Token = token ?? throw new ArgumentNullException(nameof(token));
-    }
-
-    public string Token { get; }
+    public string Token { get; set; } = null!;
   }
 }

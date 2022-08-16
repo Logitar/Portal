@@ -1,7 +1,7 @@
-﻿using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Sessions.Models;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Core.Sessions.Models;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Web.Models.Users;
 
 namespace Logitar.Portal.Web

@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Actors;
+﻿using Logitar.Portal.Application.Actors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

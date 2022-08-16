@@ -1,7 +1,7 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Actors;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Domain.Actors;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Users;
 using System.Net;
 
 namespace Logitar.Portal.Web

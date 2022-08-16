@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Core.Actors;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application.Actors;
+using Logitar.Portal.Core.Actors;
+using Logitar.Portal.Domain.Actors;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Actors
