@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Core.Emails.Senders;
+using Logitar.Portal.Domain.Emails.Senders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

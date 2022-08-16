@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logitar.Portal.Infrastructure.Entities;
+﻿using Logitar.Portal.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Tokens
 {

@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Messages;
+﻿using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Core;
+using Logitar.Portal.Domain.Emails.Messages;
 using Logitar.Portal.Infrastructure.Emails.Providers.SendGrid.Payloads;
+using System.Net.Http.Json;
 
 namespace Logitar.Portal.Infrastructure.Emails.Providers.SendGrid
 {
@@ -29,7 +31,7 @@ namespace Logitar.Portal.Infrastructure.Emails.Providers.SendGrid
       var payload = new SendMailPayload(message);
       using var request = new HttpRequestMessage(HttpMethod.Post, _requestUri)
       {
-        Content = new JsonContent(payload)
+        Content = JsonContent.Create(payload)
       };
 
       using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);

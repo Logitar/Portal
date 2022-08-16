@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Infrastructure.Emails.Messages
 {

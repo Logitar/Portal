@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Logitar.Portal.Web.Models.Api.Culture
+namespace Logitar.Portal.Web.Models.Api.Locale
 {
   public class LocaleSummary
   {

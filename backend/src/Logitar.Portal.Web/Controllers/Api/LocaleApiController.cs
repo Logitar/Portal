@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Web.Models.Api.Culture;
+﻿using Logitar.Portal.Web.Models.Api.Locale;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;

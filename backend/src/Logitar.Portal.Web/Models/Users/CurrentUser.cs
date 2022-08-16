@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Web.Models.Users
 {

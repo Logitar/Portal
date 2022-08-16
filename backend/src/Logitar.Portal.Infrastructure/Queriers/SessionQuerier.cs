@@ -1,5 +1,7 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Core.Sessions;
+using Logitar.Portal.Domain.Sessions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers

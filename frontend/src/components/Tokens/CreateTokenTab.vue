@@ -128,7 +128,6 @@ export default {
         this.loading = true
         try {
           if (await this.$refs.form.validate()) {
-            alert('FLAG')
             const { data } = await createToken(this.payload)
             this.token = data.token
             this.$refs.form.reset()

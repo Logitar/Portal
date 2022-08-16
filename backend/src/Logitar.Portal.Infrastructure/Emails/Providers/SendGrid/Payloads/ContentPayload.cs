@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
+﻿using Logitar.Portal.Domain.Emails.Messages;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Infrastructure.Emails.Providers.SendGrid.Payloads
