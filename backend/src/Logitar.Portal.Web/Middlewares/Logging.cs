@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Application;
 using Logitar.Portal.Core;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Infrastructure.Entities;

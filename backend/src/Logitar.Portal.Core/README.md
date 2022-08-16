@@ -1,3 +1,3 @@
 # Logitar.Portal.Core
 
-Core logic of the Logitar Portal.
+Core interfaces of the Logitar Portal.

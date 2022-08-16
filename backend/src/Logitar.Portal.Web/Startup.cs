@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
@@ -68,7 +68,7 @@ namespace Logitar.Portal.Web
         })
         .AddDistributedMemoryCache();
 
-      services.AddPortalCore();
+      services.AddPortalApplication();
       services.AddPortalInfrastructure(_configuration);
 
       services.AddSingleton(_configuration.GetSection("Logging").Get<LoggingSettings>() ?? new());

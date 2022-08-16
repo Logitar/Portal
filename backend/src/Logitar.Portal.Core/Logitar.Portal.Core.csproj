@@ -6,29 +6,22 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Francis Pion</Authors>
     <Company>Logitar</Company>
-    <Description>Core logic of the Logitar Portal.</Description>
+    <Description>Core interfaces of the Logitar Portal.</Description>
     <Copyright>© 2022 Francis Pion All Rights Reserved.</Copyright>
     <PackageProjectUrl>https://github.com/Utar94/Portal</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Utar94/Portal</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Fixed dependency to Core layer.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored the software architecture.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>portal;api;core;logic;net6.0;asp;net</PackageTags>
+    <PackageTags>portal;api;core;interfaces;net6.0;asp;net</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageIcon>logitar_portal.png</PackageIcon>
     <Title>Logitar.Portal.Core</Title>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.1.1" />
-    <PackageReference Include="Google.Apis.Auth" Version="1.57.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="LICENSE">

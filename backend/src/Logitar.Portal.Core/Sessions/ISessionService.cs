@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Core.Sessions.Models;
-using Logitar.Portal.Core.Users;
 
 namespace Logitar.Portal.Core.Sessions
 {
@@ -10,8 +9,6 @@ namespace Logitar.Portal.Core.Sessions
       SessionSort? sort = null, bool desc = false,
       int? index = null, int? count = null,
       CancellationToken cancellationToken = default);
-    Task<SessionModel> RenewAsync(Session session, string? ipAddress = null, string? additionalInformation = null, CancellationToken cancellationToken = default);
-    Task<SessionModel> SignInAsync(User user, bool remember = false, string? ipAddress = null, string? additionalInformation = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<SessionModel>> SignOutAllAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<SessionModel> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
   }

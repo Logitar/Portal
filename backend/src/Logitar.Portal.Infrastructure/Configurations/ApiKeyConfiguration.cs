@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.ApiKeys;
+﻿using Logitar.Portal.Domain.ApiKeys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

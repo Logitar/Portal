@@ -1,16 +1,10 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Actors;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Core.Emails.Providers;
-using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Core.Emails.Templates;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Tokens;
-using Logitar.Portal.Core.Users;
+using Logitar.Portal.Application;
+using Logitar.Portal.Application.Actors;
+using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Application.Emails.Providers;
+using Logitar.Portal.Application.Tokens;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Infrastructure.Actors;
 using Logitar.Portal.Infrastructure.Emails.Messages;
 using Logitar.Portal.Infrastructure.Queriers;
@@ -55,27 +49,27 @@ namespace Logitar.Portal.Infrastructure
     private static IServiceCollection AddQueriers(this IServiceCollection services)
     {
       return services
-        .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
-        .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
+        .AddScoped<Application.ApiKeys.IApiKeyQuerier, ApiKeyQuerier>()
+        .AddScoped<Application.Dictionaries.IDictionaryQuerier, DictionaryQuerier>()
         .AddScoped<IMessageQuerier, MessageQuerier>()
-        .AddScoped<IRealmQuerier, RealmQuerier>()
-        .AddScoped<ISenderQuerier, SenderQuerier>()
-        .AddScoped<ISessionQuerier, SessionQuerier>()
-        .AddScoped<ITemplateQuerier, TemplateQuerier>()
+        .AddScoped<Application.Emails.Senders.ISenderQuerier, SenderQuerier>()
+        .AddScoped<Application.Emails.Templates.ITemplateQuerier, TemplateQuerier>()
+        .AddScoped<Application.Realms.IRealmQuerier, RealmQuerier>()
+        .AddScoped<Application.Sessions.ISessionQuerier, SessionQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
       return services
-        .AddScoped<IRepository<ApiKey>, Repository<ApiKey>>()
-        .AddScoped<IRepository<Dictionary>, Repository<Dictionary>>()
-        .AddScoped<IRepository<Message>, Repository<Message>>()
-        .AddScoped<IRepository<Realm>, Repository<Realm>>()
-        .AddScoped<IRepository<Sender>, Repository<Sender>>()
-        .AddScoped<IRepository<Session>, Repository<Session>>()
-        .AddScoped<IRepository<Template>, Repository<Template>>()
-        .AddScoped<IRepository<User>, Repository<User>>();
+        .AddScoped<IRepository<Domain.ApiKeys.ApiKey>, Repository<Domain.ApiKeys.ApiKey>>()
+        .AddScoped<IRepository<Domain.Dictionaries.Dictionary>, Repository<Domain.Dictionaries.Dictionary>>()
+        .AddScoped<IRepository<Domain.Emails.Messages.Message>, Repository<Domain.Emails.Messages.Message>>()
+        .AddScoped<IRepository<Domain.Emails.Senders.Sender>, Repository<Domain.Emails.Senders.Sender>>()
+        .AddScoped<IRepository<Domain.Emails.Templates.Template>, Repository<Domain.Emails.Templates.Template>>()
+        .AddScoped<IRepository<Domain.Realms.Realm>, Repository<Domain.Realms.Realm>>()
+        .AddScoped<IRepository<Domain.Sessions.Session>, Repository<Domain.Sessions.Session>>()
+        .AddScoped<IRepository<Domain.Users.User>, Repository<Domain.Users.User>>();
     }
   }
 }

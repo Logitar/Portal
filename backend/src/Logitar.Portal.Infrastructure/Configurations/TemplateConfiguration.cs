@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Templates;
+﻿using Logitar.Portal.Domain.Emails.Templates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Net.Mime;

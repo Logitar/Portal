@@ -1,5 +1,7 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Emails.Messages;
 using Logitar.Portal.Core.Emails.Messages;
+using Logitar.Portal.Domain.Emails.Messages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers

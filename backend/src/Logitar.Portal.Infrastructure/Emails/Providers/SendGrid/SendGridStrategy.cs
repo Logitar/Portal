@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Core.Emails.Providers;
+using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Application.Emails.Providers;
 
 namespace Logitar.Portal.Infrastructure.Emails.Providers.SendGrid
 {

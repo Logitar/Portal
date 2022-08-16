@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Dictionaries;
+﻿using Logitar.Portal.Domain.Dictionaries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

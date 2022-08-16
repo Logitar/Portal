@@ -1,5 +1,7 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Core.Dictionaries;
+using Logitar.Portal.Domain.Dictionaries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers

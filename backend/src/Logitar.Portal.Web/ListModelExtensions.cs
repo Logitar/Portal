@@ -10,7 +10,11 @@ namespace Logitar.Portal.Web
       ArgumentNullException.ThrowIfNull(list);
       ArgumentNullException.ThrowIfNull(mapper);
 
-      return new ListModel<TOut>(mapper.Map<IEnumerable<TOut>>(list.Items), list.Total);
+      return new ListModel<TOut>
+      {
+        Items = mapper.Map<IEnumerable<TOut>>(list.Items),
+        Total = list.Total
+      };
     }
   }
 }

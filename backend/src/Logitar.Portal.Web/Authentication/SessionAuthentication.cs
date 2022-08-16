@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Logitar.Portal.Application.Claims;
+using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Domain.Sessions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using Logitar.Portal.Core.Claims;
-using Logitar.Portal.Core.Sessions;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 

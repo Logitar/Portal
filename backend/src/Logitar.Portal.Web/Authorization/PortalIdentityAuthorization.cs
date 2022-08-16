@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Domain.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Logitar.Portal.Web.Authorization
 {

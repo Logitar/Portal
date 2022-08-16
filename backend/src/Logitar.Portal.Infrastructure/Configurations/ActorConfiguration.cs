@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Actors;
+﻿using Logitar.Portal.Domain.Actors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
