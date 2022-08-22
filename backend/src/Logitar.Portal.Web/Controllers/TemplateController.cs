@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Templates;
+﻿using Logitar.Portal.Application.Emails.Templates;
 using Logitar.Portal.Core.Emails.Templates.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

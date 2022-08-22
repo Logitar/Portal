@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Application.Emails.Senders;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Emails.Senders;
 using Logitar.Portal.Core.Emails.Senders.Models;

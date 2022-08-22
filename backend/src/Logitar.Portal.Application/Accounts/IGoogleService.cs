@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Core.Accounts.Payloads;
 using Logitar.Portal.Core.Sessions.Models;
 
-namespace Logitar.Portal.Core.Accounts
+namespace Logitar.Portal.Application.Accounts
 {
   public interface IGoogleService
   {

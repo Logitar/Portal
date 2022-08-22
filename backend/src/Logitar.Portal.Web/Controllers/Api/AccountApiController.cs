@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Accounts;
+﻿using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Core.Accounts.Payloads;
 using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;

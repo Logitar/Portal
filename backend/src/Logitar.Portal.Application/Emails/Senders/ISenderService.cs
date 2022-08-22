@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Emails.Senders.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Emails.Senders;
+using Logitar.Portal.Core.Emails.Senders.Models;
 using Logitar.Portal.Core.Emails.Senders.Payloads;
 
-namespace Logitar.Portal.Core.Emails.Senders
+namespace Logitar.Portal.Application.Emails.Senders
 {
   public interface ISenderService
   {

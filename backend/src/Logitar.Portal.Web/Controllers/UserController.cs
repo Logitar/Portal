@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application.Users;
 using Logitar.Portal.Core.Users.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

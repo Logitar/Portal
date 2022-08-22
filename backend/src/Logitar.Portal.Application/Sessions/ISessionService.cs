@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Sessions;
+using Logitar.Portal.Core.Sessions.Models;
 
-namespace Logitar.Portal.Core.Sessions
+namespace Logitar.Portal.Application.Sessions
 {
   public interface ISessionService
   {

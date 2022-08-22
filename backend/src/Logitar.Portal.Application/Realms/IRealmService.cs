@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Realms.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Realms.Models;
 using Logitar.Portal.Core.Realms.Payloads;
 
-namespace Logitar.Portal.Core.Realms
+namespace Logitar.Portal.Application.Realms
 {
   public interface IRealmService
   {

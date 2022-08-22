@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Emails.Templates.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Emails.Templates;
+using Logitar.Portal.Core.Emails.Templates.Models;
 using Logitar.Portal.Core.Emails.Templates.Payloads;
 
-namespace Logitar.Portal.Core.Emails.Templates
+namespace Logitar.Portal.Application.Emails.Templates
 {
   public interface ITemplateService
   {
