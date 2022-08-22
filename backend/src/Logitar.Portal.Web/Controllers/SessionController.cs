@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Sessions;
+﻿using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Core.Sessions.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

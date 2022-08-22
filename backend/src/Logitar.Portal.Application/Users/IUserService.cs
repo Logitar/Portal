@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Users.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Users;
+using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;
 
-namespace Logitar.Portal.Core.Users
+namespace Logitar.Portal.Application.Users
 {
   public interface IUserService
   {

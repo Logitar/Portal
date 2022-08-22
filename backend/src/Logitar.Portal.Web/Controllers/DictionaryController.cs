@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Dictionaries;
+﻿using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Core.Dictionaries.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

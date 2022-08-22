@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Realms;
+﻿using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Core.Realms.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

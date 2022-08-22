@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Dictionaries.Models;

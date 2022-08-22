@@ -1,8 +1,16 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Application.Accounts;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Emails.Messages;
+using Logitar.Portal.Application.Emails.Senders;
+using Logitar.Portal.Application.Emails.Templates;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Realms.Mutations;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Tokens;
+using Logitar.Portal.Application.Users;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -27,17 +35,17 @@ namespace Logitar.Portal.Application
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
       return services
-        .AddScoped<Core.Accounts.IAccountService, Accounts.AccountService>()
-        .AddScoped<Core.Accounts.IGoogleService, Accounts.GoogleService>()
-        .AddScoped<Core.ApiKeys.IApiKeyService, ApiKeys.ApiKeyService>()
-        .AddScoped<Core.Dictionaries.IDictionaryService, Dictionaries.DictionaryService>()
-        .AddScoped<Core.Emails.Messages.IMessageService, MessageService>()
-        .AddScoped<Core.Emails.Senders.ISenderService, Emails.Senders.SenderService>()
-        .AddScoped<Core.Emails.Templates.ITemplateService, Emails.Templates.TemplateService>()
-        .AddScoped<Core.Realms.IRealmService, Realms.RealmService>()
-        .AddScoped<Core.Sessions.ISessionService, SessionService>()
-        .AddScoped<Core.Tokens.ITokenService, Tokens.TokenService>()
-        .AddScoped<Core.Users.IUserService, Users.UserService>()
+        .AddScoped<IAccountService, AccountService>()
+        .AddScoped<IGoogleService, GoogleService>()
+        .AddScoped<IApiKeyService, ApiKeyService>()
+        .AddScoped<IDictionaryService, DictionaryService>()
+        .AddScoped<IMessageService, MessageService>()
+        .AddScoped<ISenderService, SenderService>()
+        .AddScoped<ITemplateService, TemplateService>()
+        .AddScoped<IRealmService, RealmService>()
+        .AddScoped<ISessionService, SessionService>()
+        .AddScoped<ITokenService, TokenService>()
+        .AddScoped<IUserService, UserService>()
         .AddScoped<IConfigurationService, ConfigurationService>();
     }
   }

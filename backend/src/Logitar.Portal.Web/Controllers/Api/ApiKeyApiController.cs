@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.ApiKeys;
 using Logitar.Portal.Core.ApiKeys.Models;

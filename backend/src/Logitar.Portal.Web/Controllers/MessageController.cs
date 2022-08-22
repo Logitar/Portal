@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Messages;
+﻿using Logitar.Portal.Application.Emails.Messages;
 using Logitar.Portal.Core.Emails.Messages.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

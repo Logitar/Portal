@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Emails.Messages.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Emails.Messages;
+using Logitar.Portal.Core.Emails.Messages.Models;
 using Logitar.Portal.Core.Emails.Messages.Payloads;
 
-namespace Logitar.Portal.Core.Emails.Messages
+namespace Logitar.Portal.Application.Emails.Messages
 {
   public interface IMessageService
   {

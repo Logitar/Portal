@@ -3,7 +3,7 @@ using Logitar.Portal.Core.Sessions.Models;
 using Logitar.Portal.Core.Users.Models;
 using Logitar.Portal.Core.Users.Payloads;
 
-namespace Logitar.Portal.Core.Accounts
+namespace Logitar.Portal.Application.Accounts
 {
   public interface IAccountService
   {

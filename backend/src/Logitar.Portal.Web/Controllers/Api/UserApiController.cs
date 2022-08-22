@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Models;
