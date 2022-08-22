@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Core;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Realms.Models;

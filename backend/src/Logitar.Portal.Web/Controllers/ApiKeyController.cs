@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.ApiKeys;
+﻿using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Core.ApiKeys.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

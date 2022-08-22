@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.Dictionaries.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Dictionaries;
+using Logitar.Portal.Core.Dictionaries.Models;
 using Logitar.Portal.Core.Dictionaries.Payloads;
 
-namespace Logitar.Portal.Core.Dictionaries
+namespace Logitar.Portal.Application.Dictionaries
 {
   public interface IDictionaryService
   {

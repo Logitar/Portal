@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Application.Configurations.Payloads;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Core;
-using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Models;
 
 namespace Logitar.Portal.Application.Configurations

@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Core.Tokens.Models;
 using Logitar.Portal.Core.Tokens.Payloads;
 
-namespace Logitar.Portal.Core.Tokens
+namespace Logitar.Portal.Application.Tokens
 {
   public interface ITokenService
   {

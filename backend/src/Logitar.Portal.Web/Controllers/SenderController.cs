@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Emails.Senders;
+﻿using Logitar.Portal.Application.Emails.Senders;
 using Logitar.Portal.Core.Emails.Senders.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

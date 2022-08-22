@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Core.ApiKeys.Models;
+﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.ApiKeys;
+using Logitar.Portal.Core.ApiKeys.Models;
 using Logitar.Portal.Core.ApiKeys.Payloads;
 
-namespace Logitar.Portal.Core.ApiKeys
+namespace Logitar.Portal.Application.ApiKeys
 {
   public interface IApiKeyService
   {
