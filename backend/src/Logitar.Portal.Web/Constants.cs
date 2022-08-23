@@ -37,6 +37,6 @@
       public static string[] All => new[] { ApiKey, Session };
     }
 
-    public const string Version = "1.1.1";
+    public const string Version = "1.1.2";
   }
 }
