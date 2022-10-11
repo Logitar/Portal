@@ -82,7 +82,7 @@
           <picture-field class="col" validate v-model="picture" />
         </b-row>
         <h3 v-t="'user.externalProviders.title'" />
-        <table class="table table-striped" v-if="user.externalProviders.length">
+        <table class="table table-striped" v-if="user && user.externalProviders.length">
           <thead>
             <tr>
               <th scope="col" v-t="'user.externalProviders.name'" />

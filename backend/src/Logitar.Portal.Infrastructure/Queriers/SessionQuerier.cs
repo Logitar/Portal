@@ -30,7 +30,6 @@ namespace Logitar.Portal.Infrastructure.Queriers
       IQueryable<Session> query = _sessions.ApplyTracking(readOnly)
         .Include(x => x.User).ThenInclude(x => x!.Realm);
 
-
       if (realm == null)
       {
         query = query.Where(x => x.User != null && x.User.RealmSid == null);
