@@ -101,6 +101,7 @@ namespace Logitar.Portal.Application.Users
       _validator.Validate(context);
 
       await _repository.SaveAsync(user, cancellationToken);
+      await _actorService.SaveAsync(user, cancellationToken);
 
       return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }
@@ -115,7 +116,7 @@ namespace Logitar.Portal.Application.Users
         throw new UserCannotDeleteItselfException(user);
       }
 
-      PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
+      PagedList<Session> sessions = await _sessionQuerier.GetPagedAsync(realm: user.Realm?.Id.ToString(), userId: user.Id, readOnly: false, cancellationToken: cancellationToken);
       foreach (Session session in sessions)
       {
         session.Delete(_userContext.Actor.Id);
