@@ -101,6 +101,7 @@ namespace Logitar.Portal.Application.Users
       _validator.Validate(context);
 
       await _repository.SaveAsync(user, cancellationToken);
+      await _actorService.SaveAsync(user, cancellationToken);
 
       return await _mappingService.MapAsync<UserModel>(user, cancellationToken);
     }

@@ -51,6 +51,7 @@ namespace Logitar.Portal.Application.ApiKeys
       _validator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
+      await _actorService.SaveAsync(apiKey, cancellationToken);
 
       var model = await _mappingService.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
       model.XApiKey = new SecureToken(apiKey.Id, secretBytes).ToString();
