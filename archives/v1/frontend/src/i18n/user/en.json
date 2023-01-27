@@ -1,0 +1,173 @@
+{
+  "confirmed": {
+    "label": "Confirmed",
+    "placeholder": "Select an option",
+    "warning": "Changing the email address or phone number will remove its confirmed status."
+  },
+  "create": {
+    "passwordPlaceholder": "Enter a password",
+    "usernamePlaceholder": "Enter a new username"
+  },
+  "created": "The user has been created.",
+  "createdAt": "Created on",
+  "delete": {
+    "confirm": "Do you really want to delete the following user?",
+    "success": "The user has been deleted.",
+    "title": "Delete user"
+  },
+  "disable": {
+    "confirm": "Do you really want to disable the following user? All access to its account and services will be revoked.",
+    "submit": "Disable",
+    "success": "The user has been disabled.",
+    "title": "Disable user"
+  },
+  "disabled": {
+    "label": "Disabled",
+    "placeholder": "Select an option"
+  },
+  "disabledAt": "Disabled on {date}",
+  "editTitle": "Edit user",
+  "email": {
+    "confirmed": "Confirmed",
+    "conflict": {
+      "detail": "The realm {name} requires users to have unique email addresses.",
+      "header": "This email address is already used by another user."
+    },
+    "label": "Email Address",
+    "placeholder": "Enter an email address"
+  },
+  "empty": "This list is empty.",
+  "enable": {
+    "confirm": "Do you really want to enable the following user? All access to its account and services will be restored.",
+    "submit": "Enable",
+    "success": "The user has been enabled.",
+    "title": "Enable user"
+  },
+  "externalProviders": {
+    "addedAt": "Added on",
+    "empty": "This list is empty.",
+    "name": "Name",
+    "title": "External Providers"
+  },
+  "firstName": {
+    "label": "First Name",
+    "placeholder": "Enter a first name"
+  },
+  "fullName": "Name",
+  "information": {
+    "authentication": "Authentication Information",
+    "personal": "Personal Information"
+  },
+  "lastName": {
+    "label": "Last Name",
+    "placeholder": "Enter a last name"
+  },
+  "newTitle": "Create user",
+  "password": {
+    "changeFailed": "Password change failed!",
+    "changed": "Your password has been changed.",
+    "changedAt": "Last changed on",
+    "confirm": {
+      "label": "Password Confirmation",
+      "placeholder": "Enter the same password again"
+    },
+    "current": {
+      "label": "Current Password",
+      "placeholder": "Enter your current password"
+    },
+    "invalidCredentials": "Please check you provided your correct current password.",
+    "label": "Password",
+    "new": {
+      "label": "New Password",
+      "placeholder": "Enter a new password"
+    },
+    "placeholder": "Enter your password",
+    "submit": "Change password",
+    "warning": "Avoid changing an user's password without its consent."
+  },
+  "passwordChangedAt": "Password changed on",
+  "phone": {
+    "confirmed": "Confirmed",
+    "label": "Phone Number",
+    "placeholder": "Enter a phone number"
+  },
+  "picture": {
+    "label": "Picture URL",
+    "placeholder": "Paste the picture URL of the user"
+  },
+  "profile": {
+    "title": "Profile",
+    "updated": "Your profile has been updated."
+  },
+  "select": {
+    "label": "User",
+    "placeholder": "Select an user"
+  },
+  "session": {
+    "active": {
+      "label": "Active",
+      "placeholder": "Select an option"
+    },
+    "additionalInformation": {
+      "empty": "No additional information to show.",
+      "title": "Additional Information"
+    },
+    "confirm": "Do you really want to sign out the current session? You will be signed out of the application.",
+    "confirmAll": "Do you really want to sign out all the sessions of this user?",
+    "confirmAllCurrent": "You will be signed out of the application and any other device using this application.",
+    "confirmAllOther": "The user will be signed out of any application using the Portal.",
+    "empty": "This list is empty.",
+    "ipAddress": "IP Address",
+    "persistent": {
+      "label": "Persistent",
+      "placeholder": "Select an option"
+    },
+    "signOut": "Sign out",
+    "signOutAll": "Sign out all",
+    "signedOutAt": "Signed out",
+    "sort": {
+      "options": {
+        "IpAddress": "IP Address",
+        "SignedOutAt": "Signed out on",
+        "UpdatedAt": "Updated on"
+      }
+    },
+    "success": "The session has been signed out.",
+    "successAll": "The sessions have been signed out.",
+    "title": "Sessions",
+    "user": "User",
+    "view": "View sessions",
+    "viewTitle": "View session"
+  },
+  "signIn": {
+    "accountIsDisabled": "Your account is disabled.",
+    "failed": "Sign in failed!",
+    "invalidCredentials": "Please check you provided the correct email address/username and password.",
+    "recoverPassword": "I forgot my password",
+    "remember": "Remember me",
+    "submit": "Sign in",
+    "title": "Sign In"
+  },
+  "signOut": "Sign Out",
+  "signedInAt": "Last signed-in on",
+  "sort": {
+    "options": {
+      "Email": "Email address",
+      "FirstMiddleLastName": "Name",
+      "LastFirstMiddleName": "Last name, then first and middle names",
+      "PasswordChangedAt": "Password changed on",
+      "PhoneNumber": "Phone number",
+      "SignedInAt": "Signed-in on",
+      "UpdatedAt": "Updated on",
+      "Username": "Username"
+    }
+  },
+  "title": "Users",
+  "updated": "The user has been updated.",
+  "updatedAt": "Last updated on",
+  "username": {
+    "conflict": "This username is already used by another user.",
+    "label": "Username",
+    "placeholder": "Enter an username"
+  }
+}

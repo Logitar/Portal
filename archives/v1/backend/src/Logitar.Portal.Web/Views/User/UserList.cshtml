@@ -1,0 +1,7 @@
+﻿@{
+  Layout = "_Layout";
+
+  ViewBag.Title = "Users";
+}
+
+<user-list current="@(Context.GetUser()?.Id)"></user-list>
