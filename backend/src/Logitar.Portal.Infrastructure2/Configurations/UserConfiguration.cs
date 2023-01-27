@@ -19,6 +19,7 @@ namespace Logitar.Portal.Infrastructure2.Configurations
       builder.Property(x => x.EmailConfirmedBy).HasMaxLength(256);
       builder.Property(x => x.EmailNormalized).HasMaxLength(256);
       builder.Property(x => x.FirstName).HasMaxLength(128);
+      builder.Property(x => x.FullName).HasMaxLength(512);
       builder.Property(x => x.LastName).HasMaxLength(128);
       builder.Property(x => x.Locale).HasMaxLength(16);
       builder.Property(x => x.MiddleName).HasMaxLength(128);

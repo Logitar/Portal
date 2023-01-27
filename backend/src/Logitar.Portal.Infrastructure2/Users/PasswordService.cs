@@ -12,12 +12,28 @@ namespace Logitar.Portal.Infrastructure2.Users
     private const int IterationCount = 100000;
     private const int SaltLength = 256 / 8;
 
+    public string GenerateAndHash(int length, out byte[] password)
+    {
+      password = RandomNumberGenerator.GetBytes(length);
+
+      return Hash(Convert.ToBase64String(password));
+    }
+
     public string Hash(string password)
     {
-      byte[] salt = RandomNumberGenerator.GetBytes(SaltLength);
-      byte[] hash = KeyDerivation.Pbkdf2(password, salt, Algorithm, IterationCount, salt.Length);
+      Pbkdf2 pbkdf2 = new(password, Algorithm, IterationCount, SaltLength);
+      return pbkdf2.ToString();
+    }
 
-      return string.Join(':', Algorithm, IterationCount, Convert.ToBase64String(salt), Convert.ToBase64String(hash));
+    public bool IsMatch(User user, string password)
+    {
+      if (user.PasswordHash == null)
+      {
+        return false;
+      }
+
+      Pbkdf2 pbkdf2 = Pbkdf2.Parse(user.PasswordHash);
+      return pbkdf2.IsMatch(password);
     }
 
     public void ValidateAndThrow(string password, Configuration configuration)

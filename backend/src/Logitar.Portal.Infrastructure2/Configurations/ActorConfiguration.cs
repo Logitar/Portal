@@ -13,9 +13,9 @@ namespace Logitar.Portal.Infrastructure2.Configurations
       builder.HasIndex(x => x.AggregateId).IsUnique();
 
       builder.Property(x => x.AggregateId).HasMaxLength(256);
-      builder.Property(x => x.DisplayName).HasMaxLength(386);
+      builder.Property(x => x.DisplayName).HasMaxLength(512);
       builder.Property(x => x.Email).HasMaxLength(256);
-      builder.Property(x => x.Email).HasMaxLength(2048);
+      builder.Property(x => x.Picture).HasMaxLength(2048);
     }
   }
 }

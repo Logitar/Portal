@@ -7,6 +7,9 @@ namespace Logitar.Portal.Infrastructure2.Entities
     public ActorTypeEntity(ActorType actorType) : base((int)actorType, actorType.ToString())
     {
     }
+    private ActorTypeEntity() : base()
+    {
+    }
 
     public static IEnumerable<ActorTypeEntity> GetData() => Enum.GetValues<ActorType>()
       .Select(actorType => new ActorTypeEntity(actorType));

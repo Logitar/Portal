@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Core2
 {
-  internal interface IRequestPipeline
+  public interface IRequestPipeline
   {
     Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken = default);
   }

@@ -38,7 +38,7 @@ namespace Logitar.Portal.Core2.Configurations.Commands
       AggregateId userId = AggregateId.NewId();
 
       CultureInfo defaultLocale = CultureInfo.GetCultureInfo(payload.DefaultLocale);
-      configuration = new(defaultLocale, payload.JwtSettings, payload.UsernameSettings, payload.PasswordSettings, userId);
+      configuration = new(defaultLocale, payload.JwtSecret, payload.UsernameSettings, payload.PasswordSettings, userId);
       _configurationValidator.ValidateAndThrow(configuration);
 
       _passwordService.ValidateAndThrow(userPayload.Password, configuration);

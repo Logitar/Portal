@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core2.Configurations.Payloads
 {
-  internal record UserPayload
+  public record UserPayload
   {
     public string Username { get; init; } = null!;
     public string Password { get; init; } = null!;

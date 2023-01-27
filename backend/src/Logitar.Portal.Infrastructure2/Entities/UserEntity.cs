@@ -27,6 +27,7 @@ namespace Logitar.Portal.Infrastructure2.Entities
 
     public int UserId { get; private set; }
 
+    public RealmEntity? Realm { get; private set; }
     public int? RealmId { get; private set; }
 
     public string Username { get; private set; } = null!;
@@ -59,7 +60,7 @@ namespace Logitar.Portal.Infrastructure2.Entities
     public string? PhoneNumber { get; private set; }
     public string? PhoneNumberNormalized
     {
-      get => PhoneNumber?.ToUpper();
+      get => PhoneNumber;
       private set { }
     }
     public string? PhoneNumberConfirmedBy { get; private set; }
@@ -78,9 +79,13 @@ namespace Logitar.Portal.Infrastructure2.Entities
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
     public string? LastName { get; private set; }
-    public string? FullName => string.Join(' ', new[] { FirstName, MiddleName, LastName }
-      .Where(name => !string.IsNullOrWhiteSpace(name))
-      .Select(name => name!.Trim())).CleanTrim();
+    public string? FullName
+    {
+      get => string.Join(' ', new[] { FirstName, MiddleName, LastName }
+        .Where(name => !string.IsNullOrWhiteSpace(name))
+        .Select(name => name!.Trim())).CleanTrim();
+      private set { }
+    }
 
     public string? Locale { get; private set; }
     public string? Picture { get; private set; }

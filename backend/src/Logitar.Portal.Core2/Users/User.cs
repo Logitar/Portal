@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.Core2.Users.Events;
+﻿using Logitar.Portal.Core2.Accounts;
+using Logitar.Portal.Core2.Realms.Models;
+using Logitar.Portal.Core2.Users.Events;
 using System.Globalization;
 
 namespace Logitar.Portal.Core2.Users
@@ -23,7 +25,10 @@ namespace Logitar.Portal.Core2.Users
     public string? PasswordHash { get; private set; }
 
     public string? Email { get; private set; }
+    public bool IsEmailConfirmed { get; private set; }
     public string? PhoneNumber { get; private set; }
+    public bool IsPhoneNumberConfirmed { get; private set; }
+    public bool IsAccountConfirmed => IsEmailConfirmed || IsPhoneNumberConfirmed;
 
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
@@ -34,6 +39,22 @@ namespace Logitar.Portal.Core2.Users
 
     public CultureInfo? Locale { get; private set; }
     public string? Picture { get; private set; }
+
+    public bool IsDisabled { get; private set; }
+
+    public void EnsureIsTrusted(RealmModel? realm = null)
+    {
+      if (realm?.RequireUniqueEmail == true && !IsAccountConfirmed)
+      {
+        throw new AccountNotConfirmedException(Id);
+      }
+      else if (IsDisabled)
+      {
+        throw new AccountIsDisabledException(Id);
+      }
+    }
+
+    public void SignIn() => ApplyChange(new UserSignedInEvent(), Id);
 
     protected virtual void Apply(UserCreatedEvent @event)
     {
@@ -49,6 +70,9 @@ namespace Logitar.Portal.Core2.Users
 
       Locale = @event.Locale == null ? null : CultureInfo.GetCultureInfo(@event.Locale);
       Picture = @event.Picture;
+    }
+    protected virtual void Apply(UserSignedInEvent @event)
+    {
     }
 
     public override string ToString() => $"{(FullName == null ? Username : $"{FullName} ({Username})")} | {base.ToString()}";

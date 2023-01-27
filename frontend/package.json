@@ -3,7 +3,7 @@
   "version": "1.1.5",
   "private": true,
   "scripts": {
-    "watch": "vue-cli-service build --watch --mode development",
+    "serve": "vue-cli-service build --watch --mode development",
     "build": "vue-cli-service build",
     "build:prod": "vue-cli-service build",
     "build:staging": "vue-cli-service build --mode staging",

@@ -63,11 +63,22 @@ export default {
   },
   computed: {
     payload() {
+      const locale = this.$i18n.locale
       return {
-        user: {
-          ...this.user,
-          locale: this.$i18n.locale
-        }
+        defaultLocale: locale,
+        jwtSecret: 'dFES$?PnHZ]76WDv8_YT4#V"Xp=N;a>c',
+        usernameSettings: {
+          allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+        },
+        passwordSettings: {
+          requiredLength: 8,
+          requiredUniqueChars: 8,
+          requireNonAlphanumeric: true,
+          requireLowercase: true,
+          requireUppercase: true,
+          requireDigit: true
+        },
+        user: { ...this.user, locale }
       }
     }
   },

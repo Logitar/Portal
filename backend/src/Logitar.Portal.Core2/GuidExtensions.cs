@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core2
 {
-  internal static class GuidExtensions
+  public static class GuidExtensions
   {
     public static Guid FromHash(this string hash) => new(Convert.FromBase64String(string.Concat(hash, "==")
       .Replace('-', '+')
