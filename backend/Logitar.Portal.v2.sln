@@ -13,11 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README2.md = README2.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Core2", "src\Logitar.Portal.Core2\Logitar.Portal.Core2.csproj", "{583C5A28-BB9F-4E86-A8A4-C4BFFC0AD346}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Core", "src\Logitar.Portal.Core\Logitar.Portal.Core.csproj", "{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure2", "src\Logitar.Portal.Infrastructure2\Logitar.Portal.Infrastructure2.csproj", "{EE610169-0848-4BF0-AA8D-975802E6F389}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{DF6A63E6-680C-4120-806D-936BF0FCD8ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web2", "src\Logitar.Portal.Web2\Logitar.Portal.Web2.csproj", "{7C6240DC-2377-4A62-B5B6-0B56BA819F77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{0762D36E-03B1-4615-84B7-8E70B1527B2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,18 +25,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{583C5A28-BB9F-4E86-A8A4-C4BFFC0AD346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{583C5A28-BB9F-4E86-A8A4-C4BFFC0AD346}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{583C5A28-BB9F-4E86-A8A4-C4BFFC0AD346}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{583C5A28-BB9F-4E86-A8A4-C4BFFC0AD346}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE610169-0848-4BF0-AA8D-975802E6F389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE610169-0848-4BF0-AA8D-975802E6F389}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE610169-0848-4BF0-AA8D-975802E6F389}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE610169-0848-4BF0-AA8D-975802E6F389}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C6240DC-2377-4A62-B5B6-0B56BA819F77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C6240DC-2377-4A62-B5B6-0B56BA819F77}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C6240DC-2377-4A62-B5B6-0B56BA819F77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C6240DC-2377-4A62-B5B6-0B56BA819F77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
