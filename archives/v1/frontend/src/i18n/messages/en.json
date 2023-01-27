@@ -1,0 +1,67 @@
+{
+  "contentFormat": "content",
+  "contents": {
+    "ignoreUserLocale": "Ignore user locale",
+    "label": "Contents",
+    "localization": "Localization",
+    "noLocale": "No locale were specified in this message.",
+    "noVariable": "No variable were specified in this message.",
+    "variables": "Variables",
+    "viewAsHtml": "View as HTML",
+    "warning": "The following section may contain sensitive information."
+  },
+  "demo": {
+    "label": "Demo",
+    "text": "This message is a demo message."
+  },
+  "empty": "This list is empty.",
+  "failureData": "Failure data",
+  "noRealm": {
+    "part1": "This message was sent through the",
+    "part2": "Portal (no realm)"
+  },
+  "noResult": "No data to display.",
+  "realmFormat": "This message was sent through the realm",
+  "recipient": {
+    "address": "Email address",
+    "displayName": "Display name",
+    "type": {
+      "label": "Type",
+      "options": {
+        "Bcc": "Bcc",
+        "CC": "CC",
+        "To": "To"
+      }
+    },
+    "user": "Associated user"
+  },
+  "recipients": "Recipients",
+  "sender": {
+    "default": "Default",
+    "format1": "This message was sent from",
+    "format2": "using the provider",
+    "label": "Sender"
+  },
+  "sort": {
+    "options": {
+      "Subject": "Subject",
+      "UpdatedAt": "Sent on"
+    }
+  },
+  "status": {
+    "format": "Status:",
+    "label": "Status",
+    "options": {
+      "Failed": "Failed",
+      "Sent": "Sent",
+      "Unsent": "Unsent"
+    },
+    "placeholder": "Select a status"
+  },
+  "subject": "Subject",
+  "successData": "Success data",
+  "templateFormat": "This message contents were generated using the template",
+  "title": "Messages",
+  "updatedAt": "Sent on",
+  "viewTitle": "View message"
+}

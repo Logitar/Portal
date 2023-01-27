@@ -1,0 +1,10 @@
+﻿@using Logitar.Portal.Core.Emails.Messages.Models;
+
+@model MessageModel
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = "View message";
+}
+
+  <message-view json="@(ModelSerializer.Serialize(Model))"></message-view>
