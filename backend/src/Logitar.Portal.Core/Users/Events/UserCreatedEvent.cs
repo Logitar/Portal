@@ -4,6 +4,8 @@ namespace Logitar.Portal.Core.Users.Events
 {
   public class UserCreatedEvent : DomainEvent, INotification
   {
+    public string? RealmId { get; init; }
+
     public string Username { get; init; } = null!;
     public string? PasswordHash { get; init; }
 

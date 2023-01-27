@@ -2,13 +2,13 @@
 
 namespace Logitar.Portal.Core.Configurations.Payloads
 {
-  public record InitializeConfigurationPayload
+  public class InitializeConfigurationPayload
   {
-    public string DefaultLocale { get; init; } = null!;
-    public string JwtSecret { get; init; } = null!;
+    public string DefaultLocale { get; set; } = null!;
+    public string JwtSecret { get; set; } = null!;
 
-    public UsernameSettings UsernameSettings { get; init; } = null!;
-    public PasswordSettings PasswordSettings { get; init; } = null!;
+    public UsernameSettings UsernameSettings { get; set; } = null!;
+    public PasswordSettings PasswordSettings { get; set; } = null!;
 
     public UserPayload User { get; set; } = null!;
   }

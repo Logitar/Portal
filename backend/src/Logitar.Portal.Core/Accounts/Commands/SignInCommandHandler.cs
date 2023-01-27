@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Realms;
+﻿using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Realms.Models;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Sessions.Models;
@@ -38,17 +37,15 @@ namespace Logitar.Portal.Core.Accounts.Commands
           ?? throw EntityNotFoundException.Typed<Realm>(request.Realm, nameof(request.Realm));
       }
 
-      SignInPayload payload = request.Payload;
-
-      AggregateId? userId = (await _userQuerier.GetAsync(payload.Username, realm, cancellationToken))?.GetAggregateId();
+      AggregateId? userId = (await _userQuerier.GetAsync(request.Payload.Username, realm?.Id, cancellationToken))?.GetAggregateId();
       User? user = userId.HasValue ? await _repository.LoadAsync<User>(userId.Value, cancellationToken) : null;
-      if (user == null || !_passwordService.IsMatch(user, payload.Password))
+      if (user == null || !_passwordService.IsMatch(user, request.Payload.Password))
       {
         throw new InvalidCredentialsException();
       }
       user.EnsureIsTrusted(realm);
 
-      return await _signInService.SignInAsync(user, payload.Remember, payload.IpAddress, payload.AdditionalInformation, cancellationToken);
+      return await _signInService.SignInAsync(user, request.Payload.Remember, request.Payload.IpAddress, request.Payload.AdditionalInformation, cancellationToken);
     }
   }
 }

@@ -1,25 +1,26 @@
 ﻿using Logitar.Portal.Core.Models;
+using Logitar.Portal.Core.Users;
 
 namespace Logitar.Portal.Core.Realms.Models
 {
   public class RealmModel : AggregateModel
   {
-    public string Alias { get; init; } = null!;
-    public string DisplayName { get; init; } = null!;
-    public string? Description { get; init; }
+    public string Alias { get; set; } = null!;
+    public string DisplayName { get; set; } = null!;
+    public string? Description { get; set; }
 
-    public string? DefaultLocale { get; init; }
-    public string? Url { get; init; }
+    public string? DefaultLocale { get; set; }
+    public string? Url { get; set; }
 
-    public bool RequireConfirmedAccount { get; init; }
-    public bool RequireUniqueEmail { get; init; }
+    public bool RequireConfirmedAccount { get; set; }
+    public bool RequireUniqueEmail { get; set; }
 
-    // TODO(fpion): UsernameSettings
-    // TODO(fpion): PasswordSettings
+    public UsernameSettings UsernameSettings { get; set; } = null!;
+    public PasswordSettings PasswordSettings { get; set; } = null!;
 
     // TODO(fpion): PasswordRecoverySender
     // TODO(fpion): PasswordRecoveryTemplate
 
-    public string? GoogleClientId { get; init; }
+    public string? GoogleClientId { get; set; }
   }
 }

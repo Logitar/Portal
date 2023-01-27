@@ -14,6 +14,7 @@ namespace Logitar.Portal.Core
 
     public AggregateId Id { get; private set; }
     public long Version { get; private set; }
+    public bool IsDeleted { get; protected set; }
 
     private readonly List<DomainEvent> _changes = new();
     public bool HasChanges => _changes.Any();

@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Logitar.Portal.Core\Logitar.Portal.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Handlers\Realms\" />
+  </ItemGroup>
+
 </Project>

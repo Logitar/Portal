@@ -6,34 +6,34 @@ namespace Logitar.Portal.Core.Users.Models
 {
   public class UserModel : AggregateModel
   {
-    public RealmModel? Realm { get; init; }
+    public RealmModel? Realm { get; set; }
 
-    public string Username { get; init; } = null!;
-    public DateTime? PasswordChangedOn { get; init; }
-    public bool HasPassword { get; init; }
+    public string Username { get; set; } = null!;
+    public DateTime? PasswordChangedOn { get; set; }
+    public bool HasPassword { get; set; }
 
-    public string? Email { get; init; }
-    public ActorModel? EmailConfirmedBy { get; init; }
-    public DateTime? EmailConfirmedOn { get; init; }
-    public bool IsEmailConfirmed { get; init; }
-    public string? PhoneNumber { get; init; }
-    public ActorModel? PhoneNumberConfirmedBy { get; init; }
-    public DateTime? PhoneNumberConfirmedOn { get; init; }
-    public bool IsPhoneNumberConfirmed { get; init; }
-    public bool IsAccountConfirmed { get; init; }
+    public string? Email { get; set; }
+    public ActorModel? EmailConfirmedBy { get; set; }
+    public DateTime? EmailConfirmedOn { get; set; }
+    public bool IsEmailConfirmed { get; set; }
+    public string? PhoneNumber { get; set; }
+    public ActorModel? PhoneNumberConfirmedBy { get; set; }
+    public DateTime? PhoneNumberConfirmedOn { get; set; }
+    public bool IsPhoneNumberConfirmed { get; set; }
+    public bool IsAccountConfirmed { get; set; }
 
-    public string? FirstName { get; init; }
-    public string? MiddleName { get; init; }
-    public string? LastName { get; init; }
-    public string? FullName { get; init; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+    public string? FullName { get; set; }
 
-    public string? Locale { get; init; }
-    public string? Picture { get; init; }
+    public string? Locale { get; set; }
+    public string? Picture { get; set; }
 
-    public DateTime? SignedInOn { get; init; }
+    public DateTime? SignedInOn { get; set; }
 
-    public ActorModel? DisabledBy { get; init; }
-    public DateTime? DisabledOn { get; init; }
-    public bool IsDisabled { get; init; }
+    public ActorModel? DisabledBy { get; set; }
+    public DateTime? DisabledOn { get; set; }
+    public bool IsDisabled { get; set; }
   }
 }

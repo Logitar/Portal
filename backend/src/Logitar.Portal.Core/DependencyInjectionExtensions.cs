@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Core.Accounts;
 using Logitar.Portal.Core.Configurations;
+using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
+using Logitar.Portal.Core.Users;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -19,7 +21,10 @@ namespace Logitar.Portal.Core
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
         .AddTransient<IAccountService, AccountService>()
         .AddTransient<IConfigurationService, ConfigurationService>()
-        .AddTransient<ISignInService, SignInService>();
+        .AddTransient<IRealmService, RealmService>()
+        .AddTransient<ISessionService, SessionService>()
+        .AddTransient<ISignInService, SignInService>()
+        .AddTransient<IUserService, UserService>();
     }
   }
 }

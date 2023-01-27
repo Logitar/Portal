@@ -12,7 +12,16 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.UserId);
 
-      builder.HasIndex(x => x.UsernameNormalized).IsUnique();
+      builder.HasIndex(x => x.Email);
+      builder.HasIndex(x => x.EmailNormalized);
+      builder.HasIndex(x => x.FirstName);
+      builder.HasIndex(x => x.IsAccountConfirmed);
+      builder.HasIndex(x => x.IsDisabled);
+      builder.HasIndex(x => x.LastName);
+      builder.HasIndex(x => x.MiddleName);
+      builder.HasIndex(x => x.PhoneNumber);
+      builder.HasIndex(x => x.Username);
+      builder.HasIndex(x => new { x.RealmId, x.UsernameNormalized }).IsUnique();
 
       builder.Property(x => x.DisabledBy).HasMaxLength(256);
       builder.Property(x => x.Email).HasMaxLength(256);

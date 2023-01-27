@@ -4,6 +4,7 @@
   {
     public AccountNotConfirmedException(AggregateId userId) : base($"The user 'Id={userId}' does not have a confirmed account.")
     {
+      Data["UserId"] = userId.ToString();
     }
   }
 }

@@ -12,6 +12,17 @@ namespace Logitar.Portal.Core
     /// <typeparam name="T"></typeparam>
     /// <param name="rules"></param>
     /// <returns></returns>
+    public static IRuleBuilderOptions<T, string?> Alias<T>(this IRuleBuilder<T, string?> rules)
+    {
+      return rules.Must(alias => alias == null || alias.Split('-').All(w => !string.IsNullOrEmpty(w) && w.All(char.IsLetterOrDigit)));
+    }
+    /// <summary>
+    /// TODO(fpion): WithErrorCode?
+    /// TODO(fpion): WithMessage?
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="rules"></param>
+    /// <returns></returns>
     public static IRuleBuilderOptions<T, CultureInfo?> Locale<T>(this IRuleBuilder<T, CultureInfo?> rules)
     {
       return rules.Must(culture => culture == null || culture.LCID != 4096);

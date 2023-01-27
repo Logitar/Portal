@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core.Users
 {
-  public record PasswordSettings
+  public class PasswordSettings
   {
     public int RequiredLength { get; init; }
     public int RequiredUniqueChars { get; init; }

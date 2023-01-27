@@ -99,5 +99,69 @@ namespace Logitar.Portal.Infrastructure.Entities
       get => DisabledBy != null && DisabledOn.HasValue;
       private set { }
     }
+
+    public List<SessionEntity> Sessions { get; private set; } = new();
+
+    public void ChangePassword(UserChangedPasswordEvent @event)
+    {
+      Update(@event);
+
+      PasswordHash = @event.PasswordHash;
+      PasswordChangedOn = @event.OccurredOn;
+    }
+    public void ConfirmEmail(UserConfirmedEmailEvent @event)
+    {
+      EmailConfirmedBy = @event.UserId.ToString();
+      EmailConfirmedOn = @event.OccurredOn;
+    }
+    public void ConfirmPhoneNumber(UserConfirmedPhoneNumberEvent @event)
+    {
+      PhoneNumberConfirmedBy = @event.UserId.ToString();
+      PhoneNumberConfirmedOn = @event.OccurredOn;
+    }
+    public void Disable(UserDisabledEvent @event)
+    {
+      DisabledBy = @event.UserId.ToString();
+      DisabledOn = @event.OccurredOn;
+    }
+    public void Enable()
+    {
+      DisabledBy = null;
+      DisabledOn = null;
+    }
+    public void SignIn(UserSignedInEvent @event)
+    {
+      SignedInOn = @event.OccurredOn;
+    }
+    public void Update(UserUpdatedEvent @event)
+    {
+      base.Update(@event);
+
+      if (PasswordHash != null)
+      {
+        PasswordHash = @event.PasswordHash;
+        PasswordChangedOn = @event.OccurredOn;
+      }
+
+      if (@event.HasEmailChanged)
+      {
+        Email = @event.Email;
+        EmailConfirmedBy = null;
+        EmailConfirmedOn = null;
+      }
+      if (@event.HasPhoneNumberChanged)
+      {
+        PhoneNumber = @event.PhoneNumber;
+        PhoneNumberConfirmedBy = null;
+        PhoneNumberConfirmedOn = null;
+      }
+
+      FirstName = @event.FirstName;
+      MiddleName = @event.MiddleName;
+      LastName = @event.LastName;
+
+      Locale = @event.Locale;
+      Picture = @event.Picture;
+    }
   }
 }

@@ -1,14 +1,14 @@
 ﻿namespace Logitar.Portal.Core.Actors.Models
 {
-  public record ActorModel
+  public class ActorModel
   {
-    public string Id { get; init; } = null!;
+    public string Id { get; set; } = null!;
 
-    public ActorType Type { get; init; }
-    public bool IsDeleted { get; init; }
+    public ActorType Type { get; set; }
+    public bool IsDeleted { get; set; }
 
-    public string DisplayName { get; init; } = null!;
-    public string? Email { get; init; }
-    public string? Picture { get; init; }
+    public string DisplayName { get; set; } = null!;
+    public string? Email { get; set; }
+    public string? Picture { get; set; }
   }
 }

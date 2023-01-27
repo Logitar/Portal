@@ -2,7 +2,8 @@
 {
   internal class InvalidCredentialsException : Exception
   {
-    public InvalidCredentialsException() : base("The specified credentials did not match.")
+    public InvalidCredentialsException(Exception? innerException = null)
+      : base("The specified credentials did not match.", innerException)
     {
     }
   }

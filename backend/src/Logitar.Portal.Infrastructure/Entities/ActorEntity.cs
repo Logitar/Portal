@@ -32,5 +32,14 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string DisplayName { get; private set; } = null!;
     public string? Email { get; private set; }
     public string? Picture { get; private set; }
+
+    public void Delete() => IsDeleted = true;
+
+    public void Update(UserEntity user)
+    {
+      DisplayName = user.FullName ?? user.Username;
+      Email = user.Email;
+      Picture = user.Picture;
+    }
   }
 }

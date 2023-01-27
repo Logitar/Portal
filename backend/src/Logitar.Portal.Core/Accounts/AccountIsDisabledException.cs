@@ -4,6 +4,7 @@
   {
     public AccountIsDisabledException(AggregateId userId) : base($"The user 'Id={userId}' is disabled.")
     {
+      Data["UserId"] = userId.ToString();
     }
   }
 }

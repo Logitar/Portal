@@ -4,6 +4,8 @@ namespace Logitar.Portal.Core.Tokens
 {
   internal readonly struct SecureToken
   {
+    private const int GuidByteCount = 16;
+
     public SecureToken(Guid id, byte[] key)
     {
       Id = id;
@@ -12,6 +14,27 @@ namespace Logitar.Portal.Core.Tokens
 
     public Guid Id { get; }
     public byte[] Key { get; }
+
+    public static bool TryParse(string s, out SecureToken secureToken)
+    {
+      try
+      {
+        secureToken = Parse(s);
+        return true;
+      }
+      catch (Exception)
+      {
+        secureToken = default;
+        return false;
+      }
+    }
+    public static SecureToken Parse(string s)
+    {
+      byte[] bytes = Convert.FromBase64String(s);
+
+      return new SecureToken(new Guid(bytes.Take(GuidByteCount).ToArray()),
+        bytes.Skip(GuidByteCount).ToArray());
+    }
 
     public static bool operator ==(SecureToken x, SecureToken y) => x.Equals(y);
     public static bool operator !=(SecureToken x, SecureToken y) => !x.Equals(y);

@@ -25,10 +25,10 @@ namespace Logitar.Portal.Infrastructure
           options.UseNpgsql(configuration.GetValue<string>($"POSTGRESQLCONNSTR_{nameof(PortalContext)}"));
         })
         .AddMediatR(assembly)
-        .AddSingleton<IPasswordService, PasswordService>()
-        .AddSingleton<IUserValidator, CustomUserValidator>()
+        .AddScoped<IPasswordService, PasswordService>()
+        .AddScoped<IRepository, Repository>()
         .AddScoped<IRequestPipeline, RequestPipeline>()
-        .AddScoped<IRepository, Repository>();
+        .AddScoped<IUserValidator, CustomUserValidator>();
     }
 
     private static IServiceCollection AddQueriers(this IServiceCollection services)

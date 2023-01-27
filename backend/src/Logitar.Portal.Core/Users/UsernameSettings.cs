@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core.Users
 {
-  public record UsernameSettings
+  public class UsernameSettings
   {
     public string? AllowedCharacters { get; init; }
   }
