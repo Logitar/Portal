@@ -9,7 +9,9 @@ namespace Logitar.Portal.Domain.Realms
     }
 
     public bool RequireConfirmedAccount { get; private set; }
+    public bool RequireUniqueEmail { get; private set; }
 
     public UsernameSettings UsernameSettings { get; private set; } = new();
+    public PasswordSettings PasswordSettings { get; private set; } = new();
   }
 }

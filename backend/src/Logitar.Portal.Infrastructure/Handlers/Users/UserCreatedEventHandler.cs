@@ -33,8 +33,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
           }
         }
 
-        ActorEntity actor = new(notification);
         UserEntity user = new(notification, realm);
+        ActorEntity actor = new(user);
 
         _context.Actors.Add(actor);
         _context.Users.Add(user);

@@ -12,6 +12,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.UserId);
 
+      builder.HasIndex(x => x.Email);
       builder.HasIndex(x => new { x.RealmId, x.UsernameNormalized }).IsUnique();
 
       builder.Property(x => x.Username).HasMaxLength(256);

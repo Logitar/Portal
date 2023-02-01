@@ -97,6 +97,42 @@ namespace Logitar.Portal.Infrastructure.Entities
       private set { }
     }
 
+    public void ChangePassword(UserChangedPasswordEvent @event)
+    {
+      PasswordHash = @event.PasswordHash;
+      PasswordChangedOn = @event.OccurredOn;
+    }
     public void SignIn(UserSignedInEvent @event) => SignedInOn = @event.OccurredOn;
+    public void Update(UserUpdatedEvent @event)
+    {
+      base.Update(@event);
+
+      if (@event.PasswordHash != null)
+      {
+        PasswordHash = @event.PasswordHash;
+        PasswordChangedOn = @event.OccurredOn;
+      }
+
+      if (@event.HasEmailChanged)
+      {
+        Email = @event.Email;
+        EmailConfirmedBy = null;
+        EmailConfirmedOn = null;
+      }
+      if (@event.HasPhoneNumberChanged)
+      {
+        PhoneNumber = @event.PhoneNumber;
+        PhoneNumberConfirmedBy = null;
+        PhoneNumberConfirmedOn = null;
+      }
+
+      FirstName = @event.FirstName;
+      MiddleName = @event.MiddleName;
+      LastName = @event.LastName;
+      FullName = @event.FullName;
+
+      Locale = @event.LocaleName;
+      Picture = @event.Picture;
+    }
   }
 }

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Realms.Models;
+﻿using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Realms.Models;
 using System;
 
 namespace Logitar.Portal.Contracts.Users.Models
@@ -12,11 +13,11 @@ namespace Logitar.Portal.Contracts.Users.Models
     public bool HasPassword { get; set; }
 
     public string? Email { get; set; }
-    //public ActorModel? EmailConfirmedBy { get; set; } // TODO(fpion): implement
+    public ActorModel? EmailConfirmedBy { get; set; }
     public DateTime? EmailConfirmedOn { get; set; }
     public bool IsEmailConfirmed { get; set; }
     public string? PhoneNumber { get; set; }
-    //public ActorModel? PhoneNumberConfirmedBy { get; set; } // TODO(fpion): implement
+    public ActorModel? PhoneNumberConfirmedBy { get; set; }
     public DateTime? PhoneNumberConfirmedOn { get; set; }
     public bool IsPhoneNumberConfirmed { get; set; }
     public bool IsAccountConfirmed { get; set; }
@@ -31,7 +32,7 @@ namespace Logitar.Portal.Contracts.Users.Models
 
     public DateTime? SignedInOn { get; set; }
 
-    //public ActorModel? DisabledBy { get; set; } // TODO(fpion): implement
+    public ActorModel? DisabledBy { get; set; }
     public DateTime? DisabledOn { get; set; }
     public bool IsDisabled { get; set; }
 

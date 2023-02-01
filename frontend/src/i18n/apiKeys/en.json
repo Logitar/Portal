@@ -9,15 +9,15 @@
   "editTitle": "Edit API key",
   "empty": "This list is empty.",
   "expired": "Expired",
-  "expiredAt": "Expired on",
-  "expiresAt": "Expires on",
+  "expiredOn": "Expired on",
+  "expiresOn": "Expires on",
   "neverExpires": "Never expires",
   "newTitle": "Create API key",
   "sort": {
     "options": {
-      "ExpiresAt": "Expires on",
+      "ExpiresOn": "Expires on",
       "Name": "Name",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "status": {

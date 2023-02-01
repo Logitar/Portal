@@ -15,6 +15,22 @@
       };
     }
 
+    internal static class Policies
+    {
+      public const string ApiKey = nameof(ApiKey);
+      public const string AuthenticatedUser = nameof(AuthenticatedUser);
+      public const string PortalIdentity = nameof(PortalIdentity);
+      public const string Session = nameof(Session);
+    }
+
+    internal static class Schemes
+    {
+      //public const string ApiKey = nameof(ApiKey); // TODO(fpion): implement
+      public const string Session = nameof(Session);
+
+      public static string[] All => new[] { Session }; // TODO(fpioN): add ApiKey
+    }
+
     public const string Version = "2.0";
   }
 }

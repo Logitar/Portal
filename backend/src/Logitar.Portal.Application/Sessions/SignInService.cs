@@ -32,6 +32,20 @@ namespace Logitar.Portal.Application.Sessions
       _userValidator = userValidator;
     }
 
+    public async Task<SessionModel> RenewAsync(Session session, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
+    {
+      string keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out byte[] keyBytes);
+      session.Renew(keyHash, ipAddress, additionalInformation);
+      await _repository.SaveAsync(session, cancellationToken);
+
+      SessionModel model = await _sessionQuerier.GetAsync(session.Id, cancellationToken)
+        ?? throw new InvalidOperationException($"The session '{session.Id}' could not be found.");
+
+      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
+
+      return model;
+    }
+
     public async Task<SessionModel> SignInAsync(User user, Realm? realm, bool remember, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
     {
       UsernameSettings usernameSettings = realm?.UsernameSettings

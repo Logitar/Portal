@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Users.Models;
 using System;
 
 namespace Logitar.Portal.Contracts.Sessions.Models
@@ -10,7 +11,7 @@ namespace Logitar.Portal.Contracts.Sessions.Models
     public string? RenewToken { get; set; }
     public bool IsPersistent { get; set; }
 
-    //public ActorModel? SignedOutBy { get; set; } // TODO(fpion): implement
+    public ActorModel? SignedOutBy { get; set; }
     public DateTime? SignedOutOn { get; set; }
     public bool IsActive { get; set; }
 

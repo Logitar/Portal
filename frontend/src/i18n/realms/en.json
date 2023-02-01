@@ -57,7 +57,7 @@
     "options": {
       "Alias": "Alias",
       "Name": "Name",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "title": "Realms",

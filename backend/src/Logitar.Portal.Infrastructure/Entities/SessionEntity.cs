@@ -40,5 +40,20 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public string? IpAddress { get; private set; }
     public string? AdditionalInformation { get; private set; }
+
+    public void Renew(SessionRenewedEvent @event)
+    {
+      Update(@event);
+
+      KeyHash = @event.KeyHash;
+
+      IpAddress = @event.IpAddress;
+      AdditionalInformation = @event.AdditionalInformation;
+    }
+    public void SignOut(SessionSignedOutEvent @event)
+    {
+      SignedOutBy = @event.UserId.Value;
+      SignedOutOn = @event.OccurredOn;
+    }
   }
 }

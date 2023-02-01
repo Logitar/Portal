@@ -40,8 +40,8 @@
             <th scope="col" v-t="'user.fullName'" />
             <th scope="col" v-t="'user.email.label'" />
             <th scope="col" v-t="'user.phone.label'" />
-            <th scope="col" v-t="'user.passwordChangedAt'" />
-            <th scope="col" v-t="'user.signedInAt'" />
+            <th scope="col" v-t="'user.passwordChangedOn'" />
+            <th scope="col" v-t="'user.signedInOn'" />
             <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
@@ -61,9 +61,9 @@
               {{ user.phoneNumber || '—' }}
               <b-badge v-if="user.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
             </td>
-            <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
-            <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
-            <td><status-cell :actor="user.updatedBy" :date="user.updatedAt" /></td>
+            <td>{{ user.passwordChangedOn ? $d(new Date(user.passwordChangedOn), 'medium') : '—' }}</td>
+            <td>{{ user.signedInOn ? $d(new Date(user.signedInOn), 'medium') : '—' }}</td>
+            <td><status-cell :actor="user.updatedBy" :date="user.updatedOn" /></td>
             <td>
               <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
               <icon-button

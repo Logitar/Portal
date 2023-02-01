@@ -1,18 +1,17 @@
-﻿namespace Logitar.Portal.Web.Models.Users
+﻿using Logitar.Portal.Contracts.Users.Models;
+
+namespace Logitar.Portal.Web.Models.Users
 {
   internal class CurrentUser
   {
-    /// <summary>
-    /// TODO(fpion): implement
-    /// </summary>
-    public CurrentUser(/*User? user*/)
+    public CurrentUser(UserModel? user)
     {
-      //IsAuthenticated = user != null;
+      IsAuthenticated = user != null;
 
-      //Email = user?.Email;
-      //FullName = user?.FullName;
-      //Picture = user?.Picture;
-      //Username = user?.Username;
+      Email = user?.Email;
+      FullName = user?.FullName;
+      Picture = user?.Picture;
+      Username = user?.Username;
     }
 
     public bool IsAuthenticated { get; }

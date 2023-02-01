@@ -5,6 +5,7 @@ namespace Logitar.Portal.Application.Sessions
 {
   public interface ISessionQuerier
   {
+    Task<SessionModel?> GetAsync(string id, CancellationToken cancellationToken = default);
     Task<SessionModel?> GetAsync(AggregateId id, CancellationToken cancellationToken = default);
   }
 }

@@ -10,7 +10,8 @@ namespace Logitar.Portal.Infrastructure.Profiles
     public SessionProfile()
     {
       CreateMap<SessionEntity, SessionModel>()
-        .IncludeBase<AggregateEntity, AggregateModel>();
+        .IncludeBase<AggregateEntity, AggregateModel>()
+        .ForMember(x => x.SignedOutBy, x => x.Ignore()); // TODO(fpion): implement Actors
     }
   }
 }

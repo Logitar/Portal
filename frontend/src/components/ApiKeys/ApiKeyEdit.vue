@@ -14,10 +14,10 @@
     </b-alert>
     <template v-if="apiKey">
       <status-detail :model="apiKey" />
-      <p v-if="apiKey.expiresAt" :class="{ 'text-danger': apiKey.isExpired }">
-        <template v-if="apiKey.isExpired">{{ $t('apiKeys.expiredAt') }}</template>
-        <template v-else>{{ $t('apiKeys.expiresAt') }}</template>
-        {{ $d(new Date(apiKey.expiresAt), 'medium') }}
+      <p v-if="apiKey.expiresOn" :class="{ 'text-danger': apiKey.isExpired }">
+        <template v-if="apiKey.isExpired">{{ $t('apiKeys.expiredOn') }}</template>
+        <template v-else>{{ $t('apiKeys.expiresOn') }}</template>
+        {{ $d(new Date(apiKey.expiresOn), 'medium') }}
       </p>
       <p v-else v-t="'apiKeys.neverExpires'" />
     </template>
@@ -27,7 +27,7 @@
           <icon-submit v-if="apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <form-datetime v-if="!apiKey" id="expiresAt" label="apiKeys.expiresAt" :minDate="new Date()" validate v-model="expiresAt" />
+        <form-datetime v-if="!apiKey" id="expiresOn" label="apiKeys.expiresOn" :minDate="new Date()" validate v-model="expiresOn" />
         <name-field :disabled="apiKey && apiKey.isExpired" required v-model="name" />
         <description-field :disabled="apiKey && apiKey.isExpired" :rows="15" v-model="description" />
       </b-form>
@@ -58,7 +58,7 @@ export default {
     return {
       apiKey: null,
       description: null,
-      expiresAt: null,
+      expiresOn: null,
       loading: false,
       name: null,
       showString: false
@@ -67,7 +67,7 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (!this.apiKey && this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
+        (!this.apiKey && this.expiresOn) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
       )
     },
     payload() {
@@ -76,7 +76,7 @@ export default {
         description: this.description
       }
       if (!this.apiKey) {
-        payload.expiresAt = this.expiresAt
+        payload.expiresOn = this.expiresOn
       }
       return payload
     }
@@ -89,7 +89,7 @@ export default {
     setModel(apiKey) {
       this.apiKey = apiKey
       this.description = apiKey.description
-      this.expiresAt = apiKey.expiresAt
+      this.expiresOn = apiKey.expiresOn
       this.name = apiKey.name
     },
     async submit() {

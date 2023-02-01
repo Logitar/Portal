@@ -30,7 +30,7 @@
             <th scope="col" v-t="'messages.sender.label'" />
             <th scope="col" v-t="'templates.select.label'" />
             <th scope="col" v-t="'messages.status.label'" />
-            <th scope="col" v-t="'messages.updatedAt'" />
+            <th scope="col" v-t="'messages.updatedOn'" />
           </tr>
         </thead>
         <tbody>
@@ -52,7 +52,7 @@
             <td>
               <status-badge :message="message" />
             </td>
-            <td><status-cell :actor="message.updatedBy" :date="message.updatedAt" /></td>
+            <td><status-cell :actor="message.updatedBy" :date="message.updatedOn" /></td>
           </tr>
         </tbody>
       </table>
@@ -86,7 +86,7 @@ export default {
       page: 1,
       realm: null,
       search: null,
-      sort: 'UpdatedAt',
+      sort: 'UpdatedOn',
       status: null,
       template: null,
       total: 0

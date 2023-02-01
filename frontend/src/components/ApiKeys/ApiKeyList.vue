@@ -16,7 +16,7 @@
         <thead>
           <tr>
             <th scope="col" v-t="'name.label'" />
-            <th scope="col" v-t="'apiKeys.expiresAt'" />
+            <th scope="col" v-t="'apiKeys.expiresOn'" />
             <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
@@ -27,10 +27,10 @@
               <b-link :href="`/api-keys/${apiKey.id}`">{{ apiKey.name }}</b-link>
             </td>
             <td>
-              {{ apiKey.expiresAt ? $d(new Date(apiKey.expiresAt), 'medium') : $t('apiKeys.neverExpires') }}
+              {{ apiKey.expiresOn ? $d(new Date(apiKey.expiresOn), 'medium') : $t('apiKeys.neverExpires') }}
               <b-badge v-if="apiKey.isExpired" variant="danger">{{ $t('apiKeys.expired') }}</b-badge>
             </td>
-            <td><status-cell :actor="apiKey.updatedBy" :date="apiKey.updatedAt" /></td>
+            <td><status-cell :actor="apiKey.updatedBy" :date="apiKey.updatedOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${apiKey.id}`" />
               <delete-modal

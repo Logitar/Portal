@@ -22,5 +22,18 @@ namespace Logitar.Portal.Infrastructure
     {
       return _mapper.Map<T>(source);
     }
+
+    /// <summary>
+    /// TODO(fpion): implement
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="sources"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<IEnumerable<T>> MapAsync<T>(IEnumerable<object?> sources, CancellationToken cancellationToken = default)
+    {
+      return _mapper.Map<IEnumerable<T>>(sources);
+    }
   }
 }

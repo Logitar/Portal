@@ -45,7 +45,7 @@
   "sort": {
     "options": {
       "Subject": "Subject",
-      "UpdatedAt": "Sent on"
+      "UpdatedOn": "Sent on"
     }
   },
   "status": {
@@ -62,6 +62,6 @@
   "successData": "Success data",
   "templateFormat": "This message contents were generated using the template",
   "title": "Messages",
-  "updatedAt": "Sent on",
+  "updatedOn": "Sent on",
   "viewTitle": "View message"
 }

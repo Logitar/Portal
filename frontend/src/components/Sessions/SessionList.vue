@@ -38,7 +38,7 @@
           <tr>
             <th scope="col" v-t="'updated'" />
             <th scope="col" v-t="'user.session.user'" />
-            <th scope="col" v-t="'user.session.signedOutAt'" />
+            <th scope="col" v-t="'user.session.signedOutOn'" />
             <th scope="col" v-t="'user.session.persistent.label'" />
             <th scope="col" v-t="'user.session.ipAddress'" />
             <th scope="col" />
@@ -47,7 +47,7 @@
         <tbody>
           <tr v-for="sessionItem in sessions" :key="sessionItem.id">
             <td>
-              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedAt), 'medium') }}</b-link>
+              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedOn), 'medium') }}</b-link>
             </td>
             <td>
               <b-link :href="`/users/${sessionItem.user.id}`" target="_blank" class="mx-1"><user-avatar :user="sessionItem.user" /></b-link>
@@ -56,7 +56,7 @@
               /></b-link>
             </td>
             <td>
-              <status-cell v-if="sessionItem.signedOutAt" :actor="sessionItem.signedOutBy" :date="new Date(sessionItem.signedOutAt)" />
+              <status-cell v-if="sessionItem.signedOutOn" :actor="sessionItem.signedOutBy" :date="new Date(sessionItem.signedOutOn)" />
               <b-badge v-else-if="sessionItem.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
             </td>
             <td v-text="$t(sessionItem.isPersistent ? 'yes' : 'no')" />
@@ -127,7 +127,7 @@ export default {
       page: 1,
       selectedRealm: null,
       selectedUser: null,
-      sort: 'UpdatedAt',
+      sort: 'UpdatedOn',
       sessions: [],
       total: 0,
       userId: null

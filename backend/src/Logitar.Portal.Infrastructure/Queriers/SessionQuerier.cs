@@ -18,9 +18,13 @@ namespace Logitar.Portal.Infrastructure.Queriers
     }
 
     public async Task<SessionModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+
+    public async Task<SessionModel?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
       SessionEntity? session = await _sessions
-        .SingleOrDefaultAsync(x => x.AggregateId == id.Value, cancellationToken);
+        .Include(x => x.User).ThenInclude(x => x!.Realm)
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
       return await _mapper.MapAsync<SessionModel?>(session, cancellationToken);
     }

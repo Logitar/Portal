@@ -10,7 +10,10 @@ namespace Logitar.Portal.Infrastructure.Profiles
     public UserProfile()
     {
       CreateMap<UserEntity, UserModel>()
-        .IncludeBase<AggregateEntity, AggregateModel>();
+        .IncludeBase<AggregateEntity, AggregateModel>()
+        .ForMember(x => x.DisabledBy, x => x.Ignore()) // TODO(fpion): implement Actors
+        .ForMember(x => x.EmailConfirmedBy, x => x.Ignore()) // TODO(fpion): implement Actors
+        .ForMember(x => x.PhoneNumberConfirmedBy, x => x.Ignore()); // TODO(fpion): implement Actors
     }
   }
 }

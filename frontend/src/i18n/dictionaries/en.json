@@ -18,7 +18,7 @@
   "sort": {
     "options": {
       "RealmLocale": "Realm then Locale",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "title": "Dictionaries",

@@ -9,7 +9,9 @@ namespace Logitar.Portal.Infrastructure.Profiles
     public AggregateProfile()
     {
       CreateMap<AggregateEntity, AggregateModel>()
-        .ForMember(x => x.Id, x => x.MapFrom(y => y.AggregateId));
+        .ForMember(x => x.Id, x => x.MapFrom(y => y.AggregateId))
+        .ForMember(x => x.CreatedBy, x => x.Ignore()) // TODO(fpion): implement Actors
+        .ForMember(x => x.UpdatedBy, x => x.Ignore()); // TODO(fpion): implement Actors
     }
   }
 }

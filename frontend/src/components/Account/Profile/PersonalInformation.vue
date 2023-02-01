@@ -22,17 +22,17 @@
           </td>
         </tr>
         <tr>
-          <th scope="row" v-t="'user.createdAt'" />
-          <td>{{ $d(new Date(profile.createdAt), 'medium') }}</td>
+          <th scope="row" v-t="'user.createdOn'" />
+          <td>{{ $d(new Date(profile.createdOn), 'medium') }}</td>
         </tr>
-        <tr v-if="profile.updatedAt">
-          <th scope="row" v-t="'user.updatedAt'" />
-          <td>{{ $d(new Date(profile.updatedAt), 'medium') }}</td>
+        <tr v-if="profile.updatedOn">
+          <th scope="row" v-t="'user.updatedOn'" />
+          <td>{{ $d(new Date(profile.updatedOn), 'medium') }}</td>
         </tr>
-        <tr v-if="profile.signedInAt">
-          <th scope="row" v-t="'user.signedInAt'" />
+        <tr v-if="profile.signedInOn">
+          <th scope="row" v-t="'user.signedInOn'" />
           <td>
-            {{ $d(new Date(profile.signedInAt), 'medium') }}
+            {{ $d(new Date(profile.signedInOn), 'medium') }}
             <br />
             <b-link :href="`/sessions?user=${profile.id}`">{{ $t('user.session.view') }}</b-link>
           </td>

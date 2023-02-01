@@ -1,7 +1,11 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Web.Authentication;
+using Logitar.Portal.Web.Authorization;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Filters;
+using Logitar.Portal.Web.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web
@@ -15,29 +19,29 @@ namespace Logitar.Portal.Web
       services.AddControllersWithViews(options => options.Filters.Add(new ExceptionFilterAttribute()))
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-      //services.AddAuthentication()
-      //  .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { })
-      //  .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Constants.Schemes.Session, options => { }); // TODO(fpion): implement
+      services.AddAuthentication()
+        //.AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { }) // TODO(fpion): implement
+        .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Constants.Schemes.Session, options => { });
 
-      //services.AddAuthorization(options =>
-      //{
-      //  options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.All)
-      //    .RequireAuthenticatedUser()
-      //    .AddRequirements(new ApiKeyAuthorizationRequirement())
-      //    .Build());
-      //  options.AddPolicy(Constants.Policies.AuthenticatedUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
-      //    .RequireAuthenticatedUser()
-      //    .AddRequirements(new UserAuthorizationRequirement())
-      //    .Build());
-      //  options.AddPolicy(Constants.Policies.PortalIdentity, new AuthorizationPolicyBuilder(Constants.Schemes.All)
-      //    .RequireAuthenticatedUser()
-      //    .AddRequirements(new PortalIdentityAuthorizationRequirement())
-      //    .Build());
-      //  options.AddPolicy(Constants.Policies.Session, new AuthorizationPolicyBuilder(Constants.Schemes.All)
-      //    .RequireAuthenticatedUser()
-      //    .AddRequirements(new SessionAuthorizationRequirement())
-      //    .Build());
-      //}); // TODO(fpion): implement
+      services.AddAuthorization(options =>
+      {
+        //options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+        //  .RequireAuthenticatedUser()
+        //  .AddRequirements(new ApiKeyAuthorizationRequirement())
+        //  .Build()); // TODO(fpion): implement
+        options.AddPolicy(Constants.Policies.AuthenticatedUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new UserAuthorizationRequirement())
+          .Build());
+        options.AddPolicy(Constants.Policies.PortalIdentity, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new PortalIdentityAuthorizationRequirement())
+          .Build());
+        options.AddPolicy(Constants.Policies.Session, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new SessionAuthorizationRequirement())
+          .Build());
+      });
 
       services.AddApplicationInsightsTelemetry();
       services.AddHealthChecks()
@@ -55,6 +59,12 @@ namespace Logitar.Portal.Web
 
       services.AddLogitarPortalApplication();
       services.AddLogitarPortalInfrastructure();
+
+      //services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>(); // TODO(fpion): implement
+      services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
+      services.AddSingleton<IAuthorizationHandler, SessionAuthorizationHandler>();
+      services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
+      services.AddSingleton<IUserContext, HttpUserContext>();
     }
 
     public override void Configure(IApplicationBuilder applicationBuilder)
@@ -70,8 +80,8 @@ namespace Logitar.Portal.Web
         application.UseStaticFiles();
         application.UseSession();
         //application.UseMiddleware<Logging>(); // TODO(fpion): implement
-        //application.UseMiddleware<RenewSession>(); // TODO(fpion): implement
-        //application.UseMiddleware<RedirectUnauthorized>(); // TODO(fpion): implement
+        application.UseMiddleware<RenewSession>();
+        application.UseMiddleware<RedirectUnauthorized>();
         application.UseAuthentication();
         application.UseAuthorization();
         application.MapControllers();

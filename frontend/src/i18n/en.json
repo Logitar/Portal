@@ -42,8 +42,8 @@
   },
   "statusDetail": {
     "by": "by",
-    "createdAt": "Created on {date}",
-    "updatedAt": "Last updated on {date}"
+    "createdOn": "Created on {date}",
+    "updatedOn": "Last updated on {date}"
   },
   "success": "Success!",
   "system": "System",
