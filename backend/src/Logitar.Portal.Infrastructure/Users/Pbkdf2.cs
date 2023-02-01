@@ -1,34 +1,46 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 
 namespace Logitar.Portal.Infrastructure.Users
 {
-  internal readonly struct Pbkdf2
+  internal class Pbkdf2
   {
-    private const char Separator = ';';
+    private const char Separator = ':';
 
-    private readonly KeyDerivationPrf _algorithm;
+    private readonly KeyDerivationPrf _algorith;
     private readonly int _iterations;
     private readonly byte[] _salt;
     private readonly byte[] _hash;
 
-    public Pbkdf2(string password, KeyDerivationPrf algorithm, int iterations, int saltLength)
+    public Pbkdf2(string password)
     {
-      _algorithm = algorithm;
-      _iterations = iterations;
-      _salt = RandomNumberGenerator.GetBytes(saltLength);
-      _hash = Hash(password);
+      _algorith = KeyDerivationPrf.HMACSHA256;
+      _iterations = 100000;
+      _salt = RandomNumberGenerator.GetBytes(32);
+      _hash = ComputeHash(password);
     }
-    private Pbkdf2(KeyDerivationPrf algorithm, int iterations, byte[] salt, byte[] hash)
+    private Pbkdf2(KeyDerivationPrf algorith, int iterations, byte[] salt, byte[] hash)
     {
-      _algorithm = algorithm;
+      _algorith = algorith;
       _iterations = iterations;
       _salt = salt;
       _hash = hash;
     }
 
-    public static bool TryParse(string s, out Pbkdf2 pbkdf2)
+    public static Pbkdf2 Parse(string s)
+    {
+      string[] values = s.Split(Separator);
+      if (values.Length != 4)
+      {
+        throw new ArgumentException($"The value '{s}' is not a valid Pbkdf2 representation.", nameof(s));
+      }
+
+      return new Pbkdf2(Enum.Parse<KeyDerivationPrf>(values[0]),
+        int.Parse(values[1]),
+        Convert.FromBase64String(values[2]),
+        Convert.FromBase64String(values[3]));
+    }
+    public static bool TryParse(string s, out Pbkdf2? pbkdf2)
     {
       try
       {
@@ -37,40 +49,25 @@ namespace Logitar.Portal.Infrastructure.Users
       }
       catch (Exception)
       {
-        pbkdf2 = default;
+        pbkdf2 = null;
         return false;
       }
     }
-    public static Pbkdf2 Parse(string s)
-    {
-      string[] values = s.Split(Separator);
-      if (s.Length != 4)
-      {
-        throw new ArgumentException($"The value '{s}' is not a valid Pbkdf2 string.");
-      }
 
-      return new Pbkdf2(Enum.Parse<KeyDerivationPrf>(values[0]),
-        int.Parse(values[1]),
-        Convert.FromBase64String(values[2]),
-        Convert.FromBase64String(values[3]));
-    }
+    public bool IsMatch(string password)
+      => _hash.SequenceEqual(ComputeHash(password, _hash.Length));
 
-    public bool IsMatch(string password) => _hash.SequenceEqual(Hash(password, _hash.Length));
+    private byte[] ComputeHash(string password, int? length = null)
+      => KeyDerivation.Pbkdf2(password, _salt, _algorith, _iterations, length ?? _salt.Length);
 
-    private byte[] Hash(string password, int? length = null)
-      => KeyDerivation.Pbkdf2(password, _salt, _algorithm, _iterations, length ?? _salt.Length);
-
-    public static bool operator ==(Pbkdf2 x, Pbkdf2 y) => x.Equals(y);
-    public static bool operator !=(Pbkdf2 x, Pbkdf2 y) => !x.Equals(y);
-
-    public override bool Equals([NotNullWhen(true)] object? obj) => obj is Pbkdf2 pbkdf2
-      && pbkdf2._algorithm == _algorithm
+    public override bool Equals(object? obj) => obj is Pbkdf2 pbkdf2
+      && pbkdf2._algorith == _algorith
       && pbkdf2._iterations == _iterations
       && pbkdf2._salt.SequenceEqual(_salt)
       && pbkdf2._hash.SequenceEqual(_hash);
-    public override int GetHashCode() => HashCode.Combine(_algorithm, _iterations, _salt, _hash);
+    public override int GetHashCode() => HashCode.Combine(_algorith, _iterations, _salt, _hash);
     public override string ToString() => string.Join(Separator,
-      _algorithm,
+      _algorith,
       _iterations,
       Convert.ToBase64String(_salt),
       Convert.ToBase64String(_hash));

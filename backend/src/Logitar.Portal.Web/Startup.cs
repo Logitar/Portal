@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Extensions;
+using Logitar.Portal.Web.Filters;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web
@@ -11,7 +12,7 @@ namespace Logitar.Portal.Web
     {
       base.ConfigureServices(services);
 
-      services.AddControllersWithViews()
+      services.AddControllersWithViews(options => options.Filters.Add(new ExceptionFilterAttribute()))
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
       //services.AddAuthentication()
@@ -47,13 +48,12 @@ namespace Logitar.Portal.Web
       services.AddOpenApi();
 
       services.AddSession(options =>
-        {
-          options.Cookie.SameSite = SameSiteMode.Strict;
-          options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        })
-        .AddDistributedMemoryCache();
+      {
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+      }).AddDistributedMemoryCache();
 
-      services.AddLogitarPortalCore();
+      services.AddLogitarPortalApplication();
       services.AddLogitarPortalInfrastructure();
     }
 

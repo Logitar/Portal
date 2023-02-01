@@ -2,6 +2,9 @@
 {
   internal class CurrentUser
   {
+    /// <summary>
+    /// TODO(fpion): implement
+    /// </summary>
     public CurrentUser(/*User? user*/)
     {
       //IsAuthenticated = user != null;

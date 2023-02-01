@@ -1,8 +1,8 @@
-﻿using Logitar.Portal.Core.Accounts;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Configurations;
-using Logitar.Portal.Core.Configurations.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Application.Accounts;
+using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Configurations.Payloads;
+using Logitar.Portal.Contracts.Accounts.Payloads;
+using Logitar.Portal.Contracts.Sessions.Models;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -25,6 +25,11 @@ namespace Logitar.Portal.Web.Controllers.Api
     [HttpPost]
     public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
     {
+      if (payload.User.Password == null)
+      {
+        return BadRequest(new { code = "PasswordIsRequired" });
+      }
+
       await _configurationService.InitializeAsync(payload, cancellationToken);
 
       SignInPayload signInPayload = new()
@@ -35,7 +40,7 @@ namespace Logitar.Portal.Web.Controllers.Api
         AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers)
       };
       SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, cancellationToken);
-      HttpContext.SetSession(session);
+      HttpContext.SignIn(session);
 
       return NoContent();
     }

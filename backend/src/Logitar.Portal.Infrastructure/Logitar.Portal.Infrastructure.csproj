@@ -8,17 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.Core\Logitar.Portal.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Handlers\Realms\" />
+    <ProjectReference Include="..\Logitar.Portal.Application\Logitar.Portal.Application.csproj" />
   </ItemGroup>
 
 </Project>

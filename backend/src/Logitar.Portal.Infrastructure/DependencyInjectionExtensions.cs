@@ -1,8 +1,9 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Users;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Infrastructure.Queriers;
+using Logitar.Portal.Infrastructure.Repositories;
 using Logitar.Portal.Infrastructure.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,24 +20,32 @@ namespace Logitar.Portal.Infrastructure
       Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
       return services
+        .AddAutoMapper(assembly)
         .AddDbContext<PortalContext>((provider, options) =>
         {
           IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
           options.UseNpgsql(configuration.GetValue<string>($"POSTGRESQLCONNSTR_{nameof(PortalContext)}"));
         })
         .AddMediatR(assembly)
-        .AddScoped<IPasswordService, PasswordService>()
-        .AddScoped<IRepository, Repository>()
-        .AddScoped<IRequestPipeline, RequestPipeline>()
-        .AddScoped<IUserValidator, CustomUserValidator>();
+        .AddQueriers()
+        .AddRepositories()
+        .AddSingleton<IUserValidator, CustomUserValidator>()
+        .AddSingleton<IPasswordService, PasswordService>()
+        .AddScoped<IMappingService, MappingService>()
+        .AddTransient<IRequestPipeline, RequestPipeline>();
     }
 
     private static IServiceCollection AddQueriers(this IServiceCollection services)
     {
+      return services.AddScoped<ISessionQuerier, SessionQuerier>();
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
       return services
-        .AddScoped<IRealmQuerier, RealmQuerier>()
-        .AddScoped<ISessionQuerier, SessionQuerier>()
-        .AddScoped<IUserQuerier, UserQuerier>();
+        .AddScoped<IRepository, Repository>()
+        .AddScoped<IRealmRepository, RealmRepository>()
+        .AddScoped<IUserRepository, UserRepository>();
     }
   }
 }

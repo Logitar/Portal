@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class EnumConfiguration<TEntity, TKey> where TEntity : EnumEntity<TKey>
+  internal abstract class EnumConfiguration<TEntity, TKey> where TEntity : EnumEntity<TKey> where TKey : new()
   {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
@@ -11,8 +11,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasIndex(x => x.Name).IsUnique();
 
-      builder.Property(x => x.Name).HasMaxLength(256);
       builder.Property(x => x.Value).ValueGeneratedNever();
+      builder.Property(x => x.Name).HasMaxLength(256);
     }
   }
 }

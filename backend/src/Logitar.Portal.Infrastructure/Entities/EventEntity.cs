@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Domain;
 using System.Text.Json;
 
 namespace Logitar.Portal.Infrastructure.Entities
@@ -9,17 +9,17 @@ namespace Logitar.Portal.Infrastructure.Entities
     {
     }
 
-    public long EventId { get; private set; }
-    public long Version { get; private set; }
+    public long EventId { get; set; }
+    public long Version { get; set; }
 
-    public DateTime OccurredOn { get; private set; }
-    public string UserId { get; private set; } = null!;
+    public DateTime OccurredOn { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
-    public string AggregateType { get; private set; } = null!;
-    public string AggregateId { get; private set; } = null!;
+    public string AggregateType { get; set; } = string.Empty;
+    public string AggregateId { get; set; } = string.Empty;
 
-    public string EventType { get; private set; } = null!;
-    public string EventData { get; private set; } = null!;
+    public string EventType { get; set; } = string.Empty;
+    public string EventData { get; set; } = string.Empty;
 
     public static IEnumerable<EventEntity> FromChanges(AggregateRoot aggregate)
     {
@@ -33,9 +33,9 @@ namespace Logitar.Portal.Infrastructure.Entities
         {
           Version = change.Version,
           OccurredOn = change.OccurredOn,
-          UserId = change.UserId.ToString(),
+          UserId = change.UserId.Value,
           AggregateType = aggregateType,
-          AggregateId = aggregate.Id.ToString(),
+          AggregateId = aggregate.Id.Value,
           EventType = eventType.GetName(),
           EventData = JsonSerializer.Serialize(change, eventType)
         };

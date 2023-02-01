@@ -10,14 +10,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		README.md = README.md
-		README2.md = README2.md
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Core", "src\Logitar.Portal.Core\Logitar.Portal.Core.csproj", "{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{DF6A63E6-680C-4120-806D-936BF0FCD8ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{0762D36E-03B1-4615-84B7-8E70B1527B2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Domain", "src\Logitar.Portal.Domain\Logitar.Portal.Domain.csproj", "{2252DD95-7FA0-4D3B-B966-290525DD1B74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Application", "src\Logitar.Portal.Application\Logitar.Portal.Application.csproj", "{14B1271F-47A9-4F18-B43D-056C1DD37443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Contracts", "src\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj", "{A54A0A2C-E239-4163-A51C-F2F6FA82609D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Client", "src\Logitar.Portal.Client\Logitar.Portal.Client.csproj", "{4D99D91D-5F68-4609-A7AB-760AF2821B5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +30,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E71CC9D-79B6-4F39-ADC6-92EDBF5769AA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF6A63E6-680C-4120-806D-936BF0FCD8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,6 +38,22 @@ Global
 		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0762D36E-03B1-4615-84B7-8E70B1527B2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2252DD95-7FA0-4D3B-B966-290525DD1B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2252DD95-7FA0-4D3B-B966-290525DD1B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2252DD95-7FA0-4D3B-B966-290525DD1B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2252DD95-7FA0-4D3B-B966-290525DD1B74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14B1271F-47A9-4F18-B43D-056C1DD37443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14B1271F-47A9-4F18-B43D-056C1DD37443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14B1271F-47A9-4F18-B43D-056C1DD37443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14B1271F-47A9-4F18-B43D-056C1DD37443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A54A0A2C-E239-4163-A51C-F2F6FA82609D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54A0A2C-E239-4163-A51C-F2F6FA82609D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54A0A2C-E239-4163-A51C-F2F6FA82609D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54A0A2C-E239-4163-A51C-F2F6FA82609D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D99D91D-5F68-4609-A7AB-760AF2821B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D99D91D-5F68-4609-A7AB-760AF2821B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D99D91D-5F68-4609-A7AB-760AF2821B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D99D91D-5F68-4609-A7AB-760AF2821B5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

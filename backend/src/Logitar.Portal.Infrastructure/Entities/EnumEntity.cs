@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Infrastructure.Entities
 {
-  internal abstract class EnumEntity<T>
+  internal abstract class EnumEntity<T> where T : new()
   {
     protected EnumEntity()
     {
@@ -11,7 +11,7 @@
       Name = name;
     }
 
-    public T Value { get; private set; } = default!;
-    public string Name { get; private set; } = null!;
+    public T Value { get; protected set; } = new();
+    public string Name { get; protected set; } = string.Empty;
   }
 }

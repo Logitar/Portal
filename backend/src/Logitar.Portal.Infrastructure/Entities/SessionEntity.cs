@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Sessions.Events;
+﻿using Logitar.Portal.Domain.Sessions.Events;
 
 namespace Logitar.Portal.Infrastructure.Entities
 {
@@ -40,20 +40,5 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public string? IpAddress { get; private set; }
     public string? AdditionalInformation { get; private set; }
-
-    public void Renew(SessionRenewedEvent @event)
-    {
-      Update(@event);
-
-      KeyHash = @event.KeyHash;
-
-      IpAddress = @event.IpAddress;
-      AdditionalInformation = @event.AdditionalInformation;
-    }
-    public void SignOut(SessionSignedOutEvent @event)
-    {
-      SignedOutBy = @event.UserId.ToString();
-      SignedOutOn = @event.OccurredOn;
-    }
   }
 }

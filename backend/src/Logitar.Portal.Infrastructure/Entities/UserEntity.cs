@@ -1,11 +1,10 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Users.Events;
+﻿using Logitar.Portal.Domain.Users.Events;
 
 namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class UserEntity : AggregateEntity
   {
-    public UserEntity(UserCreatedEvent @event) : base(@event)
+    public UserEntity(UserCreatedEvent @event, RealmEntity? realm = null) : base(@event)
     {
       Username = @event.Username;
       PasswordHash = @event.PasswordHash;
@@ -17,9 +16,13 @@ namespace Logitar.Portal.Infrastructure.Entities
       FirstName = @event.FirstName;
       MiddleName = @event.MiddleName;
       LastName = @event.LastName;
+      FullName = @event.FullName;
 
-      Locale = @event.Locale;
+      Locale = @event.LocaleName;
       Picture = @event.Picture;
+
+      Realm = realm;
+      RealmId = realm?.RealmId;
     }
     private UserEntity() : base()
     {
@@ -30,7 +33,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public RealmEntity? Realm { get; private set; }
     public int? RealmId { get; private set; }
 
-    public string Username { get; private set; } = null!;
+    public string Username { get; private set; } = string.Empty;
     public string UsernameNormalized
     {
       get => Username.ToUpper();
@@ -60,7 +63,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? PhoneNumber { get; private set; }
     public string? PhoneNumberNormalized
     {
-      get => PhoneNumber;
+      get => PhoneNumber?.ToUpper();
       private set { }
     }
     public string? PhoneNumberConfirmedBy { get; private set; }
@@ -79,13 +82,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
     public string? LastName { get; private set; }
-    public string? FullName
-    {
-      get => string.Join(' ', new[] { FirstName, MiddleName, LastName }
-        .Where(name => !string.IsNullOrWhiteSpace(name))
-        .Select(name => name!.Trim())).CleanTrim();
-      private set { }
-    }
+    public string? FullName { get; private set; }
 
     public string? Locale { get; private set; }
     public string? Picture { get; private set; }
@@ -100,68 +97,6 @@ namespace Logitar.Portal.Infrastructure.Entities
       private set { }
     }
 
-    public List<SessionEntity> Sessions { get; private set; } = new();
-
-    public void ChangePassword(UserChangedPasswordEvent @event)
-    {
-      Update(@event);
-
-      PasswordHash = @event.PasswordHash;
-      PasswordChangedOn = @event.OccurredOn;
-    }
-    public void ConfirmEmail(UserConfirmedEmailEvent @event)
-    {
-      EmailConfirmedBy = @event.UserId.ToString();
-      EmailConfirmedOn = @event.OccurredOn;
-    }
-    public void ConfirmPhoneNumber(UserConfirmedPhoneNumberEvent @event)
-    {
-      PhoneNumberConfirmedBy = @event.UserId.ToString();
-      PhoneNumberConfirmedOn = @event.OccurredOn;
-    }
-    public void Disable(UserDisabledEvent @event)
-    {
-      DisabledBy = @event.UserId.ToString();
-      DisabledOn = @event.OccurredOn;
-    }
-    public void Enable()
-    {
-      DisabledBy = null;
-      DisabledOn = null;
-    }
-    public void SignIn(UserSignedInEvent @event)
-    {
-      SignedInOn = @event.OccurredOn;
-    }
-    public void Update(UserUpdatedEvent @event)
-    {
-      base.Update(@event);
-
-      if (PasswordHash != null)
-      {
-        PasswordHash = @event.PasswordHash;
-        PasswordChangedOn = @event.OccurredOn;
-      }
-
-      if (@event.HasEmailChanged)
-      {
-        Email = @event.Email;
-        EmailConfirmedBy = null;
-        EmailConfirmedOn = null;
-      }
-      if (@event.HasPhoneNumberChanged)
-      {
-        PhoneNumber = @event.PhoneNumber;
-        PhoneNumberConfirmedBy = null;
-        PhoneNumberConfirmedOn = null;
-      }
-
-      FirstName = @event.FirstName;
-      MiddleName = @event.MiddleName;
-      LastName = @event.LastName;
-
-      Locale = @event.Locale;
-      Picture = @event.Picture;
-    }
+    public void SignIn(UserSignedInEvent @event) => SignedInOn = @event.OccurredOn;
   }
 }

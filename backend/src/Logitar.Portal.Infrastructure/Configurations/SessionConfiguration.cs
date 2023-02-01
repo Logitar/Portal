@@ -12,14 +12,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.SessionId);
 
-      builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.NoAction);
-
-      builder.HasIndex(x => x.IsActive);
-      builder.HasIndex(x => x.IsPersistent);
-
-      builder.Property(x => x.AdditionalInformation).HasColumnType("jsonb");
-      builder.Property(x => x.IpAddress).HasMaxLength(40);
       builder.Property(x => x.SignedOutBy).HasMaxLength(256);
+      builder.Property(x => x.IpAddress).HasMaxLength(64);
     }
   }
 }

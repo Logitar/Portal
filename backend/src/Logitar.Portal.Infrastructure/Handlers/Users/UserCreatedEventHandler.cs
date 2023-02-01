@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Core.Users.Events;
+﻿using Logitar.Portal.Domain.Users.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Logitar.Portal.Infrastructure.Handlers.Users
@@ -20,10 +21,23 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
     {
       try
       {
-        UserEntity user = new(notification);
+        RealmEntity? realm = null;
+        if (notification.RealmId.HasValue)
+        {
+          realm = await _context.Realms.SingleOrDefaultAsync(x => x.AggregateId == notification.RealmId.Value.Value, cancellationToken);
+          if (realm == null)
+          {
+            _logger.LogError("The realm 'AggregateId={aggregateId}' could not be found.", notification.RealmId);
 
+            return;
+          }
+        }
+
+        ActorEntity actor = new(notification);
+        UserEntity user = new(notification, realm);
+
+        _context.Actors.Add(actor);
         _context.Users.Add(user);
-        _context.Actors.Add(new ActorEntity(user));
 
         await _context.SaveChangesAsync(cancellationToken);
       }

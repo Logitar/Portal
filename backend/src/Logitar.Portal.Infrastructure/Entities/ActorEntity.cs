@@ -1,45 +1,31 @@
-﻿using Logitar.Portal.Core.Actors;
+﻿using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Domain.Users.Events;
 
 namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class ActorEntity
   {
-    public ActorEntity(UserEntity user)
+    public ActorEntity(UserCreatedEvent @event)
     {
       Type = ActorType.User;
-      AggregateId = user.AggregateId;
+      AggregateId = @event.AggregateId.Value;
 
-      DisplayName = user.FullName ?? user.Username;
-      Email = user.Email;
-      Picture = user.Picture;
+      DisplayName = @event.FullName ?? @event.Username;
+      Email = @event.Email;
+      Picture = @event.Picture;
     }
     private ActorEntity()
     {
     }
 
-    public static ActorEntity System => new()
-    {
-      AggregateId = nameof(System),
-      DisplayName = nameof(System)
-    };
-
     public int ActorId { get; private set; }
 
     public ActorType Type { get; private set; }
-    public string AggregateId { get; private set; } = null!;
+    public string AggregateId { get; private set; } = string.Empty;
     public bool IsDeleted { get; private set; }
 
-    public string DisplayName { get; private set; } = null!;
+    public string DisplayName { get; private set; } = string.Empty;
     public string? Email { get; private set; }
     public string? Picture { get; private set; }
-
-    public void Delete() => IsDeleted = true;
-
-    public void Update(UserEntity user)
-    {
-      DisplayName = user.FullName ?? user.Username;
-      Email = user.Email;
-      Picture = user.Picture;
-    }
   }
 }

@@ -9,7 +9,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
     {
       builder.HasIndex(x => x.AggregateId).IsUnique();
 
-      builder.Property(x => x.AggregateId).HasMaxLength(256);
+      builder.Property(x => x.AggregateId).HasMaxLength(256).IsRequired();
       builder.Property(x => x.CreatedBy).HasMaxLength(256);
       builder.Property(x => x.UpdatedBy).HasMaxLength(256);
     }

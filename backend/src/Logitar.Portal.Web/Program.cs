@@ -1,5 +1,4 @@
-﻿
-using Logitar.Portal.Infrastructure;
+﻿using Logitar.Portal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Web

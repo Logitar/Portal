@@ -39,6 +39,16 @@ import PasswordField from './User/PasswordField.vue'
 import UsernameField from './User/UsernameField.vue'
 import { initialize } from '@/api/configurations'
 
+function generateSecret(length) {
+  const buffer = new Uint8Array(length * 3)
+  let bytes = []
+  do {
+    crypto.getRandomValues(buffer)
+    bytes = buffer.filter(b => b > 32 && b < 127).slice(0, length)
+  } while (bytes.length < 32)
+  return String.fromCharCode(...bytes)
+}
+
 export default {
   name: 'Home',
   components: {
@@ -66,7 +76,7 @@ export default {
       const locale = this.$i18n.locale
       return {
         defaultLocale: locale,
-        jwtSecret: 'dFES$?PnHZ]76WDv8_YT4#V"Xp=N;a>c',
+        jwtSecret: generateSecret(32),
         usernameSettings: {
           allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
         },

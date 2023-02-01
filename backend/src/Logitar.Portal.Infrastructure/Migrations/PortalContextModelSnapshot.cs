@@ -137,9 +137,161 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasKey("EventId");
 
+                    b.HasIndex("Version");
+
                     b.HasIndex("AggregateType", "AggregateId");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
+                {
+                    b.Property<int>("RealmId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RealmId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("AliasNormalized")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DefaultLocale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("GoogleClientId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordSettings")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("RequireConfirmedAccount")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireUniqueEmail")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("UsernameSettings")
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("RealmId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("AliasNormalized")
+                        .IsUnique();
+
+                    b.ToTable("Realms");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
+                {
+                    b.Property<int>("SessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SessionId"));
+
+                    b.Property<string>("AdditionalInformation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPersistent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("KeyHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SignedOutBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("SignedOutOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
@@ -274,10 +426,33 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
-                    b.HasIndex("UsernameNormalized")
+                    b.HasIndex("RealmId", "UsernameNormalized")
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
+                        .WithMany("Users")
+                        .HasForeignKey("RealmId");
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

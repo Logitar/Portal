@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Sessions.Events;
+﻿using Logitar.Portal.Domain.Sessions.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,19 +21,20 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
     {
       try
       {
-        UserEntity? user = await _context.Users.SingleOrDefaultAsync(x => x.AggregateId == notification.UserId.ToString(), cancellationToken);
+        UserEntity? user = await _context.Users
+          .SingleOrDefaultAsync(x => x.AggregateId == notification.UserId.Value, cancellationToken);
         if (user == null)
         {
-          _logger.LogError("The user 'AggregateId={userId}' could not be found.", notification.UserId);
-        }
-        else
-        {
-          SessionEntity session = new(notification, user);
+          _logger.LogError("The user 'AggregateId={aggregateId}' could not be found.", notification.UserId);
 
-          _context.Sessions.Add(session);
-
-          await _context.SaveChangesAsync(cancellationToken);
+          return;
         }
+
+        SessionEntity session = new(notification, user);
+
+        _context.Sessions.Add(session);
+
+        await _context.SaveChangesAsync(cancellationToken);
       }
       catch (Exception exception)
       {

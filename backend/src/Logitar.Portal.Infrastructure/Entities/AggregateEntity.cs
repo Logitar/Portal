@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Infrastructure.Entities
 {
@@ -9,27 +9,27 @@ namespace Logitar.Portal.Infrastructure.Entities
     }
     protected AggregateEntity(DomainEvent @event)
     {
-      AggregateId = @event.AggregateId.ToString();
+      AggregateId = @event.AggregateId.Value;
       Version = @event.Version;
 
-      CreatedBy = @event.UserId.ToString();
+      CreatedBy = @event.UserId.Value;
       CreatedOn = @event.OccurredOn;
     }
 
-    public string AggregateId { get; private set; } = null!;
+    public string AggregateId { get; private set; } = string.Empty;
     public long Version { get; private set; }
 
-    public string CreatedBy { get; private set; } = null!;
+    public string CreatedBy { get; private set; } = string.Empty;
     public DateTime CreatedOn { get; private set; }
 
     public string? UpdatedBy { get; private set; }
     public DateTime? UpdatedOn { get; private set; }
 
-    protected void Update(DomainEvent @event)
+    protected virtual void Update(DomainEvent @event)
     {
       Version = @event.Version;
 
-      UpdatedBy = @event.UserId.ToString();
+      UpdatedBy = @event.UserId.Value;
       UpdatedOn = @event.OccurredOn;
     }
   }

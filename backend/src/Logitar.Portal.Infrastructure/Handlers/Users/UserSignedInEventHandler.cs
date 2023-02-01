@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Users.Events;
+﻿using Logitar.Portal.Domain.Users.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,9 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
     {
       try
       {
-        UserEntity? user = await _context.Users.SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.ToString(), cancellationToken);
+        UserEntity? user = await _context.Users
+          .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken);
+
         if (user == null)
         {
           _logger.LogError("The user 'AggregateId={aggregateId}' could not be found.", notification.AggregateId);

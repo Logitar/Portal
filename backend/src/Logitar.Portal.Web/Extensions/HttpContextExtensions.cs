@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Contracts.Sessions.Models;
 using Logitar.Portal.Web.Models.Users;
 using System.Text;
 
@@ -10,7 +10,7 @@ namespace Logitar.Portal.Web.Extensions
 
     public static CurrentUser GetCurrentUser(this HttpContext context) => new();
 
-    public static void SetSession(this HttpContext context, SessionModel session)
+    public static void SignIn(this HttpContext context, SessionModel session)
     {
       context.Session.Set(SessionIdKey, Encoding.ASCII.GetBytes(session.Id));
 

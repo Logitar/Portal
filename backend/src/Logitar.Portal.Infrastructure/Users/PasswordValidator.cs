@@ -1,54 +1,53 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Core.Users;
+using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Infrastructure.Users
 {
   internal class PasswordValidator : AbstractValidator<string>
   {
-    public PasswordValidator(PasswordSettings settings)
+    /// <summary>
+    /// TODO(fpion): WithErrorCode?
+    /// TODO(fpion): WithMessage?
+    /// </summary>
+    /// <param name="passwordSettings"></param>
+    public PasswordValidator(PasswordSettings passwordSettings)
     {
-      IRuleBuilderOptions<string, string> rules = RuleFor(x => x).NotEmpty();
+      RuleFor(x => x).NotEmpty();
 
-      if (settings.RequiredLength > 1)
+      if (passwordSettings.RequiredLength > 1)
       {
-        rules.MinimumLength(settings.RequiredLength)
-          .WithErrorCode("PasswordTooShort")
-          .WithMessage($"Passwords must be at least {settings.RequiredLength} characters.");
+        RuleFor(x => x)
+          .MinimumLength(passwordSettings.RequiredLength);
       }
 
-      if (settings.RequiredUniqueChars > 1)
+      if (passwordSettings.RequiredUniqueChars > 1)
       {
-        rules.Must(p => p.GroupBy(c => c).Count() >= settings.RequiredUniqueChars)
-          .WithErrorCode("PasswordRequiresUniqueChars")
-          .WithMessage($"Passwords must use at least {settings.RequiredUniqueChars} different characters.");
+        RuleFor(x => x)
+          .Must(x => x.GroupBy(c => c).Count() >= passwordSettings.RequiredUniqueChars);
       }
 
-      if (settings.RequireNonAlphanumeric)
+      if (passwordSettings.RequireNonAlphanumeric)
       {
-        rules.Must(p => p.Any(c => !char.IsLetterOrDigit(c)))
-          .WithErrorCode("PasswordRequiresNonAlphanumeric")
-          .WithMessage("Passwords must have at least one non alphanumeric character.");
+        RuleFor(x => x)
+          .Must(x => x.Any(c => !char.IsLetterOrDigit(c)));
       }
 
-      if (settings.RequireLowercase)
+      if (passwordSettings.RequireLowercase)
       {
-        rules.Must(p => p.Any(char.IsLower))
-          .WithErrorCode("PasswordRequiresLower")
-          .WithMessage("Passwords must have at least one lowercase ('a'-'z').");
+        RuleFor(x => x)
+          .Must(x => x.Any(char.IsLower));
       }
 
-      if (settings.RequireUppercase)
+      if (passwordSettings.RequireUppercase)
       {
-        rules.Must(p => p.Any(char.IsUpper))
-          .WithErrorCode("PasswordRequiresUpper")
-          .WithMessage("Passwords must have at least one uppercase ('A'-'Z').");
+        RuleFor(x => x)
+          .Must(x => x.Any(char.IsUpper));
       }
 
-      if (settings.RequireDigit)
+      if (passwordSettings.RequireDigit)
       {
-        rules.Must(p => p.Any(char.IsDigit))
-          .WithErrorCode("PasswordRequiresDigit")
-          .WithMessage("Passwords must have at least one digit ('0'-'9').");
+        RuleFor(x => x)
+          .Must(x => x.Any(char.IsDigit));
       }
     }
   }
