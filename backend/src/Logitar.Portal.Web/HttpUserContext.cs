@@ -38,7 +38,7 @@ namespace Logitar.Portal.Web
         //ApiKey? apiKey = HttpContext.GetApiKey();
         //if (apiKey != null)
         //{
-        //  throw new NotImplementedException(); // TODO(fpion): implement
+        //  throw new NotImplementedException(); // TODO(fpion): implement Api Keys
         //}
 
         return new ActorModel

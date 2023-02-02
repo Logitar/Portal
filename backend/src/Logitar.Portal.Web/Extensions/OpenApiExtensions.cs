@@ -63,34 +63,34 @@ namespace Logitar.Portal.Web.Extensions
       //    },
       //    new List<string>()
       //  }
-      //});
+      //}); // TODO(fpion): implement Api Keys
 
-      //options.AddSecurityDefinition(Constants.Schemes.Session, new OpenApiSecurityScheme
-      //{
-      //  Description = "Enter your session ID in the input below.",
-      //  In = ParameterLocation.Header,
-      //  Name = Constants.Headers.Session,
-      //  Scheme = Constants.Schemes.Session,
-      //  Type = SecuritySchemeType.ApiKey
-      //});
-      //options.AddSecurityRequirement(new OpenApiSecurityRequirement
-      //{
-      //  {
-      //    new OpenApiSecurityScheme
-      //    {
-      //      In = ParameterLocation.Header,
-      //      Name = Constants.Headers.Session,
-      //      Reference = new OpenApiReference
-      //      {
-      //        Id = Constants.Schemes.Session,
-      //        Type = ReferenceType.SecurityScheme
-      //      },
-      //      Scheme = Constants.Schemes.Session,
-      //      Type = SecuritySchemeType.ApiKey
-      //    },
-      //    new List<string>()
-      //  }
-      //});
+      options.AddSecurityDefinition(Constants.Schemes.Session, new OpenApiSecurityScheme
+      {
+        Description = "Enter your session ID in the input below.",
+        In = ParameterLocation.Header,
+        Name = Constants.Headers.Session,
+        Scheme = Constants.Schemes.Session,
+        Type = SecuritySchemeType.ApiKey
+      });
+      options.AddSecurityRequirement(new OpenApiSecurityRequirement
+      {
+        {
+          new OpenApiSecurityScheme
+          {
+            In = ParameterLocation.Header,
+            Name = Constants.Headers.Session,
+            Reference = new OpenApiReference
+            {
+              Id = Constants.Schemes.Session,
+              Type = ReferenceType.SecurityScheme
+            },
+            Scheme = Constants.Schemes.Session,
+            Type = SecuritySchemeType.ApiKey
+          },
+          new List<string>()
+        }
+      });
     }
   }
 }

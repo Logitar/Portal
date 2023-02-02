@@ -15,6 +15,12 @@
       };
     }
 
+    internal static class Headers
+    {
+      public const string ApiKey = "X-API-Key";
+      public const string Session = "X-Session";
+    }
+
     internal static class Policies
     {
       public const string ApiKey = nameof(ApiKey);
@@ -25,7 +31,7 @@
 
     internal static class Schemes
     {
-      //public const string ApiKey = nameof(ApiKey); // TODO(fpion): implement
+      //public const string ApiKey = nameof(ApiKey); // TODO(fpion): implement Api Keys
       public const string Session = nameof(Session);
 
       public static string[] All => new[] { Session }; // TODO(fpion): add ApiKey

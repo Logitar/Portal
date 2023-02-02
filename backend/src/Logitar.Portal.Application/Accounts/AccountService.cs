@@ -31,7 +31,7 @@ namespace Logitar.Portal.Application.Accounts
 
     public async Task RecoverPasswordAsync(RecoverPasswordPayload payload, string realm, CancellationToken cancellationToken)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      await _requestPipeline.ExecuteAsync(new RecoverPasswordCommand(payload, realm), cancellationToken);
     }
 
     public async Task<SessionModel> RenewSessionAsync(RenewSessionPayload payload, string? realm, CancellationToken cancellationToken)
@@ -41,7 +41,7 @@ namespace Logitar.Portal.Application.Accounts
 
     public async Task ResetPasswordAsync(ResetPasswordPayload payload, string realm, CancellationToken cancellationToken)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      await _requestPipeline.ExecuteAsync(new ResetPasswordCommand(payload, realm), cancellationToken);
     }
 
     public async Task<UserModel> SaveProfileAsync(UpdateUserPayload payload, CancellationToken cancellationToken)

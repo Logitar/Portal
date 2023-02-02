@@ -25,6 +25,7 @@ namespace Logitar.Portal.Web.Filters
       [typeof(UserAlreadyDisabledException)] = SetBadRequestCodeResult,
       [typeof(UserCannotDeleteItselfException)] = SetBadRequestCodeResult,
       [typeof(UserCannotDisableItselfException)] = SetBadRequestCodeResult,
+      [typeof(UserHasNoPasswordException)] = SetBadRequestCodeResult,
       [typeof(UserNotDisabledException)] = SetBadRequestCodeResult,
       [typeof(ValidationException)] = SetBadRequestCodeResult,
       // 403 Forbidden

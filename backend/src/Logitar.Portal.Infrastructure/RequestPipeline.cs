@@ -13,7 +13,7 @@ namespace Logitar.Portal.Infrastructure
     }
 
     /// <summary>
-    /// TODO(fpion): implement logging
+    /// TODO(fpion): implement Logging
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="request"></param>

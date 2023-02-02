@@ -28,6 +28,7 @@ namespace Logitar.Portal.Application
         .AddTransient<IAccountService, AccountService>()
         .AddTransient<IConfigurationService, ConfigurationService>()
         .AddTransient<IGoogleService, GoogleService>()
+        .AddTransient<IInternalTokenService, InternalTokenService>()
         .AddTransient<ISessionService, SessionService>()
         .AddTransient<ISignInService, SignInService>()
         .AddTransient<ITokenService, TokenService>()

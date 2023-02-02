@@ -20,7 +20,7 @@ namespace Logitar.Portal.Web
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
       services.AddAuthentication()
-        //.AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { }) // TODO(fpion): implement
+        //.AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { }) // TODO(fpion): implement Api Keys
         .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Constants.Schemes.Session, options => { });
 
       services.AddAuthorization(options =>
@@ -28,7 +28,7 @@ namespace Logitar.Portal.Web
         //options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.All)
         //  .RequireAuthenticatedUser()
         //  .AddRequirements(new ApiKeyAuthorizationRequirement())
-        //  .Build()); // TODO(fpion): implement
+        //  .Build()); // TODO(fpion): implement Api Keys
         options.AddPolicy(Constants.Policies.AuthenticatedUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new UserAuthorizationRequirement())
@@ -60,7 +60,7 @@ namespace Logitar.Portal.Web
       services.AddLogitarPortalApplication();
       services.AddLogitarPortalInfrastructure();
 
-      //services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>(); // TODO(fpion): implement
+      //services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>(); // TODO(fpion): implement Api Keys
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, SessionAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
@@ -79,7 +79,7 @@ namespace Logitar.Portal.Web
         application.UseHttpsRedirection();
         application.UseStaticFiles();
         application.UseSession();
-        //application.UseMiddleware<Logging>(); // TODO(fpion): implement
+        //application.UseMiddleware<Logging>(); // TODO(fpion): implement Logging
         application.UseMiddleware<RenewSession>();
         application.UseMiddleware<RedirectUnauthorized>();
         application.UseAuthentication();

@@ -26,8 +26,8 @@
     public string UsernameSettings { get; private set; } = string.Empty;
     public string PasswordSettings { get; private set; } = string.Empty;
 
-    //public string? PasswordRecoverySenderId { get; private set; } // TODO(fpion): implement
-    //public string? PasswordRecoveryTemplateId { get; private set; } // TODO(fpion): implement
+    //public string? PasswordRecoverySenderId { get; private set; } // TODO(fpion): implement when Senders are completed
+    //public string? PasswordRecoveryTemplateId { get; private set; } // TODO(fpion): implement when Templates are completed
 
     public string? GoogleClientId { get; private set; }
 

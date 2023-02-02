@@ -32,7 +32,7 @@ namespace Logitar.Portal.Web.Authorization
         //else if (_httpContextAccessor.HttpContext.GetApiKey() != null)
         //{
         //  context.Succeed(requirement);
-        //} // TODO(fpion): implement
+        //} // TODO(fpion): implement Api Keys
       }
 
       return Task.CompletedTask;
