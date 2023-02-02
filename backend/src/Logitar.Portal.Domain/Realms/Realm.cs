@@ -22,5 +22,7 @@ namespace Logitar.Portal.Domain.Realms
 
     public UsernameSettings UsernameSettings { get; private set; } = new();
     public PasswordSettings PasswordSettings { get; private set; } = new();
+
+    public string? GoogleClientId { get; private set; }
   }
 }

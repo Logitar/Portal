@@ -1,6 +1,8 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Logitar.Portal.Contracts.Users
 {
@@ -36,6 +38,6 @@ namespace Logitar.Portal.Contracts.Users
     public DateTime? DisabledOn { get; set; }
     public bool IsDisabled { get; set; }
 
-    //public IEnumerable<ExternalProviderModel> ExternalProviders { get; set; } = Enumerable.Empty<ExternalProviderModel>(); // TODO(fpion): implement
+    public IEnumerable<ExternalProviderModel> ExternalProviders { get; set; } = Enumerable.Empty<ExternalProviderModel>();
   }
 }

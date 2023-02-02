@@ -16,6 +16,28 @@ namespace Logitar.Portal.Infrastructure.Repositories
       _users = context.Users;
     }
 
+    public async Task<IEnumerable<User>> LoadByEmailAsync(string email, Realm? realm, CancellationToken cancellationToken)
+    {
+      UserEntity[] users = await _users.AsNoTracking()
+        .Include(x => x.Realm)
+        .Where(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
+          && x.EmailNormalized == email.ToUpper())
+        .ToArrayAsync(cancellationToken);
+
+      return users.Any() ? await LoadAsync<User>(users.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<User>();
+    }
+
+    public async Task<User?> LoadByExternalProviderAsync(Realm realm, string key, string value, CancellationToken cancellationToken)
+    {
+      UserEntity? user = await _users.AsNoTracking()
+        .Include(x => x.ExternalProviders)
+        .Include(x => x.Realm)
+        .SingleOrDefaultAsync(x => x.Realm!.AggregateId == realm.Id.Value
+          && x.ExternalProviders.Any(y => y.Key == key && y.Value == value), cancellationToken);
+
+      return user == null ? null : await LoadAsync<User>(user.AggregateId, cancellationToken);
+    }
+
     public async Task<User?> LoadByUsernameAsync(string username, Realm? realm, CancellationToken cancellationToken)
     {
       UserEntity? user = await _users.AsNoTracking()

@@ -168,6 +168,58 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ExternalProviderEntity", b =>
+                {
+                    b.Property<int>("ExternalProviderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExternalProviderId"));
+
+                    b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("ExternalProviderId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("RealmId", "Key", "Value")
+                        .IsUnique();
+
+                    b.ToTable("ExternalProviders");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
                 {
                     b.Property<int>("RealmId")
@@ -460,6 +512,25 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ExternalProviderEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
+                        .WithMany("ExternalProviders")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
+                        .WithMany("ExternalProviders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
@@ -482,7 +553,14 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
                 {
+                    b.Navigation("ExternalProviders");
+
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
+                {
+                    b.Navigation("ExternalProviders");
                 });
 #pragma warning restore 612, 618
         }

@@ -157,6 +157,38 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExternalProviders",
+                columns: table => new
+                {
+                    ExternalProviderId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RealmId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Key = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Value = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    AddedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExternalProviders", x => x.ExternalProviderId);
+                    table.ForeignKey(
+                        name: "FK_ExternalProviders_Realms_RealmId",
+                        column: x => x.RealmId,
+                        principalTable: "Realms",
+                        principalColumn: "RealmId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExternalProviders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sessions",
                 columns: table => new
                 {
@@ -221,6 +253,23 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "Version");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExternalProviders_Id",
+                table: "ExternalProviders",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExternalProviders_RealmId_Key_Value",
+                table: "ExternalProviders",
+                columns: new[] { "RealmId", "Key", "Value" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExternalProviders_UserId",
+                table: "ExternalProviders",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JwtBlacklist_ExpiresOn",
                 table: "JwtBlacklist",
                 column: "ExpiresOn");
@@ -283,6 +332,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "ExternalProviders");
 
             migrationBuilder.DropTable(
                 name: "JwtBlacklist");

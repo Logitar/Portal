@@ -31,6 +31,7 @@
 
     public string? GoogleClientId { get; private set; }
 
+    public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
     public List<UserEntity> Users { get; private set; } = new();
   }
 }

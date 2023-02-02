@@ -6,6 +6,14 @@ namespace Logitar.Portal.Domain.Users
 {
   public class User : AggregateRoot
   {
+    public User(AggregateId userId, string username, Realm? realm = null, string? email = null, bool isEmailConfirmed = false,
+      string? firstName = null, string? lastName = null, CultureInfo? locale = null, string? picture = null)
+      : this(userId, username, realm, passwordHash: null,
+          email, isEmailConfirmed, phoneNumber: null, isPhoneNumberConfirmed: false,
+          firstName, middleName: null, lastName,
+          locale, picture)
+    {
+    }
     public User(AggregateId userId, string username, Realm? realm = null, string? passwordHash = null,
       string? email = null, bool isEmailConfirmed = false, string? phoneNumber = null, bool isPhoneNumberConfirmed = false,
       string? firstName = null, string? middleName = null, string? lastName = null,
@@ -67,6 +75,17 @@ namespace Logitar.Portal.Domain.Users
 
     public bool IsDisabled { get; private set; }
 
+    public List<ExternalProvider> ExternalProviders { get; private set; } = new();
+
+    public void AddExternalProvider(AggregateId userId, string key, string value, string? displayName = null)
+    {
+      ApplyChange(new UserAddedExternalProviderEvent
+      {
+        Key = key,
+        Value = value,
+        DisplayName = displayName
+      }, userId);
+    }
     public void ChangePassword(string passwordHash) => ApplyChange(new UserChangedPasswordEvent
     {
       PasswordHash = passwordHash
@@ -127,6 +146,10 @@ namespace Logitar.Portal.Domain.Users
       }, userId);
     }
 
+    protected virtual void Apply(UserAddedExternalProviderEvent @event)
+    {
+      ExternalProviders.Add(new ExternalProvider(@event.Key, @event.Value, @event.DisplayName));
+    }
     protected virtual void Apply(UserChangedPasswordEvent @event)
     {
       PasswordHash = @event.PasswordHash;

@@ -101,6 +101,12 @@ namespace Logitar.Portal.Infrastructure.Entities
       private set { }
     }
 
+    public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
+
+    public void AddExternalProvider(UserAddedExternalProviderEvent @event)
+    {
+      ExternalProviders.Add(new ExternalProviderEntity(@event, this));
+    }
     public void ChangePassword(UserChangedPasswordEvent @event)
     {
       PasswordHash = @event.PasswordHash;

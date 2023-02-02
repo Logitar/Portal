@@ -18,6 +18,7 @@ namespace Logitar.Portal.Web.Filters
       // 400 BadRequest
       [typeof(AccountIsDisabledException)] = SetBadRequestCodeResult,
       [typeof(AccountNotConfirmedException)] = SetBadRequestCodeResult,
+      [typeof(GoogleClientIdRequiredException)] = SetBadRequestCodeResult,
       [typeof(InvalidCredentialsException)] = SetBadRequestCodeResult,
       [typeof(SessionAlreadySignedOutException)] = SetBadRequestCodeResult,
       [typeof(SessionIsNotActiveException)] = SetBadRequestCodeResult,

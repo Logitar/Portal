@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Accounts;
+﻿using Logitar.Portal.Application.Accounts.Commands;
+using Logitar.Portal.Contracts.Accounts;
 using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.Application.Accounts
@@ -14,7 +15,7 @@ namespace Logitar.Portal.Application.Accounts
 
     public async Task<SessionModel> AuthenticateAsync(string realm, AuthenticateWithGooglePayload payload, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      return await _requestPipeline.ExecuteAsync(new AuthenticateWithGoogleCommand(realm, payload, ipAddress, additionalInformation), cancellationToken);
     }
   }
 }

@@ -60,7 +60,7 @@ namespace Logitar.Portal.Application.Users.Commands
       }
       else if (realm?.RequireUniqueEmail == true
         && payload.Email != null
-        && (await _userQuerier.GetByEmailAsync(payload.Email, realm, cancellationToken)).Any())
+        && (await _userRepository.LoadByEmailAsync(payload.Email, realm, cancellationToken)).Any())
       {
         throw new EmailAlreadyUsedException(payload.Email, nameof(payload.Email));
       }

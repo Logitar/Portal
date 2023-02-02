@@ -14,6 +14,8 @@ namespace Logitar.Portal.Infrastructure.Profiles
         .ForMember(x => x.DisabledBy, x => x.Ignore()) // TODO(fpion): implement Actors
         .ForMember(x => x.EmailConfirmedBy, x => x.Ignore()) // TODO(fpion): implement Actors
         .ForMember(x => x.PhoneNumberConfirmedBy, x => x.Ignore()); // TODO(fpion): implement Actors
+      CreateMap<ExternalProviderEntity, ExternalProviderModel>()
+        .ForMember(x => x.AddedBy, x => x.Ignore()); // TODO(fpion): implement Actors
     }
   }
 }

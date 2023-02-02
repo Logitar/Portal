@@ -2,7 +2,6 @@
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
-using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,20 +24,11 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<UserModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
       UserEntity? user = await _users.AsNoTracking()
+        .Include(x => x.ExternalProviders)
         .Include(x => x.Realm)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
       return await _mapper.MapAsync<UserModel>(user, cancellationToken);
-    }
-
-    public async Task<IEnumerable<UserModel>> GetByEmailAsync(string email, Realm realm, CancellationToken cancellationToken)
-    {
-      UserEntity[] users = await _users.AsNoTracking()
-        .Include(x => x.Realm)
-        .Where(x => x.Realm!.AggregateId == realm.Id.Value && x.EmailNormalized == email.ToUpper())
-        .ToArrayAsync(cancellationToken);
-
-      return await _mapper.MapAsync<UserModel>(users, cancellationToken);
     }
 
     public async Task<ListModel<UserModel>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
