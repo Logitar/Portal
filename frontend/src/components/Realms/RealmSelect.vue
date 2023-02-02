@@ -39,7 +39,7 @@ export default {
   },
   async created() {
     try {
-      const { data } = await getRealms({ sort: 'Name', desc: false })
+      const { data } = await getRealms({ sort: 'DisplayName', desc: false })
       this.realms = data.items
     } catch (e) {
       this.handleError(e)

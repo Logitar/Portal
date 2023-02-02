@@ -6,21 +6,18 @@
     "success": "The API key has been deleted.",
     "title": "Delete API key"
   },
-  "displayName": {
-    "label": "Display name",
-    "placeholder": "Enter a display name"
-  },
   "editTitle": "Edit API key",
   "empty": "This list is empty.",
   "expired": "Expired",
   "expiredOn": "Expired on",
   "expiresOn": "Expires on",
+  "listTitle": "API keys",
   "neverExpires": "Never expires",
   "newTitle": "Create API key",
   "sort": {
     "options": {
-      "DisplayName": "Display name",
       "ExpiresOn": "Expires on",
+      "Title": "Title",
       "UpdatedOn": "Updated on"
     }
   },
@@ -36,6 +33,9 @@
     "heading": "Your new API key",
     "warning": "Make sure you save it — you won't be able to access it again."
   },
-  "title": "API keys",
+  "title": {
+    "label": "Title",
+    "placeholder": "Enter a title"
+  },
   "updated": "The API key has been updated."
 }

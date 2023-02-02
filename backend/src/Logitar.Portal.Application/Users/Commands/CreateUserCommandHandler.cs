@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
@@ -72,7 +73,7 @@ namespace Logitar.Portal.Application.Users.Commands
         passwordHash = _passwordService.Hash(payload.Password);
       }
 
-      CultureInfo? locale = payload.Locale == null ? null : CultureInfo.GetCultureInfo(payload.Locale);
+      CultureInfo? locale = payload.Locale?.GetCultureInfo();
       User user = new(_userContext.ActorId, payload.Username, realm, passwordHash,
         payload.Email, payload.IsEmailConfirmed, payload.PhoneNumber, payload.IsPhoneNumberConfirmed,
         payload.FirstName, payload.MiddleName, payload.LastName,

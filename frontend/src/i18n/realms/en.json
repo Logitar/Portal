@@ -5,16 +5,16 @@
     "label": "Alias",
     "placeholder": "Enter an unique alias"
   },
-  "allowedUsernameCharacters": {
-    "label": "Allowed username characters",
-    "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
-  },
   "created": "The realm has been created.",
   "defaultLocale": "Default Locale",
   "delete": {
     "confirm": "Do you really want to delete the following realm?",
     "success": "The realm has been deleted.",
     "title": "Delete realm"
+  },
+  "displayName": {
+    "label": "Display name",
+    "placeholder": "Enter a display name"
   },
   "editTitle": "Edit realm",
   "empty": "This list is empty.",
@@ -26,6 +26,7 @@
     },
     "title": "Google Authentication"
   },
+  "jwt": "JSON Web Tokens",
   "newTitle": "Create realm",
   "password": {
     "requireDigit": "Require digit",
@@ -56,7 +57,7 @@
   "sort": {
     "options": {
       "Alias": "Alias",
-      "Name": "Name",
+      "DisplayName": "Display name",
       "UpdatedOn": "Updated on"
     }
   },
@@ -65,5 +66,12 @@
   "url": {
     "label": "Application URL",
     "placeholder": "Enter the web address (URL) of the application corresponding to this realm"
+  },
+  "username": {
+    "allowedCharacters": {
+      "label": "Allowed username characters",
+      "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
+    },
+    "title": "Username"
   }
 }

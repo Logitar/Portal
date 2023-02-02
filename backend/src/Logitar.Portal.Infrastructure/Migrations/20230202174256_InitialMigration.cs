@@ -51,7 +51,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     ApiKeyId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SecretHash = table.Column<string>(type: "text", nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ExpiresOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -110,6 +110,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     DefaultLocale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
+                    JwtSecret = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     RequireConfirmedAccount = table.Column<bool>(type: "boolean", nullable: false),
                     RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),
@@ -276,14 +277,14 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "CreatedOn");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApiKeys_DisplayName",
-                table: "ApiKeys",
-                column: "DisplayName");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_ExpiresOn",
                 table: "ApiKeys",
                 column: "ExpiresOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_Title",
+                table: "ApiKeys",
+                column: "Title");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_UpdatedOn",
@@ -335,6 +336,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Realms_Alias",
+                table: "Realms",
+                column: "Alias");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Realms_AliasNormalized",
                 table: "Realms",
                 column: "AliasNormalized",
@@ -344,6 +350,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Realms_CreatedOn",
                 table: "Realms",
                 column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_DisplayName",
+                table: "Realms",
+                column: "DisplayName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Realms_UpdatedOn",

@@ -47,7 +47,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
           {
             string pattern = $"%{term}%";
 
-            query = query.Where(x => EF.Functions.ILike(x.DisplayName, pattern));
+            query = query.Where(x => EF.Functions.ILike(x.Title, pattern));
           }
         }
       }
@@ -58,8 +58,8 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          ApiKeySort.DisplayName => isDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName),
           ApiKeySort.ExpiresOn => isDescending ? query.OrderByDescending(x => x.ExpiresOn) : query.OrderBy(x => x.ExpiresOn),
+          ApiKeySort.Title => isDescending ? query.OrderByDescending(x => x.Title) : query.OrderBy(x => x.Title),
           ApiKeySort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The API key sort '{sort}' is not valid.", nameof(sort)),
         };

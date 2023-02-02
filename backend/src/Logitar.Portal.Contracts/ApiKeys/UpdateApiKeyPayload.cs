@@ -2,7 +2,7 @@
 {
   public record UpdateApiKeyPayload
   {
-    public string DisplayName { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
   }
 }

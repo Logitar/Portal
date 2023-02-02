@@ -12,12 +12,15 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.RealmId);
 
+      builder.HasIndex(x => x.Alias);
       builder.HasIndex(x => x.AliasNormalized).IsUnique();
+      builder.HasIndex(x => x.DisplayName);
 
       builder.Property(x => x.Alias).HasMaxLength(256);
       builder.Property(x => x.AliasNormalized).HasMaxLength(256);
       builder.Property(x => x.DisplayName).HasMaxLength(256);
       builder.Property(x => x.DefaultLocale).HasMaxLength(16);
+      builder.Property(x => x.JwtSecret).HasMaxLength(256);
       builder.Property(x => x.Url).HasMaxLength(2048);
       builder.Property(x => x.UsernameSettings).HasColumnType("jsonb");
       builder.Property(x => x.PasswordSettings).HasColumnType("jsonb");

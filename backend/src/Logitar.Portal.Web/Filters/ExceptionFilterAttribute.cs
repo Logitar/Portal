@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Sessions;
@@ -27,12 +28,13 @@ namespace Logitar.Portal.Web.Filters
       [typeof(UserCannotDisableItselfException)] = SetBadRequestCodeResult,
       [typeof(UserHasNoPasswordException)] = SetBadRequestCodeResult,
       [typeof(UserNotDisabledException)] = SetBadRequestCodeResult,
-      [typeof(ValidationException)] = SetBadRequestCodeResult,
+      [typeof(ValidationException)] = context => context.Result = new BadRequestObjectResult(new { errors = ((ValidationException)context.Exception).Errors }),
       // 403 Forbidden
       [typeof(ConfigurationAlreadyInitializedException)] = context => context.Result = new ForbidResult(),
       // 409 Conflict
-      [typeof(EmailAlreadyUsedException)] = SetBadRequestCodeResult,
-      [typeof(UsernameAlreadyUsedException)] = SetBadRequestCodeResult
+      [typeof(AliasAlreadyUsedException)] = SetConflictFieldResult,
+      [typeof(EmailAlreadyUsedException)] = SetConflictFieldResult,
+      [typeof(UsernameAlreadyUsedException)] = SetConflictFieldResult
     };
 
     public override void OnException(ExceptionContext context)

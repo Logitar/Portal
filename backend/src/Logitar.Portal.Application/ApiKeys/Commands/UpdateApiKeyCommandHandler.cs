@@ -29,7 +29,7 @@ namespace Logitar.Portal.Application.ApiKeys.Commands
 
       ApiKey apiKey = await _repository.LoadAsync<ApiKey>(request.Id, cancellationToken)
         ?? throw new EntityNotFoundException<ApiKey>(request.Id);
-      apiKey.Update(_userContext.ActorId, payload.DisplayName, payload.Description);
+      apiKey.Update(_userContext.ActorId, payload.Title, payload.Description);
       _apiKeyValidator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);

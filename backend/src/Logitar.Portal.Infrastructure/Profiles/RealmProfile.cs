@@ -18,8 +18,16 @@ namespace Logitar.Portal.Infrastructure.Profiles
     }
 
     private static UsernameSettingsModel GetUsernameSettings(RealmEntity realm, RealmModel model)
-      => JsonSerializer.Deserialize<UsernameSettingsModel>(realm.UsernameSettings) ?? new();
+    {
+      var r = JsonSerializer.Deserialize<UsernameSettingsModel>(realm.UsernameSettings) ?? new();
+
+      return r;
+    }
     private static PasswordSettingsModel GetPasswordSettings(RealmEntity realm, RealmModel model)
-      => JsonSerializer.Deserialize<PasswordSettingsModel>(realm.UsernameSettings) ?? new();
+    {
+      var r = JsonSerializer.Deserialize<PasswordSettingsModel>(realm.PasswordSettings) ?? new();
+
+      return r;
+    }
   }
 }

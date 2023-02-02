@@ -38,19 +38,8 @@ namespace Logitar.Portal.Application.Configurations.Commands
       UserPayload userPayload = payload.User;
 
       CultureInfo defaultLocale = CultureInfo.GetCultureInfo(payload.DefaultLocale);
-      UsernameSettings usernameSettings = new()
-      {
-        AllowedCharacters = payload.UsernameSettings.AllowedCharacters
-      };
-      PasswordSettings passwordSettings = new()
-      {
-        RequiredLength = payload.PasswordSettings.RequiredLength,
-        RequiredUniqueChars = payload.PasswordSettings.RequiredUniqueChars,
-        RequireNonAlphanumeric = payload.PasswordSettings.RequireNonAlphanumeric,
-        RequireLowercase = payload.PasswordSettings.RequireLowercase,
-        RequireUppercase = payload.PasswordSettings.RequireUppercase,
-        RequireDigit = payload.PasswordSettings.RequireDigit
-      };
+      UsernameSettings usernameSettings = payload.UsernameSettings.GetUsernameSettings();
+      PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
       _passwordService.ValidateAndThrow(userPayload.Password, passwordSettings);
       string passwordHash = _passwordService.Hash(userPayload.Password);

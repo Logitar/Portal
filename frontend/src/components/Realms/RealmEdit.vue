@@ -14,9 +14,9 @@
               <strong v-t="'realms.alias.conflict'" />
             </b-alert>
             <b-row>
-              <name-field class="col" required v-model="name" />
+              <name-field class="col" id="displayName" label="realms.displayName.label" placeholder="realms.displayName.placeholder" v-model="displayName" />
               <alias-field class="col" v-if="realm" disabled :value="alias" />
-              <alias-field class="col" v-else :name="name" ref="alias" required validate v-model="alias" />
+              <alias-field class="col" v-else :name="displayName" ref="alias" required validate v-model="alias" />
             </b-row>
             <b-row>
               <locale-select class="col" label="realms.defaultLocale" v-model="defaultLocale" />
@@ -39,12 +39,7 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
-            <form-field
-              id="allowedUsernameCharacters"
-              label="realms.allowedUsernameCharacters.label"
-              placeholder="realms.allowedUsernameCharacters.placeholder"
-              v-model="allowedUsernameCharacters"
-            />
+            <username-settings v-model="usernameSettings" />
             <password-settings v-model="passwordSettings" />
             <div v-if="realm">
               <h5 v-t="'realms.passwordRecovery.title'" />
@@ -67,6 +62,22 @@
               placeholder="realms.googleAuth.id.placeholder"
               v-model="googleClientId"
             />
+            <h5 v-t="'realms.jwt'" />
+            <form-field
+              id="jwtSecret"
+              label="jwtSecret.label"
+              :minLength="32"
+              :maxLength="256"
+              placeholder="jwtSecret.placeholder"
+              required
+              :type="showJwtSecret ? 'text' : 'password'"
+              v-model="jwtSecret"
+            >
+              <b-input-group-append>
+                <icon-button icon="sync-alt" variant="primary" @click="generateJwtSecret" />
+                <icon-button icon="eye" variant="info" @click="showJwtSecret = !showJwtSecret" />
+              </b-input-group-append>
+            </form-field>
           </b-tab>
         </b-tabs>
       </b-form>
@@ -80,7 +91,10 @@ import AliasField from './AliasField.vue'
 import PasswordSettings from './PasswordSettings.vue'
 import SenderSelect from '@/components/Senders/SenderSelect.vue'
 import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
+import UsernameSettings from './UsernameSettings.vue'
 import { createRealm, updateRealm } from '@/api/realms'
+import { generateSecret } from '@/helpers/cryptoUtils'
+import FormField from '../shared/FormField.vue'
 
 export default {
   name: 'RealmEdit',
@@ -88,7 +102,9 @@ export default {
     AliasField,
     PasswordSettings,
     SenderSelect,
-    TemplateSelect
+    TemplateSelect,
+    UsernameSettings,
+    FormField
   },
   props: {
     json: {
@@ -104,12 +120,12 @@ export default {
     return {
       alias: null,
       aliasConflict: false,
-      allowedUsernameCharacters: null,
       defaultLocale: null,
       description: null,
+      displayName: null,
       googleClientId: null,
+      jwtSecret: null,
       loading: false,
-      name: null,
       passwordRecoverySenderId: null,
       passwordRecoveryTemplateId: null,
       passwordSettings: {
@@ -123,72 +139,82 @@ export default {
       realm: null,
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
-      url: null
+      url: null,
+      showJwtSecret: false,
+      usernameSettings: {
+        allowedCharacters: null
+      }
     }
   },
   computed: {
     hasChanges() {
       return (
         (this.alias ?? '') !== (this.realm?.alias ?? '') ||
-        (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
         (this.defaultLocale !== this.realm?.defaultLocale ?? null) ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
+        (this.displayName ?? '') !== (this.realm?.displayName ?? '') ||
         (this.googleClientId ?? '') !== (this.realm?.googleClientId ?? '') ||
-        (this.name ?? '') !== (this.realm?.name ?? '') ||
+        (this.jwtSecret ?? '') !== (this.realm?.jwtSecret ?? '') ||
         this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
         this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
-        this.passwordSettings.requireDigit !== (this.realm?.passwordSettings?.requireDigit ?? false) ||
-        this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings?.requireLowercase ?? false) ||
-        this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings?.requireNonAlphanumeric ?? false) ||
-        this.passwordSettings.requireUppercase !== (this.realm?.passwordSettings?.requireUppercase ?? false) ||
-        (this.passwordSettings.requiredLength ?? 0) !== (this.realm?.passwordSettings?.requiredLength ?? 0) ||
-        (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings?.requiredUniqueChars ?? 0) ||
+        this.passwordSettings.requireDigit !== (this.realm?.passwordSettings.requireDigit ?? false) ||
+        this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings.requireLowercase ?? false) ||
+        this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings.requireNonAlphanumeric ?? false) ||
+        this.passwordSettings.requireUppercase !== (this.realm?.passwordSettings.requireUppercase ?? false) ||
+        (this.passwordSettings.requiredLength ?? 0) !== (this.realm?.passwordSettings.requiredLength ?? 0) ||
+        (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings.requiredUniqueChars ?? 0) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
         this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
-        (this.url ?? '') !== (this.realm?.url ?? '')
+        (this.url ?? '') !== (this.realm?.url ?? '') ||
+        (this.usernameSettings.allowedCharacters ?? '') !== (this.realm?.usernameSettings.allowedCharacters ?? '')
       )
     },
     payload() {
       const payload = {
-        allowedUsernameCharacters: this.allowedUsernameCharacters,
         defaultLocale: this.defaultLocale,
+        displayName: this.displayName,
         description: this.description,
         googleClientId: this.googleClientId,
-        name: this.name,
-        passwordRecoverySenderId: this.passwordRecoverySenderId,
-        passwordRecoveryTemplateId: this.passwordRecoveryTemplateId,
+        jwtSecret: this.jwtSecret,
         passwordSettings: { ...this.passwordSettings },
         requireConfirmedAccount: this.requireConfirmedAccount,
         requireUniqueEmail: this.requireUniqueEmail,
-        url: this.url
+        url: this.url,
+        usernameSettings: { ...this.usernameSettings }
       }
       if (!this.realm) {
         payload.alias = this.alias
+      } else {
+        payload.passwordRecoverySenderId = this.passwordRecoverySenderId
+        payload.passwordRecoveryTemplateId = this.passwordRecoveryTemplateId
       }
       return payload
     }
   },
   methods: {
-    browse() {},
+    generateJwtSecret() {
+      this.jwtSecret = generateSecret(32)
+    },
     setModel(realm) {
       this.realm = realm
       this.alias = realm.alias
-      this.allowedUsernameCharacters = realm.allowedUsernameCharacters
       this.defaultLocale = realm.defaultLocale
       this.description = realm.description
+      this.displayName = realm.displayName
       this.googleClientId = realm.googleClientId
-      this.name = realm.name
+      this.jwtSecret = realm.jwtSecret
       this.passwordRecoverySenderId = realm.passwordRecoverySenderId
       this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
-      Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings?.requireDigit ?? false)
-      Vue.set(this.passwordSettings, 'requireLowercase', realm.passwordSettings?.requireLowercase ?? false)
-      Vue.set(this.passwordSettings, 'requireNonAlphanumeric', realm.passwordSettings?.requireNonAlphanumeric ?? false)
-      Vue.set(this.passwordSettings, 'requireUppercase', realm.passwordSettings?.requireUppercase ?? false)
-      Vue.set(this.passwordSettings, 'requiredLength', realm.passwordSettings?.requiredLength ?? 0)
-      Vue.set(this.passwordSettings, 'requiredUniqueChars', realm.passwordSettings?.requiredUniqueChars ?? 0)
+      Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings.requireDigit)
+      Vue.set(this.passwordSettings, 'requireLowercase', realm.passwordSettings.requireLowercase)
+      Vue.set(this.passwordSettings, 'requireNonAlphanumeric', realm.passwordSettings.requireNonAlphanumeric)
+      Vue.set(this.passwordSettings, 'requireUppercase', realm.passwordSettings.requireUppercase)
+      Vue.set(this.passwordSettings, 'requiredLength', realm.passwordSettings.requiredLength)
+      Vue.set(this.passwordSettings, 'requiredUniqueChars', realm.passwordSettings.requiredUniqueChars)
       this.requireConfirmedAccount = realm.requireConfirmedAccount
       this.requireUniqueEmail = realm.requireUniqueEmail
       this.url = realm.url
+      Vue.set(this.usernameSettings, 'allowedCharacters', realm.usernameSettings.allowedCharacters)
     },
     async submit() {
       if (!this.loading) {
@@ -224,6 +250,8 @@ export default {
   created() {
     if (this.json) {
       this.setModel(JSON.parse(this.json))
+    } else {
+      this.generateJwtSecret()
     }
     if (this.status === 'created') {
       this.toast('success', 'realms.created')

@@ -9,7 +9,7 @@ namespace Logitar.Portal.Application.ApiKeys
     {
       RuleFor(x => x.SecretHash).NotEmpty();
 
-      RuleFor(x => x.DisplayName).NotEmpty()
+      RuleFor(x => x.Title).NotEmpty()
         .MaximumLength(256);
 
       RuleFor(x => x.Description).NullOrNotEmpty();

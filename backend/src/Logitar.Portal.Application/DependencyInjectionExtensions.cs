@@ -2,6 +2,7 @@
 using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
@@ -31,6 +32,7 @@ namespace Logitar.Portal.Application
         .AddTransient<IConfigurationService, ConfigurationService>()
         .AddTransient<IGoogleService, GoogleService>()
         .AddTransient<IInternalTokenService, InternalTokenService>()
+        .AddTransient<IRealmService, RealmService>()
         .AddTransient<ISessionService, SessionService>()
         .AddTransient<ISignInService, SignInService>()
         .AddTransient<ITokenService, TokenService>()

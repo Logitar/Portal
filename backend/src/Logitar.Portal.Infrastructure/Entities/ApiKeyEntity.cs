@@ -8,7 +8,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     {
       SecretHash = @event.SecretHash;
 
-      DisplayName = @event.DisplayName;
+      Title = @event.Title;
       Description = @event.Description;
 
       ExpiresOn = @event.ExpiresOn;
@@ -21,7 +21,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public string SecretHash { get; private set; } = string.Empty;
 
-    public string DisplayName { get; private set; } = string.Empty;
+    public string Title { get; private set; } = string.Empty;
     public string? Description { get; private set; }
 
     public DateTime? ExpiresOn { get; private set; }
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     {
       base.Update(@event);
 
-      DisplayName = @event.DisplayName;
+      Title = @event.Title;
       Description = @event.Description;
     }
   }

@@ -15,7 +15,7 @@
           <template v-if="currentUser.isAuthenticated">
             <b-nav-item href="/api-keys">
               <font-awesome-icon icon="key" />
-              {{ $t('apiKeys.title') }}
+              {{ $t('apiKeys.listTitle') }}
             </b-nav-item>
             <b-nav-item href="/realms">
               <font-awesome-icon icon="chess-rook" />

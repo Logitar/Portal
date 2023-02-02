@@ -171,7 +171,7 @@ namespace Logitar.Portal.Domain.Users
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName == null ? null : CultureInfo.GetCultureInfo(@event.LocaleName);
+      Locale = @event.LocaleName?.GetCultureInfo();
       Picture = @event.Picture;
     }
     protected virtual void Apply(UserDeletedEvent @event)
@@ -209,7 +209,7 @@ namespace Logitar.Portal.Domain.Users
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName == null ? null : CultureInfo.GetCultureInfo(@event.LocaleName);
+      Locale = @event.LocaleName?.GetCultureInfo();
       Picture = @event.Picture;
     }
 

@@ -7,9 +7,9 @@ namespace Logitar.Portal.Application.Users
   {
     public PasswordSettingsValidator()
     {
-      RuleFor(x => x.RequiredLength).GreaterThanOrEqualTo(0);
+      RuleFor(x => x.RequiredLength).GreaterThanOrEqualTo(1);
 
-      RuleFor(x => x.RequiredUniqueChars).GreaterThanOrEqualTo(0)
+      RuleFor(x => x.RequiredUniqueChars).GreaterThanOrEqualTo(1)
         .LessThanOrEqualTo(x => x.RequiredLength);
     }
   }

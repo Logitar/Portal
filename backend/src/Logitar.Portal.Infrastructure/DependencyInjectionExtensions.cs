@@ -44,6 +44,7 @@ namespace Logitar.Portal.Infrastructure
     {
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
+        .AddScoped<IRealmQuerier, RealmQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
     }

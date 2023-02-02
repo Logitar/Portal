@@ -37,17 +37,8 @@ import FirstNameField from './User/FirstNameField.vue'
 import LastNameField from './User/LastNameField.vue'
 import PasswordField from './User/PasswordField.vue'
 import UsernameField from './User/UsernameField.vue'
+import { generateSecret } from '@/helpers/cryptoUtils'
 import { initialize } from '@/api/configurations'
-
-function generateSecret(length) {
-  const buffer = new Uint8Array(length * 3)
-  let bytes = []
-  do {
-    crypto.getRandomValues(buffer)
-    bytes = buffer.filter(b => b > 32 && b < 127).slice(0, length)
-  } while (bytes.length < 32)
-  return String.fromCharCode(...bytes)
-}
 
 export default {
   name: 'Home',

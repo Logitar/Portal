@@ -4,12 +4,12 @@ namespace Logitar.Portal.Domain.ApiKeys
 {
   public class ApiKey : AggregateRoot
   {
-    public ApiKey(AggregateId userId, string secretHash, string displayName, string? description = null, DateTime? expiresOn = null) : base()
+    public ApiKey(AggregateId userId, string secretHash, string title, string? description = null, DateTime? expiresOn = null) : base()
     {
       ApplyChange(new ApiKeyCreatedEvent
       {
         SecretHash = secretHash,
-        DisplayName = displayName.Trim(),
+        Title = title.Trim(),
         Description = description?.CleanTrim(),
         ExpiresOn = expiresOn
       }, userId);
@@ -20,7 +20,7 @@ namespace Logitar.Portal.Domain.ApiKeys
 
     public string SecretHash { get; private set; } = string.Empty;
 
-    public string DisplayName { get; private set; } = string.Empty;
+    public string Title { get; private set; } = string.Empty;
     public string? Description { get; private set; }
 
     public DateTime? ExpiresOn { get; private set; }
@@ -28,9 +28,9 @@ namespace Logitar.Portal.Domain.ApiKeys
     public bool IsExpired(DateTime? expiredOn = null) => ExpiresOn <= (expiredOn ?? DateTime.UtcNow);
 
     public void Delete(AggregateId userId) => ApplyChange(new ApiKeyDeletedEvent(), userId);
-    public void Update(AggregateId userId, string displayName, string? description = null) => ApplyChange(new ApiKeyUpdatedEvent
+    public void Update(AggregateId userId, string title, string? description = null) => ApplyChange(new ApiKeyUpdatedEvent
     {
-      DisplayName = displayName.Trim(),
+      Title = title.Trim(),
       Description = description?.CleanTrim()
     }, userId);
 
@@ -38,7 +38,7 @@ namespace Logitar.Portal.Domain.ApiKeys
     {
       SecretHash = @event.SecretHash;
 
-      DisplayName = @event.DisplayName;
+      Title = @event.Title;
       Description = @event.Description;
 
       ExpiresOn = @event.ExpiresOn;
@@ -49,10 +49,10 @@ namespace Logitar.Portal.Domain.ApiKeys
     }
     protected virtual void Apply(ApiKeyUpdatedEvent @event)
     {
-      DisplayName = @event.DisplayName;
+      Title = @event.Title;
       Description = @event.Description;
     }
 
-    public override string ToString() => $"{DisplayName} | {base.ToString()}";
+    public override string ToString() => $"{Title} | {base.ToString()}";
   }
 }

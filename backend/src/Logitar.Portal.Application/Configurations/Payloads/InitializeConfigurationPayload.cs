@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.Users.Payloads;
+﻿using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Configurations.Payloads
 {

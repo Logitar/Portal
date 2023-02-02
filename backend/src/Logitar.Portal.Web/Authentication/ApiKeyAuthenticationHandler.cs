@@ -148,22 +148,22 @@ namespace Logitar.Portal.Web.Authentication
     {
       public ApiKeyAuthenticateResult(AuthenticateResult result)
       {
-        Result = result ?? throw new ArgumentNullException(nameof(result));
-
         if (result.Succeeded)
         {
           throw new ArgumentException("The result should be a failure.", nameof(result));
         }
+
+        Result = result;
       }
       public ApiKeyAuthenticateResult(AuthenticateResult result, ApiKeyModel apiKey)
       {
-        ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
-        Result = result ?? throw new ArgumentNullException(nameof(result));
-
         if (!result.Succeeded)
         {
           throw new ArgumentException("The result should be a success.", nameof(result));
         }
+
+        ApiKey = apiKey;
+        Result = result;
       }
 
       public ApiKeyModel? ApiKey { get; }

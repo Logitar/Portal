@@ -8,16 +8,18 @@ namespace Logitar.Portal.Infrastructure.Users
 {
   internal class CustomUserValidator : IUserValidator
   {
+    private readonly IValidator<ExternalProvider> _externalProviderValidator;
     private readonly IRepository _repository;
 
-    public CustomUserValidator(IRepository repository)
+    public CustomUserValidator(IValidator<ExternalProvider> externalProviderValidator, IRepository repository)
     {
+      _externalProviderValidator = externalProviderValidator;
       _repository = repository;
     }
 
     public void ValidateAndThrow(User user, UsernameSettings usernameSettings)
     {
-      UserValidator validator = new(usernameSettings);
+      UserValidator validator = new(_externalProviderValidator, usernameSettings);
       validator.ValidateAndThrow(user);
     }
 

@@ -12,7 +12,7 @@ namespace Logitar.Portal.Application.Claims
 
       identity.AddClaim(new(Rfc7519ClaimTypes.Subject, apiKey.Id.ToString()));
       identity.AddClaim((apiKey.UpdatedOn ?? apiKey.CreatedOn).GetClaim(Rfc7519ClaimTypes.UpdatedOn));
-      identity.AddClaim(new(Rfc7519ClaimTypes.FullName, apiKey.DisplayName));
+      identity.AddClaim(new(Rfc7519ClaimTypes.FullName, apiKey.Title));
       identity.AddClaim(DateTime.UtcNow.GetClaim(Rfc7519ClaimTypes.AuthenticationTime));
 
       if (apiKey.ExpiresOn.HasValue)

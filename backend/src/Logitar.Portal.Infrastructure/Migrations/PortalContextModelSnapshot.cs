@@ -121,17 +121,17 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
                     b.Property<DateTime?>("ExpiresOn")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SecretHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(256)
@@ -150,9 +150,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("CreatedOn");
 
-                    b.HasIndex("DisplayName");
-
                     b.HasIndex("ExpiresOn");
+
+                    b.HasIndex("Title");
 
                     b.HasIndex("UpdatedOn");
 
@@ -328,6 +328,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("JwtSecret")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("PasswordSettings")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -361,10 +366,14 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("Alias");
+
                     b.HasIndex("AliasNormalized")
                         .IsUnique();
 
                     b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisplayName");
 
                     b.HasIndex("UpdatedOn");
 

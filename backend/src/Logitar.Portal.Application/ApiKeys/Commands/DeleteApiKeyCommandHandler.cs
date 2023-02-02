@@ -1,20 +1,15 @@
-﻿using FluentValidation;
-using Logitar.Portal.Domain.ApiKeys;
+﻿using Logitar.Portal.Domain.ApiKeys;
 using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands
 {
   internal class DeleteApiKeyCommandHandler : IRequestHandler<DeleteApiKeyCommand>
   {
-    private readonly IValidator<ApiKey> _apiKeyValidator;
     private readonly IRepository _repository;
     private readonly IUserContext _userContext;
 
-    public DeleteApiKeyCommandHandler(IValidator<ApiKey> apiKeyValidator,
-      IRepository repository,
-      IUserContext userContext)
+    public DeleteApiKeyCommandHandler(IRepository repository, IUserContext userContext)
     {
-      _apiKeyValidator = apiKeyValidator;
       _repository = repository;
       _userContext = userContext;
     }
@@ -25,7 +20,6 @@ namespace Logitar.Portal.Application.ApiKeys.Commands
         ?? throw new EntityNotFoundException<ApiKey>(request.Id);
 
       apiKey.Delete(_userContext.ActorId);
-      _apiKeyValidator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);
 

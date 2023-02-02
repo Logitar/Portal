@@ -18,7 +18,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       Type = ActorType.ApiKey;
       AggregateId = apiKey.AggregateId;
 
-      DisplayName = apiKey.DisplayName;
+      DisplayName = apiKey.Title;
     }
     private ActorEntity()
     {
@@ -42,7 +42,7 @@ namespace Logitar.Portal.Infrastructure.Entities
         throw new InvalidOperationException($"This actor has type '{Type}' and cannot be updated by an '{ActorType.ApiKey}' actor.");
       }
 
-      DisplayName = apiKey.DisplayName;
+      DisplayName = apiKey.Title;
     }
     public void Update(UserEntity user)
     {

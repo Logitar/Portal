@@ -9,13 +9,14 @@ namespace Logitar.Portal.Contracts.Realms
     public string? Description { get; set; }
 
     public string? DefaultLocale { get; set; }
+    public string JwtSecret { get; set; } = string.Empty;
     public string? Url { get; set; }
 
     public bool RequireConfirmedAccount { get; set; }
     public bool RequireUniqueEmail { get; set; }
 
-    public UsernameSettingsModel? UsernameSettings { get; set; }
-    public PasswordSettingsModel? PasswordSettings { get; set; }
+    public UsernameSettingsModel UsernameSettings { get; set; } = new();
+    public PasswordSettingsModel PasswordSettings { get; set; } = new();
 
     public string? PasswordRecoverySenderId { get; set; }
     public string? PasswordRecoveryTemplateId { get; set; }

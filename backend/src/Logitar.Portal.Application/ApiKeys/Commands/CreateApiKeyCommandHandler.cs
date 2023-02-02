@@ -34,7 +34,7 @@ namespace Logitar.Portal.Application.ApiKeys.Commands
       CreateApiKeyPayload payload = request.Payload;
 
       string keyHash = _passwordService.GenerateAndHash(ApiKeySecretLength, out byte[] secret);
-      ApiKey apiKey = new(_userContext.ActorId, keyHash, payload.DisplayName, payload.Description, payload.ExpiresOn);
+      ApiKey apiKey = new(_userContext.ActorId, keyHash, payload.Title, payload.Description, payload.ExpiresOn);
       _apiKeyValidator.ValidateAndThrow(apiKey);
 
       await _repository.SaveAsync(apiKey, cancellationToken);

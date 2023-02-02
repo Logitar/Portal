@@ -17,6 +17,10 @@
     "body": "An unexpected error occurred. Please try again later or contact our support team.",
     "title": "Error!"
   },
+  "jwtSecret": {
+    "label": "JWT Secret",
+    "placeholder": "Enter a JWT secret or click the following button to generate a random secret"
+  },
   "locale": {
     "label": "Locale",
     "placeholder": "Select a locale"

@@ -43,7 +43,7 @@ namespace Logitar.Portal.Web
           {
             Id = apiKey.Id,
             Type = ActorType.ApiKey,
-            DisplayName = apiKey.DisplayName
+            DisplayName = apiKey.Title
           };
         }
 

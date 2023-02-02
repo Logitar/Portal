@@ -38,6 +38,16 @@ namespace Logitar.Portal.Infrastructure.Repositories
       return user == null ? null : await LoadAsync<User>(user.AggregateId, cancellationToken);
     }
 
+    public async Task<IEnumerable<User>> LoadByRealmAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      UserEntity[] users = await _users.AsNoTracking()
+        .Include(x => x.Realm)
+        .Where(x => x.Realm!.AggregateId == realm.Id.Value)
+        .ToArrayAsync(cancellationToken);
+
+      return users.Any() ? await LoadAsync<User>(users.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<User>();
+    }
+
     public async Task<User?> LoadByUsernameAsync(string username, Realm? realm, CancellationToken cancellationToken)
     {
       UserEntity? user = await _users.AsNoTracking()
