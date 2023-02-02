@@ -2,7 +2,10 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Users;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -12,11 +15,22 @@ namespace Logitar.Portal.Web.Filters
   {
     private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
     {
-      [typeof(AccountNotConfirmedException)] = context => context.Result = new BadRequestObjectResult(new { code = "AccountNotConfirmed" }),
+      // 400 BadRequest
+      [typeof(AccountIsDisabledException)] = SetBadRequestCodeResult,
+      [typeof(AccountNotConfirmedException)] = SetBadRequestCodeResult,
+      [typeof(InvalidCredentialsException)] = SetBadRequestCodeResult,
+      [typeof(SessionAlreadySignedOutException)] = SetBadRequestCodeResult,
+      [typeof(SessionIsNotActiveException)] = SetBadRequestCodeResult,
+      [typeof(UserAlreadyDisabledException)] = SetBadRequestCodeResult,
+      [typeof(UserCannotDeleteItselfException)] = SetBadRequestCodeResult,
+      [typeof(UserCannotDisableItselfException)] = SetBadRequestCodeResult,
+      [typeof(UserNotDisabledException)] = SetBadRequestCodeResult,
+      [typeof(ValidationException)] = SetBadRequestCodeResult,
+      // 403 Forbidden
       [typeof(ConfigurationAlreadyInitializedException)] = context => context.Result = new ForbidResult(),
-      [typeof(InvalidCredentialsException)] = context => context.Result = new BadRequestObjectResult(new { code = "InvalidCredentials" }),
-      [typeof(SessionAlreadySignedOutException)] = context => context.Result = new BadRequestObjectResult(new { code = "SessionAlreadySignedOut" }),
-      [typeof(ValidationException)] = context => context.Result = new BadRequestObjectResult(new { errors = ((ValidationException)context.Exception).Errors })
+      // 409 Conflict
+      [typeof(EmailAlreadyUsedException)] = SetBadRequestCodeResult,
+      [typeof(UsernameAlreadyUsedException)] = SetBadRequestCodeResult
     };
 
     public override void OnException(ExceptionContext context)
@@ -34,5 +48,14 @@ namespace Logitar.Portal.Web.Filters
         context.ExceptionHandled = true;
       }
     }
+
+    private static void SetBadRequestCodeResult(ExceptionContext context) => context.Result = new BadRequestObjectResult(new
+    {
+      code = context.Exception.GetType().Name.Remove(nameof(Exception))
+    });
+    private static void SetConflictFieldResult(ExceptionContext context) => context.Result = new ConflictObjectResult(new
+    {
+      field = context.Exception.Data["ParamName"]
+    });
   }
 }

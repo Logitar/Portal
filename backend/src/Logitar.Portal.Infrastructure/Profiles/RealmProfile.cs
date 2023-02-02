@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Realms.Models;
-using Logitar.Portal.Contracts.Users.Models;
+using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Infrastructure.Entities;
 using System.Text.Json;
 

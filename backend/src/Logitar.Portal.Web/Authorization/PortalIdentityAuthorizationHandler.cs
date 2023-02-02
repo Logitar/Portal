@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 

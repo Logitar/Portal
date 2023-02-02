@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Contracts.Sessions.Models;
+﻿using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;

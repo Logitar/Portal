@@ -11,7 +11,11 @@ namespace Logitar.Portal.Infrastructure.Entities
       PasswordChangedOn = @event.PasswordHash == null ? null : @event.OccurredOn;
 
       Email = @event.Email;
+      EmailConfirmedBy = @event.IsEmailConfirmed ? @event.UserId.Value : null;
+      EmailConfirmedOn = @event.IsEmailConfirmed ? @event.OccurredOn : null;
       PhoneNumber = @event.PhoneNumber;
+      PhoneNumberConfirmedBy = @event.IsPhoneNumberConfirmed ? @event.UserId.Value : null;
+      PhoneNumberConfirmedOn = @event.IsPhoneNumberConfirmed ? @event.OccurredOn : null;
 
       FirstName = @event.FirstName;
       MiddleName = @event.MiddleName;
@@ -101,6 +105,16 @@ namespace Logitar.Portal.Infrastructure.Entities
     {
       PasswordHash = @event.PasswordHash;
       PasswordChangedOn = @event.OccurredOn;
+    }
+    public void Disable(UserDisabledEvent @event)
+    {
+      DisabledBy = @event.UserId.Value;
+      DisabledOn = @event.OccurredOn;
+    }
+    public void Enable()
+    {
+      DisabledBy = null;
+      DisabledOn = null;
     }
     public void SignIn(UserSignedInEvent @event) => SignedInOn = @event.OccurredOn;
     public void Update(UserUpdatedEvent @event)

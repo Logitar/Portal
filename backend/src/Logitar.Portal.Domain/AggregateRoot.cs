@@ -14,7 +14,7 @@ namespace Logitar.Portal.Domain
 
     public AggregateId Id { get; private set; }
     public long Version { get; private set; }
-    public bool IsDeleted { get; protected set; }
+    public bool IsDeleted { get; private set; }
 
     private readonly List<DomainEvent> _changes = new();
     public bool HasChanges => _changes.Any();
@@ -62,6 +62,11 @@ namespace Logitar.Portal.Domain
       method.Invoke(this, new[] { @event });
 
       Version = @event.Version;
+    }
+
+    protected void Delete()
+    {
+      IsDeleted = true;
     }
 
     public override bool Equals(object? obj) => obj is AggregateRoot aggregate

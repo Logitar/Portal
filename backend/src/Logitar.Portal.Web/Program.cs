@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Logitar.Portal.Web
 {
@@ -7,6 +8,8 @@ namespace Logitar.Portal.Web
   {
     public static async Task Main(string[] args)
     {
+      JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
       WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
       Startup startup = new();

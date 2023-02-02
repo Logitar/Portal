@@ -47,7 +47,7 @@
         <tbody>
           <tr v-for="sessionItem in sessions" :key="sessionItem.id">
             <td>
-              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedOn), 'medium') }}</b-link>
+              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedOn || sessionItem.createdOn), 'medium') }}</b-link>
             </td>
             <td>
               <b-link :href="`/users/${sessionItem.user.id}`" target="_blank" class="mx-1"><user-avatar :user="sessionItem.user" /></b-link>

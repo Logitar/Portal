@@ -2,6 +2,8 @@
 using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Tokens;
+using Logitar.Portal.Application.Users;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -25,7 +27,11 @@ namespace Logitar.Portal.Application
       return services
         .AddTransient<IAccountService, AccountService>()
         .AddTransient<IConfigurationService, ConfigurationService>()
-        .AddTransient<ISignInService, SignInService>();
+        .AddTransient<IGoogleService, GoogleService>()
+        .AddTransient<ISessionService, SessionService>()
+        .AddTransient<ISignInService, SignInService>()
+        .AddTransient<ITokenService, TokenService>()
+        .AddTransient<IUserService, UserService>();
     }
   }
 }

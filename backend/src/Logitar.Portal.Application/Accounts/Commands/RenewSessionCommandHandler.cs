@@ -2,8 +2,8 @@
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
-using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;

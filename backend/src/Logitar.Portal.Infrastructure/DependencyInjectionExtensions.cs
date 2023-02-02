@@ -1,9 +1,11 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Infrastructure.Queriers;
 using Logitar.Portal.Infrastructure.Repositories;
+using Logitar.Portal.Infrastructure.Tokens;
 using Logitar.Portal.Infrastructure.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +31,11 @@ namespace Logitar.Portal.Infrastructure
         .AddMediatR(assembly)
         .AddQueriers()
         .AddRepositories()
-        .AddSingleton<IUserValidator, CustomUserValidator>()
         .AddSingleton<IPasswordService, PasswordService>()
+        .AddScoped<IJwtBlacklist, JwtBlacklist>()
         .AddScoped<IMappingService, MappingService>()
+        .AddScoped<ISecurityTokenService, JwtService>()
+        .AddScoped<IUserValidator, CustomUserValidator>()
         .AddTransient<IRequestPipeline, RequestPipeline>();
     }
 
@@ -47,6 +51,7 @@ namespace Logitar.Portal.Infrastructure
       return services
         .AddScoped<IRepository, Repository>()
         .AddScoped<IRealmRepository, RealmRepository>()
+        .AddScoped<ISessionRepository, SessionRepository>()
         .AddScoped<IUserRepository, UserRepository>();
     }
   }

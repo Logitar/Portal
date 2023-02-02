@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Contracts.Sessions.Models;
-using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Models.Users;
 using System.Text;
 

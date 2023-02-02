@@ -97,6 +97,30 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.BlacklistedJwtEntity", b =>
+                {
+                    b.Property<long>("BlacklistedJwtId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("BlacklistedJwtId"));
+
+                    b.Property<DateTime?>("ExpiresOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("BlacklistedJwtId");
+
+                    b.HasIndex("ExpiresOn");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("JwtBlacklist");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.EventEntity", b =>
                 {
                     b.Property<long>("EventId")
@@ -191,6 +215,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordSettings")
+                        .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.Property<bool>("RequireConfirmedAccount")
@@ -211,6 +236,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(2048)");
 
                     b.Property<string>("UsernameSettings")
+                        .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.Property<long>("Version")
@@ -278,7 +304,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.Property<long>("Version")
@@ -426,6 +452,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("Email");
+
                     b.HasIndex("RealmId", "UsernameNormalized")
                         .IsUnique();
 
@@ -436,7 +464,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

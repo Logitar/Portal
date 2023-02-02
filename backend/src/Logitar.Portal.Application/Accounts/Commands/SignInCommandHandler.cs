@@ -1,8 +1,8 @@
 ﻿using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
-using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -38,7 +38,7 @@ namespace Logitar.Portal.Application.Accounts.Commands
 
       SignInPayload payload = request.Payload;
 
-      User? user = await _userRepository.LoadByUsernameAsync(payload.Username, realm?.Id, cancellationToken);
+      User? user = await _userRepository.LoadByUsernameAsync(payload.Username, realm, cancellationToken);
       if (user == null || !_passwordService.IsMatch(user, payload.Password))
       {
         throw new InvalidCredentialsException();

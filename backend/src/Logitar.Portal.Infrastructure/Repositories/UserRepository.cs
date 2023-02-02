@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.Users;
-using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
@@ -16,11 +16,11 @@ namespace Logitar.Portal.Infrastructure.Repositories
       _users = context.Users;
     }
 
-    public async Task<User?> LoadByUsernameAsync(string username, AggregateId? realmId, CancellationToken cancellationToken)
+    public async Task<User?> LoadByUsernameAsync(string username, Realm? realm, CancellationToken cancellationToken)
     {
       UserEntity? user = await _users.AsNoTracking()
         .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => (realmId.HasValue ? x.Realm!.AggregateId == realmId.Value.Value : x.RealmId == null)
+        .SingleOrDefaultAsync(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
           && x.UsernameNormalized == username.ToUpper(), cancellationToken);
 
       return user == null ? null : await LoadAsync<User>(user.AggregateId, cancellationToken);

@@ -43,9 +43,9 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
           {
             actor.Update(user);
           }
-        }
 
-        await _context.SaveChangesAsync(cancellationToken);
+          await _context.SaveChangesAsync(cancellationToken);
+        }
       }
       catch (Exception exception)
       {

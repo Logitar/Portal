@@ -10,7 +10,9 @@ namespace Logitar.Portal.Domain.Users.Events
     public string? PasswordHash { get; init; }
 
     public string? Email { get; init; }
+    public bool IsEmailConfirmed { get; init; }
     public string? PhoneNumber { get; init; }
+    public bool IsPhoneNumberConfirmed { get; init; }
 
     public string? FirstName { get; init; }
     public string? MiddleName { get; init; }

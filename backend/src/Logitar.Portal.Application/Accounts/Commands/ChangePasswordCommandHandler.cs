@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.Users;
-using Logitar.Portal.Contracts.Users.Models;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;

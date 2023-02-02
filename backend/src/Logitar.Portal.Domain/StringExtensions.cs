@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Domain
 {
-  internal static class StringExtensions
+  public static class StringExtensions
   {
     public static string? CleanTrim(this string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
 

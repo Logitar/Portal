@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Contracts.Actors;
-using Logitar.Portal.Contracts.Users.Models;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Web.Extensions;
 
@@ -52,5 +52,7 @@ namespace Logitar.Portal.Web
 
     public string SessionId => HttpContext.GetSession()?.Id ?? throw new InvalidOperationException("The Session is required.");
     public string UserId => HttpContext.GetUser()?.Id ?? throw new InvalidOperationException("The User is required.");
+
+    public string BaseUrl => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
   }
 }

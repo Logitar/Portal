@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Infrastructure.Entities;
 
 namespace Logitar.Portal.Infrastructure.Profiles

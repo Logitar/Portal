@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Contracts.Actors
 {
-  public class ActorModel
+  public record ActorModel
   {
     public string Id { get; set; } = string.Empty;
     public ActorType Type { get; set; }

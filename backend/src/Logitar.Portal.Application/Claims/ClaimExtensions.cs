@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Users;
 using System.Security.Claims;
 
 namespace Logitar.Portal.Application.Claims
@@ -7,13 +7,11 @@ namespace Logitar.Portal.Application.Claims
   {
     public static ClaimsIdentity GetClaimsIdentity(this UserModel user, string? authenticationScheme = null)
     {
-      ArgumentNullException.ThrowIfNull(user);
-
-      var identity = new ClaimsIdentity(authenticationScheme);
+      ClaimsIdentity identity = new(authenticationScheme);
 
       identity.AddClaim(new(Rfc7519ClaimTypes.Subject, user.Id.ToString()));
       identity.AddClaim(new(Rfc7519ClaimTypes.Username, user.Username));
-      identity.AddClaim((user.UpdatedOn ?? user.CreatedOn).GetClaim(Rfc7519ClaimTypes.UpdatedAt));
+      identity.AddClaim((user.UpdatedOn ?? user.CreatedOn).GetClaim(Rfc7519ClaimTypes.UpdatedOn));
 
       if (user.Email != null)
       {
@@ -64,8 +62,9 @@ namespace Logitar.Portal.Application.Claims
       return identity;
     }
     private static Claim GetClaim(this DateTime moment, string type)
-    {
-      return new(type, new DateTimeOffset(moment).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64);
-    }
+      => new(type, new DateTimeOffset(moment).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64);
+
+    public static DateTime GetDateTime(this Claim claim)
+      => DateTimeOffset.FromUnixTimeSeconds(long.Parse(claim.Value)).UtcDateTime;
   }
 }

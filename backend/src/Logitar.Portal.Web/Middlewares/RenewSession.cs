@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 using System.Text.Json;
 
@@ -23,7 +23,7 @@ namespace Logitar.Portal.Web.Middlewares
         {
           try
           {
-            var payload = new RenewSessionPayload
+            RenewSessionPayload payload = new()
             {
               AdditionalInformation = JsonSerializer.Serialize(context.Request.Headers),
               IpAddress = context.Connection.RemoteIpAddress?.ToString(),

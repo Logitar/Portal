@@ -1,10 +1,33 @@
-﻿using Logitar.Portal.Domain.Users.Events;
+﻿using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Users.Events;
 using System.Globalization;
 
 namespace Logitar.Portal.Domain.Users
 {
   public class User : AggregateRoot
   {
+    public User(AggregateId userId, string username, Realm? realm = null, string? passwordHash = null,
+      string? email = null, bool isEmailConfirmed = false, string? phoneNumber = null, bool isPhoneNumberConfirmed = false,
+      string? firstName = null, string? middleName = null, string? lastName = null,
+      CultureInfo? locale = null, string? picture = null)
+    {
+      ApplyChange(new UserCreatedEvent
+      {
+        RealmId = realm?.Id,
+        Username = username.Trim(),
+        PasswordHash = passwordHash,
+        Email = email?.CleanTrim(),
+        IsEmailConfirmed = isEmailConfirmed,
+        PhoneNumber = phoneNumber?.CleanTrim(),
+        IsPhoneNumberConfirmed = isPhoneNumberConfirmed,
+        FirstName = firstName?.CleanTrim(),
+        MiddleName = middleName?.CleanTrim(),
+        LastName = lastName?.CleanTrim(),
+        FullName = GetFullName(firstName, middleName, lastName),
+        LocaleName = locale?.Name,
+        Picture = picture?.CleanTrim()
+      }, userId);
+    }
     public User(string username, string passwordHash, string email, string firstName, string lastName, CultureInfo locale) : base()
     {
       ApplyChange(new UserCreatedEvent
@@ -48,6 +71,37 @@ namespace Logitar.Portal.Domain.Users
     {
       PasswordHash = passwordHash
     }, Id);
+    public void Delete(AggregateId userId)
+    {
+      if (userId == Id)
+      {
+        throw new UserCannotDeleteItselfException(this);
+      }
+
+      ApplyChange(new UserDeletedEvent(), userId);
+    }
+    public void Disable(AggregateId userId)
+    {
+      if (IsDisabled)
+      {
+        throw new UserAlreadyDisabledException(this);
+      }
+      else if (userId == Id)
+      {
+        throw new UserCannotDisableItselfException(this);
+      }
+
+      ApplyChange(new UserDisabledEvent(), userId);
+    }
+    public void Enable(AggregateId userId)
+    {
+      if (!IsDisabled)
+      {
+        throw new UserNotDisabledException(this);
+      }
+
+      ApplyChange(new UserEnabledEvent(), userId);
+    }
     public void SignIn() => ApplyChange(new UserSignedInEvent(), Id);
     public void Update(AggregateId userId, string? passwordHash = null,
       string? email = null, string? phoneNumber = null,
@@ -79,16 +133,35 @@ namespace Logitar.Portal.Domain.Users
     }
     protected virtual void Apply(UserCreatedEvent @event)
     {
+      RealmId = @event.RealmId;
+
       Username = @event.Username;
       PasswordHash = @event.PasswordHash;
 
       Email = @event.Email;
+      IsEmailConfirmed = @event.IsEmailConfirmed;
+      PhoneNumber = @event.PhoneNumber;
+      IsPhoneNumberConfirmed = @event.IsPhoneNumberConfirmed;
 
       FirstName = @event.FirstName;
+      MiddleName = @event.MiddleName;
       LastName = @event.LastName;
       FullName = @event.FullName;
 
       Locale = @event.LocaleName == null ? null : CultureInfo.GetCultureInfo(@event.LocaleName);
+      Picture = @event.Picture;
+    }
+    protected virtual void Apply(UserDeletedEvent @event)
+    {
+      Delete();
+    }
+    protected virtual void Apply(UserDisabledEvent @event)
+    {
+      IsDisabled = true;
+    }
+    protected virtual void Apply(UserEnabledEvent @event)
+    {
+      IsDisabled = false;
     }
     protected virtual void Apply(UserSignedInEvent @event)
     {

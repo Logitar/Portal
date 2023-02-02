@@ -28,7 +28,7 @@
       //public const string ApiKey = nameof(ApiKey); // TODO(fpion): implement
       public const string Session = nameof(Session);
 
-      public static string[] All => new[] { Session }; // TODO(fpioN): add ApiKey
+      public static string[] All => new[] { Session }; // TODO(fpion): add ApiKey
     }
 
     public const string Version = "2.0";

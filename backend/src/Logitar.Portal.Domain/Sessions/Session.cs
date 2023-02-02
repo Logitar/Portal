@@ -28,6 +28,7 @@ namespace Logitar.Portal.Domain.Sessions
     public string? IpAddress { get; private set; }
     public string? AdditionalInformation { get; private set; }
 
+    public void Delete(AggregateId userId) => ApplyChange(new SessionDeletedEvent(), userId);
     public void Renew(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null)
     {
       if (!IsActive)
@@ -62,6 +63,10 @@ namespace Logitar.Portal.Domain.Sessions
 
       IpAddress = @event.IpAddress;
       AdditionalInformation = @event.AdditionalInformation;
+    }
+    protected virtual void Apply(SessionDeletedEvent @event)
+    {
+      Delete();
     }
     protected virtual void Apply(SessionRenewedEvent @event)
     {

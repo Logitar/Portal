@@ -24,7 +24,7 @@ namespace Logitar.Portal.Infrastructure.Repositories
     {
       string aggregateType = typeof(T).GetName();
 
-      IEnumerable<EventEntity> events = await _context.Events.AsNoTracking()
+      EventEntity[] events = await _context.Events.AsNoTracking()
         .Where(x => x.AggregateType == aggregateType && x.AggregateId == id.Value)
         .OrderBy(x => x.Version)
         .ToArrayAsync(cancellationToken);
@@ -34,8 +34,31 @@ namespace Logitar.Portal.Infrastructure.Repositories
         return null;
       }
 
-      return AggregateRoot.LoadFromHistory<T>(events.Select(e => e.Deserialize()), id);
+      T aggregate = AggregateRoot.LoadFromHistory<T>(events.Select(e => e.Deserialize()), id);
+
+      return aggregate.IsDeleted ? null : aggregate;
     }
+
+    public async Task<IEnumerable<T>> LoadAsync<T>(IEnumerable<string> ids, CancellationToken cancellationToken) where T : AggregateRoot
+    {
+      string aggregateType = typeof(T).GetName();
+
+      EventEntity[] events = await _context.Events.AsNoTracking()
+        .Where(x => x.AggregateType == aggregateType && ids.Contains(x.AggregateId))
+        .OrderBy(x => x.Version)
+        .ToArrayAsync(cancellationToken);
+
+      if (!events.Any())
+      {
+        return Enumerable.Empty<T>();
+      }
+
+      return events.GroupBy(x => x.AggregateId)
+        .Select(x => AggregateRoot.LoadFromHistory<T>(x.Select(e => e.Deserialize()), new AggregateId(x.Key)))
+        .Where(x => !x.IsDeleted);
+    }
+    public async Task<IEnumerable<T>> LoadAsync<T>(IEnumerable<AggregateId> ids, CancellationToken cancellationToken) where T : AggregateRoot
+      => await LoadAsync<T>(ids.Select(id => id.Value), cancellationToken);
 
     public async Task<Configuration?> LoadConfigurationAsync(CancellationToken cancellationToken)
     {

@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

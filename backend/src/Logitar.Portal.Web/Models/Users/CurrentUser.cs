@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Web.Models.Users
 {

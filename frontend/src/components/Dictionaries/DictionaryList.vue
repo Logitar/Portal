@@ -27,7 +27,7 @@
               <b-link :href="`/dictionaries/${dictionary.id}`">{{ dictionary.realm || $t('realms.select.placeholder') }} | {{ dictionary.locale }}</b-link>
             </td>
             <td v-text="dictionary.entries" />
-            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedOn" /></td>
+            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedOn || dictionary.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${dictionary.id}`" />
               <delete-modal

@@ -1,0 +1,300 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace Logitar.Portal.Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitialMigration : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "Actors",
+                columns: table => new
+                {
+                    ActorId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Picture = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Actors", x => x.ActorId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ActorTypes",
+                columns: table => new
+                {
+                    Value = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActorTypes", x => x.Value);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    EventId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    OccurredOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AggregateType = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    EventType = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    EventData = table.Column<string>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.EventId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JwtBlacklist",
+                columns: table => new
+                {
+                    BlacklistedJwtId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpiresOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JwtBlacklist", x => x.BlacklistedJwtId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Realms",
+                columns: table => new
+                {
+                    RealmId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Alias = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AliasNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    DefaultLocale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
+                    Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    RequireConfirmedAccount = table.Column<bool>(type: "boolean", nullable: false),
+                    RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),
+                    UsernameSettings = table.Column<string>(type: "jsonb", nullable: false),
+                    PasswordSettings = table.Column<string>(type: "jsonb", nullable: false),
+                    GoogleClientId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Realms", x => x.RealmId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RealmId = table.Column<int>(type: "integer", nullable: true),
+                    Username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    UsernameNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    PasswordChangedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    HasPassword = table.Column<bool>(type: "boolean", nullable: false),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberNormalized = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    PhoneNumberConfirmedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsPhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    IsAccountConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    MiddleName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    FullName = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
+                    Picture = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    SignedInOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DisabledBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    DisabledOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Users_Realms_RealmId",
+                        column: x => x.RealmId,
+                        principalTable: "Realms",
+                        principalColumn: "RealmId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    SessionId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    KeyHash = table.Column<string>(type: "text", nullable: true),
+                    IsPersistent = table.Column<bool>(type: "boolean", nullable: false),
+                    SignedOutBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    SignedOutOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IpAddress = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    AdditionalInformation = table.Column<string>(type: "text", nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.SessionId);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "ActorTypes",
+                columns: new[] { "Value", "Name" },
+                values: new object[,]
+                {
+                    { 0, "System" },
+                    { 1, "User" },
+                    { 2, "ApiKey" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Actors_AggregateId",
+                table: "Actors",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActorTypes_Name",
+                table: "ActorTypes",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_AggregateType_AggregateId",
+                table: "Events",
+                columns: new[] { "AggregateType", "AggregateId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_Version",
+                table: "Events",
+                column: "Version");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JwtBlacklist_ExpiresOn",
+                table: "JwtBlacklist",
+                column: "ExpiresOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JwtBlacklist_Id",
+                table: "JwtBlacklist",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_AggregateId",
+                table: "Realms",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_AliasNormalized",
+                table: "Realms",
+                column: "AliasNormalized",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_AggregateId",
+                table: "Sessions",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UserId",
+                table: "Sessions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_AggregateId",
+                table: "Users",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RealmId_UsernameNormalized",
+                table: "Users",
+                columns: new[] { "RealmId", "UsernameNormalized" },
+                unique: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Actors");
+
+            migrationBuilder.DropTable(
+                name: "ActorTypes");
+
+            migrationBuilder.DropTable(
+                name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "JwtBlacklist");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Realms");
+        }
+    }
+}

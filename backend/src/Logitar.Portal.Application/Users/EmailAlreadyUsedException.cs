@@ -8,7 +8,7 @@ namespace Logitar.Portal.Application.Users
       : base(GetMessage(email, paramName))
     {
       Data["Email"] = email;
-      Data["paramName"] = paramName;
+      Data["ParamName"] = paramName;
     }
 
     private static string GetMessage(string email, string paramName)

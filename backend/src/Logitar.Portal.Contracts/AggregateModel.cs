@@ -3,7 +3,7 @@ using System;
 
 namespace Logitar.Portal.Contracts
 {
-  public abstract class AggregateModel
+  public abstract record AggregateModel
   {
     public string Id { get; set; } = string.Empty;
     public long Version { get; set; }

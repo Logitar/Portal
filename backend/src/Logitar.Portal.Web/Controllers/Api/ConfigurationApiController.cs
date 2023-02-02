@@ -1,8 +1,8 @@
 ﻿using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Configurations.Payloads;
-using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;

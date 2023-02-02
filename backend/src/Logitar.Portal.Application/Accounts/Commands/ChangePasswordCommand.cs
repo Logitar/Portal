@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Contracts.Accounts.Payloads;
-using Logitar.Portal.Contracts.Users.Models;
+﻿using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Users;
 using MediatR;
 
 namespace Logitar.Portal.Application.Accounts.Commands

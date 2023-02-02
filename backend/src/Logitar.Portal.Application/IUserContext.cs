@@ -8,5 +8,7 @@ namespace Logitar.Portal.Application
 
     string SessionId { get; }
     string UserId { get; }
+
+    string BaseUrl { get; }
   }
 }
