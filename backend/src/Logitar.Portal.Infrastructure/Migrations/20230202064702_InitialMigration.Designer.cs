@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.Infrastructure.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230202041048_InitialMigration")]
+    [Migration("20230202064702_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -98,6 +98,68 @@ namespace Logitar.Portal.Infrastructure.Migrations
                             Value = 2,
                             Name = "ApiKey"
                         });
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ApiKeyEntity", b =>
+                {
+                    b.Property<int>("ApiKeyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ApiKeyId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("ExpiresOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SecretHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ApiKeyId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("ExpiresOn");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.ToTable("ApiKeys");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.BlacklistedJwtEntity", b =>
@@ -305,6 +367,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AliasNormalized")
                         .IsUnique();
 
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("UpdatedOn");
+
                     b.ToTable("Realms");
                 });
 
@@ -369,6 +435,18 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("AggregateId")
                         .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("IpAddress");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsPersistent");
+
+                    b.HasIndex("SignedOutOn");
+
+                    b.HasIndex("UpdatedOn");
 
                     b.HasIndex("UserId");
 
@@ -507,7 +585,31 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedOn");
+
                     b.HasIndex("Email");
+
+                    b.HasIndex("EmailNormalized");
+
+                    b.HasIndex("FirstName");
+
+                    b.HasIndex("IsAccountConfirmed");
+
+                    b.HasIndex("IsDisabled");
+
+                    b.HasIndex("LastName");
+
+                    b.HasIndex("MiddleName");
+
+                    b.HasIndex("PasswordChangedOn");
+
+                    b.HasIndex("PhoneNumber");
+
+                    b.HasIndex("SignedInOn");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("Username");
 
                     b.HasIndex("RealmId", "UsernameNormalized")
                         .IsUnique();

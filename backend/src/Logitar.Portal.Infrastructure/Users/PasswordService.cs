@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using System.Security.Cryptography;
@@ -20,6 +21,11 @@ namespace Logitar.Portal.Infrastructure.Users
       Pbkdf2 pbkdf2 = new(password);
 
       return pbkdf2.ToString();
+    }
+
+    public bool IsMatch(ApiKey apiKey, byte[] secret)
+    {
+      return Pbkdf2.Parse(apiKey.SecretHash).IsMatch(Convert.ToBase64String(secret));
     }
 
     public bool IsMatch(Session session, byte[] key)

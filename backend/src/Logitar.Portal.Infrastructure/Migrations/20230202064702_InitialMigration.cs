@@ -45,6 +45,28 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ApiKeys",
+                columns: table => new
+                {
+                    ApiKeyId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SecretHash = table.Column<string>(type: "text", nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    ExpiresOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApiKeys", x => x.ApiKeyId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
@@ -243,6 +265,32 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_AggregateId",
+                table: "ApiKeys",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_CreatedOn",
+                table: "ApiKeys",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_DisplayName",
+                table: "ApiKeys",
+                column: "DisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_ExpiresOn",
+                table: "ApiKeys",
+                column: "ExpiresOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_UpdatedOn",
+                table: "ApiKeys",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_AggregateType_AggregateId",
                 table: "Events",
                 columns: new[] { "AggregateType", "AggregateId" });
@@ -293,10 +341,50 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Realms_CreatedOn",
+                table: "Realms",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UpdatedOn",
+                table: "Realms",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sessions_AggregateId",
                 table: "Sessions",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_CreatedOn",
+                table: "Sessions",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IpAddress",
+                table: "Sessions",
+                column: "IpAddress");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IsActive",
+                table: "Sessions",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IsPersistent",
+                table: "Sessions",
+                column: "IsPersistent");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SignedOutOn",
+                table: "Sessions",
+                column: "SignedOutOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UpdatedOn",
+                table: "Sessions",
+                column: "UpdatedOn");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_UserId",
@@ -310,15 +398,75 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_CreatedOn",
+                table: "Users",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_EmailNormalized",
+                table: "Users",
+                column: "EmailNormalized");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_FirstName",
+                table: "Users",
+                column: "FirstName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_IsAccountConfirmed",
+                table: "Users",
+                column: "IsAccountConfirmed");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_IsDisabled",
+                table: "Users",
+                column: "IsDisabled");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_LastName",
+                table: "Users",
+                column: "LastName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_MiddleName",
+                table: "Users",
+                column: "MiddleName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_PasswordChangedOn",
+                table: "Users",
+                column: "PasswordChangedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_PhoneNumber",
+                table: "Users",
+                column: "PhoneNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RealmId_UsernameNormalized",
                 table: "Users",
                 columns: new[] { "RealmId", "UsernameNormalized" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_SignedInOn",
+                table: "Users",
+                column: "SignedInOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UpdatedOn",
+                table: "Users",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Username",
+                table: "Users",
+                column: "Username");
         }
 
         /// <inheritdoc />
@@ -329,6 +477,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ActorTypes");
+
+            migrationBuilder.DropTable(
+                name: "ApiKeys");
 
             migrationBuilder.DropTable(
                 name: "Events");

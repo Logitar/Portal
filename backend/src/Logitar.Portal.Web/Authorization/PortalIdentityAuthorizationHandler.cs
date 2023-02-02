@@ -29,10 +29,10 @@ namespace Logitar.Portal.Web.Authorization
             context.Fail(new AuthorizationFailureReason(this, "The User should not belong to a Realm."));
           }
         }
-        //else if (_httpContextAccessor.HttpContext.GetApiKey() != null)
-        //{
-        //  context.Succeed(requirement);
-        //} // TODO(fpion): implement Api Keys
+        else if (_httpContextAccessor.HttpContext.GetApiKey() != null)
+        {
+          context.Succeed(requirement);
+        }
       }
 
       return Task.CompletedTask;

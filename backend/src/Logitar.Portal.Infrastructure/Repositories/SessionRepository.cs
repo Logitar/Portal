@@ -20,7 +20,7 @@ namespace Logitar.Portal.Infrastructure.Repositories
     {
       SessionEntity[] sessions = await _sessions.AsNoTracking()
         .Include(x => x.User)
-        .Where(x => x.User!.AggregateId == user.Id.Value)
+        .Where(x => x.User!.AggregateId == user.Id.Value && x.IsActive)
         .ToArrayAsync(cancellationToken);
 
       if (!sessions.Any())

@@ -12,6 +12,11 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.SessionId);
 
+      builder.HasIndex(x => x.IsPersistent);
+      builder.HasIndex(x => x.SignedOutOn);
+      builder.HasIndex(x => x.IsActive);
+      builder.HasIndex(x => x.IpAddress);
+
       builder.Property(x => x.SignedOutBy).HasMaxLength(256);
       builder.Property(x => x.IpAddress).HasMaxLength(64);
     }

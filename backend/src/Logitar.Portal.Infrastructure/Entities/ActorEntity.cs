@@ -13,6 +13,13 @@ namespace Logitar.Portal.Infrastructure.Entities
       Email = user.Email;
       Picture = user.Picture;
     }
+    public ActorEntity(ApiKeyEntity apiKey)
+    {
+      Type = ActorType.ApiKey;
+      AggregateId = apiKey.AggregateId;
+
+      DisplayName = apiKey.DisplayName;
+    }
     private ActorEntity()
     {
     }
@@ -27,6 +34,16 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? Email { get; private set; }
     public string? Picture { get; private set; }
 
+    public void Delete() => IsDeleted = true;
+    public void Update(ApiKeyEntity apiKey)
+    {
+      if (Type != ActorType.ApiKey)
+      {
+        throw new InvalidOperationException($"This actor has type '{Type}' and cannot be updated by an '{ActorType.ApiKey}' actor.");
+      }
+
+      DisplayName = apiKey.DisplayName;
+    }
     public void Update(UserEntity user)
     {
       if (Type != ActorType.User)

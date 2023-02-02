@@ -64,7 +64,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       }
       if (userId != null)
       {
-        query = query.Where(x => x.User != null && x.User.AggregateId == userId);
+        query = query.Where(x => x.User!.AggregateId == userId);
       }
 
       long total = await query.LongCountAsync(cancellationToken);

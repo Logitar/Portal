@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
@@ -42,6 +43,7 @@ namespace Logitar.Portal.Infrastructure
     private static IServiceCollection AddQueriers(this IServiceCollection services)
     {
       return services
+        .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
     }

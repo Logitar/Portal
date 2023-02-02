@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Web.Extensions;
@@ -35,11 +36,16 @@ namespace Logitar.Portal.Web
           };
         }
 
-        //ApiKey? apiKey = HttpContext.GetApiKey();
-        //if (apiKey != null)
-        //{
-        //  throw new NotImplementedException(); // TODO(fpion): implement Api Keys
-        //}
+        ApiKeyModel? apiKey = HttpContext.GetApiKey();
+        if (apiKey != null)
+        {
+          return new ActorModel
+          {
+            Id = apiKey.Id,
+            Type = ActorType.ApiKey,
+            DisplayName = apiKey.DisplayName
+          };
+        }
 
         return new ActorModel
         {

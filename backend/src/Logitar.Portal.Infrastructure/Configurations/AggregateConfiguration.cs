@@ -8,6 +8,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
     public virtual void Configure(EntityTypeBuilder<T> builder)
     {
       builder.HasIndex(x => x.AggregateId).IsUnique();
+      builder.HasIndex(x => x.CreatedOn);
+      builder.HasIndex(x => x.UpdatedOn);
 
       builder.Property(x => x.AggregateId).HasMaxLength(256).IsRequired();
       builder.Property(x => x.CreatedBy).HasMaxLength(256);

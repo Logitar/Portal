@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Models.Users;
 using System.Text;
@@ -7,12 +8,14 @@ namespace Logitar.Portal.Web.Extensions
 {
   internal static class HttpContextExtensions
   {
+    private const string ApiKeyKey = "ApiKey";
     private const string SessionKey = "Session";
     private const string SessionIdKey = "SessionId";
     private const string UserKey = "User";
 
     public static CurrentUser GetCurrentUser(this HttpContext context) => new(context.GetUser());
 
+    public static ApiKeyModel? GetApiKey(this HttpContext context) => context.GetItem<ApiKeyModel>(ApiKeyKey);
     public static SessionModel? GetSession(this HttpContext context) => context.GetItem<SessionModel>(SessionKey);
     public static UserModel? GetUser(this HttpContext context) => context.GetItem<UserModel>(UserKey);
     private static T? GetItem<T>(this HttpContext context, object key)
@@ -25,6 +28,7 @@ namespace Logitar.Portal.Web.Extensions
       return default;
     }
 
+    public static bool SetApiKey(this HttpContext context, ApiKeyModel? apiKey) => context.SetItem(ApiKeyKey, apiKey);
     public static bool SetSession(this HttpContext context, SessionModel? session) => context.SetItem(SessionKey, session);
     public static bool SetUser(this HttpContext context, UserModel? user) => context.SetItem(UserKey, user);
     private static bool SetItem(this HttpContext context, object key, object? value)

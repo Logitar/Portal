@@ -17,7 +17,7 @@ namespace Logitar.Portal.Domain.Users
     public User(AggregateId userId, string username, Realm? realm = null, string? passwordHash = null,
       string? email = null, bool isEmailConfirmed = false, string? phoneNumber = null, bool isPhoneNumberConfirmed = false,
       string? firstName = null, string? middleName = null, string? lastName = null,
-      CultureInfo? locale = null, string? picture = null)
+      CultureInfo? locale = null, string? picture = null) : base()
     {
       ApplyChange(new UserCreatedEvent
       {

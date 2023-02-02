@@ -15,7 +15,7 @@
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'name.label'" />
+            <th scope="col" v-t="'apiKeys.displayName.label'" />
             <th scope="col" v-t="'apiKeys.expiresOn'" />
             <th scope="col" v-t="'updated'" />
             <th scope="col" />
@@ -24,7 +24,7 @@
         <tbody>
           <tr v-for="apiKey in apiKeys" :key="apiKey.id">
             <td>
-              <b-link :href="`/api-keys/${apiKey.id}`">{{ apiKey.name }}</b-link>
+              <b-link :href="`/api-keys/${apiKey.id}`">{{ apiKey.displayName }}</b-link>
             </td>
             <td>
               {{ apiKey.expiresOn ? $d(new Date(apiKey.expiresOn), 'medium') : $t('apiKeys.neverExpires') }}
@@ -35,7 +35,7 @@
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${apiKey.id}`" />
               <delete-modal
                 confirm="apiKeys.delete.confirm"
-                :displayName="apiKey.name"
+                :displayName="apiKey.displayName"
                 :id="`delete_${apiKey.id}`"
                 :loading="loading"
                 title="apiKeys.delete.title"
@@ -61,18 +61,27 @@ export default {
       apiKeys: [],
       count: 10,
       desc: false,
-      isExpired: false,
+      isExpired: null,
       loading: false,
       page: 1,
       search: null,
-      sort: 'Name',
+      sort: 'DisplayName',
       total: 0
     }
   },
   computed: {
     params() {
+      let expiredOn = null
+      switch (this.isExpired) {
+        case 'Expired':
+          expiredOn = new Date().toISOString()
+          break
+        case 'NotExpired':
+          expiredOn = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+          break
+      }
       return {
-        isExpired: this.isExpired,
+        expiredOn,
         search: this.search,
         sort: this.sort,
         desc: this.desc,

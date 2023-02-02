@@ -28,7 +28,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<UserModel>> DeleteAsync(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
     {
       await _userService.DeleteAsync(id, cancellationToken);
 

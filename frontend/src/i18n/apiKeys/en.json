@@ -6,6 +6,10 @@
     "success": "The API key has been deleted.",
     "title": "Delete API key"
   },
+  "displayName": {
+    "label": "Display name",
+    "placeholder": "Enter a display name"
+  },
   "editTitle": "Edit API key",
   "empty": "This list is empty.",
   "expired": "Expired",
@@ -15,16 +19,16 @@
   "newTitle": "Create API key",
   "sort": {
     "options": {
+      "DisplayName": "Display name",
       "ExpiresOn": "Expires on",
-      "Name": "Name",
       "UpdatedOn": "Updated on"
     }
   },
   "status": {
     "label": "Status",
     "options": {
-      "false": "Not expired",
-      "true": "Expired"
+      "Expired": "Expired",
+      "NotExpired": "Not expired"
     },
     "placeholder": "Select a status"
   },

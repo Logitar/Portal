@@ -28,7 +28,7 @@
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <form-datetime v-if="!apiKey" id="expiresOn" label="apiKeys.expiresOn" :minDate="new Date()" validate v-model="expiresOn" />
-        <name-field :disabled="apiKey && apiKey.isExpired" required v-model="name" />
+        <name-field id="displayName" label="apiKeys.displayName.label" placeholder="apiKeys.displayName.placeholder" required v-model="displayName" />
         <description-field :disabled="apiKey && apiKey.isExpired" :rows="15" v-model="description" />
       </b-form>
     </validation-observer>
@@ -58,21 +58,23 @@ export default {
     return {
       apiKey: null,
       description: null,
+      displayName: null,
       expiresOn: null,
       loading: false,
-      name: null,
       showString: false
     }
   },
   computed: {
     hasChanges() {
       return (
-        (!this.apiKey && this.expiresOn) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
+        (!this.apiKey && this.expiresOn) ||
+        (this.displayName ?? '') !== (this.apiKey?.displayName ?? '') ||
+        (this.description ?? '') !== (this.apiKey?.description ?? '')
       )
     },
     payload() {
       const payload = {
-        name: this.name,
+        displayName: this.displayName,
         description: this.description
       }
       if (!this.apiKey) {
@@ -89,8 +91,8 @@ export default {
     setModel(apiKey) {
       this.apiKey = apiKey
       this.description = apiKey.description
+      this.displayName = apiKey.displayName
       this.expiresOn = apiKey.expiresOn
-      this.name = apiKey.name
     },
     async submit() {
       if (!this.loading) {

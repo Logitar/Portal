@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Accounts;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
@@ -26,6 +27,7 @@ namespace Logitar.Portal.Application
     {
       return services
         .AddTransient<IAccountService, AccountService>()
+        .AddTransient<IApiKeyService, ApiKeyService>()
         .AddTransient<IConfigurationService, ConfigurationService>()
         .AddTransient<IGoogleService, GoogleService>()
         .AddTransient<IInternalTokenService, InternalTokenService>()

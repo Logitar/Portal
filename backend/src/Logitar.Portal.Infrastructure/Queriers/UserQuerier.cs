@@ -37,9 +37,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       CancellationToken cancellationToken)
     {
       IQueryable<UserEntity> query = _users.AsNoTracking()
-        .Include(x => x.Realm)
-        .Where(x => realm == null ? x.RealmId == null
-          : (x.Realm!.AliasNormalized == realm.ToUpper() || x.Realm.AggregateId == realm));
+        .Include(x => x.Realm);
 
       query = realm == null
         ? query.Where(x => x.RealmId == null)
