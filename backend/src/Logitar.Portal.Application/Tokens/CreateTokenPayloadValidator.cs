@@ -9,9 +9,9 @@ namespace Logitar.Portal.Application.Tokens
     {
       RuleFor(x => x.Lifetime).GreaterThan(0);
 
-      // TODO(fpion): WithErrorCode?
-      // TODO(fpion): WithMessage?
-      RuleFor(x => x.Purpose).Must(BeAValidPurpose);
+      RuleFor(x => x.Purpose).Must(BeAValidPurpose)
+        .WithErrorCode("PurposeValidator")
+        .WithMessage("'{PropertyName}' must be composed of non-empty letter-only words, separated by underscores '_'.");
 
       RuleFor(x => x.Email).EmailAddress();
 

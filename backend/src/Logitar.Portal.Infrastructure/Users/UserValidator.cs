@@ -5,15 +5,11 @@ namespace Logitar.Portal.Application.Users
 {
   internal class UserValidator : AbstractValidator<User>
   {
-    /// <summary>
-    /// TODO(fpion): WithErrorCode? (username)
-    /// TODO(fpion): WithMessage? (username)
-    /// </summary>
     public UserValidator(UsernameSettings usernameSettings)
     {
       RuleFor(x => x.Username).NotEmpty()
         .MaximumLength(256)
-        .Must(u => usernameSettings.AllowedCharacters == null || u.All(usernameSettings.AllowedCharacters.Contains));
+        .Username(usernameSettings);
 
       RuleFor(x => x.PasswordHash).NullOrNotEmpty();
 
