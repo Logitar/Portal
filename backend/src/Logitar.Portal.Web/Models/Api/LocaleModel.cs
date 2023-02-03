@@ -2,9 +2,9 @@
 
 namespace Logitar.Portal.Web.Models.Api
 {
-  public class LocaleSummary
+  public class LocaleModel
   {
-    public LocaleSummary(CultureInfo culture)
+    public LocaleModel(CultureInfo culture)
     {
       Code = culture.Name;
       DisplayName = culture.EnglishName;
