@@ -54,6 +54,9 @@ namespace Logitar.Portal.Infrastructure.Entities
     //public string? PasswordRecoveryTemplateId { get; private set; } // TODO(fpion): implement when Templates are completed
 
     public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
+    public List<SenderEntity> Senders { get; private set; } = new();
+    public List<SessionEntity> Sessions { get; private set; } = new();
+    public List<TemplateEntity> Templates { get; private set; } = new();
     public List<UserEntity> Users { get; private set; } = new();
 
     public void Update(RealmUpdatedEvent @event)

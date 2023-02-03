@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     options() {
-      return this.realms.map(({ id, name }) => ({ text: name, value: id }))
+      return this.realms.map(({ id, alias, displayName }) => ({ text: displayName ?? alias, value: id }))
     }
   },
   async created() {

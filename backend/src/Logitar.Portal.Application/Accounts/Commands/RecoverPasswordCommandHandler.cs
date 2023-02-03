@@ -1,6 +1,4 @@
-﻿using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Application.Tokens;
-using Logitar.Portal.Application.Users;
+﻿using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Contracts.Accounts;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Realms;
@@ -11,17 +9,13 @@ namespace Logitar.Portal.Application.Accounts.Commands
 {
   internal class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordCommand>
   {
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly IInternalTokenService _internalTokenService;
-    private readonly IUserRepository _userRepository;
 
-    public RecoverPasswordCommandHandler(IRealmRepository realmRepository,
-      IInternalTokenService internalTokenService,
-      IUserRepository userRepository)
+    public RecoverPasswordCommandHandler(IRepository repository, IInternalTokenService internalTokenService)
     {
-      _realmRepository = realmRepository;
+      _repository = repository;
       _internalTokenService = internalTokenService;
-      _userRepository = userRepository;
     }
 
     /// <summary>
@@ -34,12 +28,12 @@ namespace Logitar.Portal.Application.Accounts.Commands
     /// <exception cref="EntityNotFoundException{User}"></exception>
     public async Task<Unit> Handle(RecoverPasswordCommand request, CancellationToken cancellationToken)
     {
-      Realm realm = await _realmRepository.LoadByAliasOrIdAsync(request.Realm, cancellationToken)
+      Realm realm = await _repository.LoadRealmByAliasOrIdAsync(request.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(request.Realm);
 
       RecoverPasswordPayload payload = request.Payload;
 
-      User user = await _userRepository.LoadByUsernameAsync(payload.Username, realm, cancellationToken)
+      User user = await _repository.LoadUserByUsernameAsync(payload.Username, realm, cancellationToken)
         ?? throw new EntityNotFoundException<User>(payload.Username, nameof(payload.Username));
       user.EnsureIsTrusted(realm);
       if (!user.HasPassword)
@@ -56,19 +50,19 @@ namespace Logitar.Portal.Application.Accounts.Commands
       {
         Lifetime = ResetPassword.Lifetime,
         Purpose = ResetPassword.Purpose,
-        Realm = realm.Id.ToString(),
-        Subject = user.Id.ToString()
+        Realm = realm.Id.Value,
+        Subject = user.Id.Value
       };
       TokenModel token = await _internalTokenService.CreateAsync(createTokenPayload, cancellationToken);
 
       //SendMessagePayload sendMessagePayload = new()
       //{
-      //  Realm = realm.Id.ToString(),
-      //  Template = realm.PasswordRecoveryTemplate.Id.ToString(),
+      //  Realm = realm.Id.Value,
+      //  Template = realm.PasswordRecoveryTemplate.Id.Value,
       //  SenderId = realm.PasswordRecoverySender?.Id,
       //  IgnoreUserLocale = payload.IgnoreUserLocale,
       //  Locale = payload.Locale,
-      //  Recipients = new[] { new RecipientPayload { User = user.Id.ToString() } },
+      //  Recipients = new[] { new RecipientPayload { User = user.Id.Value } },
       //  Variables = new[] { new VariablePayload { Key = "Token", Value = token.Token } }
       //};
       //SentMessagesModel sentMessages = await _messageService.SendAsync(sendMessagePayload, cancellationToken);

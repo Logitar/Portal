@@ -282,6 +282,31 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("ExternalProviders");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ProviderTypeEntity", b =>
+                {
+                    b.Property<int>("Value")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Value");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("SenderProviderTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Value = 0,
+                            Name = "SendGrid"
+                        });
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
                 {
                     b.Property<int>("RealmId")
@@ -380,6 +405,81 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Realms");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
+                {
+                    b.Property<int>("SenderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SenderId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Settings")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("SenderId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("EmailAddress");
+
+                    b.HasIndex("IsDefault")
+                        .HasFilter("\"IsDefault\" = true");
+
+                    b.HasIndex("Provider");
+
+                    b.HasIndex("RealmId");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.ToTable("Senders");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
                 {
                     b.Property<int>("SessionId")
@@ -417,6 +517,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<string>("KeyHash")
                         .HasColumnType("text");
 
+                    b.Property<int?>("RealmEntityRealmId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SignedOutBy")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -450,6 +553,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("IsPersistent");
 
+                    b.HasIndex("RealmEntityRealmId");
+
                     b.HasIndex("SignedOutOn");
 
                     b.HasIndex("UpdatedOn");
@@ -457,6 +562,90 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Sessions");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.TemplateEntity", b =>
+                {
+                    b.Property<int>("TemplateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TemplateId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Contents")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("KeyNormalized")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int?>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TemplateId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("Key");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("RealmId", "KeyNormalized")
+                        .IsUnique();
+
+                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
@@ -642,8 +831,21 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
+                        .WithMany("Senders")
+                        .HasForeignKey("RealmId");
+
+                    b.Navigation("Realm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
                 {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", null)
+                        .WithMany("Sessions")
+                        .HasForeignKey("RealmEntityRealmId");
+
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -651,6 +853,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.TemplateEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
+                        .WithMany("Templates")
+                        .HasForeignKey("RealmId");
+
+                    b.Navigation("Realm");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
@@ -665,6 +876,12 @@ namespace Logitar.Portal.Infrastructure.Migrations
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
                 {
                     b.Navigation("ExternalProviders");
+
+                    b.Navigation("Senders");
+
+                    b.Navigation("Sessions");
+
+                    b.Navigation("Templates");
 
                     b.Navigation("Users");
                 });

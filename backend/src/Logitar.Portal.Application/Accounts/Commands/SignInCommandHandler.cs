@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Application.Sessions;
+﻿using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Accounts;
 using Logitar.Portal.Contracts.Sessions;
@@ -12,19 +11,16 @@ namespace Logitar.Portal.Application.Accounts.Commands
   internal class SignInCommandHandler : IRequestHandler<SignInCommand, SessionModel>
   {
     private readonly IPasswordService _passwordService;
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly ISignInService _signInService;
-    private readonly IUserRepository _userRepository;
 
     public SignInCommandHandler(IPasswordService passwordService,
-      IRealmRepository realmRepository,
-      ISignInService signInService,
-      IUserRepository userRepository)
+      IRepository repository,
+      ISignInService signInService)
     {
       _passwordService = passwordService;
-      _realmRepository = realmRepository;
+      _repository = repository;
       _signInService = signInService;
-      _userRepository = userRepository;
     }
 
     public async Task<SessionModel> Handle(SignInCommand request, CancellationToken cancellationToken)
@@ -32,13 +28,13 @@ namespace Logitar.Portal.Application.Accounts.Commands
       Realm? realm = null;
       if (request.Realm != null)
       {
-        realm = await _realmRepository.LoadByAliasOrIdAsync(request.Realm, cancellationToken)
+        realm = await _repository.LoadRealmByAliasOrIdAsync(request.Realm, cancellationToken)
           ?? throw new EntityNotFoundException<Realm>(request.Realm);
       }
 
       SignInPayload payload = request.Payload;
 
-      User? user = await _userRepository.LoadByUsernameAsync(payload.Username, realm, cancellationToken);
+      User? user = await _repository.LoadUserByUsernameAsync(payload.Username, realm, cancellationToken);
       if (user == null || !_passwordService.IsMatch(user, payload.Password))
       {
         throw new InvalidCredentialsException();

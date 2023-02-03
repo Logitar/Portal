@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.ApiKeys;
+﻿using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.AspNetCore.Authorization;
@@ -13,12 +12,10 @@ namespace Logitar.Portal.Web.Controllers.Api
   public class ApiKeyApiController : ControllerBase
   {
     private readonly IApiKeyService _apiKeyService;
-    private readonly IMapper _mapper;
 
-    public ApiKeyApiController(IApiKeyService apiKeyService, IMapper mapper)
+    public ApiKeyApiController(IApiKeyService apiKeyService)
     {
       _apiKeyService = apiKeyService;
-      _mapper = mapper;
     }
 
     [HttpPost]

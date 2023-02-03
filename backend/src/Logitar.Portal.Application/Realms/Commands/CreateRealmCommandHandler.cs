@@ -12,17 +12,17 @@ namespace Logitar.Portal.Application.Realms.Commands
   internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, RealmModel>
   {
     private readonly IRealmQuerier _realmQuerier;
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly IUserContext _userContext;
     private readonly IValidator<Realm> _realmValidator;
 
     public CreateRealmCommandHandler(IRealmQuerier realmQuerier,
-      IRealmRepository realmRepository,
+      IRepository repository,
       IUserContext userContext,
       IValidator<Realm> realmValidator)
     {
       _realmQuerier = realmQuerier;
-      _realmRepository = realmRepository;
+      _repository = repository;
       _userContext = userContext;
       _realmValidator = realmValidator;
     }
@@ -31,7 +31,7 @@ namespace Logitar.Portal.Application.Realms.Commands
     {
       CreateRealmPayload payload = request.Payload;
 
-      if (await _realmRepository.LoadByAliasOrIdAsync(payload.Alias, cancellationToken) != null)
+      if (await _repository.LoadRealmByAliasOrIdAsync(payload.Alias, cancellationToken) != null)
       {
         throw new AliasAlreadyUsedException(payload.Alias, nameof(payload.Alias));
       }
@@ -46,7 +46,7 @@ namespace Logitar.Portal.Application.Realms.Commands
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);
 
-      await _realmRepository.SaveAsync(realm, cancellationToken);
+      await _repository.SaveAsync(realm, cancellationToken);
 
       return await _realmQuerier.GetAsync(realm.Id, cancellationToken)
         ?? throw new InvalidOperationException($"The realm 'Id={realm.Id}' could not be found.");

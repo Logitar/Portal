@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Claims;
-using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Realms;
@@ -11,17 +10,17 @@ namespace Logitar.Portal.Application.Tokens
   internal class InternalTokenService : IInternalTokenService
   {
     private readonly IValidator<CreateTokenPayload> _payloadValidator;
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly ISecurityTokenService _securityTokenService;
     private readonly IUserContext _userContext;
 
     public InternalTokenService(IValidator<CreateTokenPayload> payloadValidator,
-      IRealmRepository realmRepository,
+      IRepository repository,
       ISecurityTokenService securityTokenService,
       IUserContext userContext)
     {
       _payloadValidator = payloadValidator;
-      _realmRepository = realmRepository;
+      _repository = repository;
       _securityTokenService = securityTokenService;
       _userContext = userContext;
     }
@@ -33,7 +32,7 @@ namespace Logitar.Portal.Application.Tokens
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = await _realmRepository.LoadByAliasOrIdAsync(payload.Realm, cancellationToken)
+        realm = await _repository.LoadRealmByAliasOrIdAsync(payload.Realm, cancellationToken)
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
@@ -65,7 +64,7 @@ namespace Logitar.Portal.Application.Tokens
       }
 
       string secret = realm?.JwtSecret
-        ?? (await _realmRepository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
+        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
         ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
 
       string token = _securityTokenService.Create(identity, secret, GetAudience(realm), expires, GetIssuer(realm));
@@ -81,12 +80,12 @@ namespace Logitar.Portal.Application.Tokens
       Realm? realm = null;
       if (payload.Realm != null)
       {
-        realm = await _realmRepository.LoadByAliasOrIdAsync(payload.Realm, cancellationToken)
+        realm = await _repository.LoadRealmByAliasOrIdAsync(payload.Realm, cancellationToken)
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
       string secret = realm?.JwtSecret
-        ?? (await _realmRepository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
+        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
         ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
 
       ValidateTokenResult result = await _securityTokenService

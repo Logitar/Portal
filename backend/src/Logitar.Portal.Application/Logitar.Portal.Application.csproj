@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj" />
     <ProjectReference Include="..\Logitar.Portal.Domain\Logitar.Portal.Domain.csproj" />
   </ItemGroup>
 

@@ -33,13 +33,13 @@
               <font-awesome-icon icon="id-card" />
               {{ $t('tokens.title') }}
             </b-nav-item>
-            <b-nav-item href="/templates">
-              <font-awesome-icon icon="at" />
-              {{ $t('templates.title') }}
-            </b-nav-item>
             <b-nav-item href="/senders">
               <font-awesome-icon icon="paper-plane" />
               {{ $t('senders.title') }}
+            </b-nav-item>
+            <b-nav-item href="/templates">
+              <font-awesome-icon icon="at" />
+              {{ $t('templates.title') }}
             </b-nav-item>
             <b-nav-item href="/dictionaries">
               <font-awesome-icon icon="language" />

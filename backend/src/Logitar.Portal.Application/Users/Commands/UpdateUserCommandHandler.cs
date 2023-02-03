@@ -14,21 +14,18 @@ namespace Logitar.Portal.Application.Users.Commands
     private readonly IRepository _repository;
     private readonly IUserContext _userContext;
     private readonly IUserQuerier _userQuerier;
-    private readonly IUserRepository _userRepository;
     private readonly IUserValidator _userValidator;
 
     public UpdateUserCommandHandler(IPasswordService passwordService,
       IRepository repository,
       IUserContext userContext,
       IUserQuerier userQuerier,
-      IUserRepository userRepository,
       IUserValidator userValidator)
     {
       _passwordService = passwordService;
       _repository = repository;
       _userContext = userContext;
       _userQuerier = userQuerier;
-      _userRepository = userRepository;
       _userValidator = userValidator;
     }
 
@@ -49,7 +46,7 @@ namespace Logitar.Portal.Application.Users.Commands
 
       if (realm?.RequireUniqueEmail == true && payload.Email != null)
       {
-        IEnumerable<User> users = await _userRepository.LoadByEmailAsync(payload.Email, realm, cancellationToken);
+        IEnumerable<User> users = await _repository.LoadUsersByEmailAsync(payload.Email, realm, cancellationToken);
         if (users.Any(x => !x.Equals(user)))
         {
           throw new EmailAlreadyUsedException(payload.Email, nameof(payload.Email));

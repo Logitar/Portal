@@ -1,7 +1,7 @@
-﻿using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Application.Users;
-using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using MediatR;
 
@@ -10,19 +10,12 @@ namespace Logitar.Portal.Application.Realms.Commands
   internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand>
   {
     private readonly IRepository _repository;
-    private readonly ISessionRepository _sessionRepository;
     private readonly IUserContext _userContext;
-    private readonly IUserRepository _userRepository;
 
-    public DeleteRealmCommandHandler(IRepository repository,
-      ISessionRepository sessionRepository,
-      IUserContext userContext,
-      IUserRepository userRepository)
+    public DeleteRealmCommandHandler(IRepository repository, IUserContext userContext)
     {
       _repository = repository;
-      _sessionRepository = sessionRepository;
       _userContext = userContext;
-      _userRepository = userRepository;
     }
 
     public async Task<Unit> Handle(DeleteRealmCommand request, CancellationToken cancellationToken)
@@ -33,8 +26,8 @@ namespace Logitar.Portal.Application.Realms.Commands
       await DeleteSessionsAsync(realm, cancellationToken);
       await DeleteUsersAsync(realm, cancellationToken);
 
-      //await DeleteSendersAsync(realm, cancellationToken); // TODO(fpion): implement when Senders are completed
-      //await DeleteTemplatesAsync(realm, cancellationToken); // TODO(fpion): implement when Templates are completed
+      await DeleteSendersAsync(realm, cancellationToken);
+      await DeleteTemplatesAsync(realm, cancellationToken);
 
       //await DeleteDictionariesAsync(realm, cancellationToken); // TODO(fpion): implement when Dictionaries are completed
 
@@ -45,26 +38,48 @@ namespace Logitar.Portal.Application.Realms.Commands
       return Unit.Value;
     }
 
+    private async Task DeleteSendersAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      IEnumerable<Sender> senders = await _repository.LoadSendersByRealmAsync(realm, cancellationToken);
+      foreach (Sender sender in senders)
+      {
+        sender.Delete(_userContext.ActorId);
+      }
+
+      await _repository.SaveAsync(senders, cancellationToken);
+    }
+
     private async Task DeleteSessionsAsync(Realm realm, CancellationToken cancellationToken)
     {
-      IEnumerable<Session> sessions = await _sessionRepository.LoadByRealmAsync(realm, cancellationToken);
+      IEnumerable<Session> sessions = await _repository.LoadSessionsByRealmAsync(realm, cancellationToken);
       foreach (Session session in sessions)
       {
         session.Delete(_userContext.ActorId);
       }
 
-      await _sessionRepository.SaveAsync(sessions, cancellationToken);
+      await _repository.SaveAsync(sessions, cancellationToken);
+    }
+
+    private async Task DeleteTemplatesAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      IEnumerable<Template> templates = await _repository.LoadTemplatesByRealmAsync(realm, cancellationToken);
+      foreach (Template template in templates)
+      {
+        template.Delete(_userContext.ActorId);
+      }
+
+      await _repository.SaveAsync(templates, cancellationToken);
     }
 
     private async Task DeleteUsersAsync(Realm realm, CancellationToken cancellationToken)
     {
-      IEnumerable<User> users = await _userRepository.LoadByRealmAsync(realm, cancellationToken);
+      IEnumerable<User> users = await _repository.LoadUsersByRealmAsync(realm, cancellationToken);
       foreach (User user in users)
       {
         user.Delete(_userContext.ActorId);
       }
 
-      await _userRepository.SaveAsync(users, cancellationToken);
+      await _repository.SaveAsync(users, cancellationToken);
     }
   }
 }

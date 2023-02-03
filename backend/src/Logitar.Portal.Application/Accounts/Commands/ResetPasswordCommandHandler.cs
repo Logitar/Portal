@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Application.Tokens;
+﻿using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Accounts;
@@ -14,26 +13,23 @@ namespace Logitar.Portal.Application.Accounts.Commands
   {
     private readonly IInternalTokenService _internalTokenService;
     private readonly IPasswordService _passwordService;
-    private readonly IRealmRepository _realmRepository;
     private readonly IRepository _repository;
     private readonly IUserValidator _userValidator;
 
     public ResetPasswordCommandHandler(IInternalTokenService internalTokenService,
       IPasswordService passwordService,
-      IRealmRepository realmRepository,
       IRepository repository,
       IUserValidator userValidator)
     {
       _internalTokenService = internalTokenService;
       _passwordService = passwordService;
-      _realmRepository = realmRepository;
       _repository = repository;
       _userValidator = userValidator;
     }
 
     public async Task<Unit> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-      Realm realm = await _realmRepository.LoadByAliasOrIdAsync(request.Realm, cancellationToken)
+      Realm realm = await _repository.LoadRealmByAliasOrIdAsync(request.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(request.Realm);
 
       ResetPasswordPayload payload = request.Payload;
@@ -44,7 +40,7 @@ namespace Logitar.Portal.Application.Accounts.Commands
       {
         Token = payload.Token,
         Purpose = ResetPassword.Purpose,
-        Realm = realm.Id.ToString()
+        Realm = realm.Id.Value
       };
       ValidatedTokenModel token = await _internalTokenService.ValidateAsync(validateTokenPayload, consume: true, cancellationToken);
       if (!token.Succeeded)

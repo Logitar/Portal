@@ -3,6 +3,8 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Sessions;
@@ -19,6 +21,7 @@ namespace Logitar.Portal.Web.Filters
       // 400 BadRequest
       [typeof(AccountIsDisabledException)] = SetBadRequestCodeResult,
       [typeof(AccountNotConfirmedException)] = SetBadRequestCodeResult,
+      [typeof(CannotDeleteDefaultSenderException)] = SetBadRequestCodeResult,
       [typeof(GoogleClientIdRequiredException)] = SetBadRequestCodeResult,
       [typeof(InvalidCredentialsException)] = SetBadRequestCodeResult,
       [typeof(SessionAlreadySignedOutException)] = SetBadRequestCodeResult,
@@ -34,6 +37,7 @@ namespace Logitar.Portal.Web.Filters
       // 409 Conflict
       [typeof(AliasAlreadyUsedException)] = SetConflictFieldResult,
       [typeof(EmailAlreadyUsedException)] = SetConflictFieldResult,
+      [typeof(KeyAlreadyUsedException)] = SetConflictFieldResult,
       [typeof(UsernameAlreadyUsedException)] = SetConflictFieldResult
     };
 

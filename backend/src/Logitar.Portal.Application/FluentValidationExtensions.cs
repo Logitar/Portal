@@ -13,6 +13,13 @@ namespace Logitar.Portal.Application
         .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words, separated by hyphens '-'.");
     }
 
+    public static IRuleBuilder<T, string?> Identifier<T>(this IRuleBuilder<T, string?> rules)
+    {
+      return rules.Must(i => i == null || (!string.IsNullOrWhiteSpace(i) && !char.IsDigit(i.First()) && i.All(c => char.IsLetterOrDigit(c) || c == '_')))
+        .WithErrorCode("IdentifierValidator")
+        .WithMessage("'{PropertyName}' must start with a letter and must be composed of only letters, digits and underscores '_'");
+    }
+
     public static IRuleBuilder<T, CultureInfo?> Locale<T>(this IRuleBuilder<T, CultureInfo?> rules)
     {
       return rules.Must(c => c == null || (!string.IsNullOrWhiteSpace(c.Name) && c.LCID != 4096))

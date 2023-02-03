@@ -1,11 +1,12 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Infrastructure.Queriers;
-using Logitar.Portal.Infrastructure.Repositories;
 using Logitar.Portal.Infrastructure.Tokens;
 using Logitar.Portal.Infrastructure.Users;
 using MediatR;
@@ -31,13 +32,13 @@ namespace Logitar.Portal.Infrastructure
         })
         .AddMediatR(assembly)
         .AddQueriers()
-        .AddRepositories()
+        .AddScoped<IRepository, Repository>()
         .AddSingleton<IPasswordService, PasswordService>()
         .AddScoped<IJwtBlacklist, JwtBlacklist>()
         .AddScoped<IMappingService, MappingService>()
+        .AddScoped<IRequestPipeline, RequestPipeline>()
         .AddScoped<ISecurityTokenService, JwtService>()
-        .AddScoped<IUserValidator, CustomUserValidator>()
-        .AddTransient<IRequestPipeline, RequestPipeline>();
+        .AddScoped<IUserValidator, CustomUserValidator>();
     }
 
     private static IServiceCollection AddQueriers(this IServiceCollection services)
@@ -45,17 +46,10 @@ namespace Logitar.Portal.Infrastructure
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
+        .AddScoped<ISenderQuerier, SenderQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()
+        .AddScoped<ITemplateQuerier, TemplateQuerier>()
         .AddScoped<IUserQuerier, UserQuerier>();
-    }
-
-    private static IServiceCollection AddRepositories(this IServiceCollection services)
-    {
-      return services
-        .AddScoped<IRepository, Repository>()
-        .AddScoped<IRealmRepository, RealmRepository>()
-        .AddScoped<ISessionRepository, SessionRepository>()
-        .AddScoped<IUserRepository, UserRepository>();
     }
   }
 }

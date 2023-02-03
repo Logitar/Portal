@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain;
@@ -41,7 +40,7 @@ namespace Logitar.Portal.Application.Sessions
       SessionModel model = await _sessionQuerier.GetAsync(session.Id, cancellationToken)
         ?? throw new InvalidOperationException($"The session '{session.Id}' could not be found.");
 
-      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
+      model.RenewToken = keyBytes == null ? null : new RenewToken(model.Id, keyBytes).ToString();
 
       return model;
     }
@@ -70,7 +69,7 @@ namespace Logitar.Portal.Application.Sessions
       SessionModel model = await _sessionQuerier.GetAsync(session.Id, cancellationToken)
         ?? throw new InvalidOperationException($"The session '{session.Id}' could not be found.");
 
-      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
+      model.RenewToken = keyBytes == null ? null : new RenewToken(model.Id, keyBytes).ToString();
 
       return model;
     }

@@ -1,5 +1,4 @@
 ﻿using Google.Apis.Auth;
-using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Accounts;
@@ -14,28 +13,25 @@ namespace Logitar.Portal.Application.Accounts.Commands
 {
   internal class AuthenticateWithGoogleCommandHandler : IRequestHandler<AuthenticateWithGoogleCommand, SessionModel>
   {
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly ISignInService _signInService;
     private readonly IUserContext _userContext;
-    private readonly IUserRepository _userRepository;
     private readonly IUserValidator _userValidator;
 
-    public AuthenticateWithGoogleCommandHandler(IRealmRepository realmRepository,
+    public AuthenticateWithGoogleCommandHandler(IRepository repository,
       ISignInService signInService,
       IUserContext userContext,
-      IUserRepository userRepository,
       IUserValidator userValidator)
     {
-      _realmRepository = realmRepository;
+      _repository = repository;
       _signInService = signInService;
       _userContext = userContext;
-      _userRepository = userRepository;
       _userValidator = userValidator;
     }
 
     public async Task<SessionModel> Handle(AuthenticateWithGoogleCommand request, CancellationToken cancellationToken)
     {
-      Realm realm = await _realmRepository.LoadByAliasOrIdAsync(request.Realm, cancellationToken)
+      Realm realm = await _repository.LoadRealmByAliasOrIdAsync(request.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(request.Realm);
 
       if (realm.GoogleClientId == null)
@@ -51,15 +47,15 @@ namespace Logitar.Portal.Application.Accounts.Commands
       };
       GoogleJsonWebSignature.Payload googlePayload = await GoogleJsonWebSignature.ValidateAsync(payload.Credential, validationSettings);
 
-      User? user = await _userRepository.LoadByExternalProviderAsync(realm, ExternalProviders.Google, googlePayload.Subject, cancellationToken);
+      User? user = await _repository.LoadUserByExternalProviderAsync(realm, ExternalProviders.Google, googlePayload.Subject, cancellationToken);
       if (user == null)
       {
-        user = await _userRepository.LoadByUsernameAsync(googlePayload.Email, realm, cancellationToken);
+        user = await _repository.LoadUserByUsernameAsync(googlePayload.Email, realm, cancellationToken);
         if (user == null)
         {
           if (realm.RequireUniqueEmail)
           {
-            user = (await _userRepository.LoadByEmailAsync(googlePayload.Email, realm, cancellationToken))
+            user = (await _repository.LoadUsersByEmailAsync(googlePayload.Email, realm, cancellationToken))
               .SingleOrDefault();
           }
 
@@ -71,14 +67,14 @@ namespace Logitar.Portal.Application.Accounts.Commands
               googlePayload.GivenName, googlePayload.FamilyName, locale, googlePayload.Picture);
             _userValidator.ValidateAndThrow(user, realm.UsernameSettings);
 
-            await _userRepository.SaveAsync(user, cancellationToken);
+            await _repository.SaveAsync(user, cancellationToken);
           }
         }
 
         user.AddExternalProvider(_userContext.ActorId, ExternalProviders.Google, googlePayload.Subject, ExternalProviders.Google);
         _userValidator.ValidateAndThrow(user, realm.UsernameSettings);
 
-        await _userRepository.SaveAsync(user, cancellationToken);
+        await _repository.SaveAsync(user, cancellationToken);
       }
 
       return await _signInService.SignInAsync(user, realm, remember: true,

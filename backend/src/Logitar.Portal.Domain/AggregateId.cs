@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Domain
 {
-  public readonly struct AggregateId
+  public struct AggregateId
   {
     public AggregateId(Guid value) : this(Convert.ToBase64String(value.ToByteArray()).ToUriSafeHash())
     {
@@ -17,7 +17,7 @@ namespace Logitar.Portal.Domain
       Value = value;
     }
 
-    public string Value { get; }
+    public string Value { get; set; }
 
     public static AggregateId NewId() => new(Guid.NewGuid());
 

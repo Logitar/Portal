@@ -1,0 +1,24 @@
+﻿@using Logitar.Portal.Application.Senders;
+@using Logitar.Portal.Contracts.Senders;
+@using Logitar.Portal.Contracts.Templates;
+
+@inject ISenderService _senderService;
+
+@model TemplateModel
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model?.DisplayName ?? Model?.Key ?? "Create template";
+
+  SenderModel? sender = await _senderService.GetDefaultAsync(Model?.Realm?.Id.ToString());
+  string? senderJson = sender == null ? null : ModelSerializer.Serialize(sender);
+}
+
+@if (Model == null)
+{
+  <template-edit realm="@(Context.Request.Query["realm"])"></template-edit>
+}
+else
+{
+  <template-edit json="@(ModelSerializer.Serialize(Model))" sender="@(senderJson)" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></template-edit>
+}

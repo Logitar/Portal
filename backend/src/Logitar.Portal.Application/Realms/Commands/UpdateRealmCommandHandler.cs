@@ -12,24 +12,24 @@ namespace Logitar.Portal.Application.Realms.Commands
   internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, RealmModel>
   {
     private readonly IRealmQuerier _realmQuerier;
-    private readonly IRealmRepository _realmRepository;
+    private readonly IRepository _repository;
     private readonly IUserContext _userContext;
     private readonly IValidator<Realm> _realmValidator;
 
     public UpdateRealmCommandHandler(IRealmQuerier realmQuerier,
-      IRealmRepository realmRepository,
+      IRepository repository,
       IUserContext userContext,
       IValidator<Realm> realmValidator)
     {
       _realmQuerier = realmQuerier;
-      _realmRepository = realmRepository;
+      _repository = repository;
       _userContext = userContext;
       _realmValidator = realmValidator;
     }
 
     public async Task<RealmModel> Handle(UpdateRealmCommand request, CancellationToken cancellationToken)
     {
-      Realm realm = await _realmRepository.LoadAsync<Realm>(request.Id, cancellationToken)
+      Realm realm = await _repository.LoadAsync<Realm>(request.Id, cancellationToken)
         ?? throw new EntityNotFoundException<Realm>(request.Id);
 
       UpdateRealmPayload payload = request.Payload;
@@ -43,7 +43,7 @@ namespace Logitar.Portal.Application.Realms.Commands
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);
 
-      await _realmRepository.SaveAsync(realm, cancellationToken);
+      await _repository.SaveAsync(realm, cancellationToken);
 
       return await _realmQuerier.GetAsync(realm.Id, cancellationToken)
         ?? throw new InvalidOperationException($"The realm 'Id={realm.Id}' could not be found.");
