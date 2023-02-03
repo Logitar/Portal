@@ -4,18 +4,18 @@ using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Infrastructure.JsonConverters
 {
-  public class CultureInfoConverter : JsonConverter<CultureInfo?>
+  public class CultureInfoConverter : JsonConverter<CultureInfo>
   {
-    public override CultureInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override CultureInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
       string? name = reader.GetString();
 
-      return name == null ? null : CultureInfo.GetCultureInfo(name);
+      return CultureInfo.GetCultureInfo(name ?? string.Empty);
     }
 
-    public override void Write(Utf8JsonWriter writer, CultureInfo? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, CultureInfo culture, JsonSerializerOptions options)
     {
-      writer.WriteStringValue(value?.Name);
+      writer.WriteStringValue(culture.Name);
     }
   }
 }

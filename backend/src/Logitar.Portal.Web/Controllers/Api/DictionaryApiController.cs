@@ -23,7 +23,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     public async Task<ActionResult<DictionaryModel>> CreateAsync([FromBody] CreateDictionaryPayload payload, CancellationToken cancellationToken)
     {
       DictionaryModel dictionary = await _dictionaryService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/dictionaries/{dictionary.Id}", UriKind.Relative);
+      Uri uri = new($"/api/dictionaries/{dictionary.Id}", UriKind.Relative);
 
       return Created(uri, dictionary);
     }

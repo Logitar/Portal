@@ -11,6 +11,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     static EventEntity()
     {
+      _serializerOptions.Converters.Add(new AggregateIdConverter());
       _serializerOptions.Converters.Add(new CultureInfoConverter());
       _serializerOptions.Converters.Add(new JsonStringEnumConverter());
     }

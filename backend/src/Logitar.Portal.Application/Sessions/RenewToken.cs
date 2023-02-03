@@ -5,7 +5,7 @@ namespace Logitar.Portal.Application.Sessions
 {
   internal readonly struct RenewToken
   {
-    private const char Separator = ':';
+    private const char Separator = '.';
 
     public RenewToken(string id, byte[] key)
     {
