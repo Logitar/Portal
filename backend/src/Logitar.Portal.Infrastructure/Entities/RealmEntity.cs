@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Domain.Realms.Events;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Logitar.Portal.Infrastructure.Entities
@@ -11,7 +12,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       DisplayName = @event.DisplayName;
       Description = @event.Description;
 
-      DefaultLocale = @event.DefaultLocaleName;
+      DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
@@ -38,7 +39,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? DisplayName { get; private set; }
     public string? Description { get; private set; }
 
-    public string? DefaultLocale { get; private set; }
+    public CultureInfo? DefaultLocale { get; private set; }
     public string JwtSecret { get; private set; } = string.Empty;
     public string? Url { get; private set; }
 
@@ -69,7 +70,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       DisplayName = @event.DisplayName;
       Description = @event.Description;
 
-      DefaultLocale = @event.DefaultLocaleName;
+      DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 

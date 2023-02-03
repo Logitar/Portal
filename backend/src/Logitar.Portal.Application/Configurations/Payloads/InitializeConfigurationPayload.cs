@@ -1,10 +1,11 @@
 ﻿using Logitar.Portal.Contracts.Users;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Configurations.Payloads
 {
   public record InitializeConfigurationPayload
   {
-    public string DefaultLocale { get; init; } = string.Empty;
+    public CultureInfo DefaultLocale { get; init; } = CultureInfo.InvariantCulture;
     public string JwtSecret { get; init; } = string.Empty;
 
     public UsernameSettingsPayload UsernameSettings { get; init; } = new();

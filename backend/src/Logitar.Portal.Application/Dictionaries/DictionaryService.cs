@@ -2,6 +2,7 @@
 using Logitar.Portal.Application.Dictionaries.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Dictionaries
 {
@@ -29,7 +30,7 @@ namespace Logitar.Portal.Application.Dictionaries
       return await _requestPipeline.ExecuteAsync(new GetDictionaryQuery(id), cancellationToken);
     }
 
-    public async Task<ListModel<DictionaryModel>> GetAsync(string? locale, string? realm,
+    public async Task<ListModel<DictionaryModel>> GetAsync(CultureInfo? locale, string? realm,
       DictionarySort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetDictionariesQuery(locale, realm,

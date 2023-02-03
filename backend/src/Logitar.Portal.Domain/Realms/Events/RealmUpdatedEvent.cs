@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Domain.Users;
 using MediatR;
+using System.Globalization;
 
 namespace Logitar.Portal.Domain.Realms.Events
 {
@@ -8,7 +9,7 @@ namespace Logitar.Portal.Domain.Realms.Events
     public string? DisplayName { get; init; }
     public string? Description { get; init; }
 
-    public string? DefaultLocaleName { get; init; }
+    public CultureInfo? DefaultLocale { get; init; }
     public string JwtSecret { get; init; } = string.Empty;
     public string? Url { get; init; }
 

@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Users
+﻿using System.Globalization;
+
+namespace Logitar.Portal.Contracts.Users
 {
   public record CreateUserPayload
   {
@@ -14,7 +16,7 @@
     public string? LastName { get; set; }
     public string? MiddleName { get; set; }
 
-    public string? Locale { get; set; }
+    public CultureInfo? Locale { get; set; }
     public string? Picture { get; set; }
 
     public bool IsEmailConfirmed { get; set; }

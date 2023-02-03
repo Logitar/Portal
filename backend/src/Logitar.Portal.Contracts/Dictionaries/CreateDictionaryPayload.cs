@@ -1,9 +1,11 @@
-﻿namespace Logitar.Portal.Contracts.Dictionaries
+﻿using System.Globalization;
+
+namespace Logitar.Portal.Contracts.Dictionaries
 {
   public record CreateDictionaryPayload
   {
     public string? Realm { get; set; }
-    public string Locale { get; set; } = string.Empty;
+    public CultureInfo Locale { get; set; } = CultureInfo.InvariantCulture;
 
     public IEnumerable<EntryPayload>? Entries { get; set; }
   }

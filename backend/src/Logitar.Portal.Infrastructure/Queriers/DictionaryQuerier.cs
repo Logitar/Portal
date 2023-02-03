@@ -4,6 +4,7 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
@@ -29,7 +30,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       return await _mapper.MapAsync<DictionaryModel>(dictionary, cancellationToken);
     }
 
-    public async Task<ListModel<DictionaryModel>> GetPagedAsync(string? locale, string? realm,
+    public async Task<ListModel<DictionaryModel>> GetPagedAsync(CultureInfo? locale, string? realm,
       DictionarySort? sort, bool isDescending,
       int? index, int? count,
       CancellationToken cancellationToken)

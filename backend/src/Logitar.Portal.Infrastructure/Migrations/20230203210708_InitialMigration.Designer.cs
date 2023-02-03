@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.Infrastructure.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230203195502_InitialMigration")]
+    [Migration("20230203210708_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

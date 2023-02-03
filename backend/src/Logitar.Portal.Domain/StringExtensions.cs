@@ -1,12 +1,8 @@
-﻿using System.Globalization;
-
-namespace Logitar.Portal.Domain
+﻿namespace Logitar.Portal.Domain
 {
   public static class StringExtensions
   {
     public static string? CleanTrim(this string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
-
-    public static CultureInfo? GetCultureInfo(this string? s) => s == null ? null : CultureInfo.GetCultureInfo(s);
 
     public static string Remove(this string s, string pattern) => s.Replace(pattern, string.Empty);
 

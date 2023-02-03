@@ -15,7 +15,7 @@ namespace Logitar.Portal.Domain.Realms
         Alias = alias.Trim(),
         DisplayName = displayName?.CleanTrim(),
         Description = description?.CleanTrim(),
-        DefaultLocaleName = defaultLocale?.Name,
+        DefaultLocale = defaultLocale,
         JwtSecret = jwtSecret.Trim(),
         Url = url?.CleanTrim(),
         RequireConfirmedAccount = requireConfirmedAccount,
@@ -54,7 +54,7 @@ namespace Logitar.Portal.Domain.Realms
       {
         DisplayName = displayName?.CleanTrim(),
         Description = description?.CleanTrim(),
-        DefaultLocaleName = defaultLocale?.Name,
+        DefaultLocale = defaultLocale,
         JwtSecret = jwtSecret.Trim(),
         Url = url?.CleanTrim(),
         RequireConfirmedAccount = requireConfirmedAccount,
@@ -71,7 +71,7 @@ namespace Logitar.Portal.Domain.Realms
       DisplayName = @event.DisplayName;
       Description = @event.Description;
 
-      DefaultLocale = @event.DefaultLocaleName?.GetCultureInfo();
+      DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
@@ -92,7 +92,7 @@ namespace Logitar.Portal.Domain.Realms
       DisplayName = @event.DisplayName;
       Description = @event.Description;
 
-      DefaultLocale = @event.DefaultLocaleName?.GetCultureInfo();
+      DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 

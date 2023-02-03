@@ -11,7 +11,7 @@ namespace Logitar.Portal.Domain.Dictionaries
       ApplyChange(new DictionaryCreatedEvent
       {
         RealmId = realm?.Id,
-        LocaleName = locale.Name,
+        Locale = locale,
         Entries = entries
       }, userId);
     }
@@ -35,7 +35,7 @@ namespace Logitar.Portal.Domain.Dictionaries
     {
       RealmId = @event.RealmId;
 
-      Locale = CultureInfo.GetCultureInfo(@event.LocaleName);
+      Locale = @event.Locale;
 
       Entries = @event.Entries ?? new();
     }

@@ -63,7 +63,7 @@ namespace Logitar.Portal.Application.Claims
 
       if (user.Locale != null)
       {
-        identity.AddClaim(new(Rfc7519ClaimTypes.Locale, user.Locale));
+        identity.AddClaim(new(Rfc7519ClaimTypes.Locale, user.Locale.Name));
       }
 
       if (user.Picture != null)

@@ -3,7 +3,6 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
-using System.Globalization;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands
 {
@@ -41,9 +40,8 @@ namespace Logitar.Portal.Application.Dictionaries.Commands
         throw new DictionaryAlreadyExistingException(realm, payload.Locale);
       }
 
-      CultureInfo locale = CultureInfo.GetCultureInfo(payload.Locale);
       Dictionary<string, string>? entries = payload.Entries?.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Last().Value);
-      Dictionary dictionary = new(_userContext.ActorId, locale, realm, entries);
+      Dictionary dictionary = new(_userContext.ActorId, payload.Locale, realm, entries);
       _dictionaryValidator.ValidateAndThrow(dictionary);
 
       await _repository.SaveAsync(dictionary, cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Domain.Users.Events;
+using System.Globalization;
 
 namespace Logitar.Portal.Infrastructure.Entities
 {
@@ -22,7 +23,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName;
+      Locale = @event.Locale;
       Picture = @event.Picture;
 
       Realm = realm;
@@ -88,7 +89,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? LastName { get; private set; }
     public string? FullName { get; private set; }
 
-    public string? Locale { get; private set; }
+    public CultureInfo? Locale { get; private set; }
     public string? Picture { get; private set; }
 
     public DateTime? SignedInOn { get; private set; }
@@ -152,7 +153,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName;
+      Locale = @event.Locale;
       Picture = @event.Picture;
     }
   }

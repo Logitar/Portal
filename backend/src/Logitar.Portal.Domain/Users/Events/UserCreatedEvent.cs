@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.Globalization;
 
 namespace Logitar.Portal.Domain.Users.Events
 {
@@ -19,7 +20,7 @@ namespace Logitar.Portal.Domain.Users.Events
     public string? LastName { get; init; }
     public string? FullName { get; init; }
 
-    public string? LocaleName { get; init; }
+    public CultureInfo? Locale { get; init; }
     public string? Picture { get; init; }
   }
 }

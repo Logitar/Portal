@@ -3,6 +3,7 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -36,7 +37,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<DictionaryModel>>> GetAsync(string? locale, string? realm,
+    public async Task<ActionResult<ListModel<DictionaryModel>>> GetAsync(CultureInfo? locale, string? realm,
       DictionarySort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)

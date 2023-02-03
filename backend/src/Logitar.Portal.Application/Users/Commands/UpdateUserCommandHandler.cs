@@ -1,10 +1,8 @@
 ﻿using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
-using System.Globalization;
 
 namespace Logitar.Portal.Application.Users.Commands
 {
@@ -60,11 +58,10 @@ namespace Logitar.Portal.Application.Users.Commands
         passwordHash = _passwordService.Hash(payload.Password);
       }
 
-      CultureInfo? locale = payload.Locale?.GetCultureInfo();
       user.Update(_userContext.ActorId, passwordHash,
         payload.Email, payload.PhoneNumber,
         payload.FirstName, payload.MiddleName, payload.LastName,
-        locale, payload.Picture);
+        payload.Locale, payload.Picture);
       _userValidator.ValidateAndThrow(user, realm?.UsernameSettings ?? configuration?.UsernameSettings ?? new());
 
       await _repository.SaveAsync(user, cancellationToken);

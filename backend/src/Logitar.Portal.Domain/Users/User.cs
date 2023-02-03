@@ -32,7 +32,7 @@ namespace Logitar.Portal.Domain.Users
         MiddleName = middleName?.CleanTrim(),
         LastName = lastName?.CleanTrim(),
         FullName = GetFullName(firstName, middleName, lastName),
-        LocaleName = locale?.Name,
+        Locale = locale,
         Picture = picture?.CleanTrim()
       }, userId);
     }
@@ -46,7 +46,7 @@ namespace Logitar.Portal.Domain.Users
         FirstName = firstName.Trim(),
         LastName = lastName.Trim(),
         FullName = GetFullName(firstName, lastName),
-        LocaleName = locale.Name
+        Locale = locale
       }, Id);
     }
     private User() : base()
@@ -141,7 +141,7 @@ namespace Logitar.Portal.Domain.Users
         MiddleName = middleName?.CleanTrim(),
         LastName = lastName?.CleanTrim(),
         FullName = GetFullName(firstName, middleName, lastName),
-        LocaleName = locale?.Name,
+        Locale = locale,
         Picture = picture?.CleanTrim()
       }, userId);
     }
@@ -171,7 +171,7 @@ namespace Logitar.Portal.Domain.Users
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName?.GetCultureInfo();
+      Locale = @event.Locale;
       Picture = @event.Picture;
     }
     protected virtual void Apply(UserDeletedEvent @event)
@@ -209,7 +209,7 @@ namespace Logitar.Portal.Domain.Users
       LastName = @event.LastName;
       FullName = @event.FullName;
 
-      Locale = @event.LocaleName?.GetCultureInfo();
+      Locale = @event.Locale;
       Picture = @event.Picture;
     }
 

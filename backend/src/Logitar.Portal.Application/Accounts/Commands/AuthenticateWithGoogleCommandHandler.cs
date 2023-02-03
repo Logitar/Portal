@@ -3,7 +3,6 @@ using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Accounts;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -61,8 +60,9 @@ namespace Logitar.Portal.Application.Accounts.Commands
 
           if (user == null)
           {
-            string? localeName = payload.IgnoreProviderLocale ? payload.Locale : (googlePayload.Locale ?? payload.Locale);
-            CultureInfo? locale = localeName?.GetCultureInfo();
+            CultureInfo? locale = payload.IgnoreProviderLocale
+              ? payload.Locale
+              : (googlePayload.Locale != null ? CultureInfo.GetCultureInfo(googlePayload.Locale) : payload.Locale);
             user = new(_userContext.ActorId, googlePayload.Email, realm, googlePayload.Email, googlePayload.EmailVerified,
               googlePayload.GivenName, googlePayload.FamilyName, locale, googlePayload.Picture);
             _userValidator.ValidateAndThrow(user, realm.UsernameSettings);

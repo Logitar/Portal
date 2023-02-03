@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Infrastructure.JsonConverters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
 using Logitar.Portal.Web.Extensions;
@@ -17,7 +18,11 @@ namespace Logitar.Portal.Web
       base.ConfigureServices(services);
 
       services.AddControllersWithViews(options => options.Filters.Add(new ExceptionFilterAttribute()))
-        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        .AddJsonOptions(options =>
+        {
+          options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
       services.AddAuthentication()
         .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { })

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Logitar.Portal.Infrastructure.JsonConverters;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web.Models
@@ -9,6 +10,7 @@ namespace Logitar.Portal.Web.Models
 
     static ModelSerializer()
     {
+      _options.Converters.Add(new CultureInfoConverter());
       _options.Converters.Add(new JsonStringEnumConverter());
       _options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     }

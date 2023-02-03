@@ -1,5 +1,7 @@
 ﻿using Logitar.Portal.Infrastructure.Entities;
+using Logitar.Portal.Infrastructure.ValueConverters;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Logitar.Portal.Infrastructure
 {
@@ -23,9 +25,14 @@ namespace Logitar.Portal.Infrastructure
     internal DbSet<TemplateEntity> Templates { get; private set; } = null!;
     internal DbSet<UserEntity> Users { get; private set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-      modelBuilder.ApplyConfigurationsFromAssembly(typeof(PortalContext).Assembly);
+      builder.ApplyConfigurationsFromAssembly(typeof(PortalContext).Assembly);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+    {
+      builder.Properties<CultureInfo>().HaveConversion<CultureInfoValueConverter>();
     }
   }
 }

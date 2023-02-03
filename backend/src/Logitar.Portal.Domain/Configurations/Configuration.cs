@@ -12,7 +12,7 @@ namespace Logitar.Portal.Domain.Configurations
     {
       ApplyChange(new ConfigurationInitializedEvent
       {
-        DefaultLocaleName = defaultLocale.Name,
+        DefaultLocale = defaultLocale,
         JwtSecret = jwtSecret,
         UsernameSettings = usernameSettings,
         PasswordSettings = passwordSettings
@@ -32,7 +32,7 @@ namespace Logitar.Portal.Domain.Configurations
 
     protected virtual void Apply(ConfigurationInitializedEvent @event)
     {
-      DefaultLocale = CultureInfo.GetCultureInfo(@event.DefaultLocaleName);
+      DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
 
       UsernameSettings = @event.UsernameSettings;

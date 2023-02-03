@@ -1,11 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
-using System.Globalization;
 
 namespace Logitar.Portal.Application.Realms.Commands
 {
@@ -37,9 +35,8 @@ namespace Logitar.Portal.Application.Realms.Commands
       UsernameSettings usernameSettings = payload.UsernameSettings.GetUsernameSettings();
       PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
-      CultureInfo? defaultLocale = payload.DefaultLocale?.GetCultureInfo();
       realm.Update(_userContext.ActorId, payload.JwtSecret, usernameSettings, passwordSettings,
-        payload.DisplayName, payload.Description, defaultLocale, payload.Url,
+        payload.DisplayName, payload.Description, payload.DefaultLocale, payload.Url,
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);
 

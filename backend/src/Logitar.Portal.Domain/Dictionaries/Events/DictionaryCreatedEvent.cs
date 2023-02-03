@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.Globalization;
 
 namespace Logitar.Portal.Domain.Dictionaries.Events
 {
@@ -6,7 +7,7 @@ namespace Logitar.Portal.Domain.Dictionaries.Events
   {
     public AggregateId? RealmId { get; init; }
 
-    public string LocaleName { get; init; } = string.Empty;
+    public CultureInfo Locale { get; init; } = CultureInfo.InvariantCulture;
 
     public Dictionary<string, string>? Entries { get; init; }
   }

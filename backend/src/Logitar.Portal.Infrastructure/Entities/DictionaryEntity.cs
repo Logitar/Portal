@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Domain.Dictionaries.Events;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Logitar.Portal.Infrastructure.Entities
@@ -10,7 +11,7 @@ namespace Logitar.Portal.Infrastructure.Entities
       Realm = realm;
       RealmId = realm?.RealmId;
 
-      Locale = @event.LocaleName;
+      Locale = @event.Locale;
 
       Entries = @event.Entries?.Any() == true ? JsonSerializer.Serialize(@event.Entries) : null;
     }
@@ -23,7 +24,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     public RealmEntity? Realm { get; private set; }
     public int? RealmId { get; private set; }
 
-    public string Locale { get; private set; } = string.Empty;
+    public CultureInfo Locale { get; private set; } = CultureInfo.InvariantCulture;
 
     public string? Entries { get; private set; }
 
