@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Templates;
@@ -23,19 +24,29 @@ namespace Logitar.Portal.Application.Realms.Commands
       Realm realm = await _repository.LoadAsync<Realm>(request.Id, cancellationToken)
        ?? throw new EntityNotFoundException<Realm>(request.Id);
 
-      await DeleteSessionsAsync(realm, cancellationToken);
-      await DeleteUsersAsync(realm, cancellationToken);
-
+      await DeleteDictionariesAsync(realm, cancellationToken);
       await DeleteSendersAsync(realm, cancellationToken);
       await DeleteTemplatesAsync(realm, cancellationToken);
 
-      //await DeleteDictionariesAsync(realm, cancellationToken); // TODO(fpion): implement when Dictionaries are completed
+      await DeleteSessionsAsync(realm, cancellationToken);
+      await DeleteUsersAsync(realm, cancellationToken);
 
       realm.Delete(_userContext.ActorId);
 
       await _repository.SaveAsync(realm, cancellationToken);
 
       return Unit.Value;
+    }
+
+    private async Task DeleteDictionariesAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      IEnumerable<Dictionary> dictionaries = await _repository.LoadDictionariesByRealmAsync(realm, cancellationToken);
+      foreach (Dictionary dictionary in dictionaries)
+      {
+        dictionary.Delete(_userContext.ActorId);
+      }
+
+      await _repository.SaveAsync(dictionaries, cancellationToken);
     }
 
     private async Task DeleteSendersAsync(Realm realm, CancellationToken cancellationToken)

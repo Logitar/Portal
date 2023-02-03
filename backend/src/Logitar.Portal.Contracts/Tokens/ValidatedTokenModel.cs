@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Logitar.Portal.Contracts.Tokens
+﻿namespace Logitar.Portal.Contracts.Tokens
 {
   public record ValidatedTokenModel
   {

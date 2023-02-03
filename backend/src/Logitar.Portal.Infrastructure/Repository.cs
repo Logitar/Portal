@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
@@ -69,6 +70,15 @@ namespace Logitar.Portal.Infrastructure
     public async Task<Configuration?> LoadConfigurationAsync(CancellationToken cancellationToken)
     {
       return await LoadAsync<Configuration>(Configuration.AggregateId, cancellationToken);
+    }
+    public async Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm realm, CancellationToken cancellationToken)
+    {
+      DictionaryEntity[] dictionaries = await _context.Dictionaries.AsNoTracking()
+        .Include(x => x.Realm)
+        .Where(x => x.Realm!.AggregateId == realm.Id.Value)
+        .ToArrayAsync(cancellationToken);
+
+      return dictionaries.Any() ? await LoadAsync<Dictionary>(dictionaries.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<Dictionary>();
     }
 
     public async Task<Realm?> LoadRealmByAliasOrIdAsync(string aliasOrId, CancellationToken cancellationToken)

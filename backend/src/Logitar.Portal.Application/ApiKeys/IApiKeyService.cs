@@ -9,9 +9,7 @@ namespace Logitar.Portal.Application.ApiKeys
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     Task<ApiKeyModel?> GetAsync(string id, CancellationToken cancellationToken = default);
     Task<ListModel<ApiKeyModel>> GetAsync(DateTime? expiredOn = null, string? search = null,
-      ApiKeySort? sort = null, bool isDescending = false,
-      int? index = null, int? count = null,
-      CancellationToken cancellationToken = default);
+      ApiKeySort? sort = null, bool isDescending = false, int? index = null, int? count = null, CancellationToken cancellationToken = default);
     Task<ApiKeyModel> UpdateAsync(string id, UpdateApiKeyPayload payload, CancellationToken cancellationToken = default);
   }
 }

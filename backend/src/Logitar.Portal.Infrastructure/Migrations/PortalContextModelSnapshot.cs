@@ -183,6 +183,63 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("JwtBlacklist");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.DictionaryEntity", b =>
+                {
+                    b.Property<int>("DictionaryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DictionaryId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Entries")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<int?>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("DictionaryId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("RealmId", "Locale")
+                        .IsUnique();
+
+                    b.ToTable("Dictionaries");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.EventEntity", b =>
                 {
                     b.Property<long>("EventId")
@@ -358,6 +415,12 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<int?>("PasswordRecoverySenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PasswordRecoveryTemplateId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PasswordSettings")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -399,6 +462,12 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
+
+                    b.HasIndex("PasswordRecoverySenderId")
+                        .IsUnique();
+
+                    b.HasIndex("PasswordRecoveryTemplateId")
+                        .IsUnique();
 
                     b.HasIndex("UpdatedOn");
 
@@ -517,9 +586,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<string>("KeyHash")
                         .HasColumnType("text");
 
-                    b.Property<int?>("RealmEntityRealmId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("SignedOutBy")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -552,8 +618,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("IsActive");
 
                     b.HasIndex("IsPersistent");
-
-                    b.HasIndex("RealmEntityRealmId");
 
                     b.HasIndex("SignedOutOn");
 
@@ -812,6 +876,16 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.DictionaryEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
+                        .WithMany("Dictionaries")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Realm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ExternalProviderEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
@@ -831,25 +905,39 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.SenderEntity", "PasswordRecoverySender")
+                        .WithOne("UsedAsPasswordRecoverySenderInRealm")
+                        .HasForeignKey("Logitar.Portal.Infrastructure.Entities.RealmEntity", "PasswordRecoverySenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.TemplateEntity", "PasswordRecoveryTemplate")
+                        .WithOne("UsedAsPasswordRecoveryTemplateInRealm")
+                        .HasForeignKey("Logitar.Portal.Infrastructure.Entities.RealmEntity", "PasswordRecoveryTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PasswordRecoverySender");
+
+                    b.Navigation("PasswordRecoveryTemplate");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
                         .WithMany("Senders")
-                        .HasForeignKey("RealmId");
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SessionEntity", b =>
                 {
-                    b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", null)
-                        .WithMany("Sessions")
-                        .HasForeignKey("RealmEntityRealmId");
-
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.UserEntity", "User")
-                        .WithMany()
+                        .WithMany("Sessions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -859,7 +947,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
                         .WithMany("Templates")
-                        .HasForeignKey("RealmId");
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -868,27 +957,40 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
                         .WithMany("Users")
-                        .HasForeignKey("RealmId");
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>
                 {
+                    b.Navigation("Dictionaries");
+
                     b.Navigation("ExternalProviders");
 
                     b.Navigation("Senders");
-
-                    b.Navigation("Sessions");
 
                     b.Navigation("Templates");
 
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
+                {
+                    b.Navigation("UsedAsPasswordRecoverySenderInRealm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.TemplateEntity", b =>
+                {
+                    b.Navigation("UsedAsPasswordRecoveryTemplateInRealm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.UserEntity", b =>
                 {
                     b.Navigation("ExternalProviders");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

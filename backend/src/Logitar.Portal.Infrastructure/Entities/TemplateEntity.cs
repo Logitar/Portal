@@ -39,6 +39,8 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string ContentType { get; private set; } = string.Empty;
     public string Contents { get; private set; } = string.Empty;
 
+    public RealmEntity? UsedAsPasswordRecoveryTemplateInRealm { get; private set; }
+
     public void Update(TemplateUpdatedEvent @event)
     {
       base.Update(@event);

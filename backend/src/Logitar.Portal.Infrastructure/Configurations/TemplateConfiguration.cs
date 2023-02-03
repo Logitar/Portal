@@ -12,6 +12,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.TemplateId);
 
+      builder.HasOne(x => x.Realm).WithMany(x => x.Templates).OnDelete(DeleteBehavior.Restrict);
+
       builder.HasIndex(x => x.Key);
       builder.HasIndex(x => x.DisplayName);
       builder.HasIndex(x => new { x.RealmId, x.KeyNormalized }).IsUnique();

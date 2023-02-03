@@ -1,6 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Realms;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Logitar.Portal.Contracts.Senders
 {

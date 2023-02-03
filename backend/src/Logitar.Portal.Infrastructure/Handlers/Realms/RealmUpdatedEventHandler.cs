@@ -30,7 +30,7 @@ namespace Logitar.Portal.Infrastructure.Handlers.Realms
         }
         else
         {
-          realm.Update(notification);
+          realm.Update(notification, passwordRecoverySender: null, passwordRecoveryTemplate: null); // TODO(fpion): implement
 
           await _context.SaveChangesAsync(cancellationToken);
         }

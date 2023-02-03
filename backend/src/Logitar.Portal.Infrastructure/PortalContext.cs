@@ -12,6 +12,7 @@ namespace Logitar.Portal.Infrastructure
     internal DbSet<ActorEntity> Actors { get; private set; } = null!;
     internal DbSet<ActorTypeEntity> ActorTypes { get; private set; } = null!;
     internal DbSet<ApiKeyEntity> ApiKeys { get; private set; } = null!;
+    internal DbSet<DictionaryEntity> Dictionaries { get; private set; } = null!;
     internal DbSet<EventEntity> Events { get; private set; } = null!;
     internal DbSet<ExternalProviderEntity> ExternalProviders { get; private set; } = null!;
     internal DbSet<BlacklistedJwtEntity> JwtBlacklist { get; private set; } = null!;

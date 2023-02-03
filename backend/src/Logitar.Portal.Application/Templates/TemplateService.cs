@@ -30,13 +30,10 @@ namespace Logitar.Portal.Application.Templates
     }
 
     public async Task<ListModel<TemplateModel>> GetAsync(string? realm, string? search,
-      TemplateSort? sort, bool isDescending,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+      TemplateSort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetTemplatesQuery(realm, search,
-        sort, isDescending,
-        index, count), cancellationToken);
+        sort, isDescending, index, count), cancellationToken);
     }
 
     public async Task<TemplateModel> UpdateAsync(string id, UpdateTemplatePayload payload, CancellationToken cancellationToken)

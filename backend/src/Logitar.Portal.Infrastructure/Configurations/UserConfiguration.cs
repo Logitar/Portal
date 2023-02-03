@@ -12,6 +12,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.UserId);
 
+      builder.HasOne(x => x.Realm).WithMany(x => x.Users).OnDelete(DeleteBehavior.Restrict);
+
       builder.HasIndex(x => x.Username);
       builder.HasIndex(x => x.PasswordChangedOn);
       builder.HasIndex(x => x.Email);

@@ -102,6 +102,7 @@ namespace Logitar.Portal.Infrastructure.Entities
     }
 
     public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
+    public List<SessionEntity> Sessions { get; private set; } = new();
 
     public void AddExternalProvider(UserAddedExternalProviderEvent @event)
     {

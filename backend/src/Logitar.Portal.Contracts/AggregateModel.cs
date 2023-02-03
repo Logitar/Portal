@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Actors;
-using System;
 
 namespace Logitar.Portal.Contracts
 {

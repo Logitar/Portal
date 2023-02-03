@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
@@ -17,6 +18,8 @@ namespace Logitar.Portal.Application
     Task<IEnumerable<T>> LoadAsync<T>(IEnumerable<string> ids, CancellationToken cancellationToken = default) where T : AggregateRoot;
 
     Task<Configuration?> LoadConfigurationAsync(CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
 
     Task<Realm?> LoadRealmByAliasOrIdAsync(string aliasOrId, CancellationToken cancellationToken = default);
 

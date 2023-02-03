@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Logitar.Portal.Contracts
+﻿namespace Logitar.Portal.Contracts
 {
   public record ListModel<T>
   {

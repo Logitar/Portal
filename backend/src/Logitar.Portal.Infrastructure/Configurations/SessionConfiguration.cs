@@ -12,6 +12,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.SessionId);
 
+      builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.Restrict);
+
       builder.HasIndex(x => x.IsPersistent);
       builder.HasIndex(x => x.SignedOutOn);
       builder.HasIndex(x => x.IsActive);

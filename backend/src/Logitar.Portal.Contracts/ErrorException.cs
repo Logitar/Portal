@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Logitar.Portal.Contracts
+﻿namespace Logitar.Portal.Contracts
 {
   public class ErrorException : Exception
   {

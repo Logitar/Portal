@@ -30,13 +30,10 @@ namespace Logitar.Portal.Application.Senders
     }
 
     public async Task<ListModel<SenderModel>> GetAsync(ProviderType? provider, string? realm, string? search,
-      SenderSort? sort, bool isDescending,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+      SenderSort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetSendersQuery(provider, realm, search,
-        sort, isDescending,
-        index, count), cancellationToken);
+        sort, isDescending, index, count), cancellationToken);
     }
 
     public async Task<SenderModel?> GetDefaultAsync(string? realm, CancellationToken cancellationToken)

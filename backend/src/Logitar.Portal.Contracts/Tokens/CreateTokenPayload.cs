@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Logitar.Portal.Contracts.Tokens
+﻿namespace Logitar.Portal.Contracts.Tokens
 {
   public record CreateTokenPayload
   {

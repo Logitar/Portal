@@ -36,6 +36,8 @@ namespace Logitar.Portal.Infrastructure.Entities
     public ProviderType Provider { get; private set; }
     public string? Settings { get; private set; }
 
+    public RealmEntity? UsedAsPasswordRecoverySenderInRealm { get; private set; }
+
     public void SetDefault(SenderSetDefaultEvent @event)
     {
       base.Update(@event);

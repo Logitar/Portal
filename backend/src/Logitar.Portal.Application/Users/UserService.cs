@@ -40,13 +40,10 @@ namespace Logitar.Portal.Application.Users
     }
 
     public async Task<ListModel<UserModel>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
-      UserSort? sort, bool isDescending,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+      UserSort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetUsersQuery(isConfirmed, isDisabled, realm, search,
-        sort, isDescending,
-        index, count), cancellationToken);
+        sort, isDescending, index, count), cancellationToken);
     }
 
     public async Task<UserModel> UpdateAsync(string id, UpdateUserPayload payload, CancellationToken cancellationToken)

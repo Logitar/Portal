@@ -20,13 +20,10 @@ namespace Logitar.Portal.Application.Sessions
     }
 
     public async Task<ListModel<SessionModel>> GetAsync(bool? isActive, bool? isPersistent, string? realm, string? userId,
-      SessionSort? sort, bool isDescending,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+      SessionSort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetSessionsQuery(isActive, isPersistent, realm, userId,
-        sort, isDescending,
-        index, count), cancellationToken);
+        sort, isDescending, index, count), cancellationToken);
     }
 
     public async Task<IEnumerable<SessionModel>> SignOutAllAsync(string userId, CancellationToken cancellationToken)

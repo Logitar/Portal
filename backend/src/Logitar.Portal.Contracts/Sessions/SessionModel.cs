@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Users;
-using System;
 
 namespace Logitar.Portal.Contracts.Sessions
 {

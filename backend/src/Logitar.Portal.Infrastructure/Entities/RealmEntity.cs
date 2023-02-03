@@ -50,16 +50,19 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public string? GoogleClientId { get; private set; }
 
-    //public string? PasswordRecoverySenderId { get; private set; } // TODO(fpion): implement when Senders are completed
-    //public string? PasswordRecoveryTemplateId { get; private set; } // TODO(fpion): implement when Templates are completed
+    public SenderEntity? PasswordRecoverySender { get; private set; }
+    public int? PasswordRecoverySenderId { get; private set; }
 
+    public TemplateEntity? PasswordRecoveryTemplate { get; private set; }
+    public int? PasswordRecoveryTemplateId { get; private set; }
+
+    public List<DictionaryEntity> Dictionaries { get; private set; } = new();
     public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
     public List<SenderEntity> Senders { get; private set; } = new();
-    public List<SessionEntity> Sessions { get; private set; } = new();
     public List<TemplateEntity> Templates { get; private set; } = new();
     public List<UserEntity> Users { get; private set; } = new();
 
-    public void Update(RealmUpdatedEvent @event)
+    public void Update(RealmUpdatedEvent @event, SenderEntity? passwordRecoverySender, TemplateEntity? passwordRecoveryTemplate)
     {
       base.Update(@event);
 
@@ -77,6 +80,12 @@ namespace Logitar.Portal.Infrastructure.Entities
       PasswordSettings = JsonSerializer.Serialize(@event.PasswordSettings);
 
       GoogleClientId = @event.GoogleClientId;
+
+      PasswordRecoverySender = passwordRecoverySender;
+      PasswordRecoverySenderId = passwordRecoverySender?.SenderId;
+
+      PasswordRecoveryTemplate = passwordRecoveryTemplate;
+      PasswordRecoveryTemplateId = passwordRecoveryTemplate?.TemplateId;
     }
   }
 }

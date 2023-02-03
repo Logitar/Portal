@@ -12,6 +12,9 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasKey(x => x.RealmId);
 
+      builder.HasOne(x => x.PasswordRecoverySender).WithOne(x => x.UsedAsPasswordRecoverySenderInRealm).OnDelete(DeleteBehavior.Restrict);
+      builder.HasOne(x => x.PasswordRecoveryTemplate).WithOne(x => x.UsedAsPasswordRecoveryTemplateInRealm).OnDelete(DeleteBehavior.Restrict);
+
       builder.HasIndex(x => x.Alias);
       builder.HasIndex(x => x.AliasNormalized).IsUnique();
       builder.HasIndex(x => x.DisplayName);

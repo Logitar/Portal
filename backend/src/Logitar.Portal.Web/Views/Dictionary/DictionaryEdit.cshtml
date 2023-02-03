@@ -1,0 +1,17 @@
+﻿@using Logitar.Portal.Contracts.Dictionaries;
+
+@model DictionaryModel
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model == null ? "Create dictionary" : "Edit dictionary";
+}
+
+@if (Model == null)
+{
+  <dictionary-edit locale="@(Context.Request.Query["locale"])" realm="@(Context.Request.Query["realm"])"></dictionary-edit>
+}
+else
+{
+  <dictionary-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></dictionary-edit>
+}

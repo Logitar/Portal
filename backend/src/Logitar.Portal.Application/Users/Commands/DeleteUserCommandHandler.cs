@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Domain;
-using Logitar.Portal.Domain.Sessions;
+﻿using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using MediatR;
 
@@ -21,15 +20,15 @@ namespace Logitar.Portal.Application.Users.Commands
       User user = await _repository.LoadAsync<User>(request.Id, cancellationToken)
         ?? throw new EntityNotFoundException<User>(request.Id);
 
-      user.Delete(_userContext.ActorId);
-
       IEnumerable<Session> sessions = await _repository.LoadSessionsByUserAsync(user, cancellationToken);
       foreach (Session session in sessions)
       {
         session.Delete(_userContext.ActorId);
       }
+      await _repository.SaveAsync(sessions, cancellationToken);
 
-      await _repository.SaveAsync(new AggregateRoot[] { user }.Concat(sessions), cancellationToken);
+      user.Delete(_userContext.ActorId);
+      await _repository.SaveAsync(user, cancellationToken);
 
       return Unit.Value;
     }

@@ -30,9 +30,7 @@ namespace Logitar.Portal.Application.ApiKeys
     }
 
     public async Task<ListModel<ApiKeyModel>> GetAsync(DateTime? expiredOn, string? search,
-      ApiKeySort? sort, bool isDescending,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+      ApiKeySort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetApiKeysQuery(expiredOn, search,
         sort, isDescending,

@@ -30,12 +30,10 @@ namespace Logitar.Portal.Application.Realms
     }
 
     public async Task<ListModel<RealmModel>> GetAsync(string? search,
-      RealmSort? sort, bool isDescending,
-      int? index, int? count, CancellationToken cancellationToken)
+      RealmSort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
       return await _requestPipeline.ExecuteAsync(new GetRealmsQuery(search,
-        sort, isDescending,
-        index, count), cancellationToken);
+        sort, isDescending, index, count), cancellationToken);
     }
 
     public async Task<RealmModel> UpdateAsync(string id, UpdateRealmPayload payload, CancellationToken cancellationToken)

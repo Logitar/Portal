@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Logitar.Portal.Contracts.Senders
+﻿namespace Logitar.Portal.Contracts.Senders
 {
   public record UpdateSenderPayload
   {

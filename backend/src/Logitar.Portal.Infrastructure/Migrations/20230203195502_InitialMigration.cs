@@ -100,6 +100,59 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SenderProviderTypes",
+                columns: table => new
+                {
+                    Value = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SenderProviderTypes", x => x.Value);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Dictionaries",
+                columns: table => new
+                {
+                    DictionaryId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RealmId = table.Column<int>(type: "integer", nullable: true),
+                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
+                    Entries = table.Column<string>(type: "jsonb", nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Dictionaries", x => x.DictionaryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExternalProviders",
+                columns: table => new
+                {
+                    ExternalProviderId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RealmId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Key = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Value = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    AddedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExternalProviders", x => x.ExternalProviderId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Realms",
                 columns: table => new
                 {
@@ -117,6 +170,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     UsernameSettings = table.Column<string>(type: "jsonb", nullable: false),
                     PasswordSettings = table.Column<string>(type: "jsonb", nullable: false),
                     GoogleClientId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    PasswordRecoverySenderId = table.Column<int>(type: "integer", nullable: true),
+                    PasswordRecoveryTemplateId = table.Column<int>(type: "integer", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
                     CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -127,18 +182,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Realms", x => x.RealmId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SenderProviderTypes",
-                columns: table => new
-                {
-                    Value = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SenderProviderTypes", x => x.Value);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,7 +210,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         name: "FK_Senders_Realms_RealmId",
                         column: x => x.RealmId,
                         principalTable: "Realms",
-                        principalColumn: "RealmId");
+                        principalColumn: "RealmId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,7 +242,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         name: "FK_Templates_Realms_RealmId",
                         column: x => x.RealmId,
                         principalTable: "Realms",
-                        principalColumn: "RealmId");
+                        principalColumn: "RealmId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -248,39 +293,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         name: "FK_Users_Realms_RealmId",
                         column: x => x.RealmId,
                         principalTable: "Realms",
-                        principalColumn: "RealmId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExternalProviders",
-                columns: table => new
-                {
-                    ExternalProviderId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RealmId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    Key = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Value = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    AddedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    AddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExternalProviders", x => x.ExternalProviderId);
-                    table.ForeignKey(
-                        name: "FK_ExternalProviders_Realms_RealmId",
-                        column: x => x.RealmId,
-                        principalTable: "Realms",
                         principalColumn: "RealmId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExternalProviders_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -297,7 +311,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     IpAddress = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     AdditionalInformation = table.Column<string>(type: "text", nullable: true),
-                    RealmEntityRealmId = table.Column<int>(type: "integer", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
                     CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -309,16 +322,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Sessions", x => x.SessionId);
                     table.ForeignKey(
-                        name: "FK_Sessions_Realms_RealmEntityRealmId",
-                        column: x => x.RealmEntityRealmId,
-                        principalTable: "Realms",
-                        principalColumn: "RealmId");
-                    table.ForeignKey(
                         name: "FK_Sessions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -372,6 +380,28 @@ namespace Logitar.Portal.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_UpdatedOn",
                 table: "ApiKeys",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_AggregateId",
+                table: "Dictionaries",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_CreatedOn",
+                table: "Dictionaries",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_RealmId_Locale",
+                table: "Dictionaries",
+                columns: new[] { "RealmId", "Locale" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_UpdatedOn",
+                table: "Dictionaries",
                 column: "UpdatedOn");
 
             migrationBuilder.CreateIndex(
@@ -438,6 +468,18 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Realms_DisplayName",
                 table: "Realms",
                 column: "DisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_PasswordRecoverySenderId",
+                table: "Realms",
+                column: "PasswordRecoverySenderId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_PasswordRecoveryTemplateId",
+                table: "Realms",
+                column: "PasswordRecoveryTemplateId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Realms_UpdatedOn",
@@ -517,11 +559,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Sessions_IsPersistent",
                 table: "Sessions",
                 column: "IsPersistent");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sessions_RealmEntityRealmId",
-                table: "Sessions",
-                column: "RealmEntityRealmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_SignedOutOn",
@@ -646,11 +683,59 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Users_Username",
                 table: "Users",
                 column: "Username");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Dictionaries_Realms_RealmId",
+                table: "Dictionaries",
+                column: "RealmId",
+                principalTable: "Realms",
+                principalColumn: "RealmId",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ExternalProviders_Realms_RealmId",
+                table: "ExternalProviders",
+                column: "RealmId",
+                principalTable: "Realms",
+                principalColumn: "RealmId",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ExternalProviders_Users_UserId",
+                table: "ExternalProviders",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "UserId",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Realms_Senders_PasswordRecoverySenderId",
+                table: "Realms",
+                column: "PasswordRecoverySenderId",
+                principalTable: "Senders",
+                principalColumn: "SenderId",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Realms_Templates_PasswordRecoveryTemplateId",
+                table: "Realms",
+                column: "PasswordRecoveryTemplateId",
+                principalTable: "Templates",
+                principalColumn: "TemplateId",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Senders_Realms_RealmId",
+                table: "Senders");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Templates_Realms_RealmId",
+                table: "Templates");
+
             migrationBuilder.DropTable(
                 name: "Actors");
 
@@ -659,6 +744,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ApiKeys");
+
+            migrationBuilder.DropTable(
+                name: "Dictionaries");
 
             migrationBuilder.DropTable(
                 name: "Events");
@@ -673,19 +761,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "SenderProviderTypes");
 
             migrationBuilder.DropTable(
-                name: "Senders");
-
-            migrationBuilder.DropTable(
                 name: "Sessions");
-
-            migrationBuilder.DropTable(
-                name: "Templates");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Realms");
+
+            migrationBuilder.DropTable(
+                name: "Senders");
+
+            migrationBuilder.DropTable(
+                name: "Templates");
         }
     }
 }

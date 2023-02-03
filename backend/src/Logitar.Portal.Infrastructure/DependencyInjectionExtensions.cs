@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Application.ApiKeys;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
@@ -45,6 +46,7 @@ namespace Logitar.Portal.Infrastructure
     {
       return services
         .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
+        .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
         .AddScoped<IRealmQuerier, RealmQuerier>()
         .AddScoped<ISenderQuerier, SenderQuerier>()
         .AddScoped<ISessionQuerier, SessionQuerier>()

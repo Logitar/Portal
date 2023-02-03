@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Logitar.Portal.Contracts.ApiKeys
+﻿namespace Logitar.Portal.Contracts.ApiKeys
 {
   public record CreateApiKeyPayload
   {
