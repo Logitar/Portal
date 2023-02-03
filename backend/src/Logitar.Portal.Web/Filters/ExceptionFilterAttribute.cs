@@ -22,6 +22,8 @@ namespace Logitar.Portal.Web.Filters
       [typeof(AccountIsDisabledException)] = SetBadRequestCodeResult,
       [typeof(AccountNotConfirmedException)] = SetBadRequestCodeResult,
       [typeof(CannotDeleteDefaultSenderException)] = SetBadRequestCodeResult,
+      [typeof(CannotDeletePasswordRecoverySenderException)] = SetBadRequestCodeResult,
+      [typeof(CannotDeletePasswordRecoveryTemplateException)] = SetBadRequestCodeResult,
       [typeof(GoogleClientIdRequiredException)] = SetBadRequestCodeResult,
       [typeof(InvalidCredentialsException)] = SetBadRequestCodeResult,
       [typeof(SessionAlreadySignedOutException)] = SetBadRequestCodeResult,

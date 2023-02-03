@@ -14,6 +14,7 @@
   "created": "The template has been created.",
   "defaultSenderRequired": "You need to configure a default sender to send a demo message.",
   "delete": {
+    "cannotDeletePasswordRecoveryTemplate": "The <strong>password recovery template</strong> cannot be deleted.",
     "confirm": "Do you really want to delete the following template?",
     "success": "The template has been deleted.",
     "title": "Delete template"

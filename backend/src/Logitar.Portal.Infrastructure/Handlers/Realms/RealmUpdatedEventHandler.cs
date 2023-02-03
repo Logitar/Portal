@@ -21,6 +21,32 @@ namespace Logitar.Portal.Infrastructure.Handlers.Realms
     {
       try
       {
+        SenderEntity? passwordRecoverySender = null;
+        if (notification.PasswordRecoverySenderId.HasValue)
+        {
+          passwordRecoverySender = await _context.Senders
+            .SingleOrDefaultAsync(x => x.AggregateId == notification.PasswordRecoverySenderId.Value.Value, cancellationToken);
+          if (passwordRecoverySender == null)
+          {
+            _logger.LogError("The sender 'AggregateId={aggregateId}' could not be found.", notification.PasswordRecoverySenderId);
+
+            return;
+          }
+        }
+
+        TemplateEntity? passwordRecoveryTemplate = null;
+        if (notification.PasswordRecoveryTemplateId.HasValue)
+        {
+          passwordRecoveryTemplate = await _context.Templates
+            .SingleOrDefaultAsync(x => x.AggregateId == notification.PasswordRecoveryTemplateId.Value.Value, cancellationToken);
+          if (passwordRecoveryTemplate == null)
+          {
+            _logger.LogError("The template 'AggregateId={aggregateId}' could not be found.", notification.PasswordRecoveryTemplateId);
+
+            return;
+          }
+        }
+
         RealmEntity? realm = await _context.Realms
           .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken);
 
@@ -30,7 +56,7 @@ namespace Logitar.Portal.Infrastructure.Handlers.Realms
         }
         else
         {
-          realm.Update(notification, passwordRecoverySender: null, passwordRecoveryTemplate: null); // TODO(fpion): implement
+          realm.Update(notification, passwordRecoverySender, passwordRecoveryTemplate);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

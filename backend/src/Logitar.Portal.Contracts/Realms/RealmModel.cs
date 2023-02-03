@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Contracts.Templates;
+using Logitar.Portal.Contracts.Users;
 using System.Globalization;
 
 namespace Logitar.Portal.Contracts.Realms
@@ -10,7 +12,6 @@ namespace Logitar.Portal.Contracts.Realms
     public string? Description { get; set; }
 
     public CultureInfo? DefaultLocale { get; set; }
-    public string JwtSecret { get; set; } = string.Empty;
     public string? Url { get; set; }
 
     public bool RequireConfirmedAccount { get; set; }
@@ -19,8 +20,10 @@ namespace Logitar.Portal.Contracts.Realms
     public UsernameSettingsModel UsernameSettings { get; set; } = new();
     public PasswordSettingsModel PasswordSettings { get; set; } = new();
 
-    public string? PasswordRecoverySenderId { get; set; }
-    public string? PasswordRecoveryTemplateId { get; set; }
+    public SenderModel? PasswordRecoverySender { get; set; }
+    public TemplateModel? PasswordRecoveryTemplate { get; set; }
+
+    public string JwtSecret { get; set; } = string.Empty;
 
     public string? GoogleClientId { get; set; }
   }

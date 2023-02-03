@@ -24,6 +24,8 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<RealmModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
       RealmEntity? realm = await _realms.AsNoTracking()
+        .Include(x => x.PasswordRecoverySender)
+        .Include(x => x.PasswordRecoveryTemplate)
         .SingleOrDefaultAsync(x => x.AliasNormalized == id.ToUpper() || x.AggregateId == id, cancellationToken);
 
       return await _mapper.MapAsync<RealmModel>(realm, cancellationToken);

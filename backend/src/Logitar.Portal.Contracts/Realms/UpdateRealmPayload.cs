@@ -9,7 +9,6 @@ namespace Logitar.Portal.Contracts.Realms
     public string? Description { get; set; }
 
     public CultureInfo? DefaultLocale { get; set; }
-    public string JwtSecret { get; set; } = string.Empty;
     public string? Url { get; set; }
 
     public bool RequireConfirmedAccount { get; set; }
@@ -17,6 +16,11 @@ namespace Logitar.Portal.Contracts.Realms
 
     public UsernameSettingsPayload UsernameSettings { get; set; } = new();
     public PasswordSettingsPayload PasswordSettings { get; set; } = new();
+
+    public string? PasswordRecoverySenderId { get; set; }
+    public string? PasswordRecoveryTemplateId { get; set; }
+
+    public string JwtSecret { get; set; } = string.Empty;
 
     public string? GoogleClientId { get; set; }
   }

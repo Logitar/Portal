@@ -54,14 +54,6 @@
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
-            <h5 v-t="'realms.googleAuth.title'" />
-            <form-field
-              id="googleClientId"
-              label="realms.googleAuth.id.label"
-              :maxLength="256"
-              placeholder="realms.googleAuth.id.placeholder"
-              v-model="googleClientId"
-            />
             <h5 v-t="'realms.jwt'" />
             <form-field
               id="jwtSecret"
@@ -78,6 +70,14 @@
                 <icon-button icon="eye" variant="info" @click="showJwtSecret = !showJwtSecret" />
               </b-input-group-append>
             </form-field>
+            <h5 v-t="'realms.googleAuth.title'" />
+            <form-field
+              id="googleClientId"
+              label="realms.googleAuth.id.label"
+              :maxLength="256"
+              placeholder="realms.googleAuth.id.placeholder"
+              v-model="googleClientId"
+            />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -155,8 +155,8 @@ export default {
         (this.displayName ?? '') !== (this.realm?.displayName ?? '') ||
         (this.googleClientId ?? '') !== (this.realm?.googleClientId ?? '') ||
         (this.jwtSecret ?? '') !== (this.realm?.jwtSecret ?? '') ||
-        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
-        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
+        this.passwordRecoverySenderId !== (this.realm?.passwordRecoverySender?.id ?? null) ||
+        this.passwordRecoveryTemplateId !== (this.realm?.passwordRecoveryTemplate?.id ?? null) ||
         this.passwordSettings.requireDigit !== (this.realm?.passwordSettings.requireDigit ?? false) ||
         this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings.requireLowercase ?? false) ||
         this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings.requireNonAlphanumeric ?? false) ||
@@ -203,8 +203,8 @@ export default {
       this.displayName = realm.displayName
       this.googleClientId = realm.googleClientId
       this.jwtSecret = realm.jwtSecret
-      this.passwordRecoverySenderId = realm.passwordRecoverySenderId
-      this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
+      this.passwordRecoverySenderId = realm.passwordRecoverySender?.id ?? null
+      this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplate?.id ?? null
       Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings.requireDigit)
       Vue.set(this.passwordSettings, 'requireLowercase', realm.passwordSettings.requireLowercase)
       Vue.set(this.passwordSettings, 'requireNonAlphanumeric', realm.passwordSettings.requireNonAlphanumeric)

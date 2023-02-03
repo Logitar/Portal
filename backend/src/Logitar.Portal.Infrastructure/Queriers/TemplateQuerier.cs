@@ -23,7 +23,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<TemplateModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
       TemplateEntity? template = await _templates.AsNoTracking()
-        .Include(x => x.Realm)
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoveryTemplate)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
       return await _mapper.MapAsync<TemplateModel>(template, cancellationToken);
@@ -35,7 +35,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       CancellationToken cancellationToken)
     {
       IQueryable<TemplateEntity> query = _templates.AsNoTracking()
-        .Include(x => x.Realm);
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoveryTemplate);
 
       query = realm == null
         ? query.Where(x => x.RealmId == null)

@@ -37,8 +37,8 @@ namespace Logitar.Portal.Application.Realms.Commands
       UsernameSettings usernameSettings = payload.UsernameSettings.GetUsernameSettings();
       PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
-      Realm realm = new(_userContext.ActorId, payload.Alias, payload.JwtSecret,
-        usernameSettings, passwordSettings,
+      Realm realm = new(_userContext.ActorId, payload.Alias,
+        usernameSettings, passwordSettings, payload.JwtSecret,
         payload.DisplayName, payload.Description, payload.DefaultLocale, payload.Url,
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);

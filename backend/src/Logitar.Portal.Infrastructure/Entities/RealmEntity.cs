@@ -13,7 +13,6 @@ namespace Logitar.Portal.Infrastructure.Entities
       Description = @event.Description;
 
       DefaultLocale = @event.DefaultLocale;
-      JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
       RequireConfirmedAccount = @event.RequireConfirmedAccount;
@@ -21,6 +20,8 @@ namespace Logitar.Portal.Infrastructure.Entities
 
       UsernameSettings = JsonSerializer.Serialize(@event.UsernameSettings);
       PasswordSettings = JsonSerializer.Serialize(@event.PasswordSettings);
+
+      JwtSecret = @event.JwtSecret;
 
       GoogleClientId = @event.GoogleClientId;
     }
@@ -40,7 +41,6 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string? Description { get; private set; }
 
     public CultureInfo? DefaultLocale { get; private set; }
-    public string JwtSecret { get; private set; } = string.Empty;
     public string? Url { get; private set; }
 
     public bool RequireConfirmedAccount { get; private set; }
@@ -49,13 +49,15 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string UsernameSettings { get; private set; } = string.Empty;
     public string PasswordSettings { get; private set; } = string.Empty;
 
-    public string? GoogleClientId { get; private set; }
-
     public SenderEntity? PasswordRecoverySender { get; private set; }
     public int? PasswordRecoverySenderId { get; private set; }
 
     public TemplateEntity? PasswordRecoveryTemplate { get; private set; }
     public int? PasswordRecoveryTemplateId { get; private set; }
+
+    public string JwtSecret { get; private set; } = string.Empty;
+
+    public string? GoogleClientId { get; private set; }
 
     public List<DictionaryEntity> Dictionaries { get; private set; } = new();
     public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
@@ -71,7 +73,6 @@ namespace Logitar.Portal.Infrastructure.Entities
       Description = @event.Description;
 
       DefaultLocale = @event.DefaultLocale;
-      JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
       RequireConfirmedAccount = @event.RequireConfirmedAccount;
@@ -80,13 +81,15 @@ namespace Logitar.Portal.Infrastructure.Entities
       UsernameSettings = JsonSerializer.Serialize(@event.UsernameSettings);
       PasswordSettings = JsonSerializer.Serialize(@event.PasswordSettings);
 
-      GoogleClientId = @event.GoogleClientId;
-
       PasswordRecoverySender = passwordRecoverySender;
       PasswordRecoverySenderId = passwordRecoverySender?.SenderId;
 
       PasswordRecoveryTemplate = passwordRecoveryTemplate;
       PasswordRecoveryTemplateId = passwordRecoveryTemplate?.TemplateId;
+
+      JwtSecret = @event.JwtSecret;
+
+      GoogleClientId = @event.GoogleClientId;
     }
   }
 }

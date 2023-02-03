@@ -2,6 +2,8 @@
   "created": "The sender has been created.",
   "default": "Default",
   "delete": {
+    "cannotDeletePasswordRecoverySender": "The <strong>password recovery sender</strong> cannot be deleted.",
+    "cannotDeleteDefaultSender": "The <strong>default sender</strong> cannot be deleted, unless there are no other senders in the realm.",
     "confirm": "Do you really want to delete the following sender?",
     "success": "The sender has been deleted.",
     "title": "Delete sender"

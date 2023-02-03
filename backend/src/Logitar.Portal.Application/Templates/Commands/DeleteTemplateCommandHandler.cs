@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Templates;
+﻿using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Templates;
 using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands
@@ -19,7 +20,16 @@ namespace Logitar.Portal.Application.Templates.Commands
       Template template = await _repository.LoadAsync<Template>(request.Id, cancellationToken)
         ?? throw new EntityNotFoundException<Template>(request.Id);
 
-      // TODO(fpion): what if is set as PasswordRecoverTemplate in its realm?
+      if (template.RealmId.HasValue)
+      {
+        Realm realm = await _repository.LoadAsync<Realm>(template.RealmId.Value, cancellationToken)
+          ?? throw new InvalidOperationException($"The realm 'Id={template.RealmId}' could not be found.");
+
+        if (realm.PasswordRecoveryTemplateId == template.Id)
+        {
+          throw new CannotDeletePasswordRecoveryTemplateException(template, realm);
+        }
+      }
 
       template.Delete(_userContext.ActorId);
 

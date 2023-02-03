@@ -1,4 +1,6 @@
 ﻿using Logitar.Portal.Domain.Realms.Events;
+using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using System.Globalization;
 
@@ -6,7 +8,7 @@ namespace Logitar.Portal.Domain.Realms
 {
   public class Realm : AggregateRoot
   {
-    public Realm(AggregateId userId, string alias, string jwtSecret, UsernameSettings usernameSettings, PasswordSettings passwordSettings,
+    public Realm(AggregateId userId, string alias, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
       string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
       bool requireConfirmedAccount = false, bool requireUniqueEmail = false, string? googleClientId = null) : base()
     {
@@ -16,12 +18,12 @@ namespace Logitar.Portal.Domain.Realms
         DisplayName = displayName?.CleanTrim(),
         Description = description?.CleanTrim(),
         DefaultLocale = defaultLocale,
-        JwtSecret = jwtSecret.Trim(),
         Url = url?.CleanTrim(),
         RequireConfirmedAccount = requireConfirmedAccount,
         RequireUniqueEmail = requireUniqueEmail,
         UsernameSettings = usernameSettings,
         PasswordSettings = passwordSettings,
+        JwtSecret = jwtSecret.Trim(),
         GoogleClientId = googleClientId?.CleanTrim()
       }, userId);
     }
@@ -34,7 +36,6 @@ namespace Logitar.Portal.Domain.Realms
     public string? Description { get; private set; }
 
     public CultureInfo? DefaultLocale { get; private set; }
-    public string JwtSecret { get; private set; } = string.Empty;
     public string? Url { get; private set; }
 
     public bool RequireConfirmedAccount { get; private set; }
@@ -43,24 +44,33 @@ namespace Logitar.Portal.Domain.Realms
     public UsernameSettings UsernameSettings { get; private set; } = new();
     public PasswordSettings PasswordSettings { get; private set; } = new();
 
+    public AggregateId? PasswordRecoverySenderId { get; private set; }
+    public AggregateId? PasswordRecoveryTemplateId { get; private set; }
+
+    public string JwtSecret { get; private set; } = string.Empty;
+
     public string? GoogleClientId { get; private set; }
 
     public void Delete(AggregateId userId) => ApplyChange(new RealmDeletedEvent(), userId);
-    public void Update(AggregateId userId, string jwtSecret, UsernameSettings usernameSettings, PasswordSettings passwordSettings,
+    public void Update(AggregateId userId, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
       string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
-      bool requireConfirmedAccount = false, bool requireUniqueEmail = false, string? googleClientId = null)
+      bool requireConfirmedAccount = false, bool requireUniqueEmail = false,
+      Sender? passwordRecoverySender = null, Template? passwordRecoveryTemplate = null,
+      string? googleClientId = null)
     {
       ApplyChange(new RealmUpdatedEvent
       {
         DisplayName = displayName?.CleanTrim(),
         Description = description?.CleanTrim(),
         DefaultLocale = defaultLocale,
-        JwtSecret = jwtSecret.Trim(),
         Url = url?.CleanTrim(),
         RequireConfirmedAccount = requireConfirmedAccount,
         RequireUniqueEmail = requireUniqueEmail,
         UsernameSettings = usernameSettings,
         PasswordSettings = passwordSettings,
+        PasswordRecoverySenderId = passwordRecoverySender?.Id,
+        PasswordRecoveryTemplateId = passwordRecoveryTemplate?.Id,
+        JwtSecret = jwtSecret.Trim(),
         GoogleClientId = googleClientId?.CleanTrim()
       }, userId);
     }
@@ -72,7 +82,6 @@ namespace Logitar.Portal.Domain.Realms
       Description = @event.Description;
 
       DefaultLocale = @event.DefaultLocale;
-      JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
       RequireConfirmedAccount = @event.RequireConfirmedAccount;
@@ -80,6 +89,8 @@ namespace Logitar.Portal.Domain.Realms
 
       UsernameSettings = @event.UsernameSettings;
       PasswordSettings = @event.PasswordSettings;
+
+      JwtSecret = @event.JwtSecret;
 
       GoogleClientId = @event.GoogleClientId;
     }
@@ -93,7 +104,6 @@ namespace Logitar.Portal.Domain.Realms
       Description = @event.Description;
 
       DefaultLocale = @event.DefaultLocale;
-      JwtSecret = @event.JwtSecret;
       Url = @event.Url;
 
       RequireConfirmedAccount = @event.RequireConfirmedAccount;
@@ -101,6 +111,11 @@ namespace Logitar.Portal.Domain.Realms
 
       UsernameSettings = @event.UsernameSettings;
       PasswordSettings = @event.PasswordSettings;
+
+      PasswordRecoverySenderId = @event.PasswordRecoverySenderId;
+      PasswordRecoveryTemplateId = @event.PasswordRecoveryTemplateId;
+
+      JwtSecret = @event.JwtSecret;
 
       GoogleClientId = @event.GoogleClientId;
     }

@@ -24,7 +24,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<SenderModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
       SenderEntity? sender = await _senders.AsNoTracking()
-        .Include(x => x.Realm)
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
       return await _mapper.MapAsync<SenderModel>(sender, cancellationToken);
@@ -33,7 +33,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
     public async Task<SenderModel?> GetDefaultAsync(Realm? realm, CancellationToken cancellationToken)
     {
       SenderEntity? sender = await _senders.AsNoTracking()
-        .Include(x => x.Realm)
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender)
         .SingleOrDefaultAsync(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
           && x.IsDefault, cancellationToken);
 
@@ -46,7 +46,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       CancellationToken cancellationToken)
     {
       IQueryable<SenderEntity> query = _senders.AsNoTracking()
-        .Include(x => x.Realm);
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender);
 
       query = realm == null
         ? query.Where(x => x.RealmId == null)

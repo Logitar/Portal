@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using MediatR;
 
@@ -34,10 +35,18 @@ namespace Logitar.Portal.Application.Senders.Commands
         }
       }
 
-      // TODO(fpion): what if is set as PasswordRecoverSender in its realm?
+      if (sender.RealmId.HasValue)
+      {
+        Realm realm = await _repository.LoadAsync<Realm>(sender.RealmId.Value, cancellationToken)
+          ?? throw new InvalidOperationException($"The realm 'Id={sender.RealmId}' could not be found.");
+
+        if (realm.PasswordRecoverySenderId == sender.Id)
+        {
+          throw new CannotDeletePasswordRecoverySenderException(sender, realm);
+        }
+      }
 
       sender.Delete(_userContext.ActorId);
-
       await _repository.SaveAsync(sender, cancellationToken);
 
       return Unit.Value;

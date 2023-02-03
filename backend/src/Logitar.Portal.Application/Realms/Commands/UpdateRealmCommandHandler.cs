@@ -2,6 +2,8 @@
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using MediatR;
 
@@ -32,12 +34,27 @@ namespace Logitar.Portal.Application.Realms.Commands
 
       UpdateRealmPayload payload = request.Payload;
 
+      Sender? passwordRecoverySender = null;
+      if (payload.PasswordRecoverySenderId != null)
+      {
+        passwordRecoverySender = await _repository.LoadAsync<Sender>(payload.PasswordRecoverySenderId, cancellationToken)
+          ?? throw new EntityNotFoundException<Sender>(payload.PasswordRecoverySenderId, nameof(payload.PasswordRecoverySenderId));
+      }
+      Template? passwordRecoveryTemplate = null;
+      if (payload.PasswordRecoveryTemplateId != null)
+      {
+        passwordRecoveryTemplate = await _repository.LoadAsync<Template>(payload.PasswordRecoveryTemplateId, cancellationToken)
+          ?? throw new EntityNotFoundException<Sender>(payload.PasswordRecoveryTemplateId, nameof(payload.PasswordRecoveryTemplateId));
+      }
+
       UsernameSettings usernameSettings = payload.UsernameSettings.GetUsernameSettings();
       PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
-      realm.Update(_userContext.ActorId, payload.JwtSecret, usernameSettings, passwordSettings,
+      realm.Update(_userContext.ActorId, usernameSettings, passwordSettings, payload.JwtSecret,
         payload.DisplayName, payload.Description, payload.DefaultLocale, payload.Url,
-        payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
+        payload.RequireConfirmedAccount, payload.RequireUniqueEmail,
+        passwordRecoverySender, passwordRecoveryTemplate,
+        payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);
 
       await _repository.SaveAsync(realm, cancellationToken);

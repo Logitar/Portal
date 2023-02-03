@@ -11,7 +11,6 @@ namespace Logitar.Portal.Domain.Realms.Events
     public string? Description { get; init; }
 
     public CultureInfo? DefaultLocale { get; init; }
-    public string JwtSecret { get; init; } = string.Empty;
     public string? Url { get; init; }
 
     public bool RequireConfirmedAccount { get; init; }
@@ -19,6 +18,8 @@ namespace Logitar.Portal.Domain.Realms.Events
 
     public UsernameSettings UsernameSettings { get; init; } = new();
     public PasswordSettings PasswordSettings { get; init; } = new();
+
+    public string JwtSecret { get; init; } = string.Empty;
 
     public string? GoogleClientId { get; init; }
   }
