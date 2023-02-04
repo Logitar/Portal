@@ -10,6 +10,7 @@ using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Logitar.Portal.Infrastructure
 {
@@ -71,11 +72,11 @@ namespace Logitar.Portal.Infrastructure
     {
       return await LoadAsync<Configuration>(Configuration.AggregateId, cancellationToken);
     }
-    public async Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm realm, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm? realm, CancellationToken cancellationToken)
     {
       DictionaryEntity[] dictionaries = await _context.Dictionaries.AsNoTracking()
         .Include(x => x.Realm)
-        .Where(x => x.Realm!.AggregateId == realm.Id.Value)
+        .Where(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value))
         .ToArrayAsync(cancellationToken);
 
       return dictionaries.Any() ? await LoadAsync<Dictionary>(dictionaries.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<Dictionary>();
@@ -90,6 +91,8 @@ namespace Logitar.Portal.Infrastructure
       return realm == null ? null : await LoadAsync<Realm>(realm.AggregateId, cancellationToken);
     }
 
+    public async Task<Sender?> LoadDefaultSenderAsync(Realm? realm, CancellationToken cancellationToken)
+      => await LoadDefaultSenderAsync(realm?.Id, cancellationToken);
     public async Task<Sender?> LoadDefaultSenderAsync(AggregateId? realmId, CancellationToken cancellationToken)
     {
       SenderEntity? sender = await _context.Senders.AsNoTracking()
@@ -142,6 +145,15 @@ namespace Logitar.Portal.Infrastructure
       return sessions.Any() ? await LoadAsync<Session>(sessions.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<Session>();
     }
 
+    public async Task<Template?> LoadTemplateByIdOrKeyAsync(string idOrKey, Realm? realm, CancellationToken cancellationToken)
+    {
+      TemplateEntity? template = await _context.Templates.AsNoTracking()
+        .Include(x => x.Realm)
+        .SingleOrDefaultAsync(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
+          && (x.AggregateId == idOrKey || x.KeyNormalized == idOrKey.ToUpper()), cancellationToken);
+
+      return template == null ? null : await LoadAsync<Template>(template.AggregateId, cancellationToken);
+    }
     public async Task<Template?> LoadTemplateByKeyAsync(string key, Realm? realm, CancellationToken cancellationToken)
     {
       TemplateEntity? template = await _context.Templates.AsNoTracking()
@@ -195,6 +207,17 @@ namespace Logitar.Portal.Infrastructure
       UserEntity[] users = await _context.Users.AsNoTracking()
         .Include(x => x.Realm)
         .Where(x => x.Realm!.AggregateId == realm.Id.Value)
+        .ToArrayAsync(cancellationToken);
+
+      return users.Any() ? await LoadAsync<User>(users.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<User>();
+    }
+    public async Task<IEnumerable<User>> LoadUsersByUsernamesAsync(IEnumerable<string> usernames, Realm? realm, CancellationToken cancellationToken)
+    {
+      usernames = usernames.Select(x => x.ToUpper());
+
+      UserEntity[] users = await _context.Users.AsNoTracking()
+        .Include(x => x.Realm)
+        .Where(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value) && usernames.Contains(x.UsernameNormalized))
         .ToArrayAsync(cancellationToken);
 
       return users.Any() ? await LoadAsync<User>(users.Select(x => x.AggregateId), cancellationToken) : Enumerable.Empty<User>();

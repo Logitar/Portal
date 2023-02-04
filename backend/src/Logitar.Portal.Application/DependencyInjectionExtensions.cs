@@ -3,6 +3,7 @@ using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
@@ -24,7 +25,10 @@ namespace Logitar.Portal.Application
       return services
         .AddApplicationServices()
         .AddMediatR(assembly)
-        .AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
+        .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
+        .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
+        .AddTransient<IInternalTokenService, InternalTokenService>()
+        .AddTransient<ISignInService, SignInService>();
     }
 
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
@@ -35,11 +39,10 @@ namespace Logitar.Portal.Application
         .AddTransient<IConfigurationService, ConfigurationService>()
         .AddTransient<IDictionaryService, DictionaryService>()
         .AddTransient<IGoogleService, GoogleService>()
-        .AddTransient<IInternalTokenService, InternalTokenService>()
+        .AddTransient<IMessageService, MessageService>()
         .AddTransient<IRealmService, RealmService>()
         .AddTransient<ISenderService, SenderService>()
         .AddTransient<ISessionService, SessionService>()
-        .AddTransient<ISignInService, SignInService>()
         .AddTransient<ITemplateService, TemplateService>()
         .AddTransient<ITokenService, TokenService>()
         .AddTransient<IUserService, UserService>();

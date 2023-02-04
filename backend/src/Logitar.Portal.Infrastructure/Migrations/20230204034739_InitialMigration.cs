@@ -100,7 +100,49 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SenderProviderTypes",
+                name: "Messages",
+                columns: table => new
+                {
+                    MessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Subject = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Body = table.Column<string>(type: "text", nullable: false),
+                    SenderId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    SenderIsDefault = table.Column<bool>(type: "boolean", nullable: false),
+                    SenderAddress = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    SenderDisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    SenderProvider = table.Column<int>(type: "integer", nullable: false),
+                    TemplateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    TemplateKey = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    TemplateKeyNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    TemplateDisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    TemplateContentType = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    RealmId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    RealmAlias = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    RealmAliasNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    RealmDisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    IgnoreUserLocale = table.Column<bool>(type: "boolean", nullable: false),
+                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
+                    Variables = table.Column<string>(type: "jsonb", nullable: true),
+                    IsDemo = table.Column<bool>(type: "boolean", nullable: false),
+                    Errors = table.Column<string>(type: "jsonb", nullable: true),
+                    HasErrors = table.Column<bool>(type: "boolean", nullable: false),
+                    Result = table.Column<string>(type: "jsonb", nullable: true),
+                    HasSucceeded = table.Column<bool>(type: "boolean", nullable: false),
+                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.MessageId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProviderTypes",
                 columns: table => new
                 {
                     Value = table.Column<int>(type: "integer", nullable: false),
@@ -108,7 +150,45 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SenderProviderTypes", x => x.Value);
+                    table.PrimaryKey("PK_ProviderTypes", x => x.Value);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecipientTypes",
+                columns: table => new
+                {
+                    Value = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipientTypes", x => x.Value);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Recipients",
+                columns: table => new
+                {
+                    RecipientId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    MessageId = table.Column<long>(type: "bigint", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    UserId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UserLocale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Recipients", x => x.RecipientId);
+                    table.ForeignKey(
+                        name: "FK_Recipients_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "MessageId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -163,15 +243,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     DefaultLocale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
-                    JwtSecret = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     RequireConfirmedAccount = table.Column<bool>(type: "boolean", nullable: false),
                     RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),
                     UsernameSettings = table.Column<string>(type: "jsonb", nullable: false),
                     PasswordSettings = table.Column<string>(type: "jsonb", nullable: false),
-                    GoogleClientId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     PasswordRecoverySenderId = table.Column<int>(type: "integer", nullable: true),
                     PasswordRecoveryTemplateId = table.Column<int>(type: "integer", nullable: true),
+                    JwtSecret = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    GoogleClientId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
                     CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -340,9 +420,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "SenderProviderTypes",
+                table: "ProviderTypes",
                 columns: new[] { "Value", "Name" },
                 values: new object[] { 0, "SendGrid" });
+
+            migrationBuilder.InsertData(
+                table: "RecipientTypes",
+                columns: new[] { "Value", "Name" },
+                values: new object[,]
+                {
+                    { 0, "To" },
+                    { 1, "CC" },
+                    { 2, "Bcc" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Actors_AggregateId",
@@ -443,6 +533,93 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messages_AggregateId",
+                table: "Messages",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_CreatedOn",
+                table: "Messages",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_HasErrors",
+                table: "Messages",
+                column: "HasErrors");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_HasSucceeded",
+                table: "Messages",
+                column: "HasSucceeded");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_IsDemo",
+                table: "Messages",
+                column: "IsDemo");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_RealmAlias",
+                table: "Messages",
+                column: "RealmAlias");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_RealmAliasNormalized",
+                table: "Messages",
+                column: "RealmAliasNormalized");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_RealmDisplayName",
+                table: "Messages",
+                column: "RealmDisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_RealmId",
+                table: "Messages",
+                column: "RealmId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SenderAddress",
+                table: "Messages",
+                column: "SenderAddress");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SenderDisplayName",
+                table: "Messages",
+                column: "SenderDisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_Subject",
+                table: "Messages",
+                column: "Subject");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_TemplateDisplayName",
+                table: "Messages",
+                column: "TemplateDisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_TemplateKey",
+                table: "Messages",
+                column: "TemplateKey");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_TemplateKeyNormalized",
+                table: "Messages",
+                column: "TemplateKeyNormalized");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_UpdatedOn",
+                table: "Messages",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProviderTypes_Name",
+                table: "ProviderTypes",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Realms_AggregateId",
                 table: "Realms",
                 column: "AggregateId",
@@ -487,8 +664,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "UpdatedOn");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SenderProviderTypes_Name",
-                table: "SenderProviderTypes",
+                name: "IX_Recipients_Id",
+                table: "Recipients",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recipients_MessageId",
+                table: "Recipients",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecipientTypes_Name",
+                table: "RecipientTypes",
                 column: "Name",
                 unique: true);
 
@@ -758,10 +946,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "JwtBlacklist");
 
             migrationBuilder.DropTable(
-                name: "SenderProviderTypes");
+                name: "ProviderTypes");
+
+            migrationBuilder.DropTable(
+                name: "Recipients");
+
+            migrationBuilder.DropTable(
+                name: "RecipientTypes");
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Users");

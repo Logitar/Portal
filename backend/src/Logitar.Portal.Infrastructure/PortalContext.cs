@@ -18,8 +18,11 @@ namespace Logitar.Portal.Infrastructure
     internal DbSet<EventEntity> Events { get; private set; } = null!;
     internal DbSet<ExternalProviderEntity> ExternalProviders { get; private set; } = null!;
     internal DbSet<BlacklistedJwtEntity> JwtBlacklist { get; private set; } = null!;
+    internal DbSet<MessageEntity> Messages { get; private set; } = null!;
+    internal DbSet<ProviderTypeEntity> ProviderTypes { get; private set; } = null!;
     internal DbSet<RealmEntity> Realms { get; private set; } = null!;
-    internal DbSet<ProviderTypeEntity> SenderProviderTypes { get; private set; } = null!;
+    internal DbSet<RecipientEntity> Recipients { get; private set; } = null!;
+    internal DbSet<RecipientTypeEntity> RecipientTypes { get; private set; } = null!;
     internal DbSet<SenderEntity> Senders { get; private set; } = null!;
     internal DbSet<SessionEntity> Sessions { get; private set; } = null!;
     internal DbSet<TemplateEntity> Templates { get; private set; } = null!;

@@ -96,7 +96,7 @@ export default {
       return ''
     },
     status() {
-      return this.message.succeeded ? 'Sent' : this.message.hasErrors ? 'Failed' : 'Unsent'
+      return this.message.hasSucceeded ? 'Sent' : this.message.hasErrors ? 'Failed' : 'Unsent'
     }
   },
   methods: {

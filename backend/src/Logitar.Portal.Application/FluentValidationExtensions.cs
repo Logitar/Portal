@@ -1,16 +1,30 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Domain.Users;
 using System.Globalization;
+using System.Net.Mime;
 
 namespace Logitar.Portal.Application
 {
   public static class FluentValidationExtensions
   {
+    private static readonly HashSet<string> _allowedContentTypes = new(new[]
+    {
+      MediaTypeNames.Text.Plain,
+      MediaTypeNames.Text.Html
+    });
+
     public static IRuleBuilder<T, string?> Alias<T>(this IRuleBuilder<T, string?> rules)
     {
       return rules.Must(a => a == null || a.Split('-').All(w => !string.IsNullOrEmpty(w) && w.All(char.IsLetterOrDigit)))
         .WithErrorCode("AliasValidator")
         .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words, separated by hyphens '-'.");
+    }
+
+    public static IRuleBuilder<T, string?> ContentType<T>(this IRuleBuilder<T, string?> rules)
+    {
+      return rules.Must(s => s == null || _allowedContentTypes.Contains(s))
+        .WithErrorCode("ContentTypeValidator")
+        .WithMessage($"'{{PropertyName}}' must be one of the following: {string.Join(", ", _allowedContentTypes)}");
     }
 
     public static IRuleBuilder<T, string?> Identifier<T>(this IRuleBuilder<T, string?> rules)

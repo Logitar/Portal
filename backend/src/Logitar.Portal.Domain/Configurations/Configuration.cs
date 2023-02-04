@@ -22,7 +22,7 @@ namespace Logitar.Portal.Domain.Configurations
     {
     }
 
-    public static AggregateId AggregateId => new(nameof(Portal));
+    public static AggregateId AggregateId => new("Portal");
 
     public CultureInfo DefaultLocale { get; private set; } = CultureInfo.InvariantCulture;
     public string JwtSecret { get; private set; } = string.Empty;

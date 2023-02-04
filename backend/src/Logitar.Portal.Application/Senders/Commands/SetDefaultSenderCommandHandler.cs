@@ -29,7 +29,7 @@ namespace Logitar.Portal.Application.Senders.Commands
         ?? throw new EntityNotFoundException<Sender>(request.Id);
 
       Sender @default = await _repository.LoadDefaultSenderAsync(sender.RealmId, cancellationToken)
-        ?? throw new InvalidOperationException($"The default sender from realm '{(sender.RealmId.HasValue ? $"Id={sender.RealmId.Value}" : nameof(Portal))}' could not be found.");
+        ?? throw new InvalidOperationException($"The default sender from realm '{(sender.RealmId.HasValue ? $"Id={sender.RealmId.Value}" : "Portal")}' could not be found.");
 
       if (!sender.Equals(@default))
       {

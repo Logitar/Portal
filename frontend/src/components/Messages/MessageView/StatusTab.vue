@@ -4,9 +4,13 @@
     <p>
       <template v-if="realm">
         {{ $t('messages.realmFormat') }}
-        <b-link :href="`/realms/${realm.alias}`" target="_blank">{{ `${realm.name} (${realm.alias})` }} <font-awesome-icon icon="external-link-alt" /></b-link>.
+        <b-link :href="`/realms/${realm.alias}`" target="_blank"
+          >{{ realm.displayName ? `${realm.displayName} (${realm.alias})` : realm.alias }} <font-awesome-icon icon="external-link-alt" /> </b-link
+        >.
       </template>
-      <template v-else-if="message.realmId">{{ $t('messages.realmFormat') }} <strong v-text="`${message.realmName} (${message.realmAlias})`" />.</template>
+      <template v-else-if="message.realmId"
+        >{{ $t('messages.realmFormat') }} <strong v-text="realm.displayName ? `${message.realmDisplayName} (${message.realmAlias})` : realm.alias" />.</template
+      >
       <template v-else>{{ $t('messages.noRealm.part1') }} <strong v-t="'messages.noRealm.part2'" />.</template>
       <br />
       <template v-if="sender">
@@ -84,7 +88,7 @@ export default {
       return this.message.result ? Object.fromEntries(this.message.result.map(({ key, value }) => [key, value])) : null
     },
     status() {
-      return this.message.succeeded ? 'Sent' : this.message.hasErrors ? 'Failed' : 'Unsent'
+      return this.message.hasSucceeded ? 'Sent' : this.message.hasErrors ? 'Failed' : 'Unsent'
     }
   },
   async created() {

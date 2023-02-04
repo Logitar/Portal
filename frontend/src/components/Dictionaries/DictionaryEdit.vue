@@ -12,6 +12,9 @@
           <realm-select class="col" :disabled="Boolean(dictionary)" v-model="selectedRealm" />
           <locale-select class="col" :disabled="Boolean(dictionary)" required v-model="selectedLocale" />
         </b-row>
+        <b-alert dismissible variant="warning" v-model="alreadyExists">
+          <strong v-t="'dictionaries.alreadyExists'" />
+        </b-alert>
         <h3 v-t="'dictionaries.entries.label'" />
         <div class="my-2">
           <icon-button icon="plus" text="dictionaries.entries.add" variant="success" @click="addEntry" />
@@ -77,6 +80,7 @@ export default {
   },
   data() {
     return {
+      alreadyExists: false,
       dictionary: null,
       entries: [],
       loading: false,
@@ -122,6 +126,7 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.alreadyExists = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.dictionary) {
@@ -135,6 +140,11 @@ export default {
             }
           }
         } catch (e) {
+          const { data, status } = e
+          if (status === 409 && data?.realm && data?.locale) {
+            this.alreadyExists = true
+            return
+          }
           this.handleError(e)
         } finally {
           this.loading = false

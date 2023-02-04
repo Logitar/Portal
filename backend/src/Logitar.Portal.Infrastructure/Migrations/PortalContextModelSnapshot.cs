@@ -339,6 +339,172 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.ToTable("ExternalProviders");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.MessageEntity", b =>
+                {
+                    b.Property<long>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("MessageId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Errors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HasSucceeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IgnoreUserLocale")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("RealmAlias")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("RealmAliasNormalized")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("RealmDisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("RealmId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SenderAddress")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("SenderDisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("SenderIsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SenderProvider")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateContentType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateDisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TemplateKeyNormalized")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Variables")
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("HasErrors");
+
+                    b.HasIndex("HasSucceeded");
+
+                    b.HasIndex("IsDemo");
+
+                    b.HasIndex("RealmAlias");
+
+                    b.HasIndex("RealmAliasNormalized");
+
+                    b.HasIndex("RealmDisplayName");
+
+                    b.HasIndex("RealmId");
+
+                    b.HasIndex("SenderAddress");
+
+                    b.HasIndex("SenderDisplayName");
+
+                    b.HasIndex("Subject");
+
+                    b.HasIndex("TemplateDisplayName");
+
+                    b.HasIndex("TemplateKey");
+
+                    b.HasIndex("TemplateKeyNormalized");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ProviderTypeEntity", b =>
                 {
                     b.Property<int>("Value")
@@ -354,7 +520,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("SenderProviderTypes");
+                    b.ToTable("ProviderTypes");
 
                     b.HasData(
                         new
@@ -472,6 +638,89 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("UpdatedOn");
 
                     b.ToTable("Realms");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RecipientEntity", b =>
+                {
+                    b.Property<long>("RecipientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("RecipientId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("MessageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("UserLocale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("RecipientId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("Recipients");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RecipientTypeEntity", b =>
+                {
+                    b.Property<int>("Value")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Value");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("RecipientTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Value = 0,
+                            Name = "To"
+                        },
+                        new
+                        {
+                            Value = 1,
+                            Name = "CC"
+                        },
+                        new
+                        {
+                            Value = 2,
+                            Name = "Bcc"
+                        });
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
@@ -922,6 +1171,17 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Navigation("PasswordRecoveryTemplate");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RecipientEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.Infrastructure.Entities.MessageEntity", "Message")
+                        .WithMany("Recipients")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+                });
+
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.SenderEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.Infrastructure.Entities.RealmEntity", "Realm")
@@ -961,6 +1221,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.MessageEntity", b =>
+                {
+                    b.Navigation("Recipients");
                 });
 
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.RealmEntity", b =>

@@ -31,7 +31,6 @@ namespace Logitar.Portal.Infrastructure.Entities
     }
 
     public int ExternalProviderId { get; private set; }
-
     public Guid Id { get; private set; }
 
     public RealmEntity? Realm { get; private set; }

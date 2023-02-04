@@ -3,9 +3,12 @@
   public class ErrorException : Exception
   {
     public ErrorException(Error error, Exception? innerException = null)
-      : base(error?.ToString(), innerException)
+      : base(error.ToString(), innerException)
     {
       Data["Error"] = error;
+      Error = error;
     }
+
+    public Error Error { get; }
   }
 }

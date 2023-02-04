@@ -19,10 +19,11 @@ namespace Logitar.Portal.Application
 
     Task<Configuration?> LoadConfigurationAsync(CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Dictionary>> LoadDictionariesByRealmAsync(Realm? realm, CancellationToken cancellationToken = default);
 
     Task<Realm?> LoadRealmByAliasOrIdAsync(string aliasOrId, CancellationToken cancellationToken = default);
 
+    Task<Sender?> LoadDefaultSenderAsync(Realm? realm, CancellationToken cancellationToken = default);
     Task<Sender?> LoadDefaultSenderAsync(AggregateId? realmId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Sender>> LoadSendersByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
 
@@ -30,6 +31,7 @@ namespace Logitar.Portal.Application
     Task<IEnumerable<Session>> LoadSessionsByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
     Task<IEnumerable<Session>> LoadSessionsByUserAsync(User user, CancellationToken cancellationToken = default);
 
+    Task<Template?> LoadTemplateByIdOrKeyAsync(string idOrKey, Realm? realm = null, CancellationToken cancellation = default);
     Task<Template?> LoadTemplateByKeyAsync(string key, Realm? realm = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<Template>> LoadTemplatesByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
 
@@ -37,6 +39,7 @@ namespace Logitar.Portal.Application
     Task<User?> LoadUserByUsernameAsync(string username, Realm? realm = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<User>> LoadUsersByEmailAsync(string email, Realm? realm = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<User>> LoadUsersByRealmAsync(Realm realm, CancellationToken cancellationToken = default);
+    Task<IEnumerable<User>> LoadUsersByUsernamesAsync(IEnumerable<string> usernames, Realm? realm = null, CancellationToken cancellationToken = default);
 
     Task SaveAsync(AggregateRoot aggregate, CancellationToken cancellationToken = default);
     Task SaveAsync(IEnumerable<AggregateRoot> aggregates, CancellationToken cancellationToken = default);

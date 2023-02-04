@@ -7,7 +7,7 @@ namespace Logitar.Portal.Application.Dictionaries
   {
     public DictionaryAlreadyExistingException(Realm? realm, CultureInfo locale) : base()
     {
-      Data["Realm"] = realm?.ToString() ?? nameof(Portal);
+      Data["Realm"] = realm?.ToString() ?? "Portal";
       Data["Locale"] = locale.ToString();
     }
   }

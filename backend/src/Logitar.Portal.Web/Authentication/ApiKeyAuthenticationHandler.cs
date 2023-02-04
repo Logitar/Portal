@@ -167,7 +167,7 @@ namespace Logitar.Portal.Web.Authentication
       }
 
       public ApiKeyModel? ApiKey { get; }
-      public AuthenticateResult Result { get; } = null!;
+      public AuthenticateResult Result { get; } = AuthenticateResult.NoResult();
     }
   }
 }
