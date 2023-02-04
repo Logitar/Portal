@@ -6,7 +6,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class SenderEntity : AggregateEntity
   {
-    public SenderEntity(SenderCreatedEvent @event, RealmEntity? realm) : base(@event)
+    public SenderEntity(SenderCreatedEvent @event, Actor actor, RealmEntity? realm = null) : base(@event, actor)
     {
       Realm = realm;
       RealmId = realm?.RealmId;
@@ -38,15 +38,15 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public RealmEntity? UsedAsPasswordRecoverySenderInRealm { get; private set; }
 
-    public void SetDefault(SenderSetDefaultEvent @event)
+    public void SetDefault(SenderSetDefaultEvent @event, Actor actor)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       IsDefault = @event.IsDefault;
     }
-    public void Update(SenderUpdatedEvent @event)
+    public void Update(SenderUpdatedEvent @event, Actor actor)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       EmailAddress = @event.EmailAddress;
       DisplayName = @event.DisplayName;

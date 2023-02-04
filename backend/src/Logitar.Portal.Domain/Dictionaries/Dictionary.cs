@@ -6,14 +6,14 @@ namespace Logitar.Portal.Domain.Dictionaries
 {
   public class Dictionary : AggregateRoot
   {
-    public Dictionary(AggregateId userId, CultureInfo locale, Realm? realm = null, Dictionary<string, string>? entries = null) : base()
+    public Dictionary(AggregateId actorId, CultureInfo locale, Realm? realm = null, Dictionary<string, string>? entries = null) : base()
     {
       ApplyChange(new DictionaryCreatedEvent
       {
         RealmId = realm?.Id,
         Locale = locale,
         Entries = entries
-      }, userId);
+      }, actorId);
     }
     private Dictionary() : base()
     {
@@ -25,11 +25,11 @@ namespace Logitar.Portal.Domain.Dictionaries
 
     public Dictionary<string, string> Entries { get; private set; } = new();
 
-    public void Delete(AggregateId userId) => ApplyChange(new DictionaryDeletedEvent(), userId);
-    public void Update(AggregateId userId, Dictionary<string, string>? entries = null) => ApplyChange(new DictionaryUpdatedEvent
+    public void Delete(AggregateId actorId) => ApplyChange(new DictionaryDeletedEvent(), actorId);
+    public void Update(AggregateId actorId, Dictionary<string, string>? entries = null) => ApplyChange(new DictionaryUpdatedEvent
     {
       Entries = entries
-    }, userId);
+    }, actorId);
 
     protected virtual void Apply(DictionaryCreatedEvent @event)
     {

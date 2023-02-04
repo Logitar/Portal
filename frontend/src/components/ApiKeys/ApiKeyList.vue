@@ -30,7 +30,7 @@
               {{ apiKey.expiresOn ? $d(new Date(apiKey.expiresOn), 'medium') : $t('apiKeys.neverExpires') }}
               <b-badge v-if="apiKey.expiresOn < new Date().toISOString()" variant="danger">{{ $t('apiKeys.expired') }}</b-badge>
             </td>
-            <td><status-cell :actor="apiKey.updatedBy" :date="apiKey.updatedOn || apiKey.createdOn" /></td>
+            <td><status-cell :actor="apiKey.updatedBy || apiKey.createdBy" :date="apiKey.updatedOn || apiKey.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${apiKey.id}`" />
               <delete-modal

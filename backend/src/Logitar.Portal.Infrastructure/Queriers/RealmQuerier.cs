@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Realms;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain;
@@ -9,10 +10,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class RealmQuerier : IRealmQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<RealmEntity> _realms;
 
-    public RealmQuerier(PortalContext context, IMappingService mapper)
+    public RealmQuerier(PortalContext context, IMapper mapper)
     {
       _mapper = mapper;
       _realms = context.Realms;
@@ -28,7 +29,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.PasswordRecoveryTemplate)
         .SingleOrDefaultAsync(x => x.AliasNormalized == id.ToUpper() || x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<RealmModel>(realm, cancellationToken);
+      return _mapper.Map<RealmModel>(realm);
     }
 
     public async Task<ListModel<RealmModel>> GetPagedAsync(string? search,
@@ -69,7 +70,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<RealmModel>(await _mapper.MapAsync<RealmModel>(realms, cancellationToken), total);
+      return new ListModel<RealmModel>(_mapper.Map<IEnumerable<RealmModel>>(realms), total);
     }
   }
 }

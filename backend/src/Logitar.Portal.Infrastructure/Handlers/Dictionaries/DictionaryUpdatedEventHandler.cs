@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Dictionaries
         }
         else
         {
-          dictionary.Update(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          dictionary.Update(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

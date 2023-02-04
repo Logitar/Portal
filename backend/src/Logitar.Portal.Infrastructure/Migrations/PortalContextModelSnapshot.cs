@@ -22,81 +22,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ActorEntity", b =>
-                {
-                    b.Property<int>("ActorId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ActorId"));
-
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Picture")
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ActorId");
-
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
-                    b.ToTable("Actors");
-                });
-
-            modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ActorTypeEntity", b =>
-                {
-                    b.Property<int>("Value")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Value");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("ActorTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Value = 0,
-                            Name = "System"
-                        },
-                        new
-                        {
-                            Value = 1,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Value = 2,
-                            Name = "ApiKey"
-                        });
-                });
-
             modelBuilder.Entity("Logitar.Portal.Infrastructure.Entities.ApiKeyEntity", b =>
                 {
                     b.Property<int>("ApiKeyId")
@@ -111,6 +36,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -134,6 +63,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -148,11 +80,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("ExpiresOn");
 
                     b.HasIndex("Title");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -198,6 +134,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -216,6 +156,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -230,7 +173,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -247,6 +194,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("EventId"));
+
+                    b.Property<string>("ActorId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("AggregateId")
                         .IsRequired()
@@ -270,11 +222,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.Property<DateTime>("OccurredOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
                     b.Property<long>("Version")
                         .HasColumnType("bigint");
 
@@ -296,6 +243,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExternalProviderId"));
 
                     b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("AddedById")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -328,6 +279,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasKey("ExternalProviderId");
 
+                    b.HasIndex("AddedById");
+
                     b.HasIndex("Id")
                         .IsUnique();
 
@@ -357,6 +310,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -455,6 +412,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -471,6 +431,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("AggregateId")
                         .IsUnique();
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("CreatedOn");
 
@@ -499,6 +461,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("TemplateKey");
 
                     b.HasIndex("TemplateKeyNormalized");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -555,6 +519,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -598,6 +566,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -625,6 +596,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AliasNormalized")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
@@ -634,6 +607,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("PasswordRecoveryTemplateId")
                         .IsUnique();
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -738,6 +713,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -766,6 +745,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("jsonb");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -780,6 +762,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
@@ -792,6 +776,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("Provider");
 
                     b.HasIndex("RealmId");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -816,6 +802,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -836,6 +826,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("SignedOutBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SignedOutById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -843,6 +836,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -860,6 +856,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("IpAddress");
@@ -868,7 +866,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("IsPersistent");
 
+                    b.HasIndex("SignedOutById");
+
                     b.HasIndex("SignedOutOn");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -900,6 +902,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -933,6 +939,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -947,11 +956,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
 
                     b.HasIndex("Key");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 
@@ -976,6 +989,10 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -983,6 +1000,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DisabledBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("DisabledById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -994,6 +1014,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("EmailConfirmedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("EmailConfirmedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -1049,6 +1072,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumberConfirmedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("PhoneNumberConfirmedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -1069,6 +1095,9 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedById")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -1093,9 +1122,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     b.HasIndex("AggregateId")
                         .IsUnique();
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("CreatedOn");
 
+                    b.HasIndex("DisabledById");
+
                     b.HasIndex("Email");
+
+                    b.HasIndex("EmailConfirmedById");
 
                     b.HasIndex("EmailNormalized");
 
@@ -1113,7 +1148,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
 
                     b.HasIndex("PhoneNumber");
 
+                    b.HasIndex("PhoneNumberConfirmedById");
+
                     b.HasIndex("SignedInOn");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UpdatedOn");
 

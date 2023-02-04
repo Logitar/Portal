@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain;
@@ -9,10 +10,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class SessionQuerier : ISessionQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<SessionEntity> _sessions;
 
-    public SessionQuerier(IMappingService mapper, PortalContext context)
+    public SessionQuerier(IMapper mapper, PortalContext context)
     {
       _mapper = mapper;
       _sessions = context.Sessions;
@@ -27,7 +28,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.User).ThenInclude(x => x!.Realm)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<SessionModel>(session, cancellationToken);
+      return _mapper.Map<SessionModel>(session);
     }
 
     public async Task<IEnumerable<SessionModel>> GetAsync(IEnumerable<AggregateId> ids, CancellationToken cancellationToken)
@@ -39,7 +40,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Where(x => aggregateIds.Contains(x.AggregateId))
         .ToArrayAsync(cancellationToken);
 
-      return await _mapper.MapAsync<SessionModel>(sessions, cancellationToken);
+      return _mapper.Map<IEnumerable<SessionModel>>(sessions);
     }
 
     public async Task<ListModel<SessionModel>> GetPagedAsync(bool? isActive, bool? isPersistent, string? realm, string? userId,
@@ -84,7 +85,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       SessionEntity[] sessions = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<SessionModel>(await _mapper.MapAsync<SessionModel>(sessions, cancellationToken), total);
+      return new ListModel<SessionModel>(_mapper.Map<IEnumerable<SessionModel>>(sessions), total);
     }
   }
 }

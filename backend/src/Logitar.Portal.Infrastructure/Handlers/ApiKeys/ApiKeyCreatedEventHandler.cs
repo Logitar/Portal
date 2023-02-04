@@ -20,10 +20,9 @@ namespace Logitar.Portal.Infrastructure.Handlers.ApiKeys
     {
       try
       {
-        ApiKeyEntity apiKey = new(notification);
-        ActorEntity actor = new(apiKey);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        ApiKeyEntity apiKey = new(notification, actor);
 
-        _context.Actors.Add(actor);
         _context.ApiKeys.Add(apiKey);
 
         await _context.SaveChangesAsync(cancellationToken);

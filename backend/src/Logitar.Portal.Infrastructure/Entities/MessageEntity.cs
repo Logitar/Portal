@@ -8,7 +8,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class MessageEntity : AggregateEntity
   {
-    public MessageEntity(MessageCreatedEvent @event) : base(@event)
+    public MessageEntity(MessageCreatedEvent @event, Actor actor) : base(@event, actor)
     {
       Subject = @event.Subject;
       Body = @event.Body;
@@ -99,15 +99,15 @@ namespace Logitar.Portal.Infrastructure.Entities
       private set { }
     }
 
-    public void Fail(MessageFailedEvent @event)
+    public void Fail(MessageFailedEvent @event, Actor actor)
     {
-      Update(@event);
+      Update(@event, actor);
 
       Errors = JsonSerializer.Serialize(@event.Errors);
     }
-    public void Succeed(MessageSucceededEvent @event)
+    public void Succeed(MessageSucceededEvent @event, Actor actor)
     {
-      Update(@event);
+      Update(@event, actor);
 
       Result = JsonSerializer.Serialize(@event.Result);
     }

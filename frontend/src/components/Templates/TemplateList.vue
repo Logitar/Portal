@@ -29,7 +29,7 @@
             </td>
             <td v-text="template.displayName || '—'" />
             <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
-            <td><status-cell :actor="template.updatedBy" :date="template.updatedOn || template.createdOn" /></td>
+            <td><status-cell :actor="template.updatedBy || template.createdBy" :date="template.updatedOn || template.createdOn" /></td>
             <td>
               <template v-if="isPasswordRecoveryTemplate(template)">
                 <span :id="`tooltip_${template.id}`" tabindex="0">

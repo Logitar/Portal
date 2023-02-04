@@ -11,7 +11,7 @@ namespace Logitar.Portal.Infrastructure.Profiles
     {
       CreateMap<SessionEntity, SessionModel>()
         .IncludeBase<AggregateEntity, AggregateModel>()
-        .ForMember(x => x.SignedOutBy, x => x.Ignore()); // TODO(fpion): implement Actors
+        .ForMember(x => x.SignedOutBy, x => x.MapFrom(y => Actor.GetActorModel(y.SignedOutById, y.SignedOutBy)));
     }
   }
 }

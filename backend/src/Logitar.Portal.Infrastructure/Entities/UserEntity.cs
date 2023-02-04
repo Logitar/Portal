@@ -5,17 +5,19 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class UserEntity : AggregateEntity
   {
-    public UserEntity(UserCreatedEvent @event, RealmEntity? realm = null) : base(@event)
+    public UserEntity(UserCreatedEvent @event, Actor actor, RealmEntity? realm = null) : base(@event, actor)
     {
       Username = @event.Username;
       PasswordHash = @event.PasswordHash;
       PasswordChangedOn = @event.PasswordHash == null ? null : @event.OccurredOn;
 
       Email = @event.Email;
-      EmailConfirmedBy = @event.IsEmailConfirmed ? @event.UserId.Value : null;
+      EmailConfirmedById = @event.IsEmailConfirmed ? @event.ActorId.Value : null;
+      EmailConfirmedBy = @event.IsEmailConfirmed ? actor.Serialize() : null;
       EmailConfirmedOn = @event.IsEmailConfirmed ? @event.OccurredOn : null;
       PhoneNumber = @event.PhoneNumber;
-      PhoneNumberConfirmedBy = @event.IsPhoneNumberConfirmed ? @event.UserId.Value : null;
+      PhoneNumberConfirmedById = @event.IsPhoneNumberConfirmed ? @event.ActorId.Value : null;
+      PhoneNumberConfirmedBy = @event.IsPhoneNumberConfirmed ? actor.Serialize() : null;
       PhoneNumberConfirmedOn = @event.IsPhoneNumberConfirmed ? @event.OccurredOn : null;
 
       FirstName = @event.FirstName;
@@ -58,11 +60,12 @@ namespace Logitar.Portal.Infrastructure.Entities
       get => Email?.ToUpper();
       private set { }
     }
+    public string? EmailConfirmedById { get; private set; }
     public string? EmailConfirmedBy { get; private set; }
     public DateTime? EmailConfirmedOn { get; private set; }
     public bool IsEmailConfirmed
     {
-      get => EmailConfirmedBy != null && EmailConfirmedOn.HasValue;
+      get => EmailConfirmedById != null && EmailConfirmedOn.HasValue;
       private set { }
     }
     public string? PhoneNumber { get; private set; }
@@ -71,11 +74,12 @@ namespace Logitar.Portal.Infrastructure.Entities
       get => PhoneNumber?.ToUpper();
       private set { }
     }
+    public string? PhoneNumberConfirmedById { get; private set; }
     public string? PhoneNumberConfirmedBy { get; private set; }
     public DateTime? PhoneNumberConfirmedOn { get; private set; }
     public bool IsPhoneNumberConfirmed
     {
-      get => PhoneNumberConfirmedBy != null && PhoneNumberConfirmedOn.HasValue;
+      get => PhoneNumberConfirmedById != null && PhoneNumberConfirmedOn.HasValue;
       private set { }
     }
     public bool IsAccountConfirmed
@@ -94,40 +98,62 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public DateTime? SignedInOn { get; private set; }
 
+    public string? DisabledById { get; private set; }
     public string? DisabledBy { get; private set; }
     public DateTime? DisabledOn { get; private set; }
     public bool IsDisabled
     {
-      get => DisabledBy != null && DisabledOn.HasValue;
+      get => DisabledById != null && DisabledOn.HasValue;
       private set { }
     }
 
     public List<ExternalProviderEntity> ExternalProviders { get; private set; } = new();
     public List<SessionEntity> Sessions { get; private set; } = new();
 
+    public override void UpdateActors(string id, Actor actor)
+    {
+      base.UpdateActors(id, actor);
+
+      if (EmailConfirmedById == id)
+      {
+        EmailConfirmedBy = actor.Serialize();
+      }
+
+      if (PhoneNumberConfirmedById == id)
+      {
+        PhoneNumberConfirmedBy = actor.Serialize();
+      }
+
+      if (DisabledById == id)
+      {
+        DisabledBy = actor.Serialize();
+      }
+    }
+
     public void AddExternalProvider(UserAddedExternalProviderEvent @event)
     {
-      ExternalProviders.Add(new ExternalProviderEntity(@event, this));
+      ExternalProviders.Add(new ExternalProviderEntity(@event, this, new Actor(this)));
     }
     public void ChangePassword(UserChangedPasswordEvent @event)
     {
       PasswordHash = @event.PasswordHash;
       PasswordChangedOn = @event.OccurredOn;
     }
-    public void Disable(UserDisabledEvent @event)
+    public void Disable(UserDisabledEvent @event, Actor actor)
     {
-      DisabledBy = @event.UserId.Value;
+      DisabledById = @event.ActorId.Value;
+      DisabledBy = actor.Serialize();
       DisabledOn = @event.OccurredOn;
     }
     public void Enable()
     {
-      DisabledBy = null;
+      DisabledById = null;
       DisabledOn = null;
     }
     public void SignIn(UserSignedInEvent @event) => SignedInOn = @event.OccurredOn;
-    public void Update(UserUpdatedEvent @event)
+    public void Update(UserUpdatedEvent @event, Actor actor)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       if (@event.PasswordHash != null)
       {
@@ -138,13 +164,13 @@ namespace Logitar.Portal.Infrastructure.Entities
       if (@event.HasEmailChanged)
       {
         Email = @event.Email;
-        EmailConfirmedBy = null;
+        EmailConfirmedById = null;
         EmailConfirmedOn = null;
       }
       if (@event.HasPhoneNumberChanged)
       {
         PhoneNumber = @event.PhoneNumber;
-        PhoneNumberConfirmedBy = null;
+        PhoneNumberConfirmedById = null;
         PhoneNumberConfirmedOn = null;
       }
 

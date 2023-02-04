@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Users;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
@@ -9,10 +10,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class UserQuerier : IUserQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<UserEntity> _users;
 
-    public UserQuerier(PortalContext context, IMappingService mapper)
+    public UserQuerier(PortalContext context, IMapper mapper)
     {
       _mapper = mapper;
       _users = context.Users;
@@ -28,7 +29,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Realm)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<UserModel>(user, cancellationToken);
+      return _mapper.Map<UserModel>(user);
     }
 
     public async Task<ListModel<UserModel>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
@@ -95,7 +96,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       UserEntity[] users = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<UserModel>(await _mapper.MapAsync<UserModel>(users, cancellationToken), total);
+      return new ListModel<UserModel>(_mapper.Map<IEnumerable<UserModel>>(users), total);
     }
   }
 }

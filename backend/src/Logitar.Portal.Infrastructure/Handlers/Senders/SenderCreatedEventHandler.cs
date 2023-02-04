@@ -33,7 +33,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Senders
           }
         }
 
-        SenderEntity sender = new(notification, realm);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        SenderEntity sender = new(notification, actor, realm);
 
         _context.Senders.Add(sender);
 

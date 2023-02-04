@@ -63,7 +63,7 @@
             </td>
             <td>{{ user.passwordChangedOn ? $d(new Date(user.passwordChangedOn), 'medium') : '—' }}</td>
             <td>{{ user.signedInOn ? $d(new Date(user.signedInOn), 'medium') : '—' }}</td>
-            <td><status-cell :actor="user.updatedBy" :date="user.updatedOn || user.createdOn" /></td>
+            <td><status-cell :actor="user.updatedBy || user.createdBy" :date="user.updatedOn || user.createdOn" /></td>
             <td>
               <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
               <icon-button

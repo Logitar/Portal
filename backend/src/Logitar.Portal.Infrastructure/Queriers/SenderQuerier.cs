@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Senders;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain;
@@ -10,10 +11,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class SenderQuerier : ISenderQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<SenderEntity> _senders;
 
-    public SenderQuerier(PortalContext context, IMappingService mapper)
+    public SenderQuerier(PortalContext context, IMapper mapper)
     {
       _mapper = mapper;
       _senders = context.Senders;
@@ -27,7 +28,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<SenderModel>(sender, cancellationToken);
+      return _mapper.Map<SenderModel>(sender);
     }
 
     public async Task<SenderModel?> GetDefaultAsync(Realm? realm, CancellationToken cancellationToken)
@@ -37,7 +38,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .SingleOrDefaultAsync(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
           && x.IsDefault, cancellationToken);
 
-      return await _mapper.MapAsync<SenderModel>(sender, cancellationToken);
+      return _mapper.Map<SenderModel>(sender);
     }
 
     public async Task<ListModel<SenderModel>> GetPagedAsync(ProviderType? provider, string? realm, string? search,
@@ -87,7 +88,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       SenderEntity[] senders = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<SenderModel>(await _mapper.MapAsync<SenderModel>(senders, cancellationToken));
+      return new ListModel<SenderModel>(_mapper.Map<IEnumerable<SenderModel>>(senders));
     }
   }
 }

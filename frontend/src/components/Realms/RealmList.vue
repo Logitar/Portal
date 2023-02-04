@@ -26,7 +26,7 @@
               <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
             </td>
             <td v-text="realm.displayName || realm.alias" />
-            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedOn || realm.createdOn" /></td>
+            <td><status-cell :actor="realm.updatedBy || realm.createdBy" :date="realm.updatedOn || realm.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal

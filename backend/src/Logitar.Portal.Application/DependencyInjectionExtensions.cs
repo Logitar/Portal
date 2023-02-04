@@ -27,6 +27,7 @@ namespace Logitar.Portal.Application
         .AddMediatR(assembly)
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
         .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
+        .AddTransient<IInternalMessageService, InternalMessageService>()
         .AddTransient<IInternalTokenService, InternalTokenService>()
         .AddTransient<ISignInService, SignInService>();
     }

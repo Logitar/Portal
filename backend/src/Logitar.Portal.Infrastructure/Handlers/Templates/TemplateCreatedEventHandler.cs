@@ -33,7 +33,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Templates
           }
         }
 
-        TemplateEntity template = new(notification, realm);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        TemplateEntity template = new(notification, actor, realm);
 
         _context.Templates.Add(template);
 

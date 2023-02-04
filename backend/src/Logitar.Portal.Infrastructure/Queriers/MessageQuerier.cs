@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Messages;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain;
@@ -9,10 +10,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class MessageQuerier : IMessageQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<MessageEntity> _messages;
 
-    public MessageQuerier(PortalContext context, IMappingService mapper)
+    public MessageQuerier(PortalContext context, IMapper mapper)
     {
       _mapper = mapper;
       _messages = context.Messages;
@@ -24,7 +25,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Recipients)
         .SingleOrDefaultAsync(x => x.AggregateId == id.Value, cancellationToken);
 
-      return await _mapper.MapAsync<MessageModel>(message, cancellationToken);
+      return _mapper.Map<MessageModel>(message);
     }
 
     public async Task<ListModel<MessageModel>> GetPagedAsync(bool? hasErrors, bool? hasSucceeded, bool? isDemo, string? realm, string? search, string? template,
@@ -89,7 +90,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       MessageEntity[] messages = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<MessageModel>(await _mapper.MapAsync<MessageModel>(messages, cancellationToken), total);
+      return new ListModel<MessageModel>(_mapper.Map<IEnumerable<MessageModel>>(messages), total);
     }
   }
 }

@@ -28,17 +28,7 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
         {
           _context.Users.Remove(user);
 
-          ActorEntity? actor = await _context.Actors
-            .SingleOrDefaultAsync(x => x.AggregateId == user.AggregateId, cancellationToken);
-          if (actor == null)
-          {
-            _logger.LogError("The API key 'AggregateId={aggregateId}' could  not be found.", user.AggregateId);
-          }
-          else
-          {
-            actor.Delete();
-          }
-
+          await _context.UpdateActorsAsync(user.AggregateId, new Actor(user, isDeleted: true), cancellationToken);
           await _context.SaveChangesAsync(cancellationToken);
         }
       }

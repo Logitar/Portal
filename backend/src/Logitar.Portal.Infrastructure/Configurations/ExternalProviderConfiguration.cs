@@ -14,12 +14,14 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasOne(x => x.User).WithMany(x => x.ExternalProviders).OnDelete(DeleteBehavior.Cascade);
 
       builder.HasIndex(x => x.Id).IsUnique();
+      builder.HasIndex(x => x.AddedById);
       builder.HasIndex(x => new { x.RealmId, x.Key, x.Value }).IsUnique();
 
       builder.Property(x => x.Key).HasMaxLength(256);
       builder.Property(x => x.Value).HasMaxLength(256);
       builder.Property(x => x.DisplayName).HasMaxLength(256);
-      builder.Property(x => x.AddedBy).HasMaxLength(256);
+      builder.Property(x => x.AddedById).HasMaxLength(256);
+      builder.Property(x => x.AddedBy).HasColumnType("jsonb");
     }
   }
 }

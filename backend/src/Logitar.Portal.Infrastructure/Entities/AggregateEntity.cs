@@ -7,29 +7,46 @@ namespace Logitar.Portal.Infrastructure.Entities
     protected AggregateEntity()
     {
     }
-    protected AggregateEntity(DomainEvent @event)
+    protected AggregateEntity(DomainEvent @event, Actor actor)
     {
       AggregateId = @event.AggregateId.Value;
       Version = @event.Version;
 
-      CreatedBy = @event.UserId.Value;
+      CreatedById = @event.ActorId.Value;
+      CreatedBy = actor.Serialize();
       CreatedOn = @event.OccurredOn;
     }
 
     public string AggregateId { get; private set; } = string.Empty;
     public long Version { get; private set; }
 
+    public string CreatedById { get; private set; } = string.Empty;
     public string CreatedBy { get; private set; } = string.Empty;
     public DateTime CreatedOn { get; private set; }
 
+    public string? UpdatedById { get; private set; }
     public string? UpdatedBy { get; private set; }
     public DateTime? UpdatedOn { get; private set; }
 
-    protected virtual void Update(DomainEvent @event)
+    public virtual void UpdateActors(string id, Actor actor)
+    {
+      if (CreatedById == id)
+      {
+        CreatedBy = actor.Serialize();
+      }
+
+      if (UpdatedById == id)
+      {
+        UpdatedBy = actor.Serialize();
+      }
+    }
+
+    protected virtual void Update(DomainEvent @event, Actor actor)
     {
       Version = @event.Version;
 
-      UpdatedBy = @event.UserId.Value;
+      UpdatedById = @event.ActorId.Value;
+      UpdatedBy = actor.Serialize();
       UpdatedOn = @event.OccurredOn;
     }
   }

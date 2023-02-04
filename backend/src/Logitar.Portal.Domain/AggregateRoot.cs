@@ -39,12 +39,13 @@ namespace Logitar.Portal.Domain
       return aggregate;
     }
 
-    protected void ApplyChange(DomainEvent change, AggregateId userId)
+    protected void ApplyChange(DomainEvent change, AggregateId actorId)
     {
       change.AggregateId = Id;
-      change.OccurredOn = DateTime.UtcNow;
-      change.UserId = userId;
       change.Version = Version + 1;
+
+      change.ActorId = actorId;
+      change.OccurredOn = DateTime.UtcNow;
 
       Dispatch(change);
 

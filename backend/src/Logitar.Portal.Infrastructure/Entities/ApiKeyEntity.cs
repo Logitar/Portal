@@ -4,7 +4,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class ApiKeyEntity : AggregateEntity
   {
-    public ApiKeyEntity(ApiKeyCreatedEvent @event) : base(@event)
+    public ApiKeyEntity(ApiKeyCreatedEvent @event, Actor actor) : base(@event, actor)
     {
       SecretHash = @event.SecretHash;
 
@@ -26,9 +26,9 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public DateTime? ExpiresOn { get; private set; }
 
-    public void Update(ApiKeyUpdatedEvent @event)
+    public void Update(ApiKeyUpdatedEvent @event, Actor actor)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       Title = @event.Title;
       Description = @event.Description;

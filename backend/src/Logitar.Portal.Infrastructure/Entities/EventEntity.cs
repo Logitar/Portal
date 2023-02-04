@@ -23,8 +23,8 @@ namespace Logitar.Portal.Infrastructure.Entities
     public long EventId { get; private set; }
     public long Version { get; private set; }
 
+    public string ActorId { get; private set; } = string.Empty;
     public DateTime OccurredOn { get; private set; }
-    public string UserId { get; private set; } = string.Empty;
 
     public string AggregateType { get; private set; } = string.Empty;
     public string AggregateId { get; private set; } = string.Empty;
@@ -43,8 +43,8 @@ namespace Logitar.Portal.Infrastructure.Entities
         return new EventEntity
         {
           Version = change.Version,
+          ActorId = change.ActorId.Value,
           OccurredOn = change.OccurredOn,
-          UserId = change.UserId.Value,
           AggregateType = aggregateType,
           AggregateId = aggregate.Id.Value,
           EventType = eventType.GetName(),

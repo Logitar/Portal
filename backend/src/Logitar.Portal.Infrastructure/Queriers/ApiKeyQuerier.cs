@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.ApiKeys;
+﻿using AutoMapper;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Domain;
@@ -10,9 +11,9 @@ namespace Logitar.Portal.Infrastructure.Queriers
   internal class ApiKeyQuerier : IApiKeyQuerier
   {
     private readonly DbSet<ApiKeyEntity> _apiKeys;
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
 
-    public ApiKeyQuerier(PortalContext context, IMappingService mapper)
+    public ApiKeyQuerier(PortalContext context, IMapper mapper)
     {
       _apiKeys = context.ApiKeys;
       _mapper = mapper;
@@ -25,7 +26,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
       ApiKeyEntity? apiKey = await _apiKeys.AsNoTracking()
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
+      return _mapper.Map<ApiKeyModel>(apiKey);
     }
 
     public async Task<ListModel<ApiKeyModel>> GetPagedAsync(DateTime? expiredOn, string? search,
@@ -69,7 +70,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       ApiKeyEntity[] apiKeys = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<ApiKeyModel>(await _mapper.MapAsync<ApiKeyModel>(apiKeys, cancellationToken), total);
+      return new ListModel<ApiKeyModel>(_mapper.Map<IEnumerable<ApiKeyModel>>(apiKeys), total);
     }
   }
 }
