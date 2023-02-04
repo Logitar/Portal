@@ -1,53 +1,42 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class RealmQuerier : IRealmQuerier
   {
-    private readonly DbSet<Realm> _realms;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<RealmEntity> _realms;
 
-    public RealmQuerier(PortalDbContext dbContext)
+    public RealmQuerier(PortalContext context, IMappingService mapper)
     {
-      _realms = dbContext.Realms;
+      _mapper = mapper;
+      _realms = context.Realms;
     }
 
-    public async Task<Realm?> GetAsync(string key, bool readOnly, CancellationToken cancellationToken)
-    {
-      ArgumentNullException.ThrowIfNull(key);
+    public async Task<RealmModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
 
-      return Guid.TryParse(key, out Guid id)
-        ? await GetAsync(id, readOnly, cancellationToken)
-        : await GetByAliasAsync(key, readOnly, cancellationToken);
+    public async Task<RealmModel?> GetAsync(string id, CancellationToken cancellationToken)
+    {
+      RealmEntity? realm = await _realms.AsNoTracking()
+        .Include(x => x.PasswordRecoverySender)
+        .Include(x => x.PasswordRecoveryTemplate)
+        .SingleOrDefaultAsync(x => x.AliasNormalized == id.ToUpper() || x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<RealmModel>(realm, cancellationToken);
     }
 
-    public async Task<Realm?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
-    {
-      return await _realms.ApplyTracking(readOnly)
-        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
-        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<Realm?> GetByAliasAsync(string alias, bool readOnly, CancellationToken cancellationToken)
-    {
-      alias = alias?.ToUpper() ?? throw new ArgumentNullException(nameof(alias));
-
-      return await _realms.ApplyTracking(readOnly)
-        .Include(x => x.PasswordRecoverySenderRelation).ThenInclude(x => x!.Sender)
-        .Include(x => x.PasswordRecoveryTemplateRelation).ThenInclude(x => x!.Template)
-        .SingleOrDefaultAsync(x => x.AliasNormalized == alias, cancellationToken);
-    }
-
-    public async Task<PagedList<Realm>> GetPagedAsync(string? search,
-      RealmSort? sort, bool desc,
+    public async Task<ListModel<RealmModel>> GetPagedAsync(string? search,
+      RealmSort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<Realm> query = _realms.ApplyTracking(readOnly);
+      IQueryable<RealmEntity> query = _realms.AsNoTracking();
 
       if (search != null)
       {
@@ -57,7 +46,8 @@ namespace Logitar.Portal.Infrastructure.Queriers
           {
             string pattern = $"%{term}%";
 
-            query = query.Where(x => EF.Functions.ILike(x.Alias, pattern) || EF.Functions.ILike(x.Name, pattern));
+            query = query.Where(x => EF.Functions.ILike(x.Alias, pattern)
+              || (x.DisplayName != null && EF.Functions.ILike(x.DisplayName, pattern)));
           }
         }
       }
@@ -68,18 +58,18 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          RealmSort.Alias => desc ? query.OrderByDescending(x => x.Alias) : query.OrderBy(x => x.Alias),
-          RealmSort.Name => desc ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
-          RealmSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          RealmSort.Alias => isDescending ? query.OrderByDescending(x => x.Alias) : query.OrderBy(x => x.Alias),
+          RealmSort.DisplayName => isDescending ? query.OrderByDescending(x => x.DisplayName ?? x.Alias) : query.OrderBy(x => x.DisplayName ?? x.Alias),
+          RealmSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The realm sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Realm[] realms = await query.ToArrayAsync(cancellationToken);
+      RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Realm>(realms, total);
+      return new ListModel<RealmModel>(await _mapper.MapAsync<RealmModel>(realms, cancellationToken), total);
     }
   }
 }

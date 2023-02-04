@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Realms.Models;
-using Logitar.Portal.Core.Realms.Payloads;
+﻿using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +11,10 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/realms")]
   public class RealmApiController : ControllerBase
   {
-    private readonly IMapper _mapper;
     private readonly IRealmService _realmService;
 
-    public RealmApiController(IMapper mapper, IRealmService realmService)
+    public RealmApiController(IRealmService realmService)
     {
-      _mapper = mapper;
       _realmService = realmService;
     }
 
@@ -27,29 +22,29 @@ namespace Logitar.Portal.Web.Controllers.Api
     public async Task<ActionResult<RealmModel>> CreateAsync([FromBody] CreateRealmPayload payload, CancellationToken cancellationToken)
     {
       RealmModel realm = await _realmService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/realms/{realm.Id}", UriKind.Relative);
+      Uri uri = new($"/api/realms/{realm.Id}", UriKind.Relative);
 
       return Created(uri, realm);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<RealmModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      return Ok(await _realmService.DeleteAsync(id, cancellationToken));
+      await _realmService.DeleteAsync(id, cancellationToken);
+
+      return NoContent();
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<RealmSummary>>> GetAsync(string? search,
+    public async Task<ActionResult<ListModel<RealmModel>>> GetAsync(string? search,
       RealmSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      ListModel<RealmModel> realms = await _realmService.GetAsync(search,
+      return Ok(await _realmService.GetAsync(search,
         sort, desc,
         index, count,
-        cancellationToken);
-
-      return Ok(realms.To<RealmModel, RealmSummary>(_mapper));
+        cancellationToken));
     }
 
     [HttpGet("{id}")]
@@ -65,7 +60,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<RealmModel>> UpdateAsync(Guid id, [FromBody] UpdateRealmPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult<RealmModel>> UpdateAsync(string id, [FromBody] UpdateRealmPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _realmService.UpdateAsync(id, payload, cancellationToken));
     }

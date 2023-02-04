@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.Application.Accounts
 {

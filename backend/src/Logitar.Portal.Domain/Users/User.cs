@@ -1,185 +1,222 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Users.Payloads;
-using Logitar.Portal.Domain.Realms;
-using Logitar.Portal.Domain.Sessions;
+﻿using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users.Events;
 using System.Globalization;
 
 namespace Logitar.Portal.Domain.Users
 {
-  public class User : Aggregate
+  public class User : AggregateRoot
   {
-    public User(CreateUserSecurePayload payload, Guid userId, Realm? realm = null)
-    {
-      ApplyChange(new CreatedEvent(payload, userId));
-
-      Realm = realm;
-      RealmSid = realm?.Sid;
-    }
-    private User()
+    public User(AggregateId userId, string username, Realm? realm = null, string? email = null, bool isEmailConfirmed = false,
+      string? firstName = null, string? lastName = null, CultureInfo? locale = null, string? picture = null)
+      : this(userId, username, realm, passwordHash: null,
+          email, isEmailConfirmed, phoneNumber: null, isPhoneNumberConfirmed: false,
+          firstName, middleName: null, lastName,
+          locale, picture)
     {
     }
-
-    public Realm? Realm { get; private set; }
-    public int? RealmSid { get; private set; }
-
-    public string Username { get; private set; } = null!;
-    public string UsernameNormalized
+    public User(AggregateId userId, string username, Realm? realm = null, string? passwordHash = null,
+      string? email = null, bool isEmailConfirmed = false, string? phoneNumber = null, bool isPhoneNumberConfirmed = false,
+      string? firstName = null, string? middleName = null, string? lastName = null,
+      CultureInfo? locale = null, string? picture = null) : base()
     {
-      get => Username.ToUpper();
-      private set { /* EntityFrameworkCore only setter */ }
+      ApplyChange(new UserCreatedEvent
+      {
+        RealmId = realm?.Id,
+        Username = username.Trim(),
+        PasswordHash = passwordHash,
+        Email = email?.CleanTrim(),
+        IsEmailConfirmed = isEmailConfirmed,
+        PhoneNumber = phoneNumber?.CleanTrim(),
+        IsPhoneNumberConfirmed = isPhoneNumberConfirmed,
+        FirstName = firstName?.CleanTrim(),
+        MiddleName = middleName?.CleanTrim(),
+        LastName = lastName?.CleanTrim(),
+        FullName = GetFullName(firstName, middleName, lastName),
+        Locale = locale,
+        Picture = picture?.CleanTrim()
+      }, userId);
+    }
+    public User(string username, string passwordHash, string email, string firstName, string lastName, CultureInfo locale) : base()
+    {
+      ApplyChange(new UserCreatedEvent
+      {
+        Username = username.Trim(),
+        PasswordHash = passwordHash,
+        Email = email.Trim(),
+        FirstName = firstName.Trim(),
+        LastName = lastName.Trim(),
+        FullName = GetFullName(firstName, lastName),
+        Locale = locale
+      }, Id);
+    }
+    private User() : base()
+    {
     }
 
-    public DateTime? PasswordChangedAt { get; private set; }
+    public AggregateId? RealmId { get; private set; }
+
+    public string Username { get; private set; } = string.Empty;
     public string? PasswordHash { get; private set; }
-    public bool HasPassword
-    {
-      get => PasswordChangedAt.HasValue && PasswordHash != null;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool HasPassword => PasswordHash != null;
 
     public string? Email { get; private set; }
-    public string? EmailNormalized
-    {
-      get => Email?.ToUpper();
-      private set { /* EntityFrameworkCore only setter */ }
-    }
-    public DateTime? EmailConfirmedAt { get; private set; }
-    public Guid? EmailConfirmedById { get; private set; }
-    public bool IsEmailConfirmed
-    {
-      get => EmailConfirmedAt.HasValue && EmailConfirmedById.HasValue;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool IsEmailConfirmed { get; private set; }
     public string? PhoneNumber { get; private set; }
-    public DateTime? PhoneNumberConfirmedAt { get; private set; }
-    public Guid? PhoneNumberConfirmedById { get; private set; }
-    public bool IsPhoneNumberConfirmed
-    {
-      get => PhoneNumberConfirmedAt.HasValue && PhoneNumberConfirmedById.HasValue;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
-    public bool IsAccountConfirmed
-    {
-      get => IsEmailConfirmed || IsPhoneNumberConfirmed;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool IsPhoneNumberConfirmed { get; private set; }
+    public bool IsAccountConfirmed => IsEmailConfirmed || IsPhoneNumberConfirmed;
 
     public string? FirstName { get; private set; }
     public string? MiddleName { get; private set; }
     public string? LastName { get; private set; }
-    public string? FullName => string.Join(' ', new[] { FirstName, MiddleName, LastName }
-      .Where(name => name != null)).CleanTrim();
+    public string? FullName { get; private set; }
 
-    public CultureInfo? Culture => Locale == null ? null : CultureInfo.GetCultureInfo(Locale);
-    public string? Locale { get; private set; }
+    public CultureInfo? Locale { get; private set; }
     public string? Picture { get; private set; }
 
-    public DateTime? SignedInAt { get; private set; }
-
-    public DateTime? DisabledAt { get; private set; }
-    public Guid? DisabledById { get; private set; }
-    public bool IsDisabled
-    {
-      get => DisabledAt.HasValue && DisabledById.HasValue;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool IsDisabled { get; private set; }
 
     public List<ExternalProvider> ExternalProviders { get; private set; } = new();
-    public List<Session> Sessions { get; private set; } = new();
 
-    public void ConfirmEmail(Guid? userId = null) => ApplyChange(new ConfirmedEmailEvent(userId ?? Id));
-    public void ConfirmPhoneNumber(Guid? userId = null) => ApplyChange(new ConfirmedPhoneNumberEvent(userId ?? Id));
-    public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
-    public void Update(UpdateUserSecurePayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
-
-    public void ChangePassword(string passwordHash) => ApplyChange(new ChangedPasswordEvent(passwordHash, Id));
-    public void SignIn(DateTime signedInAt) => ApplyChange(new SignedInEvent(signedInAt, Id));
-
-    public void Disable(Guid userId) => ApplyChange(new DisabledEvent(userId));
-    public void Enable(Guid userId) => ApplyChange(new EnabledEvent(userId));
-
-    public void AddExternalProvider(string key, string value, Guid userId, string? displayName = null)
-      => ApplyChange(new AddExternalProviderEvent(key, value, displayName, userId));
-
-    protected virtual void Apply(ConfirmedEmailEvent @event)
+    public void AddExternalProvider(AggregateId userId, string key, string value, string? displayName = null)
     {
-      EmailConfirmedAt = @event.OccurredAt;
-      EmailConfirmedById = @event.UserId;
+      ApplyChange(new UserAddedExternalProviderEvent
+      {
+        Key = key,
+        Value = value,
+        DisplayName = displayName
+      }, userId);
     }
-    protected virtual void Apply(ConfirmedPhoneNumberEvent @event)
+    public void ChangePassword(string passwordHash) => ApplyChange(new UserChangedPasswordEvent
     {
-      PhoneNumberConfirmedAt = @event.OccurredAt;
-      PhoneNumberConfirmedById = @event.UserId;
-    }
-    protected virtual void Apply(CreatedEvent @event)
+      PasswordHash = passwordHash
+    }, Id);
+    public void Delete(AggregateId userId)
     {
-      Username = @event.Payload.Username;
+      if (userId == Id)
+      {
+        throw new UserCannotDeleteItselfException(this);
+      }
 
-      Apply(@event.Payload, @event.OccurredAt);
+      ApplyChange(new UserDeletedEvent(), userId);
     }
-    protected virtual void Apply(ChangedPasswordEvent @event)
+    public void Disable(AggregateId userId)
     {
-      PasswordChangedAt = @event.OccurredAt;
+      if (IsDisabled)
+      {
+        throw new UserAlreadyDisabledException(this);
+      }
+      else if (userId == Id)
+      {
+        throw new UserCannotDisableItselfException(this);
+      }
+
+      ApplyChange(new UserDisabledEvent(), userId);
+    }
+    public void Enable(AggregateId userId)
+    {
+      if (!IsDisabled)
+      {
+        throw new UserNotDisabledException(this);
+      }
+
+      ApplyChange(new UserEnabledEvent(), userId);
+    }
+    public void SignIn() => ApplyChange(new UserSignedInEvent(), Id);
+    public void Update(AggregateId userId, string? passwordHash = null,
+      string? email = null, string? phoneNumber = null,
+      string? firstName = null, string? middleName = null, string? lastName = null,
+      CultureInfo? locale = null, string? picture = null)
+    {
+      email = email?.CleanTrim();
+      phoneNumber = phoneNumber?.CleanTrim();
+
+      ApplyChange(new UserUpdatedEvent
+      {
+        PasswordHash = passwordHash,
+        HasEmailChanged = email?.ToUpper() != Email?.ToUpper(),
+        Email = email,
+        HasPhoneNumberChanged = phoneNumber?.ToUpper() != PhoneNumber?.ToUpper(),
+        PhoneNumber = phoneNumber,
+        FirstName = firstName?.CleanTrim(),
+        MiddleName = middleName?.CleanTrim(),
+        LastName = lastName?.CleanTrim(),
+        FullName = GetFullName(firstName, middleName, lastName),
+        Locale = locale,
+        Picture = picture?.CleanTrim()
+      }, userId);
+    }
+
+    protected virtual void Apply(UserAddedExternalProviderEvent @event)
+    {
+      ExternalProviders.Add(new ExternalProvider(@event.Key, @event.Value, @event.DisplayName));
+    }
+    protected virtual void Apply(UserChangedPasswordEvent @event)
+    {
       PasswordHash = @event.PasswordHash;
     }
-    protected virtual void Apply(DeletedEvent @event)
+    protected virtual void Apply(UserCreatedEvent @event)
     {
-    }
-    protected virtual void Apply(DisabledEvent @event)
-    {
-      DisabledAt = @event.OccurredAt;
-      DisabledById = @event.UserId;
-    }
-    protected virtual void Apply(EnabledEvent @event)
-    {
-      DisabledAt = null;
-      DisabledById = null;
-    }
-    protected virtual void Apply(SignedInEvent @event)
-    {
-      SignedInAt = @event.OccurredAt;
-    }
-    protected virtual void Apply(UpdatedEvent @event)
-    {
-      Apply(@event.Payload, @event.OccurredAt);
-    }
+      RealmId = @event.RealmId;
 
-    protected virtual void Apply(AddExternalProviderEvent @event)
-    {
-      ExternalProviders.Add(new ExternalProvider(this, @event.Key, @event.Value, @event.OccurredAt, @event.UserId, @event.DisplayName));
-    }
+      Username = @event.Username;
+      PasswordHash = @event.PasswordHash;
 
-    private void Apply(SaveUserSecurePayload payload, DateTime occurredAt)
+      Email = @event.Email;
+      IsEmailConfirmed = @event.IsEmailConfirmed;
+      PhoneNumber = @event.PhoneNumber;
+      IsPhoneNumberConfirmed = @event.IsPhoneNumberConfirmed;
+
+      FirstName = @event.FirstName;
+      MiddleName = @event.MiddleName;
+      LastName = @event.LastName;
+      FullName = @event.FullName;
+
+      Locale = @event.Locale;
+      Picture = @event.Picture;
+    }
+    protected virtual void Apply(UserDeletedEvent @event)
     {
-      if (payload.PasswordHash != null)
+      Delete();
+    }
+    protected virtual void Apply(UserDisabledEvent @event)
+    {
+      IsDisabled = true;
+    }
+    protected virtual void Apply(UserEnabledEvent @event)
+    {
+      IsDisabled = false;
+    }
+    protected virtual void Apply(UserSignedInEvent @event)
+    {
+    }
+    protected virtual void Apply(UserUpdatedEvent @event)
+    {
+      PasswordHash = @event.PasswordHash ?? PasswordHash;
+
+      if (@event.HasEmailChanged)
       {
-        PasswordChangedAt = occurredAt;
-        PasswordHash = payload.PasswordHash;
+        Email = @event.Email;
+        IsEmailConfirmed = false;
+      }
+      if (@event.HasPhoneNumberChanged)
+      {
+        PhoneNumber = @event.PhoneNumber;
+        IsPhoneNumberConfirmed = false;
       }
 
-      if (Email?.ToUpper() != payload.Email?.ToUpper())
-      {
-        Email = payload.Email;
-        EmailConfirmedAt = null;
-        EmailConfirmedById = null;
-      }
+      FirstName = @event.FirstName;
+      MiddleName = @event.MiddleName;
+      LastName = @event.LastName;
+      FullName = @event.FullName;
 
-      if (PhoneNumber?.ToUpper() != payload.PhoneNumber?.ToUpper())
-      {
-        PhoneNumber = payload.PhoneNumber;
-        PhoneNumberConfirmedAt = null;
-        PhoneNumberConfirmedById = null;
-      }
-
-      FirstName = payload.FirstName?.CleanTrim();
-      LastName = payload.LastName?.CleanTrim();
-      MiddleName = payload.MiddleName?.CleanTrim();
-
-      Locale = payload.Locale;
-      Picture = payload.Picture;
+      Locale = @event.Locale;
+      Picture = @event.Picture;
     }
 
-    public override string ToString() => $"{Username} | {base.ToString()}";
+    public override string ToString() => $"{(FullName == null ? Username : $"{FullName} ({Username})")} | {base.ToString()}";
+
+    private static string? GetFullName(params string?[] names) => string.Join(' ', names
+      .Where(name => !string.IsNullOrWhiteSpace(name))
+      .Select(name => name!.Trim())).CleanTrim();
   }
 }

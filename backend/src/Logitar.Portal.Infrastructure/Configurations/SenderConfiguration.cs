@@ -1,30 +1,27 @@
-﻿using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Domain.Emails.Senders;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class SenderConfiguration : AggregateConfiguration<Sender>, IEntityTypeConfiguration<Sender>
+  internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEntityTypeConfiguration<SenderEntity>
   {
-    public override void Configure(EntityTypeBuilder<Sender> builder)
+    public override void Configure(EntityTypeBuilder<SenderEntity> builder)
     {
       base.Configure(builder);
 
-      builder.HasIndex(x => x.DisplayName);
+      builder.HasKey(x => x.SenderId);
+
+      builder.HasOne(x => x.Realm).WithMany(x => x.Senders).OnDelete(DeleteBehavior.Restrict);
+
+      builder.HasIndex(x => x.IsDefault).HasFilter(@"""IsDefault"" = true");
       builder.HasIndex(x => x.EmailAddress);
-      builder.HasIndex(x => x.IsDefault);
+      builder.HasIndex(x => x.DisplayName);
       builder.HasIndex(x => x.Provider);
 
-      builder.HasOne(x => x.Realm).WithMany(x => x.Senders).OnDelete(DeleteBehavior.NoAction);
-
-      builder.Ignore(x => x.Settings);
-
-      builder.Property(x => x.DisplayName).HasMaxLength(256);
       builder.Property(x => x.EmailAddress).HasMaxLength(256);
-      builder.Property(x => x.IsDefault).HasDefaultValue(false);
-      builder.Property(x => x.Provider).HasDefaultValue(default(ProviderType));
-      builder.Property(x => x.SettingsSerialized).HasColumnName(nameof(Sender.Settings)).HasColumnType("jsonb");
+      builder.Property(x => x.DisplayName).HasMaxLength(256);
+      builder.Property(x => x.Settings).HasColumnType("jsonb");
     }
   }
 }

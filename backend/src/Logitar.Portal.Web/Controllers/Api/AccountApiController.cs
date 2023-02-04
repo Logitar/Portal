@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Users.Models;
-using Logitar.Portal.Core.Users.Payloads;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +11,7 @@ namespace Logitar.Portal.Web.Controllers.Api
   public class AccountApiController : ControllerBase
   {
     private readonly IAccountService _accountService;
+
     public AccountApiController(IAccountService accountService)
     {
       _accountService = accountService;

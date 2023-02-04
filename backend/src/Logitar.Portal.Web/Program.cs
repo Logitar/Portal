@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Logitar.Portal.Web
@@ -11,16 +12,19 @@ namespace Logitar.Portal.Web
 
       WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-      var startup = new Startup(builder.Configuration);
+      Startup startup = new();
       startup.ConfigureServices(builder.Services);
 
       WebApplication application = builder.Build();
 
       startup.Configure(application);
 
-      using IServiceScope scope = application.Services.CreateScope();
-      var databaseService = scope.ServiceProvider.GetRequiredService<IDatabaseService>();
-      await databaseService.InitializeAsync();
+      if (application.Configuration.GetValue<bool>("MigrateDatabase"))
+      {
+        using IServiceScope scope = application.Services.CreateScope();
+        using PortalContext context = scope.ServiceProvider.GetRequiredService<PortalContext>();
+        await context.Database.MigrateAsync();
+      }
 
       application.Run();
     }

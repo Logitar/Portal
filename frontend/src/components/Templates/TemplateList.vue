@@ -29,17 +29,27 @@
             </td>
             <td v-text="template.displayName || '—'" />
             <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
-            <td><status-cell :actor="template.updatedBy" :date="template.updatedAt" /></td>
+            <td><status-cell :actor="template.updatedBy" :date="template.updatedOn || template.createdOn" /></td>
             <td>
-              <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
-              <delete-modal
-                confirm="templates.delete.confirm"
-                :displayName="template.displayName ? `${template.displayName} (${template.key})` : template.key"
-                :id="`delete_${template.id}`"
-                :loading="loading"
-                title="templates.delete.title"
-                @ok="onDelete(template, $event)"
-              />
+              <template v-if="isPasswordRecoveryTemplate(template)">
+                <span :id="`tooltip_${template.id}`" tabindex="0">
+                  <icon-button disabled icon="trash-alt" text="actions.delete" variant="danger" />
+                </span>
+                <b-tooltip :target="`tooltip_${template.id}`" triggers="hover">
+                  <span v-html="$t('templates.delete.cannotDeletePasswordRecoveryTemplate')" />
+                </b-tooltip>
+              </template>
+              <template v-else>
+                <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
+                <delete-modal
+                  confirm="templates.delete.confirm"
+                  :displayName="template.displayName ? `${template.displayName} (${template.key})` : template.key"
+                  :id="`delete_${template.id}`"
+                  :loading="loading"
+                  title="templates.delete.title"
+                  @ok="onDelete(template, $event)"
+                />
+              </template>
             </td>
           </tr>
         </tbody>
@@ -95,6 +105,9 @@ export default {
     }
   },
   methods: {
+    isPasswordRecoveryTemplate({ id, realm }) {
+      return realm?.passwordRecoveryTemplate?.id === id
+    },
     async onDelete({ id }, callback = null) {
       if (!this.loading) {
         this.loading = true

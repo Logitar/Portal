@@ -9,7 +9,7 @@
     "usernamePlaceholder": "Enter a new username"
   },
   "created": "The user has been created.",
-  "createdAt": "Created on",
+  "createdOn": "Created on",
   "delete": {
     "confirm": "Do you really want to delete the following user?",
     "success": "The user has been deleted.",
@@ -25,7 +25,7 @@
     "label": "Disabled",
     "placeholder": "Select an option"
   },
-  "disabledAt": "Disabled on {date}",
+  "disabledOn": "Disabled on {date}",
   "editTitle": "Edit user",
   "email": {
     "confirmed": "Confirmed",
@@ -44,7 +44,7 @@
     "title": "Enable user"
   },
   "externalProviders": {
-    "addedAt": "Added on",
+    "addedOn": "Added on",
     "empty": "This list is empty.",
     "name": "Name",
     "title": "External Providers"
@@ -66,7 +66,7 @@
   "password": {
     "changeFailed": "Password change failed!",
     "changed": "Your password has been changed.",
-    "changedAt": "Last changed on",
+    "changedOn": "Last changed on",
     "confirm": {
       "label": "Password Confirmation",
       "placeholder": "Enter the same password again"
@@ -85,7 +85,7 @@
     "submit": "Change password",
     "warning": "Avoid changing an user's password without its consent."
   },
-  "passwordChangedAt": "Password changed on",
+  "passwordChangedOn": "Password changed on",
   "phone": {
     "confirmed": "Confirmed",
     "label": "Phone Number",
@@ -124,12 +124,12 @@
     },
     "signOut": "Sign out",
     "signOutAll": "Sign out all",
-    "signedOutAt": "Signed out",
+    "signedOutOn": "Signed out",
     "sort": {
       "options": {
         "IpAddress": "IP Address",
-        "SignedOutAt": "Signed out on",
-        "UpdatedAt": "Updated on"
+        "SignedOutOn": "Signed out on",
+        "UpdatedOn": "Updated on"
       }
     },
     "success": "The session has been signed out.",
@@ -149,22 +149,22 @@
     "title": "Sign In"
   },
   "signOut": "Sign Out",
-  "signedInAt": "Last signed-in on",
+  "signedInOn": "Last signed-in on",
   "sort": {
     "options": {
       "Email": "Email address",
       "FirstMiddleLastName": "Name",
       "LastFirstMiddleName": "Last name, then first and middle names",
-      "PasswordChangedAt": "Password changed on",
+      "PasswordChangedOn": "Password changed on",
       "PhoneNumber": "Phone number",
-      "SignedInAt": "Signed-in on",
-      "UpdatedAt": "Updated on",
+      "SignedInOn": "Signed-in on",
+      "UpdatedOn": "Updated on",
       "Username": "Username"
     }
   },
   "title": "Users",
   "updated": "The user has been updated.",
-  "updatedAt": "Last updated on",
+  "updatedOn": "Last updated on",
   "username": {
     "conflict": "This username is already used by another user.",
     "label": "Username",

@@ -24,15 +24,15 @@
         <tbody>
           <tr v-for="dictionary in dictionaries" :key="dictionary.id">
             <td>
-              <b-link :href="`/dictionaries/${dictionary.id}`">{{ dictionary.realm || $t('realms.select.placeholder') }} | {{ dictionary.locale }}</b-link>
+              <b-link :href="`/dictionaries/${dictionary.id}`">{{ getDisplayName(dictionary) }}</b-link>
             </td>
-            <td v-text="dictionary.entries" />
-            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedAt" /></td>
+            <td v-text="dictionary.entries.length" />
+            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedOn || dictionary.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${dictionary.id}`" />
               <delete-modal
                 confirm="dictionaries.delete.confirm"
-                :displayName="`${dictionary.realm || $t('realms.select.placeholder')} | ${dictionary.locale}`"
+                :displayName="getDisplayName(dictionary)"
                 :id="`delete_${dictionary.id}`"
                 :loading="loading"
                 title="dictionaries.delete.title"
@@ -93,6 +93,9 @@ export default {
     }
   },
   methods: {
+    getDisplayName({ realm, locale }) {
+      return `${realm ? realm.displayName ?? realm.alias : this.$i18n.t('realms.select.placeholder')} | ${locale}`
+    },
     async onDelete({ id }, callback = null) {
       if (!this.loading) {
         this.loading = true

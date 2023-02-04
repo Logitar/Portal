@@ -1,14 +1,17 @@
-﻿using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Domain.Dictionaries;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Domain;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Dictionaries
 {
   public interface IDictionaryQuerier
   {
-    Task<Dictionary?> GetAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default);
-    Task<PagedList<Dictionary>> GetPagedAsync(string? locale = null, string? realm = null,
-      DictionarySort? sort = null, bool desc = false,
+    Task<DictionaryModel?> GetAsync(AggregateId id, CancellationToken cancellationToken = default);
+    Task<DictionaryModel?> GetAsync(string id, CancellationToken cancellationToken = default);
+    Task<ListModel<DictionaryModel>> GetPagedAsync(CultureInfo? locale = null, string? realm = null,
+      DictionarySort? sort = null, bool isDescending = false,
       int? index = null, int? count = null,
-      bool readOnly = false, CancellationToken cancellationToken = default);
+      CancellationToken cancellationToken = default);
   }
 }

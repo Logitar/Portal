@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.ApiKeys;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.ApiKeys.Models;
-using Logitar.Portal.Core.ApiKeys.Payloads;
+﻿using Logitar.Portal.Application.ApiKeys;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,45 +12,43 @@ namespace Logitar.Portal.Web.Controllers.Api
   public class ApiKeyApiController : ControllerBase
   {
     private readonly IApiKeyService _apiKeyService;
-    private readonly IMapper _mapper;
 
-    public ApiKeyApiController(IApiKeyService apiKeyService, IMapper mapper)
+    public ApiKeyApiController(IApiKeyService apiKeyService)
     {
       _apiKeyService = apiKeyService;
-      _mapper = mapper;
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiKeyModel>> CreateAsync([FromBody] CreateApiKeyPayload payload, CancellationToken cancellationToken)
     {
       ApiKeyModel apiKey = await _apiKeyService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/keys/{apiKey.Id}", UriKind.Relative);
+      Uri uri = new($"/api/keys/{apiKey.Id}", UriKind.Relative);
 
       return Created(uri, apiKey);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<ApiKeyModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      return Ok(await _apiKeyService.DeleteAsync(id, cancellationToken));
+      await _apiKeyService.DeleteAsync(id, cancellationToken);
+
+      return NoContent();
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<ApiKeySummary>>> GetAsync(bool? isExpired, string? search,
+    public async Task<ActionResult<ListModel<ApiKeyModel>>> GetAsync(DateTime? expiredOn, string? search,
       ApiKeySort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      ListModel<ApiKeyModel> apiKeys = await _apiKeyService.GetAsync(isExpired, search,
+      return Ok(await _apiKeyService.GetAsync(expiredOn, search,
         sort, desc,
         index, count,
-        cancellationToken);
-
-      return Ok(apiKeys.To<ApiKeyModel, ApiKeySummary>(_mapper));
+        cancellationToken));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiKeyModel>> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiKeyModel>> GetAsync(string id, CancellationToken cancellationToken)
     {
       ApiKeyModel? apiKey = await _apiKeyService.GetAsync(id, cancellationToken);
       if (apiKey == null)
@@ -65,7 +60,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ApiKeyModel>> UpdateAsync(Guid id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiKeyModel>> UpdateAsync(string id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _apiKeyService.UpdateAsync(id, payload, cancellationToken));
     }

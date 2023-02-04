@@ -1,14 +1,17 @@
-﻿using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Domain.Sessions;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Sessions
 {
   public interface ISessionQuerier
   {
-    Task<Session?> GetAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default);
-    Task<PagedList<Session>> GetPagedAsync(bool? isActive = null, bool? isPersistent = null, string? realm = null, Guid? userId = null,
-      SessionSort? sort = null, bool desc = false,
+    Task<SessionModel?> GetAsync(string id, CancellationToken cancellationToken = default);
+    Task<SessionModel?> GetAsync(AggregateId id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<SessionModel>> GetAsync(IEnumerable<AggregateId> ids, CancellationToken cancellationToken = default);
+    Task<ListModel<SessionModel>> GetPagedAsync(bool? isActive = null, bool? isPersistent = null, string? realm = null, string? userId = null,
+      SessionSort? sort = null, bool isDescending = false,
       int? index = null, int? count = null,
-      bool readOnly = false, CancellationToken cancellationToken = default);
+      CancellationToken cancellationToken = default);
   }
 }

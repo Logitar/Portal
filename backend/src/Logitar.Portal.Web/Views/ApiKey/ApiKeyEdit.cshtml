@@ -1,10 +1,10 @@
-﻿@using Logitar.Portal.Core.ApiKeys.Models;
+﻿@using Logitar.Portal.Contracts.ApiKeys;
 
 @model ApiKeyModel
 @{
   Layout = "_Layout";
 
-  ViewBag.Title = Model?.Name ?? "Create API key";
+  ViewBag.Title = Model?.Title ?? "Create API key";
 }
 
 @if (Model == null)

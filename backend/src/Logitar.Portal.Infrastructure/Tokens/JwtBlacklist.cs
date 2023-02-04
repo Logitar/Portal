@@ -5,28 +5,24 @@ namespace Logitar.Portal.Infrastructure.Tokens
 {
   internal class JwtBlacklist : IJwtBlacklist
   {
-    private readonly PortalDbContext _dbContext;
+    private readonly PortalContext _context;
 
-    public JwtBlacklist(PortalDbContext dbContext)
+    public JwtBlacklist(PortalContext dbContext)
     {
-      _dbContext = dbContext;
+      _context = dbContext;
     }
 
-    public async Task BlacklistAsync(IEnumerable<Guid> ids, DateTime? expiresAt, CancellationToken cancellationToken)
+    public async Task BlacklistAsync(IEnumerable<Guid> ids, DateTime? expiresOn, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(ids);
+      _context.JwtBlacklist.AddRange(ids.Select(id => new BlacklistedJwtEntity(id, expiresOn)));
 
-      _dbContext.JwtBlacklist.AddRange(ids.Select(id => new BlacklistedJwt(id, expiresAt)));
-
-      await _dbContext.SaveChangesAsync(cancellationToken);
+      await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Guid>> GetBlacklistedAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(ids);
-
-      return await _dbContext.JwtBlacklist.AsNoTracking()
-        .Where(x => ids.Contains(x.Id) && (x.ExpiresAt == null || x.ExpiresAt > DateTime.UtcNow))
+      return await _context.JwtBlacklist.AsNoTracking()
+        .Where(x => ids.Contains(x.Id) && (x.ExpiresOn == null || x.ExpiresOn > DateTime.UtcNow))
         .Select(x => x.Id)
         .ToArrayAsync(cancellationToken);
     }

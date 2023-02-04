@@ -32,26 +32,31 @@
             </td>
             <td v-text="sender.displayName || '—'" />
             <td>{{ $t(`senders.provider.options.${sender.provider}`) }}</td>
-            <td><status-cell :actor="sender.updatedBy" :date="sender.updatedAt" /></td>
+            <td><status-cell :actor="sender.updatedBy" :date="sender.updatedOn || sender.createdOn" /></td>
             <td>
               <icon-button v-if="sender.isDefault" class="mx-1" disabled icon="star" text="senders.default" variant="info" />
               <icon-button v-else class="mx-1" icon="star" :loading="loading" text="senders.default" variant="warning" @click="onSetDefault(sender)" />
-              <icon-button
-                class="mx-1"
-                :disabled="sender.isDefault && senders.length > 1"
-                icon="trash-alt"
-                text="actions.delete"
-                variant="danger"
-                v-b-modal="`delete_${sender.id}`"
-              />
-              <delete-modal
-                confirm="senders.delete.confirm"
-                :displayName="sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress"
-                :id="`delete_${sender.id}`"
-                :loading="loading"
-                title="senders.delete.title"
-                @ok="onDelete(sender, $event)"
-              />
+              <template v-if="canDelete(sender)">
+                <icon-button class="mx-1" icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${sender.id}`" />
+                <delete-modal
+                  confirm="senders.delete.confirm"
+                  :displayName="sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress"
+                  :id="`delete_${sender.id}`"
+                  :loading="loading"
+                  title="senders.delete.title"
+                  @ok="onDelete(sender, $event)"
+                />
+              </template>
+              <template v-else>
+                <span :id="`tooltip_${sender.id}`" class="mx-1" tabindex="0">
+                  <icon-button disabled icon="trash-alt" text="actions.delete" variant="danger" />
+                </span>
+                <b-tooltip :target="`tooltip_${sender.id}`" triggers="hover">
+                  <span v-if="isDefaultNotUniqueSender(sender)" v-html="$t('senders.delete.cannotDeleteDefaultSender')" />
+                  {{ ' ' }}
+                  <span v-if="isPasswordRecoverySender(sender)" v-html="$t('senders.delete.cannotDeletePasswordRecoverySender')" />
+                </b-tooltip>
+              </template>
             </td>
           </tr>
         </tbody>
@@ -111,6 +116,15 @@ export default {
     }
   },
   methods: {
+    canDelete(sender) {
+      return !this.isDefaultNotUniqueSender(sender) && !this.isPasswordRecoverySender(sender)
+    },
+    isDefaultNotUniqueSender({ isDefault }) {
+      return isDefault && this.senders.length > 1
+    },
+    isPasswordRecoverySender({ id, realm }) {
+      return realm?.passwordRecoverySender?.id === id
+    },
     async onDelete({ id }, callback = null) {
       if (!this.loading) {
         this.loading = true

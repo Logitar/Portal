@@ -3,12 +3,12 @@
     <h1 v-t="user ? 'user.editTitle' : 'user.newTitle'" />
     <template v-if="user">
       <status-detail :model="user" />
-      <p v-if="user.signedInAt">
-        {{ $t('user.signedInAt') }} {{ $d(new Date(user.signedInAt), 'medium') }}
+      <p v-if="user.signedInOn">
+        {{ $t('user.signedInOn') }} {{ $d(new Date(user.signedInOn), 'medium') }}
         <br />
         <b-link :href="viewSessionsUrl">{{ $t('user.session.view') }}</b-link>
       </p>
-      <p v-if="user.isDisabled" class="text-danger"><status-info :actor="user.disabledBy" :date="new Date(user.disabledAt)" dateFormat="user.disabledAt" /></p>
+      <p v-if="user.isDisabled" class="text-danger"><status-info :actor="user.disabledBy" :date="new Date(user.disabledOn)" dateFormat="user.disabledOn" /></p>
     </template>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
@@ -33,9 +33,9 @@
           :validate="!user"
           v-model="username"
         />
-        <template v-if="!user || user.passwordChangedAt">
+        <template v-if="!user || user.passwordChangedOn">
           <h5 v-if="user" v-t="'user.password.label'" />
-          <p v-if="user && user.passwordChangedAt">{{ $t('user.password.changedAt') }} {{ $d(new Date(user.passwordChangedAt), 'medium') }}</p>
+          <p v-if="user && user.passwordChangedOn">{{ $t('user.password.changedOn') }} {{ $d(new Date(user.passwordChangedOn), 'medium') }}</p>
           <p v-if="user && (password || passwordConfirmation)" class="text-warning">
             <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.password.warning'" />
           </p>
@@ -82,11 +82,11 @@
           <picture-field class="col" validate v-model="picture" />
         </b-row>
         <h3 v-t="'user.externalProviders.title'" />
-        <table class="table table-striped" v-if="user && user.externalProviders.length">
+        <table class="table table-striped" v-if="user && user.externalProviders && user.externalProviders.length">
           <thead>
             <tr>
               <th scope="col" v-t="'user.externalProviders.name'" />
-              <th scope="col" v-t="'user.externalProviders.addedAt'" />
+              <th scope="col" v-t="'user.externalProviders.addedOn'" />
             </tr>
           </thead>
           <tbody>
@@ -95,7 +95,7 @@
                 {{ externalProvider.displayName || externalProvider.key }}
                 <font-awesome-icon v-if="externalProvider.key === 'Google'" :icon="['fab', 'google']" />
               </td>
-              <td>{{ $d(new Date(externalProvider.addedAt), 'medium') }}</td>
+              <td>{{ $d(new Date(externalProvider.addedOn), 'medium') }}</td>
             </tr>
           </tbody>
         </table>

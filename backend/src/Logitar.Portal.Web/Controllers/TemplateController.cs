@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Application.Emails.Templates;
-using Logitar.Portal.Core.Emails.Templates.Models;
+﻿using Logitar.Portal.Application.Templates;
+using Logitar.Portal.Contracts.Templates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> TemplateEdit(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> TemplateEdit(string id, CancellationToken cancellationToken = default)
     {
       TemplateModel? template = await _templateService.GetAsync(id, cancellationToken);
       if (template == null)

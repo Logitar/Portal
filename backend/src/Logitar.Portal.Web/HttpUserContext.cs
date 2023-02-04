@@ -1,8 +1,9 @@
 ﻿using Logitar.Portal.Application;
-using Logitar.Portal.Domain.Actors;
-using Logitar.Portal.Domain.ApiKeys;
-using Logitar.Portal.Domain.Users;
-using System.Net;
+using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web
 {
@@ -18,28 +19,45 @@ namespace Logitar.Portal.Web
     private HttpContext HttpContext => _httpContextAccessor.HttpContext
       ?? throw new InvalidOperationException($"The {nameof(HttpContext)} is required.");
 
-    public Actor Actor
+    public ActorModel Actor
     {
       get
       {
-        User? user = HttpContext.GetUser();
+        UserModel? user = HttpContext.GetUser();
         if (user != null)
         {
-          return new Actor(user);
+          return new ActorModel
+          {
+            Id = user.Id,
+            Type = ActorType.User,
+            DisplayName = user.FullName ?? user.Username,
+            Email = user.Email,
+            Picture = user.Picture
+          };
         }
 
-        ApiKey? apiKey = HttpContext.GetApiKey();
+        ApiKeyModel? apiKey = HttpContext.GetApiKey();
         if (apiKey != null)
         {
-          return new Actor(apiKey);
+          return new ActorModel
+          {
+            Id = apiKey.Id,
+            Type = ActorType.ApiKey,
+            DisplayName = apiKey.Title
+          };
         }
 
-        return Actor.System;
+        return new ActorModel
+        {
+          Id = "SYSTEM",
+          DisplayName = "System"
+        };
       }
     }
+    public AggregateId ActorId => new(Actor.Id);
 
-    public Guid Id => HttpContext.GetUser()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The User context item is required.");
-    public Guid SessionId => HttpContext.GetSession()?.Id ?? throw new ApiException(HttpStatusCode.Unauthorized, "The Session ID is required.");
+    public string SessionId => HttpContext.GetSession()?.Id ?? throw new InvalidOperationException("The Session is required.");
+    public string UserId => HttpContext.GetUser()?.Id ?? throw new InvalidOperationException("The User is required.");
 
     public string BaseUrl => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
   }

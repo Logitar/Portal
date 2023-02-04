@@ -1,55 +1,56 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Emails.Senders;
-using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Domain.Emails.Senders;
+﻿using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class SenderQuerier : ISenderQuerier
   {
-    private readonly DbSet<Sender> _senders;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<SenderEntity> _senders;
 
-    public SenderQuerier(PortalDbContext dbContext)
+    public SenderQuerier(PortalContext context, IMappingService mapper)
     {
-      _senders = dbContext.Senders;
+      _mapper = mapper;
+      _senders = context.Senders;
     }
 
-    public async Task<Sender?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
+    public async Task<SenderModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+    public async Task<SenderModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      return await _senders.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+      SenderEntity? sender = await _senders.AsNoTracking()
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender)
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
-    public async Task<Sender?> GetDefaultAsync(Realm? realm, bool readOnly = false, CancellationToken cancellationToken = default)
+    public async Task<SenderModel?> GetDefaultAsync(Realm? realm, CancellationToken cancellationToken)
     {
-      IQueryable<Sender> query = _senders.ApplyTracking(readOnly).Include(x => x.Realm);
+      SenderEntity? sender = await _senders.AsNoTracking()
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender)
+        .SingleOrDefaultAsync(x => (realm == null ? x.RealmId == null : x.Realm!.AggregateId == realm.Id.Value)
+          && x.IsDefault, cancellationToken);
 
-      return realm == null
-        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.IsDefault, cancellationToken)
-        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.IsDefault, cancellationToken);
+      return await _mapper.MapAsync<SenderModel>(sender, cancellationToken);
     }
 
-    public async Task<PagedList<Sender>> GetPagedAsync(ProviderType? provider, string? realm, string? search,
-      SenderSort? sort, bool desc,
+    public async Task<ListModel<SenderModel>> GetPagedAsync(ProviderType? provider, string? realm, string? search,
+      SenderSort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<Sender> query = _senders.ApplyTracking(readOnly)
-        .Include(x => x.Realm);
+      IQueryable<SenderEntity> query = _senders.AsNoTracking()
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoverySender);
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.RealmSid == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
-          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.RealmId == null)
+        : query.Where(x => x.Realm!.AliasNormalized == realm.ToUpper() || x.Realm.AggregateId == realm);
 
       if (search != null)
       {
@@ -75,18 +76,18 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          SenderSort.DisplayName => desc ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName),
-          SenderSort.EmailAddress => desc ? query.OrderByDescending(x => x.EmailAddress) : query.OrderBy(x => x.EmailAddress),
-          SenderSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          SenderSort.DisplayName => isDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName),
+          SenderSort.EmailAddress => isDescending ? query.OrderByDescending(x => x.EmailAddress) : query.OrderBy(x => x.EmailAddress),
+          SenderSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The sender sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Sender[] senders = await query.ToArrayAsync(cancellationToken);
+      SenderEntity[] senders = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Sender>(senders, total);
+      return new ListModel<SenderModel>(await _mapper.MapAsync<SenderModel>(senders, cancellationToken));
     }
   }
 }

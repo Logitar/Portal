@@ -1,8 +1,9 @@
 ﻿using Logitar.Portal.Application.Accounts;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Configurations.Payloads;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -31,7 +32,7 @@ namespace Logitar.Portal.Web.Controllers.Api
 
       await _configurationService.InitializeAsync(payload, cancellationToken);
 
-      var signInPayload = new SignInPayload
+      SignInPayload signInPayload = new()
       {
         Username = payload.User.Username,
         Password = payload.User.Password,
@@ -39,7 +40,7 @@ namespace Logitar.Portal.Web.Controllers.Api
         AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers)
       };
       SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, cancellationToken);
-      HttpContext.SetSession(session);
+      HttpContext.SignIn(session);
 
       return NoContent();
     }

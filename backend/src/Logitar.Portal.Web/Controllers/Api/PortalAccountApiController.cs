@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
-using Logitar.Portal.Web.Models.Api.PortalAccount;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -19,17 +19,13 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPost("sign/in")]
-    public async Task<ActionResult> SignInAsync([FromBody] PortalSignInPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult> SignInAsync([FromBody] SignInPayload payload, CancellationToken cancellationToken)
     {
-      SessionModel session = await _accountService.SignInAsync(new SignInPayload
-      {
-        Username = payload.Username,
-        Password = payload.Password,
-        Remember = payload.Remember,
-        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-        AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers)
-      }, realm: null, cancellationToken);
-      HttpContext.SetSession(session);
+      payload.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+      payload.AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers);
+
+      SessionModel session = await _accountService.SignInAsync(payload, realm: null, cancellationToken);
+      HttpContext.SignIn(session);
 
       return NoContent();
     }

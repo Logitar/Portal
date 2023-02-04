@@ -7,12 +7,12 @@ namespace Logitar.Portal.Application.ApiKeys
   {
     public ApiKeyValidator()
     {
-      RuleFor(x => x.KeyHash)
-        .NotEmpty();
+      RuleFor(x => x.SecretHash).NotEmpty();
 
-      RuleFor(x => x.Name)
-        .NotEmpty()
-        .MaximumLength(100);
+      RuleFor(x => x.Title).NotEmpty()
+        .MaximumLength(256);
+
+      RuleFor(x => x.Description).NullOrNotEmpty();
     }
   }
 }

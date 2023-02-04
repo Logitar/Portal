@@ -1,14 +1,16 @@
-﻿using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Application.Users
 {
   public interface IPasswordService
   {
-    string GenerateAndHash(int length, out byte[] password);
+    string GenerateAndHash(int length, out byte[] bytes);
     string Hash(string password);
+    bool IsMatch(ApiKey apiKey, byte[] secret);
+    bool IsMatch(Session session, byte[] key);
     bool IsMatch(User user, string password);
-    bool IsMatch(string hash, byte[] password);
-    void ValidateAndThrow(string password, Realm? realm = null);
+    void ValidateAndThrow(string password, PasswordSettings passwordSettings);
   }
 }

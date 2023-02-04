@@ -23,7 +23,7 @@
     public const string ProfileUri = "profile";
     public const string Subject = "sub";
     public const string TimeZone = "zoneinfo";
-    public const string UpdatedAt = "updated_at";
+    public const string UpdatedOn = "updated_at";
     public const string Username = "preferred_username";
     public const string WebsiteUri = "website";
   }

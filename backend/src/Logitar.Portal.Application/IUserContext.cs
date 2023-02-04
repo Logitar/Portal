@@ -1,13 +1,13 @@
-﻿using Logitar.Portal.Domain.Actors;
+﻿using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application
 {
   public interface IUserContext
   {
-    Actor Actor { get; }
+    AggregateId ActorId { get; }
 
-    Guid Id { get; }
-    Guid SessionId { get; }
+    string SessionId { get; }
+    string UserId { get; }
 
     string BaseUrl { get; }
   }

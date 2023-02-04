@@ -1,7 +1,6 @@
-﻿using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
-using Logitar.Portal.Core.Users.Models;
-using Logitar.Portal.Core.Users.Payloads;
+﻿using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Accounts
 {

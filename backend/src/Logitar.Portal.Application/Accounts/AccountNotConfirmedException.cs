@@ -1,17 +1,13 @@
-﻿using Logitar.Portal.Core;
-using System.Net;
+﻿using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Application.Accounts
 {
-  internal class AccountNotConfirmedException : ApiException
+  public class AccountNotConfirmedException : Exception
   {
-    public AccountNotConfirmedException(Guid userId)
-      : base(HttpStatusCode.BadRequest, $"The user 'Id={userId}' does not have a confirmed account.")
+    public AccountNotConfirmedException(User user)
+      : base($"The user '{user}' does not have a confirmed account.")
     {
-      UserId = userId;
-      Value = new { code = nameof(AccountNotConfirmedException).Remove(nameof(Exception)) };
+      Data["User"] = user.ToString();
     }
-
-    public Guid UserId { get; }
   }
 }

@@ -1,36 +1,26 @@
-﻿using Logitar.Portal.Application.Configurations.Payloads;
-using Logitar.Portal.Application.Users;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Users.Models;
+﻿using Logitar.Portal.Application.Configurations.Commands;
+using Logitar.Portal.Application.Configurations.Payloads;
+using Logitar.Portal.Application.Configurations.Queries;
 
 namespace Logitar.Portal.Application.Configurations
 {
   internal class ConfigurationService : IConfigurationService
   {
-    private readonly IUserService _userService;
+    private readonly IRequestPipeline _requestPipeline;
 
-    public ConfigurationService(IUserService userService)
+    public ConfigurationService(IRequestPipeline requestPipeline)
     {
-      _userService = userService;
+      _requestPipeline = requestPipeline;
     }
 
-    public async Task InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken = default)
+    public async Task InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(payload);
-
-      if (await IsInitializedAsync(cancellationToken))
-      {
-        throw new ConfigurationAlreadyInitializedException();
-      }
-
-      await _userService.CreateAsync(payload.User, cancellationToken);
+      await _requestPipeline.ExecuteAsync(new InitializeConfigurationCommand(payload), cancellationToken);
     }
 
-    public async Task<bool> IsInitializedAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> IsInitializedAsync(CancellationToken cancellationToken)
     {
-      ListModel<UserModel> users = await _userService.GetAsync(realm: null, count: 1, cancellationToken: cancellationToken);
-
-      return users.Items.Any();
+      return await _requestPipeline.ExecuteAsync(new IsConfigurationInitializedQuery(), cancellationToken);
     }
   }
 }

@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Application.Emails.Messages;
-using Logitar.Portal.Core.Emails.Messages.Models;
+﻿using Logitar.Portal.Application.Messages;
+using Logitar.Portal.Contracts.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +24,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> MessageView(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> MessageView(string id, CancellationToken cancellationToken = default)
     {
       MessageModel? message = await _messageService.GetAsync(id, cancellationToken);
       if (message == null)

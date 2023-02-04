@@ -1,45 +1,58 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Domain.Sessions;
+﻿using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class SessionQuerier : ISessionQuerier
   {
-    private readonly DbSet<Session> _sessions;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<SessionEntity> _sessions;
 
-    public SessionQuerier(PortalDbContext dbContext)
+    public SessionQuerier(IMappingService mapper, PortalContext context)
     {
-      _sessions = dbContext.Sessions;
+      _mapper = mapper;
+      _sessions = context.Sessions;
     }
 
-    public async Task<Session?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
+    public async Task<SessionModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+
+    public async Task<SessionModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      return await _sessions.ApplyTracking(readOnly)
+      SessionEntity? session = await _sessions.AsNoTracking()
         .Include(x => x.User).ThenInclude(x => x!.Realm)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<SessionModel>(session, cancellationToken);
     }
 
-    public async Task<PagedList<Session>> GetPagedAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
-      SessionSort? sort, bool desc,
-      int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+    public async Task<IEnumerable<SessionModel>> GetAsync(IEnumerable<AggregateId> ids, CancellationToken cancellationToken)
     {
-      IQueryable<Session> query = _sessions.ApplyTracking(readOnly)
+      IEnumerable<string> aggregateIds = ids.Select(x => x.Value);
+
+      SessionEntity[] sessions = await _sessions.AsNoTracking()
+        .Include(x => x.User).ThenInclude(x => x!.Realm)
+        .Where(x => aggregateIds.Contains(x.AggregateId))
+        .ToArrayAsync(cancellationToken);
+
+      return await _mapper.MapAsync<SessionModel>(sessions, cancellationToken);
+    }
+
+    public async Task<ListModel<SessionModel>> GetPagedAsync(bool? isActive, bool? isPersistent, string? realm, string? userId,
+      SessionSort? sort, bool isDescending,
+      int? index, int? count,
+      CancellationToken cancellationToken)
+    {
+      IQueryable<SessionEntity> query = _sessions.AsNoTracking()
         .Include(x => x.User).ThenInclude(x => x!.Realm);
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.User != null && x.User.RealmSid == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.User != null && x.User.Realm != null && x.User.Realm.Id == realmId)
-          : query.Where(x => x.User != null && x.User.Realm != null && x.User.Realm.AliasNormalized == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.User!.RealmId == null)
+        : query.Where(x => x.User!.Realm!.AliasNormalized == realm.ToUpper() || x.User.Realm.AggregateId == realm);
 
       if (isActive.HasValue)
       {
@@ -49,9 +62,9 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = query.Where(x => x.IsPersistent == isPersistent.Value);
       }
-      if (userId.HasValue)
+      if (userId != null)
       {
-        query = query.Where(x => x.User != null && x.User.Id == userId.Value);
+        query = query.Where(x => x.User!.AggregateId == userId);
       }
 
       long total = await query.LongCountAsync(cancellationToken);
@@ -60,18 +73,18 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          SessionSort.IpAddress => desc ? query.OrderByDescending(x => x.IpAddress) : query.OrderBy(x => x.IpAddress),
-          SessionSort.SignedOutAt => desc ? query.OrderByDescending(x => x.SignedOutAt) : query.OrderBy(x => x.SignedOutAt),
-          SessionSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          SessionSort.IpAddress => isDescending ? query.OrderByDescending(x => x.IpAddress) : query.OrderBy(x => x.IpAddress),
+          SessionSort.SignedOutOn => isDescending ? query.OrderByDescending(x => x.SignedOutOn) : query.OrderBy(x => x.SignedOutOn),
+          SessionSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The session sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Session[] sessions = await query.ToArrayAsync(cancellationToken);
+      SessionEntity[] sessions = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Session>(sessions, total);
+      return new ListModel<SessionModel>(await _mapper.MapAsync<SessionModel>(sessions, cancellationToken), total);
     }
   }
 }

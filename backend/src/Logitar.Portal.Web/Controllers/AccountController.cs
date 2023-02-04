@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Core.Users.Models;
+using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,7 @@ namespace Logitar.Portal.Web.Controllers
     [HttpGet("sign-in")]
     public ActionResult SignIn()
     {
-      if (HttpContext.GetSessionId().HasValue)
+      if (HttpContext.GetSessionId() != null)
       {
         return RedirectToAction(actionName: "Profile");
       }

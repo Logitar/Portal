@@ -1,10 +1,10 @@
-﻿using Logitar.Portal.Domain.Users;
+﻿using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Web.Models.Users
 {
   internal class CurrentUser
   {
-    public CurrentUser(User? user)
+    public CurrentUser(UserModel? user)
     {
       IsAuthenticated = user != null;
 

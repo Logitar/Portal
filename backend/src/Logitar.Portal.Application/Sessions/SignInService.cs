@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Application.Accounts;
+﻿using FluentValidation;
 using Logitar.Portal.Application.Users;
-using Logitar.Portal.Core.Sessions.Models;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 
@@ -10,41 +12,44 @@ namespace Logitar.Portal.Application.Sessions
   {
     private const int SessionKeyLength = 32;
 
-    private readonly IMappingService _mappingService;
     private readonly IPasswordService _passwordService;
-    private readonly IRepository<Session> _repository;
-    private readonly IRepository<User> _userRepository;
+    private readonly IRepository _repository;
+    private readonly ISessionQuerier _sessionQuerier;
+    private readonly IValidator<Session> _sessionValidator;
+    private readonly IUserValidator _userValidator;
 
-    public SignInService(
-      IMappingService mappingService,
-      IPasswordService passwordService,
-      IRepository<Session> repository,
-      IRepository<User> userRepository
-    )
+    public SignInService(IPasswordService passwordService,
+      IRepository repository,
+      ISessionQuerier sessionQuerier,
+      IValidator<Session> sessionValidator,
+      IUserValidator userValidator)
     {
-      _mappingService = mappingService;
       _passwordService = passwordService;
       _repository = repository;
-      _userRepository = userRepository;
+      _sessionQuerier = sessionQuerier;
+      _sessionValidator = sessionValidator;
+      _userValidator = userValidator;
     }
 
     public async Task<SessionModel> RenewAsync(Session session, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(session);
-
       string keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out byte[] keyBytes);
-      session.Update(keyHash, ipAddress, additionalInformation);
+      session.Renew(keyHash, ipAddress, additionalInformation);
       await _repository.SaveAsync(session, cancellationToken);
 
-      var model = await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
-      model.RenewToken = new SecureToken(model.Id, keyBytes).ToString();
+      SessionModel model = await _sessionQuerier.GetAsync(session.Id, cancellationToken)
+        ?? throw new InvalidOperationException($"The session '{session.Id}' could not be found.");
+
+      model.RenewToken = keyBytes == null ? null : new RenewToken(model.Id, keyBytes).ToString();
 
       return model;
     }
 
-    public async Task<SessionModel> SignInAsync(User user, bool remember, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
+    public async Task<SessionModel> SignInAsync(User user, Realm? realm, bool remember, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(user);
+      UsernameSettings usernameSettings = realm?.UsernameSettings
+        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.UsernameSettings
+        ?? throw new InvalidOperationException("The username settings could not be resolved.");
 
       byte[]? keyBytes = null;
       string? keyHash = null;
@@ -53,14 +58,18 @@ namespace Logitar.Portal.Application.Sessions
         keyHash = _passwordService.GenerateAndHash(SessionKeyLength, out keyBytes);
       }
 
-      var session = new Session(user, keyHash, ipAddress, additionalInformation);
-      await _repository.SaveAsync(session, cancellationToken);
+      Session session = new(user, keyHash, ipAddress, additionalInformation);
+      _sessionValidator.ValidateAndThrow(session);
 
-      user.SignIn(session.CreatedAt);
-      await _userRepository.SaveAsync(user, cancellationToken);
+      user.SignIn();
+      _userValidator.ValidateAndThrow(user, usernameSettings);
 
-      var model = await _mappingService.MapAsync<SessionModel>(session, cancellationToken);
-      model.RenewToken = keyBytes == null ? null : new SecureToken(model.Id, keyBytes).ToString();
+      await _repository.SaveAsync(new AggregateRoot[] { session, user }, cancellationToken);
+
+      SessionModel model = await _sessionQuerier.GetAsync(session.Id, cancellationToken)
+        ?? throw new InvalidOperationException($"The session '{session.Id}' could not be found.");
+
+      model.RenewToken = keyBytes == null ? null : new RenewToken(model.Id, keyBytes).ToString();
 
       return model;
     }

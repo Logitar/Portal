@@ -1,47 +1,50 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Emails.Messages;
-using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Domain.Emails.Messages;
+﻿using Logitar.Portal.Application.Messages;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class MessageQuerier : IMessageQuerier
   {
-    private readonly DbSet<Message> _messages;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<MessageEntity> _messages;
 
-    public MessageQuerier(PortalDbContext dbContext)
+    public MessageQuerier(PortalContext context, IMappingService mapper)
     {
-      _messages = dbContext.Messages;
+      _mapper = mapper;
+      _messages = context.Messages;
     }
 
-    public async Task<Message?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
+    public async Task<MessageModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
     {
-      return await _messages.ApplyTracking(readOnly)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+      MessageEntity? message = await _messages.AsNoTracking()
+        .Include(x => x.Recipients)
+        .SingleOrDefaultAsync(x => x.AggregateId == id.Value, cancellationToken);
+
+      return await _mapper.MapAsync<MessageModel>(message, cancellationToken);
     }
 
-    public async Task<PagedList<Message>> GetPagedAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
-      MessageSort? sort, bool desc,
+    public async Task<ListModel<MessageModel>> GetPagedAsync(bool? hasErrors, bool? hasSucceeded, bool? isDemo, string? realm, string? search, string? template,
+      MessageSort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<Message> query = _messages.ApplyTracking(readOnly);
+      IQueryable<MessageEntity> query = _messages.AsNoTracking();
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.RealmId == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.RealmId == realmId)
-          : query.Where(x => x.RealmAlias == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.RealmId == null)
+        : query.Where(x => x.RealmAliasNormalized == realm.ToUpper() || x.RealmId == realm);
 
       if (hasErrors.HasValue)
       {
         query = query.Where(x => x.HasErrors == hasErrors.Value);
+      }
+      if (hasSucceeded.HasValue)
+      {
+        query = query.Where(x => x.HasSucceeded == hasSucceeded.Value);
       }
       if (isDemo.HasValue)
       {
@@ -59,21 +62,15 @@ namespace Logitar.Portal.Infrastructure.Queriers
               || EF.Functions.ILike(x.Subject, pattern)
               || EF.Functions.ILike(x.TemplateKey, pattern)
               || (x.RealmAlias != null && EF.Functions.ILike(x.RealmAlias, pattern))
-              || (x.RealmName != null && EF.Functions.ILike(x.RealmName, pattern))
+              || (x.RealmDisplayName != null && EF.Functions.ILike(x.RealmDisplayName, pattern))
               || (x.SenderDisplayName != null && EF.Functions.ILike(x.SenderDisplayName, pattern))
               || (x.TemplateDisplayName != null && EF.Functions.ILike(x.TemplateDisplayName, pattern)));
           }
         }
       }
-      if (succeeded.HasValue)
-      {
-        query = query.Where(x => x.Succeeded == succeeded.Value);
-      }
       if (template != null)
       {
-        query = Guid.TryParse(template, out Guid templateId)
-          ? query.Where(x => x.TemplateId == templateId)
-          : query.Where(x => x.TemplateKey == template.ToUpper());
+        query.Where(x => x.TemplateId == template || x.TemplateKeyNormalized == template);
       }
 
       long total = await query.LongCountAsync(cancellationToken);
@@ -82,17 +79,17 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          MessageSort.Subject => desc ? query.OrderByDescending(x => x.Subject) : query.OrderBy(x => x.Subject),
-          MessageSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          MessageSort.Subject => isDescending ? query.OrderByDescending(x => x.Subject) : query.OrderBy(x => x.Subject),
+          MessageSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The message sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Message[] messages = await query.ToArrayAsync(cancellationToken);
+      MessageEntity[] messages = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Message>(messages, total);
+      return new ListModel<MessageModel>(await _mapper.MapAsync<MessageModel>(messages, cancellationToken), total);
     }
   }
 }

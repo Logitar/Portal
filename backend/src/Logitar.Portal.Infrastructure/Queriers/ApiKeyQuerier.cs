@@ -1,36 +1,43 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.ApiKeys;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Domain.ApiKeys;
+﻿using Logitar.Portal.Application.ApiKeys;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class ApiKeyQuerier : IApiKeyQuerier
   {
-    private readonly DbSet<ApiKey> _apiKeys;
+    private readonly DbSet<ApiKeyEntity> _apiKeys;
+    private readonly IMappingService _mapper;
 
-    public ApiKeyQuerier(PortalDbContext dbContext)
+    public ApiKeyQuerier(PortalContext context, IMappingService mapper)
     {
-      _apiKeys = dbContext.ApiKeys;
+      _apiKeys = context.ApiKeys;
+      _mapper = mapper;
     }
 
-    public async Task<ApiKey?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
+    public async Task<ApiKeyModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+    public async Task<ApiKeyModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      return await _apiKeys.ApplyTracking(readOnly)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+      ApiKeyEntity? apiKey = await _apiKeys.AsNoTracking()
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<ApiKeyModel>(apiKey, cancellationToken);
     }
 
-    public async Task<PagedList<ApiKey>> GetPagedAsync(bool? isExpired, string? search,
-      ApiKeySort? sort, bool desc,
+    public async Task<ListModel<ApiKeyModel>> GetPagedAsync(DateTime? expiredOn, string? search,
+      ApiKeySort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<ApiKey> query = _apiKeys.ApplyTracking(readOnly);
+      IQueryable<ApiKeyEntity> query = _apiKeys.AsNoTracking();
 
-      if (isExpired.HasValue)
+      if (expiredOn.HasValue)
       {
-        query = query.Where(x => x.IsExpired == isExpired.Value);
+        query = query.Where(x => x.ExpiresOn <= expiredOn.Value);
       }
       if (search != null)
       {
@@ -40,7 +47,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
           {
             string pattern = $"%{term}%";
 
-            query = query.Where(x => EF.Functions.ILike(x.Name, pattern));
+            query = query.Where(x => EF.Functions.ILike(x.Title, pattern));
           }
         }
       }
@@ -51,18 +58,18 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          ApiKeySort.ExpiresAt => desc ? query.OrderByDescending(x => x.ExpiresAt) : query.OrderBy(x => x.ExpiresAt),
-          ApiKeySort.Name => desc ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
-          ApiKeySort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          ApiKeySort.ExpiresOn => isDescending ? query.OrderByDescending(x => x.ExpiresOn) : query.OrderBy(x => x.ExpiresOn),
+          ApiKeySort.Title => isDescending ? query.OrderByDescending(x => x.Title) : query.OrderBy(x => x.Title),
+          ApiKeySort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The API key sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      ApiKey[] apiKeys = await query.ToArrayAsync(cancellationToken);
+      ApiKeyEntity[] apiKeys = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<ApiKey>(apiKeys, total);
+      return new ListModel<ApiKeyModel>(await _mapper.MapAsync<ApiKeyModel>(apiKeys, cancellationToken), total);
     }
   }
 }

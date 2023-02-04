@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.ApiKeys;
-using Logitar.Portal.Core.ApiKeys.Models;
+using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> ApiKeyEdit(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> ApiKeyEdit(string id, CancellationToken cancellationToken = default)
     {
       ApiKeyModel? apiKey = await _apiKeyService.GetAsync(id, cancellationToken);
       if (apiKey == null)

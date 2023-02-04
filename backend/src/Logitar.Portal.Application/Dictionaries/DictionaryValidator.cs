@@ -7,11 +7,12 @@ namespace Logitar.Portal.Application.Dictionaries
   {
     public DictionaryValidator()
     {
-      RuleFor(x => x.Locale)
-        .Must(ValidationRules.BeAValidCulture);
+      RuleFor(x => x.Locale).Locale();
 
-      RuleForEach(x => x.Entries)
-        .SetValidator(new EntryValidator());
+      RuleForEach(x => x.Entries.Keys).NotEmpty()
+        .MaximumLength(256)
+        .Identifier();
+      RuleForEach(x => x.Entries.Values).NotNull();
     }
   }
 }

@@ -1,27 +1,25 @@
-﻿using Logitar.Portal.Domain.Users;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class ExternalProviderConfiguration : IEntityTypeConfiguration<ExternalProvider>
+  internal class ExternalProviderConfiguration : IEntityTypeConfiguration<ExternalProviderEntity>
   {
-    public void Configure(EntityTypeBuilder<ExternalProvider> builder)
+    public void Configure(EntityTypeBuilder<ExternalProviderEntity> builder)
     {
-      builder.ToTable("ExternalProviders");
+      builder.HasKey(x => x.ExternalProviderId);
 
-      builder.HasKey(x => x.Sid);
-      builder.HasIndex(x => x.Id).IsUnique();
-      builder.HasIndex(x => new { x.RealmSid, x.Key, x.Value }).IsUnique();
-
+      builder.HasOne(x => x.Realm).WithMany(x => x.ExternalProviders).OnDelete(DeleteBehavior.Cascade);
       builder.HasOne(x => x.User).WithMany(x => x.ExternalProviders).OnDelete(DeleteBehavior.Cascade);
 
-      builder.Property(x => x.AddedAt).HasDefaultValueSql("now()");
-      builder.Property(x => x.AddedById).HasDefaultValue(Guid.Empty);
-      builder.Property(x => x.DisplayName).HasMaxLength(256);
-      builder.Property(x => x.Id).HasDefaultValueSql("uuid_generate_v4()");
+      builder.HasIndex(x => x.Id).IsUnique();
+      builder.HasIndex(x => new { x.RealmId, x.Key, x.Value }).IsUnique();
+
       builder.Property(x => x.Key).HasMaxLength(256);
       builder.Property(x => x.Value).HasMaxLength(256);
+      builder.Property(x => x.DisplayName).HasMaxLength(256);
+      builder.Property(x => x.AddedBy).HasMaxLength(256);
     }
   }
 }

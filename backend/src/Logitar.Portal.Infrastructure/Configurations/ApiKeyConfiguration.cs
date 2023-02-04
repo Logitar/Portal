@@ -1,20 +1,21 @@
-﻿using Logitar.Portal.Domain.ApiKeys;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class ApiKeyConfiguration : AggregateConfiguration<ApiKey>, IEntityTypeConfiguration<ApiKey>
+  internal class ApiKeyConfiguration : AggregateConfiguration<ApiKeyEntity>, IEntityTypeConfiguration<ApiKeyEntity>
   {
-    public override void Configure(EntityTypeBuilder<ApiKey> builder)
+    public override void Configure(EntityTypeBuilder<ApiKeyEntity> builder)
     {
       base.Configure(builder);
 
-      builder.HasIndex(x => x.IsExpired);
-      builder.HasIndex(x => x.Name);
+      builder.HasKey(x => x.ApiKeyId);
 
-      builder.Property(x => x.IsExpired).HasDefaultValue(false);
-      builder.Property(x => x.Name).HasMaxLength(256);
+      builder.HasIndex(x => x.Title);
+      builder.HasIndex(x => x.ExpiresOn);
+
+      builder.Property(x => x.Title).HasMaxLength(256);
     }
   }
 }

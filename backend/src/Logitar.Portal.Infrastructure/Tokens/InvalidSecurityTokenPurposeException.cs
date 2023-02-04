@@ -8,16 +8,13 @@ namespace Logitar.Portal.Infrastructure.Tokens
     public InvalidSecurityTokenPurposeException(string requiredPurpose, IEnumerable<string> actualPurposes)
       : base(GetMessage(requiredPurpose, actualPurposes))
     {
-      ActualPurposes = actualPurposes ?? throw new ArgumentNullException(nameof(actualPurposes));
-      RequiredPurpose = requiredPurpose ?? throw new ArgumentNullException(nameof(requiredPurpose));
+      Data["RequiredPurpose"] = requiredPurpose;
+      Data["ActualPurposes"] = actualPurposes;
     }
-
-    public IEnumerable<string> ActualPurposes { get; }
-    public string RequiredPurpose { get; }
 
     private static string GetMessage(string requiredPurpose, IEnumerable<string> actualPurposes)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
       message.AppendLine("The security token does not serve the required purpose.");
       message.AppendLine($"Required purpose: {requiredPurpose}");

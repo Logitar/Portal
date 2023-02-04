@@ -3,68 +3,81 @@ using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Domain.Sessions
 {
-  public class Session : Aggregate
+  public class Session : AggregateRoot
   {
-    public Session(User user, string? keyHash = null, string? ipAddress = null, string? additionalInformation = null)
+    public Session(User user, string? keyHash = null, string? ipAddress = null, string? additionalInformation = null) : base()
     {
-      User = user ?? throw new ArgumentNullException(nameof(user));
-      UserSid = user.Sid;
-
-      ApplyChange(new CreatedEvent(user.Id, keyHash, ipAddress, additionalInformation));
+      ApplyChange(new SessionCreatedEvent
+      {
+        KeyHash = keyHash,
+        IpAddress = ipAddress?.CleanTrim(),
+        AdditionalInformation = additionalInformation?.CleanTrim()
+      }, user.Id);
     }
-    private Session()
+    private Session() : base()
     {
     }
 
-    public User? User { get; private set; }
-    public int UserSid { get; private set; }
+    public AggregateId UserId { get; private set; }
 
     public string? KeyHash { get; private set; }
-    public bool IsPersistent
-    {
-      get => KeyHash != null;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool IsPersistent => KeyHash != null;
 
-    public DateTime? SignedOutAt { get; private set; }
-    public Guid? SignedOutById { get; private set; }
-    public bool IsActive
-    {
-      get => !SignedOutAt.HasValue && !SignedOutById.HasValue;
-      private set { /* EntityFrameworkCore only setter */ }
-    }
+    public bool IsActive { get; private set; }
 
     public string? IpAddress { get; private set; }
     public string? AdditionalInformation { get; private set; }
 
-    private Guid UserId => User?.Id ?? throw new InvalidOperationException($"The {nameof(User)} is required.");
+    public void Delete(AggregateId userId) => ApplyChange(new SessionDeletedEvent(), userId);
+    public void Renew(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null)
+    {
+      if (!IsActive)
+      {
+        throw new SessionIsNotActiveException(this);
+      }
 
-    public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
-    public void Update(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null) => ApplyChange(new UpdatedEvent(UserId, keyHash, ipAddress, additionalInformation));
+      ApplyChange(new SessionRenewedEvent
+      {
+        KeyHash = keyHash,
+        IpAddress = ipAddress?.CleanTrim(),
+        AdditionalInformation = additionalInformation?.CleanTrim()
+      }, UserId);
+    }
+    public void SignOut(AggregateId userId)
+    {
+      if (!IsActive)
+      {
+        throw new SessionAlreadySignedOutException(this);
+      }
 
-    public void SignOut(Guid? userId = null) => ApplyChange(new SignedOutEvent(userId ?? UserId));
+      ApplyChange(new SessionSignedOutEvent(), userId);
+    }
 
-    protected virtual void Apply(CreatedEvent @event)
+    protected virtual void Apply(SessionCreatedEvent @event)
+    {
+      UserId = @event.UserId;
+
+      KeyHash = @event.KeyHash;
+
+      IsActive = true;
+
+      IpAddress = @event.IpAddress;
+      AdditionalInformation = @event.AdditionalInformation;
+    }
+    protected virtual void Apply(SessionDeletedEvent @event)
+    {
+      Delete();
+    }
+    protected virtual void Apply(SessionRenewedEvent @event)
     {
       KeyHash = @event.KeyHash;
 
       IpAddress = @event.IpAddress;
       AdditionalInformation = @event.AdditionalInformation;
     }
-    protected virtual void Apply(DeletedEvent @event)
+    protected virtual void Apply(SessionSignedOutEvent @event)
     {
-    }
-    protected virtual void Apply(SignedOutEvent @event)
-    {
-      SignedOutAt = @event.OccurredAt;
-      SignedOutById = @event.UserId;
-    }
-    protected virtual void Apply(UpdatedEvent @event)
-    {
-      KeyHash = @event.KeyHash;
-
-      IpAddress = @event.IpAddress;
-      AdditionalInformation = @event.AdditionalInformation;
+      IsActive = false;
     }
   }
 }

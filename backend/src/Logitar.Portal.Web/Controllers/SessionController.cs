@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Core.Sessions.Models;
+using Logitar.Portal.Contracts.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +24,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> SessionView(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> SessionView(string id, CancellationToken cancellationToken = default)
     {
       SessionModel? session = await _sessionService.GetAsync(id, cancellationToken);
       if (session == null)

@@ -1,23 +1,23 @@
-﻿using Logitar.Portal.Domain.Dictionaries;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class DictionaryConfiguration : AggregateConfiguration<Dictionary>, IEntityTypeConfiguration<Dictionary>
+  internal class DictionaryConfiguration : AggregateConfiguration<DictionaryEntity>, IEntityTypeConfiguration<DictionaryEntity>
   {
-    public override void Configure(EntityTypeBuilder<Dictionary> builder)
+    public override void Configure(EntityTypeBuilder<DictionaryEntity> builder)
     {
       base.Configure(builder);
 
-      builder.HasIndex(x => new { x.RealmSid, x.Locale }).IsUnique();
+      builder.HasKey(x => x.DictionaryId);
 
-      builder.HasOne(x => x.Realm).WithMany(x => x.Dictionaries).OnDelete(DeleteBehavior.NoAction);
+      builder.HasOne(x => x.Realm).WithMany(x => x.Dictionaries).OnDelete(DeleteBehavior.Restrict);
 
-      builder.Ignore(x => x.Entries);
+      builder.HasIndex(x => new { x.RealmId, x.Locale }).IsUnique();
 
-      builder.Property(x => x.EntriesSerialized).HasColumnName(nameof(Dictionary.Entries)).HasColumnType("jsonb");
       builder.Property(x => x.Locale).HasMaxLength(16);
+      builder.Property(x => x.Entries).HasColumnType("jsonb");
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+using Logitar.Portal.Contracts.Accounts;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Extensions;
 using System.Text.Json;
 
 namespace Logitar.Portal.Web.Middlewares
@@ -16,20 +17,20 @@ namespace Logitar.Portal.Web.Middlewares
 
     public async Task InvokeAsync(HttpContext context, IAccountService accountService)
     {
-      if (!context.GetSessionId().HasValue)
+      if (context.GetSessionId() == null)
       {
         if (context.Request.Cookies.TryGetValue(Constants.Cookies.RenewToken, out string? renewToken) && renewToken != null)
         {
           try
           {
-            var payload = new RenewSessionPayload
+            RenewSessionPayload payload = new()
             {
               AdditionalInformation = JsonSerializer.Serialize(context.Request.Headers),
               IpAddress = context.Connection.RemoteIpAddress?.ToString(),
               RenewToken = renewToken
             };
             SessionModel session = await accountService.RenewSessionAsync(payload);
-            context.SetSession(session);
+            context.SignIn(session);
           }
           catch (Exception)
           {

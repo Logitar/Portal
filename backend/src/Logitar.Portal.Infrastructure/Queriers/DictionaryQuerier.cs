@@ -1,45 +1,46 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Dictionaries;
-using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Domain.Dictionaries;
+﻿using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class DictionaryQuerier : IDictionaryQuerier
   {
-    private readonly DbSet<Dictionary> _dictionaries;
+    private readonly DbSet<DictionaryEntity> _dictionaries;
+    private readonly IMappingService _mapper;
 
-    public DictionaryQuerier(PortalDbContext dbContext)
+    public DictionaryQuerier(PortalContext context, IMappingService mapper)
     {
-      _dictionaries = dbContext.Dictionaries;
+      _dictionaries = context.Dictionaries;
+      _mapper = mapper;
     }
 
-    public async Task<Dictionary?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
+    public async Task<DictionaryModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+    public async Task<DictionaryModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      return await _dictionaries.ApplyTracking(readOnly)
+      DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
         .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<DictionaryModel>(dictionary, cancellationToken);
     }
 
-    public async Task<PagedList<Dictionary>> GetPagedAsync(string? locale, string? realm,
-      DictionarySort? sort, bool desc,
+    public async Task<ListModel<DictionaryModel>> GetPagedAsync(CultureInfo? locale, string? realm,
+      DictionarySort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<Dictionary> query = _dictionaries.ApplyTracking(readOnly)
+      IQueryable<DictionaryEntity> query = _dictionaries.AsNoTracking()
         .Include(x => x.Realm);
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.RealmSid == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
-          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.RealmId == null)
+        : query.Where(x => x.Realm!.AliasNormalized == realm.ToUpper() || x.Realm.AggregateId == realm);
 
       if (locale != null)
       {
@@ -52,19 +53,17 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          DictionarySort.RealmLocale => desc
-            ? query.OrderByDescending(x => x.Realm == null ? null : x.Realm.Name).ThenByDescending(x => x.Locale)
-            : query.OrderBy(x => x.Realm == null ? null : x.Realm.Name).ThenBy(x => x.Locale),
-          DictionarySort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          DictionarySort.RealmLocale => isDescending ? query.OrderByDescending(x => x.Realm!.DisplayName ?? x.Realm.Alias).ThenByDescending(x => x.Locale) : query.OrderBy(x => x.Realm!.DisplayName ?? x.Realm.Alias).ThenBy(x => x.Locale),
+          DictionarySort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The dictionary sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Dictionary[] dictionaries = await query.ToArrayAsync(cancellationToken);
+      DictionaryEntity[] dictionaries = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Dictionary>(dictionaries, total);
+      return new ListModel<DictionaryModel>(await _mapper.MapAsync<DictionaryModel>(dictionaries, cancellationToken), total);
     }
   }
 }

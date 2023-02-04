@@ -14,7 +14,7 @@
       <strong v-t="'user.password.changeFailed'" />
       {{ $t('user.password.invalidCredentials') }}
     </b-alert>
-    <p v-if="profile.passwordChangedAt">{{ $t('user.password.changedAt') }} {{ $d(new Date(profile.passwordChangedAt), 'medium') }}</p>
+    <p v-if="profile.passwordChangedOn">{{ $t('user.password.changedOn') }} {{ $d(new Date(profile.passwordChangedOn), 'medium') }}</p>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <password-field

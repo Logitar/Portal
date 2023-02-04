@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class BlacklistedJwtConfiguration : IEntityTypeConfiguration<BlacklistedJwt>
+  internal class BlacklistedJwtConfiguration : IEntityTypeConfiguration<BlacklistedJwtEntity>
   {
-    public virtual void Configure(EntityTypeBuilder<BlacklistedJwt> builder)
+    public void Configure(EntityTypeBuilder<BlacklistedJwtEntity> builder)
     {
-      builder.HasKey(x => x.Sid);
-      builder.HasIndex(x => x.ExpiresAt);
+      builder.HasKey(x => x.BlacklistedJwtId);
+      builder.HasIndex(x => x.ExpiresOn);
       builder.HasIndex(x => x.Id).IsUnique();
     }
   }

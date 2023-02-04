@@ -1,66 +1,45 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Emails.Templates;
-using Logitar.Portal.Core.Emails.Templates;
-using Logitar.Portal.Domain.Emails.Templates;
-using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Application.Templates;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Templates;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class TemplateQuerier : ITemplateQuerier
   {
-    private readonly DbSet<Template> _templates;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<TemplateEntity> _templates;
 
-    public TemplateQuerier(PortalDbContext dbContext)
+    public TemplateQuerier(PortalContext context, IMappingService mapper)
     {
-      _templates = dbContext.Templates;
+      _mapper = mapper;
+      _templates = context.Templates;
     }
 
-    public async Task<Template?> GetAsync(string key, Realm? realm, bool readOnly, CancellationToken cancellationToken)
+    public async Task<TemplateModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
+    public async Task<TemplateModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(key);
+      TemplateEntity? template = await _templates.AsNoTracking()
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoveryTemplate)
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return Guid.TryParse(key, out Guid id)
-        ? await GetAsync(id, readOnly, cancellationToken)
-        : await GetByKeyAsync(key, realm, readOnly, cancellationToken);
+      return await _mapper.MapAsync<TemplateModel>(template, cancellationToken);
     }
 
-    public async Task<Template?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
-    {
-      return await _templates.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<Template?> GetByKeyAsync(string key, Realm? realm, bool readOnly, CancellationToken cancellationToken)
-    {
-      key = key?.ToUpper() ?? throw new ArgumentNullException(nameof(key));
-
-      IQueryable<Template> query = _templates.ApplyTracking(readOnly).Include(x => x.Realm);
-
-      return realm == null
-        ? await query.SingleOrDefaultAsync(x => x.RealmSid == null && x.KeyNormalized == key, cancellationToken)
-        : await query.SingleOrDefaultAsync(x => x.RealmSid == realm.Sid && x.KeyNormalized == key, cancellationToken);
-    }
-
-    public async Task<PagedList<Template>> GetPagedAsync(string? realm, string? search,
-      TemplateSort? sort, bool desc,
+    public async Task<ListModel<TemplateModel>> GetPagedAsync(string? realm, string? search,
+      TemplateSort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<Template> query = _templates.ApplyTracking(readOnly)
-        .Include(x => x.Realm);
+      IQueryable<TemplateEntity> query = _templates.AsNoTracking()
+        .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoveryTemplate);
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.RealmSid == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
-          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.RealmId == null)
+        : query.Where(x => x.Realm!.AliasNormalized == realm.ToUpper() || x.Realm.AggregateId == realm);
 
       if (search != null)
       {
@@ -82,18 +61,18 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          TemplateSort.DisplayName => desc ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName),
-          TemplateSort.Key => desc ? query.OrderByDescending(x => x.Key) : query.OrderBy(x => x.Key),
-          TemplateSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
+          TemplateSort.DisplayName => isDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName),
+          TemplateSort.Key => isDescending ? query.OrderByDescending(x => x.Key) : query.OrderBy(x => x.Key),
+          TemplateSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
           _ => throw new ArgumentException($"The template sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      Template[] templates = await query.ToArrayAsync(cancellationToken);
+      TemplateEntity[] templates = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<Template>(templates, total);
+      return new ListModel<TemplateModel>(await _mapper.MapAsync<TemplateModel>(templates, cancellationToken), total);
     }
   }
 }

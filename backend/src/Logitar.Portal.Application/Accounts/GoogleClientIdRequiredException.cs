@@ -1,18 +1,13 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Domain.Realms;
-using System.Net;
+﻿using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application.Accounts
 {
-  internal class GoogleClientIdRequiredException : ApiException
+  public class GoogleClientIdRequiredException : Exception
   {
     public GoogleClientIdRequiredException(Realm realm)
-      : base(HttpStatusCode.BadRequest, $"The realm '{realm}' does not have a configured Google Client ID.")
+      : base($"The realm '{realm}' does not have a configured Google Client ID.")
     {
-      Realm = realm ?? throw new ArgumentNullException(nameof(realm));
-      Value = new { code = nameof(GoogleClientIdRequiredException).Remove(nameof(Exception)) };
+      Data["Realm"] = realm.ToString();
     }
-
-    public Realm Realm { get; }
   }
 }

@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.Users;
-using Logitar.Portal.Core.Users.Models;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> UserEdit(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> UserEdit(string id, CancellationToken cancellationToken = default)
     {
       UserModel? user = await _userService.GetAsync(id, cancellationToken);
       if (user == null)

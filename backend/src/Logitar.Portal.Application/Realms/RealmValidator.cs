@@ -1,36 +1,37 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Application.Realms
 {
   internal class RealmValidator : AbstractValidator<Realm>
   {
-    public RealmValidator()
+    public RealmValidator(IValidator<PasswordSettings> passwordSettingsValidator, IValidator<UsernameSettings> usernameSettingsValidator)
     {
-      RuleFor(x => x.Alias)
-        .NotEmpty()
+      RuleFor(x => x.Alias).NotEmpty()
         .MaximumLength(256)
-        .Must(BeAValidAlias);
+        .Alias();
 
-      RuleFor(x => x.Name)
-        .NotEmpty()
+      RuleFor(x => x.DisplayName).NullOrNotEmpty()
         .MaximumLength(256);
 
-      RuleFor(x => x.DefaultLocale)
-        .Must(ValidationRules.BeAValidCulture);
+      RuleFor(x => x.Description).NullOrNotEmpty();
 
-      RuleFor(x => x.Url)
+      RuleFor(x => x.DefaultLocale).Locale();
+
+      RuleFor(x => x.JwtSecret).NotEmpty()
+        .MinimumLength(256 / 8);
+
+      RuleFor(x => x.Url).NullOrNotEmpty()
         .MaximumLength(2048)
-        .Must(ValidationRules.BeAValidUrl);
+        .Url();
 
-      When(x => x.PasswordSettings != null, () => RuleFor(x => x.PasswordSettings!)
-        .SetValidator(new PasswordSettingsValidator()));
+      RuleFor(x => x.UsernameSettings).SetValidator(usernameSettingsValidator);
 
-      RuleFor(x => x.GoogleClientId)
+      RuleFor(x => x.PasswordSettings).SetValidator(passwordSettingsValidator);
+
+      RuleFor(x => x.GoogleClientId).NullOrNotEmpty()
         .MaximumLength(256);
     }
-
-    private static bool BeAValidAlias(string? value) => value == null
-      || value.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
   }
 }

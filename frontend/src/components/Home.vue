@@ -37,6 +37,7 @@ import FirstNameField from './User/FirstNameField.vue'
 import LastNameField from './User/LastNameField.vue'
 import PasswordField from './User/PasswordField.vue'
 import UsernameField from './User/UsernameField.vue'
+import { generateSecret } from '@/helpers/cryptoUtils'
 import { initialize } from '@/api/configurations'
 
 export default {
@@ -63,11 +64,22 @@ export default {
   },
   computed: {
     payload() {
+      const locale = this.$i18n.locale
       return {
-        user: {
-          ...this.user,
-          locale: this.$i18n.locale
-        }
+        defaultLocale: locale,
+        jwtSecret: generateSecret(32),
+        usernameSettings: {
+          allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+        },
+        passwordSettings: {
+          requiredLength: 8,
+          requiredUniqueChars: 8,
+          requireNonAlphanumeric: true,
+          requireLowercase: true,
+          requireUppercase: true,
+          requireDigit: true
+        },
+        user: { ...this.user, locale }
       }
     }
   },

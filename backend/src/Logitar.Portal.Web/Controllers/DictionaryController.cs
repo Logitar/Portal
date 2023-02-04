@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Application.Dictionaries;
-using Logitar.Portal.Core.Dictionaries.Models;
+using Logitar.Portal.Contracts.Dictionaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> DictionaryEdit(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> DictionaryEdit(string id, CancellationToken cancellationToken = default)
     {
       DictionaryModel? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
       if (dictionary == null)

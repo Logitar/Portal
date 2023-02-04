@@ -34,12 +34,12 @@ export default {
   },
   computed: {
     options() {
-      return this.realms.map(({ id, name }) => ({ text: name, value: id }))
+      return this.realms.map(({ id, alias, displayName }) => ({ text: displayName ?? alias, value: id }))
     }
   },
   async created() {
     try {
-      const { data } = await getRealms({ sort: 'Name', desc: false })
+      const { data } = await getRealms({ sort: 'DisplayName', desc: false })
       this.realms = data.items
     } catch (e) {
       this.handleError(e)

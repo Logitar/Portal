@@ -7,20 +7,17 @@ namespace Logitar.Portal.Domain
     public EventNotSupportedException(Type aggregateType, Type eventType)
       : base(GetMessage(aggregateType, eventType))
     {
-      AggregateType = aggregateType ?? throw new ArgumentNullException(nameof(aggregateType));
-      EventType = eventType ?? throw new ArgumentNullException(nameof(eventType));
+      Data["AggregateType"] = aggregateType.GetName();
+      Data["EventType"] = eventType.GetName();
     }
-
-    public Type AggregateType { get; }
-    public Type EventType { get; }
 
     private static string GetMessage(Type aggregateType, Type eventType)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
       message.AppendLine("The specified event is not supported by the aggregate.");
-      message.AppendLine($"Aggregate type: {aggregateType?.GetName()}");
-      message.AppendLine($"Event type: {eventType?.GetName()}");
+      message.AppendLine($"Aggregate type: {aggregateType.GetName()}");
+      message.AppendLine($"Event type: {eventType.GetName()}");
 
       return message.ToString();
     }

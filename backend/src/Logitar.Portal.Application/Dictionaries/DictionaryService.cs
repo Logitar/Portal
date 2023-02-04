@@ -1,113 +1,45 @@
-﻿using FluentValidation;
-using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Core.Dictionaries.Models;
-using Logitar.Portal.Core.Dictionaries.Payloads;
-using Logitar.Portal.Domain.Dictionaries;
-using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Application.Dictionaries.Commands;
+using Logitar.Portal.Application.Dictionaries.Queries;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Dictionaries;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Dictionaries
 {
   internal class DictionaryService : IDictionaryService
   {
-    private readonly IMappingService _mappingService;
-    private readonly IDictionaryQuerier _querier;
-    private readonly IRealmQuerier _realmQuerier;
-    private readonly IRepository<Dictionary> _repository;
-    private readonly IUserContext _userContext;
-    private readonly IValidator<Dictionary> _validator;
+    private readonly IRequestPipeline _requestPipeline;
 
-    public DictionaryService(
-      IMappingService mappingService,
-      IDictionaryQuerier querier,
-      IRealmQuerier realmQuerier,
-      IRepository<Dictionary> repository,
-      IUserContext userContext,
-      IValidator<Dictionary> validator
-    )
+    public DictionaryService(IRequestPipeline requestPipeline)
     {
-      _mappingService = mappingService;
-      _querier = querier;
-      _realmQuerier = realmQuerier;
-      _repository = repository;
-      _userContext = userContext;
-      _validator = validator;
+      _requestPipeline = requestPipeline;
     }
 
     public async Task<DictionaryModel> CreateAsync(CreateDictionaryPayload payload, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(payload);
-
-      Realm? realm = null;
-      if (payload.Realm != null)
-      {
-        realm = await _realmQuerier.GetAsync(payload.Realm, readOnly: false, cancellationToken)
-          ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
-      }
-
-      if ((await _querier.GetPagedAsync(locale: payload.Locale, realm: realm?.Id.ToString(), readOnly: true, cancellationToken: cancellationToken)).Any())
-      {
-        throw new DictionaryAlreadyExistingException(realm?.Id, payload.Locale);
-      }
-
-      var dictionary = new Dictionary(payload, _userContext.Actor.Id, realm);
-      _validator.ValidateAndThrow(dictionary);
-
-      await _repository.SaveAsync(dictionary, cancellationToken);
-
-      return await _mappingService.MapAsync<DictionaryModel>(dictionary, cancellationToken);
+      return await _requestPipeline.ExecuteAsync(new CreateDictionaryCommand(payload), cancellationToken);
     }
 
-    public async Task<DictionaryModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      Dictionary dictionary = await _querier.GetAsync(id, readOnly: false, cancellationToken)
-        ?? throw new EntityNotFoundException<Dictionary>(id);
-
-      dictionary.Delete(_userContext.Actor.Id);
-
-      await _repository.SaveAsync(dictionary, cancellationToken);
-
-      return await _mappingService.MapAsync<DictionaryModel>(dictionary, cancellationToken);
+      await _requestPipeline.ExecuteAsync(new DeleteDictionaryCommand(id), cancellationToken);
     }
 
-    public async Task<DictionaryModel?> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<DictionaryModel?> GetAsync(string id, CancellationToken cancellationToken)
     {
-      Dictionary? dictionary = await _querier.GetAsync(id, readOnly: true, cancellationToken);
-      if (dictionary == null)
-      {
-        return null;
-      }
-
-      return await _mappingService.MapAsync<DictionaryModel>(dictionary, cancellationToken);
+      return await _requestPipeline.ExecuteAsync(new GetDictionaryQuery(id), cancellationToken);
     }
 
-    public async Task<ListModel<DictionaryModel>> GetAsync(string? locale, string? search,
-      DictionarySort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken)
+    public async Task<ListModel<DictionaryModel>> GetAsync(CultureInfo? locale, string? realm,
+      DictionarySort? sort, bool isDescending, int? index, int? count, CancellationToken cancellationToken)
     {
-      PagedList<Dictionary> dictionaries = await _querier.GetPagedAsync(locale, search,
-        sort, desc,
-        index, count,
-        readOnly: true, cancellationToken);
-
-      return await _mappingService.MapAsync<Dictionary, DictionaryModel>(dictionaries, cancellationToken);
+      return await _requestPipeline.ExecuteAsync(new GetDictionariesQuery(locale, realm,
+        sort, isDescending, index, count), cancellationToken);
     }
 
-    public async Task<DictionaryModel> UpdateAsync(Guid id, UpdateDictionaryPayload payload, CancellationToken cancellationToken)
+    public async Task<DictionaryModel> UpdateAsync(string id, UpdateDictionaryPayload payload, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(payload);
-
-      Dictionary dictionary = await _querier.GetAsync(id, readOnly: false, cancellationToken)
-        ?? throw new EntityNotFoundException<Dictionary>(id);
-
-      dictionary.Update(payload, _userContext.Actor.Id);
-      _validator.ValidateAndThrow(dictionary);
-
-      await _repository.SaveAsync(dictionary, cancellationToken);
-
-      return await _mappingService.MapAsync<DictionaryModel>(dictionary, cancellationToken);
+      return await _requestPipeline.ExecuteAsync(new UpdateDictionaryCommand(id, payload), cancellationToken);
     }
   }
 }

@@ -9,22 +9,23 @@
   "editTitle": "Edit API key",
   "empty": "This list is empty.",
   "expired": "Expired",
-  "expiredAt": "Expired on",
-  "expiresAt": "Expires on",
+  "expiredOn": "Expired on",
+  "expiresOn": "Expires on",
+  "listTitle": "API keys",
   "neverExpires": "Never expires",
   "newTitle": "Create API key",
   "sort": {
     "options": {
-      "ExpiresAt": "Expires on",
-      "Name": "Name",
-      "UpdatedAt": "Updated on"
+      "ExpiresOn": "Expires on",
+      "Title": "Title",
+      "UpdatedOn": "Updated on"
     }
   },
   "status": {
     "label": "Status",
     "options": {
-      "false": "Not expired",
-      "true": "Expired"
+      "Expired": "Expired",
+      "NotExpired": "Not expired"
     },
     "placeholder": "Select a status"
   },
@@ -32,6 +33,9 @@
     "heading": "Your new API key",
     "warning": "Make sure you save it — you won't be able to access it again."
   },
-  "title": "API keys",
+  "title": {
+    "label": "Title",
+    "placeholder": "Enter a title"
+  },
   "updated": "The API key has been updated."
 }

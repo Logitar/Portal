@@ -1,24 +1,19 @@
-﻿using Logitar.Portal.Domain;
-using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal abstract class AggregateConfiguration<T> : IEntityTypeConfiguration<T>
-    where T : Aggregate
+  internal abstract class AggregateConfiguration<T> where T : AggregateEntity
   {
     public virtual void Configure(EntityTypeBuilder<T> builder)
     {
-      builder.HasKey(x => x.Sid);
-      builder.HasIndex(x => x.Id).IsUnique();
+      builder.HasIndex(x => x.AggregateId).IsUnique();
+      builder.HasIndex(x => x.CreatedOn);
+      builder.HasIndex(x => x.UpdatedOn);
 
-      builder.Ignore(x => x.DeletedAt);
-      builder.Ignore(x => x.DeletedById);
-
-      builder.Property(x => x.CreatedAt).HasDefaultValueSql("now()");
-      builder.Property(x => x.CreatedById).HasDefaultValue(Guid.Empty);
-      builder.Property(x => x.Id).HasDefaultValueSql("uuid_generate_v4()");
-      builder.Property(x => x.Version).HasDefaultValue(0);
+      builder.Property(x => x.AggregateId).HasMaxLength(256).IsRequired();
+      builder.Property(x => x.CreatedBy).HasMaxLength(256);
+      builder.Property(x => x.UpdatedBy).HasMaxLength(256);
     }
   }
 }

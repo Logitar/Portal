@@ -1,19 +1,15 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.ApiKeys;
-using Logitar.Portal.Core.ApiKeys.Models;
-using Logitar.Portal.Core.ApiKeys.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.ApiKeys;
 
 namespace Logitar.Portal.Application.ApiKeys
 {
   public interface IApiKeyService
   {
     Task<ApiKeyModel> CreateAsync(CreateApiKeyPayload payload, CancellationToken cancellationToken = default);
-    Task<ApiKeyModel> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<ApiKeyModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<ListModel<ApiKeyModel>> GetAsync(bool? isExpired = null, string? search = null,
-      ApiKeySort? sort = null, bool desc = false,
-      int? index = null, int? count = null,
-      CancellationToken cancellationToken = default);
-    Task<ApiKeyModel> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken = default);
+    Task DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task<ApiKeyModel?> GetAsync(string id, CancellationToken cancellationToken = default);
+    Task<ListModel<ApiKeyModel>> GetAsync(DateTime? expiredOn = null, string? search = null,
+      ApiKeySort? sort = null, bool isDescending = false, int? index = null, int? count = null, CancellationToken cancellationToken = default);
+    Task<ApiKeyModel> UpdateAsync(string id, UpdateApiKeyPayload payload, CancellationToken cancellationToken = default);
   }
 }

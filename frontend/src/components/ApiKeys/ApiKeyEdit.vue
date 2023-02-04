@@ -14,10 +14,10 @@
     </b-alert>
     <template v-if="apiKey">
       <status-detail :model="apiKey" />
-      <p v-if="apiKey.expiresAt" :class="{ 'text-danger': apiKey.isExpired }">
-        <template v-if="apiKey.isExpired">{{ $t('apiKeys.expiredAt') }}</template>
-        <template v-else>{{ $t('apiKeys.expiresAt') }}</template>
-        {{ $d(new Date(apiKey.expiresAt), 'medium') }}
+      <p v-if="apiKey.expiresOn" :class="{ 'text-danger': isExpired }">
+        <template v-if="isExpired">{{ $t('apiKeys.expiredOn') }}</template>
+        <template v-else>{{ $t('apiKeys.expiresOn') }}</template>
+        {{ $d(new Date(apiKey.expiresOn), 'medium') }}
       </p>
       <p v-else v-t="'apiKeys.neverExpires'" />
     </template>
@@ -27,9 +27,9 @@
           <icon-submit v-if="apiKey" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <form-datetime v-if="!apiKey" id="expiresAt" label="apiKeys.expiresAt" :minDate="new Date()" validate v-model="expiresAt" />
-        <name-field :disabled="apiKey && apiKey.isExpired" required v-model="name" />
-        <description-field :disabled="apiKey && apiKey.isExpired" :rows="15" v-model="description" />
+        <form-datetime v-if="!apiKey" id="expiresOn" label="apiKeys.expiresOn" :minDate="new Date()" validate v-model="expiresOn" />
+        <name-field :disabled="isExpired" id="title" label="apiKeys.title.label" placeholder="apiKeys.title.placeholder" required v-model="title" />
+        <description-field :disabled="isExpired" :rows="15" v-model="description" />
       </b-form>
     </validation-observer>
   </b-container>
@@ -58,25 +58,28 @@ export default {
     return {
       apiKey: null,
       description: null,
-      expiresAt: null,
+      expiresOn: null,
       loading: false,
-      name: null,
-      showString: false
+      showString: false,
+      title: null
     }
   },
   computed: {
     hasChanges() {
       return (
-        (!this.apiKey && this.expiresAt) || (this.name ?? '') !== (this.apiKey?.name ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
+        (!this.apiKey && this.expiresOn) || (this.title ?? '') !== (this.apiKey?.title ?? '') || (this.description ?? '') !== (this.apiKey?.description ?? '')
       )
+    },
+    isExpired() {
+      return this.apiKey && this.apiKey.expiresOn <= new Date().toISOString()
     },
     payload() {
       const payload = {
-        name: this.name,
+        title: this.title,
         description: this.description
       }
       if (!this.apiKey) {
-        payload.expiresAt = this.expiresAt
+        payload.expiresOn = this.expiresOn
       }
       return payload
     }
@@ -89,8 +92,8 @@ export default {
     setModel(apiKey) {
       this.apiKey = apiKey
       this.description = apiKey.description
-      this.expiresAt = apiKey.expiresAt
-      this.name = apiKey.name
+      this.expiresOn = apiKey.expiresOn
+      this.title = apiKey.title
     },
     async submit() {
       if (!this.loading) {

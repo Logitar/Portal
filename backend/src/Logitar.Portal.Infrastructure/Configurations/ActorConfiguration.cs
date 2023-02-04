@@ -1,19 +1,20 @@
-﻿using Logitar.Portal.Domain.Actors;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class ActorConfiguration : IEntityTypeConfiguration<Actor>
+  internal class ActorConfiguration : IEntityTypeConfiguration<ActorEntity>
   {
-    public void Configure(EntityTypeBuilder<Actor> builder)
+    public void Configure(EntityTypeBuilder<ActorEntity> builder)
     {
-      builder.HasKey(x => x.Sid);
-      builder.HasIndex(x => x.Id).IsUnique();
-      builder.HasIndex(x => x.Type);
+      builder.HasKey(x => x.ActorId);
 
+      builder.HasIndex(x => x.AggregateId).IsUnique();
+
+      builder.Property(x => x.AggregateId).HasMaxLength(256);
+      builder.Property(x => x.DisplayName).HasMaxLength(512);
       builder.Property(x => x.Email).HasMaxLength(256);
-      builder.Property(x => x.Name).HasMaxLength(256);
       builder.Property(x => x.Picture).HasMaxLength(2048);
     }
   }

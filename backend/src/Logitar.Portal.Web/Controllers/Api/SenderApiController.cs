@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Emails.Senders;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Core.Emails.Senders.Models;
-using Logitar.Portal.Core.Emails.Senders.Payloads;
+﻿using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Senders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +11,10 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/senders")]
   public class SenderApiController : ControllerBase
   {
-    private readonly IMapper _mapper;
     private readonly ISenderService _senderService;
 
-    public SenderApiController(IMapper mapper, ISenderService senderService)
+    public SenderApiController(ISenderService senderService)
     {
-      _mapper = mapper;
       _senderService = senderService;
     }
 
@@ -27,29 +22,29 @@ namespace Logitar.Portal.Web.Controllers.Api
     public async Task<ActionResult<SenderModel>> CreateAsync([FromBody] CreateSenderPayload payload, CancellationToken cancellationToken)
     {
       SenderModel sender = await _senderService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/senders/{sender.Id}", UriKind.Relative);
+      Uri uri = new($"/api/senders/{sender.Id}", UriKind.Relative);
 
       return Created(uri, sender);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<SenderModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<SenderModel>> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      return Ok(await _senderService.DeleteAsync(id, cancellationToken));
+      await _senderService.DeleteAsync(id, cancellationToken);
+
+      return Ok();
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<SenderSummary>>> GetAsync(ProviderType? provider, string? realm, string? search,
+    public async Task<ActionResult<ListModel<SenderModel>>> GetAsync(ProviderType? provider, string? realm, string? search,
       SenderSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      ListModel<SenderModel> senders = await _senderService.GetAsync(provider, realm, search,
+      return Ok(await _senderService.GetAsync(provider, realm, search,
         sort, desc,
         index, count,
-        cancellationToken);
-
-      return Ok(senders.To<SenderModel, SenderSummary>(_mapper));
+        cancellationToken));
     }
 
     [HttpGet("default")]
@@ -65,7 +60,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<SenderModel>> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<SenderModel>> GetAsync(string id, CancellationToken cancellationToken)
     {
       SenderModel? sender = await _senderService.GetAsync(id, cancellationToken);
       if (sender == null)
@@ -77,13 +72,13 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<SenderModel>> UpdateAsync(Guid id, [FromBody] UpdateSenderPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult<SenderModel>> UpdateAsync(string id, [FromBody] UpdateSenderPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _senderService.UpdateAsync(id, payload, cancellationToken));
     }
 
     [HttpPatch("{id}/default")]
-    public async Task<ActionResult<SenderModel>> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<SenderModel>> SetDefaultAsync(string id, CancellationToken cancellationToken)
     {
       return Ok(await _senderService.SetDefaultAsync(id, cancellationToken));
     }

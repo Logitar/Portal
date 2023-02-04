@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Core.Tokens.Payloads;
+using Logitar.Portal.Contracts.Tokens;
 
 namespace Logitar.Portal.Application.Tokens
 {
@@ -7,11 +7,11 @@ namespace Logitar.Portal.Application.Tokens
   {
     public ClaimPayloadValidator()
     {
-      RuleFor(x => x.Type)
-        .NotEmpty();
+      RuleFor(x => x.Type).NotEmpty();
 
-      RuleFor(x => x.Value)
-        .NotEmpty();
+      RuleFor(x => x.Value).NotEmpty();
+
+      RuleFor(x => x.ValueType).NullOrNotEmpty();
     }
   }
 }

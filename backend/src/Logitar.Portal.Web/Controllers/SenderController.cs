@@ -1,5 +1,5 @@
-﻿using Logitar.Portal.Application.Emails.Senders;
-using Logitar.Portal.Core.Emails.Senders.Models;
+﻿using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Contracts.Senders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web.Controllers
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> SenderEdit(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> SenderEdit(string id, CancellationToken cancellationToken = default)
     {
       SenderModel? sender = await _senderService.GetAsync(id, cancellationToken);
       if (sender == null)

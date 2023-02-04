@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Users;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Users;
-using Logitar.Portal.Core.Users.Models;
-using Logitar.Portal.Core.Users.Payloads;
+﻿using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +11,10 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/users")]
   public class UserApiController : ControllerBase
   {
-    private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
-    public UserApiController(IMapper mapper, IUserService userService)
+    public UserApiController(IUserService userService)
     {
-      _mapper = mapper;
       _userService = userService;
     }
 
@@ -27,33 +22,33 @@ namespace Logitar.Portal.Web.Controllers.Api
     public async Task<ActionResult<UserModel>> CreateAsync([FromBody] CreateUserPayload payload, CancellationToken cancellationToken)
     {
       UserModel user = await _userService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/users/{user.Id}", UriKind.Relative);
+      Uri uri = new($"/api/users/{user.Id}", UriKind.Relative);
 
       return Created(uri, user);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<UserModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      return Ok(await _userService.DeleteAsync(id, cancellationToken));
+      await _userService.DeleteAsync(id, cancellationToken);
+
+      return NoContent();
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<UserSummary>>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
+    public async Task<ActionResult<ListModel<UserModel>>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
       UserSort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      ListModel<UserModel> users = await _userService.GetAsync(isConfirmed, isDisabled, realm, search,
+      return Ok(await _userService.GetAsync(isConfirmed, isDisabled, realm, search,
         sort, desc,
         index, count,
-        cancellationToken);
-
-      return Ok(users.To<UserModel, UserSummary>(_mapper));
+        cancellationToken));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserModel>> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserModel>> GetAsync(string id, CancellationToken cancellationToken)
     {
       UserModel? user = await _userService.GetAsync(id, cancellationToken);
       if (user == null)
@@ -65,19 +60,19 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<UserModel>> UpdateAsync(Guid id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserModel>> UpdateAsync(string id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _userService.UpdateAsync(id, payload, cancellationToken));
     }
 
     [HttpPatch("{id}/disable")]
-    public async Task<ActionResult<UserModel>> DisableAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserModel>> DisableAsync(string id, CancellationToken cancellationToken)
     {
       return Ok(await _userService.DisableAsync(id, cancellationToken));
     }
 
     [HttpPatch("{id}/enable")]
-    public async Task<ActionResult<UserModel>> EnableAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserModel>> EnableAsync(string id, CancellationToken cancellationToken)
     {
       return Ok(await _userService.EnableAsync(id, cancellationToken));
     }

@@ -1,103 +1,47 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Users;
-using Logitar.Portal.Core.Users;
-using Logitar.Portal.Domain.Realms;
-using Logitar.Portal.Domain.Users;
+﻿using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
+using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class UserQuerier : IUserQuerier
   {
-    private readonly DbSet<User> _users;
+    private readonly IMappingService _mapper;
+    private readonly DbSet<UserEntity> _users;
 
-    public UserQuerier(PortalDbContext dbContext)
+    public UserQuerier(PortalContext context, IMappingService mapper)
     {
-      _users = dbContext.Users;
+      _mapper = mapper;
+      _users = context.Users;
     }
 
-    public async Task<User?> GetAsync(string username, Realm? realm, bool readOnly, CancellationToken cancellationToken)
-    {
-      username = username?.ToUpper() ?? throw new ArgumentNullException(nameof(username));
-      int? realmSid = realm?.Sid;
+    public async Task<UserModel?> GetAsync(AggregateId id, CancellationToken cancellationToken)
+      => await GetAsync(id.Value, cancellationToken);
 
-      return await _users.ApplyTracking(readOnly)
+    public async Task<UserModel?> GetAsync(string id, CancellationToken cancellationToken)
+    {
+      UserEntity? user = await _users.AsNoTracking()
         .Include(x => x.ExternalProviders)
         .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.RealmSid == realmSid && x.UsernameNormalized == username, cancellationToken);
+        .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+
+      return await _mapper.MapAsync<UserModel>(user, cancellationToken);
     }
 
-    public async Task<IEnumerable<User>> GetAsync(IEnumerable<string> usernames, Realm? realm, bool readOnly, CancellationToken cancellationToken)
-    {
-      usernames = usernames?.Select(x => x.ToUpper()) ?? throw new ArgumentNullException(nameof(usernames));
-      int? realmSid = realm?.Sid;
-
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => x.RealmSid == realmSid && usernames.Contains(x.UsernameNormalized))
-        .ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<User?> GetAsync(Guid id, bool readOnly, CancellationToken cancellationToken)
-    {
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.ExternalProviders)
-        .Include(x => x.Realm)
-        .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<IEnumerable<User>> GetAsync(IEnumerable<Guid> ids, bool readOnly, CancellationToken cancellationToken)
-    {
-      ArgumentNullException.ThrowIfNull(ids);
-
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => ids.Contains(x.Id))
-        .ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<User>> GetByEmailAsync(string email, Realm? realm, bool readOnly, CancellationToken cancellationToken)
-    {
-      email = email?.ToUpper() ?? throw new ArgumentNullException(nameof(email));
-      int? realmSid = realm?.Sid;
-
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.Realm)
-        .Where(x => x.RealmSid == realmSid && x.EmailNormalized == email)
-        .ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<User?> GetByExternalProviderAsync(Realm realm, string providerKey, string providerValue, bool readOnly, CancellationToken cancellationToken = default)
-    {
-      ArgumentNullException.ThrowIfNull(realm);
-      ArgumentNullException.ThrowIfNull(providerKey);
-      ArgumentNullException.ThrowIfNull(providerValue);
-
-      return await _users.ApplyTracking(readOnly)
-        .Include(x => x.ExternalProviders)
-        .Include(x => x.Realm)
-        .Where(x => x.ExternalProviders.Any(y => y.RealmSid == realm.Sid && y.Key == providerKey && y.Value == providerValue))
-        .SingleOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<PagedList<User>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
-      UserSort? sort, bool desc,
+    public async Task<ListModel<UserModel>> GetPagedAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
+      UserSort? sort, bool isDescending,
       int? index, int? count,
-      bool readOnly, CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-      IQueryable<User> query = _users.ApplyTracking(readOnly)
+      IQueryable<UserEntity> query = _users.AsNoTracking()
         .Include(x => x.Realm);
 
-      if (realm == null)
-      {
-        query = query.Where(x => x.RealmSid == null);
-      }
-      else
-      {
-        query = Guid.TryParse(realm, out Guid realmId)
-          ? query.Where(x => x.Realm != null && x.Realm.Id == realmId)
-          : query.Where(x => x.Realm != null && x.Realm.AliasNormalized == realm.ToUpper());
-      }
+      query = realm == null
+        ? query.Where(x => x.RealmId == null)
+        : query.Where(x => x.Realm!.AliasNormalized == realm.ToUpper() || x.Realm.AggregateId == realm);
 
       if (isConfirmed.HasValue)
       {
@@ -131,27 +75,27 @@ namespace Logitar.Portal.Infrastructure.Queriers
       {
         query = sort.Value switch
         {
-          UserSort.Email => desc ? query.OrderByDescending(x => x.Email) : query.OrderBy(x => x.Email),
-          UserSort.FirstMiddleLastName => desc
+          UserSort.Email => isDescending ? query.OrderByDescending(x => x.Email) : query.OrderBy(x => x.Email),
+          UserSort.FirstMiddleLastName => isDescending
             ? query.OrderByDescending(x => x.FirstName).ThenByDescending(x => x.MiddleName).ThenByDescending(x => x.LastName)
             : query.OrderBy(x => x.FirstName).ThenBy(x => x.MiddleName).ThenBy(x => x.LastName),
-          UserSort.LastFirstMiddleName => desc
+          UserSort.LastFirstMiddleName => isDescending
             ? query.OrderByDescending(x => x.LastName).ThenByDescending(x => x.FirstName).ThenByDescending(x => x.MiddleName)
             : query.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.MiddleName),
-          UserSort.PhoneNumber => desc ? query.OrderByDescending(x => x.PhoneNumber) : query.OrderBy(x => x.PhoneNumber),
-          UserSort.PasswordChangedAt => desc ? query.OrderByDescending(x => x.PasswordChangedAt) : query.OrderBy(x => x.PasswordChangedAt),
-          UserSort.SignedInAt => desc ? query.OrderByDescending(x => x.SignedInAt) : query.OrderBy(x => x.SignedInAt),
-          UserSort.UpdatedAt => desc ? query.OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt) : query.OrderBy(x => x.UpdatedAt ?? x.CreatedAt),
-          UserSort.Username => desc ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username),
+          UserSort.PhoneNumber => isDescending ? query.OrderByDescending(x => x.PhoneNumber) : query.OrderBy(x => x.PhoneNumber),
+          UserSort.PasswordChangedOn => isDescending ? query.OrderByDescending(x => x.PasswordChangedOn) : query.OrderBy(x => x.PasswordChangedOn),
+          UserSort.SignedInOn => isDescending ? query.OrderByDescending(x => x.SignedInOn) : query.OrderBy(x => x.SignedInOn),
+          UserSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
+          UserSort.Username => isDescending ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username),
           _ => throw new ArgumentException($"The user sort '{sort}' is not valid.", nameof(sort)),
         };
       }
 
       query = query.ApplyPaging(index, count);
 
-      User[] users = await query.ToArrayAsync(cancellationToken);
+      UserEntity[] users = await query.ToArrayAsync(cancellationToken);
 
-      return new PagedList<User>(users, total);
+      return new ListModel<UserModel>(await _mapper.MapAsync<UserModel>(users, cancellationToken), total);
     }
   }
 }

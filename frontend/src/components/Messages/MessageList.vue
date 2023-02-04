@@ -30,7 +30,7 @@
             <th scope="col" v-t="'messages.sender.label'" />
             <th scope="col" v-t="'templates.select.label'" />
             <th scope="col" v-t="'messages.status.label'" />
-            <th scope="col" v-t="'messages.updatedAt'" />
+            <th scope="col" v-t="'messages.updatedOn'" />
           </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
               &nbsp;
               <b-badge v-if="message.isDemo" variant="info">{{ $t('messages.demo.label') }}</b-badge>
             </td>
-            <td v-text="message.recipients" />
+            <td v-text="message.recipientCount" />
             <td>
               <template v-if="message.senderDisplayName">{{ message.senderDisplayName }} &lt;{{ message.senderAddress }}&gt;</template>
               <template v-else>{{ message.senderAddress }}</template>
@@ -52,7 +52,7 @@
             <td>
               <status-badge :message="message" />
             </td>
-            <td><status-cell :actor="message.updatedBy" :date="message.updatedAt" /></td>
+            <td><status-cell :actor="message.updatedBy" :date="message.updatedOn || message.createdOn" /></td>
           </tr>
         </tbody>
       </table>
@@ -86,7 +86,7 @@ export default {
       page: 1,
       realm: null,
       search: null,
-      sort: 'UpdatedAt',
+      sort: 'UpdatedOn',
       status: null,
       template: null,
       total: 0
@@ -99,10 +99,10 @@ export default {
     params() {
       return {
         hasErrors: this.hasErrors,
+        hasSucceeded: this.hasSucceeded,
         isDemo: this.isDemo,
         realm: this.realm,
         search: this.search,
-        succeeded: this.succeeded,
         template: this.template,
         sort: this.sort,
         desc: this.desc,
@@ -116,7 +116,7 @@ export default {
         'text'
       )
     },
-    succeeded() {
+    hasSucceeded() {
       return this.status === null ? null : this.status === 'Sent'
     }
   },
@@ -145,10 +145,10 @@ export default {
           newValue?.index &&
           oldValue &&
           (newValue.hasErrors !== oldValue.hasErrors ||
+            newValue.hasSucceeded !== oldValue.hasSucceeded ||
             newValue.isDemo !== oldValue.isDemo ||
             newValue.realm !== oldValue.realm ||
             newValue.search !== oldValue.search ||
-            newValue.succeeded !== oldValue.succeeded ||
             newValue.template !== oldValue.template ||
             newValue.count !== oldValue.count)
         ) {

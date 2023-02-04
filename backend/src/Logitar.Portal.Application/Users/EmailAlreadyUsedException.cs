@@ -1,27 +1,22 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 
 namespace Logitar.Portal.Application.Users
 {
-  internal class EmailAlreadyUsedException : ApiException
+  public class EmailAlreadyUsedException : Exception
   {
     public EmailAlreadyUsedException(string email, string paramName)
-      : base(HttpStatusCode.Conflict, GetMessage(email, paramName))
+      : base(GetMessage(email, paramName))
     {
-      Email = email ?? throw new ArgumentNullException(nameof(email));
-      ParamName = paramName ?? throw new ArgumentNullException(nameof(paramName));
-
-      Value = new { field = paramName };
+      Data["Email"] = email;
+      Data["ParamName"] = paramName;
     }
-
-    public string Email { get; }
-    public string? ParamName { get; }
 
     private static string GetMessage(string email, string paramName)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
-      message.AppendLine($"The email address '{email}' is already used.");
+      message.AppendLine("The specified email is already used.");
+      message.AppendLine($"Email: {email}");
       message.AppendLine($"ParamName: {paramName}");
 
       return message.ToString();

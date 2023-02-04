@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Dictionaries;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Core.Dictionaries.Models;
-using Logitar.Portal.Core.Dictionaries.Payloads;
+﻿using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Dictionaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace Logitar.Portal.Web.Controllers.Api
 {
@@ -14,12 +12,10 @@ namespace Logitar.Portal.Web.Controllers.Api
   [Route("api/dictionaries")]
   public class DictionaryApiController : ControllerBase
   {
-    private readonly IMapper _mapper;
     private readonly IDictionaryService _dictionaryService;
 
-    public DictionaryApiController(IMapper mapper, IDictionaryService dictionaryService)
+    public DictionaryApiController(IDictionaryService dictionaryService)
     {
-      _mapper = mapper;
       _dictionaryService = dictionaryService;
     }
 
@@ -27,33 +23,33 @@ namespace Logitar.Portal.Web.Controllers.Api
     public async Task<ActionResult<DictionaryModel>> CreateAsync([FromBody] CreateDictionaryPayload payload, CancellationToken cancellationToken)
     {
       DictionaryModel dictionary = await _dictionaryService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/dictionaries/{dictionary.Id}", UriKind.Relative);
+      Uri uri = new($"/api/dictionaries/{dictionary.Id}", UriKind.Relative);
 
       return Created(uri, dictionary);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<DictionaryModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<DictionaryModel>> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-      return Ok(await _dictionaryService.DeleteAsync(id, cancellationToken));
+      await _dictionaryService.DeleteAsync(id, cancellationToken);
+
+      return NoContent();
     }
 
     [HttpGet]
-    public async Task<ActionResult<ListModel<DictionarySummary>>> GetAsync(string? locale, string? realm,
+    public async Task<ActionResult<ListModel<DictionaryModel>>> GetAsync(CultureInfo? locale, string? realm,
       DictionarySort? sort, bool desc,
       int? index, int? count,
       CancellationToken cancellationToken = default)
     {
-      ListModel<DictionaryModel> dictionaries = await _dictionaryService.GetAsync(locale, realm,
+      return Ok(await _dictionaryService.GetAsync(locale, realm,
         sort, desc,
         index, count,
-        cancellationToken);
-
-      return Ok(dictionaries.To<DictionaryModel, DictionarySummary>(_mapper));
+        cancellationToken));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<DictionaryModel>> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<DictionaryModel>> GetAsync(string id, CancellationToken cancellationToken)
     {
       DictionaryModel? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
       if (dictionary == null)
@@ -65,7 +61,7 @@ namespace Logitar.Portal.Web.Controllers.Api
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<DictionaryModel>> UpdateAsync(Guid id, [FromBody] UpdateDictionaryPayload payload, CancellationToken cancellationToken)
+    public async Task<ActionResult<DictionaryModel>> UpdateAsync(string id, [FromBody] UpdateDictionaryPayload payload, CancellationToken cancellationToken)
     {
       return Ok(await _dictionaryService.UpdateAsync(id, payload, cancellationToken));
     }

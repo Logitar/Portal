@@ -1,27 +1,22 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 
 namespace Logitar.Portal.Application.Users
 {
-  internal class UsernameAlreadyUsedException : ApiException
+  public class UsernameAlreadyUsedException : Exception
   {
     public UsernameAlreadyUsedException(string username, string paramName)
-      : base(HttpStatusCode.Conflict, GetMessage(username, paramName))
+      : base(GetMessage(username, paramName))
     {
-      ParamName = paramName ?? throw new ArgumentNullException(nameof(paramName));
-      Username = username ?? throw new ArgumentNullException(nameof(username));
-
-      Value = new { field = paramName };
+      Data["Username"] = username;
+      Data["ParamName"] = paramName;
     }
 
-    public string? ParamName { get; }
-    public string Username { get; }
-
-    private static string GetMessage(string alias, string paramName)
+    private static string GetMessage(string username, string paramName)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
-      message.AppendLine($"The username '{alias}' is already used.");
+      message.AppendLine("The specified username is already used.");
+      message.AppendLine($"Username: {username}");
       message.AppendLine($"ParamName: {paramName}");
 
       return message.ToString();

@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Application.Claims;
 using Logitar.Portal.Application.Tokens;
-using Logitar.Portal.Core;
-using Logitar.Portal.Infrastructure.Settings;
+using Logitar.Portal.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,32 +14,22 @@ namespace Logitar.Portal.Infrastructure.Tokens
 
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
     private readonly IJwtBlacklist _blacklist;
-    private readonly SecurityKey _key;
 
-    public JwtService(IJwtBlacklist blacklist, JwtSettings settings)
+    public JwtService(IJwtBlacklist blacklist)
     {
-      ArgumentNullException.ThrowIfNull(blacklist);
-      ArgumentNullException.ThrowIfNull(settings);
-
-      if (settings.Secret == null)
-      {
-        throw new ArgumentException($"The {nameof(settings.Secret)} is required.", nameof(settings));
-      }
-
       _blacklist = blacklist;
-      _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(settings.Secret));
     }
 
-    public string Create(ClaimsIdentity subject, string? algorithm, string? audience, DateTime? expires, string? issuer)
+    public string Create(ClaimsIdentity subject, string secret, string? audience, DateTime? expires, string? issuer)
+      => Create(subject, secret, algorithm: null, audience, expires, issuer);
+    public string Create(ClaimsIdentity subject, string secret, string? algorithm, string? audience, DateTime? expires, string? issuer)
     {
-      ArgumentNullException.ThrowIfNull(subject);
-
-      var tokenDescriptor = new SecurityTokenDescriptor
+      SecurityTokenDescriptor tokenDescriptor = new()
       {
         Audience = audience,
         Expires = expires,
         Issuer = issuer,
-        SigningCredentials = new SigningCredentials(_key, algorithm ?? DefaultAlgorithm),
+        SigningCredentials = new SigningCredentials(GetSecurityKey(secret), algorithm ?? DefaultAlgorithm),
         Subject = subject
       };
 
@@ -49,13 +38,11 @@ namespace Logitar.Portal.Infrastructure.Tokens
       return _tokenHandler.WriteToken(token);
     }
 
-    public async Task<ValidateTokenResult> ValidateAsync(string token, string? audience, string? issuer, string? purpose, bool consume, CancellationToken cancellationToken)
+    public async Task<ValidateTokenResult> ValidateAsync(string token, string secret, string? audience, string? issuer, string? purpose, bool consume, CancellationToken cancellationToken)
     {
-      ArgumentNullException.ThrowIfNull(token);
-
-      var validationParameters = new TokenValidationParameters
+      TokenValidationParameters validationParameters = new()
       {
-        IssuerSigningKey = _key,
+        IssuerSigningKey = GetSecurityKey(secret),
         ValidAudience = audience,
         ValidIssuer = issuer,
         ValidateAudience = audience != null,
@@ -89,11 +76,11 @@ namespace Logitar.Portal.Infrastructure.Tokens
 
         if (consume)
         {
-          DateTime? expiresAt = principal.FindFirst(Rfc7519ClaimTypes.Expires)
+          DateTime? expiresOn = principal.FindFirst(Rfc7519ClaimTypes.Expires)
             ?.GetDateTime()
             .Add(validationParameters.ClockSkew);
 
-          await _blacklist.BlacklistAsync(ids, expiresAt, cancellationToken);
+          await _blacklist.BlacklistAsync(ids, expiresOn, cancellationToken);
         }
 
         return ValidateTokenResult.Success(principal);
@@ -103,5 +90,7 @@ namespace Logitar.Portal.Infrastructure.Tokens
         return ValidateTokenResult.Failed(new Error(exception));
       }
     }
+
+    private static SecurityKey GetSecurityKey(string secret) => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
   }
 }

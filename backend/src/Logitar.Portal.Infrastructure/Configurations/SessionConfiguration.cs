@@ -1,21 +1,26 @@
-﻿using Logitar.Portal.Domain.Sessions;
+﻿using Logitar.Portal.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.Infrastructure.Configurations
 {
-  internal class SessionConfiguration : AggregateConfiguration<Session>, IEntityTypeConfiguration<Session>
+  internal class SessionConfiguration : AggregateConfiguration<SessionEntity>, IEntityTypeConfiguration<SessionEntity>
   {
-    public override void Configure(EntityTypeBuilder<Session> builder)
+    public override void Configure(EntityTypeBuilder<SessionEntity> builder)
     {
       base.Configure(builder);
 
-      builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.NoAction);
+      builder.HasKey(x => x.SessionId);
 
-      builder.Property(x => x.AdditionalInformation).HasColumnType("jsonb");
-      builder.Property(x => x.IpAddress).HasMaxLength(40);
-      builder.Property(x => x.IsActive).HasDefaultValue(false);
-      builder.Property(x => x.IsPersistent).HasDefaultValue(false);
+      builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.Restrict);
+
+      builder.HasIndex(x => x.IsPersistent);
+      builder.HasIndex(x => x.SignedOutOn);
+      builder.HasIndex(x => x.IsActive);
+      builder.HasIndex(x => x.IpAddress);
+
+      builder.Property(x => x.SignedOutBy).HasMaxLength(256);
+      builder.Property(x => x.IpAddress).HasMaxLength(64);
     }
   }
 }

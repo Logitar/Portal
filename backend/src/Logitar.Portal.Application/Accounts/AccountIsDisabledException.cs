@@ -1,17 +1,13 @@
-﻿using Logitar.Portal.Core;
-using System.Net;
+﻿using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Application.Accounts
 {
-  internal class AccountIsDisabledException : ApiException
+  public class AccountIsDisabledException : Exception
   {
-    public AccountIsDisabledException(Guid userId)
-      : base(HttpStatusCode.BadRequest, $"The user 'Id={userId}' is disabled.")
+    public AccountIsDisabledException(User user)
+      : base($"The user '{user}' is disabled.")
     {
-      UserId = userId;
-      Value = new { code = nameof(AccountIsDisabledException).Remove(nameof(Exception)) };
+      Data["User"] = user.ToString();
     }
-
-    public Guid UserId { get; }
   }
 }

@@ -1,80 +1,51 @@
-﻿using Logitar.Portal.Core.Dictionaries.Payloads;
-using Logitar.Portal.Domain.Dictionaries.Events;
+﻿using Logitar.Portal.Domain.Dictionaries.Events;
 using Logitar.Portal.Domain.Realms;
 using System.Globalization;
-using System.Text.Json;
 
 namespace Logitar.Portal.Domain.Dictionaries
 {
-  public class Dictionary : Aggregate
+  public class Dictionary : AggregateRoot
   {
-    public Dictionary(CreateDictionaryPayload payload, Guid userId, Realm? realm = null)
+    public Dictionary(AggregateId userId, CultureInfo locale, Realm? realm = null, Dictionary<string, string>? entries = null) : base()
     {
-      ApplyChange(new CreatedEvent(payload, userId));
-
-      Realm = realm;
-      RealmSid = realm?.Sid;
+      ApplyChange(new DictionaryCreatedEvent
+      {
+        RealmId = realm?.Id,
+        Locale = locale,
+        Entries = entries
+      }, userId);
     }
-    private Dictionary()
+    private Dictionary() : base()
     {
     }
 
-    public Realm? Realm { get; private set; }
-    public int? RealmSid { get; private set; }
+    public AggregateId? RealmId { get; private set; }
 
-    public CultureInfo Culture => CultureInfo.GetCultureInfo(Locale);
-    public string Locale { get; private set; } = null!;
+    public CultureInfo Locale { get; private set; } = CultureInfo.InvariantCulture;
 
     public Dictionary<string, string> Entries { get; private set; } = new();
-    public string? EntriesSerialized
-    {
-      get => Entries.Any() ? JsonSerializer.Serialize(Entries) : null;
-      private set
-      {
-        Entries.Clear();
 
-        if (value != null)
-        {
-          var entries = JsonSerializer.Deserialize<Dictionary<string, string>>(value);
-          if (entries != null)
-          {
-            foreach (var (key, entry) in entries)
-            {
-              Entries[key] = entry;
-            }
-          }
-        }
-      }
+    public void Delete(AggregateId userId) => ApplyChange(new DictionaryDeletedEvent(), userId);
+    public void Update(AggregateId userId, Dictionary<string, string>? entries = null) => ApplyChange(new DictionaryUpdatedEvent
+    {
+      Entries = entries
+    }, userId);
+
+    protected virtual void Apply(DictionaryCreatedEvent @event)
+    {
+      RealmId = @event.RealmId;
+
+      Locale = @event.Locale;
+
+      Entries = @event.Entries ?? new();
     }
-
-    public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
-    public void Update(UpdateDictionaryPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
-
-    protected virtual void Apply(CreatedEvent @event)
+    protected virtual void Apply(DictionaryDeletedEvent @event)
     {
-      Locale = @event.Payload.Locale;
-
-      Apply(@event.Payload);
+      Delete();
     }
-    protected virtual void Apply(DeletedEvent @event)
+    protected virtual void Apply(DictionaryUpdatedEvent @event)
     {
-    }
-    protected virtual void Apply(UpdatedEvent @event)
-    {
-      Apply(@event.Payload);
-    }
-
-    private void Apply(SaveDictionaryPayload payload)
-    {
-      Entries.Clear();
-
-      if (payload.Entries != null)
-      {
-        foreach (EntryPayload entry in payload.Entries)
-        {
-          Entries[entry.Key] = entry.Value.Trim();
-        }
-      }
+      Entries = @event.Entries ?? new();
     }
   }
 }

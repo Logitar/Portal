@@ -1,117 +1,125 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms.Payloads;
-using Logitar.Portal.Core.Users.Payloads;
-using Logitar.Portal.Domain.Dictionaries;
-using Logitar.Portal.Domain.Emails.Senders;
-using Logitar.Portal.Domain.Emails.Templates;
-using Logitar.Portal.Domain.Realms.Events;
+﻿using Logitar.Portal.Domain.Realms.Events;
+using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using System.Globalization;
-using System.Text.Json;
 
 namespace Logitar.Portal.Domain.Realms
 {
-  public class Realm : Aggregate
+  public class Realm : AggregateRoot
   {
-    public Realm(CreateRealmPayload payload, Guid userId)
+    public Realm(AggregateId userId, string alias, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
+      string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
+      bool requireConfirmedAccount = false, bool requireUniqueEmail = false, string? googleClientId = null) : base()
     {
-      ApplyChange(new CreatedEvent(payload, userId));
+      ApplyChange(new RealmCreatedEvent
+      {
+        Alias = alias.Trim(),
+        DisplayName = displayName?.CleanTrim(),
+        Description = description?.CleanTrim(),
+        DefaultLocale = defaultLocale,
+        Url = url?.CleanTrim(),
+        RequireConfirmedAccount = requireConfirmedAccount,
+        RequireUniqueEmail = requireUniqueEmail,
+        UsernameSettings = usernameSettings,
+        PasswordSettings = passwordSettings,
+        JwtSecret = jwtSecret.Trim(),
+        GoogleClientId = googleClientId?.CleanTrim()
+      }, userId);
     }
-    private Realm()
+    private Realm() : base()
     {
     }
 
-    public string Alias { get; private set; } = null!;
-    public string AliasNormalized
-    {
-      get => Alias.ToUpper();
-      private set { /* EntityFrameworkCore only setter */ }
-    }
-
-    public string Name { get; private set; } = null!;
+    public string Alias { get; private set; } = string.Empty;
+    public string? DisplayName { get; private set; }
     public string? Description { get; private set; }
 
-    public string? AllowedUsernameCharacters { get; private set; }
+    public CultureInfo? DefaultLocale { get; private set; }
+    public string? Url { get; private set; }
+
     public bool RequireConfirmedAccount { get; private set; }
     public bool RequireUniqueEmail { get; private set; }
 
-    public CultureInfo? DefaultCulture => DefaultLocale == null ? null : CultureInfo.GetCultureInfo(DefaultLocale);
-    public string? DefaultLocale { get; private set; }
-    public string? Url { get; private set; }
+    public UsernameSettings UsernameSettings { get; private set; } = new();
+    public PasswordSettings PasswordSettings { get; private set; } = new();
 
-    public Sender? PasswordRecoverySender
-    {
-      get => PasswordRecoverySenderRelation?.Sender;
-      set => PasswordRecoverySenderRelation = value == null ? null : new PasswordRecoverySender(this, value);
-    }
-    /// <summary>
-    /// EntityFrameworkCore only property
-    /// </summary>
-    public PasswordRecoverySender? PasswordRecoverySenderRelation { get; private set; }
-    public Template? PasswordRecoveryTemplate
-    {
-      get => PasswordRecoveryTemplateRelation?.Template;
-      set => PasswordRecoveryTemplateRelation = value == null ? null : new PasswordRecoveryTemplate(this, value);
-    }
-    /// <summary>
-    /// EntityFrameworkCore only property
-    /// </summary>
-    public PasswordRecoveryTemplate? PasswordRecoveryTemplateRelation { get; private set; }
+    public AggregateId? PasswordRecoverySenderId { get; private set; }
+    public AggregateId? PasswordRecoveryTemplateId { get; private set; }
 
-    public PasswordSettings? PasswordSettings { get; private set; }
-    public string? PasswordSettingsSerialized
-    {
-      get => PasswordSettings == null ? null : JsonSerializer.Serialize(PasswordSettings);
-      private set => PasswordSettings = value == null ? null : JsonSerializer.Deserialize<PasswordSettings>(value);
-    }
+    public string JwtSecret { get; private set; } = string.Empty;
 
     public string? GoogleClientId { get; private set; }
 
-    public List<Dictionary> Dictionaries { get; private set; } = new();
-    public List<Sender> Senders { get; private set; } = new();
-    public List<Template> Templates { get; private set; } = new();
-    public List<User> Users { get; private set; } = new();
-
-    public void Delete(Guid userId) => ApplyChange(new DeletedEvent(userId));
-    public void Update(UpdateRealmPayload payload, Guid userId) => ApplyChange(new UpdatedEvent(payload, userId));
-
-    protected virtual void Apply(CreatedEvent @event)
+    public void Delete(AggregateId userId) => ApplyChange(new RealmDeletedEvent(), userId);
+    public void Update(AggregateId userId, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
+      string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
+      bool requireConfirmedAccount = false, bool requireUniqueEmail = false,
+      Sender? passwordRecoverySender = null, Template? passwordRecoveryTemplate = null,
+      string? googleClientId = null)
     {
-      Alias = @event.Payload.Alias;
-
-      Apply(@event.Payload);
-    }
-    protected virtual void Apply(DeletedEvent @event)
-    {
-    }
-    protected virtual void Apply(UpdatedEvent @event)
-    {
-      Apply(@event.Payload);
-    }
-
-    private void Apply(SaveRealmPayload payload)
-    {
-      Name = payload.Name.Trim();
-      Description = payload.Description?.CleanTrim();
-
-      AllowedUsernameCharacters = payload.AllowedUsernameCharacters == null
-        ? null
-        : new string(payload.AllowedUsernameCharacters.ToCharArray().Distinct().ToArray());
-      RequireConfirmedAccount = payload.RequireConfirmedAccount;
-      RequireUniqueEmail = payload.RequireUniqueEmail;
-
-      DefaultLocale = payload.DefaultLocale;
-      Url = payload.Url;
-
-      PasswordSettingsPayload? password = payload.PasswordSettings;
-      PasswordSettings = password == null
-        ? null
-        : new PasswordSettings(password.RequiredLength, password.RequiredUniqueChars,
-            password.RequireNonAlphanumeric, password.RequireLowercase, password.RequireUppercase, password.RequireDigit);
-
-      GoogleClientId = payload.GoogleClientId?.CleanTrim();
+      ApplyChange(new RealmUpdatedEvent
+      {
+        DisplayName = displayName?.CleanTrim(),
+        Description = description?.CleanTrim(),
+        DefaultLocale = defaultLocale,
+        Url = url?.CleanTrim(),
+        RequireConfirmedAccount = requireConfirmedAccount,
+        RequireUniqueEmail = requireUniqueEmail,
+        UsernameSettings = usernameSettings,
+        PasswordSettings = passwordSettings,
+        PasswordRecoverySenderId = passwordRecoverySender?.Id,
+        PasswordRecoveryTemplateId = passwordRecoveryTemplate?.Id,
+        JwtSecret = jwtSecret.Trim(),
+        GoogleClientId = googleClientId?.CleanTrim()
+      }, userId);
     }
 
-    public override string ToString() => $"{Name} | {base.ToString()}";
+    protected virtual void Apply(RealmCreatedEvent @event)
+    {
+      Alias = @event.Alias;
+      DisplayName = @event.DisplayName;
+      Description = @event.Description;
+
+      DefaultLocale = @event.DefaultLocale;
+      Url = @event.Url;
+
+      RequireConfirmedAccount = @event.RequireConfirmedAccount;
+      RequireUniqueEmail = @event.RequireUniqueEmail;
+
+      UsernameSettings = @event.UsernameSettings;
+      PasswordSettings = @event.PasswordSettings;
+
+      JwtSecret = @event.JwtSecret;
+
+      GoogleClientId = @event.GoogleClientId;
+    }
+    protected virtual void Apply(RealmDeletedEvent @event)
+    {
+      Delete();
+    }
+    protected virtual void Apply(RealmUpdatedEvent @event)
+    {
+      DisplayName = @event.DisplayName;
+      Description = @event.Description;
+
+      DefaultLocale = @event.DefaultLocale;
+      Url = @event.Url;
+
+      RequireConfirmedAccount = @event.RequireConfirmedAccount;
+      RequireUniqueEmail = @event.RequireUniqueEmail;
+
+      UsernameSettings = @event.UsernameSettings;
+      PasswordSettings = @event.PasswordSettings;
+
+      PasswordRecoverySenderId = @event.PasswordRecoverySenderId;
+      PasswordRecoveryTemplateId = @event.PasswordRecoveryTemplateId;
+
+      JwtSecret = @event.JwtSecret;
+
+      GoogleClientId = @event.GoogleClientId;
+    }
+
+    public override string ToString() => $"{DisplayName} | {base.ToString()}";
   }
 }

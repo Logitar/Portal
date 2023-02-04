@@ -1,33 +1,30 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Infrastructure.JsonConverters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
+using Logitar.Portal.Web.Extensions;
+using Logitar.Portal.Web.Filters;
 using Logitar.Portal.Web.Middlewares;
-using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web
 {
-  internal class Startup : StartupBase
+  public class Startup : StartupBase
   {
-    private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
-    {
-      _configuration = configuration;
-    }
-
     public override void ConfigureServices(IServiceCollection services)
     {
       base.ConfigureServices(services);
 
-      services
-        .AddControllersWithViews()
-        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+      services.AddControllersWithViews(options => options.Filters.Add(new ExceptionFilterAttribute()))
+        .AddJsonOptions(options =>
+        {
+          options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
-      services
-        .AddAuthentication()
+      services.AddAuthentication()
         .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Constants.Schemes.ApiKey, options => { })
         .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Constants.Schemes.Session, options => { });
 
@@ -52,26 +49,22 @@ namespace Logitar.Portal.Web
       });
 
       services.AddApplicationInsightsTelemetry();
-      services
-        .AddHealthChecks()
-        .AddDbContextCheck<PortalDbContext>();
+      services.AddHealthChecks()
+        .AddDbContextCheck<PortalContext>();
 
       services.AddHttpContextAccessor();
 
       services.AddOpenApi();
 
-      services
-        .AddSession(options =>
-        {
-          options.Cookie.SameSite = SameSiteMode.Strict;
-          options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        })
-        .AddDistributedMemoryCache();
+      services.AddSession(options =>
+      {
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+      }).AddDistributedMemoryCache();
 
-      services.AddPortalApplication();
-      services.AddPortalInfrastructure(_configuration);
+      services.AddLogitarPortalApplication();
+      services.AddLogitarPortalInfrastructure();
 
-      services.AddSingleton(_configuration.GetSection("Logging").Get<LoggingSettings>() ?? new());
       services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, SessionAuthorizationHandler>();
@@ -83,7 +76,7 @@ namespace Logitar.Portal.Web
     {
       if (applicationBuilder is WebApplication application)
       {
-        if (application.Environment.IsDevelopment())
+        if (!application.Environment.IsProduction())
         {
           application.UseOpenApi();
         }
@@ -91,7 +84,7 @@ namespace Logitar.Portal.Web
         application.UseHttpsRedirection();
         application.UseStaticFiles();
         application.UseSession();
-        application.UseMiddleware<Logging>();
+        //application.UseMiddleware<Logging>(); // TODO(fpion): implement Logging
         application.UseMiddleware<RenewSession>();
         application.UseMiddleware<RedirectUnauthorized>();
         application.UseAuthentication();

@@ -7,14 +7,12 @@ namespace Logitar.Portal.Infrastructure.Tokens
   {
     public SecurityTokenBlacklistedException(IEnumerable<Guid> ids) : base(GetMessage(ids))
     {
-      Ids = ids ?? throw new ArgumentNullException(nameof(ids));
+      Data["Ids"] = ids;
     }
-
-    public IEnumerable<Guid> Ids { get; }
 
     private static string GetMessage(IEnumerable<Guid> ids)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
       message.AppendLine("The security token is blacklisted.");
       message.AppendLine($"Blacklisted IDs: {string.Join(", ", ids)}");

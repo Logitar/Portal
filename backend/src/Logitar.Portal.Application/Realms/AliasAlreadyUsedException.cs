@@ -1,27 +1,22 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 
 namespace Logitar.Portal.Application.Realms
 {
-  internal class AliasAlreadyUsedException : ApiException
+  public class AliasAlreadyUsedException : Exception
   {
     public AliasAlreadyUsedException(string alias, string paramName)
-      : base(HttpStatusCode.Conflict, GetMessage(alias, paramName))
+      : base(GetMessage(alias, paramName))
     {
-      Alias = alias ?? throw new ArgumentNullException(nameof(alias));
-      ParamName = paramName ?? throw new ArgumentNullException(nameof(paramName));
-
-      Value = new { field = paramName };
+      Data["Alias"] = alias;
+      Data["ParamName"] = paramName;
     }
-
-    public string Alias { get; }
-    public string? ParamName { get; }
 
     private static string GetMessage(string alias, string paramName)
     {
-      var message = new StringBuilder();
+      StringBuilder message = new();
 
-      message.AppendLine($"The alias '{alias}' is already used.");
+      message.AppendLine("The specified username is already used.");
+      message.AppendLine($"Alias: {alias}");
       message.AppendLine($"ParamName: {paramName}");
 
       return message.ToString();

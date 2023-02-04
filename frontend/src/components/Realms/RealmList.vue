@@ -15,7 +15,7 @@
         <thead>
           <tr>
             <th scope="col" v-t="'realms.alias.label'" />
-            <th scope="col" v-t="'name.label'" />
+            <th scope="col" v-t="'realms.displayName.label'" />
             <th scope="col" v-t="'updated'" />
             <th scope="col" />
           </tr>
@@ -25,13 +25,13 @@
             <td>
               <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
             </td>
-            <td v-text="realm.name" />
-            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedAt" /></td>
+            <td v-text="realm.displayName || realm.alias" />
+            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedOn || realm.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal
                 confirm="realms.delete.confirm"
-                :displayName="realm.name"
+                :displayName="realm.displayName || realm.alias"
                 :id="`delete_${realm.id}`"
                 :loading="loading"
                 title="realms.delete.title"
@@ -60,7 +60,7 @@ export default {
       page: 1,
       realms: [],
       search: null,
-      sort: 'Name',
+      sort: 'DisplayName',
       total: 0
     }
   },

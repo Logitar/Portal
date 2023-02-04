@@ -1,11 +1,9 @@
-﻿using System.Net;
-
-namespace Logitar.Portal.Application.Configurations
+﻿namespace Logitar.Portal.Application.Configurations
 {
-  internal class ConfigurationAlreadyInitializedException : ApiException
+  public class ConfigurationAlreadyInitializedException : Exception
   {
     public ConfigurationAlreadyInitializedException()
-      : base(HttpStatusCode.Forbidden, "The configuration has already been initialized.")
+      : base("The configuration has already been initialized.")
     {
     }
   }
