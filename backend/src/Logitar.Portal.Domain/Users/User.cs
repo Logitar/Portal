@@ -6,15 +6,15 @@ namespace Logitar.Portal.Domain.Users
 {
   public class User : AggregateRoot
   {
-    public User(AggregateId userId, string username, Realm? realm = null, string? email = null, bool isEmailConfirmed = false,
+    public User(AggregateId actorId, string username, Realm? realm = null, string? email = null, bool isEmailConfirmed = false,
       string? firstName = null, string? lastName = null, CultureInfo? locale = null, string? picture = null)
-      : this(userId, username, realm, passwordHash: null,
+      : this(actorId, username, realm, passwordHash: null,
           email, isEmailConfirmed, phoneNumber: null, isPhoneNumberConfirmed: false,
           firstName, middleName: null, lastName,
           locale, picture)
     {
     }
-    public User(AggregateId userId, string username, Realm? realm = null, string? passwordHash = null,
+    public User(AggregateId actorId, string username, Realm? realm = null, string? passwordHash = null,
       string? email = null, bool isEmailConfirmed = false, string? phoneNumber = null, bool isPhoneNumberConfirmed = false,
       string? firstName = null, string? middleName = null, string? lastName = null,
       CultureInfo? locale = null, string? picture = null) : base()
@@ -34,7 +34,7 @@ namespace Logitar.Portal.Domain.Users
         FullName = GetFullName(firstName, middleName, lastName),
         Locale = locale,
         Picture = picture?.CleanTrim()
-      }, userId);
+      }, actorId);
     }
     public User(string username, string passwordHash, string email, string firstName, string lastName, CultureInfo locale) : base()
     {
@@ -77,52 +77,52 @@ namespace Logitar.Portal.Domain.Users
 
     public List<ExternalProvider> ExternalProviders { get; private set; } = new();
 
-    public void AddExternalProvider(AggregateId userId, string key, string value, string? displayName = null)
+    public void AddExternalProvider(AggregateId actorId, string key, string value, string? displayName = null)
     {
       ApplyChange(new UserAddedExternalProviderEvent
       {
         Key = key,
         Value = value,
         DisplayName = displayName
-      }, userId);
+      }, actorId);
     }
     public void ChangePassword(string passwordHash) => ApplyChange(new UserChangedPasswordEvent
     {
       PasswordHash = passwordHash
     }, Id);
-    public void Delete(AggregateId userId)
+    public void Delete(AggregateId actorId)
     {
-      if (userId == Id)
+      if (actorId == Id)
       {
         throw new UserCannotDeleteItselfException(this);
       }
 
-      ApplyChange(new UserDeletedEvent(), userId);
+      ApplyChange(new UserDeletedEvent(), actorId);
     }
-    public void Disable(AggregateId userId)
+    public void Disable(AggregateId actorId)
     {
       if (IsDisabled)
       {
         throw new UserAlreadyDisabledException(this);
       }
-      else if (userId == Id)
+      else if (actorId == Id)
       {
         throw new UserCannotDisableItselfException(this);
       }
 
-      ApplyChange(new UserDisabledEvent(), userId);
+      ApplyChange(new UserDisabledEvent(), actorId);
     }
-    public void Enable(AggregateId userId)
+    public void Enable(AggregateId actorId)
     {
       if (!IsDisabled)
       {
         throw new UserNotDisabledException(this);
       }
 
-      ApplyChange(new UserEnabledEvent(), userId);
+      ApplyChange(new UserEnabledEvent(), actorId);
     }
     public void SignIn() => ApplyChange(new UserSignedInEvent(), Id);
-    public void Update(AggregateId userId, string? passwordHash = null,
+    public void Update(AggregateId actorId, string? passwordHash = null,
       string? email = null, string? phoneNumber = null,
       string? firstName = null, string? middleName = null, string? lastName = null,
       CultureInfo? locale = null, string? picture = null)
@@ -143,7 +143,7 @@ namespace Logitar.Portal.Domain.Users
         FullName = GetFullName(firstName, middleName, lastName),
         Locale = locale,
         Picture = picture?.CleanTrim()
-      }, userId);
+      }, actorId);
     }
 
     protected virtual void Apply(UserAddedExternalProviderEvent @event)

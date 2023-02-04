@@ -56,7 +56,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Realms
         }
         else
         {
-          realm.Update(notification, passwordRecoverySender, passwordRecoveryTemplate);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          realm.Update(notification, actor, passwordRecoverySender, passwordRecoveryTemplate);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

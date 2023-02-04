@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Senders
         }
         else
         {
-          sender.SetDefault(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          sender.SetDefault(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

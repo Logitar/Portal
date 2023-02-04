@@ -10,7 +10,7 @@ namespace Logitar.Portal.Domain.Messages
 {
   public class Message : AggregateRoot
   {
-    public Message(AggregateId userId, string subject, string body, IEnumerable<Recipient> recipients,
+    public Message(AggregateId actorId, string subject, string body, IEnumerable<Recipient> recipients,
       Sender sender, Template template, Realm? realm = null, bool ignoreUserLocale = false, CultureInfo? locale = null,
       Dictionary<string, string?>? variables = null, bool isDemo = false) : base()
     {
@@ -35,7 +35,7 @@ namespace Logitar.Portal.Domain.Messages
         Locale = locale,
         Variables = variables,
         IsDemo = isDemo
-      }, userId);
+      }, actorId);
     }
     private Message() : base()
     {
@@ -73,7 +73,7 @@ namespace Logitar.Portal.Domain.Messages
     public SendMessageResult? Result { get; private set; }
     public bool HasSucceeded => !HasErrors && Result != null;
 
-    public void Fail(AggregateId userId, Error error)
+    public void Fail(AggregateId actorId, Error error)
     {
       if (HasErrors || HasSucceeded)
       {
@@ -83,9 +83,9 @@ namespace Logitar.Portal.Domain.Messages
       ApplyChange(new MessageFailedEvent
       {
         Errors = new[] { error }
-      }, userId);
+      }, actorId);
     }
-    public void Succeed(AggregateId userId, SendMessageResult result)
+    public void Succeed(AggregateId actorId, SendMessageResult result)
     {
       if (HasErrors || HasSucceeded)
       {
@@ -95,7 +95,7 @@ namespace Logitar.Portal.Domain.Messages
       ApplyChange(new MessageSucceededEvent
       {
         Result = result
-      }, userId);
+      }, actorId);
     }
 
     protected virtual void Apply(MessageCreatedEvent @event)

@@ -28,7 +28,7 @@ namespace Logitar.Portal.Domain.Sessions
     public string? IpAddress { get; private set; }
     public string? AdditionalInformation { get; private set; }
 
-    public void Delete(AggregateId userId) => ApplyChange(new SessionDeletedEvent(), userId);
+    public void Delete(AggregateId actorId) => ApplyChange(new SessionDeletedEvent(), actorId);
     public void Renew(string? keyHash = null, string? ipAddress = null, string? additionalInformation = null)
     {
       if (!IsActive)
@@ -43,19 +43,19 @@ namespace Logitar.Portal.Domain.Sessions
         AdditionalInformation = additionalInformation?.CleanTrim()
       }, UserId);
     }
-    public void SignOut(AggregateId userId)
+    public void SignOut(AggregateId actorId)
     {
       if (!IsActive)
       {
         throw new SessionAlreadySignedOutException(this);
       }
 
-      ApplyChange(new SessionSignedOutEvent(), userId);
+      ApplyChange(new SessionSignedOutEvent(), actorId);
     }
 
     protected virtual void Apply(SessionCreatedEvent @event)
     {
-      UserId = @event.UserId;
+      UserId = @event.ActorId;
 
       KeyHash = @event.KeyHash;
 

@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
         }
         else
         {
-          session.Renew(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          session.Renew(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

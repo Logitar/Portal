@@ -10,8 +10,8 @@ namespace Logitar.Portal.Infrastructure.Profiles
     {
       CreateMap<AggregateEntity, AggregateModel>()
         .ForMember(x => x.Id, x => x.MapFrom(y => y.AggregateId))
-        .ForMember(x => x.CreatedBy, x => x.Ignore()) // TODO(fpion): implement Actors
-        .ForMember(x => x.UpdatedBy, x => x.Ignore()); // TODO(fpion): implement Actors
+        .ForMember(x => x.CreatedBy, x => x.MapFrom(y => Actor.GetActorModel(y.CreatedById, y.CreatedBy)))
+        .ForMember(x => x.UpdatedBy, x => x.MapFrom(y => Actor.GetActorModel(y.UpdatedById, y.UpdatedBy)));
     }
   }
 }

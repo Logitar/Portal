@@ -20,7 +20,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Realms
     {
       try
       {
-        RealmEntity realm = new(notification);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        RealmEntity realm = new(notification, actor);
 
         _context.Realms.Add(realm);
 

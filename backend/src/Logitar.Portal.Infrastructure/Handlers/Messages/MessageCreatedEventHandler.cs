@@ -20,7 +20,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Messages
     {
       try
       {
-        MessageEntity message = new(notification);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        MessageEntity message = new(notification, actor);
 
         _context.Messages.Add(message);
 

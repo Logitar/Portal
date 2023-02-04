@@ -42,7 +42,6 @@ namespace Logitar.Portal.Infrastructure
         .AddSingleton<IPasswordService, PasswordService>()
         .AddSingleton<ITemplateCompiler, TemplateCompiler>()
         .AddScoped<IJwtBlacklist, JwtBlacklist>()
-        .AddScoped<IMappingService, MappingService>()
         .AddScoped<IRepository, Repository>()
         .AddScoped<IRequestPipeline, RequestPipeline>()
         .AddScoped<ISecurityTokenService, JwtService>()

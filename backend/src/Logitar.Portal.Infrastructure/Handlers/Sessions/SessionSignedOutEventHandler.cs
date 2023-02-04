@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
         }
         else
         {
-          session.SignOut(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          session.SignOut(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

@@ -4,7 +4,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class TemplateEntity : AggregateEntity
   {
-    public TemplateEntity(TemplateCreatedEvent @event, RealmEntity? realm) : base(@event)
+    public TemplateEntity(TemplateCreatedEvent @event, Actor actor, RealmEntity? realm = null) : base(@event, actor)
     {
       Realm = realm;
       RealmId = realm?.RealmId;
@@ -41,9 +41,9 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public RealmEntity? UsedAsPasswordRecoveryTemplateInRealm { get; private set; }
 
-    public void Update(TemplateUpdatedEvent @event)
+    public void Update(TemplateUpdatedEvent @event, Actor actor)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       DisplayName = @event.DisplayName;
       Description = @event.Description;

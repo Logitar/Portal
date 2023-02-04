@@ -30,7 +30,7 @@ namespace Logitar.Portal.Web
 
       services.AddAuthorization(options =>
       {
-        options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+        options.AddPolicy(Constants.Policies.ApiKey, new AuthorizationPolicyBuilder(Constants.Schemes.ApiKey)
           .RequireAuthenticatedUser()
           .AddRequirements(new ApiKeyAuthorizationRequirement())
           .Build());
@@ -41,6 +41,10 @@ namespace Logitar.Portal.Web
         options.AddPolicy(Constants.Policies.PortalIdentity, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
           .AddRequirements(new PortalIdentityAuthorizationRequirement())
+          .Build());
+        options.AddPolicy(Constants.Policies.PortalUser, new AuthorizationPolicyBuilder(Constants.Schemes.Session)
+          .RequireAuthenticatedUser()
+          .AddRequirements(new PortalUserAuthorizationRequirement())
           .Build());
         options.AddPolicy(Constants.Policies.Session, new AuthorizationPolicyBuilder(Constants.Schemes.All)
           .RequireAuthenticatedUser()
@@ -67,6 +71,7 @@ namespace Logitar.Portal.Web
 
       services.AddSingleton<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, PortalIdentityAuthorizationHandler>();
+      services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, SessionAuthorizationHandler>();
       services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
       services.AddSingleton<IUserContext, HttpUserContext>();

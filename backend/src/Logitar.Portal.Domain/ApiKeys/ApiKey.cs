@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.ApiKeys
 {
   public class ApiKey : AggregateRoot
   {
-    public ApiKey(AggregateId userId, string secretHash, string title, string? description = null, DateTime? expiresOn = null) : base()
+    public ApiKey(AggregateId actor, string secretHash, string title, string? description = null, DateTime? expiresOn = null) : base()
     {
       ApplyChange(new ApiKeyCreatedEvent
       {
@@ -12,7 +12,7 @@ namespace Logitar.Portal.Domain.ApiKeys
         Title = title.Trim(),
         Description = description?.CleanTrim(),
         ExpiresOn = expiresOn
-      }, userId);
+      }, actor);
     }
     private ApiKey() : base()
     {
@@ -27,12 +27,12 @@ namespace Logitar.Portal.Domain.ApiKeys
 
     public bool IsExpired(DateTime? expiredOn = null) => ExpiresOn <= (expiredOn ?? DateTime.UtcNow);
 
-    public void Delete(AggregateId userId) => ApplyChange(new ApiKeyDeletedEvent(), userId);
-    public void Update(AggregateId userId, string title, string? description = null) => ApplyChange(new ApiKeyUpdatedEvent
+    public void Delete(AggregateId actorId) => ApplyChange(new ApiKeyDeletedEvent(), actorId);
+    public void Update(AggregateId actorId, string title, string? description = null) => ApplyChange(new ApiKeyUpdatedEvent
     {
       Title = title.Trim(),
       Description = description?.CleanTrim()
-    }, userId);
+    }, actorId);
 
     protected virtual void Apply(ApiKeyCreatedEvent @event)
     {

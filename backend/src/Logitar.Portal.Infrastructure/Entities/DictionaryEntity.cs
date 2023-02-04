@@ -6,7 +6,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class DictionaryEntity : AggregateEntity
   {
-    public DictionaryEntity(DictionaryCreatedEvent @event, RealmEntity? realm) : base(@event)
+    public DictionaryEntity(DictionaryCreatedEvent @event, Actor actor, RealmEntity? realm = null) : base(@event, actor)
     {
       Realm = realm;
       RealmId = realm?.RealmId;
@@ -28,8 +28,10 @@ namespace Logitar.Portal.Infrastructure.Entities
 
     public string? Entries { get; private set; }
 
-    public void Update(DictionaryUpdatedEvent @event)
+    public void Update(DictionaryUpdatedEvent @event, Actor actor)
     {
+      base.Update(@event, actor);
+
       Entries = @event.Entries?.Any() == true ? JsonSerializer.Serialize(@event.Entries) : null;
     }
   }

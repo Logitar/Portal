@@ -24,7 +24,7 @@ namespace Logitar.Portal.Web.Controllers.Api
       return Ok(await _messageService.SendAsync(payload, cancellationToken));
     }
 
-    [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
+    [Authorize(Policy = Constants.Policies.PortalUser)]
     [HttpPost("demo")]
     public async Task<ActionResult<MessageModel>> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken)
     {

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Dictionaries;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain;
@@ -11,9 +12,9 @@ namespace Logitar.Portal.Infrastructure.Queriers
   internal class DictionaryQuerier : IDictionaryQuerier
   {
     private readonly DbSet<DictionaryEntity> _dictionaries;
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
 
-    public DictionaryQuerier(PortalContext context, IMappingService mapper)
+    public DictionaryQuerier(PortalContext context, IMapper mapper)
     {
       _dictionaries = context.Dictionaries;
       _mapper = mapper;
@@ -27,7 +28,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Realm)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<DictionaryModel>(dictionary, cancellationToken);
+      return _mapper.Map<DictionaryModel>(dictionary);
     }
 
     public async Task<ListModel<DictionaryModel>> GetPagedAsync(CultureInfo? locale, string? realm,
@@ -63,7 +64,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       DictionaryEntity[] dictionaries = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<DictionaryModel>(await _mapper.MapAsync<DictionaryModel>(dictionaries, cancellationToken), total);
+      return new ListModel<DictionaryModel>(_mapper.Map<IEnumerable<DictionaryModel>>(dictionaries), total);
     }
   }
 }

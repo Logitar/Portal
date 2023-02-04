@@ -22,10 +22,10 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
       try
       {
         UserEntity? user = await _context.Users
-          .SingleOrDefaultAsync(x => x.AggregateId == notification.UserId.Value, cancellationToken);
+          .SingleOrDefaultAsync(x => x.AggregateId == notification.ActorId.Value, cancellationToken);
         if (user == null)
         {
-          _logger.LogError("The user 'AggregateId={aggregateId}' could not be found.", notification.UserId);
+          _logger.LogError("The user 'AggregateId={aggregateId}' could not be found.", notification.ActorId);
 
           return;
         }

@@ -5,7 +5,7 @@ namespace Logitar.Portal.Domain.Templates
 {
   public class Template : AggregateRoot
   {
-    public Template(AggregateId userId, string key, string subject, string contentType, string contents,
+    public Template(AggregateId actorId, string key, string subject, string contentType, string contents,
       Realm? realm = null, string? displayName = null, string? description = null) : base()
     {
       ApplyChange(new TemplateCreatedEvent
@@ -17,7 +17,7 @@ namespace Logitar.Portal.Domain.Templates
         Subject = subject.Trim(),
         ContentType = contentType.Trim(),
         Contents = contents.Trim()
-      }, userId);
+      }, actorId);
     }
     private Template() : base()
     {
@@ -33,8 +33,8 @@ namespace Logitar.Portal.Domain.Templates
     public string ContentType { get; private set; } = string.Empty;
     public string Contents { get; private set; } = string.Empty;
 
-    public void Delete(AggregateId userId) => ApplyChange(new TemplateDeletedEvent(), userId);
-    public void Update(AggregateId userId, string subject, string contentType, string contents, string? displayName = null, string? description = null)
+    public void Delete(AggregateId actorId) => ApplyChange(new TemplateDeletedEvent(), actorId);
+    public void Update(AggregateId actorId, string subject, string contentType, string contents, string? displayName = null, string? description = null)
     {
       ApplyChange(new TemplateUpdatedEvent
       {
@@ -43,7 +43,7 @@ namespace Logitar.Portal.Domain.Templates
         Subject = subject.Trim(),
         ContentType = contentType.Trim(),
         Contents = contents.Trim()
-      }, userId);
+      }, actorId);
     }
 
     protected virtual void Apply(TemplateCreatedEvent @event)

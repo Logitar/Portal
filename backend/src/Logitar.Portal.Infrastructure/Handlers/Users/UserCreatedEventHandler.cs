@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Users.Events;
+﻿using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Domain.Users.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,10 +34,23 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
           }
         }
 
-        UserEntity user = new(notification, realm);
-        ActorEntity actor = new(user);
+        Actor actor;
+        if (notification.AggregateId == notification.ActorId)
+        {
+          actor = new Actor
+          {
+            Type = ActorType.User,
+            DisplayName = notification.FullName ?? notification.Username,
+            Email = notification.Email,
+            Picture = notification.Picture
+          };
+        }
+        else
+        {
+          actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        }
+        UserEntity user = new(notification, actor, realm);
 
-        _context.Actors.Add(actor);
         _context.Users.Add(user);
 
         await _context.SaveChangesAsync(cancellationToken);

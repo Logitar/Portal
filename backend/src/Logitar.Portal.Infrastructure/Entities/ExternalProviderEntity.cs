@@ -4,7 +4,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class ExternalProviderEntity
   {
-    public ExternalProviderEntity(UserAddedExternalProviderEvent @event, UserEntity user)
+    public ExternalProviderEntity(UserAddedExternalProviderEvent @event, UserEntity user, Actor actor)
     {
       if (user.Realm == null)
       {
@@ -23,7 +23,8 @@ namespace Logitar.Portal.Infrastructure.Entities
       Value = @event.Value;
       DisplayName = @event.DisplayName;
 
-      AddedBy = @event.UserId.Value;
+      AddedById = @event.ActorId.Value;
+      AddedBy = actor.Serialize();
       AddedOn = @event.OccurredOn;
     }
     private ExternalProviderEntity()
@@ -43,7 +44,16 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string Value { get; private set; } = string.Empty;
     public string? DisplayName { get; private set; }
 
+    public string AddedById { get; private set; } = string.Empty;
     public string AddedBy { get; private set; } = string.Empty;
     public DateTime AddedOn { get; private set; }
+
+    public void UpdateActors(string id, Actor actor)
+    {
+      if (AddedById == id)
+      {
+        AddedBy = actor.Serialize();
+      }
+    }
   }
 }

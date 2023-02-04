@@ -18,12 +18,15 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.PasswordChangedOn);
       builder.HasIndex(x => x.Email);
       builder.HasIndex(x => x.EmailNormalized);
+      builder.HasIndex(x => x.EmailConfirmedById);
       builder.HasIndex(x => x.PhoneNumber);
+      builder.HasIndex(x => x.PhoneNumberConfirmedById);
       builder.HasIndex(x => x.IsAccountConfirmed);
       builder.HasIndex(x => x.FirstName);
       builder.HasIndex(x => x.MiddleName);
       builder.HasIndex(x => x.LastName);
       builder.HasIndex(x => x.SignedInOn);
+      builder.HasIndex(x => x.DisabledById);
       builder.HasIndex(x => x.IsDisabled);
       builder.HasIndex(x => new { x.RealmId, x.UsernameNormalized }).IsUnique();
 
@@ -31,15 +34,18 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.Property(x => x.UsernameNormalized).HasMaxLength(256);
       builder.Property(x => x.Email).HasMaxLength(256);
       builder.Property(x => x.EmailNormalized).HasMaxLength(256);
-      builder.Property(x => x.EmailConfirmedBy).HasMaxLength(256);
-      builder.Property(x => x.PhoneNumberConfirmedBy).HasMaxLength(256);
+      builder.Property(x => x.EmailConfirmedById).HasMaxLength(256);
+      builder.Property(x => x.EmailConfirmedBy).HasColumnType("jsonb");
+      builder.Property(x => x.PhoneNumberConfirmedById).HasMaxLength(256);
+      builder.Property(x => x.PhoneNumberConfirmedBy).HasColumnType("jsonb");
       builder.Property(x => x.FirstName).HasMaxLength(128);
       builder.Property(x => x.MiddleName).HasMaxLength(128);
       builder.Property(x => x.LastName).HasMaxLength(128);
       builder.Property(x => x.FullName).HasMaxLength(512);
       builder.Property(x => x.Locale).HasMaxLength(16);
       builder.Property(x => x.Picture).HasMaxLength(2048);
-      builder.Property(x => x.DisabledBy).HasMaxLength(256);
+      builder.Property(x => x.DisabledById).HasMaxLength(256);
+      builder.Property(x => x.DisabledBy).HasColumnType("jsonb");
     }
   }
 }

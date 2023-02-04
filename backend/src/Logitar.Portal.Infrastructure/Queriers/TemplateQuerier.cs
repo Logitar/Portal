@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Templates;
+﻿using AutoMapper;
+using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain;
@@ -9,10 +10,10 @@ namespace Logitar.Portal.Infrastructure.Queriers
 {
   internal class TemplateQuerier : ITemplateQuerier
   {
-    private readonly IMappingService _mapper;
+    private readonly IMapper _mapper;
     private readonly DbSet<TemplateEntity> _templates;
 
-    public TemplateQuerier(PortalContext context, IMappingService mapper)
+    public TemplateQuerier(PortalContext context, IMapper mapper)
     {
       _mapper = mapper;
       _templates = context.Templates;
@@ -26,7 +27,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
         .Include(x => x.Realm).ThenInclude(x => x!.PasswordRecoveryTemplate)
         .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-      return await _mapper.MapAsync<TemplateModel>(template, cancellationToken);
+      return _mapper.Map<TemplateModel>(template);
     }
 
     public async Task<ListModel<TemplateModel>> GetPagedAsync(string? realm, string? search,
@@ -72,7 +73,7 @@ namespace Logitar.Portal.Infrastructure.Queriers
 
       TemplateEntity[] templates = await query.ToArrayAsync(cancellationToken);
 
-      return new ListModel<TemplateModel>(await _mapper.MapAsync<TemplateModel>(templates, cancellationToken), total);
+      return new ListModel<TemplateModel>(_mapper.Map<IEnumerable<TemplateModel>>(templates), total);
     }
   }
 }

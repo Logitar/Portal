@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
         }
         else
         {
-          user.Disable(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          user.Disable(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }

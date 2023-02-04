@@ -15,36 +15,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Actors",
-                columns: table => new
-                {
-                    ActorId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Picture = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Actors", x => x.ActorId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ActorTypes",
-                columns: table => new
-                {
-                    Value = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ActorTypes", x => x.Value);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ApiKeys",
                 columns: table => new
                 {
@@ -56,9 +26,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     ExpiresOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -73,8 +45,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     EventId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Version = table.Column<long>(type: "bigint", nullable: false),
+                    ActorId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     OccurredOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     AggregateType = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     EventType = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -107,6 +79,7 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Subject = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Body = table.Column<string>(type: "text", nullable: false),
+                    RecipientCount = table.Column<int>(type: "integer", nullable: false),
                     SenderId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     SenderIsDefault = table.Column<bool>(type: "boolean", nullable: false),
                     SenderAddress = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -131,9 +104,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     HasSucceeded = table.Column<bool>(type: "boolean", nullable: false),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -202,9 +177,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     Entries = table.Column<string>(type: "jsonb", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -224,7 +201,8 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     Key = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Value = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    AddedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AddedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    AddedBy = table.Column<string>(type: "jsonb", nullable: false),
                     AddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -254,9 +232,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     GoogleClientId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -278,9 +258,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     Settings = table.Column<string>(type: "jsonb", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -310,9 +292,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     Contents = table.Column<string>(type: "text", nullable: false),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -340,12 +324,14 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     HasPassword = table.Column<bool>(type: "boolean", nullable: false),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     EmailNormalized = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmedBy = table.Column<string>(type: "jsonb", nullable: true),
                     EmailConfirmedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     PhoneNumberNormalized = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    PhoneNumberConfirmedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    PhoneNumberConfirmedBy = table.Column<string>(type: "jsonb", nullable: true),
                     PhoneNumberConfirmedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsPhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     IsAccountConfirmed = table.Column<bool>(type: "boolean", nullable: false),
@@ -356,14 +342,17 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
                     Picture = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     SignedInOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DisabledBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    DisabledById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    DisabledBy = table.Column<string>(type: "jsonb", nullable: true),
                     DisabledOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -386,16 +375,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     KeyHash = table.Column<string>(type: "text", nullable: true),
                     IsPersistent = table.Column<bool>(type: "boolean", nullable: false),
-                    SignedOutBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    SignedOutById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    SignedOutBy = table.Column<string>(type: "jsonb", nullable: true),
                     SignedOutOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     IpAddress = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     AdditionalInformation = table.Column<string>(type: "text", nullable: true),
                     AggregateId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedById = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -407,16 +399,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.InsertData(
-                table: "ActorTypes",
-                columns: new[] { "Value", "Name" },
-                values: new object[,]
-                {
-                    { 0, "System" },
-                    { 1, "User" },
-                    { 2, "ApiKey" }
                 });
 
             migrationBuilder.InsertData(
@@ -435,22 +417,15 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Actors_AggregateId",
-                table: "Actors",
-                column: "AggregateId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ActorTypes_Name",
-                table: "ActorTypes",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_AggregateId",
                 table: "ApiKeys",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_CreatedById",
+                table: "ApiKeys",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_CreatedOn",
@@ -468,6 +443,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "Title");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_UpdatedById",
+                table: "ApiKeys",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_UpdatedOn",
                 table: "ApiKeys",
                 column: "UpdatedOn");
@@ -479,6 +459,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_CreatedById",
+                table: "Dictionaries",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_CreatedOn",
                 table: "Dictionaries",
                 column: "CreatedOn");
@@ -488,6 +473,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Dictionaries",
                 columns: new[] { "RealmId", "Locale" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_UpdatedById",
+                table: "Dictionaries",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_UpdatedOn",
@@ -503,6 +493,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Events_Version",
                 table: "Events",
                 column: "Version");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExternalProviders_AddedById",
+                table: "ExternalProviders",
+                column: "AddedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExternalProviders_Id",
@@ -537,6 +532,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Messages",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_CreatedById",
+                table: "Messages",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_CreatedOn",
@@ -609,6 +609,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "TemplateKeyNormalized");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messages_UpdatedById",
+                table: "Messages",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_UpdatedOn",
                 table: "Messages",
                 column: "UpdatedOn");
@@ -637,6 +642,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Realms_CreatedById",
+                table: "Realms",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Realms_CreatedOn",
                 table: "Realms",
                 column: "CreatedOn");
@@ -657,6 +667,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Realms",
                 column: "PasswordRecoveryTemplateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UpdatedById",
+                table: "Realms",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Realms_UpdatedOn",
@@ -685,6 +700,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Senders",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Senders_CreatedById",
+                table: "Senders",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Senders_CreatedOn",
@@ -718,6 +738,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "RealmId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Senders_UpdatedById",
+                table: "Senders",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Senders_UpdatedOn",
                 table: "Senders",
                 column: "UpdatedOn");
@@ -727,6 +752,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Sessions",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_CreatedById",
+                table: "Sessions",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_CreatedOn",
@@ -749,9 +779,19 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "IsPersistent");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SignedOutById",
+                table: "Sessions",
+                column: "SignedOutById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sessions_SignedOutOn",
                 table: "Sessions",
                 column: "SignedOutOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UpdatedById",
+                table: "Sessions",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_UpdatedOn",
@@ -768,6 +808,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 table: "Templates",
                 column: "AggregateId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Templates_CreatedById",
+                table: "Templates",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Templates_CreatedOn",
@@ -791,6 +836,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Templates_UpdatedById",
+                table: "Templates",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Templates_UpdatedOn",
                 table: "Templates",
                 column: "UpdatedOn");
@@ -802,14 +852,29 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_CreatedById",
+                table: "Users",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_CreatedOn",
                 table: "Users",
                 column: "CreatedOn");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_DisabledById",
+                table: "Users",
+                column: "DisabledById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_EmailConfirmedById",
+                table: "Users",
+                column: "EmailConfirmedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_EmailNormalized",
@@ -852,6 +917,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 column: "PhoneNumber");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_PhoneNumberConfirmedById",
+                table: "Users",
+                column: "PhoneNumberConfirmedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RealmId_UsernameNormalized",
                 table: "Users",
                 columns: new[] { "RealmId", "UsernameNormalized" },
@@ -861,6 +931,11 @@ namespace Logitar.Portal.Infrastructure.Migrations
                 name: "IX_Users_SignedInOn",
                 table: "Users",
                 column: "SignedInOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UpdatedById",
+                table: "Users",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_UpdatedOn",
@@ -923,12 +998,6 @@ namespace Logitar.Portal.Infrastructure.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Templates_Realms_RealmId",
                 table: "Templates");
-
-            migrationBuilder.DropTable(
-                name: "Actors");
-
-            migrationBuilder.DropTable(
-                name: "ActorTypes");
 
             migrationBuilder.DropTable(
                 name: "ApiKeys");

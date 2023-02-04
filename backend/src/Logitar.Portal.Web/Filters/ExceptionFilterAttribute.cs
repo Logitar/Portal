@@ -29,6 +29,7 @@ namespace Logitar.Portal.Web.Filters
       [typeof(DefaultSenderRequiredException)] = SetBadRequestCodeResult,
       [typeof(GoogleClientIdRequiredException)] = SetBadRequestCodeResult,
       [typeof(InvalidCredentialsException)] = SetBadRequestCodeResult,
+      [typeof(PasswordRecoveryTemplateRequiredException)] = SetBadRequestCodeResult,
       [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
       [typeof(SessionAlreadySignedOutException)] = SetBadRequestCodeResult,
       [typeof(SessionIsNotActiveException)] = SetBadRequestCodeResult,

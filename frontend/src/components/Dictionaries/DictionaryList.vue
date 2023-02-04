@@ -27,7 +27,7 @@
               <b-link :href="`/dictionaries/${dictionary.id}`">{{ getDisplayName(dictionary) }}</b-link>
             </td>
             <td v-text="dictionary.entries.length" />
-            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedOn || dictionary.createdOn" /></td>
+            <td><status-cell :actor="dictionary.updatedBy || dictionary.createdBy" :date="dictionary.updatedOn || dictionary.createdOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${dictionary.id}`" />
               <delete-modal

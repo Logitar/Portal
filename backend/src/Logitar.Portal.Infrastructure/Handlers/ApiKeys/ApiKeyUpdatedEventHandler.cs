@@ -30,20 +30,10 @@ namespace Logitar.Portal.Infrastructure.Handlers.ApiKeys
         }
         else
         {
-          apiKey.Update(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          apiKey.Update(notification, actor);
 
-          ActorEntity? actor = await _context.Actors
-            .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken);
-
-          if (actor == null)
-          {
-            _logger.LogError("The actor 'AggregateId={aggregateId}' could not be found.", notification.AggregateId);
-          }
-          else
-          {
-            actor.Update(apiKey);
-          }
-
+          await _context.UpdateActorsAsync(apiKey.AggregateId, new Actor(apiKey), cancellationToken);
           await _context.SaveChangesAsync(cancellationToken);
         }
       }

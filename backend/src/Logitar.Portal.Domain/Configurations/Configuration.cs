@@ -8,7 +8,7 @@ namespace Logitar.Portal.Domain.Configurations
   {
     public Configuration(CultureInfo defaultLocale, string jwtSecret,
       UsernameSettings usernameSettings, PasswordSettings passwordSettings,
-      AggregateId userId) : base(AggregateId)
+      AggregateId actorId) : base(AggregateId)
     {
       ApplyChange(new ConfigurationInitializedEvent
       {
@@ -16,7 +16,7 @@ namespace Logitar.Portal.Domain.Configurations
         JwtSecret = jwtSecret,
         UsernameSettings = usernameSettings,
         PasswordSettings = passwordSettings
-      }, userId);
+      }, actorId);
     }
     private Configuration() : base()
     {

@@ -26,6 +26,7 @@
       public const string ApiKey = nameof(ApiKey);
       public const string AuthenticatedUser = nameof(AuthenticatedUser);
       public const string PortalIdentity = nameof(PortalIdentity);
+      public const string PortalUser = nameof(PortalUser);
       public const string Session = nameof(Session);
     }
 

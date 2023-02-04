@@ -8,7 +8,7 @@ namespace Logitar.Portal.Domain.Realms
 {
   public class Realm : AggregateRoot
   {
-    public Realm(AggregateId userId, string alias, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
+    public Realm(AggregateId actorId, string alias, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
       string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
       bool requireConfirmedAccount = false, bool requireUniqueEmail = false, string? googleClientId = null) : base()
     {
@@ -25,7 +25,7 @@ namespace Logitar.Portal.Domain.Realms
         PasswordSettings = passwordSettings,
         JwtSecret = jwtSecret.Trim(),
         GoogleClientId = googleClientId?.CleanTrim()
-      }, userId);
+      }, actorId);
     }
     private Realm() : base()
     {
@@ -51,8 +51,8 @@ namespace Logitar.Portal.Domain.Realms
 
     public string? GoogleClientId { get; private set; }
 
-    public void Delete(AggregateId userId) => ApplyChange(new RealmDeletedEvent(), userId);
-    public void Update(AggregateId userId, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
+    public void Delete(AggregateId actorId) => ApplyChange(new RealmDeletedEvent(), actorId);
+    public void Update(AggregateId actorId, UsernameSettings usernameSettings, PasswordSettings passwordSettings, string jwtSecret,
       string? displayName = null, string? description = null, CultureInfo? defaultLocale = null, string? url = null,
       bool requireConfirmedAccount = false, bool requireUniqueEmail = false,
       Sender? passwordRecoverySender = null, Template? passwordRecoveryTemplate = null,
@@ -72,7 +72,7 @@ namespace Logitar.Portal.Domain.Realms
         PasswordRecoveryTemplateId = passwordRecoveryTemplate?.Id,
         JwtSecret = jwtSecret.Trim(),
         GoogleClientId = googleClientId?.CleanTrim()
-      }, userId);
+      }, actorId);
     }
 
     protected virtual void Apply(RealmCreatedEvent @event)

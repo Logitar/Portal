@@ -6,7 +6,7 @@ namespace Logitar.Portal.Domain.Senders
 {
   public class Sender : AggregateRoot
   {
-    public Sender(AggregateId userId, string emailAddress, ProviderType provider, Realm? realm = null,
+    public Sender(AggregateId actorId, string emailAddress, ProviderType provider, Realm? realm = null,
       bool isDefault = false, string? displayName = null, Dictionary<string, string?>? settings = null) : base()
     {
       ApplyChange(new SenderCreatedEvent
@@ -17,7 +17,7 @@ namespace Logitar.Portal.Domain.Senders
         DisplayName = displayName?.CleanTrim(),
         Provider = provider,
         Settings = settings
-      }, userId);
+      }, actorId);
     }
     private Sender() : base()
     {
@@ -33,22 +33,22 @@ namespace Logitar.Portal.Domain.Senders
     public ProviderType Provider { get; private set; }
     public Dictionary<string, string?> Settings { get; private set; } = new();
 
-    public void Delete(AggregateId userId) => ApplyChange(new SenderDeletedEvent(), userId);
-    public void SetDefault(AggregateId userId, bool isDefault = true)
+    public void Delete(AggregateId actorId) => ApplyChange(new SenderDeletedEvent(), actorId);
+    public void SetDefault(AggregateId actorId, bool isDefault = true)
     {
       ApplyChange(new SenderSetDefaultEvent
       {
         IsDefault = isDefault
-      }, userId);
+      }, actorId);
     }
-    public void Update(AggregateId userId, string emailAddress, string? displayName = null, Dictionary<string, string?>? settings = null)
+    public void Update(AggregateId actorId, string emailAddress, string? displayName = null, Dictionary<string, string?>? settings = null)
     {
       ApplyChange(new SenderUpdatedEvent
       {
         EmailAddress = emailAddress.Trim(),
         DisplayName = displayName?.CleanTrim(),
         Settings = settings
-      }, userId);
+      }, actorId);
     }
 
     protected virtual void Apply(SenderCreatedEvent @event)

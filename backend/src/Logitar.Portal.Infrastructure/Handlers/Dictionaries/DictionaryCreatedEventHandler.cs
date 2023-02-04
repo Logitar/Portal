@@ -33,7 +33,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Dictionaries
           }
         }
 
-        DictionaryEntity dictionary = new(notification, realm);
+        Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+        DictionaryEntity dictionary = new(notification, actor, realm);
 
         _context.Dictionaries.Add(dictionary);
 

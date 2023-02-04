@@ -6,7 +6,7 @@ namespace Logitar.Portal.Infrastructure.Entities
 {
   internal class RealmEntity : AggregateEntity
   {
-    public RealmEntity(RealmCreatedEvent @event) : base(@event)
+    public RealmEntity(RealmCreatedEvent @event, Actor actor) : base(@event, actor)
     {
       Alias = @event.Alias;
       DisplayName = @event.DisplayName;
@@ -65,9 +65,9 @@ namespace Logitar.Portal.Infrastructure.Entities
     public List<TemplateEntity> Templates { get; private set; } = new();
     public List<UserEntity> Users { get; private set; } = new();
 
-    public void Update(RealmUpdatedEvent @event, SenderEntity? passwordRecoverySender, TemplateEntity? passwordRecoveryTemplate)
+    public void Update(RealmUpdatedEvent @event, Actor actor, SenderEntity? passwordRecoverySender, TemplateEntity? passwordRecoveryTemplate)
     {
-      base.Update(@event);
+      base.Update(@event, actor);
 
       DisplayName = @event.DisplayName;
       Description = @event.Description;

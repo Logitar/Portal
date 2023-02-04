@@ -30,7 +30,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Templates
         }
         else
         {
-          template.Update(notification);
+          Actor actor = await _context.GetActorAsync(notification.ActorId, cancellationToken);
+          template.Update(notification, actor);
 
           await _context.SaveChangesAsync(cancellationToken);
         }
