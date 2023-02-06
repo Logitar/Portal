@@ -18,7 +18,7 @@
               <key-field class="col" :disabled="Boolean(template)" ref="key" :required="!template" :validate="!template" v-model="key" />
               <content-type-select class="col" required v-model="contentType" />
             </b-row>
-            <form-field id="subject" label="templates.subject.label" :maxLength="256" placeholder="templates.subject.placeholder" required v-model="subject" />
+            <form-field id="subject" label="templates.subject.label" :maxLength="255" placeholder="templates.subject.placeholder" required v-model="subject" />
             <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required :rows="20" v-model="contents" />
           </b-tab>
           <b-tab :title="$t('templates.metadata')">

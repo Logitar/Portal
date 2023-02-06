@@ -19,8 +19,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.DisplayName);
       builder.HasIndex(x => x.Provider);
 
-      builder.Property(x => x.EmailAddress).HasMaxLength(256);
-      builder.Property(x => x.DisplayName).HasMaxLength(256);
+      builder.Property(x => x.EmailAddress).HasMaxLength(255);
+      builder.Property(x => x.DisplayName).HasMaxLength(255);
       builder.Property(x => x.Settings).HasColumnType("jsonb");
     }
   }

@@ -12,7 +12,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.Name).IsUnique();
 
       builder.Property(x => x.Value).ValueGeneratedNever();
-      builder.Property(x => x.Name).HasMaxLength(256);
+      builder.Property(x => x.Name).HasMaxLength(255);
     }
   }
 }

@@ -20,7 +20,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.IsActive);
       builder.HasIndex(x => x.IpAddress);
 
-      builder.Property(x => x.SignedOutById).HasMaxLength(256);
+      builder.Property(x => x.SignedOutById).HasMaxLength(255);
       builder.Property(x => x.SignedOutBy).HasColumnType("jsonb");
       builder.Property(x => x.IpAddress).HasMaxLength(64);
     }

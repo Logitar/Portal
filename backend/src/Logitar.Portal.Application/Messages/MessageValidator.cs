@@ -9,7 +9,7 @@ namespace Logitar.Portal.Application.Messages
     public MessageValidator(IValidator<Recipient> recipientValidator)
     {
       RuleFor(x => x.Subject).NotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.Body).NotEmpty();
 
@@ -19,35 +19,35 @@ namespace Logitar.Portal.Application.Messages
       RuleForEach(x => x.Recipients).SetValidator(recipientValidator);
 
       RuleFor(x => x.SenderAddress).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .EmailAddress();
 
       RuleFor(x => x.SenderDisplayName).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.SenderProvider).IsInEnum();
 
       RuleFor(x => x.TemplateKey).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Identifier();
 
       RuleFor(x => x.TemplateDisplayName).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.TemplateContentType).NotEmpty()
         .ContentType();
 
       RuleFor(x => x.RealmAlias).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Alias();
 
       RuleFor(x => x.RealmDisplayName).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.Locale).Locale();
 
       When(x => x.Variables != null, () => RuleForEach(x => x.Variables!.Keys).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Identifier());
 
       RuleFor(x => x).Must(x => x.Result == null || !x.HasErrors)

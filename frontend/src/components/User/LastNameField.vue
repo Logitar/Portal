@@ -2,7 +2,7 @@
   <form-field
     id="lastName"
     label="user.lastName.label"
-    :maxLength="validate ? 128 : null"
+    :maxLength="validate ? 127 : null"
     placeholder="user.lastName.placeholder"
     :required="required"
     :value="value"

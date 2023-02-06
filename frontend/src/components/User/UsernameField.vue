@@ -3,7 +3,7 @@
     :disabled="disabled"
     :id="id"
     :label="label"
-    :maxLength="validate ? 256 : null"
+    :maxLength="validate ? 255 : null"
     :placeholder="placeholder"
     :ref="id"
     :required="required"
