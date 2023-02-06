@@ -9,6 +9,15 @@ namespace Logitar.Portal.Infrastructure
     public Actor()
     {
     }
+    public Actor(ActorModel actor)
+    {
+      Type = actor.Type;
+      IsDeleted = actor.IsDeleted;
+
+      DisplayName = actor.DisplayName;
+      Email = actor.Email;
+      Picture = actor.Picture;
+    }
     public Actor(ApiKeyEntity apiKey, bool isDeleted = false)
     {
       Type = ActorType.ApiKey;

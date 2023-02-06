@@ -27,7 +27,6 @@ namespace Logitar.Portal.Infrastructure.Entities
     }
 
     public long RecipientId { get; private set; }
-
     public Guid Id { get; private set; }
 
     public MessageEntity? Message { get; private set; }

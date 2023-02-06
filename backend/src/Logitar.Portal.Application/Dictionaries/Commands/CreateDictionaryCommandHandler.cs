@@ -3,6 +3,7 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands
 {
@@ -35,13 +36,14 @@ namespace Logitar.Portal.Application.Dictionaries.Commands
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
-      if ((await _dictionaryQuerier.GetPagedAsync(payload.Locale, realm?.Id.ToString(), cancellationToken: cancellationToken)).Total > 0)
+      CultureInfo locale = CultureInfo.GetCultureInfo(payload.Locale);
+      if ((await _dictionaryQuerier.GetPagedAsync(locale, realm?.Id.ToString(), cancellationToken: cancellationToken)).Total > 0)
       {
-        throw new DictionaryAlreadyExistingException(realm, payload.Locale);
+        throw new DictionaryAlreadyExistingException(realm, locale);
       }
 
       Dictionary<string, string>? entries = payload.Entries?.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Last().Value);
-      Dictionary dictionary = new(_userContext.ActorId, payload.Locale, realm, entries);
+      Dictionary dictionary = new(_userContext.ActorId, locale, realm, entries);
       _dictionaryValidator.ValidateAndThrow(dictionary);
 
       await _repository.SaveAsync(dictionary, cancellationToken);

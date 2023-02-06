@@ -1,20 +1,18 @@
-﻿using Logitar.Portal.Infrastructure.JsonConverters;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Web.Models
 {
   internal static class ModelSerializer
   {
-    private static readonly JsonSerializerOptions _options = new();
+    private static readonly JsonSerializerOptions _serializerOptions = new();
 
     static ModelSerializer()
     {
-      _options.Converters.Add(new CultureInfoConverter());
-      _options.Converters.Add(new JsonStringEnumConverter());
-      _options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+      _serializerOptions.Converters.Add(new JsonStringEnumConverter());
+      _serializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     }
 
-    public static string? Serialize<T>(T model) => JsonSerializer.Serialize(model, _options);
+    public static string? Serialize<T>(T model) => JsonSerializer.Serialize(model, _serializerOptions);
   }
 }

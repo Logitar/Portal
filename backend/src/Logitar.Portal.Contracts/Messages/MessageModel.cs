@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Senders;
-using System.Globalization;
 
 namespace Logitar.Portal.Contracts.Messages
 {
@@ -27,7 +26,7 @@ namespace Logitar.Portal.Contracts.Messages
     public string? RealmDisplayName { get; set; }
 
     public bool IgnoreUserLocale { get; set; }
-    public CultureInfo? Locale { get; set; }
+    public string? Locale { get; set; }
 
     public IEnumerable<VariableModel> Variables { get; set; } = Enumerable.Empty<VariableModel>();
 

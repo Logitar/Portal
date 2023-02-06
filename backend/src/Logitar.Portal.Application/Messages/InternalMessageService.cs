@@ -56,7 +56,7 @@ namespace Logitar.Portal.Application.Messages
       IMessageHandler handler = _messageHandlerFactory.GetHandler(sender);
 
       Dictionaries? dictionaries = payload.IgnoreUserLocale
-        ? MessageHelper.GetDictionaries(payload.Locale, defaultDictionary, allDictionaries)
+        ? MessageHelper.GetDictionaries(payload.Locale?.GetCultureInfo(), defaultDictionary, allDictionaries)
         : null;
 
       List<Message> messages = new(capacity: allRecipients.To.Count);
@@ -73,7 +73,8 @@ namespace Logitar.Portal.Application.Messages
           .Concat(allRecipients.CC)
           .Concat(allRecipients.Bcc);
 
-        Message message = new(_userContext.ActorId, subject, body, recipients, sender, template, realm, payload.IgnoreUserLocale, payload.IgnoreUserLocale ? payload.Locale : (recipient.UserLocale ?? payload.Locale), variables, isDemo: false);
+        CultureInfo? locale = payload.IgnoreUserLocale ? payload.Locale?.GetCultureInfo() : (recipient.UserLocale ?? payload.Locale?.GetCultureInfo());
+        Message message = new(_userContext.ActorId, subject, body, recipients, sender, template, realm, payload.IgnoreUserLocale, locale, variables, isDemo: false);
         _messageValidator.ValidateAndThrow(message);
 
         try

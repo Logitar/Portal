@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
@@ -51,7 +52,7 @@ namespace Logitar.Portal.Application.Realms.Commands
       PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
       realm.Update(_userContext.ActorId, usernameSettings, passwordSettings, payload.JwtSecret,
-        payload.DisplayName, payload.Description, payload.DefaultLocale, payload.Url,
+        payload.DisplayName, payload.Description, payload.DefaultLocale?.GetCultureInfo(), payload.Url,
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail,
         passwordRecoverySender, passwordRecoveryTemplate,
         payload.GoogleClientId);

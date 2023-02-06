@@ -17,11 +17,13 @@ namespace Logitar.Portal.Infrastructure
   internal class Repository : IRepository
   {
     private readonly PortalContext _context;
+    private readonly IInternalLoggingContext _log;
     private readonly IPublisher _publisher;
 
-    public Repository(PortalContext context, IPublisher publisher)
+    public Repository(PortalContext context, IInternalLoggingContext log, IPublisher publisher)
     {
       _context = context;
+      _log = log;
       _publisher = publisher;
     }
 
@@ -228,6 +230,8 @@ namespace Logitar.Portal.Infrastructure
       if (aggregate.HasChanges)
       {
         IEnumerable<EventEntity> events = EventEntity.FromChanges(aggregate);
+        _log.AddEvents(events);
+
         _context.Events.AddRange(events);
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -245,6 +249,8 @@ namespace Logitar.Portal.Infrastructure
       IEnumerable<EventEntity> events = aggregates.SelectMany(EventEntity.FromChanges);
       if (events.Any())
       {
+        _log.AddEvents(events);
+
         _context.Events.AddRange(events);
         await _context.SaveChangesAsync(cancellationToken);
 
