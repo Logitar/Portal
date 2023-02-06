@@ -10,16 +10,16 @@ namespace Logitar.Portal.Application.Messages
       RuleFor(x => x.Type).IsInEnum();
 
       RuleFor(x => x.Address).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .EmailAddress();
 
       RuleFor(x => x.DisplayName).NullOrNotEmpty()
-        .MaximumLength(512);
+        .MaximumLength(383);
 
       When(x => x.UserId.HasValue, () =>
       {
         RuleFor(x => x.Username).NullOrNotEmpty()
-          .MaximumLength(256);
+          .MaximumLength(255);
 
         RuleFor(x => x.UserLocale).Locale();
       }).Otherwise(() =>

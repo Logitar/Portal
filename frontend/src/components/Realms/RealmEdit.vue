@@ -59,7 +59,7 @@
               id="jwtSecret"
               label="jwtSecret.label"
               :minLength="32"
-              :maxLength="256"
+              :maxLength="255"
               placeholder="jwtSecret.placeholder"
               required
               :type="showJwtSecret ? 'text' : 'password'"
@@ -74,7 +74,7 @@
             <form-field
               id="googleClientId"
               label="realms.googleAuth.id.label"
-              :maxLength="256"
+              :maxLength="255"
               placeholder="realms.googleAuth.id.placeholder"
               v-model="googleClientId"
             />

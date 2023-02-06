@@ -9,11 +9,11 @@ namespace Logitar.Portal.Application.Realms
     public RealmValidator(IValidator<PasswordSettings> passwordSettingsValidator, IValidator<UsernameSettings> usernameSettingsValidator)
     {
       RuleFor(x => x.Alias).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Alias();
 
       RuleFor(x => x.DisplayName).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.Description).NullOrNotEmpty();
 
@@ -31,7 +31,7 @@ namespace Logitar.Portal.Application.Realms
       RuleFor(x => x.PasswordSettings).SetValidator(passwordSettingsValidator);
 
       RuleFor(x => x.GoogleClientId).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
     }
   }
 }

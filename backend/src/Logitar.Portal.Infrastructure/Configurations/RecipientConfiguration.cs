@@ -14,11 +14,11 @@ namespace Logitar.Portal.Infrastructure.Configurations
 
       builder.HasIndex(x => x.Id).IsUnique();
 
-      builder.Property(x => x.Address).HasMaxLength(256);
-      builder.Property(x => x.DisplayName).HasMaxLength(512);
+      builder.Property(x => x.Address).HasMaxLength(255);
+      builder.Property(x => x.DisplayName).HasMaxLength(383);
 
-      builder.Property(x => x.UserId).HasMaxLength(256);
-      builder.Property(x => x.Username).HasMaxLength(256);
+      builder.Property(x => x.UserId).HasMaxLength(255);
+      builder.Property(x => x.Username).HasMaxLength(255);
       builder.Property(x => x.UserLocale).HasMaxLength(16);
     }
   }

@@ -25,7 +25,7 @@
             hideLabel
             :id="`key_${index}`"
             label="dictionaries.entries.key"
-            :maxLength="256"
+            :maxLength="255"
             placeholder="dictionaries.entries.key"
             required
             :rules="{ identifier: true }"

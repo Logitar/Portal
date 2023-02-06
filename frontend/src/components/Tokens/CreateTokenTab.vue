@@ -32,7 +32,7 @@
             hideLabel
             :id="`type_${index}`"
             label="tokens.claims.type"
-            :maxLength="256"
+            :maxLength="255"
             placeholder="tokens.claims.type"
             required
             :value="claim.type"

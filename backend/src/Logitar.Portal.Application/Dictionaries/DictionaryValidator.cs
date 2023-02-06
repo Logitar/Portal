@@ -10,7 +10,7 @@ namespace Logitar.Portal.Application.Dictionaries
       RuleFor(x => x.Locale).Locale();
 
       RuleForEach(x => x.Entries.Keys).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Identifier();
       RuleForEach(x => x.Entries.Values).NotNull();
     }

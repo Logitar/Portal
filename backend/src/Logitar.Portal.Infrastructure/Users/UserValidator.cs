@@ -8,25 +8,25 @@ namespace Logitar.Portal.Application.Users
     public UserValidator(IValidator<ExternalProvider> externalProviderValidator, UsernameSettings usernameSettings)
     {
       RuleFor(x => x.Username).NotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .Username(usernameSettings);
 
       RuleFor(x => x.PasswordHash).NullOrNotEmpty();
 
       RuleFor(x => x.Email).NullOrNotEmpty()
-        .MaximumLength(256)
+        .MaximumLength(255)
         .EmailAddress();
 
       RuleFor(x => x.PhoneNumber).NullOrNotEmpty();
 
       RuleFor(x => x.FirstName).NullOrNotEmpty()
-        .MaximumLength(128);
+        .MaximumLength(127);
 
       RuleFor(x => x.MiddleName).NullOrNotEmpty()
-        .MaximumLength(128);
+        .MaximumLength(127);
 
       RuleFor(x => x.LastName).NullOrNotEmpty()
-        .MaximumLength(128);
+        .MaximumLength(127);
 
       RuleFor(x => x.Locale).Locale();
 

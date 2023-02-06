@@ -17,10 +17,10 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.AddedById);
       builder.HasIndex(x => new { x.RealmId, x.Key, x.Value }).IsUnique();
 
-      builder.Property(x => x.Key).HasMaxLength(256);
-      builder.Property(x => x.Value).HasMaxLength(256);
-      builder.Property(x => x.DisplayName).HasMaxLength(256);
-      builder.Property(x => x.AddedById).HasMaxLength(256);
+      builder.Property(x => x.Key).HasMaxLength(255);
+      builder.Property(x => x.Value).HasMaxLength(255);
+      builder.Property(x => x.DisplayName).HasMaxLength(255);
+      builder.Property(x => x.AddedById).HasMaxLength(255);
       builder.Property(x => x.AddedBy).HasColumnType("jsonb");
     }
   }

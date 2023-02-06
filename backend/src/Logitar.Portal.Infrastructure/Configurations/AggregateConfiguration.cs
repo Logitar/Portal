@@ -14,10 +14,10 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.UpdatedById);
       builder.HasIndex(x => x.UpdatedOn);
 
-      builder.Property(x => x.AggregateId).HasMaxLength(256).IsRequired();
-      builder.Property(x => x.CreatedById).HasMaxLength(256);
+      builder.Property(x => x.AggregateId).HasMaxLength(255).IsRequired();
+      builder.Property(x => x.CreatedById).HasMaxLength(255);
       builder.Property(x => x.CreatedBy).HasColumnType("jsonb");
-      builder.Property(x => x.UpdatedById).HasMaxLength(256);
+      builder.Property(x => x.UpdatedById).HasMaxLength(255);
       builder.Property(x => x.UpdatedBy).HasColumnType("jsonb");
     }
   }

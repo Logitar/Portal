@@ -27,7 +27,7 @@
           hideLabel
           :id="`key_${index}`"
           label="templates.variables.key"
-          :maxLength="256"
+          :maxLength="255"
           placeholder="templates.variables.key"
           required
           :rules="{ identifier: true }"

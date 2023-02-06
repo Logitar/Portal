@@ -15,7 +15,7 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.Title);
       builder.HasIndex(x => x.ExpiresOn);
 
-      builder.Property(x => x.Title).HasMaxLength(256);
+      builder.Property(x => x.Title).HasMaxLength(255);
     }
   }
 }

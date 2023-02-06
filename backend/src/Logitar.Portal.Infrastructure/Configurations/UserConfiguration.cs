@@ -30,21 +30,21 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.HasIndex(x => x.IsDisabled);
       builder.HasIndex(x => new { x.RealmId, x.UsernameNormalized }).IsUnique();
 
-      builder.Property(x => x.Username).HasMaxLength(256);
-      builder.Property(x => x.UsernameNormalized).HasMaxLength(256);
-      builder.Property(x => x.Email).HasMaxLength(256);
-      builder.Property(x => x.EmailNormalized).HasMaxLength(256);
-      builder.Property(x => x.EmailConfirmedById).HasMaxLength(256);
+      builder.Property(x => x.Username).HasMaxLength(255);
+      builder.Property(x => x.UsernameNormalized).HasMaxLength(255);
+      builder.Property(x => x.Email).HasMaxLength(255);
+      builder.Property(x => x.EmailNormalized).HasMaxLength(255);
+      builder.Property(x => x.EmailConfirmedById).HasMaxLength(255);
       builder.Property(x => x.EmailConfirmedBy).HasColumnType("jsonb");
-      builder.Property(x => x.PhoneNumberConfirmedById).HasMaxLength(256);
+      builder.Property(x => x.PhoneNumberConfirmedById).HasMaxLength(255);
       builder.Property(x => x.PhoneNumberConfirmedBy).HasColumnType("jsonb");
-      builder.Property(x => x.FirstName).HasMaxLength(128);
-      builder.Property(x => x.MiddleName).HasMaxLength(128);
-      builder.Property(x => x.LastName).HasMaxLength(128);
-      builder.Property(x => x.FullName).HasMaxLength(512);
+      builder.Property(x => x.FirstName).HasMaxLength(127);
+      builder.Property(x => x.MiddleName).HasMaxLength(127);
+      builder.Property(x => x.LastName).HasMaxLength(127);
+      builder.Property(x => x.FullName).HasMaxLength(383);
       builder.Property(x => x.Locale).HasMaxLength(16);
       builder.Property(x => x.Picture).HasMaxLength(2048);
-      builder.Property(x => x.DisabledById).HasMaxLength(256);
+      builder.Property(x => x.DisabledById).HasMaxLength(255);
       builder.Property(x => x.DisabledBy).HasColumnType("jsonb");
     }
   }

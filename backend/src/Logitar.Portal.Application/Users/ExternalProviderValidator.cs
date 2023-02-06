@@ -8,13 +8,13 @@ namespace Logitar.Portal.Application.Users
     public ExternalProviderValidator()
     {
       RuleFor(x => x.Key).NotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.Value).NotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
 
       RuleFor(x => x.DisplayName).NullOrNotEmpty()
-        .MaximumLength(256);
+        .MaximumLength(255);
     }
   }
 }
