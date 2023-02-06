@@ -230,10 +230,10 @@ namespace Logitar.Portal.Infrastructure
       if (aggregate.HasChanges)
       {
         IEnumerable<EventEntity> events = EventEntity.FromChanges(aggregate);
-        _log.AddEvents(events);
-
         _context.Events.AddRange(events);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _log.AddEvents(events);
 
         foreach (DomainEvent change in aggregate.Changes)
         {
@@ -249,10 +249,10 @@ namespace Logitar.Portal.Infrastructure
       IEnumerable<EventEntity> events = aggregates.SelectMany(EventEntity.FromChanges);
       if (events.Any())
       {
-        _log.AddEvents(events);
-
         _context.Events.AddRange(events);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _log.AddEvents(events);
 
         foreach (AggregateRoot aggregate in aggregates)
         {

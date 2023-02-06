@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Accounts.Commands;
+﻿using Logitar.Portal.Application.Accounts.Commands;
+using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Application.Users.Commands;
 using MediatR;
 using System.Text.Json;
@@ -10,68 +10,75 @@ namespace Logitar.Portal.Application
   {
     private const string PasswordMask = "********";
 
-    private readonly IMapper _mapper;
-
-    public RequestSerializer(IMapper mapper)
-    {
-      _mapper = mapper;
-    }
-
     public string Serialize<T>(IRequest<T> request) => request switch
     {
-      ChangePasswordCommand changePasswordCommand => HandleChangePasswordCommand(changePasswordCommand),
-      CreateUserCommand createUserCommand => HandleCreateUserCommand(createUserCommand),
-      ResetPasswordCommand resetPasswordCommand => HandleResetPasswordCommand(resetPasswordCommand),
-      SignInCommand signInCommand => HandleSignInCommand(signInCommand),
-      UpdateUserCommand updateUserCommand => HandleUpdateUserCommand(updateUserCommand),
-      _ => JsonSerializer.Serialize(request, request.GetType()),
+      ChangePasswordCommand changePasswordCommand => MaskChangePasswordCommand(changePasswordCommand),
+      CreateUserCommand createUserCommand => MaskCreateUserCommand(createUserCommand),
+      InitializeConfigurationCommand initializeConfigurationCommand => MaskInitializeConfigurationCommand(initializeConfigurationCommand),
+      ResetPasswordCommand resetPasswordCommand => MaskResetPasswordCommand(resetPasswordCommand),
+      SignInCommand signInCommand => MaskSignInCommand(signInCommand),
+      UpdateUserCommand updateUserCommand => MaskUpdateUserCommand(updateUserCommand),
+      _ => SerializeToJson(request),
     };
 
-    private string HandleChangePasswordCommand(ChangePasswordCommand source)
+    private static string MaskChangePasswordCommand(ChangePasswordCommand source)
     {
-      ChangePasswordCommand command = _mapper.Map<ChangePasswordCommand>(source);
+      ChangePasswordCommand command = Clone(source);
       command.Payload.Current = PasswordMask;
       command.Payload.Password = PasswordMask;
 
-      return JsonSerializer.Serialize(command);
+      return SerializeToJson(command);
     }
 
-    private string HandleCreateUserCommand(CreateUserCommand source)
+    private static string MaskCreateUserCommand(CreateUserCommand source)
     {
-      CreateUserCommand command = _mapper.Map<CreateUserCommand>(source);
+      CreateUserCommand command = Clone(source);
       if (source.Payload.Password != null)
       {
         command.Payload.Password = PasswordMask;
       }
 
-      return JsonSerializer.Serialize(command);
+      return SerializeToJson(command);
     }
 
-    private string HandleResetPasswordCommand(ResetPasswordCommand source)
+    private static string MaskInitializeConfigurationCommand(InitializeConfigurationCommand source)
     {
-      ResetPasswordCommand command = _mapper.Map<ResetPasswordCommand>(source);
+      InitializeConfigurationCommand command = Clone(source);
+      command.Payload.User.Password = PasswordMask;
+
+      return SerializeToJson(command);
+    }
+
+    private static string MaskResetPasswordCommand(ResetPasswordCommand source)
+    {
+      ResetPasswordCommand command = Clone(source);
       command.Payload.Password = PasswordMask;
 
-      return JsonSerializer.Serialize(command);
+      return SerializeToJson(command);
     }
 
-    private string HandleSignInCommand(SignInCommand source)
+    private static string MaskSignInCommand(SignInCommand source)
     {
-      SignInCommand command = _mapper.Map<SignInCommand>(source);
+      SignInCommand command = Clone(source);
       command.Payload.Password = PasswordMask;
 
-      return JsonSerializer.Serialize(command);
+      return SerializeToJson(command);
     }
 
-    private string HandleUpdateUserCommand(UpdateUserCommand source)
+    private static string MaskUpdateUserCommand(UpdateUserCommand source)
     {
-      UpdateUserCommand command = _mapper.Map<UpdateUserCommand>(source);
+      UpdateUserCommand command = Clone(source);
       if (source.Payload.Password != null)
       {
         command.Payload.Password = PasswordMask;
       }
 
-      return JsonSerializer.Serialize(command);
+      return SerializeToJson(command);
     }
+
+    private static T Clone<T>(T source) where T : notnull => JsonSerializer.Deserialize<T>(SerializeToJson(source))
+      ?? throw new InvalidOperationException($"The object '{source}' could not be cloned.");
+
+    private static string SerializeToJson(object obj) => JsonSerializer.Serialize(obj, obj.GetType());
   }
 }

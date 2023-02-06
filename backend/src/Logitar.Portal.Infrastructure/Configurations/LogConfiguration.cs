@@ -20,8 +20,8 @@ namespace Logitar.Portal.Infrastructure.Configurations
       builder.Property(x => x.ApiKeyId).HasMaxLength(255);
       builder.Property(x => x.UserId).HasMaxLength(255);
       builder.Property(x => x.SessionId).HasMaxLength(255);
-      builder.Property(x => x.RequestType).HasMaxLength(255);
-      builder.Property(x => x.RequestData).HasColumnType("jsonb");
+      builder.Property(x => x.ActivityType).HasMaxLength(255);
+      builder.Property(x => x.ActivityData).HasColumnType("jsonb");
       builder.Property(x => x.Errors).HasColumnType("jsonb");
       builder.Property(x => x.Level).HasMaxLength(16);
     }

@@ -7,6 +7,7 @@ namespace Logitar.Portal.Domain.Configurations
   public class Configuration : AggregateRoot
   {
     public Configuration(CultureInfo defaultLocale, string jwtSecret,
+      LoggingSettings loggingSettings,
       UsernameSettings usernameSettings, PasswordSettings passwordSettings,
       AggregateId actorId) : base(AggregateId)
     {
@@ -14,6 +15,7 @@ namespace Logitar.Portal.Domain.Configurations
       {
         DefaultLocale = defaultLocale,
         JwtSecret = jwtSecret,
+        LoggingSettings = loggingSettings,
         UsernameSettings = usernameSettings,
         PasswordSettings = passwordSettings
       }, actorId);
@@ -27,6 +29,8 @@ namespace Logitar.Portal.Domain.Configurations
     public CultureInfo DefaultLocale { get; private set; } = CultureInfo.InvariantCulture;
     public string JwtSecret { get; private set; } = string.Empty;
 
+    public LoggingSettings LoggingSettings { get; private set; } = new();
+
     public UsernameSettings UsernameSettings { get; private set; } = new();
     public PasswordSettings PasswordSettings { get; private set; } = new();
 
@@ -34,6 +38,8 @@ namespace Logitar.Portal.Domain.Configurations
     {
       DefaultLocale = @event.DefaultLocale;
       JwtSecret = @event.JwtSecret;
+
+      LoggingSettings = @event.LoggingSettings;
 
       UsernameSettings = @event.UsernameSettings;
       PasswordSettings = @event.PasswordSettings;

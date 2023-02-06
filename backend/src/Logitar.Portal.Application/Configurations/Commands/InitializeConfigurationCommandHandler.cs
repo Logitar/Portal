@@ -5,6 +5,7 @@ using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Users;
 using MediatR;
+using System.Globalization;
 
 namespace Logitar.Portal.Application.Configurations.Commands
 {
@@ -36,15 +37,21 @@ namespace Logitar.Portal.Application.Configurations.Commands
       InitializeConfigurationPayload payload = request.Payload;
       UserPayload userPayload = payload.User;
 
+      CultureInfo defaultLocale = payload.DefaultLocale.GetCultureInfo();
       UsernameSettings usernameSettings = payload.UsernameSettings.GetUsernameSettings();
       PasswordSettings passwordSettings = payload.PasswordSettings.GetPasswordSettings();
 
       _passwordService.ValidateAndThrow(userPayload.Password, passwordSettings);
       string passwordHash = _passwordService.Hash(userPayload.Password);
-      User user = new(userPayload.Username, passwordHash, userPayload.Email, userPayload.FirstName, userPayload.LastName, payload.DefaultLocale);
+      User user = new(userPayload.Username, passwordHash, userPayload.Email, userPayload.FirstName, userPayload.LastName, defaultLocale);
       _userValidator.ValidateAndThrow(user, usernameSettings);
 
-      Configuration configuration = new(payload.DefaultLocale, payload.JwtSecret, usernameSettings, passwordSettings, user.Id);
+      LoggingSettings loggingSettings = new()
+      {
+        Extent = payload.LoggingSettings.Extent,
+        OnlyErrors = payload.LoggingSettings.OnlyErrors
+      };
+      Configuration configuration = new(defaultLocale, payload.JwtSecret, loggingSettings, usernameSettings, passwordSettings, user.Id);
       _configurationValidator.ValidateAndThrow(configuration);
 
       await _repository.SaveAsync(new AggregateRoot[] { configuration, user }, cancellationToken);

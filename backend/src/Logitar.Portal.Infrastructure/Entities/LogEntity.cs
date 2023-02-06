@@ -33,8 +33,8 @@
     public string? UserId { get; private set; }
     public string? SessionId { get; private set; }
 
-    public string? RequestType { get; private set; }
-    public string? RequestData { get; private set; }
+    public string? ActivityType { get; private set; }
+    public string? ActivityData { get; private set; }
 
     public string? Errors { get; private set; }
     public bool HasErrors
@@ -68,10 +68,10 @@
       Errors = errors;
       Level = level;
     }
-    public void SetRequest(string type, string data)
+    public void SetActivity(string type, string data)
     {
-      RequestType = type;
-      RequestData = data;
+      ActivityType = type;
+      ActivityData = data;
     }
     public void Start(string traceIdentifier, string? ipAddress, string? additionalInformation, string method, string url)
     {

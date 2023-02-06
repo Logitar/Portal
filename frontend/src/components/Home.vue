@@ -39,6 +39,7 @@ import PasswordField from './User/PasswordField.vue'
 import UsernameField from './User/UsernameField.vue'
 import { generateSecret } from '@/helpers/cryptoUtils'
 import { initialize } from '@/api/configurations'
+import { signIn } from '@/api/account'
 
 export default {
   name: 'Home',
@@ -68,6 +69,10 @@ export default {
       return {
         defaultLocale: locale,
         jwtSecret: generateSecret(32),
+        loggingSettings: {
+          extent: 'ActivityOnly',
+          onlyErrors: false
+        },
         usernameSettings: {
           allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
         },
@@ -90,6 +95,12 @@ export default {
         try {
           if (await this.$refs.form.validate()) {
             await initialize(this.payload)
+            await signIn({
+              username: this.user.username,
+              password: this.user.password
+            })
+            this.user.password = null
+            this.passwordConfirmation = null
             window.location.replace('/user/profile')
           }
         } catch (e) {

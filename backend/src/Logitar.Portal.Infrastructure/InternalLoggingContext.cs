@@ -67,7 +67,14 @@ namespace Logitar.Portal.Infrastructure
       }
       _log.Complete(statusCode, actor.Id, new Actor(actor).Serialize(), apiKey?.Id, user?.Id, session?.Id, errors, level.ToString());
 
-      // TODO(fpion): restrict logging from Portal Configuration cache
+      //Configuration configuration = await _repository.LoadConfigurationAsync(cancellationToken)
+      //  ?? throw new InvalidOperationException("The configuration could not be loaded.");
+      //if (configuration.LoggingSettings.Extent == LoggingExtent.None
+      //  || (configuration.LoggingSettings.Extent == LoggingExtent.ActivityOnly && (_log.ActivityType == null || _log.ActivityData == null))
+      //  || (configuration.LoggingSettings.OnlyErrors && !_log.HasErrors))
+      //{
+      //  return;
+      //} // TODO(fpion): restrict logging
 
       _context.Logs.Add(_log);
       await _context.SaveChangesAsync(cancellationToken);
@@ -79,12 +86,12 @@ namespace Logitar.Portal.Infrastructure
 
       string requestData = _requestSerializer.Serialize(request);
 
-      _log.SetRequest(request.GetType().GetName(), requestData);
+      _log.SetActivity(request.GetType().GetName(), requestData);
     }
 
     public void Start(string traceIdentifier, string method, string url, string? ipAddress, string? additionalInformation)
     {
-      if (_log.StartedOn == default)
+      if (_log.StartedOn != default)
       {
         throw new InvalidOperationException("The log has already been started.");
       }
@@ -94,7 +101,7 @@ namespace Logitar.Portal.Infrastructure
 
     private void EnsureLogHasStarted()
     {
-      if (_log.StartedOn != default)
+      if (_log.StartedOn == default)
       {
         throw new InvalidOperationException($"The log has not been started. You must call the {nameof(Start)} method before calling the current method.");
       }
