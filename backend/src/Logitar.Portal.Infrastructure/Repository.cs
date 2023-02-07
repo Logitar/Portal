@@ -17,10 +17,10 @@ namespace Logitar.Portal.Infrastructure
   internal class Repository : IRepository
   {
     private readonly PortalContext _context;
-    private readonly IInternalLoggingContext _log;
+    private readonly ILoggingContext _log;
     private readonly IPublisher _publisher;
 
-    public Repository(PortalContext context, IInternalLoggingContext log, IPublisher publisher)
+    public Repository(PortalContext context, ILoggingContext log, IPublisher publisher)
     {
       _context = context;
       _log = log;
