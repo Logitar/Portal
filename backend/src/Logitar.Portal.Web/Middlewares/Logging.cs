@@ -3,7 +3,6 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -22,7 +21,10 @@ namespace Logitar.Portal.Web.Middlewares
       _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ILoggingContext logging, IRepository repository, IUserContext userContext)
+    public async Task InvokeAsync(HttpContext context,
+      ILoggingService logging,
+      IRepository repository,
+      IUserContext userContext)
     {
       HttpRequest request = context.Request;
       HttpResponse response = context.Response;
@@ -59,15 +61,11 @@ namespace Logitar.Portal.Web.Middlewares
       {
         try
         {
-          Configuration? configuration = await repository.LoadConfigurationAsync();
-          if (configuration != null)
-          {
-            ActorModel actor = userContext.Actor;
-            ApiKeyModel? apiKey = context.GetApiKey();
-            UserModel? user = context.GetUser();
-            SessionModel? session = context.GetSession();
-            await logging.CompleteAsync(configuration, response.StatusCode, actor, apiKey, user, session);
-          }
+          ActorModel actor = userContext.Actor;
+          ApiKeyModel? apiKey = context.GetApiKey();
+          UserModel? user = context.GetUser();
+          SessionModel? session = context.GetSession();
+          await logging.CompleteAsync(response.StatusCode, actor, apiKey, user, session);
         }
         catch (Exception exception)
         {

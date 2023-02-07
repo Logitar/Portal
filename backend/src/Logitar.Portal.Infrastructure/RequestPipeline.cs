@@ -5,10 +5,10 @@ namespace Logitar.Portal.Infrastructure
 {
   internal class RequestPipeline : IRequestPipeline
   {
-    private readonly IInternalLoggingContext _log;
+    private readonly ILoggingContext _log;
     private readonly IMediator _mediator;
 
-    public RequestPipeline(IInternalLoggingContext log, IMediator mediator)
+    public RequestPipeline(ILoggingContext log, IMediator mediator)
     {
       _log = log;
       _mediator = mediator;
