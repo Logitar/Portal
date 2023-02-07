@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Application;
-using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Microsoft.Extensions.Caching.Memory;
@@ -24,9 +23,9 @@ namespace Logitar.Portal.Infrastructure
       set => SetItem(ConfigurationKey, value);
     }
 
-    public ApiKeyModel? GetApiKey(AggregateId id) => GetItem<ApiKeyModel>(string.Format(ApiKeyKeyFormat, id));
+    public CachedApiKey? GetApiKey(AggregateId id) => GetItem<CachedApiKey>(string.Format(ApiKeyKeyFormat, id));
     public void RemoveApiKey(AggregateId id) => RemoveItem(string.Format(ApiKeyKeyFormat, id));
-    public void SetApiKey(ApiKeyModel apiKey) => SetItem(string.Format(ApiKeyKeyFormat, apiKey.Id), apiKey, TimeSpan.FromHours(1));
+    public void SetApiKey(CachedApiKey apiKey) => SetItem(string.Format(ApiKeyKeyFormat, apiKey.Id), apiKey, TimeSpan.FromHours(1));
 
     private T? GetItem<T>(object key) => _memoryCache.TryGetValue(key, out object? value) ? (T?)value : default;
     private void RemoveItem(object key) => _memoryCache.Remove(key);

@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Domain;
+﻿using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 
 namespace Logitar.Portal.Application
@@ -8,8 +7,8 @@ namespace Logitar.Portal.Application
   {
     Configuration? Configuration { get; set; }
 
-    ApiKeyModel? GetApiKey(AggregateId id);
+    CachedApiKey? GetApiKey(AggregateId id);
     void RemoveApiKey(AggregateId id);
-    void SetApiKey(ApiKeyModel apiKey);
+    void SetApiKey(CachedApiKey apiKey);
   }
 }

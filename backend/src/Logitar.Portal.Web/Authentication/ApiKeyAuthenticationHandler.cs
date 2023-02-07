@@ -63,8 +63,9 @@ namespace Logitar.Portal.Web.Authentication
         try
         {
           XApiKey xApiKey = XApiKey.Parse(values.Single() ?? string.Empty);
-          ApiKey? apiKey = await _repository.LoadAsync<ApiKey>(xApiKey.Id);
-          ApiKeyModel? apiKeyModel = _cacheService.GetApiKey(xApiKey.Id) ?? await _apiKeyQuerier.GetAsync(xApiKey.Id);
+          CachedApiKey? cached = _cacheService.GetApiKey(xApiKey.Id);
+          ApiKey? apiKey = cached?.Aggregate ?? await _repository.LoadAsync<ApiKey>(xApiKey.Id);
+          ApiKeyModel? apiKeyModel = cached?.Model ?? await _apiKeyQuerier.GetAsync(xApiKey.Id);
           if (apiKey == null || apiKeyModel == null)
           {
             return new(AuthenticateResult.Fail($"The API key 'Id={xApiKey.Id}' could not be found."));
@@ -83,7 +84,7 @@ namespace Logitar.Portal.Web.Authentication
             throw new InvalidOperationException("The API key context item could not be set.");
           }
 
-          _cacheService.SetApiKey(apiKeyModel);
+          _cacheService.SetApiKey(new CachedApiKey(apiKey, apiKeyModel));
 
           ClaimsPrincipal principal = new(apiKeyModel.GetClaimsIdentity(Constants.Schemes.ApiKey));
           AuthenticationTicket ticket = new(principal, Constants.Schemes.ApiKey);
