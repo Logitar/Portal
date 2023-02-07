@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
@@ -61,7 +62,7 @@ namespace Logitar.Portal.Application.Users.Commands
       user.Update(_userContext.ActorId, passwordHash,
         payload.Email, payload.PhoneNumber,
         payload.FirstName, payload.MiddleName, payload.LastName,
-        payload.Locale, payload.Picture);
+        payload.Locale?.GetCultureInfo(), payload.Picture);
       _userValidator.ValidateAndThrow(user, realm?.UsernameSettings ?? configuration?.UsernameSettings ?? new());
 
       await _repository.SaveAsync(user, cancellationToken);

@@ -24,8 +24,10 @@ namespace Logitar.Portal.Application
 
       return services
         .AddApplicationServices()
+        .AddAutoMapper(assembly)
         .AddMediatR(assembly)
         .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
+        .AddSingleton<IRequestSerializer, RequestSerializer>()
         .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
         .AddTransient<IInternalMessageService, InternalMessageService>()
         .AddTransient<IInternalTokenService, InternalTokenService>()

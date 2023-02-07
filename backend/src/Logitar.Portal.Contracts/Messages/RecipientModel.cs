@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Logitar.Portal.Contracts.Messages
+﻿namespace Logitar.Portal.Contracts.Messages
 {
   public record RecipientModel
   {
@@ -13,6 +11,6 @@ namespace Logitar.Portal.Contracts.Messages
 
     public string? UserId { get; set; }
     public string? Username { get; set; }
-    public CultureInfo? UserLocale { get; set; }
+    public string? UserLocale { get; set; }
   }
 }

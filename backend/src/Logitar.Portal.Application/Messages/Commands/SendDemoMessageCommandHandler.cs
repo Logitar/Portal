@@ -38,7 +38,6 @@ namespace Logitar.Portal.Application.Messages.Commands
 
     public async Task<MessageModel> Handle(SendDemoMessageCommand request, CancellationToken cancellationToken)
     {
-      // TODO(fpion): what if _userContext.Actor is an API Key?
       User user = await _repository.LoadAsync<User>(_userContext.UserId, cancellationToken)
         ?? throw new InvalidOperationException($"The user 'Id={_userContext.UserId}' could not be found.");
       if (user.Email == null)

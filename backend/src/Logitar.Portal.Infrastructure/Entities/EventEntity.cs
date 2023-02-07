@@ -32,6 +32,8 @@ namespace Logitar.Portal.Infrastructure.Entities
     public string EventType { get; private set; } = string.Empty;
     public string EventData { get; private set; } = string.Empty;
 
+    public LogEventEntity? Log { get; private set; }
+
     public static IEnumerable<EventEntity> FromChanges(AggregateRoot aggregate)
     {
       string aggregateType = aggregate.GetType().GetName();

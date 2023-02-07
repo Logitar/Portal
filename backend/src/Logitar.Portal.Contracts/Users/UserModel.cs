@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
-using System.Globalization;
 
 namespace Logitar.Portal.Contracts.Users
 {
@@ -27,7 +26,7 @@ namespace Logitar.Portal.Contracts.Users
     public string? LastName { get; set; }
     public string? FullName { get; set; }
 
-    public CultureInfo? Locale { get; set; }
+    public string? Locale { get; set; }
     public string? Picture { get; set; }
 
     public DateTime? SignedInOn { get; set; }

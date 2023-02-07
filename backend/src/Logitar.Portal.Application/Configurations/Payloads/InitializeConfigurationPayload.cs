@@ -1,16 +1,17 @@
 ﻿using Logitar.Portal.Contracts.Users;
-using System.Globalization;
 
 namespace Logitar.Portal.Application.Configurations.Payloads
 {
   public record InitializeConfigurationPayload
   {
-    public CultureInfo DefaultLocale { get; init; } = CultureInfo.InvariantCulture;
-    public string JwtSecret { get; init; } = string.Empty;
+    public string DefaultLocale { get; set; } = string.Empty;
+    public string JwtSecret { get; set; } = string.Empty;
 
-    public UsernameSettingsPayload UsernameSettings { get; init; } = new();
-    public PasswordSettingsPayload PasswordSettings { get; init; } = new();
+    public LoggingSettingsPayload LoggingSettings { get; set; } = new();
 
-    public UserPayload User { get; init; } = new();
+    public UsernameSettingsPayload UsernameSettings { get; set; } = new();
+    public PasswordSettingsPayload PasswordSettings { get; set; } = new();
+
+    public UserPayload User { get; set; } = new();
   }
 }

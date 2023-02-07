@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Logitar.Portal.Contracts.Messages
+﻿namespace Logitar.Portal.Contracts.Messages
 {
   public record SendMessagePayload
   {
@@ -9,7 +7,7 @@ namespace Logitar.Portal.Contracts.Messages
     public string? SenderId { get; set; }
 
     public bool IgnoreUserLocale { get; set; }
-    public CultureInfo? Locale { get; set; }
+    public string? Locale { get; set; }
 
     public IEnumerable<RecipientPayload> Recipients { get; set; } = Enumerable.Empty<RecipientPayload>();
 

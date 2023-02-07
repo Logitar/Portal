@@ -5,23 +5,29 @@ namespace Logitar.Portal.Infrastructure
 {
   internal class RequestPipeline : IRequestPipeline
   {
+    private readonly IInternalLoggingContext _log;
     private readonly IMediator _mediator;
 
-    public RequestPipeline(IMediator mediator)
+    public RequestPipeline(IInternalLoggingContext log, IMediator mediator)
     {
+      _log = log;
       _mediator = mediator;
     }
 
-    /// <summary>
-    /// TODO(fpion): implement Logging
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     public async Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken)
     {
-      return await _mediator.Send(request, cancellationToken);
+      _log.SetRequest(request);
+
+      try
+      {
+        return await _mediator.Send(request, cancellationToken);
+      }
+      catch (Exception exception)
+      {
+        _log.AddError(exception);
+
+        throw;
+      }
     }
   }
 }

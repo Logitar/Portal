@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -39,7 +40,7 @@ namespace Logitar.Portal.Application.Realms.Commands
 
       Realm realm = new(_userContext.ActorId, payload.Alias,
         usernameSettings, passwordSettings, payload.JwtSecret,
-        payload.DisplayName, payload.Description, payload.DefaultLocale, payload.Url,
+        payload.DisplayName, payload.Description, payload.DefaultLocale?.GetCultureInfo(), payload.Url,
         payload.RequireConfirmedAccount, payload.RequireUniqueEmail, payload.GoogleClientId);
       _realmValidator.ValidateAndThrow(realm);
 

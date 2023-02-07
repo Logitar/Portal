@@ -6,12 +6,16 @@ namespace Logitar.Portal.Application.Configurations
 {
   internal class ConfigurationValidator : AbstractValidator<Configuration>
   {
-    public ConfigurationValidator(IValidator<PasswordSettings> passwordSettingsValidator, IValidator<UsernameSettings> usernameSettingsValidator)
+    public ConfigurationValidator(IValidator<LoggingSettings> loggingSettingsValidator,
+      IValidator<PasswordSettings> passwordSettingsValidator,
+      IValidator<UsernameSettings> usernameSettingsValidator)
     {
       RuleFor(x => x.DefaultLocale).Locale();
 
       RuleFor(x => x.JwtSecret).NotEmpty()
         .MinimumLength(256 / 8);
+
+      RuleFor(x => x.LoggingSettings).SetValidator(loggingSettingsValidator);
 
       RuleFor(x => x.UsernameSettings).SetValidator(usernameSettingsValidator);
 

@@ -17,6 +17,8 @@ namespace Logitar.Portal.Infrastructure
     internal DbSet<EventEntity> Events { get; private set; } = null!;
     internal DbSet<ExternalProviderEntity> ExternalProviders { get; private set; } = null!;
     internal DbSet<BlacklistedJwtEntity> JwtBlacklist { get; private set; } = null!;
+    internal DbSet<LogEventEntity> LogEvents { get; private set; } = null!;
+    internal DbSet<LogEntity> Logs { get; private set; } = null!;
     internal DbSet<MessageEntity> Messages { get; private set; } = null!;
     internal DbSet<ProviderTypeEntity> ProviderTypes { get; private set; } = null!;
     internal DbSet<RealmEntity> Realms { get; private set; } = null!;
