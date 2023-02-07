@@ -18,22 +18,23 @@ namespace Logitar.Portal.Web.Authentication
   internal class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
   {
     private readonly IApiKeyQuerier _apiKeyQuerier;
+    private readonly ICacheService _cacheService;
     private readonly IPasswordService _passwordService;
     private readonly IRepository _repository;
     private readonly ISessionQuerier _sessionQuerier;
 
-    public ApiKeyAuthenticationHandler(
-      IApiKeyQuerier apiKeyQuerier,
+    public ApiKeyAuthenticationHandler(IApiKeyQuerier apiKeyQuerier,
+      ICacheService cacheService,
       IPasswordService passwordService,
       IRepository repository,
       ISessionQuerier sessionQuerier,
       IOptionsMonitor<ApiKeyAuthenticationOptions> options,
       ILoggerFactory logger,
       UrlEncoder encoder,
-      ISystemClock clock
-    ) : base(options, logger, encoder, clock)
+      ISystemClock clock) : base(options, logger, encoder, clock)
     {
       _apiKeyQuerier = apiKeyQuerier;
+      _cacheService = cacheService;
       _passwordService = passwordService;
       _repository = repository;
       _sessionQuerier = sessionQuerier;
@@ -63,7 +64,7 @@ namespace Logitar.Portal.Web.Authentication
         {
           XApiKey xApiKey = XApiKey.Parse(values.Single() ?? string.Empty);
           ApiKey? apiKey = await _repository.LoadAsync<ApiKey>(xApiKey.Id);
-          ApiKeyModel? apiKeyModel = await _apiKeyQuerier.GetAsync(xApiKey.Id);
+          ApiKeyModel? apiKeyModel = _cacheService.GetApiKey(xApiKey.Id) ?? await _apiKeyQuerier.GetAsync(xApiKey.Id);
           if (apiKey == null || apiKeyModel == null)
           {
             return new(AuthenticateResult.Fail($"The API key 'Id={xApiKey.Id}' could not be found."));
@@ -81,6 +82,8 @@ namespace Logitar.Portal.Web.Authentication
           {
             throw new InvalidOperationException("The API key context item could not be set.");
           }
+
+          _cacheService.SetApiKey(apiKeyModel);
 
           ClaimsPrincipal principal = new(apiKeyModel.GetClaimsIdentity(Constants.Schemes.ApiKey));
           AuthenticationTicket ticket = new(principal, Constants.Schemes.ApiKey);

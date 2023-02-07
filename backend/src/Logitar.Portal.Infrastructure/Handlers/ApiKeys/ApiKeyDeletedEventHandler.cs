@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.ApiKeys.Events;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Domain.ApiKeys.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +9,15 @@ namespace Logitar.Portal.Infrastructure.Handlers.ApiKeys
 {
   internal class ApiKeyDeletedEventHandler : INotificationHandler<ApiKeyDeletedEvent>
   {
+    private readonly ICacheService _cacheService;
     private readonly PortalContext _context;
     private readonly ILogger<ApiKeyDeletedEventHandler> _logger;
 
-    public ApiKeyDeletedEventHandler(PortalContext context, ILogger<ApiKeyDeletedEventHandler> logger)
+    public ApiKeyDeletedEventHandler(ICacheService cacheService,
+      PortalContext context,
+      ILogger<ApiKeyDeletedEventHandler> logger)
     {
+      _cacheService = cacheService;
       _context = context;
       _logger = logger;
     }
@@ -31,6 +36,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.ApiKeys
           await _context.UpdateActorsAsync(apiKey.AggregateId, new Actor(apiKey, isDeleted: true), cancellationToken);
           await _context.SaveChangesAsync(cancellationToken);
         }
+
+        _cacheService.RemoveApiKey(notification.AggregateId);
       }
       catch (Exception exception)
       {
