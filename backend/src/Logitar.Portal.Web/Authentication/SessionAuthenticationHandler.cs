@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Claims;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Claims;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
@@ -11,14 +12,17 @@ namespace Logitar.Portal.Web.Authentication
 {
   internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthenticationOptions>
   {
+    private readonly ICacheService _cacheService;
     private readonly ISessionQuerier _sessionQuerier;
 
-    public SessionAuthenticationHandler(ISessionQuerier sessionQuerier,
+    public SessionAuthenticationHandler(ICacheService cacheService,
+      ISessionQuerier sessionQuerier,
       IOptionsMonitor<SessionAuthenticationOptions> options,
       ILoggerFactory logger,
       UrlEncoder encoder,
       ISystemClock clock) : base(options, logger, encoder, clock)
     {
+      _cacheService = cacheService;
       _sessionQuerier = sessionQuerier;
     }
 
@@ -27,7 +31,7 @@ namespace Logitar.Portal.Web.Authentication
       string? sessionId = Context.GetSessionId();
       if (sessionId != null)
       {
-        SessionModel? session = await _sessionQuerier.GetAsync(sessionId);
+        SessionModel? session = _cacheService.GetSession(sessionId) ?? await _sessionQuerier.GetAsync(sessionId);
         AuthenticateResult? failure = null;
         if (session == null)
         {
@@ -61,6 +65,8 @@ namespace Logitar.Portal.Web.Authentication
         {
           throw new InvalidOperationException("The User context item could not be set.");
         }
+
+        _cacheService.SetSession(session);
 
         ClaimsPrincipal principal = new(session.User!.GetClaimsIdentity(Constants.Schemes.Session));
         AuthenticationTicket ticket = new(principal, Constants.Schemes.Session);

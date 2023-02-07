@@ -106,11 +106,11 @@ namespace Logitar.Portal.Web.Authentication
       {
         try
         {
-          string id = values.Single() ?? string.Empty;
-          SessionModel? session = await _sessionQuerier.GetAsync(id);
+          string sessionId = values.Single() ?? string.Empty;
+          SessionModel? session = _cacheService.GetSession(sessionId) ?? await _sessionQuerier.GetAsync(sessionId);
           if (session == null)
           {
-            return AuthenticateResult.Fail($"The session 'Id={id}' could not be found.");
+            return AuthenticateResult.Fail($"The session 'Id={sessionId}' could not be found.");
           }
           else if (!session.IsActive)
           {
@@ -133,6 +133,8 @@ namespace Logitar.Portal.Web.Authentication
           {
             throw new InvalidOperationException("The User context item could not be set.");
           }
+
+          _cacheService.SetSession(session);
 
           ClaimsPrincipal principal = new(session.User!.GetClaimsIdentity(Constants.Schemes.Session));
           AuthenticationTicket ticket = new(principal, Constants.Schemes.Session);

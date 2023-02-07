@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Sessions.Events;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Domain.Sessions.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +9,15 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
 {
   internal class SessionSignedOutEventHandler : INotificationHandler<SessionSignedOutEvent>
   {
+    private readonly ICacheService _cacheService;
     private readonly PortalContext _context;
     private readonly ILogger<SessionSignedOutEventHandler> _logger;
 
-    public SessionSignedOutEventHandler(PortalContext context, ILogger<SessionSignedOutEventHandler> logger)
+    public SessionSignedOutEventHandler(ICacheService cacheService,
+      PortalContext context,
+      ILogger<SessionSignedOutEventHandler> logger)
     {
+      _cacheService = cacheService;
       _context = context;
       _logger = logger;
     }
@@ -35,6 +40,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Sessions
 
           await _context.SaveChangesAsync(cancellationToken);
         }
+
+        _cacheService.RemoveSession(notification.AggregateId);
       }
       catch (Exception exception)
       {

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Users.Events;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Domain.Users.Events;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +9,15 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
 {
   internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
   {
+    private readonly ICacheService _cacheService;
     private readonly PortalContext _context;
     private readonly ILogger<UserUpdatedEventHandler> _logger;
 
-    public UserUpdatedEventHandler(PortalContext context, ILogger<UserUpdatedEventHandler> logger)
+    public UserUpdatedEventHandler(ICacheService cacheService,
+      PortalContext context,
+      ILogger<UserUpdatedEventHandler> logger)
     {
+      _cacheService = cacheService;
       _context = context;
       _logger = logger;
     }
@@ -22,6 +27,7 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
       try
       {
         UserEntity? user = await _context.Users
+          .Include(x => x.Sessions)
           .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken);
 
         if (user == null)
@@ -35,6 +41,8 @@ namespace Logitar.Portal.Infrastructure.Handlers.Users
 
           await _context.UpdateActorsAsync(user.AggregateId, new Actor(user), cancellationToken);
           await _context.SaveChangesAsync(cancellationToken);
+
+          _cacheService.RemoveSessions(user.Sessions.Select(s => s.AggregateId));
         }
       }
       catch (Exception exception)
