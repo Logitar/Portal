@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
-using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -34,21 +33,14 @@ namespace Logitar.Portal.Application.Users.Commands
       CreateUserPayload payload = request.Payload;
 
       Realm? realm = null;
-      UsernameSettings? usernameSettings;
-      PasswordSettings? passwordSettings;
+      UsernameSettings? usernameSettings = null;
+      PasswordSettings? passwordSettings = null;
       if (payload.Realm != null)
       {
         realm = await _repository.LoadRealmByAliasOrIdAsync(payload.Realm, cancellationToken)
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
         usernameSettings = realm.UsernameSettings;
         passwordSettings = realm.PasswordSettings;
-      }
-      else
-      {
-        Configuration configuration = await _repository.LoadConfigurationAsync(cancellationToken)
-          ?? throw new InvalidOperationException("The configuration could not be loaded.");
-        usernameSettings = configuration.UsernameSettings;
-        passwordSettings = configuration.PasswordSettings;
       }
 
       if (await _repository.LoadUserByUsernameAsync(payload.Username, realm, cancellationToken) != null)

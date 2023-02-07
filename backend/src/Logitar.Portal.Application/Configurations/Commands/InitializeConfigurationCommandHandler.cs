@@ -11,16 +11,19 @@ namespace Logitar.Portal.Application.Configurations.Commands
 {
   internal class InitializeConfigurationCommandHandler : IRequestHandler<InitializeConfigurationCommand>
   {
+    private readonly ICacheService _cacheService;
     private readonly IValidator<Configuration> _configurationValidator;
     private readonly IPasswordService _passwordService;
     private readonly IRepository _repository;
     private readonly IUserValidator _userValidator;
 
-    public InitializeConfigurationCommandHandler(IValidator<Configuration> configurationValidator,
+    public InitializeConfigurationCommandHandler(ICacheService cacheService,
+      IValidator<Configuration> configurationValidator,
       IPasswordService passwordService,
       IRepository repository,
       IUserValidator userValidator)
     {
+      _cacheService = cacheService;
       _configurationValidator = configurationValidator;
       _passwordService = passwordService;
       _repository = repository;
@@ -55,6 +58,8 @@ namespace Logitar.Portal.Application.Configurations.Commands
       _configurationValidator.ValidateAndThrow(configuration);
 
       await _repository.SaveAsync(new AggregateRoot[] { configuration, user }, cancellationToken);
+
+      _cacheService.Configuration = configuration;
 
       return Unit.Value;
     }

@@ -47,10 +47,6 @@ namespace Logitar.Portal.Application.Sessions
 
     public async Task<SessionModel> SignInAsync(User user, Realm? realm, bool remember, string? ipAddress, string? additionalInformation, CancellationToken cancellationToken)
     {
-      UsernameSettings usernameSettings = realm?.UsernameSettings
-        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.UsernameSettings
-        ?? throw new InvalidOperationException("The username settings could not be resolved.");
-
       byte[]? keyBytes = null;
       string? keyHash = null;
       if (remember)
@@ -62,7 +58,7 @@ namespace Logitar.Portal.Application.Sessions
       _sessionValidator.ValidateAndThrow(session);
 
       user.SignIn();
-      _userValidator.ValidateAndThrow(user, usernameSettings);
+      _userValidator.ValidateAndThrow(user, realm?.UsernameSettings);
 
       await _repository.SaveAsync(new AggregateRoot[] { session, user }, cancellationToken);
 

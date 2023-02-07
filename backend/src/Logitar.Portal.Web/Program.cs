@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.Infrastructure;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -24,6 +26,14 @@ namespace Logitar.Portal.Web
         using IServiceScope scope = application.Services.CreateScope();
         using PortalContext context = scope.ServiceProvider.GetRequiredService<PortalContext>();
         await context.Database.MigrateAsync();
+
+        IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        Configuration? configuration = await repository.LoadConfigurationAsync();
+        if (configuration != null)
+        {
+          ICacheService cacheService = application.Services.GetRequiredService<ICacheService>();
+          cacheService.Configuration = configuration;
+        }
       }
 
       application.Run();

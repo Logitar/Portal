@@ -63,11 +63,7 @@ namespace Logitar.Portal.Application.Tokens
         identity.AddClaims(payload.Claims.Select(claim => new Claim(claim.Type, claim.Value, claim.ValueType)));
       }
 
-      string secret = realm?.JwtSecret
-        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
-        ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
-
-      string token = _securityTokenService.Create(identity, secret, GetAudience(realm), expires, GetIssuer(realm));
+      string token = _securityTokenService.Create(identity, realm?.JwtSecret, GetAudience(realm), expires, GetIssuer(realm));
 
       return new TokenModel
       {
@@ -84,12 +80,8 @@ namespace Logitar.Portal.Application.Tokens
           ?? throw new EntityNotFoundException<Realm>(payload.Realm, nameof(payload.Realm));
       }
 
-      string secret = realm?.JwtSecret
-        ?? (await _repository.LoadConfigurationAsync(cancellationToken))?.JwtSecret
-        ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
-
       ValidateTokenResult result = await _securityTokenService
-        .ValidateAsync(payload.Token, secret, GetAudience(realm), GetIssuer(realm), payload.Purpose, consume, cancellationToken);
+        .ValidateAsync(payload.Token, realm?.JwtSecret, GetAudience(realm), GetIssuer(realm), payload.Purpose, consume, cancellationToken);
 
       ValidatedTokenModel model = new();
       if (result.Principal == null)

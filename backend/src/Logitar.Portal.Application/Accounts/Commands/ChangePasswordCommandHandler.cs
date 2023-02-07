@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -37,11 +36,8 @@ namespace Logitar.Portal.Application.Accounts.Commands
         ? (await _repository.LoadAsync<Realm>(user.RealmId.Value, cancellationToken)
           ?? throw new InvalidOperationException($"The realm 'Id={user.RealmId}' could not be found."))
         : null;
-      Configuration? configuration = realm == null
-        ? await _repository.LoadConfigurationAsync(cancellationToken)
-        : null;
 
-      _passwordService.ValidateAndThrow(request.Payload.Password, realm?.PasswordSettings ?? configuration?.PasswordSettings ?? new());
+      _passwordService.ValidateAndThrow(request.Payload.Password, realm?.PasswordSettings);
 
       if (!_passwordService.IsMatch(user, request.Payload.Current))
       {
@@ -50,7 +46,7 @@ namespace Logitar.Portal.Application.Accounts.Commands
 
       string passwordHash = _passwordService.Hash(request.Payload.Password);
       user.ChangePassword(passwordHash);
-      _userValidator.ValidateAndThrow(user, realm?.UsernameSettings ?? configuration?.UsernameSettings ?? new());
+      _userValidator.ValidateAndThrow(user, realm?.UsernameSettings);
 
       await _repository.SaveAsync(user, cancellationToken);
 

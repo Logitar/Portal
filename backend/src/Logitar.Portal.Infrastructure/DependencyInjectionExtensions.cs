@@ -39,6 +39,7 @@ namespace Logitar.Portal.Infrastructure
         .AddMediatR(assembly)
         .AddProviderStrategies()
         .AddQueriers()
+        .AddSingleton<ICacheService, CacheService>()
         .AddSingleton<IPasswordService, PasswordService>()
         .AddSingleton<ITemplateCompiler, TemplateCompiler>()
         .AddScoped<IJwtBlacklist, JwtBlacklist>()

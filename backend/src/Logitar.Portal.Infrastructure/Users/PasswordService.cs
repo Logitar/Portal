@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Sessions;
@@ -9,6 +10,13 @@ namespace Logitar.Portal.Infrastructure.Users
 {
   internal class PasswordService : IPasswordService
   {
+    private readonly ICacheService _cacheService;
+
+    public PasswordService(ICacheService cacheService)
+    {
+      _cacheService = cacheService;
+    }
+
     public string GenerateAndHash(int length, out byte[] bytes)
     {
       bytes = RandomNumberGenerator.GetBytes(length);
@@ -38,8 +46,11 @@ namespace Logitar.Portal.Infrastructure.Users
       return user.HasPassword && Pbkdf2.Parse(user.PasswordHash!).IsMatch(password);
     }
 
-    public void ValidateAndThrow(string password, PasswordSettings passwordSettings)
+    public void ValidateAndThrow(string password, PasswordSettings? passwordSettings)
     {
+      passwordSettings ??= _cacheService.Configuration?.PasswordSettings
+        ?? throw new InvalidOperationException("The password settings could not be resolved.");
+
       PasswordValidator validator = new(passwordSettings);
       validator.ValidateAndThrow(password);
     }

@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
-using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using MediatR;
@@ -37,9 +36,6 @@ namespace Logitar.Portal.Application.Users.Commands
         ? (await _repository.LoadAsync<Realm>(user.RealmId.Value, cancellationToken)
           ?? throw new InvalidOperationException($"The realm 'Id={user.RealmId}' could not be found."))
         : null;
-      Configuration? configuration = realm == null
-        ? await _repository.LoadConfigurationAsync(cancellationToken)
-        : null;
 
       UpdateUserPayload payload = request.Payload;
 
@@ -55,7 +51,7 @@ namespace Logitar.Portal.Application.Users.Commands
       string? passwordHash = null;
       if (payload.Password != null)
       {
-        _passwordService.ValidateAndThrow(payload.Password, realm?.PasswordSettings ?? configuration?.PasswordSettings ?? new());
+        _passwordService.ValidateAndThrow(payload.Password, realm?.PasswordSettings);
         passwordHash = _passwordService.Hash(payload.Password);
       }
 
@@ -63,7 +59,7 @@ namespace Logitar.Portal.Application.Users.Commands
         payload.Email, payload.PhoneNumber,
         payload.FirstName, payload.MiddleName, payload.LastName,
         payload.Locale?.GetCultureInfo(), payload.Picture);
-      _userValidator.ValidateAndThrow(user, realm?.UsernameSettings ?? configuration?.UsernameSettings ?? new());
+      _userValidator.ValidateAndThrow(user, realm?.UsernameSettings);
 
       await _repository.SaveAsync(user, cancellationToken);
 

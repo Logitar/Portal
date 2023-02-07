@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Claims;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Claims;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Contracts;
 using Microsoft.IdentityModel.Tokens;
@@ -14,16 +15,21 @@ namespace Logitar.Portal.Infrastructure.Tokens
 
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
     private readonly IJwtBlacklist _blacklist;
+    private readonly ICacheService _cacheService;
 
-    public JwtService(IJwtBlacklist blacklist)
+    public JwtService(IJwtBlacklist blacklist, ICacheService cacheService)
     {
       _blacklist = blacklist;
+      _cacheService = cacheService;
     }
 
-    public string Create(ClaimsIdentity subject, string secret, string? audience, DateTime? expires, string? issuer)
+    public string Create(ClaimsIdentity subject, string? secret, string? audience, DateTime? expires, string? issuer)
       => Create(subject, secret, algorithm: null, audience, expires, issuer);
-    public string Create(ClaimsIdentity subject, string secret, string? algorithm, string? audience, DateTime? expires, string? issuer)
+    public string Create(ClaimsIdentity subject, string? secret, string? algorithm, string? audience, DateTime? expires, string? issuer)
     {
+      secret ??= _cacheService.Configuration?.JwtSecret
+        ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
+
       SecurityTokenDescriptor tokenDescriptor = new()
       {
         Audience = audience,
@@ -38,8 +44,11 @@ namespace Logitar.Portal.Infrastructure.Tokens
       return _tokenHandler.WriteToken(token);
     }
 
-    public async Task<ValidateTokenResult> ValidateAsync(string token, string secret, string? audience, string? issuer, string? purpose, bool consume, CancellationToken cancellationToken)
+    public async Task<ValidateTokenResult> ValidateAsync(string token, string? secret, string? audience, string? issuer, string? purpose, bool consume, CancellationToken cancellationToken)
     {
+      secret ??= _cacheService.Configuration?.JwtSecret
+        ?? throw new InvalidOperationException("The JWT secret could not be resolved.");
+
       TokenValidationParameters validationParameters = new()
       {
         IssuerSigningKey = GetSecurityKey(secret),

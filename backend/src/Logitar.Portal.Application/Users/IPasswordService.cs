@@ -11,6 +11,6 @@ namespace Logitar.Portal.Application.Users
     bool IsMatch(ApiKey apiKey, byte[] secret);
     bool IsMatch(Session session, byte[] key);
     bool IsMatch(User user, string password);
-    void ValidateAndThrow(string password, PasswordSettings passwordSettings);
+    void ValidateAndThrow(string password, PasswordSettings? passwordSettings = null);
   }
 }

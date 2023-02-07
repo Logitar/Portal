@@ -18,11 +18,15 @@ namespace Logitar.Portal.Infrastructure
     private readonly List<Error> _errors = new();
     private readonly LogEntity _log = new();
 
+    private readonly ICacheService _cacheService;
     private readonly PortalContext _context;
     private readonly IRequestSerializer _requestSerializer;
 
-    public LoggingContext(PortalContext context, IRequestSerializer requestSerializer)
+    public LoggingContext(ICacheService cacheService,
+      PortalContext context,
+      IRequestSerializer requestSerializer)
     {
+      _cacheService = cacheService;
       _context = context;
       _requestSerializer = requestSerializer;
     }
@@ -42,18 +46,7 @@ namespace Logitar.Portal.Infrastructure
       _log.AddEvents(events);
     }
 
-    /// <summary>
-    /// TODO(fpion): use Configuration cache
-    /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="statusCode"></param>
-    /// <param name="actor"></param>
-    /// <param name="apiKey"></param>
-    /// <param name="user"></param>
-    /// <param name="session"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task CompleteAsync(Configuration configuration, int statusCode, ActorModel actor, ApiKeyModel? apiKey, UserModel? user, SessionModel? session, CancellationToken cancellationToken)
+    public async Task CompleteAsync(int statusCode, ActorModel actor, ApiKeyModel? apiKey, UserModel? user, SessionModel? session, CancellationToken cancellationToken)
     {
       EnsureLogHasStarted();
 
@@ -79,7 +72,9 @@ namespace Logitar.Portal.Infrastructure
       }
       _log.Complete(statusCode, actor.Id, new Actor(actor).Serialize(), apiKey?.Id, user?.Id, session?.Id, errors, level.ToString());
 
-      if (configuration.LoggingSettings.Extent == LoggingExtent.None
+      Configuration? configuration = _cacheService.Configuration;
+      if (configuration == null
+        || configuration.LoggingSettings.Extent == LoggingExtent.None
         || (configuration.LoggingSettings.Extent == LoggingExtent.ActivityOnly && (_log.ActivityType == null || _log.ActivityData == null))
         || (configuration.LoggingSettings.OnlyErrors && !_log.HasErrors))
       {
