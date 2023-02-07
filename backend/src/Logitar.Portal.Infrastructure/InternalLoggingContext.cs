@@ -5,6 +5,7 @@ using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Infrastructure.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,18 @@ namespace Logitar.Portal.Infrastructure
       _log.AddEvents(events);
     }
 
-    public async Task CompleteAsync(int statusCode, ActorModel actor, ApiKeyModel? apiKey, UserModel? user, SessionModel? session, CancellationToken cancellationToken)
+    /// <summary>
+    /// TODO(fpion): refactor
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="statusCode"></param>
+    /// <param name="actor"></param>
+    /// <param name="apiKey"></param>
+    /// <param name="user"></param>
+    /// <param name="session"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task CompleteAsync(Configuration configuration, int statusCode, ActorModel actor, ApiKeyModel? apiKey, UserModel? user, SessionModel? session, CancellationToken cancellationToken)
     {
       EnsureLogHasStarted();
 
@@ -67,14 +79,12 @@ namespace Logitar.Portal.Infrastructure
       }
       _log.Complete(statusCode, actor.Id, new Actor(actor).Serialize(), apiKey?.Id, user?.Id, session?.Id, errors, level.ToString());
 
-      //Configuration configuration = await _repository.LoadConfigurationAsync(cancellationToken)
-      //  ?? throw new InvalidOperationException("The configuration could not be loaded.");
-      //if (configuration.LoggingSettings.Extent == LoggingExtent.None
-      //  || (configuration.LoggingSettings.Extent == LoggingExtent.ActivityOnly && (_log.ActivityType == null || _log.ActivityData == null))
-      //  || (configuration.LoggingSettings.OnlyErrors && !_log.HasErrors))
-      //{
-      //  return;
-      //} // TODO(fpion): restrict logging
+      if (configuration.LoggingSettings.Extent == LoggingExtent.None
+        || (configuration.LoggingSettings.Extent == LoggingExtent.ActivityOnly && (_log.ActivityType == null || _log.ActivityData == null))
+        || (configuration.LoggingSettings.OnlyErrors && !_log.HasErrors))
+      {
+        return;
+      }
 
       _context.Logs.Add(_log);
       await _context.SaveChangesAsync(cancellationToken);
