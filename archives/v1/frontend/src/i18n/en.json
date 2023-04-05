@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "delete": "Delete",
+    "refresh": "Refresh",
+    "save": "Save"
+  },
+  "by": "By",
+  "copyright": "© Portal {version} 2022.",
+  "count": "Count",
+  "description": {
+    "label": "Description",
+    "placeholder": "Enter a description"
+  },
+  "errorToast": {
+    "body": "An unexpected error occurred. Please try again later or contact our support team.",
+    "title": "Error!"
+  },
+  "locale": {
+    "label": "Locale",
+    "placeholder": "Select a locale"
+  },
+  "name": {
+    "label": "Name",
+    "placeholder": "Enter a name"
+  },
+  "no": "No",
+  "notFound": {
+    "help": "The requested page could not be found.",
+    "lead": "Page Not Found",
+    "link": "Go to Home"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Enter something to search"
+  },
+  "sort": {
+    "desc": "Descending",
+    "label": "Sort",
+    "placeholder": "Select a sort option"
+  },
+  "statusDetail": {
+    "by": "by",
+    "createdAt": "Created on {date}",
+    "updatedAt": "Last updated on {date}"
+  },
+  "success": "Success!",
+  "system": "System",
+  "updated": "Updated",
+  "yes": "Yes"
+}
