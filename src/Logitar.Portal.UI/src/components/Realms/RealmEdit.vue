@@ -64,7 +64,10 @@
                 placeholder="realms.jwt.secret.placeholder"
                 v-model="secret"
               />
-              <!-- TODO(fpion): warning -->
+              <b-alert :show="realm && realm.secret !== secret" variant="warning">
+                <p><strong v-t="'realms.jwt.secret.warning'" /></p>
+                <icon-button icon="history" text="realms.jwt.secret.revert" variant="warning" @click="secret = realm.secret" />
+              </b-alert>
             </b-form-group>
           </b-tab>
         </b-tabs>
@@ -105,8 +108,8 @@ export default {
   },
   data() {
     return {
-      uniqueName: null,
-      uniqueNameConflict: false,
+      claimMappings: [],
+      customAttributes: [],
       defaultLocale: null,
       description: null,
       displayName: null,
@@ -125,6 +128,8 @@ export default {
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
       secret: null,
+      uniqueName: null,
+      uniqueNameConflict: false,
       url: null,
       usernameSettings: {
         allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
@@ -155,8 +160,8 @@ export default {
     },
     payload() {
       const payload = {
-        claimMappings: null, // TODO(fpion): implement
-        customAttributes: null, // TODO(fpion): implement
+        claimMappings: this.claimMappings,
+        customAttributes: this.customAttributes,
         defaultLocale: this.defaultLocale,
         description: this.description,
         displayName: this.displayName,
@@ -178,6 +183,8 @@ export default {
   methods: {
     setModel(realm) {
       this.realm = realm
+      this.claimMappings = realm.claimMappings.map(claimMapping => ({ ...claimMapping }))
+      this.customAttributes = realm.customAttributes.map(customAttribute => ({ ...customAttribute }))
       this.defaultLocale = realm.defaultLocale
       this.description = realm.description
       this.displayName = realm.displayName
