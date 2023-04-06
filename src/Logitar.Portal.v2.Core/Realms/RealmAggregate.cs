@@ -82,6 +82,53 @@ internal class RealmAggregate : AggregateRoot
     _customAttributes.AddRange(e.CustomAttributes);
   }
 
+  public void Update(string? displayName, string? description,
+    CultureInfo? defaultLocale, string? secret, Uri? url,
+    bool requireConfirmedAccount, bool requireUniqueEmail,
+    ReadOnlyUsernameSettings? usernameSettings, ReadOnlyPasswordSettings? passwordSettings,
+    Dictionary<string, ReadOnlyClaimMapping>? claimMappings,
+    Dictionary<string, string>? customAttributes)
+  {
+    RealmUpdated e = new()
+    {
+      DisplayName = displayName?.CleanTrim(),
+      Description = description?.CleanTrim(),
+      DefaultLocale = defaultLocale,
+      Secret = secret?.CleanTrim(),
+      Url = url,
+      RequireConfirmedAccount = requireConfirmedAccount,
+      RequireUniqueEmail = requireUniqueEmail,
+      UsernameSettings = usernameSettings ?? new(),
+      PasswordSettings = passwordSettings ?? new(),
+      ClaimMappings = CleanTrim(claimMappings) ?? new(),
+      CustomAttributes = CleanTrim(customAttributes) ?? new()
+    };
+    new RealmUpdatedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
+  }
+  protected virtual void Apply(RealmUpdated e)
+  {
+    DisplayName = e.DisplayName;
+    Description = e.Description;
+
+    DefaultLocale = e.DefaultLocale;
+    Secret = e.Secret;
+    Url = e.Url;
+
+    RequireConfirmedAccount = e.RequireConfirmedAccount;
+    RequireUniqueEmail = e.RequireUniqueEmail;
+
+    UsernameSettings = e.UsernameSettings;
+    PasswordSettings = e.PasswordSettings;
+
+    _claimMappings.Clear();
+    _claimMappings.AddRange(e.ClaimMappings);
+
+    _customAttributes.Clear();
+    _customAttributes.AddRange(e.CustomAttributes);
+  }
+
   public override string ToString() => $"{DisplayName ?? UniqueName} | {base.ToString()}";
 
   private static Dictionary<string, ReadOnlyClaimMapping>? CleanTrim(Dictionary<string, ReadOnlyClaimMapping>? claimMappings)

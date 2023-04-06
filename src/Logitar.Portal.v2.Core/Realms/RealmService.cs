@@ -16,4 +16,9 @@ internal class RealmService : IRealmService
   {
     return await _pipeline.ExecuteAsync(new CreateRealm(input), cancellationToken);
   }
+
+  public async Task<Realm> UpdateAsync(Guid id, UpdateRealmInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new UpdateRealm(id, input), cancellationToken);
+  }
 }
