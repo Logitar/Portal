@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using Logitar.Portal.v2.Contracts.Realms;
+﻿using Logitar.Portal.v2.Contracts.Realms;
 using MediatR;
 using System.Globalization;
 
@@ -24,47 +22,18 @@ internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
 
     UpdateRealmInput input = request.Input;
 
+    CultureInfo? defaultLocale = input.DefaultLocale?.GetCultureInfo(nameof(input.DefaultLocale));
+    Uri? url = input.Url?.GetUri(nameof(input.Url));
+    ReadOnlyUsernameSettings? usernameSettings = input.UsernameSettings == null ? null : new(input.UsernameSettings);
+    ReadOnlyPasswordSettings? passwordSettings = input.PasswordSettings == null ? null : new(input.PasswordSettings);
+
     realm.Update(input.DisplayName, input.Description,
-      GetCultureInfo(input.DefaultLocale), input.Secret, GetUri(input.Url),
-      input.RequireConfirmedAccount, input.RequireUniqueEmail,
-      GetUsernameSettings(input.UsernameSettings), GetPasswordSettings(input.PasswordSettings),
-      GetClaimMappings(input.ClaimMappings), GetCustomAttributes(input.CustomAttributes));
+      defaultLocale, input.Secret, url,
+      input.RequireConfirmedAccount, input.RequireUniqueEmail, usernameSettings, passwordSettings,
+      input.ClaimMappings?.ToDictionary(), input.CustomAttributes?.ToDictionary());
 
     await _realmRepository.SaveAsync(realm, cancellationToken);
 
     return await _realmQuerier.GetAsync(realm, cancellationToken);
   }
-
-  private static Dictionary<string, ReadOnlyClaimMapping>? GetClaimMappings(IEnumerable<ClaimMapping>? claimMappings)
-    => claimMappings?.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Type))
-      .GroupBy(x => x.Key.Trim())
-      .ToDictionary(x => x.Key, x => new ReadOnlyClaimMapping(x.Last().Type, x.Last().ValueType));
-
-  private static CultureInfo? GetCultureInfo(string? locale) => locale == null ? null : CultureInfo.GetCultureInfo(locale);
-
-  private static Dictionary<string, string>? GetCustomAttributes(IEnumerable<CustomAttribute>? customAttributes)
-    => customAttributes?.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
-      .GroupBy(x => x.Value.Trim())
-      .ToDictionary(x => x.Key, x => x.Last().Value);
-
-  private static Uri? GetUri(string? url)
-  {
-    try
-    {
-      return url == null ? null : new Uri(url);
-    }
-    catch (Exception)
-    {
-      ValidationFailure error = new(nameof(UpdateRealmInput.Url), $"'{nameof(UpdateRealmInput.Url)}' must be a valid URL.", url);
-      throw new ValidationException(new[] { error });
-    }
-  }
-
-  private static ReadOnlyUsernameSettings? GetUsernameSettings(UsernameSettings? usernameSettings)
-    => usernameSettings == null ? null : new(usernameSettings.AllowedCharacters);
-
-  private static ReadOnlyPasswordSettings? GetPasswordSettings(PasswordSettings? passwordSettings)
-    => passwordSettings == null ? null : new(passwordSettings.RequiredLength, passwordSettings.RequiredUniqueChars,
-      passwordSettings.RequireNonAlphanumeric, passwordSettings.RequireLowercase, passwordSettings.RequireUppercase,
-      passwordSettings.RequireDigit);
 }

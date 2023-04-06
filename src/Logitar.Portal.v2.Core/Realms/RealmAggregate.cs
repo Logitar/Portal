@@ -34,8 +34,8 @@ internal class RealmAggregate : AggregateRoot
       RequireUniqueEmail = requireUniqueEmail,
       UsernameSettings = usernameSettings ?? new(),
       PasswordSettings = passwordSettings ?? new(),
-      ClaimMappings = CleanTrim(claimMappings) ?? new(),
-      CustomAttributes = CleanTrim(customAttributes) ?? new()
+      ClaimMappings = claimMappings?.CleanTrim() ?? new(),
+      CustomAttributes = customAttributes?.CleanTrim() ?? new()
     };
     new RealmCreatedValidator().ValidateAndThrow(e);
 
@@ -62,24 +62,8 @@ internal class RealmAggregate : AggregateRoot
   protected virtual void Apply(RealmCreated e)
   {
     UniqueName = e.UniqueName;
-    DisplayName = e.DisplayName;
-    Description = e.Description;
 
-    DefaultLocale = e.DefaultLocale;
-    Secret = e.Secret;
-    Url = e.Url;
-
-    RequireConfirmedAccount = e.RequireConfirmedAccount;
-    RequireUniqueEmail = e.RequireUniqueEmail;
-
-    UsernameSettings = e.UsernameSettings;
-    PasswordSettings = e.PasswordSettings;
-
-    _claimMappings.Clear();
-    _claimMappings.AddRange(e.ClaimMappings);
-
-    _customAttributes.Clear();
-    _customAttributes.AddRange(e.CustomAttributes);
+    Apply((RealmSaved)e);
   }
 
   public void Update(string? displayName, string? description,
@@ -100,14 +84,16 @@ internal class RealmAggregate : AggregateRoot
       RequireUniqueEmail = requireUniqueEmail,
       UsernameSettings = usernameSettings ?? new(),
       PasswordSettings = passwordSettings ?? new(),
-      ClaimMappings = CleanTrim(claimMappings) ?? new(),
-      CustomAttributes = CleanTrim(customAttributes) ?? new()
+      ClaimMappings = claimMappings?.CleanTrim() ?? new(),
+      CustomAttributes = customAttributes?.CleanTrim() ?? new()
     };
     new RealmUpdatedValidator().ValidateAndThrow(e);
 
     ApplyChange(e);
   }
-  protected virtual void Apply(RealmUpdated e)
+  protected virtual void Apply(RealmUpdated e) => Apply((RealmSaved)e);
+
+  private void Apply(RealmSaved e)
   {
     DisplayName = e.DisplayName;
     Description = e.Description;
@@ -130,14 +116,4 @@ internal class RealmAggregate : AggregateRoot
   }
 
   public override string ToString() => $"{DisplayName ?? UniqueName} | {base.ToString()}";
-
-  private static Dictionary<string, ReadOnlyClaimMapping>? CleanTrim(Dictionary<string, ReadOnlyClaimMapping>? claimMappings)
-    => claimMappings?.Where(x => !string.IsNullOrWhiteSpace(x.Key))
-      .GroupBy(x => x.Key.Trim())
-      .ToDictionary(x => x.Key, x => x.Last().Value);
-
-  private static Dictionary<string, string>? CleanTrim(Dictionary<string, string>? customAttributes)
-    => customAttributes?.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
-      .GroupBy(x => x.Key.Trim())
-      .ToDictionary(x => x.Key, x => x.Last().Value.Trim());
 }
