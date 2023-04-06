@@ -29,7 +29,7 @@ internal class RealmEntity : AggregateEntity, ICustomAttributes
   public string? Description { get; private set; }
 
   public string? DefaultLocale { get; private set; }
-  public string? Secret { get; private set; }
+  public string Secret { get; private set; } = string.Empty;
   public string? Url { get; private set; }
 
   public bool RequireConfirmedAccount { get; private set; }

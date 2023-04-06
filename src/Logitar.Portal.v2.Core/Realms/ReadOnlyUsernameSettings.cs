@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.v2.Contracts.Realms;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.v2.Contracts.Realms;
 
 namespace Logitar.Portal.v2.Core.Realms;
 
@@ -9,7 +10,7 @@ public record ReadOnlyUsernameSettings
   }
   public ReadOnlyUsernameSettings(UsernameSettings usernameSettings)
   {
-    AllowedCharacters = usernameSettings.AllowedCharacters;
+    AllowedCharacters = usernameSettings.AllowedCharacters?.CleanTrim();
   }
 
   public string? AllowedCharacters { get; init; } = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";

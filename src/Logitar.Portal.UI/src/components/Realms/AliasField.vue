@@ -12,7 +12,7 @@
     @input="$emit('input', $event)"
   >
     <template #after v-if="!disabled">
-      <b-form-checkbox v-model="custom">{{ $t('realms.alias.custom') }}</b-form-checkbox>
+      <b-form-checkbox v-model="custom">{{ $t('realms.uniqueName.custom') }}</b-form-checkbox>
     </template>
   </form-field>
 </template>
@@ -29,11 +29,11 @@ export default {
     },
     id: {
       type: String,
-      default: 'alias'
+      default: 'uniqueName'
     },
     label: {
       type: String,
-      default: 'realms.alias.label'
+      default: 'realms.uniqueName.label'
     },
     name: {
       type: String,
@@ -41,7 +41,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'realms.alias.placeholder'
+      default: 'realms.uniqueName.placeholder'
     },
     required: {
       type: Boolean,

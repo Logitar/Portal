@@ -1,14 +1,4 @@
 {
-  "alias": {
-    "conflict": "This alias is already used by another realm.",
-    "custom": "Custom",
-    "label": "Alias",
-    "placeholder": "Enter an unique alias"
-  },
-  "allowedUsernameCharacters": {
-    "label": "Allowed username characters",
-    "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
-  },
   "created": "The realm has been created.",
   "defaultLocale": "Default Locale",
   "delete": {
@@ -16,15 +6,19 @@
     "success": "The realm has been deleted.",
     "title": "Delete realm"
   },
+  "displayName": {
+    "label": "Display name",
+    "placeholder": "Enter the display name of the realm"
+  },
   "editTitle": "Edit realm",
   "empty": "This list is empty.",
   "general": "General",
-  "googleAuth": {
-    "id": {
-      "label": "Google Client ID",
-      "placeholder": "Paste your Google Client ID"
+  "jwt": {
+    "secret": {
+      "label": "Secret",
+      "placeholder": "Paste a JWT secret in the input or let it empty to securely generate a new secret"
     },
-    "title": "Google Authentication"
+    "title": "JSON Web Tokens"
   },
   "newTitle": "Create realm",
   "password": {
@@ -55,15 +49,28 @@
   "settings": "Settings",
   "sort": {
     "options": {
-      "DisplayName": "Name",
-      "UniqueName": "Alias",
+      "DisplayName": "Display name",
+      "UniqueName": "Unique name (alias)",
       "UpdatedOn": "Updated on"
     }
   },
   "title": "Realms",
+  "uniqueName": {
+    "conflict": "This alias is already used by another realm.",
+    "custom": "Custom",
+    "label": "Unique name (alias)",
+    "placeholder": "Enter an unique alias"
+  },
   "updated": "The realm has been updated.",
   "url": {
     "label": "Application URL",
     "placeholder": "Enter the web address (URL) of the application corresponding to this realm"
+  },
+  "username": {
+    "allowedCharacters": {
+      "label": "Allowed characters",
+      "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
+    },
+    "title": "Username"
   }
 }

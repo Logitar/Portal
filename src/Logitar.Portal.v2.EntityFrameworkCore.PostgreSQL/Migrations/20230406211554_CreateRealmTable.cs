@@ -23,7 +23,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     DefaultLocale = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Secret = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Secret = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Url = table.Column<string>(type: "character varying(65535)", maxLength: 65535, nullable: true),
                     RequireConfirmedAccount = table.Column<bool>(type: "boolean", nullable: false),
                     RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),

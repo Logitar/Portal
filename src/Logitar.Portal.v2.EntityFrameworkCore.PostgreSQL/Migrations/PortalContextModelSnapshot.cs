@@ -73,6 +73,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Secret")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 

@@ -14,9 +14,9 @@
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'realms.alias.label'" />
-            <th scope="col" v-t="'name.label'" />
-            <th scope="col" v-t="'updated'" />
+            <th scope="col" v-t="'realms.sort.options.UniqueName'" />
+            <th scope="col" v-t="'realms.sort.options.DisplayName'" />
+            <th scope="col" v-t="'realms.sort.options.UpdatedOn'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -25,13 +25,13 @@
             <td>
               <b-link :href="`/realms/${realm.id}`">{{ realm.uniqueName }}</b-link>
             </td>
-            <td v-text="realm.displayName" />
+            <td v-text="realm.displayName || '—'" />
             <td><status-cell :actor="realm.updatedBy" :date="realm.updatedOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal
                 confirm="realms.delete.confirm"
-                :displayName="realm.displayName || realm.uniqueName"
+                :displayName="realm.displayName ? `${realm.displayName} (${realm.uniqueName})` : realm.uniqueName"
                 :id="`delete_${realm.id}`"
                 :loading="loading"
                 title="realms.delete.title"

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230406041857_CreateRealmTable")]
+    [Migration("20230406211554_CreateRealmTable")]
     partial class CreateRealmTable
     {
         /// <inheritdoc />
@@ -76,6 +76,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Secret")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 

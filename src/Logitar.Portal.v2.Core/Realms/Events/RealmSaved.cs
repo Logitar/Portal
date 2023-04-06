@@ -9,7 +9,7 @@ public abstract record RealmSaved : DomainEvent
   public string? Description { get; init; }
 
   public CultureInfo? DefaultLocale { get; init; }
-  public string? Secret { get; init; }
+  public string Secret { get; init; } = string.Empty;
   public Uri? Url { get; init; }
 
   public bool RequireConfirmedAccount { get; init; }

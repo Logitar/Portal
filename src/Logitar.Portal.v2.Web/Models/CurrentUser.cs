@@ -3,7 +3,7 @@
 /// <summary>
 /// TODO(fpion): implement
 /// </summary>
-internal class CurrentUser
+internal record CurrentUser
 {
   public CurrentUser(/*User? user*/)
   {
