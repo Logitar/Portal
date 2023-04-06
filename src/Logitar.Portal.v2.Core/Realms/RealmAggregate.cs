@@ -66,6 +66,9 @@ internal class RealmAggregate : AggregateRoot
     Apply((RealmSaved)e);
   }
 
+  public void Delete() => ApplyChange(new RealmDeleted());
+  protected virtual void Apply(RealmDeleted _) { }
+
   public void Update(string? displayName, string? description,
     CultureInfo? defaultLocale, string? secret, Uri? url,
     bool requireConfirmedAccount, bool requireUniqueEmail,
