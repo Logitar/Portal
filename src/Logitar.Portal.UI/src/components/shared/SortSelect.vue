@@ -1,7 +1,7 @@
 <template>
   <form-select id="sort" label="sort.label" :options="options" placeholder="sort.placeholder" :value="value" @input="$emit('input', $event)">
     <template #after>
-      <b-form-checkbox :checked="desc" @input="$emit('desc', $event)">{{ $t('sort.desc') }}</b-form-checkbox>
+      <b-form-checkbox :checked="isDescending" @input="$emit('isDescending', $event)">{{ $t('sort.isDescending') }}</b-form-checkbox>
     </template>
   </form-select>
 </template>
@@ -10,7 +10,7 @@
 export default {
   name: 'SortSelect',
   props: {
-    desc: {
+    isDescending: {
       type: Boolean,
       default: false
     },

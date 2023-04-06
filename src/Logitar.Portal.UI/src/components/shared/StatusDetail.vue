@@ -1,9 +1,9 @@
 <template>
   <p>
-    <status-info :actor="model && model.createdBy" :date="new Date(this.model ? this.model.createdAt : this.createdAt)" dateFormat="statusDetail.createdAt" />
-    <template v-if="(model && model.updatedAt) || updatedAt">
+    <status-info :actor="model && model.createdBy" :date="new Date(this.model ? this.model.createdOn : this.createdOn)" dateFormat="statusDetail.createdOn" />
+    <template v-if="(model && model.updatedOn) || updatedOn">
       <br />
-      <status-info :actor="model && model.updatedBy" :date="new Date(this.model ? this.model.updatedAt : this.updatedAt)" dateFormat="statusDetail.updatedAt" />
+      <status-info :actor="model && model.updatedBy" :date="new Date(this.model ? this.model.updatedOn : this.updatedOn)" dateFormat="statusDetail.updatedOn" />
     </template>
   </p>
 </template>
@@ -12,7 +12,7 @@
 export default {
   name: 'StatusDetail',
   props: {
-    createdAt: {
+    createdOn: {
       type: Date,
       default: null
     },
@@ -20,7 +20,7 @@ export default {
       type: Object,
       default: null
     },
-    updatedAt: {
+    updatedOn: {
       type: Date,
       default: null
     }

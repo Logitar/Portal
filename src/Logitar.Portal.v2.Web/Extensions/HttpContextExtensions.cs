@@ -5,7 +5,7 @@ namespace Logitar.Portal.v2.Web.Extensions;
 internal static class HttpContextExtensions
 {
   /// <summary>
-  /// TODO(fpion): implement
+  /// TODO(fpion): Authentication
   /// </summary>
   /// <param name="context"></param>
   /// <returns></returns>

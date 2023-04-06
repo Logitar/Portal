@@ -55,9 +55,9 @@
   "settings": "Settings",
   "sort": {
     "options": {
-      "Alias": "Alias",
-      "Name": "Name",
-      "UpdatedAt": "Updated on"
+      "DisplayName": "Name",
+      "UniqueName": "Alias",
+      "UpdatedOn": "Updated on"
     }
   },
   "title": "Realms",

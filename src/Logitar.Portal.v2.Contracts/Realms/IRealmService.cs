@@ -7,6 +7,5 @@ public interface IRealmService
   Task<Realm?> GetAsync(string idOrUniqueName, CancellationToken cancellationToken = default);
   Task<PagedList<Realm>> GetAsync(string? search = null, RealmSort? sort = null, bool isDescending = false,
     int? skip = null, int? limit = null, CancellationToken cancellationToken = default);
-  // TODO(fpion): renamed 'isDescending', 'skip' and 'limit'
   Task<Realm> UpdateAsync(Guid id, UpdateRealmInput input, CancellationToken cancellationToken = default);
 }

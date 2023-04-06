@@ -7,8 +7,8 @@
     </div>
     <b-row>
       <search-field class="col" v-model="search" />
-      <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-      <count-select class="col" v-model="count" />
+      <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+      <count-select class="col" v-model="limit" />
     </b-row>
     <template v-if="realms.length">
       <table id="table" class="table table-striped">
@@ -23,15 +23,15 @@
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <b-link :href="`/realms/${realm.id}`">{{ realm.alias }}</b-link>
+              <b-link :href="`/realms/${realm.id}`">{{ realm.uniqueName }}</b-link>
             </td>
-            <td v-text="realm.name" />
-            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedAt" /></td>
+            <td v-text="realm.displayName" />
+            <td><status-cell :actor="realm.updatedBy" :date="realm.updatedOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${realm.id}`" />
               <delete-modal
                 confirm="realms.delete.confirm"
-                :displayName="realm.name"
+                :displayName="realm.displayName || realm.uniqueName"
                 :id="`delete_${realm.id}`"
                 :loading="loading"
                 title="realms.delete.title"
@@ -41,7 +41,7 @@
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </template>
     <p v-else v-t="'realms.empty'" />
   </b-container>
@@ -54,13 +54,13 @@ export default {
   name: 'RealmList',
   data() {
     return {
-      count: 10,
-      desc: false,
+      isDescending: false,
+      limit: 10,
       loading: false,
       page: 1,
       realms: [],
       search: null,
-      sort: 'Name',
+      sort: 'DisplayName',
       total: 0
     }
   },
@@ -69,9 +69,9 @@ export default {
       return {
         search: this.search,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -126,7 +126,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (newValue?.index && oldValue && (newValue.search !== oldValue.search || newValue.count !== oldValue.count)) {
+        if (newValue?.skip && oldValue && (newValue.search !== oldValue.search || newValue.limit !== oldValue.limit)) {
           this.page = 1
           await this.refresh()
         } else {
