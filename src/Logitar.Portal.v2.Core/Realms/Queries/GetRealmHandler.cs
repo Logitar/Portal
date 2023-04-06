@@ -14,6 +14,6 @@ internal class GetRealmHandler : IRequestHandler<GetRealm, Realm?>
 
   public async Task<Realm?> Handle(GetRealm request, CancellationToken cancellationToken)
   {
-    return await _realmQuerier.GetAsync(request.Id, cancellationToken);
+    return await _realmQuerier.GetAsync(request.IdOrUniqueName, cancellationToken);
   }
 }

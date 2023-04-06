@@ -23,9 +23,9 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new DeleteRealm(id), cancellationToken);
   }
 
-  public async Task<Realm?> GetAsync(string id, CancellationToken cancellationToken)
+  public async Task<Realm?> GetAsync(string idOrUniqueName, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new GetRealm(id), cancellationToken);
+    return await _pipeline.ExecuteAsync(new GetRealm(idOrUniqueName), cancellationToken);
   }
 
   public async Task<Realm> UpdateAsync(Guid id, UpdateRealmInput input, CancellationToken cancellationToken)
