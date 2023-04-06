@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.v2.Contracts.Realms;
+﻿using Logitar.Portal.v2.Contracts.Realms;
 using MediatR;
 using System.Globalization;
 
@@ -8,21 +7,21 @@ namespace Logitar.Portal.v2.Core.Realms.Commands;
 internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
 {
   private readonly ICurrentActor _currentActor;
-  private readonly IEventStore _eventStore;
   private readonly IRealmQuerier _realmQuerier;
+  private readonly IRealmRepository _realmRepository;
 
   public UpdateRealmHandler(ICurrentActor currentActor,
-    IEventStore eventStore,
-    IRealmQuerier realmQuerier)
+    IRealmQuerier realmQuerier,
+    IRealmRepository realmRepository)
   {
     _currentActor = currentActor;
-    _eventStore = eventStore;
     _realmQuerier = realmQuerier;
+    _realmRepository = realmRepository;
   }
 
   public async Task<Realm> Handle(UpdateRealm request, CancellationToken cancellationToken)
   {
-    RealmAggregate realm = await _eventStore.LoadAsync<RealmAggregate>(new AggregateId(request.Id), cancellationToken)
+    RealmAggregate realm = await _realmRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(request.Id);
 
     UpdateRealmInput input = request.Input;
@@ -37,7 +36,7 @@ internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
       input.RequireConfirmedAccount, input.RequireUniqueEmail, usernameSettings, passwordSettings,
       input.ClaimMappings?.ToDictionary(), input.CustomAttributes?.ToDictionary());
 
-    await _eventStore.SaveAsync(realm, cancellationToken);
+    await _realmRepository.SaveAsync(realm, cancellationToken);
 
     return await _realmQuerier.GetAsync(realm, cancellationToken);
   }

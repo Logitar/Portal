@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.v2.Contracts.Realms;
+﻿using Logitar.Portal.v2.Contracts.Realms;
 using MediatR;
 using System.Globalization;
 
@@ -8,17 +7,14 @@ namespace Logitar.Portal.v2.Core.Realms.Commands;
 internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
 {
   private readonly ICurrentActor _currentActor;
-  private readonly IEventStore _eventStore;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
 
   public CreateRealmHandler(ICurrentActor currentActor,
-    IEventStore eventStore,
     IRealmQuerier realmQuerier,
     IRealmRepository realmRepository)
   {
     _currentActor = currentActor;
-    _eventStore = eventStore;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
   }
@@ -43,7 +39,7 @@ internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
       input.RequireConfirmedAccount, input.RequireUniqueEmail, usernameSettings, passwordSettings,
       input.ClaimMappings?.ToDictionary(), input.CustomAttributes?.ToDictionary());
 
-    await _eventStore.SaveAsync(realm, cancellationToken);
+    await _realmRepository.SaveAsync(realm, cancellationToken);
 
     return await _realmQuerier.GetAsync(realm, cancellationToken);
   }
