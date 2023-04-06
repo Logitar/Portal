@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.v2.Core.Realms.Events;
+﻿using MediatR;
 
-internal record RealmCreated : RealmSaved
+namespace Logitar.Portal.v2.Core.Realms.Events;
+
+public record RealmCreated : RealmSaved, INotification
 {
   public string UniqueName { get; init; } = string.Empty;
 }

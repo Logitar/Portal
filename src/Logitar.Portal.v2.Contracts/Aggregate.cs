@@ -1,16 +1,14 @@
-﻿namespace Logitar.Portal.v2.Contracts;
+﻿using Logitar.Portal.v2.Contracts.Actors;
 
-/// <summary>
-/// TODO(fpion): implement
-/// </summary>
+namespace Logitar.Portal.v2.Contracts;
+
 public abstract record Aggregate
 {
-  //public Guid Id { get; set; }
-  //public int Version { get; set; }
+  public Actor CreatedBy { get; set; } = new();
+  public DateTime CreatedOn { get; set; }
 
-  //public DateTime CreatedAt { get; set; }
-  //public ActorModel? CreatedBy { get; set; }
+  public Actor UpdatedBy { get; set; } = new();
+  public DateTime UpdatedOn { get; set; }
 
-  //public DateTime? UpdatedAt { get; set; }
-  //public ActorModel? UpdatedBy { get; set; }
+  public long Version { get; set; }
 }

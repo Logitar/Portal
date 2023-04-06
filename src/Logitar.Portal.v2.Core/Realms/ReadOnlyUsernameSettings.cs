@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.v2.Core.Realms;
 
-internal record ReadOnlyUsernameSettings
+public record ReadOnlyUsernameSettings
 {
   public ReadOnlyUsernameSettings()
   {

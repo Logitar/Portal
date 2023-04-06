@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.v2.Core.Realms;
 
-internal record ReadOnlyClaimMapping
+public record ReadOnlyClaimMapping
 {
   public ReadOnlyClaimMapping(string type, string? valueType = null)
   {

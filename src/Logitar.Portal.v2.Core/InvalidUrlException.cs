@@ -2,14 +2,17 @@
 
 namespace Logitar.Portal.v2.Core;
 
-internal class InvalidUrlException : Exception
+public class InvalidUrlException : Exception, IPropertyFailure
 {
   public InvalidUrlException(string value, string paramName, Exception innerException)
     : base(GetMessage(value, paramName), innerException)
   {
-    Data["Value"] = value;
-    Data["ParamName"] = paramName;
+    Data[nameof(Value)] = value;
+    Data[nameof(ParamName)] = paramName;
   }
+
+  public string ParamName => (string)Data[nameof(ParamName)]!;
+  public string Value => (string)Data[nameof(Value)]!;
 
   private static string GetMessage(string value, string paramName)
   {

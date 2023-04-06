@@ -2,6 +2,8 @@
 
 public record Realm : Aggregate
 {
+  public Guid Id { get; set; }
+
   public string UniqueName { get; set; } = string.Empty; // TODO(fpion): renamed from Alias
   public string? DisplayName { get; set; } // TODO(fpion): renamed from Name
   public string? Description { get; set; }

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Logitar.Portal.v2.Core.Realms.Events;
 
-internal abstract record RealmSaved : DomainEvent
+public abstract record RealmSaved : DomainEvent
 {
   public string? DisplayName { get; init; }
   public string? Description { get; init; }

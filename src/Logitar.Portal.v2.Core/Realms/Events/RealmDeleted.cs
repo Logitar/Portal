@@ -1,8 +1,9 @@
 ﻿using Logitar.EventSourcing;
+using MediatR;
 
 namespace Logitar.Portal.v2.Core.Realms.Events;
 
-internal record RealmDeleted : DomainEvent
+public record RealmDeleted : DomainEvent, INotification
 {
   public RealmDeleted() => DeleteAction = DeleteAction.Delete;
 }

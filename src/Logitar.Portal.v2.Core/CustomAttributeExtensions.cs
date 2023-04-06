@@ -14,7 +14,7 @@ internal static class CustomAttributeExtensions
   public static Dictionary<string, string> ToDictionary(this IEnumerable<CustomAttribute> customAttributes)
   {
     return customAttributes.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
-      .GroupBy(x => x.Value.Trim())
+      .GroupBy(x => x.Key.Trim())
       .ToDictionary(x => x.Key, x => x.Last().Value);
   }
 }

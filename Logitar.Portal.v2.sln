@@ -29,6 +29,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.v2.Contracts
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.v2.Core", "src\Logitar.Portal.v2.Core\Logitar.Portal.v2.Core.csproj", "{FF7DA25D-A067-493E-901F-F269D91B6BB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL", "src\Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL\Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.csproj", "{0D2EA863-D8F6-4D5C-B7D8-4D7A5A21E0D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.v2.Web", "src\Logitar.Portal.v2.Web\Logitar.Portal.v2.Web.csproj", "{DC3C146F-7DFA-471C-9BF3-3239AF993107}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal", "src\Logitar.Portal\Logitar.Portal.csproj", "{ABDB69A3-527A-4921-93A5-9E6448705BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +73,18 @@ Global
 		{FF7DA25D-A067-493E-901F-F269D91B6BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF7DA25D-A067-493E-901F-F269D91B6BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF7DA25D-A067-493E-901F-F269D91B6BB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D2EA863-D8F6-4D5C-B7D8-4D7A5A21E0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D2EA863-D8F6-4D5C-B7D8-4D7A5A21E0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D2EA863-D8F6-4D5C-B7D8-4D7A5A21E0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D2EA863-D8F6-4D5C-B7D8-4D7A5A21E0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC3C146F-7DFA-471C-9BF3-3239AF993107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC3C146F-7DFA-471C-9BF3-3239AF993107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC3C146F-7DFA-471C-9BF3-3239AF993107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC3C146F-7DFA-471C-9BF3-3239AF993107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABDB69A3-527A-4921-93A5-9E6448705BAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABDB69A3-527A-4921-93A5-9E6448705BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABDB69A3-527A-4921-93A5-9E6448705BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABDB69A3-527A-4921-93A5-9E6448705BAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

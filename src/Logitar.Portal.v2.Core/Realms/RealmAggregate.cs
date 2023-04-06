@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Logitar.Portal.v2.Core.Realms;
 
-internal class RealmAggregate : AggregateRoot
+public class RealmAggregate : AggregateRoot
 {
   private readonly Dictionary<string, ReadOnlyClaimMapping> _claimMappings = new();
   private readonly Dictionary<string, string> _customAttributes = new();
@@ -15,8 +15,8 @@ internal class RealmAggregate : AggregateRoot
   {
   }
 
-  public RealmAggregate(string uniqueName, string? displayName = null, string? description = null,
-    CultureInfo? defaultLocale = null, string? secret = null, Uri? url = null,
+  public RealmAggregate(AggregateId actorId, string uniqueName, string? displayName = null,
+    string? description = null, CultureInfo? defaultLocale = null, string? secret = null, Uri? url = null,
     bool requireConfirmedAccount = false, bool requireUniqueEmail = false,
     ReadOnlyUsernameSettings? usernameSettings = null, ReadOnlyPasswordSettings? passwordSettings = null,
     Dictionary<string, ReadOnlyClaimMapping>? claimMappings = null,
@@ -24,6 +24,7 @@ internal class RealmAggregate : AggregateRoot
   {
     RealmCreated e = new()
     {
+      ActorId = actorId,
       UniqueName = uniqueName.Trim(),
       DisplayName = displayName?.CleanTrim(),
       Description = description?.CleanTrim(),
@@ -66,10 +67,10 @@ internal class RealmAggregate : AggregateRoot
     Apply((RealmSaved)e);
   }
 
-  public void Delete() => ApplyChange(new RealmDeleted());
+  public void Delete(AggregateId actorId) => ApplyChange(new RealmDeleted { ActorId = actorId });
   protected virtual void Apply(RealmDeleted _) { }
 
-  public void Update(string? displayName, string? description,
+  public void Update(AggregateId actorId, string? displayName, string? description,
     CultureInfo? defaultLocale, string? secret, Uri? url,
     bool requireConfirmedAccount, bool requireUniqueEmail,
     ReadOnlyUsernameSettings? usernameSettings, ReadOnlyPasswordSettings? passwordSettings,
@@ -78,6 +79,7 @@ internal class RealmAggregate : AggregateRoot
   {
     RealmUpdated e = new()
     {
+      ActorId = actorId,
       DisplayName = displayName?.CleanTrim(),
       Description = description?.CleanTrim(),
       DefaultLocale = defaultLocale,

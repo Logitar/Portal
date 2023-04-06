@@ -3,13 +3,15 @@ using System.Text;
 
 namespace Logitar.Portal.v2.Core;
 
-internal class AggregateNotFoundException : Exception
+public class AggregateNotFoundException : Exception
 {
   public AggregateNotFoundException(Type type, string id) : base(GetMessage(type, id))
   {
     Data["Type"] = type.GetName();
-    Data["Id"] = id;
+    Data[nameof(Id)] = id;
   }
+
+  public string Id => (string)Data[nameof(Id)]!;
 
   private static string GetMessage(Type type, string id)
   {
@@ -23,7 +25,7 @@ internal class AggregateNotFoundException : Exception
   }
 }
 
-internal class AggregateNotFoundException<T> : AggregateNotFoundException
+public class AggregateNotFoundException<T> : AggregateNotFoundException
 {
   public AggregateNotFoundException(Guid id) : base(typeof(T), id.ToString())
   {
