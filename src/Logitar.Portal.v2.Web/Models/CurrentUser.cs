@@ -1,7 +1,7 @@
 ﻿namespace Logitar.Portal.v2.Web.Models;
 
 /// <summary>
-/// TODO(fpion): implement
+/// TODO(fpion): Authentication
 /// </summary>
 internal record CurrentUser
 {

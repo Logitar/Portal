@@ -14,6 +14,6 @@ internal class ActorService : IActorService
       return ActorEntity.System;
     }
 
-    throw new NotImplementedException(); // TODO(fpion): implement
+    throw new NotImplementedException(); // TODO(fpion): user actors
   }
 }
