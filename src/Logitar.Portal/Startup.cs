@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.v2.Core;
-using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
+﻿using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.v2.Web;
 
 namespace Logitar.Portal;
@@ -23,7 +22,6 @@ public class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddLogitarPortalV2Core();
     services.AddLogitarPortalv2Web();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider>("DatabaseProvider");

@@ -19,6 +19,10 @@ public static class DependencyInjectionExtensions
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
-    return services.AddSingleton<ICurrentActor, HttpCurrentActor>();
+    services.AddLogitarPortalV2Core();
+
+    services.AddSingleton<ICurrentActor, HttpCurrentActor>();
+
+    return services;
   }
 }
