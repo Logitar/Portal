@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.v2.Contracts.Realms;
 using Logitar.Portal.v2.Core.Realms.Commands;
+using Logitar.Portal.v2.Core.Realms.Queries;
 
 namespace Logitar.Portal.v2.Core.Realms;
 
@@ -20,6 +21,11 @@ internal class RealmService : IRealmService
   public async Task<Realm> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new DeleteRealm(id), cancellationToken);
+  }
+
+  public async Task<Realm?> GetAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new GetRealm(id), cancellationToken);
   }
 
   public async Task<Realm> UpdateAsync(Guid id, UpdateRealmInput input, CancellationToken cancellationToken)
