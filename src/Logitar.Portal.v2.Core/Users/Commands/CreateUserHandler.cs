@@ -28,13 +28,8 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
   {
     CreateUserInput input = request.Input;
 
-    RealmAggregate? realm = input.Realm == null ? null
-      : (await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-        ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm)));
-    if (realm == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): Portal users
-    }
+    RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
 
     string username = input.Username.Trim();
     if (await _userRepository.LoadAsync(realm, username, cancellationToken) != null)

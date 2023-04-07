@@ -33,10 +33,7 @@ internal class SetExternalIdentifierHandler : IRequestHandler<SetExternalIdentif
 
     if (value != null)
     {
-      RealmAggregate? realm = user.RealmId.HasValue
-        ? await _realmRepository.LoadAsync(user, cancellationToken)
-        : null;
-
+      RealmAggregate realm = await _realmRepository.LoadAsync(user, cancellationToken);
       if (await _userRepository.LoadAsync(realm, key, value, cancellationToken) != null)
       {
         throw new ExternalIdentifierAlreadyUsedException(realm, key, value);

@@ -6,25 +6,16 @@ internal class ExternalIdentifierEntity
 {
   public ExternalIdentifierEntity(ExternalIdentifierSet e, UserEntity user, ActorEntity actor)
   {
-    if (e.Value == null)
-    {
-      throw new ArgumentException($"The {nameof(e.Value)} is required.", nameof(e));
-    }
-    if (user.RealmId.HasValue && user.Realm == null)
-    {
-      throw new ArgumentException($"The {nameof(user.Realm)} is required.", nameof(user));
-    }
-
     Id = Guid.NewGuid();
 
     Realm = user.Realm;
-    RealmId = user.Realm?.RealmId;
+    RealmId = user.Realm?.RealmId ?? throw new ArgumentException($"The {nameof(user.Realm)} is required.", nameof(user)); ;
 
     User = user;
     UserId = user.UserId;
 
     Key = e.Key;
-    Value = e.Value;
+    Value = e.Value ?? throw new ArgumentException($"The {nameof(e.Value)} is required.", nameof(e)); ;
 
     CreatedById = e.ActorId.ToGuid();
     CreatedBy = actor.Serialize();
@@ -39,7 +30,7 @@ internal class ExternalIdentifierEntity
   public Guid Id { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
-  public int? RealmId { get; private set; }
+  public int RealmId { get; private set; }
 
   public UserEntity? User { get; private set; }
   public int UserId { get; private set; }

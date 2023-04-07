@@ -19,10 +19,9 @@ internal class UserCreatedHandler : INotificationHandler<UserCreated>
 
   public async Task Handle(UserCreated notification, CancellationToken cancellationToken)
   {
-    RealmEntity? realm = notification.RealmId.HasValue
-      ? (await _context.Realms.SingleOrDefaultAsync(x => x.AggregateId == notification.RealmId.Value.Value, cancellationToken)
-        ?? throw new InvalidOperationException($"The realm entity '{notification.RealmId}' could not be found."))
-      : null;
+    RealmEntity realm = await _context.Realms
+      .SingleOrDefaultAsync(x => x.AggregateId == notification.RealmId.Value, cancellationToken)
+      ?? throw new InvalidOperationException($"The realm entity '{notification.RealmId}' could not be found.");
 
     ActorEntity actor = await _actorService.GetAsync(notification, cancellationToken);
     UserEntity user = new(notification, realm, actor);

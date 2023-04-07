@@ -6,10 +6,10 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
 
 internal class UserEntity : AggregateEntity, ICustomAttributes
 {
-  public UserEntity(UserCreated e, RealmEntity? realm, ActorEntity actor) : base(e, actor)
+  public UserEntity(UserCreated e, RealmEntity realm, ActorEntity actor) : base(e, actor)
   {
     Realm = realm;
-    RealmId = realm?.RealmId;
+    RealmId = realm.RealmId;
 
     Username = e.Username;
 
@@ -23,7 +23,7 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
   public int UserId { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
-  public int? RealmId { get; private set; }
+  public int RealmId { get; private set; }
 
   public string Username { get; private set; } = string.Empty;
   public string UsernameNormalized

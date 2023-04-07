@@ -40,7 +40,7 @@ internal class RealmQuerier : IRealmQuerier
   public async Task<Realm?> GetAsync(string uniqueName, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _realms.AsNoTracking()
-  .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueName.ToUpper(), cancellationToken);
+      .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueName.ToUpper(), cancellationToken);
 
     return _mapper.Map<Realm>(realm);
   }

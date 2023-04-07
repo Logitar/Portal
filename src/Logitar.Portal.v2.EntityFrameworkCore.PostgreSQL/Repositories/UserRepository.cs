@@ -33,29 +33,24 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
       return Load<UserAggregate>(events);
     }
 
-    public async Task<UserAggregate?> LoadAsync(RealmAggregate? realm, string username, CancellationToken cancellationToken)
+    public async Task<UserAggregate?> LoadAsync(RealmAggregate realm, string username, CancellationToken cancellationToken)
     {
       string? aggregateId = realm?.Id.Value;
 
-      IQueryable<EventEntity> query = realm == null
-        ? Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""RealmId"" IS NULL AND u.""UsernameNormalized"" = {username.ToUpper()}")
-        : Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND u.""UsernameNormalized"" = {username.ToUpper()}");
-
-      EventEntity[] events = await query.AsNoTracking()
+      EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND u.""UsernameNormalized"" = {username.ToUpper()}")
+        .AsNoTracking()
         .OrderBy(x => x.Version)
         .ToArrayAsync(cancellationToken);
 
       return Load<UserAggregate>(events).SingleOrDefault();
     }
 
-    public async Task<UserAggregate?> LoadAsync(RealmAggregate? realm, string externalKey, string externalValue, CancellationToken cancellationToken)
+    public async Task<UserAggregate?> LoadAsync(RealmAggregate realm, string externalKey, string externalValue, CancellationToken cancellationToken)
     {
-      string? aggregateId = realm?.Id.Value;
-      IQueryable<EventEntity> query = realm == null
-        ? Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""ExternalIdentifiers"" x ON x.""UserId"" = u.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""RealmId"" IS NULL AND x.""Key"" = {externalKey} AND x.""ValueNormalized"" = {externalValue.ToUpper()}")
-        : Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" JOIN ""ExternalIdentifiers"" ON x.""UserId"" = u.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND x.""Key"" = {externalKey} AND x.""ValueNormalized"" = {externalValue.ToUpper()}");
+      string aggregateId = realm.Id.Value;
 
-      EventEntity[] events = await query.AsNoTracking()
+      EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" JOIN ""ExternalIdentifiers"" ON x.""UserId"" = u.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND x.""Key"" = {externalKey} AND x.""ValueNormalized"" = {externalValue.ToUpper()}")
+        .AsNoTracking()
         .OrderBy(x => x.Version)
         .ToArrayAsync(cancellationToken);
 

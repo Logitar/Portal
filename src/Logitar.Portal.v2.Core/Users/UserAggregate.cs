@@ -49,7 +49,7 @@ public class UserAggregate : AggregateRoot
     ApplyChange(e);
   }
 
-  public AggregateId? RealmId { get; private set; }
+  public AggregateId RealmId { get; private set; }
 
   public string Username { get; private set; } = string.Empty;
   public bool HasPassword => _password != null;

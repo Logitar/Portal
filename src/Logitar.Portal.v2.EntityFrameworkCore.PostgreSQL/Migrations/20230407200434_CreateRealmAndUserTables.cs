@@ -7,18 +7,51 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateUserTables : Migration
+    public partial class CreateRealmAndUserTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Realms",
+                columns: table => new
+                {
+                    RealmId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UniqueName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    UniqueNameNormalized = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    DefaultLocale = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Secret = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Url = table.Column<string>(type: "character varying(65535)", maxLength: 65535, nullable: true),
+                    RequireConfirmedAccount = table.Column<bool>(type: "boolean", nullable: false),
+                    RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),
+                    UsernameSettings = table.Column<string>(type: "jsonb", nullable: false),
+                    PasswordSettings = table.Column<string>(type: "jsonb", nullable: false),
+                    ClaimMappings = table.Column<string>(type: "jsonb", nullable: true),
+                    CustomAttributes = table.Column<string>(type: "jsonb", nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedById = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Realms", x => x.RealmId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RealmId = table.Column<int>(type: "integer", nullable: true),
+                    RealmId = table.Column<int>(type: "integer", nullable: false),
                     Username = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     UsernameNormalized = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     PasswordChangedById = table.Column<Guid>(type: "uuid", nullable: true),
@@ -96,7 +129,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     ExternalIdentifierId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RealmId = table.Column<int>(type: "integer", nullable: true),
+                    RealmId = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     Key = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Value = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
@@ -151,6 +184,48 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_ExternalIdentifiers_UserId",
                 table: "ExternalIdentifiers",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_AggregateId",
+                table: "Realms",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_CreatedById",
+                table: "Realms",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_CreatedOn",
+                table: "Realms",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_DisplayName",
+                table: "Realms",
+                column: "DisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UniqueName",
+                table: "Realms",
+                column: "UniqueName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UniqueNameNormalized",
+                table: "Realms",
+                column: "UniqueNameNormalized",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UpdatedById",
+                table: "Realms",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_UpdatedOn",
+                table: "Realms",
+                column: "UpdatedOn");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_AddressFormatted",
@@ -288,6 +363,9 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Realms");
         }
     }
 }

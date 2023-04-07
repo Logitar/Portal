@@ -4,7 +4,7 @@ namespace Logitar.Portal.v2.Contracts.Users;
 
 public record CreateUserInput
 {
-  public string? Realm { get; set; }
+  public string Realm { get; set; } = string.Empty;
 
   public string Username { get; set; } = string.Empty;
   public string? Password { get; set; }

@@ -48,7 +48,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("RealmId")
+                    b.Property<int>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UpdatedBy")
@@ -378,7 +378,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(65535)
                         .HasColumnType("character varying(65535)");
 
-                    b.Property<int?>("RealmId")
+                    b.Property<int>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("SignedInOn")
@@ -476,7 +476,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("ExternalIdentifiers")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", "User")
                         .WithMany("ExternalIdentifiers")
@@ -494,7 +495,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Users")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Realm");
                 });

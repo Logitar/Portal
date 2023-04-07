@@ -36,12 +36,7 @@ internal class RealmRepository : EventStore, IRealmRepository
 
   public async Task<RealmAggregate> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
   {
-    if (!user.RealmId.HasValue)
-    {
-      throw new ArgumentException($"The {nameof(user.RealmId)} is required.", nameof(user));
-    }
-
-    return await LoadAsync<RealmAggregate>(user.RealmId.Value, cancellationToken)
+    return await LoadAsync<RealmAggregate>(user.RealmId, cancellationToken)
       ?? throw new InvalidOperationException($"The realm '{user.RealmId}' could not be found.");
   }
 
