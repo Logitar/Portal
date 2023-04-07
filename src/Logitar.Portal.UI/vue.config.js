@@ -1,6 +1,6 @@
 module.exports = {
   filenameHashing: false,
-  outputDir: '../Logitar.Portal.Web/wwwroot/dist',
+  outputDir: '../Logitar.Portal/wwwroot/dist', // '../Logitar.Portal.v2.Web/wwwroot/dist'
   publicPath: '/dist',
   runtimeCompiler: true,
   productionSourceMap: false,

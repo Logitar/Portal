@@ -1,0 +1,17 @@
+﻿@using Logitar.Portal.v2.Contracts.Realms;
+
+@model Realm
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model?.DisplayName ?? Model?.UniqueName ?? "Create realm";
+}
+
+@if (Model == null)
+{
+  <realm-edit></realm-edit>
+}
+else
+{
+  <realm-edit json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></realm-edit>
+}

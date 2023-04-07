@@ -10,13 +10,13 @@
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('realms.general')">
-            <b-alert dismissible variant="warning" v-model="aliasConflict">
-              <strong v-t="'realms.alias.conflict'" />
+            <b-alert dismissible variant="warning" v-model="uniqueNameConflict">
+              <strong v-t="'realms.uniqueName.conflict'" />
             </b-alert>
             <b-row>
-              <name-field class="col" required v-model="name" />
-              <alias-field class="col" v-if="realm" disabled :value="alias" />
-              <alias-field class="col" v-else :name="name" ref="alias" required validate v-model="alias" />
+              <name-field class="col" label="realms.displayName.label" placeholder="realms.displayName.placeholder" v-model="displayName" />
+              <alias-field class="col" v-if="realm" disabled :value="uniqueName" />
+              <alias-field class="col" v-else :name="displayName" ref="uniqueName" required validate v-model="uniqueName" />
             </b-row>
             <b-row>
               <locale-select class="col" label="realms.defaultLocale" v-model="defaultLocale" />
@@ -39,14 +39,9 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
-            <form-field
-              id="allowedUsernameCharacters"
-              label="realms.allowedUsernameCharacters.label"
-              placeholder="realms.allowedUsernameCharacters.placeholder"
-              v-model="allowedUsernameCharacters"
-            />
+            <username-settings v-model="usernameSettings" />
             <password-settings v-model="passwordSettings" />
-            <div v-if="realm">
+            <!-- <div v-if="realm">
               <h5 v-t="'realms.passwordRecovery.title'" />
               <b-row>
                 <sender-select
@@ -58,15 +53,22 @@
                 />
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
-            </div>
-            <h5 v-t="'realms.googleAuth.title'" />
-            <form-field
-              id="googleClientId"
-              label="realms.googleAuth.id.label"
-              :maxLength="256"
-              placeholder="realms.googleAuth.id.placeholder"
-              v-model="googleClientId"
-            />
+            </div> -->
+            <h5 v-t="'realms.jwt.title'" />
+            <b-form-group>
+              <form-field
+                id="secret"
+                label="realms.jwt.secret.label"
+                :minLength="256 / 8"
+                :maxLength="512 / 8"
+                placeholder="realms.jwt.secret.placeholder"
+                v-model="secret"
+              />
+              <b-alert :show="realm && realm.secret !== secret" variant="warning">
+                <p><strong v-t="'realms.jwt.secret.warning'" /></p>
+                <icon-button icon="history" text="realms.jwt.secret.revert" variant="warning" @click="secret = realm.secret" />
+              </b-alert>
+            </b-form-group>
           </b-tab>
         </b-tabs>
       </b-form>
@@ -75,11 +77,14 @@
 </template>
 
 <script>
+// TODO(fpion): Password Recovery
+
 import Vue from 'vue'
 import AliasField from './AliasField.vue'
 import PasswordSettings from './PasswordSettings.vue'
-import SenderSelect from '@/components/Senders/SenderSelect.vue'
-import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
+// import SenderSelect from '@/components/Senders/SenderSelect.vue'
+// import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
+import UsernameSettings from './UsernameSettings.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
 export default {
@@ -87,8 +92,9 @@ export default {
   components: {
     AliasField,
     PasswordSettings,
-    SenderSelect,
-    TemplateSelect
+    // SenderSelect,
+    // TemplateSelect,
+    UsernameSettings
   },
   props: {
     json: {
@@ -102,39 +108,40 @@ export default {
   },
   data() {
     return {
-      alias: null,
-      aliasConflict: false,
-      allowedUsernameCharacters: null,
+      claimMappings: [],
+      customAttributes: [],
       defaultLocale: null,
       description: null,
-      googleClientId: null,
+      displayName: null,
       loading: false,
-      name: null,
       passwordRecoverySenderId: null,
       passwordRecoveryTemplateId: null,
       passwordSettings: {
-        requireDigit: false,
-        requireLowercase: false,
+        requireDigit: true,
+        requireLowercase: true,
         requireNonAlphanumeric: false,
-        requireUppercase: false,
-        requiredLength: 1,
+        requireUppercase: true,
+        requiredLength: 6,
         requiredUniqueChars: 1
       },
       realm: null,
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
-      url: null
+      secret: null,
+      uniqueName: null,
+      uniqueNameConflict: false,
+      url: null,
+      usernameSettings: {
+        allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
+      }
     }
   },
   computed: {
     hasChanges() {
       return (
-        (this.alias ?? '') !== (this.realm?.alias ?? '') ||
-        (this.allowedUsernameCharacters ?? '') !== (this.realm?.allowedUsernameCharacters ?? '') ||
         (this.defaultLocale !== this.realm?.defaultLocale ?? null) ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
-        (this.googleClientId ?? '') !== (this.realm?.googleClientId ?? '') ||
-        (this.name ?? '') !== (this.realm?.name ?? '') ||
+        (this.displayName ?? '') !== (this.realm?.displayName ?? '') ||
         this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
         this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
         this.passwordSettings.requireDigit !== (this.realm?.passwordSettings?.requireDigit ?? false) ||
@@ -145,39 +152,42 @@ export default {
         (this.passwordSettings.requiredUniqueChars ?? 0) !== (this.realm?.passwordSettings?.requiredUniqueChars ?? 0) ||
         this.requireConfirmedAccount !== (this.realm?.requireConfirmedAccount ?? false) ||
         this.requireUniqueEmail !== (this.realm?.requireUniqueEmail ?? false) ||
-        (this.url ?? '') !== (this.realm?.url ?? '')
+        (this.secret ?? '') !== (this.realm?.secret ?? '') ||
+        (this.uniqueName ?? '') !== (this.realm?.uniqueName ?? '') ||
+        (this.url ?? '') !== (this.realm?.url ?? '') ||
+        (this.usernameSettings.allowedCharacters ?? '') !== (this.realm?.usernameSettings.allowedCharacters ?? '')
       )
     },
     payload() {
       const payload = {
-        allowedUsernameCharacters: this.allowedUsernameCharacters,
+        claimMappings: this.claimMappings,
+        customAttributes: this.customAttributes,
         defaultLocale: this.defaultLocale,
         description: this.description,
-        googleClientId: this.googleClientId,
-        name: this.name,
+        displayName: this.displayName,
         passwordRecoverySenderId: this.passwordRecoverySenderId,
         passwordRecoveryTemplateId: this.passwordRecoveryTemplateId,
         passwordSettings: { ...this.passwordSettings },
         requireConfirmedAccount: this.requireConfirmedAccount,
         requireUniqueEmail: this.requireUniqueEmail,
-        url: this.url
+        secret: this.secret,
+        url: this.url,
+        usernameSettings: { ...this.usernameSettings }
       }
       if (!this.realm) {
-        payload.alias = this.alias
+        payload.uniqueName = this.uniqueName
       }
       return payload
     }
   },
   methods: {
-    browse() {},
     setModel(realm) {
       this.realm = realm
-      this.alias = realm.alias
-      this.allowedUsernameCharacters = realm.allowedUsernameCharacters
+      this.claimMappings = realm.claimMappings.map(claimMapping => ({ ...claimMapping }))
+      this.customAttributes = realm.customAttributes.map(customAttribute => ({ ...customAttribute }))
       this.defaultLocale = realm.defaultLocale
       this.description = realm.description
-      this.googleClientId = realm.googleClientId
-      this.name = realm.name
+      this.displayName = realm.displayName
       this.passwordRecoverySenderId = realm.passwordRecoverySenderId
       this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
       Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings?.requireDigit ?? false)
@@ -188,12 +198,15 @@ export default {
       Vue.set(this.passwordSettings, 'requiredUniqueChars', realm.passwordSettings?.requiredUniqueChars ?? 0)
       this.requireConfirmedAccount = realm.requireConfirmedAccount
       this.requireUniqueEmail = realm.requireUniqueEmail
+      this.secret = realm.secret
+      this.uniqueName = realm.uniqueName
       this.url = realm.url
+      Vue.set(this.usernameSettings, 'allowedCharacters', realm.usernameSettings?.allowedCharacters ?? null)
     },
     async submit() {
       if (!this.loading) {
         this.loading = true
-        this.aliasConflict = false
+        this.uniqueNameConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.realm) {
@@ -208,10 +221,10 @@ export default {
           }
         } catch (e) {
           const { data, status } = e
-          if (status === 409 && data?.field?.toLowerCase() === 'alias') {
-            this.aliasConflict = true
-            this.$refs.alias.customize()
-            Vue.nextTick(() => this.$refs.alias.focus())
+          if (status === 409 && data?.code === 'UniqueNameAlreadyUsed') {
+            this.uniqueNameConflict = true
+            this.$refs.uniqueName.customize()
+            Vue.nextTick(() => this.$refs.uniqueName.focus())
             return
           }
           this.handleError(e)

@@ -36,14 +36,14 @@
     "placeholder": "Enter something to search"
   },
   "sort": {
-    "desc": "Descending",
+    "isDescending": "Descending",
     "label": "Sort",
     "placeholder": "Select a sort option"
   },
   "statusDetail": {
     "by": "by",
-    "createdAt": "Created on {date}",
-    "updatedAt": "Last updated on {date}"
+    "createdOn": "Created on {date}",
+    "updatedOn": "Last updated on {date}"
   },
   "success": "Success!",
   "system": "System",

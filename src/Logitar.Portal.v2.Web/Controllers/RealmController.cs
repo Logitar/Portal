@@ -1,0 +1,41 @@
+﻿using Logitar.Portal.v2.Contracts.Realms;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Logitar.Portal.v2.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+//[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
+[Route("realms")]
+public class RealmController : Controller
+{
+  private readonly IRealmService _realmService;
+
+  public RealmController(IRealmService realmService)
+  {
+    _realmService = realmService;
+  }
+
+  [HttpGet("/create-realm")]
+  public ActionResult CreateRealm()
+  {
+    return View(nameof(RealmEdit));
+  }
+
+  [HttpGet("{idOrUniqueName}")]
+  public async Task<ActionResult> RealmEdit(string idOrUniqueName, CancellationToken cancellationToken = default)
+  {
+    Realm? realm = await _realmService.GetAsync(idOrUniqueName, cancellationToken);
+    if (realm == null)
+    {
+      return NotFound();
+    }
+
+    return View(realm);
+  }
+
+  [HttpGet]
+  public ActionResult RealmList()
+  {
+    return View();
+  }
+}

@@ -22,18 +22,20 @@
         @input="onInput({ requiredUniqueChars: Number($event) })"
       />
     </b-row>
-    <b-form-checkbox id="requireLowercase" :checked="value.requireLowercase" @input="onInput({ requireLowercase: $event })">
-      {{ $t('realms.password.requireLowercase') }}
-    </b-form-checkbox>
-    <b-form-checkbox id="requireUppercase" :checked="value.requireUppercase" @input="onInput({ requireUppercase: $event })">
-      {{ $t('realms.password.requireUppercase') }}
-    </b-form-checkbox>
-    <b-form-checkbox id="requireDigit" :checked="value.requireDigit" @input="onInput({ requireDigit: $event })">{{
-      $t('realms.password.requireDigit')
-    }}</b-form-checkbox>
-    <b-form-checkbox id="requireNonAlphanumeric" :checked="value.requireNonAlphanumeric" @input="onInput({ requireNonAlphanumeric: $event })">
-      {{ $t('realms.password.requireNonAlphanumeric') }}
-    </b-form-checkbox>
+    <b-form-group>
+      <b-form-checkbox id="requireLowercase" :checked="value.requireLowercase" @input="onInput({ requireLowercase: $event })">
+        {{ $t('realms.password.requireLowercase') }}
+      </b-form-checkbox>
+      <b-form-checkbox id="requireUppercase" :checked="value.requireUppercase" @input="onInput({ requireUppercase: $event })">
+        {{ $t('realms.password.requireUppercase') }}
+      </b-form-checkbox>
+      <b-form-checkbox id="requireDigit" :checked="value.requireDigit" @input="onInput({ requireDigit: $event })">{{
+        $t('realms.password.requireDigit')
+      }}</b-form-checkbox>
+      <b-form-checkbox id="requireNonAlphanumeric" :checked="value.requireNonAlphanumeric" @input="onInput({ requireNonAlphanumeric: $event })">
+        {{ $t('realms.password.requireNonAlphanumeric') }}
+      </b-form-checkbox>
+    </b-form-group>
   </div>
 </template>
 
