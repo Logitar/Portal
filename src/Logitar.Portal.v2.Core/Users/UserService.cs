@@ -37,6 +37,11 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new EnableUser(id), cancellationToken);
   }
 
+  public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SetExternalIdentifier(id, key, value), cancellationToken);
+  }
+
   public async Task<User> UpdateAsync(Guid id, UpdateUserInput input, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new UpdateUser(id, input), cancellationToken);

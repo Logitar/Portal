@@ -100,6 +100,8 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
 
   public string? CustomAttributes { get; private set; }
 
+  public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
+
   public void ChangePassword(PasswordChanged e, ActorEntity actor)
   {
     SetVersion(e);
@@ -179,6 +181,29 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
         EmailVerifiedOn = e.OccurredOn;
         IsEmailVerified = true;
         break;
+    }
+  }
+
+  public void SetExternalIdentifier(ExternalIdentifierSet e, ActorEntity actor)
+  {
+    Update(e, actor);
+
+    ExternalIdentifierEntity? externalIdentifier = ExternalIdentifiers.SingleOrDefault(x => x.Key == e.Key);
+    if (e.Value == null)
+    {
+      if (externalIdentifier != null)
+      {
+        ExternalIdentifiers.Remove(externalIdentifier);
+      }
+    }
+    else if (externalIdentifier == null)
+    {
+      externalIdentifier = new(e, this, actor);
+      ExternalIdentifiers.Add(externalIdentifier);
+    }
+    else
+    {
+      externalIdentifier.Update(e, actor);
     }
   }
 

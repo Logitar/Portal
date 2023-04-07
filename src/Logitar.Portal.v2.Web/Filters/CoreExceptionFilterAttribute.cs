@@ -11,6 +11,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {
+    [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
@@ -41,6 +42,11 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 
       context.Result = new NotFoundObjectResult(value);
     }
+  }
+
+  private static void HandleExternalIdentifierAlreadyUsedException(ExceptionContext context)
+  {
+    context.Result = new ConflictObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleInvalidCredentialsException(ExceptionContext context)

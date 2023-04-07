@@ -12,6 +12,7 @@ namespace Logitar.Portal.v2.Core.Users;
 public class UserAggregate : AggregateRoot
 {
   private readonly Dictionary<string, string> _customAttributes = new();
+  private readonly Dictionary<string, string> _externalIdentifiers = new();
   private Pbkdf2? _password = null;
 
   public UserAggregate(AggregateId id) : base(id)
@@ -77,6 +78,7 @@ public class UserAggregate : AggregateRoot
   public Uri? Website { get; private set; }
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
+  public IReadOnlyDictionary<string, string> ExternalIdentifiers => _externalIdentifiers.AsReadOnly();
 
   protected virtual void Apply(UserCreated e)
   {
@@ -166,6 +168,25 @@ public class UserAggregate : AggregateRoot
     ApplyChange(e);
   }
   protected virtual void Apply(EmailChanged e) => Email = e.Email;
+
+  public void SetExternalIdentifier(AggregateId actorId, string key, string? value)
+  {
+    key = key.Trim();
+    value = value?.CleanTrim();
+
+    if (value != null || _externalIdentifiers.ContainsKey(key))
+    {
+      ExternalIdentifierSet e = new()
+      {
+        ActorId = actorId,
+        Key = key,
+        Value = value
+      };
+      new ExternalIdentifierSetValidator().ValidateAndThrow(e);
+
+      ApplyChange(e);
+    }
+  }
 
   public void SetPhone(AggregateId actorId, ReadOnlyPhone? phone)
   {
