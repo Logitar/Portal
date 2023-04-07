@@ -19,23 +19,30 @@ internal class RealmQuerier : IRealmQuerier
     _realms = context.Realms;
   }
 
-  public async Task<Realm?> GetAsync(string idOrUniqueName, CancellationToken cancellationToken)
-  {
-    string aggregateId = (Guid.TryParse(idOrUniqueName, out Guid id) ? new AggregateId(id) : new(idOrUniqueName)).Value;
-
-    RealmEntity? realm = await _realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId
-        || x.UniqueNameNormalized == idOrUniqueName.ToUpper(), cancellationToken);
-
-    return _mapper.Map<Realm>(realm);
-  }
-
   public async Task<Realm> GetAsync(RealmAggregate realm, CancellationToken cancellationToken)
   {
     RealmEntity? entity = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == realm.Id.Value, cancellationToken);
 
     return _mapper.Map<Realm>(entity);
+  }
+
+  public async Task<Realm?> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    string aggregateId = new AggregateId(id).Value;
+
+    RealmEntity? realm = await _realms.AsNoTracking()
+      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+
+    return _mapper.Map<Realm>(realm);
+  }
+
+  public async Task<Realm?> GetAsync(string uniqueName, CancellationToken cancellationToken)
+  {
+    RealmEntity? realm = await _realms.AsNoTracking()
+  .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueName.ToUpper(), cancellationToken);
+
+    return _mapper.Map<Realm>(realm);
   }
 
   public async Task<PagedList<Realm>> GetAsync(string? search, RealmSort? sort, bool isDescending,

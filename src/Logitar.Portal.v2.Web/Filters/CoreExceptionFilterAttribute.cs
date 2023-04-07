@@ -16,6 +16,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
+    [typeof(TooManyResultsException)] = HandleTooManyResultsException,
     [typeof(UniqueNameAlreadyUsedException)] = HandleUniqueNameAlreadyUsedException,
     [typeof(ValidationException)] = HandleValidationException
   };
@@ -76,6 +77,11 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     {
       context.Result = new BadRequestObjectResult(GetPropertyFailure(exception));
     }
+  }
+
+  private static void HandleTooManyResultsException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleUniqueNameAlreadyUsedException(ExceptionContext context)

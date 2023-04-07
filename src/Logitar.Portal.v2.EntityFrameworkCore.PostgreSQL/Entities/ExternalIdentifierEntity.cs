@@ -41,6 +41,11 @@ internal class ExternalIdentifierEntity
 
   public string Key { get; private set; } = string.Empty;
   public string Value { get; private set; } = string.Empty;
+  public string ValueNormalized
+  {
+    get => Value.ToUpper();
+    private set { }
+  }
 
   public Guid CreatedById { get; private set; }
   public string CreatedBy { get; private set; } = string.Empty;
@@ -49,6 +54,19 @@ internal class ExternalIdentifierEntity
   public Guid? UpdatedById { get; private set; }
   public string? UpdatedBy { get; private set; }
   public DateTime? UpdatedOn { get; private set; }
+
+  public void SetActor(Guid id, ActorEntity actor)
+  {
+    if (CreatedById == id)
+    {
+      CreatedBy = actor.Serialize();
+    }
+
+    if (UpdatedById == id)
+    {
+      UpdatedBy = actor.Serialize();
+    }
+  }
 
   public void Update(ExternalIdentifierSet e, ActorEntity actor)
   {

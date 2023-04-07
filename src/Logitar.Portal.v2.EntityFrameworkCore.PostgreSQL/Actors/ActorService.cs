@@ -44,6 +44,13 @@ internal class ActorService : IActorService
   {
     Guid id = new AggregateId(aggregateId).ToGuid();
 
+    ExternalIdentifierEntity[] externalIdentifiers = await _context.ExternalIdentifiers.Where(x => x.CreatedById == id || x.UpdatedById == id)
+      .ToArrayAsync(cancellationToken);
+    foreach (ExternalIdentifierEntity externalIdentifier in externalIdentifiers)
+    {
+      externalIdentifier.SetActor(id, actor);
+    }
+
     RealmEntity[] realms = await _context.Realms.Where(x => x.CreatedById == id || x.UpdatedById == id)
       .ToArrayAsync(cancellationToken);
     foreach (RealmEntity realm in realms)
@@ -55,6 +62,10 @@ internal class ActorService : IActorService
         || x.PasswordChangedById == id || x.DisabledById == id
         || x.AddressVerifiedById == id || x.EmailVerifiedById == id || x.PhoneVerifiedById == id)
       .ToArrayAsync(cancellationToken);
+    foreach (UserEntity user in users)
+    {
+      user.SetActor(id, actor);
+    }
 
     await _context.SaveChangesAsync(cancellationToken);
   }

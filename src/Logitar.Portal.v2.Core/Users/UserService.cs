@@ -1,5 +1,7 @@
-﻿using Logitar.Portal.v2.Contracts.Users;
+﻿using Logitar.Portal.v2.Contracts;
+using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Core.Users.Commands;
+using Logitar.Portal.v2.Core.Users.Queries;
 
 namespace Logitar.Portal.v2.Core.Users;
 
@@ -35,6 +37,19 @@ internal class UserService : IUserService
   public async Task<User> EnableAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new EnableUser(id), cancellationToken);
+  }
+
+  public async Task<User?> GetAsync(Guid? id, string? realm, string? username,
+      string? externalKey, string? externalValue, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new GetUser(id, realm, username, externalKey, externalValue), cancellationToken);
+  }
+
+  public async Task<PagedList<User>> GetAsync(bool? isConfirmed, bool? isDisabled, string? realm, string? search,
+    UserSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new GetUsers(isConfirmed, isDisabled, realm, search,
+      sort, isDescending, skip, limit), cancellationToken);
   }
 
   public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)

@@ -24,7 +24,13 @@ public class RealmController : Controller
   [HttpGet("{idOrUniqueName}")]
   public async Task<ActionResult> RealmEdit(string idOrUniqueName, CancellationToken cancellationToken = default)
   {
-    Realm? realm = await _realmService.GetAsync(idOrUniqueName, cancellationToken);
+    Guid? id = null;
+    if (Guid.TryParse(idOrUniqueName, out Guid realmId))
+    {
+      id = realmId;
+    }
+
+    Realm? realm = await _realmService.GetAsync(id, idOrUniqueName, cancellationToken);
     if (realm == null)
     {
       return NotFound();

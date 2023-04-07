@@ -9,6 +9,7 @@ public class PortalContext : DbContext
   {
   }
 
+  internal DbSet<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = null!;
   internal DbSet<RealmEntity> Realms { get; private set; } = null!;
   internal DbSet<UserEntity> Users { get; private set; } = null!;
 

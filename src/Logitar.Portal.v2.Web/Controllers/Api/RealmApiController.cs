@@ -41,7 +41,13 @@ public class RealmApiController : ControllerBase
   [HttpGet("{idOrUniqueName}")]
   public async Task<ActionResult<Realm>> GetAsync(string idOrUniqueName, CancellationToken cancellationToken)
   {
-    Realm? realm = await _realmService.GetAsync(idOrUniqueName, cancellationToken);
+    Guid? id = null;
+    if (Guid.TryParse(idOrUniqueName, out Guid realmId))
+    {
+      id = realmId;
+    }
+
+    Realm? realm = await _realmService.GetAsync(id, idOrUniqueName, cancellationToken);
     if (realm == null)
     {
       return NotFound();
