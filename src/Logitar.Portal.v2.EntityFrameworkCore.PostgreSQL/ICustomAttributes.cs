@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Profiles;
+﻿namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
 
 internal interface ICustomAttributes
 {

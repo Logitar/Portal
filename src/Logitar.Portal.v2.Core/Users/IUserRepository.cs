@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.v2.Core.Users;
 
-internal interface IUserRepository
+public interface IUserRepository
 {
   Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<UserAggregate?> LoadAsync(RealmAggregate? realm, string username, CancellationToken cancellationToken = default);

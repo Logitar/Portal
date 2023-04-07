@@ -8,13 +8,18 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Profiles;
 
 internal static class MappingHelper
 {
-  public static Actor GetActor(Guid id, string json)
+  public static Actor? GetActor(Guid? id, string? json)
   {
+    if (!id.HasValue || json == null)
+    {
+      return null;
+    }
+
     ActorEntity entity = ActorEntity.Deserialize(json);
 
     return new Actor
     {
-      Id = id,
+      Id = id.Value,
       Type = entity.Type,
       IsDeleted = entity.IsDeleted,
       DisplayName = entity.DisplayName,

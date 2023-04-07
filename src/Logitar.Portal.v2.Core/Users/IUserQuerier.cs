@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.v2.Core.Users;
 
-internal interface IUserQuerier
+public interface IUserQuerier
 {
   Task<User> GetAsync(UserAggregate user, CancellationToken cancellationToken = default);
 }

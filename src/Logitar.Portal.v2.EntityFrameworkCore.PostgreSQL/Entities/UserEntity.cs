@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
 
-internal class UserEntity : AggregateEntity
+internal class UserEntity : AggregateEntity, ICustomAttributes
 {
   public UserEntity(UserCreated e, RealmEntity? realm, ActorEntity actor) : base(e, actor)
   {

@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.v2.Core.Realms.Events;
-using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Profiles;
 using System.Text.Json;
 
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
