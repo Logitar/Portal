@@ -44,4 +44,19 @@ public record User : Aggregate
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public Realm? Realm { get; set; }
+
+  /*
+   * CreatedAt --> CreatedOn
+   * UpdatedAt --> UpdatedOn
+   * DisabledAt --> DisabledOn
+   * PasswordChangedAt --> PasswordChangedOn
+   * SignedInAt --> SignedInOn
+   * Email --> Email.Address
+   * EmailConfirmedAt --> Email.VerifiedOn
+   * IsEmailConfirmed --> Email.IsVerified
+   * PhoneNumber --> Phone.Number
+   * PhoneNumberConfirmedAt --> Phone.VerifiedOn
+   * IsPhoneNumberConfirmed --> Phone.IsVerified
+   * IsAccountConfirmed --> IsConfirmed
+   */
 }
