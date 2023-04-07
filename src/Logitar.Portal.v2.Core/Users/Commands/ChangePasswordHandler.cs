@@ -28,7 +28,7 @@ internal class ChangePasswordHandler : IRequestHandler<ChangePassword, User>
       ?? throw new AggregateNotFoundException<UserAggregate>(request.Id);
     if (user.RealmId == null)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new NotImplementedException(); // TODO(fpion): Portal users
     }
 
     RealmAggregate realm = await _realmRepository.LoadAsync(user, cancellationToken);

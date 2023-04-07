@@ -33,7 +33,7 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
         ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm)));
     if (realm == null)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new NotImplementedException(); // TODO(fpion): Portal users
     }
 
     string username = input.Username.Trim();
