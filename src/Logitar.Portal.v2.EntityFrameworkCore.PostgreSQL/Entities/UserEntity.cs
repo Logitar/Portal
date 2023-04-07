@@ -13,23 +13,7 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
 
     Username = e.Username;
 
-    FirstName = e.FirstName;
-    MiddleName = e.MiddleName;
-    LastName = e.LastName;
-    FullName = e.FullName;
-    Nickname = e.Nickname;
-
-    Birthdate = e.Birthdate;
-    Gender = e.Gender?.Value;
-
-    Locale = e.Locale?.ToString();
-    TimeZone = e.TimeZone?.Id;
-
-    Picture = e.Picture?.ToString();
-    Profile = e.Profile?.ToString();
-    Website = e.Website?.ToString();
-
-    CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;
+    Apply(e);
   }
 
   private UserEntity() : base()
@@ -128,6 +112,8 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
 
   public void SetDisabled(DisabledChanged e, ActorEntity actor)
   {
+    SetVersion(e);
+
     if (e.IsDisabled)
     {
       DisabledById = e.ActorId.ToGuid();
@@ -250,5 +236,33 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
     {
       PhoneVerifiedBy = actor.Serialize();
     }
+  }
+
+  public void Update(UserUpdated e, ActorEntity actor)
+  {
+    base.Update(e, actor);
+
+    Apply(e);
+  }
+
+  private void Apply(UserSaved e)
+  {
+    FirstName = e.FirstName;
+    MiddleName = e.MiddleName;
+    LastName = e.LastName;
+    FullName = e.FullName;
+    Nickname = e.Nickname;
+
+    Birthdate = e.Birthdate;
+    Gender = e.Gender?.Value;
+
+    Locale = e.Locale?.ToString();
+    TimeZone = e.TimeZone?.Id;
+
+    Picture = e.Picture?.ToString();
+    Profile = e.Profile?.ToString();
+    Website = e.Website?.ToString();
+
+    CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;
   }
 }

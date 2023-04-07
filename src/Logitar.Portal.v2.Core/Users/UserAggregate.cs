@@ -84,24 +84,7 @@ public class UserAggregate : AggregateRoot
 
     Username = e.Username;
 
-    FirstName = e.FirstName;
-    MiddleName = e.MiddleName;
-    LastName = e.LastName;
-    FullName = e.FullName;
-    Nickname = e.Nickname;
-
-    Birthdate = e.Birthdate;
-    Gender = e.Gender;
-
-    Locale = e.Locale;
-    TimeZone = e.TimeZone;
-
-    Picture = e.Picture;
-    Profile = e.Profile;
-    Website = e.Website;
-
-    _customAttributes.Clear();
-    _customAttributes.AddRange(e.CustomAttributes);
+    Apply((UserSaved)e);
   }
 
   public void ChangePassword(AggregateId actorId, RealmAggregate realm, string password, string? current = null)
@@ -201,6 +184,55 @@ public class UserAggregate : AggregateRoot
     ApplyChange(e);
   }
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
+
+  public void Update(AggregateId actorId, string? firstName, string? middleName, string? lastName,
+    string? nickname, DateTime? birthdate, Gender? gender, CultureInfo? locale, TimeZoneEntry? timeZone,
+    Uri? picture, Uri? profile, Uri? website, Dictionary<string, string>? customAttributes)
+  {
+    UserUpdated e = new()
+    {
+      ActorId = actorId,
+      FirstName = firstName?.CleanTrim(),
+      MiddleName = middleName?.CleanTrim(),
+      LastName = lastName?.CleanTrim(),
+      FullName = GetFullName(firstName, middleName, lastName),
+      Nickname = nickname?.CleanTrim(),
+      Birthdate = birthdate,
+      Gender = gender,
+      Locale = locale,
+      TimeZone = timeZone,
+      Picture = picture,
+      Profile = profile,
+      Website = website,
+      CustomAttributes = customAttributes?.CleanTrim() ?? new()
+    };
+    new UserUpdatedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
+  }
+  protected virtual void Apply(UserUpdated e) => Apply((UserSaved)e);
+
+  private void Apply(UserSaved e)
+  {
+    FirstName = e.FirstName;
+    MiddleName = e.MiddleName;
+    LastName = e.LastName;
+    FullName = e.FullName;
+    Nickname = e.Nickname;
+
+    Birthdate = e.Birthdate;
+    Gender = e.Gender;
+
+    Locale = e.Locale;
+    TimeZone = e.TimeZone;
+
+    Picture = e.Picture;
+    Profile = e.Profile;
+    Website = e.Website;
+
+    _customAttributes.Clear();
+    _customAttributes.AddRange(e.CustomAttributes);
+  }
 
   public override string ToString() => $"{FullName ?? Username} | {base.ToString()}";
 

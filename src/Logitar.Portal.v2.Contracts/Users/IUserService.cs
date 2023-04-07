@@ -13,7 +13,7 @@ public interface IUserService
   //  int? index = null, int? count = null,
   //  CancellationToken cancellationToken = default);
   // SetExternalIdentifier
-  //Task<UserModel> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken = default);
+  Task<User> UpdateAsync(Guid id, UpdateUserInput input, CancellationToken cancellationToken = default);
   Task<User> VerifyAddressAsync(Guid id, CancellationToken cancellationToken = default);
   Task<User> VerifyEmailAsync(Guid id, CancellationToken cancellationToken = default);
   Task<User> VerifyPhoneAsync(Guid id, CancellationToken cancellationToken = default);
