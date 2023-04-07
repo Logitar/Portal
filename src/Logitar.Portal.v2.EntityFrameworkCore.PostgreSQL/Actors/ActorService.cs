@@ -12,7 +12,6 @@ internal class ActorService : IActorService
   {
     _context = context;
   }
-
   public async Task<ActorEntity> GetAsync(DomainEvent e, CancellationToken cancellationToken)
   {
     Guid id = e.ActorId.ToGuid();
@@ -32,6 +31,10 @@ internal class ActorService : IActorService
     throw new InvalidOperationException($"The actor '{id}' could not be found.");
   }
 
+  public async Task DeleteAsync(UserEntity user, CancellationToken cancellationToken = default)
+  {
+    await SetActorAsync(user.AggregateId, ActorEntity.From(user, isDeleted: true), cancellationToken);
+  }
   public async Task UpdateAsync(UserEntity user, CancellationToken cancellationToken)
   {
     await SetActorAsync(user.AggregateId, ActorEntity.From(user), cancellationToken);
