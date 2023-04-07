@@ -127,13 +127,16 @@ public class UserAggregate : AggregateRoot
       || address?.Locality != Address?.Locality || address?.PostalCode != Address?.PostalCode
       || address?.Country != Address?.Country || address?.Region != Address?.Region;
 
-    ApplyChange(new AddressChanged
+    AddressChanged e = new()
     {
       ActorId = actorId,
       Address = address,
       VerificationAction = address?.IsVerified == true ? VerificationAction.Verify
         : (isModified ? VerificationAction.Unverify : null)
-    });
+    };
+    new AddressChangedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
   }
   protected virtual void Apply(AddressChanged e) => Address = e.Address;
 
@@ -141,13 +144,16 @@ public class UserAggregate : AggregateRoot
   {
     bool isModified = email?.Address != Email?.Address;
 
-    ApplyChange(new EmailChanged
+    EmailChanged e = new()
     {
       ActorId = actorId,
       Email = email,
       VerificationAction = email?.IsVerified == true ? VerificationAction.Verify
         : (isModified ? VerificationAction.Unverify : null)
-    });
+    };
+    new EmailChangedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
   }
   protected virtual void Apply(EmailChanged e) => Email = e.Email;
 
@@ -156,13 +162,16 @@ public class UserAggregate : AggregateRoot
     bool isModified = phone?.CountryCode != Phone?.CountryCode
       || phone?.Number != Phone?.Number || phone?.Extension != Phone?.Extension;
 
-    ApplyChange(new PhoneChanged
+    PhoneChanged e = new()
     {
       ActorId = actorId,
       Phone = phone,
       VerificationAction = phone?.IsVerified == true ? VerificationAction.Verify
         : (isModified ? VerificationAction.Unverify : null)
-    });
+    };
+    new PhoneChangedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
   }
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
 

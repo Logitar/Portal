@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Portal.v2.Core.Realms;
+using Logitar.Portal.v2.Core.Users.Contact;
 using System.Globalization;
 
 namespace Logitar.Portal.v2.Core;
@@ -13,6 +14,14 @@ internal static class FluentValidationExtensions
   }
   private static bool BeAValidAlias(string? alias) => alias == null
     || alias.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
+
+  public static IRuleBuilder<T, string?> Country<T>(this IRuleBuilder<T, string?> ruleBuilder)
+  {
+    return ruleBuilder.Must(BeAValidCountry).WithErrorCode("CountryValidator")
+      .WithMessage(x => $"'{{PropertyName}}' must be one of the following: {string.Join(", ", PostalAddressHelper.SupportedCountries)}");
+  }
+  private static bool BeAValidCountry(string? country) => country == null
+    || PostalAddressHelper.GetCountry(country) != null;
 
   public static IRuleBuilder<T, string?> Identifier<T>(this IRuleBuilder<T, string?> ruleBuilder)
   {
@@ -44,6 +53,12 @@ internal static class FluentValidationExtensions
       .WithMessage("'{PropertyName}' must be in the past.");
   }
   private static bool BeInThePast(DateTime? value, DateTime moment) => value == null || value < moment;
+
+  public static IRuleBuilder<T, IPhoneNumber?> PhoneNumber<T>(this IRuleBuilder<T, IPhoneNumber> ruleBuilder)
+  {
+    return ruleBuilder.Must(p => p.IsValid()).WithErrorCode("PhoneNumberValidator")
+      .WithMessage("The phone number is not valid.");
+  }
 
   public static IRuleBuilder<T, string?> Username<T>(this IRuleBuilder<T, string?> ruleBuilder, IUsernameSettings usernameSettings)
   {
