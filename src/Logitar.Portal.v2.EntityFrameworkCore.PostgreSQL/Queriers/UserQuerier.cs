@@ -22,6 +22,7 @@ internal class UserQuerier : IUserQuerier
   public async Task<User> GetAsync(UserAggregate user, CancellationToken cancellationToken)
   {
     UserEntity? entity = await _users.AsNoTracking()
+      .Include(x => x.ExternalIdentifiers)
       .Include(x => x.Realm)
       .SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value, cancellationToken);
 

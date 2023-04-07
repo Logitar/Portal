@@ -15,6 +15,8 @@ internal class ExternalIdentifierEntity
       throw new ArgumentException($"The {nameof(user.Realm)} is required.", nameof(user));
     }
 
+    Id = Guid.NewGuid();
+
     Realm = user.Realm;
     RealmId = user.Realm?.RealmId;
 
@@ -32,6 +34,9 @@ internal class ExternalIdentifierEntity
   private ExternalIdentifierEntity()
   {
   }
+
+  public int ExternalIdentifierId { get; private set; }
+  public Guid Id { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
   public int? RealmId { get; private set; }

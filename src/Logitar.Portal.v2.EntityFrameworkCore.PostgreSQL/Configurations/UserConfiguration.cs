@@ -36,7 +36,7 @@ internal class UserConfiguration : AggregateConfiguration<UserEntity>, IEntityTy
     builder.Property(x => x.Username).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.UsernameNormalized).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PasswordChangedBy).HasColumnType("jsonb");
-    builder.Property(x => x.Password).HasMaxLength(ushort.MaxValue);
+    builder.Property(x => x.Password).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.DisabledBy).HasColumnType("jsonb");
     builder.Property(x => x.AddressLine1).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.AddressLine2).HasMaxLength(byte.MaxValue);
@@ -51,7 +51,7 @@ internal class UserConfiguration : AggregateConfiguration<UserEntity>, IEntityTy
     builder.Property(x => x.PhoneCountryCode).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PhoneNumber).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PhoneExtension).HasMaxLength(byte.MaxValue);
-    builder.Property(x => x.PhoneE164Formatted).HasMaxLength(ushort.MaxValue);
+    builder.Property(x => x.PhoneE164Formatted).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PhoneVerifiedBy).HasColumnType("jsonb");
     builder.Property(x => x.FirstName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.MiddleName).HasMaxLength(byte.MaxValue);

@@ -8,6 +8,9 @@ internal class ExternalIdentifierConfiguration : IEntityTypeConfiguration<Extern
 {
   public void Configure(EntityTypeBuilder<ExternalIdentifierEntity> builder)
   {
+    builder.HasKey(x => x.ExternalIdentifierId);
+
+    builder.HasIndex(x => x.Id).IsUnique();
     builder.HasIndex(x => x.CreatedById);
     builder.HasIndex(x => x.UpdatedById);
     builder.HasIndex(x => new { x.RealmId, x.Key, x.ValueNormalized }).IsUnique();
