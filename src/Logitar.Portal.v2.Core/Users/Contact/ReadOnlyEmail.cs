@@ -4,10 +4,15 @@ namespace Logitar.Portal.v2.Core.Users.Contact;
 
 public record ReadOnlyEmail : ReadOnlyContact
 {
-  public ReadOnlyEmail(EmailInput input) : base(input.Verify)
+  public ReadOnlyEmail(EmailInput input) : this(input.Address, input.Verify)
   {
-    Address = input.Address.Trim();
+  }
+  public ReadOnlyEmail(string address, bool isVerified = false) : base(isVerified)
+  {
+    Address = address.Trim();
   }
 
   public string Address { get; }
+
+  public ReadOnlyEmail AsVerified() => new(Address, isVerified: true);
 }

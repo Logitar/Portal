@@ -121,6 +121,8 @@ public class UserAggregate : AggregateRoot
   }
   protected virtual void Apply(PasswordChanged e) => _password = e.Password;
 
+  public void Delete(AggregateId actorId) => ApplyChange(new UserDeleted { ActorId = actorId });
+
   public void SetAddress(AggregateId actorId, ReadOnlyAddress? address)
   {
     bool isModified = address?.Line1 != Address?.Line1 || address?.Line2 != Address?.Line2

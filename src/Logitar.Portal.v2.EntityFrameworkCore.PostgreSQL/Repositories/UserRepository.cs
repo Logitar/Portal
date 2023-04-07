@@ -20,6 +20,19 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
       return await LoadAsync<UserAggregate>(new AggregateId(id), cancellationToken);
     }
 
+    public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+    {
+      string? aggregateId = realm?.Id.Value;
+
+      IQueryable<EventEntity> query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId}");
+
+      EventEntity[] events = await query.AsNoTracking()
+        .OrderBy(x => x.Version)
+        .ToArrayAsync(cancellationToken);
+
+      return Load<UserAggregate>(events);
+    }
+
     public async Task<UserAggregate?> LoadAsync(RealmAggregate? realm, string username, CancellationToken cancellationToken)
     {
       string? aggregateId = realm?.Id.Value;
@@ -38,6 +51,11 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
     public async Task SaveAsync(UserAggregate user, CancellationToken cancellationToken)
     {
       await base.SaveAsync(user, cancellationToken);
+    }
+
+    public async Task SaveAsync(IEnumerable<UserAggregate> users, CancellationToken cancellationToken)
+    {
+      await base.SaveAsync(users, cancellationToken);
     }
   }
 }

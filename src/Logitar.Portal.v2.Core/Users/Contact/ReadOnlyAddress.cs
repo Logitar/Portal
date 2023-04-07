@@ -6,14 +6,19 @@ namespace Logitar.Portal.v2.Core.Users.Contact;
 
 public record ReadOnlyAddress : ReadOnlyContact
 {
-  public ReadOnlyAddress(AddressInput input) : base(input.Verify)
+  public ReadOnlyAddress(AddressInput input) : this(input.Line1, input.Locality, input.Country,
+    input.Line2, input.PostalCode, input.Region, input.Verify)
   {
-    Line1 = input.Line1.Trim();
-    Line2 = input.Line2?.CleanTrim();
-    Locality = input.Locality.Trim();
-    PostalCode = input.PostalCode?.CleanTrim();
-    Country = input.Country.Trim();
-    Region = input.Region?.CleanTrim();
+  }
+  public ReadOnlyAddress(string line1, string locality, string country, string? line2 = null,
+    string? postalCode = null, string? region = null, bool isVerified = false) : base(isVerified)
+  {
+    Line1 = line1.Trim();
+    Line2 = line2?.CleanTrim();
+    Locality = locality.Trim();
+    PostalCode = postalCode?.CleanTrim();
+    Country = country.Trim();
+    Region = region?.CleanTrim();
     Formatted = Format();
   }
 
@@ -24,6 +29,8 @@ public record ReadOnlyAddress : ReadOnlyContact
   public string Country { get; }
   public string? Region { get; }
   public string Formatted { get; }
+
+  public ReadOnlyAddress AsVerified() => new(Line1, Locality, Country, Line2, PostalCode, Region, isVerified: true);
 
   private string Format()
   {
