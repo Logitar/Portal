@@ -27,6 +27,16 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new DeleteUser(id), cancellationToken);
   }
 
+  public async Task<User> DisableAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new DisableUser(id), cancellationToken);
+  }
+
+  public async Task<User> EnableAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new EnableUser(id), cancellationToken);
+  }
+
   public async Task<User> VerifyAddressAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new VerifyAddress(id), cancellationToken);

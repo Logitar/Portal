@@ -126,6 +126,24 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
     Password = e.Password.ToString();
   }
 
+  public void SetDisabled(DisabledChanged e, ActorEntity actor)
+  {
+    if (e.IsDisabled)
+    {
+      DisabledById = e.ActorId.ToGuid();
+      DisabledBy = actor.Serialize();
+      DisabledOn = e.OccurredOn;
+      IsDisabled = true;
+    }
+    else
+    {
+      DisabledById = null;
+      DisabledBy = null;
+      DisabledOn = null;
+      IsDisabled = false;
+    }
+  }
+
   public void SetAddress(AddressChanged e, ActorEntity actor)
   {
     Update(e, actor);

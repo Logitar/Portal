@@ -122,6 +122,31 @@ public class UserAggregate : AggregateRoot
   protected virtual void Apply(PasswordChanged e) => _password = e.Password;
 
   public void Delete(AggregateId actorId) => ApplyChange(new UserDeleted { ActorId = actorId });
+  protected virtual void Apply(UserDeleted _) { }
+
+  public void Disable(AggregateId actorId)
+  {
+    if (!IsDisabled)
+    {
+      ApplyChange(new DisabledChanged
+      {
+        ActorId = actorId,
+        IsDisabled = true
+      });
+    }
+  }
+  public void Enable(AggregateId actorId)
+  {
+    if (IsDisabled)
+    {
+      ApplyChange(new DisabledChanged
+      {
+        ActorId = actorId,
+        IsDisabled = false
+      });
+    }
+  }
+  protected virtual void Apply(DisabledChanged e) => IsDisabled = e.IsDisabled;
 
   public void SetAddress(AggregateId actorId, ReadOnlyAddress? address)
   {

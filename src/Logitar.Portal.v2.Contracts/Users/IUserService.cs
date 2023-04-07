@@ -5,8 +5,8 @@ public interface IUserService
   Task<User> ChangePasswordAsync(Guid id, ChangePasswordInput input, CancellationToken cancellationToken = default);
   Task<User> CreateAsync(CreateUserInput input, CancellationToken cancellationToken = default);
   Task<User> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-  //Task<UserModel> DisableAsync(Guid id, CancellationToken cancellationToken = default);
-  //Task<UserModel> EnableAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User> DisableAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User> EnableAsync(Guid id, CancellationToken cancellationToken = default);
   //Task<UserModel> GetAsync(Guid id, CancellationToken cancellationToken = default);
   //Task<ListModel<UserSummary>> GetAsync(bool? isConfirmed = null, bool? isDisabled = null, string? realm = null, string? search = null,
   //  UserSort? sort = null, bool desc = false,
