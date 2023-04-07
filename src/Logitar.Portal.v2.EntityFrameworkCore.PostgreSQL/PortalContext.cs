@@ -10,6 +10,7 @@ public class PortalContext : DbContext
   }
 
   internal DbSet<RealmEntity> Realms { get; private set; } = null!;
+  internal DbSet<UserEntity> Users { get; private set; } = null!;
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

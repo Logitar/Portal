@@ -24,5 +24,13 @@ internal record ActorEntity
   public static ActorEntity Deserialize(string json) => JsonSerializer.Deserialize<ActorEntity>(json, _options)
     ?? throw new InvalidOperationException($"The actor deserialization failed: '{json}'.");
 
+  public static ActorEntity From(UserEntity user) => new()
+  {
+    Type = ActorType.User,
+    DisplayName = user.FullName ?? user.Username,
+    EmailAddress = user.EmailAddress,
+    Picture = user.Picture
+  };
+
   public string Serialize() => JsonSerializer.Serialize(this, _options);
 }

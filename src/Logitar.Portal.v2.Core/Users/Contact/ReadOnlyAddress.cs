@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.v2.Contracts.Users.Contact;
+using System.Text;
 
 namespace Logitar.Portal.v2.Core.Users.Contact;
 
@@ -13,6 +14,7 @@ public record ReadOnlyAddress : ReadOnlyContact
     PostalCode = input.PostalCode?.CleanTrim();
     Country = input.Country.Trim();
     Region = input.Region?.CleanTrim();
+    Formatted = Format();
   }
 
   public string Line1 { get; }
@@ -21,4 +23,32 @@ public record ReadOnlyAddress : ReadOnlyContact
   public string? PostalCode { get; }
   public string Country { get; }
   public string? Region { get; }
+  public string Formatted { get; }
+
+  private string Format()
+  {
+    StringBuilder formatted = new();
+
+    formatted.AppendLine(Line1);
+
+    if (Line2 != null)
+    {
+      formatted.AppendLine(Line2);
+    }
+
+    formatted.Append(Locality);
+    if (Region != null)
+    {
+      formatted.Append(' ').Append(Region);
+    }
+    if (PostalCode != null)
+    {
+      formatted.Append(' ').Append(PostalCode);
+    }
+    formatted.AppendLine();
+
+    formatted.Append(Country);
+
+    return formatted.ToString();
+  }
 }

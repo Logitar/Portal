@@ -1,10 +1,18 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Actors;
 
 internal class ActorService : IActorService
 {
+  private readonly PortalContext _context;
+
+  public ActorService(PortalContext context)
+  {
+    _context = context;
+  }
+
   public async Task<ActorEntity> GetAsync(DomainEvent e, CancellationToken cancellationToken)
   {
     Guid id = e.ActorId.ToGuid();
@@ -14,6 +22,37 @@ internal class ActorService : IActorService
       return ActorEntity.System;
     }
 
-    throw new NotImplementedException(); // TODO(fpion): user actors
+    UserEntity? user = await _context.Users
+      .SingleOrDefaultAsync(x => x.AggregateId == e.ActorId.Value, cancellationToken);
+    if (user != null)
+    {
+      return ActorEntity.From(user);
+    }
+
+    throw new InvalidOperationException($"The actor '{id}' could not be found.");
+  }
+
+  public async Task UpdateAsync(UserEntity user, CancellationToken cancellationToken)
+  {
+    await SetActorAsync(user.AggregateId, ActorEntity.From(user), cancellationToken);
+  }
+
+  private async Task SetActorAsync(string aggregateId, ActorEntity actor, CancellationToken cancellationToken)
+  {
+    Guid id = new AggregateId(aggregateId).ToGuid();
+
+    RealmEntity[] realms = await _context.Realms.Where(x => x.CreatedById == id || x.UpdatedById == id)
+      .ToArrayAsync(cancellationToken);
+    foreach (RealmEntity realm in realms)
+    {
+      realm.SetActor(id, actor);
+    }
+
+    UserEntity[] users = await _context.Users.Where(x => x.CreatedById == id || x.UpdatedById == id
+        || x.PasswordChangedById == id || x.DisabledById == id
+        || x.AddressVerifiedById == id || x.EmailVerifiedById == id || x.PhoneVerifiedById == id)
+      .ToArrayAsync(cancellationToken);
+
+    await _context.SaveChangesAsync(cancellationToken);
   }
 }

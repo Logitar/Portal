@@ -3,7 +3,7 @@ using Logitar.Portal.v2.Contracts.Users.Contact;
 
 namespace Logitar.Portal.v2.Core.Users.Contact;
 
-public record ReadOnlyPhone : ReadOnlyContact
+public record ReadOnlyPhone : ReadOnlyContact, IPhoneNumber
 {
   public ReadOnlyPhone(PhoneInput input) : base(input.Verify)
   {
