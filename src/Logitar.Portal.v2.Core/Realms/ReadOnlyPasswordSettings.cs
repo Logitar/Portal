@@ -2,19 +2,19 @@
 
 namespace Logitar.Portal.v2.Core.Realms;
 
-public record ReadOnlyPasswordSettings
+public record ReadOnlyPasswordSettings : IPasswordSettings
 {
-  public ReadOnlyPasswordSettings()
+  public ReadOnlyPasswordSettings(PasswordSettings? passwordSettings = null)
   {
-  }
-  public ReadOnlyPasswordSettings(PasswordSettings passwordSettings)
-  {
-    RequiredLength = passwordSettings.RequiredLength;
-    RequiredUniqueChars = passwordSettings.RequiredUniqueChars;
-    RequireNonAlphanumeric = passwordSettings.RequireNonAlphanumeric;
-    RequireLowercase = passwordSettings.RequireLowercase;
-    RequireUppercase = passwordSettings.RequireUppercase;
-    RequireDigit = passwordSettings.RequireDigit;
+    if (passwordSettings != null)
+    {
+      RequiredLength = passwordSettings.RequiredLength;
+      RequiredUniqueChars = passwordSettings.RequiredUniqueChars;
+      RequireNonAlphanumeric = passwordSettings.RequireNonAlphanumeric;
+      RequireLowercase = passwordSettings.RequireLowercase;
+      RequireUppercase = passwordSettings.RequireUppercase;
+      RequireDigit = passwordSettings.RequireDigit;
+    }
   }
 
   public int RequiredLength { get; init; } = 6;

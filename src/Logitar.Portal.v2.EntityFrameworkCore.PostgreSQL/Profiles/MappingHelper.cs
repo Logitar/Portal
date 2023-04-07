@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.v2.Contracts;
 using Logitar.Portal.v2.Contracts.Actors;
-using Logitar.Portal.v2.Contracts.Realms;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
 using System.Text.Json;
 

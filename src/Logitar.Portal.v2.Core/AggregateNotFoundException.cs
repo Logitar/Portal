@@ -5,15 +5,21 @@ namespace Logitar.Portal.v2.Core;
 
 public class AggregateNotFoundException : Exception
 {
-  public AggregateNotFoundException(Type type, string id) : base(GetMessage(type, id))
+  public AggregateNotFoundException(Type type, string id, string? paramName) : base(GetMessage(type, id, paramName))
   {
     Data["Type"] = type.GetName();
     Data[nameof(Id)] = id;
+
+    if (paramName != null)
+    {
+      Data[nameof(ParamName)] = paramName;
+    }
   }
 
   public string Id => (string)Data[nameof(Id)]!;
+  public string? ParamName => (string?)Data[nameof(ParamName)];
 
-  private static string GetMessage(Type type, string id)
+  private static string GetMessage(Type type, string id, string? paramName)
   {
     StringBuilder message = new();
 
@@ -21,13 +27,21 @@ public class AggregateNotFoundException : Exception
     message.Append("Type: ").Append(type.GetName()).AppendLine();
     message.Append("Id: ").Append(id).AppendLine();
 
+    if (paramName != null)
+    {
+      message.Append("ParamName: ").Append(paramName).AppendLine();
+    }
+
     return message.ToString();
   }
 }
 
 public class AggregateNotFoundException<T> : AggregateNotFoundException
 {
-  public AggregateNotFoundException(Guid id) : base(typeof(T), id.ToString())
+  public AggregateNotFoundException(Guid id, string? paramName = null) : this(id.ToString(), paramName)
+  {
+  }
+  public AggregateNotFoundException(string id, string? paramName = null) : base(typeof(T), id, paramName)
   {
   }
 }

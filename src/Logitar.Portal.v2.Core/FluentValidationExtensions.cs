@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Portal.v2.Core.Realms;
 using System.Globalization;
 
 namespace Logitar.Portal.v2.Core;
@@ -35,4 +36,21 @@ internal static class FluentValidationExtensions
       .WithMessage("'{PropertyName}' must be null or a non-empty string.");
   }
   private static bool BeNullOrNotEmpty(string? s) => s == null || !string.IsNullOrWhiteSpace(s);
+
+  public static IRuleBuilder<T, DateTime?> Past<T>(this IRuleBuilder<T, DateTime?> ruleBuilder, DateTime? moment = null)
+  {
+    return ruleBuilder.Must(value => BeInThePast(value, moment ?? DateTime.UtcNow))
+      .WithErrorCode("PastValidator")
+      .WithMessage("'{PropertyName}' must be in the past.");
+  }
+  private static bool BeInThePast(DateTime? value, DateTime moment) => value == null || value < moment;
+
+  public static IRuleBuilder<T, string?> Username<T>(this IRuleBuilder<T, string?> ruleBuilder, IUsernameSettings usernameSettings)
+  {
+    return ruleBuilder.Must(u => BeAValidUsername(u, usernameSettings))
+      .WithErrorCode("UsernameValidator")
+      .WithMessage($"'{{PropertyName}}' may only contain the following characters: {usernameSettings.AllowedCharacters}");
+  }
+  private static bool BeAValidUsername(string? username, IUsernameSettings usernameSettings)
+    => username == null || usernameSettings.AllowedCharacters == null || username.All(usernameSettings.AllowedCharacters.Contains);
 }

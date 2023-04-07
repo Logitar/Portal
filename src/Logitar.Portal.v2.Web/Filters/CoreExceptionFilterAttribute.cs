@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core;
+using Logitar.Portal.v2.Core.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -10,7 +11,9 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {
+    [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
+    [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
     [typeof(UniqueNameAlreadyUsedException)] = HandleUniqueNameAlreadyUsedException,
     [typeof(ValidationException)] = HandleValidationException
@@ -25,14 +28,37 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     }
     else if (context.Exception is AggregateNotFoundException exception)
     {
-      context.Result = new NotFoundObjectResult(new { Code = GetCode(exception), exception.Id });
-      context.ExceptionHandled = true;
+      Dictionary<string, string> value = new()
+      {
+        ["Code"] = GetCode(exception),
+        ["Id"] = exception.Id
+      };
+
+      if (exception.ParamName != null)
+      {
+        value["PropertyName"] = exception.ParamName;
+      }
+
+      context.Result = new NotFoundObjectResult(value);
     }
+  }
+
+  private static void HandleInvalidCredentialsException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleInvalidLocaleException(ExceptionContext context)
   {
     if (context.Exception is InvalidLocaleException exception)
+    {
+      context.Result = new BadRequestObjectResult(GetPropertyFailure(exception));
+    }
+  }
+
+  private static void HandleInvalidTimeZoneEntryException(ExceptionContext context)
+  {
+    if (context.Exception is InvalidTimeZoneEntryException exception)
     {
       context.Result = new BadRequestObjectResult(GetPropertyFailure(exception));
     }

@@ -3,15 +3,15 @@ using Logitar.Portal.v2.Contracts.Realms;
 
 namespace Logitar.Portal.v2.Core.Realms;
 
-public record ReadOnlyUsernameSettings
+public record ReadOnlyUsernameSettings : IUsernameSettings
 {
-  public ReadOnlyUsernameSettings()
+  public ReadOnlyUsernameSettings(UsernameSettings? usernameSettings = null)
   {
-  }
-  public ReadOnlyUsernameSettings(UsernameSettings usernameSettings)
-  {
-    AllowedCharacters = usernameSettings.AllowedCharacters?.CleanTrim();
+    if (usernameSettings != null)
+    {
+      AllowedCharacters = usernameSettings.AllowedCharacters?.CleanTrim();
+    }
   }
 
-  public string? AllowedCharacters { get; init; } = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+  public string? AllowedCharacters { get; } = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 }
