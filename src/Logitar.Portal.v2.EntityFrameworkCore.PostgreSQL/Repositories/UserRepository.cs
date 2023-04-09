@@ -3,6 +3,7 @@ using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Users;
+using Logitar.Portal.v2.Core.Users.Contact;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
@@ -43,6 +44,18 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
         .ToArrayAsync(cancellationToken);
 
       return Load<UserAggregate>(events).SingleOrDefault();
+    }
+
+    public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, ReadOnlyEmail email, CancellationToken cancellationToken)
+    {
+      string? aggregateId = realm?.Id.Value;
+
+      EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND u.""EmailAddressNormalized"" = {email.Address.ToUpper()}")
+        .AsNoTracking()
+        .OrderBy(x => x.Version)
+        .ToArrayAsync(cancellationToken);
+
+      return Load<UserAggregate>(events);
     }
 
     public async Task<UserAggregate?> LoadAsync(RealmAggregate realm, string externalKey, string externalValue, CancellationToken cancellationToken)

@@ -11,6 +11,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {
+    [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
@@ -42,6 +43,14 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
       }
 
       context.Result = new NotFoundObjectResult(value);
+    }
+  }
+
+  private static void HandleEmailAddressAlreadyUsedException(ExceptionContext context)
+  {
+    if (context.Exception is EmailAddressAlreadyUsedException exception)
+    {
+      context.Result = new ConflictObjectResult(GetPropertyFailure(exception));
     }
   }
 

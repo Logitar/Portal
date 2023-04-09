@@ -32,6 +32,7 @@ internal class UserConfiguration : AggregateConfiguration<UserEntity>, IEntityTy
     builder.HasIndex(x => x.FullName);
     builder.HasIndex(x => x.Nickname);
     builder.HasIndex(x => new { x.RealmId, x.UsernameNormalized }).IsUnique();
+    builder.HasIndex(x => new { x.RealmId, x.EmailAddressNormalized });
 
     builder.Property(x => x.Username).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.UsernameNormalized).HasMaxLength(byte.MaxValue);
@@ -47,6 +48,7 @@ internal class UserConfiguration : AggregateConfiguration<UserEntity>, IEntityTy
     builder.Property(x => x.AddressFormatted).HasMaxLength(ushort.MaxValue);
     builder.Property(x => x.AddressVerifiedBy).HasColumnType("jsonb");
     builder.Property(x => x.EmailAddress).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.EmailAddressNormalized).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.EmailVerifiedBy).HasColumnType("jsonb");
     builder.Property(x => x.PhoneCountryCode).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PhoneNumber).HasMaxLength(byte.MaxValue);

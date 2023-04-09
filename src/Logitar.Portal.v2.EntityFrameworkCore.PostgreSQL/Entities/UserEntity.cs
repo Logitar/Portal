@@ -62,6 +62,11 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
   public bool IsAddressVerified { get; private set; }
 
   public string? EmailAddress { get; private set; }
+  public string? EmailAddressNormalized
+  {
+    get => EmailAddress?.ToUpper();
+    private set { }
+  }
   public Guid? EmailVerifiedById { get; private set; }
   public string? EmailVerifiedBy { get; private set; }
   public DateTime? EmailVerifiedOn { get; private set; }

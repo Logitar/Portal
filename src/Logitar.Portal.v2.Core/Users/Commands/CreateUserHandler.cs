@@ -37,8 +37,17 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
       throw new UniqueNameAlreadyUsedException(username, nameof(input.Username));
     }
 
-    // TODO(fpion): RequireUniqueEmail
+    ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
+    if (realm.RequireUniqueEmail && email != null)
+    {
+      if ((await _userRepository.LoadAsync(realm, email, cancellationToken)).Any())
+      {
+        throw new EmailAddressAlreadyUsedException(email, nameof(input.Email));
+      }
+    }
 
+    ReadOnlyAddress? address = ReadOnlyAddress.From(input.Address);
+    ReadOnlyPhone? phone = ReadOnlyPhone.From(input.Phone);
     Gender? gender = input.Gender?.GetGender();
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     TimeZoneEntry? timeZone = input.TimeZone?.GetTimeZoneEntry(nameof(input.TimeZone));
@@ -55,19 +64,14 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
       user.ChangePassword(_currentActor.Id, realm, input.Password);
     }
 
-    ReadOnlyAddress? address = ReadOnlyAddress.From(input.Address);
     if (address != null)
     {
       user.SetAddress(_currentActor.Id, address);
     }
-
-    ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
     if (email != null)
     {
       user.SetEmail(_currentActor.Id, email);
     }
-
-    ReadOnlyPhone? phone = ReadOnlyPhone.From(input.Phone);
     if (phone != null)
     {
       user.SetPhone(_currentActor.Id, phone);
