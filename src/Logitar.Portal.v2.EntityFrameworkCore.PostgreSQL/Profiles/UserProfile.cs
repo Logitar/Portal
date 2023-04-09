@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.v2.Contracts;
 using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Contracts.Users.Contact;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
@@ -10,6 +11,7 @@ internal class UserProfile : Profile
   public UserProfile()
   {
     CreateMap<UserEntity, User>()
+      .IncludeBase<AggregateEntity, Aggregate>()
       .ForMember(x => x.Id, x => x.MapFrom(MappingHelper.GetId))
       .ForMember(x => x.PasswordChangedBy, x => x.MapFrom(y => MappingHelper.GetActor(y.PasswordChangedById, y.PasswordChangedBy)))
       .ForMember(x => x.DisabledBy, x => x.MapFrom(y => MappingHelper.GetActor(y.DisabledById, y.DisabledBy)))
@@ -17,6 +19,10 @@ internal class UserProfile : Profile
       .ForMember(x => x.Email, x => x.MapFrom(GetEmail))
       .ForMember(x => x.Phone, x => x.MapFrom(GetPhone))
       .ForMember(x => x.CustomAttributes, x => x.MapFrom(MappingHelper.GetCustomAttributes));
+    CreateMap<ExternalIdentifierEntity, ExternalIdentifier>()
+      .ForMember(x => x.CreatedBy, x => x.MapFrom(y => MappingHelper.GetActor(y.CreatedById, y.CreatedBy)))
+      .ForMember(x => x.UpdatedBy, x => x.MapFrom(y => MappingHelper.GetActor(y.UpdatedById ?? y.CreatedById, y.UpdatedBy ?? y.CreatedBy)))
+      .ForMember(x => x.UpdatedOn, x => x.MapFrom(y => y.UpdatedOn ?? y.CreatedOn));
   }
 
   private static Address? GetAddress(UserEntity user, User _)
