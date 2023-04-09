@@ -47,7 +47,7 @@ export default {
   computed: {
     options() {
       return this.orderBy(
-        this.timeZones.map(({ id }) => ({ text: id, value: id })),
+        this.timeZones.map(({ id, displayName }) => ({ text: displayName, value: id })),
         'text'
       )
     }

@@ -9,10 +9,6 @@ namespace Logitar.Portal.v2.Web.Controllers.Api;
 [Route("api/users")]
 public class UserApiController : ControllerBase
 {
-  /*
-  Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken = default);
-   */
-
   private readonly IUserService _userService;
 
   public UserApiController(IUserService userService)
