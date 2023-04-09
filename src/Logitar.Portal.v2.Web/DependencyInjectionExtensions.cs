@@ -6,12 +6,7 @@ namespace Logitar.Portal.v2.Web;
 
 public static class DependencyInjectionExtensions
 {
-  /// <summary>
-  /// TODO(fpion): rename
-  /// </summary>
-  /// <param name="services"></param>
-  /// <returns></returns>
-  public static IServiceCollection AddLogitarPortalv2Web(this IServiceCollection services)
+  public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services)
   {
     services.AddControllersWithViews(options => options.Filters.Add<CoreExceptionFilterAttribute>())
       .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -19,7 +14,7 @@ public static class DependencyInjectionExtensions
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
-    services.AddLogitarPortalV2Core();
+    services.AddLogitarPortalCore();
 
     services.AddSingleton<ICurrentActor, HttpCurrentActor>();
 

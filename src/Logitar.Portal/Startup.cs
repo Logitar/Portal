@@ -20,12 +20,10 @@ public class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddLogitarPortalv2Web();
+    services.AddLogitarPortalWeb();
 
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
-
-    //services.AddGraphQL(_graphQLSettings); // TODO(fpion): GraphQL
 
     if (_enableOpenApi)
     {
@@ -47,11 +45,6 @@ public class Startup : StartupBase
 
   public override void Configure(IApplicationBuilder builder)
   {
-    //if (_graphQLSettings.AreAnyUiEnabled)
-    //{
-    //  builder.UseGraphQLUi(_graphQLSettings);
-    //} // TODO(fpion): GraphQL
-
     if (_enableOpenApi)
     {
       builder.UseOpenApi();
@@ -59,7 +52,6 @@ public class Startup : StartupBase
 
     builder.UseHttpsRedirection();
     builder.UseStaticFiles();
-    //builder.UseCmsGraphQL(); // TODO(fpion): GraphQL
 
     if (builder is WebApplication application)
     {

@@ -9,12 +9,7 @@ namespace Logitar.Portal.v2.Core;
 
 public static class DependencyInjectionExtensions
 {
-  /// <summary>
-  /// TODO(fpion): rename
-  /// </summary>
-  /// <param name="services"></param>
-  /// <returns></returns>
-  public static IServiceCollection AddLogitarPortalV2Core(this IServiceCollection services)
+  public static IServiceCollection AddLogitarPortalCore(this IServiceCollection services)
   {
     Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
