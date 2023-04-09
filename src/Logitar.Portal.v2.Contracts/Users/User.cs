@@ -46,19 +46,4 @@ public record User : Aggregate
   public IEnumerable<ExternalIdentifier> ExternalIdentifiers { get; set; } = Enumerable.Empty<ExternalIdentifier>();
 
   public Realm Realm { get; set; } = new();
-
-  /* TODO(fpion): changes
-   * CreatedAt --> CreatedOn
-   * UpdatedAt --> UpdatedOn
-   * DisabledAt --> DisabledOn
-   * PasswordChangedAt --> PasswordChangedOn
-   * SignedInAt --> SignedInOn
-   * Email --> Email.Address
-   * EmailConfirmedAt --> Email.VerifiedOn
-   * IsEmailConfirmed --> Email.IsVerified
-   * PhoneNumber --> Phone.Number
-   * PhoneNumberConfirmedAt --> Phone.VerifiedOn
-   * IsPhoneNumberConfirmed --> Phone.IsVerified
-   * IsAccountConfirmed --> IsConfirmed
-   */
 }
