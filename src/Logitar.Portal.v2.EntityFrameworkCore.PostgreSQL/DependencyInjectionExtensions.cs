@@ -7,6 +7,7 @@ using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Converters;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Queriers;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -14,13 +15,17 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
 
 public static class DependencyInjectionExtensions
 {
-  /// <summary>
-  /// TODO(fpion): rename
-  /// </summary>
-  /// <param name="services"></param>
-  /// <param name="connectionString"></param>
-  /// <returns></returns>
-  public static IServiceCollection AddLogitarPortalv2EntityFrameworkCorePostgreSQL(this IServiceCollection services, string connectionString)
+  private const string ConnectionStringKey = "POSTGRESQLCONNSTR_PortalContext";
+
+  public static IServiceCollection AddLogitarPortalEntityFrameworkCorePostgreSQLStore(this IServiceCollection services, IConfiguration configuration)
+  {
+    string connectionString = configuration.GetValue<string>(ConnectionStringKey)
+      ?? throw new InvalidOperationException($"The configuration key '{ConnectionStringKey}' could not be found.");
+
+    return services.AddLogitarPortalEntityFrameworkCorePostgreSQLStore(connectionString);
+  }
+
+  public static IServiceCollection AddLogitarPortalEntityFrameworkCorePostgreSQLStore(this IServiceCollection services, string connectionString)
   {
     EventSerializer.Instance.RegisterConverter(new GenderConverter());
     EventSerializer.Instance.RegisterConverter(new Pbkdf2Converter());

@@ -1,61 +1,68 @@
-﻿using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.v2.Web;
+using Logitar.Portal.v2.Web.Extensions;
 
 namespace Logitar.Portal;
 
 public class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
+  private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
+    _enableOpenApi = _configuration.GetValue<bool>("EnableOpenApi");
   }
 
-  /// <summary>
-  /// TODO(fpion): refactor
-  /// </summary>
-  /// <param name="services"></param>
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="DatabaseProviderNotSupportedException"></exception>
   public override void ConfigureServices(IServiceCollection services)
   {
     base.ConfigureServices(services);
 
     services.AddLogitarPortalv2Web();
 
+    services.AddApplicationInsightsTelemetry();
+    IHealthChecksBuilder healthChecks = services.AddHealthChecks();
+
+    //services.AddGraphQL(_graphQLSettings); // TODO(fpion): GraphQL
+
+    if (_enableOpenApi)
+    {
+      services.AddOpenApi();
+    }
+
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider>("DatabaseProvider");
     switch (databaseProvider)
     {
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:
-        string connectionString = _configuration.GetValue<string>("POSTGRESQLCONNSTR_PortalContext")
-          ?? throw new InvalidOperationException("The configuration 'POSTGRESQLCONNSTR_PortalContext' could not be found.");
-        services.AddLogitarPortalv2EntityFrameworkCorePostgreSQL(connectionString);
+        services.AddLogitarPortalEntityFrameworkCorePostgreSQLStore(_configuration);
+        healthChecks.AddDbContextCheck<EventContext>();
+        healthChecks.AddDbContextCheck<PortalContext>();
         break;
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
     }
   }
 
-  /// <summary>
-  /// TODO(fpion): refactor
-  /// </summary>
-  /// <param name="builder"></param>
   public override void Configure(IApplicationBuilder builder)
   {
+    //if (_graphQLSettings.AreAnyUiEnabled)
+    //{
+    //  builder.UseGraphQLUi(_graphQLSettings);
+    //} // TODO(fpion): GraphQL
+
+    if (_enableOpenApi)
+    {
+      builder.UseOpenApi();
+    }
+
+    builder.UseHttpsRedirection();
+    builder.UseStaticFiles();
+    //builder.UseCmsGraphQL(); // TODO(fpion): GraphQL
+
     if (builder is WebApplication application)
     {
-      if (application.Environment.IsDevelopment())
-      {
-        application.UseSwagger();
-        application.UseSwaggerUI();
-      }
-
-      application.UseHttpsRedirection();
-      application.UseStaticFiles();
-      application.UseAuthentication();
-      application.UseAuthorization();
-
       application.MapControllers();
     }
   }
