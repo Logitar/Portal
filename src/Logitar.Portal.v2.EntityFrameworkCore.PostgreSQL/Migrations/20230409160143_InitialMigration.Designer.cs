@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230407200434_CreateRealmAndUserTables")]
-    partial class CreateRealmAndUserTables
+    [Migration("20230409160143_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,6 +280,10 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("EmailAddressNormalized")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("EmailVerifiedBy")
                         .HasColumnType("jsonb");
 
@@ -467,6 +471,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("UpdatedOn");
 
                     b.HasIndex("Username");
+
+                    b.HasIndex("RealmId", "EmailAddressNormalized");
 
                     b.HasIndex("RealmId", "UsernameNormalized")
                         .IsUnique();

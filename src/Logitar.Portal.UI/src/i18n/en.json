@@ -47,6 +47,10 @@
   },
   "success": "Success!",
   "system": "System",
+  "timeZone": {
+    "label": "Time Zone",
+    "placeholder": "Select a time zone"
+  },
   "updated": "Updated",
   "yes": "Yes"
 }

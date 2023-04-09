@@ -1,4 +1,5 @@
 {
+  "birthdate": "Date of birth",
   "confirmed": {
     "label": "Confirmed",
     "placeholder": "Select an option",
@@ -55,6 +56,15 @@
     "placeholder": "Enter a first name"
   },
   "fullName": "Name",
+  "gender": {
+    "label": "Gender",
+    "options": {
+      "Female": "Female",
+      "Male": "Male",
+      "Other": "Other"
+    },
+    "placeholder": "Select a gender"
+  },
   "information": {
     "authentication": "Authentication Information",
     "personal": "Personal Information"

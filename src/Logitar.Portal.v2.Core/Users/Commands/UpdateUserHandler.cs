@@ -35,7 +35,8 @@ internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
     ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
     if (realm.RequireUniqueEmail && email != null)
     {
-      if ((await _userRepository.LoadAsync(realm, email, cancellationToken)).Any())
+      IEnumerable<UserAggregate> users = (await _userRepository.LoadAsync(realm, email, cancellationToken));
+      if (users.Any(u => !u.Equals(user)))
       {
         throw new EmailAddressAlreadyUsedException(email, nameof(input.Email));
       }

@@ -17,6 +17,7 @@ import SortSelect from './components/shared/SortSelect.vue'
 import StatusCell from './components/shared/StatusCell.vue'
 import StatusDetail from './components/shared/StatusDetail.vue'
 import StatusInfo from './components/shared/StatusInfo.vue'
+import TimeZoneSelect from './components/shared/TimeZoneSelect.vue'
 
 Vue.component('count-select', CountSelect)
 Vue.component('delete-modal', DeleteModal)
@@ -35,6 +36,7 @@ Vue.component('sort-select', SortSelect)
 Vue.component('status-cell', StatusCell)
 Vue.component('status-detail', StatusDetail)
 Vue.component('status-info', StatusInfo)
+Vue.component('timezone-select', TimeZoneSelect)
 
 Vue.mixin({
   methods: {

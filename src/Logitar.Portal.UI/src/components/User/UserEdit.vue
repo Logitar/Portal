@@ -80,7 +80,12 @@
           <nickname-field class="col" validate v-model="nickname" />
         </b-row>
         <b-row>
+          <birthdate-field class="col" v-model="birthdate" />
+          <gender-select class="col" v-model="gender" />
+        </b-row>
+        <b-row>
           <locale-select class="col" v-model="locale" />
+          <timezone-select class="col" v-model="timeZone" />
         </b-row>
         <b-row>
           <picture-field class="col" validate v-model="picture" />
@@ -116,8 +121,10 @@
 </template>
 
 <script>
+import BirthdateField from './BirthdateField.vue'
 import EmailField from './EmailField.vue'
 import FirstNameField from './FirstNameField.vue'
+import GenderSelect from './GenderSelect.vue'
 import LastNameField from './LastNameField.vue'
 import MiddleNameField from './MiddleNameField.vue'
 import NicknameField from './NicknameField.vue'
@@ -133,20 +140,13 @@ import { createUser, updateUser } from '@/api/users'
 import { getQueryString } from '@/helpers/queryUtils'
 import { getRealm } from '@/api/realms'
 
-/* TODO(fpion):
- * Address
- * Phone: CountryCode & Extension
- * Birthdate
- * Gender
- * TimeZone
- * Verifying contacts
- */
-
 export default {
   name: 'UserEdit',
   components: {
+    BirthdateField,
     EmailField,
     FirstNameField,
+    GenderSelect,
     LastNameField,
     MiddleNameField,
     NicknameField,
@@ -179,13 +179,15 @@ export default {
   },
   data() {
     return {
+      birthdate: null,
       currentUser: null,
       emailAddress: null,
       emailConflict: null,
       firstName: null,
+      gender: null,
       lastName: null,
-      locale: null,
       loading: false,
+      locale: null,
       middleName: null,
       nickname: null,
       password: null,
@@ -195,6 +197,7 @@ export default {
       profile: null,
       realmId: null,
       selectedRealm: null,
+      timeZone: null,
       user: null,
       username: null,
       usernameConflict: false,
@@ -214,7 +217,10 @@ export default {
         (this.middleName ?? '') !== (this.user?.middleName ?? '') ||
         (this.lastName ?? '') !== (this.user?.lastName ?? '') ||
         (this.nickname ?? '') !== (this.user?.nickname ?? '') ||
+        (this.birthdate ?? '') !== (this.user?.birthdate ?? '') ||
+        (this.gender ?? '') !== (this.user?.gender ?? '') ||
         (this.locale ?? '') !== (this.user?.locale ?? '') ||
+        (this.timeZone ?? '') !== (this.user?.timeZone ?? '') ||
         (this.picture ?? '') !== (this.user?.picture ?? '') ||
         (this.profile ?? '') !== (this.user?.profile ?? '') ||
         (this.website ?? '') !== (this.user?.website ?? '')
@@ -236,10 +242,10 @@ export default {
         middleName: this.middleName,
         lastName: this.lastName,
         nickname: this.nickname,
-        birthdate: this.user?.birthdate ?? null,
-        gender: this.user?.gender ?? null,
+        birthdate: this.birthdate,
+        gender: this.gender,
         locale: this.locale,
-        timeZone: this.user?.timeZone ?? null,
+        timeZone: this.timeZone,
         picture: this.picture || null,
         profile: this.profile || null,
         website: this.website || null,
@@ -258,8 +264,10 @@ export default {
   methods: {
     setModel(user) {
       this.user = user
+      this.birthdate = user.birthdate
       this.emailAddress = user.email?.address ?? null
       this.firstName = user.firstName
+      this.gender = user.gender
       this.lastName = user.lastName
       this.locale = user.locale
       this.middleName = user.middleName
@@ -270,6 +278,7 @@ export default {
       this.picture = user.picture
       this.profile = user.profile
       this.realmId = user.realm?.id ?? null
+      this.timeZone = user.timeZone
       this.username = user.username
       this.website = user.website
     },
@@ -293,11 +302,11 @@ export default {
         } catch (e) {
           const { data, status } = e
           if (status === 409) {
-            if (data?.field?.toLowerCase() === 'username') {
+            if (data?.code === 'UniqueNameAlreadyUsed') {
               this.usernameConflict = true
               this.$refs.username.focus()
               return
-            } else if (data?.field?.toLowerCase() === 'email') {
+            } else if (data?.code === 'EmailAddressAlreadyUsed') {
               this.emailConflict = true
               this.$refs.email.focus()
               return

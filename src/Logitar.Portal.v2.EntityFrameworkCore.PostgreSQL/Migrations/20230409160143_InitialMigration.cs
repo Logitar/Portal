@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateRealmAndUserTables : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,6 +76,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     AddressVerifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsAddressVerified = table.Column<bool>(type: "boolean", nullable: false),
                     EmailAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    EmailAddressNormalized = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     EmailVerifiedById = table.Column<Guid>(type: "uuid", nullable: true),
                     EmailVerifiedBy = table.Column<string>(type: "jsonb", nullable: true),
                     EmailVerifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -327,6 +328,11 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Users_PhoneVerifiedById",
                 table: "Users",
                 column: "PhoneVerifiedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RealmId_EmailAddressNormalized",
+                table: "Users",
+                columns: new[] { "RealmId", "EmailAddressNormalized" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RealmId_UsernameNormalized",

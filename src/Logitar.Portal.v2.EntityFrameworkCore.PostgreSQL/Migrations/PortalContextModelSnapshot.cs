@@ -277,6 +277,10 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("EmailAddressNormalized")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("EmailVerifiedBy")
                         .HasColumnType("jsonb");
 
@@ -464,6 +468,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("UpdatedOn");
 
                     b.HasIndex("Username");
+
+                    b.HasIndex("RealmId", "EmailAddressNormalized");
 
                     b.HasIndex("RealmId", "UsernameNormalized")
                         .IsUnique();
