@@ -5,10 +5,6 @@ namespace Logitar.Portal.v2.Core.Users.Contact;
 
 public record ReadOnlyPhone : ReadOnlyContact, IPhoneNumber
 {
-  public ReadOnlyPhone(PhoneInput input)
-    : this(input.Number, input.CountryCode, input.Extension, input.Verify)
-  {
-  }
   public ReadOnlyPhone(string number, string? countryCode = null, string? extension = null,
     bool isVerified = false) : base(isVerified)
   {
@@ -20,6 +16,11 @@ public record ReadOnlyPhone : ReadOnlyContact, IPhoneNumber
   public string? CountryCode { get; }
   public string Number { get; }
   public string? Extension { get; }
+
+  public static ReadOnlyPhone? From(PhoneInput? input)
+  {
+    return input == null ? null : new(input.Number, input.CountryCode, input.Extension, input.Verify);
+  }
 
   public ReadOnlyPhone AsVerified() => new(Number, CountryCode, Extension, isVerified: true);
 }

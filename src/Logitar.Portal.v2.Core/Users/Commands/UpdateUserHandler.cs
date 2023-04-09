@@ -50,13 +50,13 @@ internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
       user.ChangePassword(_currentActor.Id, realm, input.Password);
     }
 
-    ReadOnlyAddress? address = input.Address == null ? null : new(input.Address);
+    ReadOnlyAddress? address = ReadOnlyAddress.From(input.Address);
     user.SetAddress(_currentActor.Id, address);
 
-    ReadOnlyEmail? email = input.Email == null ? null : new(input.Email);
+    ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
     user.SetEmail(_currentActor.Id, email);
 
-    ReadOnlyPhone? phone = input.Phone == null ? null : new(input.Phone);
+    ReadOnlyPhone? phone = ReadOnlyPhone.From(input.Phone);
     user.SetPhone(_currentActor.Id, phone);
 
     await _userRepository.SaveAsync(user, cancellationToken);

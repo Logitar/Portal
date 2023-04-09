@@ -6,10 +6,6 @@ namespace Logitar.Portal.v2.Core.Users.Contact;
 
 public record ReadOnlyAddress : ReadOnlyContact
 {
-  public ReadOnlyAddress(AddressInput input) : this(input.Line1, input.Locality, input.Country,
-    input.Line2, input.PostalCode, input.Region, input.Verify)
-  {
-  }
   public ReadOnlyAddress(string line1, string locality, string country, string? line2 = null,
     string? postalCode = null, string? region = null, bool isVerified = false) : base(isVerified)
   {
@@ -31,6 +27,12 @@ public record ReadOnlyAddress : ReadOnlyContact
   public string Formatted { get; }
 
   public ReadOnlyAddress AsVerified() => new(Line1, Locality, Country, Line2, PostalCode, Region, isVerified: true);
+
+  public static ReadOnlyAddress? From(AddressInput? input)
+  {
+    return input == null ? null : new(input.Line1, input.Locality, input.Country, input.Line2,
+      input.PostalCode, input.Region, input.Verify);
+  }
 
   private string Format()
   {

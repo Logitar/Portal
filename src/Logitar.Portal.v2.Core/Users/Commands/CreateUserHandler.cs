@@ -55,21 +55,21 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
       user.ChangePassword(_currentActor.Id, realm, input.Password);
     }
 
-    if (input.Address != null)
+    ReadOnlyAddress? address = ReadOnlyAddress.From(input.Address);
+    if (address != null)
     {
-      ReadOnlyAddress address = new(input.Address);
       user.SetAddress(_currentActor.Id, address);
     }
 
-    if (input.Email != null)
+    ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
+    if (email != null)
     {
-      ReadOnlyEmail email = new(input.Email);
       user.SetEmail(_currentActor.Id, email);
     }
 
-    if (input.Phone != null)
+    ReadOnlyPhone? phone = ReadOnlyPhone.From(input.Phone);
+    if (phone != null)
     {
-      ReadOnlyPhone phone = new(input.Phone);
       user.SetPhone(_currentActor.Id, phone);
     }
 
