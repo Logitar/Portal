@@ -3,6 +3,7 @@ using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Users;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Actors;
+using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Converters;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Queriers;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,10 @@ public static class DependencyInjectionExtensions
   /// <returns></returns>
   public static IServiceCollection AddLogitarPortalv2EntityFrameworkCorePostgreSQL(this IServiceCollection services, string connectionString)
   {
+    EventSerializer.Instance.RegisterConverter(new GenderConverter());
+    EventSerializer.Instance.RegisterConverter(new Pbkdf2Converter());
+    EventSerializer.Instance.RegisterConverter(new TimeZoneEntryConverter());
+
     Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
     return services

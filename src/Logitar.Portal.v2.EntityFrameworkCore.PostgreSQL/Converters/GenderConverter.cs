@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
-using Logitar.Portal.v2.Core.Users;
+﻿using Logitar.Portal.v2.Core.Users;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -7,11 +6,6 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Converters;
 
 internal class GenderConverter : JsonConverter<Gender>
 {
-  static GenderConverter()
-  {
-    EventSerializer.Instance.RegisterConverter(new GenderConverter());
-  }
-
   public override Gender Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
   {
     string? value = reader.GetString();
