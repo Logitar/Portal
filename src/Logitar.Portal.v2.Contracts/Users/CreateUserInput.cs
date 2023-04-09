@@ -9,24 +9,24 @@ public record CreateUserInput
   public string Username { get; set; } = string.Empty;
   public string? Password { get; set; }
 
-  public AddressInput? Address { get; set; } // TODO(fpion): added
-  public EmailInput? Email { get; set; } // TODO(fpion): from Email & ConfirmEmail
-  public PhoneInput? Phone { get; set; } // TODO(fpion): from PhoneNumber & ConfirmPhoneNumber
+  public AddressInput? Address { get; set; }
+  public EmailInput? Email { get; set; }
+  public PhoneInput? Phone { get; set; }
 
   public string? FirstName { get; set; }
   public string? MiddleName { get; set; }
   public string? LastName { get; set; }
-  public string? Nickname { get; set; } // TODO(fpion): added
+  public string? Nickname { get; set; }
 
-  public DateTime? Birthdate { get; set; } // TODO(fpion): added
-  public string? Gender { get; set; } // TODO(fpion): added
+  public DateTime? Birthdate { get; set; }
+  public string? Gender { get; set; }
 
   public string? Locale { get; set; }
-  public string? TimeZone { get; set; } // TODO(fpion): added
+  public string? TimeZone { get; set; }
 
   public string? Picture { get; set; }
-  public string? Profile { get; set; } // TODO(fpion): added
-  public string? Website { get; set; } // TODO(fpion): added
+  public string? Profile { get; set; }
+  public string? Website { get; set; }
 
-  public IEnumerable<CustomAttribute>? CustomAttributes { get; set; } // TODO(fpion): added
+  public IEnumerable<CustomAttribute>? CustomAttributes { get; set; }
 }

@@ -37,6 +37,8 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
       throw new UniqueNameAlreadyUsedException(username, nameof(input.Username));
     }
 
+    // TODO(fpion): RequireUniqueEmail
+
     Gender? gender = input.Gender?.GetGender();
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     TimeZoneEntry? timeZone = input.TimeZone?.GetTimeZoneEntry(nameof(input.TimeZone));

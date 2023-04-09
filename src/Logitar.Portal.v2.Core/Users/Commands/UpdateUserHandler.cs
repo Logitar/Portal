@@ -32,6 +32,8 @@ internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
 
     UpdateUserInput input = request.Input;
 
+    // TODO(fpion): RequireUniqueEmail
+
     Gender? gender = input.Gender?.GetGender();
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     TimeZoneEntry? timeZone = input.TimeZone?.GetTimeZoneEntry(nameof(input.TimeZone));
