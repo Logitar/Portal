@@ -20,6 +20,7 @@ internal class ExternalIdentifierSetHandler : INotificationHandler<ExternalIdent
   public async Task Handle(ExternalIdentifierSet notification, CancellationToken cancellationToken)
   {
     UserEntity user = await _context.Users
+      .Include(x => x.Realm)
       .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The user entity '{notification.AggregateId}' could not be found.");
 
