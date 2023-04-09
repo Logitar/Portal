@@ -29,7 +29,7 @@ internal abstract class AggregateEntity
   public string? UpdatedBy { get; private set; }
   public DateTime? UpdatedOn { get; private set; }
 
-  protected void SetActor(Guid id, ActorEntity actor)
+  public virtual void SetActor(Guid id, ActorEntity actor)
   {
     if (CreatedById == id)
     {

@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.v2.Contracts.Realms;
+﻿using Logitar.Portal.v2.Contracts;
 
 namespace Logitar.Portal.v2.Core;
 

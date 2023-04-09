@@ -36,13 +36,13 @@
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'user.username.label'" />
-            <th scope="col" v-t="'user.fullName'" />
-            <th scope="col" v-t="'user.email.label'" />
-            <th scope="col" v-t="'user.phone.label'" />
-            <th scope="col" v-t="'user.passwordChangedAt'" />
-            <th scope="col" v-t="'user.signedInAt'" />
-            <th scope="col" v-t="'updated'" />
+            <th scope="col" v-t="'user.sort.options.Username'" />
+            <th scope="col" v-t="'user.sort.options.FullName'" />
+            <th scope="col" v-t="'user.sort.options.EmailAddress'" />
+            <th scope="col" v-t="'user.sort.options.PhoneE164Formatted'" />
+            <th scope="col" v-t="'user.sort.options.PasswordChangedOn'" />
+            <th scope="col" v-t="'user.sort.options.SignedInOn'" />
+            <th scope="col" v-t="'user.sort.options.UpdatedOn'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -54,16 +54,16 @@
             </td>
             <td v-text="user.fullName || '—'" />
             <td>
-              {{ user.email || '—' }}
-              <b-badge v-if="user.isEmailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
+              {{ user.email?.address || '—' }}
+              <b-badge v-if="user.email?.isVerified" variant="info">{{ $t('user.email.verified') }}</b-badge>
             </td>
             <td>
-              {{ user.phoneNumber || '—' }}
-              <b-badge v-if="user.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
+              {{ user.phone?.e164Formatted || '—' }}
+              <b-badge v-if="user.phone?.isVerified" variant="info">{{ $t('user.phone.verified') }}</b-badge>
             </td>
-            <td>{{ user.passwordChangedAt ? $d(new Date(user.passwordChangedAt), 'medium') : '—' }}</td>
-            <td>{{ user.signedInAt ? $d(new Date(user.signedInAt), 'medium') : '—' }}</td>
-            <td><status-cell :actor="user.updatedBy" :date="user.updatedAt" /></td>
+            <td>{{ user.passwordChangedOn ? $d(new Date(user.passwordChangedOn), 'medium') : '—' }}</td>
+            <td>{{ user.signedInOn ? $d(new Date(user.signedInOn), 'medium') : '—' }}</td>
+            <td><status-cell :actor="user.updatedBy" :date="user.updatedOn" /></td>
             <td>
               <toggle-status :disabled="user.id === current" :user="user" @updated="refresh()" />
               <icon-button

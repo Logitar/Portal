@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.v2.Contracts.Realms;
+﻿namespace Logitar.Portal.v2.Contracts;
 
 public record CustomAttribute
 {

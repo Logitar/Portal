@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <h1 v-t="'user.session.viewTitle'" />
-    <status-detail :createdAt="new Date(session.createdAt)" :updatedAt="session.updatedAt ? new Date(session.updatedAt) : null" />
+    <status-detail :model="session" />
     <table class="table table-striped">
       <tbody>
         <tr>

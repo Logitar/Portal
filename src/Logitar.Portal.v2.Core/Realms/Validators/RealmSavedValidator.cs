@@ -5,7 +5,7 @@ namespace Logitar.Portal.v2.Core.Realms.Validators;
 
 internal abstract class RealmSavedValidator<T> : AbstractValidator<T> where T : RealmSaved
 {
-  public RealmSavedValidator()
+  protected RealmSavedValidator()
   {
     RuleFor(x => x.DisplayName).NullOrNotEmpty()
       .MaximumLength(byte.MaxValue);

@@ -108,8 +108,6 @@ export default {
   },
   data() {
     return {
-      claimMappings: [],
-      customAttributes: [],
       defaultLocale: null,
       description: null,
       displayName: null,
@@ -160,8 +158,8 @@ export default {
     },
     payload() {
       const payload = {
-        claimMappings: this.claimMappings,
-        customAttributes: this.customAttributes,
+        claimMappings: this.realm?.claimMappings ?? null,
+        customAttributes: this.realm?.customAttributes ?? null,
         defaultLocale: this.defaultLocale,
         description: this.description,
         displayName: this.displayName,
@@ -183,8 +181,6 @@ export default {
   methods: {
     setModel(realm) {
       this.realm = realm
-      this.claimMappings = realm.claimMappings.map(claimMapping => ({ ...claimMapping }))
-      this.customAttributes = realm.customAttributes.map(customAttribute => ({ ...customAttribute }))
       this.defaultLocale = realm.defaultLocale
       this.description = realm.description
       this.displayName = realm.displayName

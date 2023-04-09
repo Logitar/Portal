@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Logitar.Portal.v2.Core.Realms;
+using Logitar.Portal.v2.Core.Users.Contact;
 using System.Globalization;
 
 namespace Logitar.Portal.v2.Core;
@@ -12,6 +14,14 @@ internal static class FluentValidationExtensions
   }
   private static bool BeAValidAlias(string? alias) => alias == null
     || alias.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
+
+  public static IRuleBuilder<T, string?> Country<T>(this IRuleBuilder<T, string?> ruleBuilder)
+  {
+    return ruleBuilder.Must(BeAValidCountry).WithErrorCode("CountryValidator")
+      .WithMessage(x => $"'{{PropertyName}}' must be one of the following: {string.Join(", ", PostalAddressHelper.SupportedCountries)}");
+  }
+  private static bool BeAValidCountry(string? country) => country == null
+    || PostalAddressHelper.GetCountry(country) != null;
 
   public static IRuleBuilder<T, string?> Identifier<T>(this IRuleBuilder<T, string?> ruleBuilder)
   {
@@ -35,4 +45,27 @@ internal static class FluentValidationExtensions
       .WithMessage("'{PropertyName}' must be null or a non-empty string.");
   }
   private static bool BeNullOrNotEmpty(string? s) => s == null || !string.IsNullOrWhiteSpace(s);
+
+  public static IRuleBuilder<T, DateTime?> Past<T>(this IRuleBuilder<T, DateTime?> ruleBuilder, DateTime? moment = null)
+  {
+    return ruleBuilder.Must(value => BeInThePast(value, moment ?? DateTime.UtcNow))
+      .WithErrorCode("PastValidator")
+      .WithMessage("'{PropertyName}' must be in the past.");
+  }
+  private static bool BeInThePast(DateTime? value, DateTime moment) => value == null || value < moment;
+
+  public static IRuleBuilder<T, IPhoneNumber?> PhoneNumber<T>(this IRuleBuilder<T, IPhoneNumber> ruleBuilder)
+  {
+    return ruleBuilder.Must(p => p.IsValid()).WithErrorCode("PhoneNumberValidator")
+      .WithMessage("The phone number is not valid.");
+  }
+
+  public static IRuleBuilder<T, string?> Username<T>(this IRuleBuilder<T, string?> ruleBuilder, IUsernameSettings usernameSettings)
+  {
+    return ruleBuilder.Must(u => BeAValidUsername(u, usernameSettings))
+      .WithErrorCode("UsernameValidator")
+      .WithMessage($"'{{PropertyName}}' may only contain the following characters: {usernameSettings.AllowedCharacters}");
+  }
+  private static bool BeAValidUsername(string? username, IUsernameSettings usernameSettings)
+    => username == null || usernameSettings.AllowedCharacters == null || username.All(usernameSettings.AllowedCharacters.Contains);
 }

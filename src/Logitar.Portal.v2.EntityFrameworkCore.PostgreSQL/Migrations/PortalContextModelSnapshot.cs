@@ -22,6 +22,74 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.ExternalIdentifierEntity", b =>
+                {
+                    b.Property<int>("ExternalIdentifierId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExternalIdentifierId"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ValueNormalized")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("ExternalIdentifierId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("RealmId", "Key", "ValueNormalized")
+                        .IsUnique();
+
+                    b.ToTable("ExternalIdentifiers");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
                 {
                     b.Property<int>("RealmId")
@@ -128,6 +196,327 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("UpdatedOn");
 
                     b.ToTable("Realms");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("AddressCountry")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressFormatted")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<string>("AddressLine1")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressLocality")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressPostalCode")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressRegion")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressVerifiedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("AddressVerifiedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AddressVerifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("Birthdate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CustomAttributes")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("DisabledBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("DisabledById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DisabledOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmailAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EmailAddressNormalized")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EmailVerifiedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("EmailVerifiedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("EmailVerifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("HasPassword")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAddressVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPhoneVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Locale")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Nickname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Password")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PasswordChangedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("PasswordChangedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("PasswordChangedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PhoneCountryCode")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PhoneE164Formatted")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PhoneExtension")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PhoneVerifiedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("PhoneVerifiedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("PhoneVerifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Picture")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<string>("Profile")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<int>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SignedInOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TimeZone")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UsernameNormalized")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("AddressFormatted");
+
+                    b.HasIndex("AddressVerifiedById");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisabledById");
+
+                    b.HasIndex("DisabledOn");
+
+                    b.HasIndex("EmailAddress");
+
+                    b.HasIndex("EmailVerifiedById");
+
+                    b.HasIndex("FirstName");
+
+                    b.HasIndex("FullName");
+
+                    b.HasIndex("IsConfirmed");
+
+                    b.HasIndex("IsDisabled");
+
+                    b.HasIndex("LastName");
+
+                    b.HasIndex("MiddleName");
+
+                    b.HasIndex("Nickname");
+
+                    b.HasIndex("PasswordChangedById");
+
+                    b.HasIndex("PasswordChangedOn");
+
+                    b.HasIndex("PhoneE164Formatted");
+
+                    b.HasIndex("PhoneVerifiedById");
+
+                    b.HasIndex("SignedInOn");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("Username");
+
+                    b.HasIndex("RealmId", "EmailAddressNormalized");
+
+                    b.HasIndex("RealmId", "UsernameNormalized")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.ExternalIdentifierEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
+                        .WithMany("ExternalIdentifiers")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", "User")
+                        .WithMany("ExternalIdentifiers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
+                        .WithMany("Users")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
+                {
+                    b.Navigation("ExternalIdentifiers");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
+                {
+                    b.Navigation("ExternalIdentifiers");
                 });
 #pragma warning restore 612, 618
         }
