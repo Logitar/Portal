@@ -49,7 +49,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories
     {
       string aggregateId = realm.Id.Value;
 
-      EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" JOIN ""ExternalIdentifiers"" ON x.""UserId"" = u.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND x.""Key"" = {externalKey} AND x.""ValueNormalized"" = {externalValue.ToUpper()}")
+      EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Users"" u ON u.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" JOIN ""ExternalIdentifiers"" x ON x.""UserId"" = u.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND x.""Key"" = {externalKey} AND x.""ValueNormalized"" = {externalValue.ToUpper()}")
         .AsNoTracking()
         .OrderBy(x => x.Version)
         .ToArrayAsync(cancellationToken);
