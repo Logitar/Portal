@@ -28,8 +28,8 @@ internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
 
     CultureInfo? defaultLocale = input.DefaultLocale?.GetCultureInfo(nameof(input.DefaultLocale));
     Uri? url = input.Url?.GetUri(nameof(input.Url));
-    ReadOnlyUsernameSettings? usernameSettings = input.UsernameSettings == null ? null : new(input.UsernameSettings);
-    ReadOnlyPasswordSettings? passwordSettings = input.PasswordSettings == null ? null : new(input.PasswordSettings);
+    ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
+    ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
 
     realm.Update(_currentActor.Id, input.DisplayName, input.Description,
       defaultLocale, input.Secret, url,

@@ -31,8 +31,8 @@ internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
 
     CultureInfo? defaultLocale = input.DefaultLocale?.GetCultureInfo(nameof(input.DefaultLocale));
     Uri? url = input.Url?.GetUri(nameof(input.Url));
-    ReadOnlyUsernameSettings? usernameSettings = input.UsernameSettings == null ? null : new(input.UsernameSettings);
-    ReadOnlyPasswordSettings? passwordSettings = input.PasswordSettings == null ? null : new(input.PasswordSettings);
+    ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
+    ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
 
     RealmAggregate realm = new(_currentActor.Id, uniqueName, input.DisplayName, input.Description,
       defaultLocale, input.Secret, url,

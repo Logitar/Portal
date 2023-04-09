@@ -5,13 +5,15 @@ namespace Logitar.Portal.v2.Core.Realms;
 
 public record ReadOnlyUsernameSettings : IUsernameSettings
 {
-  public ReadOnlyUsernameSettings(UsernameSettings? usernameSettings = null)
+  public ReadOnlyUsernameSettings(string? allowedCharacters = null)
   {
-    if (usernameSettings != null)
-    {
-      AllowedCharacters = usernameSettings.AllowedCharacters?.CleanTrim();
-    }
+    AllowedCharacters = allowedCharacters?.CleanTrim();
   }
 
   public string? AllowedCharacters { get; } = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+
+  public static ReadOnlyUsernameSettings? From(UsernameSettings? usernameSettings)
+  {
+    return usernameSettings == null ? null : new(usernameSettings.AllowedCharacters);
+  }
 }
