@@ -11,14 +11,14 @@
           <th scope="row" v-t="'user.email.label'" />
           <td>
             {{ profile.email }}
-            <b-badge v-if="profile.isEmailConfirmed" variant="info">{{ $t('user.email.confirmed') }}</b-badge>
+            <b-badge v-if="profile.email.isVerified" variant="info">{{ $t('user.email.verified') }}</b-badge>
           </td>
         </tr>
-        <tr v-if="profile.phoneNumber">
+        <tr v-if="profile.phone">
           <th scope="row" v-t="'user.phone.label'" />
           <td>
-            {{ profile.phoneNumber }}
-            <b-badge v-if="profile.isPhoneNumberConfirmed" variant="info">{{ $t('user.phone.confirmed') }}</b-badge>
+            {{ profile.phone }}
+            <b-badge v-if="profile.phone.isVerified" variant="info">{{ $t('user.phone.verified') }}</b-badge>
           </td>
         </tr>
         <tr>
@@ -29,24 +29,22 @@
           <th scope="row" v-t="'user.updatedAt'" />
           <td>{{ $d(new Date(profile.updatedAt), 'medium') }}</td>
         </tr>
-        <tr v-if="profile.signedInAt">
-          <th scope="row" v-t="'user.signedInAt'" />
+        <tr v-if="profile.signedInOn">
+          <th scope="row" v-t="'user.signedInOn'" />
           <td>
-            {{ $d(new Date(profile.signedInAt), 'medium') }}
+            {{ $d(new Date(profile.signedInOn), 'medium') }}
             <br />
             <b-link :href="`/sessions?user=${profile.id}`">{{ $t('user.session.view') }}</b-link>
           </td>
         </tr>
       </tbody>
     </table>
-    <p v-if="profile.isEmailConfirmed || profile.isPhoneNumberConfirmed" class="text-warning">
-      <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.confirmed.warning'" />
-    </p>
+    <p v-if="profile.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.verified.warning'" /></p>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <b-row>
-          <email-field class="col" :confirmed="profile.isEmailConfirmed" validate v-model="email" />
-          <phone-field class="col" :confirmed="profile.isPhoneNumberConfirmed" validate v-model="phoneNumber" />
+          <email-field class="col" :verified="profile.email?.isVerified" validate v-model="email" />
+          <phone-field class="col" :verified="profile.phone?.isVerified" validate v-model="phoneNumber" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
@@ -94,7 +92,6 @@ export default {
       lastName: null,
       loading: false,
       locale: null,
-      middleName: null,
       phoneNumber: null,
       picture: null
     }
@@ -116,7 +113,6 @@ export default {
         phoneNumber: this.phoneNumber || null,
         firstName: this.firstName,
         lastName: this.lastName,
-        middleName: this.middleName,
         locale: this.locale,
         picture: this.picture || null
       }
@@ -128,7 +124,6 @@ export default {
       this.firstName = profile.firstName
       this.lastName = profile.lastName
       this.locale = profile.locale
-      this.middleName = profile.middleName
       this.phoneNumber = profile.phoneNumber
       this.picture = profile.picture
     },

@@ -12,8 +12,8 @@
     :value="value"
     @input="$emit('input', $event)"
   >
-    <b-input-group-append v-if="confirmed">
-      <b-input-group-text class="bg-info text-white"><font-awesome-icon icon="check" />&nbsp;{{ $t('user.email.confirmed') }}</b-input-group-text>
+    <b-input-group-append v-if="verified">
+      <b-input-group-text class="bg-info text-white"><font-awesome-icon icon="check" />&nbsp;{{ $t('user.email.verified') }}</b-input-group-text>
     </b-input-group-append>
   </form-field>
 </template>
@@ -22,10 +22,6 @@
 export default {
   name: 'EmailField',
   props: {
-    confirmed: {
-      type: Boolean,
-      default: false
-    },
     disabled: {
       type: Boolean,
       default: false
@@ -50,7 +46,11 @@ export default {
       type: Boolean,
       default: false
     },
-    value: {}
+    value: {},
+    verified: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
     focus() {

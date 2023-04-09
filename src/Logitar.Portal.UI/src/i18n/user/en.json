@@ -25,16 +25,16 @@
     "label": "Disabled",
     "placeholder": "Select an option"
   },
-  "disabledAt": "Disabled on {date}",
+  "disabledOn": "Disabled on {date}",
   "editTitle": "Edit user",
   "email": {
-    "confirmed": "Confirmed",
     "conflict": {
       "detail": "The realm {name} requires users to have unique email addresses.",
       "header": "This email address is already used by another user."
     },
     "label": "Email Address",
-    "placeholder": "Enter an email address"
+    "placeholder": "Enter an email address",
+    "verified": "Verified"
   },
   "empty": "This list is empty.",
   "enable": {
@@ -43,11 +43,12 @@
     "success": "The user has been enabled.",
     "title": "Enable user"
   },
-  "externalProviders": {
-    "addedAt": "Added on",
+  "externalIdentifiers": {
     "empty": "This list is empty.",
-    "name": "Name",
-    "title": "External Providers"
+    "key": "Key",
+    "title": "External Identifiers",
+    "updatedOn": "Updated on",
+    "value": "Value"
   },
   "firstName": {
     "label": "First Name",
@@ -62,7 +63,15 @@
     "label": "Last Name",
     "placeholder": "Enter a last name"
   },
+  "middleName": {
+    "label": "Middle Name",
+    "placeholder": "Enter a middle name"
+  },
   "newTitle": "Create user",
+  "nickname": {
+    "label": "Nickname",
+    "placeholder": "Enter a nickname"
+  },
   "password": {
     "changeFailed": "Password change failed!",
     "changed": "Your password has been changed.",
@@ -85,17 +94,19 @@
     "submit": "Change password",
     "warning": "Avoid changing an user's password without its consent."
   },
-  "passwordChangedAt": "Password changed on",
+  "passwordChangedOn": "Password changed on",
   "phone": {
-    "confirmed": "Confirmed",
     "label": "Phone Number",
-    "placeholder": "Enter a phone number"
+    "placeholder": "Enter a phone number",
+    "verified": "Verified"
   },
   "picture": {
     "label": "Picture URL",
     "placeholder": "Paste the picture URL of the user"
   },
   "profile": {
+    "label": "Profile URL",
+    "placeholder": "Paste the profile URL of the user",
     "title": "Profile",
     "updated": "Your profile has been updated."
   },
@@ -149,16 +160,17 @@
     "title": "Sign In"
   },
   "signOut": "Sign Out",
-  "signedInAt": "Last signed-in on",
+  "signedInOn": "Last signed-in on",
   "sort": {
     "options": {
-      "Email": "Email address",
-      "FirstMiddleLastName": "Name",
+      "DisabledOn": "Disabled on",
+      "EmailAddress": "Email address",
+      "FullName": "Full name",
       "LastFirstMiddleName": "Last name, then first and middle names",
-      "PasswordChangedAt": "Password changed on",
-      "PhoneNumber": "Phone number",
-      "SignedInAt": "Signed-in on",
-      "UpdatedAt": "Updated on",
+      "PasswordChangedOn": "Password changed on",
+      "PhoneE164Formatted": "Phone number (E164)",
+      "SignedInOn": "Signed-in on",
+      "UpdatedOn": "Updated on",
       "Username": "Username"
     }
   },
@@ -169,5 +181,9 @@
     "conflict": "This username is already used by another user.",
     "label": "Username",
     "placeholder": "Enter an username"
+  },
+  "website": {
+    "label": "Website URL",
+    "placeholder": "Paste the website URL of the user"
   }
 }
