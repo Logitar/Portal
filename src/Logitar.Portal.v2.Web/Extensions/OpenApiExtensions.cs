@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Logitar.Portal.v2.Core;
+using Microsoft.OpenApi.Models;
 
 namespace Logitar.Portal.v2.Web.Extensions;
 
