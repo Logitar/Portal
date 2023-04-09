@@ -187,6 +187,17 @@ public class UserAggregate : AggregateRoot
       ApplyChange(e);
     }
   }
+  protected virtual void Apply(ExternalIdentifierSet e)
+  {
+    if (e.Value == null)
+    {
+      _externalIdentifiers.Remove(e.Key);
+    }
+    else
+    {
+      _externalIdentifiers[e.Key] = e.Value;
+    }
+  }
 
   public void SetPhone(AggregateId actorId, ReadOnlyPhone? phone)
   {
