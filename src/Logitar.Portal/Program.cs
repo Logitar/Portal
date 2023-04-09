@@ -1,6 +1,5 @@
-﻿using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
-using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
-using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Commands;
+using MediatR;
 
 namespace Logitar.Portal;
 
@@ -17,16 +16,23 @@ public class Program
 
     startup.Configure(application);
 
-    // TODO(fpion): refactor
     if (application.Configuration.GetValue<bool>("MigrateDatabase"))
     {
-      using IServiceScope scope = application.Services.CreateScope();
+      IRequest? migrateDatabase = null;
+      DatabaseProvider databaseProvider = application.Configuration.GetValue<DatabaseProvider>("DatabaseProvider");
+      switch (databaseProvider)
+      {
+        case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+          migrateDatabase = new MigrateDatabase();
+          break;
+      }
 
-      using EventContext events = scope.ServiceProvider.GetRequiredService<EventContext>();
-      await events.Database.MigrateAsync();
-
-      using PortalContext portal = scope.ServiceProvider.GetRequiredService<PortalContext>();
-      await portal.Database.MigrateAsync();
+      if (migrateDatabase != null)
+      {
+        using IServiceScope scope = application.Services.CreateScope();
+        IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        await mediator.Send(migrateDatabase);
+      }
     }
 
     application.Run();

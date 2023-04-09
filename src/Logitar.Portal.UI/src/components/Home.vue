@@ -6,7 +6,7 @@
         <h3 v-t="'configuration.initialization.user.label'" />
         <p><font-awesome-icon icon="info-circle" /> <i v-t="'configuration.initialization.user.help'" /></p>
         <b-row>
-          <email-field class="col" required validate v-model="user.email" />
+          <email-field class="col" required validate v-model="user.emailAddress" />
           <username-field class="col" required validate v-model="user.username" />
         </b-row>
         <b-row>
@@ -53,7 +53,7 @@ export default {
       loading: false,
       passwordConfirmation: null,
       user: {
-        email: null,
+        emailAddress: null,
         firstName: null,
         lastName: null,
         password: null,
@@ -89,9 +89,9 @@ export default {
     }
   },
   watch: {
-    'user.email': {
-      handler(email) {
-        this.user.username = email
+    'user.emailAddress': {
+      handler(emailAddress) {
+        this.user.username = emailAddress
       }
     }
   }
