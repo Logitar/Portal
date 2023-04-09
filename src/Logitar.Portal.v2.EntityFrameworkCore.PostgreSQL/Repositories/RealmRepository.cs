@@ -26,7 +26,7 @@ internal class RealmRepository : EventStore, IRealmRepository
       ? new AggregateId(id)
       : new(idOrUniqueName)).ToString();
 
-    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Realms"" r on r.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND (r.""AggregateId"" = {aggregateId} OR r.""UniqueNameNormalized"" = {idOrUniqueName.ToUpper()}")
+    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Realms"" r on r.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND (r.""AggregateId"" = {aggregateId} OR r.""UniqueNameNormalized"" = {idOrUniqueName.ToUpper()})")
       .AsNoTracking()
       .OrderBy(x => x.Version)
       .ToArrayAsync(cancellationToken);
