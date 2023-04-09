@@ -1,5 +1,7 @@
 ﻿using Logitar.Portal.v2.Contracts.Realms;
+using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Core.Realms;
+using Logitar.Portal.v2.Core.Users;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -24,6 +26,8 @@ public static class DependencyInjectionExtensions
 
   private static IServiceCollection AddFacades(this IServiceCollection services)
   {
-    return services.AddTransient<IRealmService, RealmService>();
+    return services
+      .AddTransient<IRealmService, RealmService>()
+      .AddTransient<IUserService, UserService>();
   }
 }
