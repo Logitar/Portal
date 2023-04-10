@@ -1,6 +1,10 @@
 import { _delete, get, patch, post, put } from '.'
 import { getQueryString } from '@/helpers/queryUtils'
 
+export async function changePassword(id, payload) {
+  return await patch(`/api/users/${id}/password/change`, payload)
+}
+
 export async function createUser(payload) {
   return await post('/api/users', payload)
 }

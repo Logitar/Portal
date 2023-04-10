@@ -20,7 +20,7 @@ public class RefreshSession
     {
       HttpRequest request = context.Request;
 
-      if (request.Cookies.TryGetValue(WebConstants.Cookies.RefreshToken, out string? refreshToken))
+      if (request.Cookies.TryGetValue(Constants.Cookies.RefreshToken, out string? refreshToken))
       {
         try
         {
@@ -50,7 +50,7 @@ public class RefreshSession
         }
         catch (Exception)
         {
-          context.Response.Cookies.Delete(WebConstants.Cookies.RefreshToken);
+          context.SignOut();
         }
       }
     }

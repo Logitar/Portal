@@ -6,12 +6,12 @@
       <b-link v-if="href" :href="href" target="_blank">
         <font-awesome-icon v-if="icon" :icon="icon" />
         <user-avatar v-else-if="user" :user="user" :size="24" />
-        {{ name }} <font-awesome-icon icon="external-link-alt" />
+        {{ displayName }} <font-awesome-icon icon="external-link-alt" />
       </b-link>
       <template v-else>
         <font-awesome-icon v-if="icon" :icon="icon" />
         <user-avatar v-else-if="user" :user="user" :size="24" />
-        {{ name }}
+        {{ displayName }}
       </template>
     </template>
   </span>
@@ -40,6 +40,13 @@ export default {
     }
   },
   computed: {
+    displayName() {
+      if (this.actor) {
+        const { displayName, type } = this.actor
+        return type === 'System' ? this.$i18n.t('system') : displayName
+      }
+      return ''
+    },
     href() {
       if (this.actor) {
         const { id, isDeleted, type } = this.actor
@@ -66,21 +73,14 @@ export default {
       }
       return ''
     },
-    name() {
-      if (this.actor) {
-        const { name, type } = this.actor
-        return type === 'System' ? this.$i18n.t('system') : name
-      }
-      return ''
-    },
     user() {
       if (this.actor) {
-        const { email, name, picture, type } = this.actor
+        const { displayName, emailAddress, picture, type } = this.actor
         if (type === 'User') {
           return {
-            email,
+            emailAddress,
             picture,
-            username: name
+            username: displayName
           }
         }
       }

@@ -35,7 +35,7 @@
         />
         <template v-if="!user || user.passwordChangedOn">
           <h5 v-if="user" v-t="'user.password.label'" />
-          <p v-if="user && user.passwordChangedOn">{{ $t('user.password.changedAt') }} {{ $d(new Date(user.passwordChangedOn), 'medium') }}</p>
+          <p v-if="user && user.passwordChangedOn">{{ $t('user.password.changedOn') }} {{ $d(new Date(user.passwordChangedOn), 'medium') }}</p>
           <p v-if="user && (password || passwordConfirmation)" class="text-warning">
             <font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.password.warning'" />
           </p>
@@ -66,7 +66,7 @@
           <strong v-t="'user.email.conflict.header'" />
           <template v-if="selectedRealm">{{ ` ${$t('user.email.conflict.detail', { name: selectedRealm.name })}` }}</template>
         </b-alert>
-        <p v-if="user?.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.confirmed.warning'" /></p>
+        <p v-if="user?.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.verifiedWarning'" /></p>
         <b-row>
           <email-field class="col" :verified="user?.email?.isVerified" ref="email" validate v-model="emailAddress" />
           <phone-field class="col" :verified="user?.phone?.isVerified" validate v-model="phoneNumber" />
@@ -246,9 +246,9 @@ export default {
         gender: this.gender,
         locale: this.locale,
         timeZone: this.timeZone,
-        picture: this.picture || null,
-        profile: this.profile || null,
-        website: this.website || null,
+        picture: this.picture,
+        profile: this.profile,
+        website: this.website,
         customAttributes: this.user?.customAttributes ?? null
       }
       if (!this.user) {

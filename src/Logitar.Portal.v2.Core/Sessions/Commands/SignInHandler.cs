@@ -48,7 +48,7 @@ internal class SignInHandler : IRequestHandler<SignIn, Session>
       throw new InvalidCredentialsException($"The user '{username}' could not be found in realm '{realm}'.");
     }
 
-    SessionAggregate session = user.SignIn(realm, input.Password);
+    SessionAggregate session = user.SignIn(realm, input.Password, input.Remember, input.CustomAttributes?.ToDictionary());
 
     await _userRepository.SaveAsync(user, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);

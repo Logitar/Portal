@@ -4,8 +4,8 @@
     <div class="my-2">
       <icon-button class="mx-1" icon="sync-alt" :loading="loading" text="actions.refresh" variant="primary" @click="refresh()" />
       <template v-if="selectedUser">
-        <icon-button :disabled="sessions.every(s => !s.isActive)" icon="sign-out-alt" text="user.session.signOutAll" variant="danger" v-b-modal.signOutAll />
-        <sign-out-all-modal :isCurrent="isCurrent" :loading="loading" :user="selectedUser" @ok="signOutAll" />
+        <icon-button :disabled="sessions.every(s => !s.isActive)" icon="sign-out-alt" text="user.session.signOutUser" variant="danger" v-b-modal.signOutUser />
+        <sign-out-user-modal :isCurrent="isCurrent" :loading="loading" :user="selectedUser" @ok="signOutUser" />
       </template>
     </div>
     <b-row>
@@ -29,16 +29,16 @@
         placeholder="user.session.persistent.placeholder"
         v-model="isPersistent"
       />
-      <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-      <count-select class="col" v-model="count" />
+      <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+      <count-select class="col" v-model="limit" />
     </b-row>
     <template v-if="sessions.length">
       <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col" v-t="'updated'" />
-            <th scope="col" v-t="'user.session.user'" />
-            <th scope="col" v-t="'user.session.signedOutAt'" />
+            <th scope="col" v-t="'user.session.sort.options.User'" />
+            <th scope="col" v-t="'user.session.sort.options.SignedOutOn'" />
             <th scope="col" v-t="'user.session.persistent.label'" />
             <th scope="col" v-t="'user.session.ipAddress'" />
             <th scope="col" />
@@ -47,7 +47,7 @@
         <tbody>
           <tr v-for="sessionItem in sessions" :key="sessionItem.id">
             <td>
-              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedAt), 'medium') }}</b-link>
+              <b-link :href="`/sessions/${sessionItem.id}`">{{ $d(new Date(sessionItem.updatedOn), 'medium') }}</b-link>
             </td>
             <td>
               <b-link :href="`/users/${sessionItem.user.id}`" target="_blank" class="mx-1"><user-avatar :user="sessionItem.user" /></b-link>
@@ -56,11 +56,11 @@
               /></b-link>
             </td>
             <td>
-              <status-cell v-if="sessionItem.signedOutAt" :actor="sessionItem.signedOutBy" :date="new Date(sessionItem.signedOutAt)" />
+              <status-cell v-if="sessionItem.signedOutOn" :actor="sessionItem.signedOutBy" :date="sessionItem.signedOutOn" />
               <b-badge v-else-if="sessionItem.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
             </td>
             <td v-text="$t(sessionItem.isPersistent ? 'yes' : 'no')" />
-            <td v-text="sessionItem.ipAddress" />
+            <td v-text="getIpAddress(sessionItem)" />
             <td>
               <icon-button
                 v-if="sessionItem.id !== session"
@@ -79,7 +79,7 @@
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </template>
     <p v-else v-t="'user.session.empty'" />
   </b-container>
@@ -87,18 +87,18 @@
 
 <script>
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
-import SignOutAllModal from '@/components/Sessions/SignOutAllModal.vue'
+import SignOutUserModal from '@/components/Sessions/SignOutUserModal.vue'
 import SignOutModal from '@/components/Sessions/SignOutModal.vue'
 import UserAvatar from '@/components/User/UserAvatar.vue'
 import UserSelect from '@/components/User/UserSelect.vue'
-import { getSessions, signOut, signOutAll } from '@/api/sessions'
+import { getSessions, signOut, signOutUser } from '@/api/sessions'
 import { getUser } from '@/api/users'
 
 export default {
   name: 'SessionList',
   components: {
     RealmSelect,
-    SignOutAllModal,
+    SignOutUserModal,
     SignOutModal,
     UserAvatar,
     UserSelect
@@ -119,16 +119,16 @@ export default {
   },
   data() {
     return {
-      count: 10,
-      desc: true,
       isActive: null,
+      isDescending: true,
       isPersistent: null,
+      limit: 10,
       loading: false,
       page: 1,
       selectedRealm: null,
       selectedUser: null,
-      sort: 'UpdatedAt',
       sessions: [],
+      sort: 'UpdatedOn',
       total: 0,
       userId: null
     }
@@ -144,9 +144,9 @@ export default {
         realm: this.selectedRealm,
         userId: this.userId,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -163,6 +163,10 @@ export default {
     }
   },
   methods: {
+    getIpAddress({ customAttributes }) {
+      const ipAddress = customAttributes.filter(({ key }) => key === 'RemoteIpAddress').map(({ value }) => value)
+      return ipAddress.length === 0 ? '—' : ipAddress[ipAddress.length - 1]
+    },
     async refresh(params = null) {
       if (!this.loading) {
         this.loading = true
@@ -202,12 +206,12 @@ export default {
         }
       }
     },
-    async signOutAll(callback) {
+    async signOutUser(callback) {
       if (!this.loading) {
         this.loading = true
         let refresh = false
         try {
-          await signOutAll(this.userId)
+          await signOutUser(this.userId)
           if (this.isCurrent) {
             window.location.replace('/user/sign-in')
           } else {
@@ -248,13 +252,13 @@ export default {
         }
 
         if (
-          newValue?.index &&
+          newValue?.skip &&
           oldValue &&
           (newValue.isActive !== oldValue.isActive ||
             newValue.isPersistent !== oldValue.isPersistent ||
             newValue.realm !== oldValue.realm ||
             newValue.userId !== oldValue.userId ||
-            newValue.count !== oldValue.count)
+            newValue.limit !== oldValue.limit)
         ) {
           this.page = 1
           await this.refresh()

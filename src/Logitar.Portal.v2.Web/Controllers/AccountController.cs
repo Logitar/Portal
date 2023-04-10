@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.v2.Contracts.Sessions;
 using Logitar.Portal.v2.Web.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers;
@@ -15,7 +16,7 @@ public class AccountController : Controller
     _sessionService = sessionService;
   }
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)] // TODO(fpion): Authorization
+  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
   [HttpGet("profile")]
   public ActionResult Profile()
   {
@@ -33,14 +34,12 @@ public class AccountController : Controller
     return View();
   }
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)] // TODO(fpion): Authorization
+  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
   [HttpGet("sign-out")]
   public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
   {
     await _sessionService.SignOutAsync(HttpContext.GetSessionId()!.Value, cancellationToken);
-
-    HttpContext.Session.Clear();
-    HttpContext.Response.Cookies.Delete(WebConstants.Cookies.RefreshToken);
+    HttpContext.SignOut();
 
     return RedirectToAction(actionName: "SignIn");
   }

@@ -57,10 +57,13 @@ public class Startup : StartupBase
     builder.UseMiddleware<Logging>();
     builder.UseMiddleware<RefreshSession>();
     builder.UseMiddleware<RedirectUnauthorized>();
+    builder.UseAuthentication();
+    builder.UseAuthorization();
 
     if (builder is WebApplication application)
     {
       application.MapControllers();
+      application.MapHealthChecks("/health");
     }
   }
 }

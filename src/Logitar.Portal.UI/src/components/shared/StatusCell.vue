@@ -17,8 +17,8 @@
         {{ $d(new Date(date), 'medium') }}
         <br />
         {{ $t('by') }}
-        <b-link v-if="href" :href="href" target="_blank">{{ name }} <font-awesome-icon icon="external-link-alt" /></b-link>
-        <template v-else>{{ name }}</template>
+        <b-link v-if="href" :href="href" target="_blank">{{ displayName }} <font-awesome-icon icon="external-link-alt" /></b-link>
+        <template v-else>{{ displayName }}</template>
       </div>
     </template>
     <template v-else>{{ $d(new Date(date), 'medium') }}</template>
@@ -44,6 +44,10 @@ export default {
     }
   },
   computed: {
+    displayName() {
+      const { displayName, type } = this.actor
+      return type === 'System' ? this.$i18n.t('system') : displayName
+    },
     href() {
       const { id, isDeleted, type } = this.actor
       if (!isDeleted) {
@@ -65,19 +69,15 @@ export default {
       }
       return ''
     },
-    name() {
-      const { name, type } = this.actor
-      return type === 'System' ? this.$i18n.t('system') : name
-    },
     user() {
-      const { email, name, picture, type } = this.actor
+      const { displayName, emailAddress, picture, type } = this.actor
       if (type !== 'User') {
         return null
       }
       return {
-        email,
+        emailAddress,
         picture,
-        username: name
+        username: displayName
       }
     },
     variant() {

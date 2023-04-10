@@ -1,8 +1,8 @@
 <template>
   <b-container>
     <h1 v-t="'user.profile.title'" />
-    <personal-information :profile="profile" />
-    <authentication-information :profile="profile" @updated="setModel" />
+    <personal-information :user="user" />
+    <authentication-information :user="user" @updated="setModel" />
   </b-container>
 </template>
 
@@ -24,12 +24,12 @@ export default {
   },
   data() {
     return {
-      profile: null
+      user: null
     }
   },
   methods: {
-    setModel(profile) {
-      this.profile = profile
+    setModel(user) {
+      this.user = user
     }
   },
   created() {

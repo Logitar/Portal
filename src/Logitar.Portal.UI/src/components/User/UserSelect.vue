@@ -32,8 +32,8 @@ export default {
       try {
         const { data } = await getUsers({
           realm: this.realm,
-          sort: 'FirstMiddleLastName',
-          desc: false
+          sort: 'FullName',
+          isDescending: false
         })
         this.users = data.items
       } catch (e) {

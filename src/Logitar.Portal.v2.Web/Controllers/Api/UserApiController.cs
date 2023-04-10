@@ -1,11 +1,12 @@
 ﻿using Logitar.Portal.v2.Contracts;
 using Logitar.Portal.v2.Contracts.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers.Api;
 
 [ApiController]
-//[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
+[Authorize(Policy = Constants.Policies.PortalActor)]
 [Route("api/users")]
 public class UserApiController : ControllerBase
 {

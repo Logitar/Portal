@@ -9,6 +9,6 @@ export async function signOut(id) {
   return await patch(`/api/sessions/${id}/sign/out`)
 }
 
-export async function signOutAll(userId) {
-  return await patch(`/api/users/${userId}/sessions/sign/out`)
+export async function signOutUser(id) {
+  return await patch(`/api/sessions/sign/out/user/${id}`)
 }

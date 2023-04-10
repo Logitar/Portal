@@ -16,9 +16,9 @@
           <td v-text="$t(session.isPersistent ? 'yes' : 'no')" />
         </tr>
         <tr>
-          <th scope="row" v-t="'user.session.signedOutAt'" />
+          <th scope="row" v-t="'user.session.signedOutOn'" />
           <td>
-            <status-cell v-if="session.signedOutAt" :actor="session.signedOutBy" :date="new Date(session.signedOutAt)" />
+            <status-cell v-if="session.signedOutOn" :actor="session.signedOutBy" :date="new Date(session.signedOutOn)" />
             <b-badge v-else-if="session.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
           </td>
         </tr>

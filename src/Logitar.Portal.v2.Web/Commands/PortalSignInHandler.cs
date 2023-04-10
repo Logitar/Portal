@@ -1,8 +1,9 @@
 ﻿using Logitar.Portal.v2.Contracts;
 using Logitar.Portal.v2.Contracts.Sessions;
-using Logitar.Portal.v2.Core;
 using MediatR;
 using System.Text.Json;
+
+using CoreConstants = Logitar.Portal.v2.Core.Constants;
 
 namespace Logitar.Portal.v2.Web.Commands;
 
@@ -40,7 +41,7 @@ internal class PortalSignInHandler : IRequestHandler<PortalSignIn, Session>
 
     SignInInput input = new()
     {
-      Realm = Constants.PortalRealm.UniqueName,
+      Realm = CoreConstants.PortalRealm.UniqueName,
       Username = request.Username,
       Password = request.Password,
       Remember = request.Remember,

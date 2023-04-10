@@ -5,7 +5,7 @@
       <tbody>
         <tr>
           <th scope="row" v-t="'user.username.label'" />
-          <td v-text="profile.username" />
+          <td v-text="user.username" />
         </tr>
       </tbody>
     </table>
@@ -14,7 +14,7 @@
       <strong v-t="'user.password.changeFailed'" />
       {{ $t('user.password.invalidCredentials') }}
     </b-alert>
-    <p v-if="profile.passwordChangedOn">{{ $t('user.password.changedAt') }} {{ $d(new Date(profile.passwordChangedOn), 'medium') }}</p>
+    <p v-if="user.passwordChangedOn">{{ $t('user.password.changedOn') }} {{ $d(new Date(user.passwordChangedOn), 'medium') }}</p>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <password-field
@@ -45,7 +45,7 @@
 
 <script>
 import PasswordField from '@/components/User/PasswordField.vue'
-import { changePassword } from '@/api/account'
+import { changePassword } from '@/api/users'
 
 export default {
   name: 'AuthenticationInformation',
@@ -53,7 +53,7 @@ export default {
     PasswordField
   },
   props: {
-    profile: {
+    user: {
       type: Object,
       required: true
     }
@@ -90,7 +90,7 @@ export default {
         this.invalidCredentials = false
         try {
           if (await this.$refs.form.validate()) {
-            const { data } = await changePassword(this.payload)
+            const { data } = await changePassword(this.user.id, this.payload)
             this.reset()
             this.$refs.form.reset()
             this.$emit('updated', data)
