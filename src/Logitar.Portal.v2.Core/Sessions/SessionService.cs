@@ -21,4 +21,9 @@ internal class SessionService : ISessionService
   {
     return await _pipeline.ExecuteAsync(new SignIn(input), cancellationToken);
   }
+
+  public async Task<Session> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SignOut(id), cancellationToken);
+  }
 }

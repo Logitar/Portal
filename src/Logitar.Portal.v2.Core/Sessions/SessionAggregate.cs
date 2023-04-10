@@ -101,6 +101,17 @@ public class SessionAggregate : AggregateRoot
     Apply((SessionSaved)e);
   }
 
+  public void SignOut(AggregateId actorId)
+  {
+    if (!IsActive)
+    {
+      throw new SessionIsNotActiveException(this);
+    }
+
+    ApplyChange(new SessionSignedOut { ActorId = actorId });
+  }
+  protected virtual void Apply(SessionSignedOut _) => IsActive = false;
+
   private void Apply(SessionSaved e)
   {
     _customAttributes.Clear();

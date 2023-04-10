@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.v2.Web.Extensions;
+﻿using Logitar.Portal.v2.Contracts.Sessions;
+using Logitar.Portal.v2.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers;
@@ -7,15 +8,19 @@ namespace Logitar.Portal.v2.Web.Controllers;
 [Route("user")]
 public class AccountController : Controller
 {
-  // TODO(fpion): Account Profile
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpGet("profile")]
-  //public async Task<ActionResult> Profile(CancellationToken cancellationToken)
-  //{
-  //  User user = await _accountService.GetProfileAsync(cancellationToken);
+  private readonly ISessionService _sessionService;
 
-  //  return View(user);
-  //}
+  public AccountController(ISessionService sessionService)
+  {
+    _sessionService = sessionService;
+  }
+
+  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)] // TODO(fpion): Authorization
+  [HttpGet("profile")]
+  public ActionResult Profile()
+  {
+    return View(HttpContext.GetUser());
+  }
 
   [HttpGet("sign-in")]
   public ActionResult SignIn()
@@ -28,16 +33,15 @@ public class AccountController : Controller
     return View();
   }
 
-  // TODO(fpion): Account SignOut
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpGet("sign-out")]
-  //public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
-  //{
-  //  await _accountService.SignOutAsync(cancellationToken);
+  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)] // TODO(fpion): Authorization
+  [HttpGet("sign-out")]
+  public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
+  {
+    await _sessionService.SignOutAsync(HttpContext.GetSessionId()!.Value, cancellationToken);
 
-  //  HttpContext.Session.Clear();
-  //  HttpContext.Response.Cookies.Delete(Constants.Cookies.RenewToken);
+    HttpContext.Session.Clear();
+    HttpContext.Response.Cookies.Delete(WebConstants.Cookies.RefreshToken);
 
-  //  return RedirectToAction(actionName: "SignIn");
-  //}
+    return RedirectToAction(actionName: "SignIn");
+  }
 }

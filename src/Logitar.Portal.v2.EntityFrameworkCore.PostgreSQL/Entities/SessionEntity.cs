@@ -64,6 +64,14 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
     }
   }
 
+  public void SignOut(SessionSignedOut e, ActorEntity actor)
+  {
+    SignedOutById = e.ActorId.ToGuid();
+    SignedOutBy = actor.Serialize();
+    SignedOutOn = e.OccurredOn;
+    IsActive = false;
+  }
+
   private void Apply(SessionSaved e)
   {
     CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;

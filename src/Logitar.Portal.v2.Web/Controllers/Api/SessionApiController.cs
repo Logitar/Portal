@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Logitar.Portal.v2.Web.Controllers.Api;
 
 [ApiController]
+//[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
 [Route("api/sessions")]
 public class SessionApiController : ControllerBase
 {
@@ -14,17 +15,21 @@ public class SessionApiController : ControllerBase
     _sessionService = sessionService;
   }
 
-  //[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
   [HttpPost("refresh")]
   public async Task<ActionResult<Session>> RefreshAsync(RefreshInput input, CancellationToken cancellationToken)
   {
     return Ok(await _sessionService.RefreshAsync(input, cancellationToken));
   }
 
-  //[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
   [HttpPost("sign/in")]
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, CancellationToken cancellationToken)
   {
     return Ok(await _sessionService.SignInAsync(input, cancellationToken));
+  }
+
+  [HttpPatch("{id}/sign/out")]
+  public async Task<ActionResult<Session>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
   }
 }
