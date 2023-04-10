@@ -33,6 +33,8 @@ internal class ChangePasswordHandler : IRequestHandler<ChangePassword, User>
 
     user.ChangePassword(_currentActor.Id, realm, input.Password, input.Current);
 
+    await _userRepository.SaveAsync(user, cancellationToken);
+
     return await _userQuerier.GetAsync(user, cancellationToken);
   }
 }

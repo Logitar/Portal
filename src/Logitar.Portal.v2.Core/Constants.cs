@@ -12,6 +12,4 @@ public static class Constants
 
     public static readonly CultureInfo DefaultLocale = CultureInfo.GetCultureInfo("en");
   }
-
-  public static readonly Version Version = new(2, 0, 0);
 }

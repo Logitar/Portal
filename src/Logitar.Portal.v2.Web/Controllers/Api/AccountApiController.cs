@@ -1,47 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Logitar.Portal.v2.Contracts.Sessions;
+using Logitar.Portal.v2.Web.Commands;
+using Logitar.Portal.v2.Web.Extensions;
+using Logitar.Portal.v2.Web.Models;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers.Api;
 
-/// <summary>
-/// TODO(fpion): Accounts
-/// </summary>
 [ApiController]
 [Route("api/account")]
 public class AccountApiController : ControllerBase
 {
-  //private readonly IAccountService _accountService;
-  //public AccountApiController(IAccountService accountService)
-  //{
-  //  _accountService = accountService;
-  //}
+  private readonly IMediator _mediator;
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpPost("password/change")]
-  //public async Task<ActionResult<User>> ChangePasswordAsync([FromBody] ChangePasswordPayload payload, CancellationToken cancellationToken)
-  //{
-  //  return Ok(await _accountService.ChangePasswordAsync(payload, cancellationToken));
-  //}
+  public AccountApiController(IMediator mediator)
+  {
+    _mediator = mediator;
+  }
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpGet("profile")]
-  //public async Task<ActionResult<User>> GetProfileAsync(CancellationToken cancellationToken)
-  //{
-  //  return Ok(await _accountService.GetProfileAsync(cancellationToken));
-  //}
+  [HttpPost("sign/in")]
+  public async Task<ActionResult> SignInAsync([FromBody] PortalSignInInput input, CancellationToken cancellationToken)
+  {
+    Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
+    HttpContext.SignIn(session);
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpPut("profile")]
-  //public async Task<ActionResult<User>> SaveProfileAsync(UpdateUserPayload payload, CancellationToken cancellationToken)
-  //{
-  //  return Ok(await _accountService.SaveProfileAsync(payload, cancellationToken));
-  //}
-
-  //[Authorize(Policy = Constants.Policies.Session)]
-  //[HttpPost("sign/out")]
-  //public async Task<ActionResult> SignOutAsync(CancellationToken cancellationToken)
-  //{
-  //  await _accountService.SignOutAsync(cancellationToken);
-
-  //  return NoContent();
-  //}
+    return NoContent();
+  }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core;
+using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,12 +12,15 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {
+    [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
+    [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
+    [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(TooManyResultsException)] = HandleTooManyResultsException,
     [typeof(UniqueNameAlreadyUsedException)] = HandleUniqueNameAlreadyUsedException,
     [typeof(ValidationException)] = HandleValidationException
@@ -44,6 +48,16 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 
       context.Result = new NotFoundObjectResult(value);
     }
+  }
+
+  private static void HandleAccountIsDisabledException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleAccountIsNotConfirmedException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleEmailAddressAlreadyUsedException(ExceptionContext context)
@@ -86,6 +100,11 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     {
       context.Result = new BadRequestObjectResult(GetPropertyFailure(exception));
     }
+  }
+
+  private static void HandleSessionIsNotActiveException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleTooManyResultsException(ExceptionContext context)

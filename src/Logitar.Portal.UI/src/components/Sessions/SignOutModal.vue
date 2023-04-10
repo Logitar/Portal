@@ -3,7 +3,7 @@
     <p>
       {{ $t('user.session.confirm') }}
       <br />
-      <span class="text-danger">{{ $d(new Date(session.updatedAt), 'medium') }}</span>
+      <span class="text-danger">{{ $d(new Date(session.updatedOn), 'medium') }}</span>
     </p>
     <slot />
     <template #modal-footer="{ cancel, ok }">

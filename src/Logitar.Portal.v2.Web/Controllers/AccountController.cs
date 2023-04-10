@@ -1,50 +1,46 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Logitar.Portal.v2.Contracts.Sessions;
+using Logitar.Portal.v2.Web.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers;
 
-/// <summary>
-/// TODO(fpion): Accounts
-/// </summary>
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("user")]
 public class AccountController : Controller
 {
-  //private readonly IAccountService _accountService;
+  private readonly ISessionService _sessionService;
 
-  //public AccountController(IAccountService accountService)
-  //{
-  //  _accountService = accountService;
-  //}
+  public AccountController(ISessionService sessionService)
+  {
+    _sessionService = sessionService;
+  }
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpGet("profile")]
-  //public async Task<ActionResult> Profile(CancellationToken cancellationToken)
-  //{
-  //  User user = await _accountService.GetProfileAsync(cancellationToken);
+  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
+  [HttpGet("profile")]
+  public ActionResult Profile()
+  {
+    return View(HttpContext.GetUser());
+  }
 
-  //  return View(user);
-  //}
+  [HttpGet("sign-in")]
+  public ActionResult SignIn()
+  {
+    if (HttpContext.IsSignedIn())
+    {
+      return RedirectToAction(actionName: "Profile");
+    }
 
-  //[HttpGet("sign-in")]
-  //public ActionResult SignIn()
-  //{
-  //  if (HttpContext.GetSessionId().HasValue)
-  //  {
-  //    return RedirectToAction(actionName: "Profile");
-  //  }
+    return View();
+  }
 
-  //  return View();
-  //}
+  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
+  [HttpGet("sign-out")]
+  public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
+  {
+    await _sessionService.SignOutAsync(HttpContext.GetSessionId()!.Value, cancellationToken);
+    HttpContext.SignOut();
 
-  //[Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-  //[HttpGet("sign-out")]
-  //public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
-  //{
-  //  await _accountService.SignOutAsync(cancellationToken);
-
-  //  HttpContext.Session.Clear();
-  //  HttpContext.Response.Cookies.Delete(Constants.Cookies.RenewToken);
-
-  //  return RedirectToAction(actionName: "SignIn");
-  //}
+    return RedirectToAction(actionName: "SignIn");
+  }
 }

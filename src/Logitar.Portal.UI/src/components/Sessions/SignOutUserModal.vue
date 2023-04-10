@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="id" :title="$t('user.session.signOutAll')">
+  <b-modal :id="id" :title="$t('user.session.signOutUser')">
     <p>
       {{ $t('user.session.confirmAll') }}
       <br />
@@ -10,18 +10,18 @@
     <slot />
     <template #modal-footer="{ cancel, ok }">
       <icon-button icon="ban" text="actions.cancel" @click="cancel()" />
-      <icon-button :disabled="loading" icon="sign-out-alt" :loading="loading" text="user.session.signOutAll" variant="danger" @click="$emit('ok', ok)" />
+      <icon-button :disabled="loading" icon="sign-out-alt" :loading="loading" text="user.session.signOutUser" variant="danger" @click="$emit('ok', ok)" />
     </template>
   </b-modal>
 </template>
 
 <script>
 export default {
-  name: 'SignOutModal',
+  name: 'SignOutUserModal',
   props: {
     id: {
       type: String,
-      default: 'signOutAll'
+      default: 'signOutUser'
     },
     isCurrent: {
       type: Boolean,

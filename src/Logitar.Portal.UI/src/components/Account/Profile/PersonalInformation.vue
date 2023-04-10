@@ -3,56 +3,71 @@
     <h3 v-t="'user.information.personal'" />
     <table class="table table-striped">
       <tbody>
-        <tr v-if="profile.fullName">
+        <tr v-if="user.fullName">
           <th scope="row" v-t="'user.fullName'" />
-          <td v-text="profile.fullName" />
+          <td v-text="user.fullName" />
         </tr>
-        <tr v-if="profile.email">
+        <tr v-if="user.email">
           <th scope="row" v-t="'user.email.label'" />
           <td>
-            {{ profile.email }}
-            <b-badge v-if="profile.email.isVerified" variant="info">{{ $t('user.email.verified') }}</b-badge>
+            {{ user.email.address }}
+            <b-badge v-if="user.email.isVerified" variant="info">{{ $t('user.email.verified') }}</b-badge>
           </td>
         </tr>
-        <tr v-if="profile.phone">
+        <tr v-if="user.phone">
           <th scope="row" v-t="'user.phone.label'" />
           <td>
-            {{ profile.phone }}
-            <b-badge v-if="profile.phone.isVerified" variant="info">{{ $t('user.phone.verified') }}</b-badge>
+            {{ user.phone.e164Formatted }}
+            <b-badge v-if="user.phone.isVerified" variant="info">{{ $t('user.phone.verified') }}</b-badge>
           </td>
         </tr>
         <tr>
-          <th scope="row" v-t="'user.createdAt'" />
-          <td>{{ $d(new Date(profile.createdAt), 'medium') }}</td>
+          <th scope="row" v-t="'user.createdOn'" />
+          <td>{{ $d(new Date(user.createdOn), 'medium') }}</td>
         </tr>
-        <tr v-if="profile.updatedAt">
-          <th scope="row" v-t="'user.updatedAt'" />
-          <td>{{ $d(new Date(profile.updatedAt), 'medium') }}</td>
+        <tr v-if="user.updatedOn">
+          <th scope="row" v-t="'user.updatedOn'" />
+          <td>{{ $d(new Date(user.updatedOn), 'medium') }}</td>
         </tr>
-        <tr v-if="profile.signedInOn">
+        <tr v-if="user.signedInOn">
           <th scope="row" v-t="'user.signedInOn'" />
           <td>
-            {{ $d(new Date(profile.signedInOn), 'medium') }}
+            {{ $d(new Date(user.signedInOn), 'medium') }}
             <br />
-            <b-link :href="`/sessions?user=${profile.id}`">{{ $t('user.session.view') }}</b-link>
+            <b-link :href="`/sessions?user=${user.id}`">{{ $t('user.session.view') }}</b-link>
           </td>
         </tr>
       </tbody>
     </table>
-    <p v-if="profile.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.verified.warning'" /></p>
+    <p v-if="user.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.verifiedWarning'" /></p>
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <b-row>
-          <email-field class="col" :verified="profile.email?.isVerified" validate v-model="email" />
-          <phone-field class="col" :verified="profile.phone?.isVerified" validate v-model="phoneNumber" />
+          <email-field class="col" :verified="user.email?.isVerified" validate v-model="emailAddress" />
+          <phone-field class="col" :verified="user.phone?.isVerified" validate v-model="phoneNumber" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
           <last-name-field class="col" validate v-model="lastName" />
         </b-row>
         <b-row>
+          <middle-name-field class="col" validate v-model="middleName" />
+          <nickname-field class="col" validate v-model="nickname" />
+        </b-row>
+        <b-row>
+          <birthdate-field class="col" v-model="birthdate" />
+          <gender-select class="col" v-model="gender" />
+        </b-row>
+        <b-row>
           <locale-select class="col" v-model="locale" />
+          <timezone-select class="col" v-model="timeZone" />
+        </b-row>
+        <b-row>
           <picture-field class="col" validate v-model="picture" />
+          <profile-field class="col" validate v-model="profile" />
+        </b-row>
+        <b-row>
+          <website-field class="col" validate v-model="website" />
         </b-row>
         <div class="mb-2">
           <icon-submit :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
@@ -63,79 +78,127 @@
 </template>
 
 <script>
+import BirthdateField from '@/components/User/BirthdateField.vue'
 import EmailField from '@/components/User/EmailField.vue'
 import FirstNameField from '@/components/User/FirstNameField.vue'
+import GenderSelect from '@/components/User/GenderSelect.vue'
 import LastNameField from '@/components/User/LastNameField.vue'
+import MiddleNameField from '@/components/User/MiddleNameField.vue'
+import NicknameField from '@/components/User/NicknameField.vue'
 import PhoneField from '@/components/User/PhoneField.vue'
 import PictureField from '@/components/User/PictureField.vue'
-import { saveProfile } from '@/api/account'
+import ProfileField from '@/components/User/ProfileField.vue'
+import WebsiteField from '@/components/User/WebsiteField.vue'
+import { updateUser } from '@/api/users'
 
 export default {
   name: 'PersonalInformation',
   components: {
+    BirthdateField,
     EmailField,
     FirstNameField,
+    GenderSelect,
     LastNameField,
+    MiddleNameField,
+    NicknameField,
     PhoneField,
-    PictureField
+    PictureField,
+    ProfileField,
+    WebsiteField
   },
   props: {
-    profile: {
+    user: {
       type: Object,
       required: true
     }
   },
   data() {
     return {
-      email: null,
+      birthdate: null,
+      emailAddress: null,
       firstName: null,
+      gender: null,
       lastName: null,
       loading: false,
       locale: null,
+      middleName: null,
+      nickname: null,
       phoneNumber: null,
-      picture: null
+      picture: null,
+      profile: null,
+      timeZone: null,
+      website: null
     }
   },
   computed: {
     hasChanges() {
       return (
-        (this.email ?? '') !== (this.profile.email ?? '') ||
-        (this.phoneNumber ?? '') !== (this.profile.phoneNumber ?? '') ||
-        (this.firstName ?? '') !== (this.profile.firstName ?? '') ||
-        (this.lastName ?? '') !== (this.profile.lastName ?? '') ||
-        this.locale !== this.profile.locale ||
-        (this.picture ?? '') !== (this.profile.picture ?? '')
+        (this.emailAddress ?? '') !== (this.user?.email?.address ?? '') ||
+        (this.phoneNumber ?? '') !== (this.user?.phone?.number ?? '') ||
+        (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
+        (this.middleName ?? '') !== (this.user?.middleName ?? '') ||
+        (this.lastName ?? '') !== (this.user?.lastName ?? '') ||
+        (this.nickname ?? '') !== (this.user?.nickname ?? '') ||
+        (this.birthdate ?? '') !== (this.user?.birthdate ?? '') ||
+        (this.gender ?? '') !== (this.user?.gender ?? '') ||
+        (this.locale ?? '') !== (this.user?.locale ?? '') ||
+        (this.timeZone ?? '') !== (this.user?.timeZone ?? '') ||
+        (this.picture ?? '') !== (this.user?.picture ?? '') ||
+        (this.profile ?? '') !== (this.user?.profile ?? '') ||
+        (this.website ?? '') !== (this.user?.website ?? '')
       )
     },
     payload() {
       return {
-        email: this.email || null,
-        phoneNumber: this.phoneNumber || null,
+        address: this.user?.address ?? null,
+        email: this.emailAddress ? { address: this.emailAddress } : null,
+        phone: this.phoneNumber
+          ? {
+              countryCode: this.user?.phone?.countryCode ?? null,
+              number: this.phoneNumber,
+              extension: this.user?.phone?.extension ?? null
+            }
+          : null,
         firstName: this.firstName,
+        middleName: this.middleName,
         lastName: this.lastName,
+        nickname: this.nickname,
+        birthdate: this.birthdate,
+        gender: this.gender,
         locale: this.locale,
-        picture: this.picture || null
+        timeZone: this.timeZone,
+        picture: this.picture,
+        profile: this.profile,
+        website: this.website,
+        customAttributes: this.user?.customAttributes ?? null
       }
     }
   },
   methods: {
-    setModel(profile) {
-      this.email = profile.email
-      this.firstName = profile.firstName
-      this.lastName = profile.lastName
-      this.locale = profile.locale
-      this.phoneNumber = profile.phoneNumber
-      this.picture = profile.picture
+    setModel(user) {
+      this.birthdate = user.birthdate
+      this.emailAddress = user.email?.address ?? null
+      this.firstName = user.firstName
+      this.gender = user.gender
+      this.lastName = user.lastName
+      this.locale = user.locale
+      this.middleName = user.middleName
+      this.nickname = user.nickname
+      this.phoneNumber = user.phone?.number ?? null
+      this.picture = user.picture
+      this.profile = user.profile
+      this.timeZone = user.timeZone
+      this.website = user.website
     },
     async submit() {
       if (!this.loading) {
         this.loading = true
         try {
           if (await this.$refs.form.validate()) {
-            const { data } = await saveProfile(this.payload)
-            this.setModel(data)
-            this.toast('success', 'user.profile.updated')
+            const { data } = await updateUser(this.user.id, this.payload)
             this.$refs.form.reset()
+            this.$emit('updated', data)
+            this.toast('success', 'user.profile.updated')
           }
         } catch (e) {
           this.handleError(e)
@@ -146,11 +209,11 @@ export default {
     }
   },
   watch: {
-    profile: {
+    user: {
       deep: true,
       immediate: true,
-      handler(profile) {
-        this.setModel(profile)
+      handler(user) {
+        this.setModel(user)
       }
     }
   }

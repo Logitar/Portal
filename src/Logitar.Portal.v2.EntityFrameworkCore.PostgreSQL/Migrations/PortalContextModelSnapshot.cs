@@ -198,6 +198,99 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Realms");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SessionEntity", b =>
+                {
+                    b.Property<int>("SessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SessionId"));
+
+                    b.Property<string>("AdditionalInformation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CustomAttributes")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPersistent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SignedOutBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("SignedOutById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("SignedOutOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsPersistent");
+
+                    b.HasIndex("SignedOutById");
+
+                    b.HasIndex("SignedOutOn");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
                 {
                     b.Property<int>("UserId")
@@ -496,6 +589,17 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SessionEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
@@ -517,6 +621,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
                 {
                     b.Navigation("ExternalIdentifiers");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }
