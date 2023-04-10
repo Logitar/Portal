@@ -196,9 +196,9 @@ export default {
         try {
           if (await this.$refs.form.validate()) {
             const { data } = await updateUser(this.user.id, this.payload)
-            this.setModel(data)
-            this.toast('success', 'user.profile.updated')
             this.$refs.form.reset()
+            this.$emit('updated', data)
+            this.toast('success', 'user.profile.updated')
           }
         } catch (e) {
           this.handleError(e)

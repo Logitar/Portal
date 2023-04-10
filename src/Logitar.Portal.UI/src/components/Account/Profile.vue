@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <h1 v-t="'user.profile.title'" />
-    <personal-information :user="user" />
+    <personal-information :user="user" @updated="setModel" />
     <authentication-information :user="user" @updated="setModel" />
   </b-container>
 </template>
