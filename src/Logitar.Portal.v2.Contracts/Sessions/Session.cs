@@ -15,10 +15,10 @@ public record Session : Aggregate
 
   public string? RefreshToken { get; set; }
 
+  public string? IpAddress { get; set; }
+  public string? AdditionalInformation { get; set; }
+
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public User User { get; set; } = new();
-
-  // TODO(fpion): IpAddress as column & sortable property?
-  // TODO(fpion): AdditionalInformation as column and/or property?
 }

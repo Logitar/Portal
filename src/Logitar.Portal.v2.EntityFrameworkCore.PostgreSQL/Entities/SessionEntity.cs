@@ -38,6 +38,9 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
   public DateTime? SignedOutOn { get; private set; }
   public bool IsActive { get; private set; }
 
+  public string? IpAddress { get; private set; }
+  public string? AdditionalInformation { get; private set; }
+
   public string? CustomAttributes { get; private set; }
 
   public void Refresh(SessionRefreshed e)
@@ -74,6 +77,9 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
 
   private void Apply(SessionSaved e)
   {
+    IpAddress = e.IpAddress;
+    AdditionalInformation = e.AdditionalInformation;
+
     CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;
   }
 }

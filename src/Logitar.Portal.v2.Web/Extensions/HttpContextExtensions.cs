@@ -1,6 +1,8 @@
 ﻿using Logitar.Portal.v2.Contracts.Sessions;
 using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Web.Models;
+using Microsoft.Extensions.Primitives;
+using System.Text.Json;
 
 namespace Logitar.Portal.v2.Web.Extensions;
 
@@ -11,6 +13,23 @@ internal static class HttpContextExtensions
   private const string UserKey = "User";
 
   public static CurrentUser GetCurrentUser(this HttpContext context) => new(context.GetUser());
+
+  public static string? GetIpAddress(this HttpContext context)
+  {
+    string? ipAddress = null;
+
+    if (context.Request.Headers.TryGetValue("X-Forwarded-For", out StringValues xForwardedFor))
+    {
+      ipAddress = xForwardedFor.Single()?.Split(':').First();
+    }
+    ipAddress ??= context.Connection.RemoteIpAddress?.ToString();
+
+    return ipAddress;
+  }
+  public static string? GetAdditionalInformation(this HttpContext context)
+  {
+    return JsonSerializer.Serialize(context.Request.Headers);
+  }
 
   public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);

@@ -7,6 +7,11 @@ internal class SessionSavedValidator<T> : AbstractValidator<T> where T : Session
 {
   protected SessionSavedValidator()
   {
+    RuleFor(x => x.IpAddress).NullOrNotEmpty()
+      .MaximumLength(byte.MaxValue);
+
+    RuleFor(x => x.AdditionalInformation).NullOrNotEmpty();
+
     RuleForEach(x => x.CustomAttributes.Keys).NotEmpty()
       .MaximumLength(byte.MaxValue)
       .Identifier();

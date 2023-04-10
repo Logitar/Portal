@@ -20,6 +20,7 @@ public class SessionAggregate : AggregateRoot
   }
 
   public SessionAggregate(AggregateId userId, DateTime signedInOn, bool isPersistent = false,
+    string? ipAddress = null, string? additionalInformation = null,
     Dictionary<string, string>? customAttributes = null) : base()
   {
     byte[]? bytes = null;
@@ -35,6 +36,8 @@ public class SessionAggregate : AggregateRoot
       ActorId = userId,
       OccurredOn = signedInOn,
       Key = key,
+      IpAddress = ipAddress?.CleanTrim(),
+      AdditionalInformation = additionalInformation?.CleanTrim(),
       CustomAttributes = customAttributes?.CleanTrim() ?? new()
     };
     new SessionCreatedValidator().ValidateAndThrow(e);
@@ -52,6 +55,9 @@ public class SessionAggregate : AggregateRoot
   public bool IsPersistent => _key != null;
 
   public bool IsActive { get; private set; }
+
+  public string? IpAddress { get; private set; }
+  public string? AdditionalInformation { get; private set; }
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
@@ -71,7 +77,8 @@ public class SessionAggregate : AggregateRoot
   public void Delete(AggregateId actorId) => ApplyChange(new SessionDeleted { ActorId = actorId });
   protected virtual void Apply(SessionDeleted _) { }
 
-  public void Refresh(byte[] bytes, Dictionary<string, string>? customAttributes = null)
+  public void Refresh(byte[] bytes, string? ipAddress = null, string? additionalInformation = null,
+    Dictionary<string, string>? customAttributes = null)
   {
     if (!IsActive)
     {
@@ -89,6 +96,8 @@ public class SessionAggregate : AggregateRoot
     {
       ActorId = UserId,
       Key = key,
+      IpAddress = ipAddress?.CleanTrim(),
+      AdditionalInformation = additionalInformation?.CleanTrim(),
       CustomAttributes = customAttributes?.CleanTrim() ?? new()
     };
     new SessionRefreshedValidator().ValidateAndThrow(e);
@@ -117,6 +126,9 @@ public class SessionAggregate : AggregateRoot
 
   private void Apply(SessionSaved e)
   {
+    IpAddress = e.IpAddress;
+    AdditionalInformation = e.AdditionalInformation;
+
     _customAttributes.Clear();
     _customAttributes.AddRange(e.CustomAttributes);
   }

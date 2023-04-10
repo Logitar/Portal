@@ -22,14 +22,14 @@
             <b-badge v-else-if="session.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
           </td>
         </tr>
-        <tr v-if="ipAddress">
+        <tr v-if="session.ipAddress">
           <th scope="row" v-t="'user.session.ipAddress'" />
-          <td v-text="ipAddress" />
+          <td v-text="session.ipAddress" />
         </tr>
       </tbody>
     </table>
     <h3 v-t="'user.session.additionalInformation.title'" />
-    <json-viewer v-if="additionalInformation" :value="JSON.parse(additionalInformation)" :expand-depth="5" copyable boxed />
+    <json-viewer v-if="session.additionalInformation" :value="JSON.parse(session.additionalInformation)" :expand-depth="5" copyable boxed />
     <p v-else v-t="'user.session.additionalInformation.empty'" />
   </b-container>
 </template>
@@ -51,16 +51,6 @@ export default {
   data() {
     return {
       session: null
-    }
-  },
-  computed: {
-    additionalInformation() {
-      const requestHeaders = this.session?.customAttributes.filter(({ key }) => key === 'RequestHeaders').map(({ value }) => value) ?? []
-      return requestHeaders.length === 0 ? null : requestHeaders[requestHeaders.length - 1]
-    },
-    ipAddress() {
-      const ipAddress = this.session?.customAttributes.filter(({ key }) => key === 'RemoteIpAddress').map(({ value }) => value) ?? []
-      return ipAddress.length === 0 ? null : ipAddress[ipAddress.length - 1]
     }
   },
   created() {

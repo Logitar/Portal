@@ -159,6 +159,42 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    SessionId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Key = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    IsPersistent = table.Column<bool>(type: "boolean", nullable: false),
+                    SignedOutById = table.Column<Guid>(type: "uuid", nullable: true),
+                    SignedOutBy = table.Column<string>(type: "jsonb", nullable: true),
+                    SignedOutOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IpAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    AdditionalInformation = table.Column<string>(type: "text", nullable: true),
+                    CustomAttributes = table.Column<string>(type: "jsonb", nullable: true),
+                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedById = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<string>(type: "jsonb", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "jsonb", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.SessionId);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ExternalIdentifiers_CreatedById",
                 table: "ExternalIdentifiers",
@@ -227,6 +263,57 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Realms_UpdatedOn",
                 table: "Realms",
                 column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_AggregateId",
+                table: "Sessions",
+                column: "AggregateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_CreatedById",
+                table: "Sessions",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_CreatedOn",
+                table: "Sessions",
+                column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IsActive",
+                table: "Sessions",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IsPersistent",
+                table: "Sessions",
+                column: "IsPersistent");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SignedOutById",
+                table: "Sessions",
+                column: "SignedOutById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SignedOutOn",
+                table: "Sessions",
+                column: "SignedOutOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UpdatedById",
+                table: "Sessions",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UpdatedOn",
+                table: "Sessions",
+                column: "UpdatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UserId",
+                table: "Sessions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_AddressFormatted",
@@ -366,6 +453,9 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ExternalIdentifiers");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "Users");

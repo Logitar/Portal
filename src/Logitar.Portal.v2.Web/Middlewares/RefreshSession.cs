@@ -1,7 +1,5 @@
-﻿using Logitar.Portal.v2.Contracts;
-using Logitar.Portal.v2.Contracts.Sessions;
+﻿using Logitar.Portal.v2.Contracts.Sessions;
 using Logitar.Portal.v2.Web.Extensions;
-using System.Text.Json;
 
 namespace Logitar.Portal.v2.Web.Middlewares;
 
@@ -24,26 +22,11 @@ public class RefreshSession
       {
         try
         {
-          List<CustomAttribute> customAttributes = new(capacity: 2)
-          {
-            new CustomAttribute
-            {
-              Key = "RequestHeaders",
-              Value = JsonSerializer.Serialize(request.Headers)
-            }
-          };
-          if (context.Connection.RemoteIpAddress != null)
-          {
-            customAttributes.Add(new CustomAttribute
-            {
-              Key = "RemoteIpAddress", // TODO(fpion): CLIENT-IP header?
-              Value = context.Connection.RemoteIpAddress.ToString()
-            });
-          }
           RefreshInput input = new()
           {
             RefreshToken = refreshToken,
-            CustomAttributes = customAttributes
+            IpAddress = context.GetIpAddress(),
+            AdditionalInformation = context.GetAdditionalInformation()
           };
           Session session = await sessionService.RefreshAsync(input);
           context.SignIn(session);

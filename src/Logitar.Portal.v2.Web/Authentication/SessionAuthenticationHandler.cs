@@ -48,7 +48,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
 
       if (failure != null)
       {
-        Context.Session.Clear(); // TODO(fpion): call Context.SignOut instead?
+        Context.SignOut();
 
         return failure;
       }

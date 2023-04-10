@@ -40,7 +40,7 @@
             <th scope="col" v-t="'user.session.sort.options.User'" />
             <th scope="col" v-t="'user.session.sort.options.SignedOutOn'" />
             <th scope="col" v-t="'user.session.persistent.label'" />
-            <th scope="col" v-t="'user.session.ipAddress'" />
+            <th scope="col" v-t="'user.session.sort.options.IpAddress'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -60,7 +60,7 @@
               <b-badge v-else-if="sessionItem.isActive" variant="info">{{ $t('user.session.active.label') }}</b-badge>
             </td>
             <td v-text="$t(sessionItem.isPersistent ? 'yes' : 'no')" />
-            <td v-text="getIpAddress(sessionItem)" />
+            <td v-text="sessionItem.ipAddress || '—'" />
             <td>
               <icon-button
                 v-if="sessionItem.id !== session"
@@ -163,10 +163,6 @@ export default {
     }
   },
   methods: {
-    getIpAddress({ customAttributes }) {
-      const ipAddress = customAttributes.filter(({ key }) => key === 'RemoteIpAddress').map(({ value }) => value)
-      return ipAddress.length === 0 ? '—' : ipAddress[ipAddress.length - 1]
-    },
     async refresh(params = null) {
       if (!this.loading) {
         this.loading = true

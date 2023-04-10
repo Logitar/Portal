@@ -91,6 +91,7 @@ internal class SessionQuerier : ISessionQuerier
     {
       query = sort.Value switch
       {
+        SessionSort.IpAddress => isDescending ? query.OrderByDescending(x => x.IpAddress) : query.OrderBy(x => x.IpAddress),
         SessionSort.SignedOutOn => isDescending ? query.OrderByDescending(x => x.SignedOutOn) : query.OrderBy(x => x.SignedOutOn),
         SessionSort.UpdatedOn => isDescending ? query.OrderByDescending(x => x.UpdatedOn ?? x.CreatedOn) : query.OrderBy(x => x.UpdatedOn ?? x.CreatedOn),
         SessionSort.User => isDescending ? query.OrderByDescending(x => x.User!.FullName ?? x.User.Username) : query.OrderBy(x => x.User!.FullName ?? x.User.Username),

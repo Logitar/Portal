@@ -206,6 +206,9 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SessionId"));
 
+                    b.Property<string>("AdditionalInformation")
+                        .HasColumnType("text");
+
                     b.Property<string>("AggregateId")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -223,6 +226,10 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.Property<string>("CustomAttributes")
                         .HasColumnType("jsonb");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");

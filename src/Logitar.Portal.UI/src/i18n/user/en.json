@@ -147,6 +147,7 @@
     "signedOutOn": "Signed out",
     "sort": {
       "options": {
+        "IpAddress": "IP Address",
         "SignedOutOn": "Signed out on",
         "UpdatedOn": "Updated on",
         "User": "User"

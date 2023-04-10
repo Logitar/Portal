@@ -225,6 +225,7 @@ public class UserAggregate : AggregateRoot
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
 
   public SessionAggregate SignIn(RealmAggregate realm, string password, bool isPersistent = false,
+    string? ipAddress = null, string? additionalInformation = null,
     Dictionary<string, string>? customAttributes = null)
   {
     if (realm.Id != RealmId)
@@ -247,7 +248,7 @@ public class UserAggregate : AggregateRoot
     UserSignedIn e = new();
     ApplyChange(e);
 
-    return new SessionAggregate(Id, e.OccurredOn, isPersistent, customAttributes);
+    return new SessionAggregate(Id, e.OccurredOn, isPersistent, ipAddress, additionalInformation, customAttributes);
   }
   protected virtual void Apply(UserSignedIn e) => SignedInOn = e.OccurredOn;
 

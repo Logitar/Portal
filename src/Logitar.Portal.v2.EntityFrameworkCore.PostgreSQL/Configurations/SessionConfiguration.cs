@@ -19,6 +19,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Configurations
 
       builder.Property(x => x.Key).HasMaxLength(byte.MaxValue);
       builder.Property(x => x.SignedOutBy).HasColumnType("jsonb");
+      builder.Property(x => x.IpAddress).HasMaxLength(byte.MaxValue);
       builder.Property(x => x.CustomAttributes).HasColumnType("jsonb");
 
       builder.HasOne(x => x.User).WithMany(x => x.Sessions).OnDelete(DeleteBehavior.Restrict);
