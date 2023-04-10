@@ -1,0 +1,10 @@
+﻿@using Logitar.Portal.v2.Contracts.Users;
+
+@model User
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = "Profile";
+}
+
+<profile json="@(ModelSerializer.Serialize(Model))" session="@(Context.GetSessionId())"></profile>

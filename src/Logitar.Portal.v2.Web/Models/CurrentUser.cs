@@ -1,18 +1,17 @@
-﻿namespace Logitar.Portal.v2.Web.Models;
+﻿using Logitar.Portal.v2.Contracts.Users;
 
-/// <summary>
-/// TODO(fpion): Authentication
-/// </summary>
+namespace Logitar.Portal.v2.Web.Models;
+
 internal record CurrentUser
 {
-  public CurrentUser(/*User? user*/)
+  public CurrentUser(User? user)
   {
-    //IsAuthenticated = user != null;
+    IsAuthenticated = user != null;
 
-    //Email = user?.Email;
-    //FullName = user?.FullName;
-    //Picture = user?.Picture;
-    //Username = user?.Username;
+    EmailAddress = user?.Email?.Address;
+    FullName = user?.FullName;
+    Picture = user?.Picture;
+    Username = user?.Username;
   }
 
   public bool IsAuthenticated { get; }

@@ -11,10 +11,19 @@ public static class DependencyInjectionExtensions
     services.AddControllersWithViews(options => options.Filters.Add<CoreExceptionFilterAttribute>())
       .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-    services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen();
+    services
+      .AddSession(options =>
+      {
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+      })
+      .AddDistributedMemoryCache();
+
+    services.AddHttpContextAccessor();
 
     services.AddLogitarPortalCore();
+
+    services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(DependencyInjectionExtensions).Assembly));
 
     services.AddSingleton<ICurrentActor, HttpCurrentActor>();
 

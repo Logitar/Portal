@@ -32,18 +32,4 @@ public class RealmAccountApiController : ControllerBase
 
   //  return NoContent();
   //}
-
-  //[HttpPost("renew")]
-  //public async Task<ActionResult<SessionModel>> RenewSessionAsync(string id, RenewSessionPayload payload, CancellationToken cancellationToken)
-  //{
-  //  SessionModel session = await _accountService.RenewSessionAsync(payload, id, cancellationToken);
-
-  //  return Ok(session);
-  //}
-
-  //[HttpPost("sign/in")]
-  //public async Task<ActionResult<SessionModel>> SignInAsync(string id, [FromBody] SignInPayload payload, CancellationToken cancellationToken)
-  //{
-  //  return Ok(await _accountService.SignInAsync(payload, id, cancellationToken));
-  //}
 }

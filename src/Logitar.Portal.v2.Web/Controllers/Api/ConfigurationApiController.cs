@@ -1,22 +1,23 @@
-﻿using Logitar.Portal.v2.Core.Configurations;
+﻿using Logitar.Portal.v2.Contracts.Sessions;
+using Logitar.Portal.v2.Core.Configurations;
+using Logitar.Portal.v2.Web.Commands;
+using Logitar.Portal.v2.Web.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers.Api;
 
-/// <summary>
-/// TODO(fpion): SignIn
-/// </summary>
 [ApiController]
 [Route("api/configurations")]
 public class ConfigurationApiController : ControllerBase
 {
-  //private readonly IAccountService _accountService;
   private readonly IConfigurationService _configurationService;
+  private readonly IMediator _mediator;
 
-  public ConfigurationApiController(/*IAccountService accountService,*/ IConfigurationService configurationService)
+  public ConfigurationApiController(IConfigurationService configurationService, IMediator mediator)
   {
-    //_accountService = accountService;
     _configurationService = configurationService;
+    _mediator = mediator;
   }
 
   [HttpPost]
@@ -31,15 +32,8 @@ public class ConfigurationApiController : ControllerBase
 
     await _configurationService.InitializeAsync(input, url, cancellationToken);
 
-    //SignInPayload signInPayload = new()
-    //{
-    //  Username = input.User.Username,
-    //  Password = input.User.Password,
-    //  IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-    //  AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers)
-    //};
-    //SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, cancellationToken);
-    //HttpContext.SetSession(session);
+    Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
+    HttpContext.SignIn(session);
 
     return NoContent();
   }
