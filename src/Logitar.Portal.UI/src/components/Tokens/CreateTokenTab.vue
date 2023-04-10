@@ -7,19 +7,23 @@
         </div>
         <b-row>
           <realm-select class="col" v-model="realm" />
-          <form-field
-            class="col"
-            id="purpose"
-            label="tokens.purpose.label"
-            :maxLength="100"
-            placeholder="tokens.purpose.placeholder"
-            :rules="{ purpose: true }"
-            v-model="purpose"
-          />
           <form-field class="col" id="lifetime" label="tokens.lifetime" :minValue="0" type="number" v-model.number="lifetime" />
         </b-row>
         <b-row>
-          <email-field class="col" validate v-model="email" />
+          <b-form-group class="col">
+            <b-form-checkbox v-model="isConsumable">{{ $t('tokens.isConsumable') }}</b-form-checkbox>
+          </b-form-group>
+        </b-row>
+        <b-row>
+          <purpose-field class="col" v-model="purpose" />
+          <secret-field class="col" v-model="secret" />
+        </b-row>
+        <b-row>
+          <audience-field class="col" v-model="audience" />
+          <issuer-field class="col" v-model="issuer" />
+        </b-row>
+        <b-row>
+          <email-field class="col" validate v-model="emailAddress" />
           <form-field class="col" id="subject" label="tokens.subject.label" placeholder="tokens.subject.placeholder" v-model="subject" />
         </b-row>
         <h3 v-t="'tokens.claims.label'" />
@@ -72,38 +76,65 @@
 
 <script>
 import Vue from 'vue'
+import AudienceField from './AudienceField.vue'
 import EmailField from '@/components/User/EmailField.vue'
+import IssuerField from './IssuerField.vue'
+import PurposeField from './PurposeField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import SecretField from './SecretField.vue'
 import { createToken } from '@/api/tokens'
 
 export default {
   name: 'CreateTokenTab',
   components: {
+    AudienceField,
     EmailField,
-    RealmSelect
+    IssuerField,
+    PurposeField,
+    RealmSelect,
+    SecretField
   },
   data() {
     return {
+      audience: null,
       claims: [],
-      email: null,
+      emailAddress: null,
+      isConsumable: false,
+      issuer: null,
       lifetime: 0,
       loading: false,
       purpose: null,
       realm: null,
+      secret: null,
       subject: null,
       token: null
     }
   },
   computed: {
     hasChanges() {
-      return this.realm || this.purpose || this.lifetime || this.email || this.subject || this.claims.length
+      return (
+        this.realm ||
+        this.purpose ||
+        this.lifetime ||
+        this.secret ||
+        this.audience ||
+        this.issuer ||
+        this.isConsumable ||
+        this.emailAddress ||
+        this.subject ||
+        this.claims.length
+      )
     },
     payload() {
       return {
+        isConsumable: this.isConsumable,
         lifetime: this.lifetime || null,
         purpose: this.purpose || null,
         realm: this.realm,
-        email: this.email || null,
+        secret: this.secret || null,
+        audience: this.audience || null,
+        issuer: this.issuer || null,
+        emailAddress: this.emailAddress || null,
         subject: this.subject || null,
         claims: [...this.claims]
       }

@@ -60,6 +60,14 @@ internal static class FluentValidationExtensions
       .WithMessage("The phone number is not valid.");
   }
 
+  public static IRuleBuilder<T, string?> Purpose<T>(this IRuleBuilder<T, string?> ruleBuilder)
+  {
+    return ruleBuilder.Must(BeAValidPurpose).WithErrorCode("PurposeValidator")
+      .WithMessage("'{PropertyName}' must be composed of non-empty letter-only words, separated by underscores '_'.");
+  }
+  private static bool BeAValidPurpose(string? purpose) => purpose == null
+    || purpose.Split('_').All(w => !string.IsNullOrEmpty(w) && w.All(char.IsLetter));
+
   public static IRuleBuilder<T, string?> Username<T>(this IRuleBuilder<T, string?> ruleBuilder, IUsernameSettings usernameSettings)
   {
     return ruleBuilder.Must(u => BeAValidUsername(u, usernameSettings))

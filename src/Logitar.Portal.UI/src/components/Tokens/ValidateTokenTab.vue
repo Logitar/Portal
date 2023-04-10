@@ -8,15 +8,14 @@
         <form-field id="token" label="tokens.token.label" placeholder="tokens.token.placeholder" required v-model="token" />
         <b-row>
           <realm-select class="col" v-model="realm" />
-          <form-field
-            class="col"
-            id="purpose"
-            label="tokens.purpose.label"
-            :maxLength="100"
-            placeholder="tokens.purpose.placeholder"
-            :rules="{ purpose: true }"
-            v-model="purpose"
-          />
+        </b-row>
+        <b-row>
+          <purpose-field class="col" v-model="purpose" />
+          <secret-field class="col" v-model="secret" />
+        </b-row>
+        <b-row>
+          <audience-field class="col" v-model="audience" />
+          <issuer-field class="col" v-model="issuer" />
         </b-row>
       </b-form>
     </validation-observer>
@@ -24,16 +23,18 @@
       <h3 v-t="'tokens.result.label'" />
       <template v-if="result.succeeded">
         <b-row>
-          <email-field class="col" disabled :value="result.email" />
+          <email-field class="col" disabled :value="result.emailAddress" />
           <form-field class="col" disabled id="subject" label="tokens.subject.label" placeholder="tokens.subject.placeholder" :value="result.subject" />
         </b-row>
         <template v-if="result.claims && result.claims.length">
           <h5 v-t="'tokens.claims.label'" />
           <table class="table table-striped">
             <thead>
-              <th scope="col" v-t="'tokens.claims.type'" />
-              <th scope="col" v-t="'tokens.claims.value'" />
-              <th scope="col" v-t="'tokens.claims.valueType'" />
+              <tr>
+                <th scope="col" v-t="'tokens.claims.type'" />
+                <th scope="col" v-t="'tokens.claims.value'" />
+                <th scope="col" v-t="'tokens.claims.valueType'" />
+              </tr>
             </thead>
             <tbody>
               <tr v-for="(claim, index) in result.claims" :key="index">
@@ -72,34 +73,48 @@
 </template>
 
 <script>
+import AudienceField from './AudienceField.vue'
 import EmailField from '@/components/User/EmailField.vue'
+import IssuerField from './IssuerField.vue'
+import PurposeField from './PurposeField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
+import SecretField from './SecretField.vue'
 import { validateToken } from '@/api/tokens'
 
 export default {
   name: 'ValidateTokenTab',
   components: {
+    AudienceField,
     EmailField,
-    RealmSelect
+    IssuerField,
+    PurposeField,
+    RealmSelect,
+    SecretField
   },
   data() {
     return {
+      audience: null,
+      issuer: null,
       loading: false,
       purpose: null,
       realm: null,
       result: null,
+      secret: null,
       token: null
     }
   },
   computed: {
     hasChanges() {
-      return this.token || this.realm || this.purpose
+      return this.token || this.realm || this.purpose || this.secret || this.audience || this.issuer
     },
     payload() {
       return {
         token: this.token,
         purpose: this.purpose,
-        realm: this.realm
+        realm: this.realm,
+        secret: this.secret,
+        audience: this.audience,
+        issuer: this.issuer
       }
     }
   },
