@@ -12,6 +12,11 @@ internal class SessionService : ISessionService
     _pipeline = pipeline;
   }
 
+  public async Task<Session> RefreshAsync(RefreshInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new Refresh(input), cancellationToken);
+  }
+
   public async Task<Session> SignInAsync(SignInInput input, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new SignIn(input), cancellationToken);

@@ -3,6 +3,7 @@ using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core.Security;
 using Logitar.Portal.v2.Core.Sessions.Events;
 using Logitar.Portal.v2.Core.Sessions.Validators;
+using Logitar.Portal.v2.Core.Users;
 using System.Security.Cryptography;
 
 namespace Logitar.Portal.v2.Core.Sessions;
@@ -46,6 +47,8 @@ public class SessionAggregate : AggregateRoot
     }
   }
 
+  public AggregateId UserId { get; private set; }
+
   public bool IsPersistent => _key != null;
 
   public bool IsActive { get; private set; }
@@ -58,8 +61,48 @@ public class SessionAggregate : AggregateRoot
   {
     _key = e.Key;
 
+    UserId = e.ActorId;
+
     IsActive = true;
 
+    Apply((SessionSaved)e);
+  }
+
+  public void Refresh(byte[] bytes, Dictionary<string, string>? customAttributes = null)
+  {
+    if (!IsActive)
+    {
+      throw new SessionIsNotActiveException(this);
+    }
+    if (_key?.IsMatch(Convert.ToBase64String(bytes)) != true)
+    {
+      throw new InvalidCredentialsException("The specified key did not match.");
+    }
+
+    bytes = RandomNumberGenerator.GetBytes(KeyLength);
+    Pbkdf2 key = new(Convert.ToBase64String(bytes));
+
+    SessionRefreshed e = new()
+    {
+      ActorId = UserId,
+      Key = key,
+      CustomAttributes = customAttributes?.CleanTrim() ?? new()
+    };
+    new SessionRefreshedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
+
+    RefreshToken = new(Id.ToGuid(), bytes);
+  }
+  protected virtual void Apply(SessionRefreshed e)
+  {
+    _key = e.Key;
+
+    Apply((SessionSaved)e);
+  }
+
+  private void Apply(SessionSaved e)
+  {
     _customAttributes.Clear();
     _customAttributes.AddRange(e.CustomAttributes);
   }

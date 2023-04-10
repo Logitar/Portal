@@ -5,7 +5,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
 
 internal class SessionEntity : AggregateEntity, ICustomAttributes
 {
-  public SessionEntity(SessionCreated e, UserEntity user, ActorEntity actor)
+  public SessionEntity(SessionCreated e, UserEntity user) : base(e, ActorEntity.From(user))
   {
     User = user;
     UserId = user.UserId;
@@ -14,7 +14,7 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
 
     IsActive = true;
 
-    CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;
+    Apply(e);
   }
 
   private SessionEntity() : base()
@@ -40,6 +40,20 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
 
   public string? CustomAttributes { get; private set; }
 
+  public void Refresh(SessionRefreshed e)
+  {
+    if (User == null)
+    {
+      throw new InvalidOperationException($"The {nameof(User)} is required.");
+    }
+
+    Update(e, ActorEntity.From(User));
+
+    Key = e.Key.ToString();
+
+    Apply(e);
+  }
+
   public override void SetActor(Guid id, ActorEntity actor)
   {
     base.SetActor(id, actor);
@@ -48,5 +62,10 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
     {
       SignedOutBy = actor.Serialize();
     }
+  }
+
+  private void Apply(SessionSaved e)
+  {
+    CustomAttributes = e.CustomAttributes.Any() ? JsonSerializer.Serialize(e.CustomAttributes) : null;
   }
 }

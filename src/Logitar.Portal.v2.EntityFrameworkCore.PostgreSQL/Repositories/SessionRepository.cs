@@ -10,6 +10,11 @@ internal class SessionRepository : EventStore, ISessionRepository
   {
   }
 
+  public async Task<SessionAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<SessionAggregate>(new AggregateId(id), cancellationToken);
+  }
+
   public async Task SaveAsync(SessionAggregate session, CancellationToken cancellationToken)
   {
     await base.SaveAsync(session, cancellationToken);

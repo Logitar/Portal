@@ -20,7 +20,7 @@ internal class SessionCreatedHandler : INotificationHandler<SessionCreated>
       .SingleOrDefaultAsync(x => x.AggregateId == notification.ActorId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The user entity '{notification.ActorId}' could not be found.");
 
-    SessionEntity session = new(notification, user, ActorEntity.From(user));
+    SessionEntity session = new(notification, user);
 
     _context.Sessions.Add(session);
     await _context.SaveChangesAsync(cancellationToken);

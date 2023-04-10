@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.v2.Web.Controllers.Api;
 
-/// <summary>
-/// TODO(fpion): Renew
-/// </summary>
 [ApiController]
 [Route("api/sessions")]
 public class SessionApiController : ControllerBase
@@ -17,16 +14,14 @@ public class SessionApiController : ControllerBase
     _sessionService = sessionService;
   }
 
-  //[Authorize(Policy = Constants.Policies.ApiKey)] // TODO(fpion): Authorization
-  //[HttpPost("renew")]
-  //public async Task<ActionResult<SessionModel>> RenewSessionAsync(string id, RenewSessionPayload payload, CancellationToken cancellationToken)
-  //{
-  //  SessionModel session = await _accountService.RenewSessionAsync(payload, id, cancellationToken);
+  //[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
+  [HttpPost("refresh")]
+  public async Task<ActionResult<Session>> RefreshAsync(RefreshInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.RefreshAsync(input, cancellationToken));
+  }
 
-  //  return Ok(session);
-  //}
-
-  //[Authorize(Policy = Constants.Policies.ApiKey)] // TODO(fpion): Authorization
+  //[Authorize(Policy = Constants.Policies.PortalIdentity)] // TODO(fpion): Authorization
   [HttpPost("sign/in")]
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, CancellationToken cancellationToken)
   {

@@ -2,6 +2,6 @@
 
 namespace Logitar.Portal.v2.Core.Sessions.Validators;
 
-internal class SessionCreatedValidator : SessionSavedValidator<SessionCreated>
+internal class SessionRefreshedValidator : SessionSavedValidator<SessionRefreshed>
 {
 }

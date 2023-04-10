@@ -1,4 +1,7 @@
-﻿using Logitar.Portal.v2.Web.Extensions;
+﻿using Logitar.Portal.v2.Contracts;
+using Logitar.Portal.v2.Contracts.Sessions;
+using Logitar.Portal.v2.Web.Extensions;
+using System.Text.Json;
 
 namespace Logitar.Portal.v2.Web.Middlewares;
 
@@ -11,23 +14,39 @@ public class RefreshSession
     _next = next;
   }
 
-  public async Task InvokeAsync(HttpContext context)
+  public async Task InvokeAsync(HttpContext context, ISessionService sessionService)
   {
     if (!context.IsSignedIn())
     {
-      if (context.Request.Cookies.TryGetValue(WebConstants.Cookies.RefreshToken, out string? refreshToken) && refreshToken != null)
+      HttpRequest request = context.Request;
+
+      if (request.Cookies.TryGetValue(WebConstants.Cookies.RefreshToken, out string? refreshToken))
       {
         try
         {
-          // TODO(fpion): refresh session
-          //RenewSessionPayload payload = new()
-          //{
-          //  AdditionalInformation = JsonSerializer.Serialize(context.Request.Headers),
-          //  IpAddress = context.Connection.RemoteIpAddress?.ToString(),
-          //  RenewToken = refreshToken
-          //};
-          //SessionModel session = await accountService.RenewSessionAsync(payload);
-          //context.SetSession(session);
+          List<CustomAttribute> customAttributes = new(capacity: 2)
+          {
+            new CustomAttribute
+            {
+              Key = "RequestHeaders",
+              Value = JsonSerializer.Serialize(request.Headers)
+            }
+          };
+          if (context.Connection.RemoteIpAddress != null)
+          {
+            customAttributes.Add(new CustomAttribute
+            {
+              Key = "RemoteIpAddress",
+              Value = context.Connection.RemoteIpAddress.ToString()
+            });
+          }
+          RefreshInput input = new()
+          {
+            RefreshToken = refreshToken,
+            CustomAttributes = customAttributes
+          };
+          Session session = await sessionService.RefreshAsync(input);
+          context.SignIn(session);
         }
         catch (Exception)
         {
