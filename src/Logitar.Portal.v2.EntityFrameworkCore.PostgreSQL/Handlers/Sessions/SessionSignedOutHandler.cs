@@ -20,7 +20,6 @@ internal class SessionSignedOutHandler : INotificationHandler<SessionSignedOut>
   public async Task Handle(SessionSignedOut notification, CancellationToken cancellationToken)
   {
     SessionEntity session = await _context.Sessions
-      .Include(x => x.User)
       .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The session entity '{notification.AggregateId}' could not be found.");
 

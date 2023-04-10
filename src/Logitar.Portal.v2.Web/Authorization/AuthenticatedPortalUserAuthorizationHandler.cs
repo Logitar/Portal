@@ -28,8 +28,7 @@ internal class AuthenticatedPortalUserAuthorizationHandler : AuthorizationHandle
       {
         context.Fail(new AuthorizationFailureReason(this, "The User should not belong to a Realm."));
       }
-
-      if (_httpContextAccessor.HttpContext.GetSession() == null)
+      else if (_httpContextAccessor.HttpContext.GetSession() == null)
       {
         context.Fail(new AuthorizationFailureReason(this, "The Session is required."));
       }

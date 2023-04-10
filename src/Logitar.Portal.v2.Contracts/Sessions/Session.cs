@@ -18,4 +18,7 @@ public record Session : Aggregate
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public User User { get; set; } = new();
+
+  // TODO(fpion): IpAddress as column & sortable property?
+  // TODO(fpion): AdditionalInformation as column and/or property?
 }

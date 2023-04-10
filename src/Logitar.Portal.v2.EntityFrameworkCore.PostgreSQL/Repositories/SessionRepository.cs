@@ -16,6 +16,23 @@ internal class SessionRepository : EventStore, ISessionRepository
   {
   }
 
+  public async Task<IEnumerable<SessionAggregate>> LoadActiveAsync(UserAggregate user, CancellationToken cancellationToken)
+  {
+    string aggregateId = user.Id.Value;
+
+    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Sessions"" s on s.""AggregateId"" = e.""AggregateId"" JOIN ""Users"" u on u.""UserId"" = s.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""AggregateId"" = {aggregateId} AND s.""IsActive"" = true")
+      .AsNoTracking()
+      .OrderBy(x => x.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<SessionAggregate>(events);
+  }
+
+  public async Task<SessionAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<SessionAggregate>(new AggregateId(id), cancellationToken);
+  }
+
   public async Task<IEnumerable<SessionAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
   {
     string aggregateId = realm.Id.Value;
@@ -38,23 +55,6 @@ internal class SessionRepository : EventStore, ISessionRepository
       .ToArrayAsync(cancellationToken);
 
     return Load<SessionAggregate>(events);
-  }
-
-  public async Task<IEnumerable<SessionAggregate>> LoadActiveAsync(UserAggregate user, CancellationToken cancellationToken)
-  {
-    string aggregateId = user.Id.Value;
-
-    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Sessions"" s on s.""AggregateId"" = e.""AggregateId"" JOIN ""Users"" u on u.""UserId"" = s.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""AggregateId"" = {aggregateId} AND s.""IsActive"" = true")
-      .AsNoTracking()
-      .OrderBy(x => x.Version)
-      .ToArrayAsync(cancellationToken);
-
-    return Load<SessionAggregate>(events);
-  }
-
-  public async Task<SessionAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-  {
-    return await LoadAsync<SessionAggregate>(new AggregateId(id), cancellationToken);
   }
 
   public async Task SaveAsync(SessionAggregate session, CancellationToken cancellationToken)
