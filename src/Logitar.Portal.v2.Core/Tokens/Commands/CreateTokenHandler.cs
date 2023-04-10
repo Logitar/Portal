@@ -60,9 +60,9 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
       identity.AddClaims(input.Claims.Select(CreateClaim));
     }
 
-    string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience(); // TODO(fpion): see algorithm
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(); // TODO(fpion): see algorithm
-    string? secret = realm?.Secret ?? input.Secret ?? string.Empty; // secret override + UI validation
+    string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
+    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(); // TODO(fpion): ¬Portal realm
+    string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
 
     return new CreatedToken
     {
