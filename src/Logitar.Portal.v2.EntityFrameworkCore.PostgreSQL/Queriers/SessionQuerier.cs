@@ -27,4 +27,17 @@ internal class SessionQuerier : ISessionQuerier
 
     return _mapper.Map<Session>(entity);
   }
+
+  public async Task<IEnumerable<Session>> GetAsync(IEnumerable<SessionAggregate> sessions, CancellationToken cancellationToken)
+  {
+    IEnumerable<string> aggregateIds = sessions.Select(session => session.Id.Value).Distinct();
+
+    SessionEntity[] entities = await _sessions.AsNoTracking()
+      .Include(x => x.User).ThenInclude(x => x!.ExternalIdentifiers)
+      .Include(x => x.User).ThenInclude(x => x!.Realm)
+      .Where(x => aggregateIds.Contains(x.AggregateId))
+      .ToArrayAsync(cancellationToken);
+
+    return _mapper.Map<IEnumerable<Session>>(entities);
+  }
 }

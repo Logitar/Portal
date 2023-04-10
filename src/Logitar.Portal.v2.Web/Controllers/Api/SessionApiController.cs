@@ -32,4 +32,10 @@ public class SessionApiController : ControllerBase
   {
     return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
   }
+
+  [HttpPatch("sign/out/user/{id}")]
+  public async Task<ActionResult<IEnumerable<Session>>> SignOutUserAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.SignOutUserAsync(id, cancellationToken));
+  }
 }
