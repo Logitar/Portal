@@ -28,9 +28,7 @@ public class ConfigurationApiController : ControllerBase
       return Forbid();
     }
 
-    Uri url = new($"{Request.Scheme}://{Request.Host}");
-
-    await _configurationService.InitializeAsync(input, url, cancellationToken);
+    await _configurationService.InitializeAsync(input, cancellationToken);
 
     Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
     HttpContext.SignIn(session);

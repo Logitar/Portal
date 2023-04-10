@@ -10,8 +10,13 @@ public static class ClaimExtensions
   {
     return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
   }
-  public static string GetIssuer(this RealmAggregate realm)
+  public static string GetIssuer(this RealmAggregate realm, Uri? baseUrl)
   {
+    if (realm.UniqueName != Constants.PortalRealm.UniqueName && baseUrl != null)
+    {
+      return $"{baseUrl.ToString().TrimEnd('/')}/realms/{{UNIQUE_NAME}}".Format(realm);
+    }
+
     return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
   }
   public static string Format(this string value, RealmAggregate? realm)

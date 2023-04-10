@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.EventSourcing;
 using Logitar.Portal.v2.Contracts.Tokens;
 using Logitar.Portal.v2.Core.Claims;
 using Logitar.Portal.v2.Core.Realms;
@@ -10,11 +11,15 @@ namespace Logitar.Portal.v2.Core.Tokens.Commands;
 
 internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
 {
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmRepository _realmRepository;
   private readonly ITokenManager _tokenManager;
 
-  public CreateTokenHandler(IRealmRepository realmRepository, ITokenManager tokenManager)
+  public CreateTokenHandler(IApplicationContext applicationContext,
+    IRealmRepository realmRepository,
+    ITokenManager tokenManager)
   {
+    _applicationContext = applicationContext;
     _realmRepository = realmRepository;
     _tokenManager = tokenManager;
   }
@@ -28,7 +33,11 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
       : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
           ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
 
-    // TODO(fpion): what if Portal realm URL changed?
+    if (realm?.UniqueName == Constants.PortalRealm.UniqueName)
+    {
+      AggregateId actorId = new(Guid.Empty);
+      realm.SetUrl(actorId, _applicationContext.BaseUrl);
+    }
 
     ClaimsIdentity identity = new();
 
@@ -61,7 +70,7 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
     }
 
     string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(); // TODO(fpion): ¬Portal realm
+    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl);
     string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
 
     return new CreatedToken

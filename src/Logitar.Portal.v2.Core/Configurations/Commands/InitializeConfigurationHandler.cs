@@ -28,7 +28,7 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     if (realm == null)
     {
       realm = new(_currentActor.Id, Constants.PortalRealm.UniqueName, Constants.PortalRealm.DisplayName,
-        Constants.PortalRealm.Description, Constants.PortalRealm.DefaultLocale, url: request.Url);
+        Constants.PortalRealm.Description, Constants.PortalRealm.DefaultLocale);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
     }

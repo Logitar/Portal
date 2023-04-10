@@ -12,11 +12,15 @@ namespace Logitar.Portal.v2.Core.Tokens.Commands;
 
 internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedToken>
 {
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmRepository _realmRepository;
   private readonly ITokenManager _tokenManager;
 
-  public ValidateTokenHandler(IRealmRepository realmRepository, ITokenManager tokenManager)
+  public ValidateTokenHandler(IApplicationContext applicationContext,
+    IRealmRepository realmRepository,
+    ITokenManager tokenManager)
   {
+    _applicationContext = applicationContext;
     _realmRepository = realmRepository;
     _tokenManager = tokenManager;
   }
@@ -30,8 +34,14 @@ internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedTo
      : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
        ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
 
+    if (realm?.UniqueName == Constants.PortalRealm.UniqueName)
+    {
+      AggregateId actorId = new(Guid.Empty);
+      realm.SetUrl(actorId, _applicationContext.BaseUrl);
+    }
+
     string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(); // TODO(fpion): ¬Portal realm
+    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl);
     string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
 
     try
