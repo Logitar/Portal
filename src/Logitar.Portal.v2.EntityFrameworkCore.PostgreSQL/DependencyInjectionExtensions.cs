@@ -2,11 +2,13 @@
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Sessions;
+using Logitar.Portal.v2.Core.Tokens;
 using Logitar.Portal.v2.Core.Users;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Actors;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Converters;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Queriers;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Repositories;
+using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +44,8 @@ public static class DependencyInjectionExtensions
       .AddQueriers()
       .AddRepositories()
       .AddScoped<IActorService, ActorService>()
-      .AddScoped<IEventBus, EventBus>();
+      .AddScoped<IEventBus, EventBus>()
+      .AddScoped<ITokenBlacklist, TokenBlacklist>();
   }
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)

@@ -1,4 +1,8 @@
 {
+  "audience": {
+    "label": "Audience",
+    "placeholder": "Specify an audience or leave blank to use default"
+  },
   "claims": {
     "add": "Add claim",
     "label": "Claims",
@@ -11,6 +15,11 @@
     "code": "Code",
     "description": "Description"
   },
+  "isConsumable": "Is consumable",
+  "issuer": {
+    "label": "Issuer",
+    "placeholder": "Specify an issuer or leave blank to use default"
+  },
   "lifetime": "Lifetime (seconds)",
   "purpose": {
     "label": "Purpose",
@@ -19,6 +28,10 @@
   "result": {
     "errors": "Errors",
     "label": "Result"
+  },
+  "secret": {
+    "label": "Secret",
+    "placeholder": "Paste a token secret or leave blank to use default"
   },
   "subject": {
     "label": "Subject",

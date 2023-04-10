@@ -43,6 +43,13 @@ internal class RealmEntity : AggregateEntity, ICustomAttributes
   public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
   public List<UserEntity> Users { get; private set; } = new();
 
+  public void SetUrl(UrlChanged e, ActorEntity actor)
+  {
+    Update(e, actor);
+
+    Url = e.Url?.ToString();
+  }
+
   public void Update(RealmUpdated e, ActorEntity actor)
   {
     base.Update(e, actor);

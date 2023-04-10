@@ -72,6 +72,13 @@ public class RealmAggregate : AggregateRoot
   public void Delete(AggregateId actorId) => ApplyChange(new RealmDeleted { ActorId = actorId });
   protected virtual void Apply(RealmDeleted _) { }
 
+  public void SetUrl(AggregateId actorId, Uri? url) => ApplyChange(new UrlChanged
+  {
+    ActorId = actorId,
+    Url = url
+  });
+  protected virtual void Apply(UrlChanged e) => Url = e.Url;
+
   public void Update(AggregateId actorId, string? displayName, string? description,
     CultureInfo? defaultLocale, string? secret, Uri? url,
     bool requireConfirmedAccount, bool requireUniqueEmail,

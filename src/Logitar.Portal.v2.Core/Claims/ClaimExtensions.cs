@@ -1,10 +1,32 @@
 ﻿using Logitar.Portal.v2.Contracts.Users;
+using Logitar.Portal.v2.Core.Realms;
 using System.Security.Claims;
 
 namespace Logitar.Portal.v2.Core.Claims;
 
 public static class ClaimExtensions
 {
+  public static string GetAudience(this RealmAggregate realm)
+  {
+    return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
+  }
+  public static string GetIssuer(this RealmAggregate realm, Uri? baseUrl)
+  {
+    if (realm.UniqueName != Constants.PortalRealm.UniqueName && baseUrl != null)
+    {
+      return $"{baseUrl.ToString().TrimEnd('/')}/realms/{{UNIQUE_NAME}}".Format(realm);
+    }
+
+    return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
+  }
+  public static string Format(this string value, RealmAggregate? realm)
+  {
+    return (realm == null
+      ? value
+      : value.Replace("{UNIQUE_NAME}", realm.UniqueName).Replace("{URL}", realm.Url?.ToString())
+    ).ToLower();
+  }
+
   public static ClaimsIdentity GetClaimsIdentity(this User user, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
@@ -95,5 +117,9 @@ public static class ClaimExtensions
   private static Claim GetClaim(this DateTime moment, string type)
   {
     return new(type, new DateTimeOffset(moment).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64);
+  }
+  public static DateTime GetDateTime(this Claim claim)
+  {
+    return DateTimeOffset.FromUnixTimeSeconds(long.Parse(claim.Value)).UtcDateTime;
   }
 }

@@ -6,6 +6,7 @@ public static class Rfc7519ClaimTypes
   public const string AuthenticationTime = "auth_time";
   public const string Birthdate = "birthdate";
   public const string EmailAddress = "email";
+  public const string Expires = "exp";
   public const string FirstName = "given_name";
   public const string FullName = "name";
   public const string Gender = "gender";
@@ -19,8 +20,10 @@ public static class Rfc7519ClaimTypes
   public const string PhoneNumber = "phone_number";
   public const string Picture = "picture";
   public const string Profile = "profile";
+  public const string Purpose = "purpose";
   public const string Subject = "sub";
   public const string TimeZone = "zoneinfo";
+  public const string TokenId = "jti";
   public const string UpdatedOn = "updated_at";
   public const string Username = "preferred_username";
   public const string Website = "website";

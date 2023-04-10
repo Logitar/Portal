@@ -44,9 +44,10 @@ public static class DependencyInjectionExtensions
 
     services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(DependencyInjectionExtensions).Assembly));
 
-    services.AddSingleton<ICurrentActor, HttpCurrentActor>();
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
     services.AddSingleton<IAuthorizationHandler, AuthenticatedPortalUserAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
+    services.AddSingleton<ICurrentActor, HttpCurrentActor>();
 
     return services;
   }
