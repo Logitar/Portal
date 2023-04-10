@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.v2.Contracts.Users;
+using Logitar.Portal.v2.Core.Sessions.Commands;
 using MediatR;
 
 namespace Logitar.Portal.v2.Core.Users.Commands;
@@ -6,14 +7,17 @@ namespace Logitar.Portal.v2.Core.Users.Commands;
 internal class DeleteUserHandler : IRequestHandler<DeleteUser, User>
 {
   private readonly ICurrentActor _currentActor;
+  private readonly IMediator _mediator;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
   public DeleteUserHandler(ICurrentActor currentActor,
+    IMediator mediator,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
     _currentActor = currentActor;
+    _mediator = mediator;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -24,7 +28,7 @@ internal class DeleteUserHandler : IRequestHandler<DeleteUser, User>
       ?? throw new AggregateNotFoundException<UserAggregate>(request.Id);
     User output = await _userQuerier.GetAsync(user, cancellationToken);
 
-    // TODO(fpion): delete Sessions
+    await _mediator.Send(new DeleteSessions(user), cancellationToken);
 
     user.Delete(_currentActor.Id);
 

@@ -68,6 +68,9 @@ public class SessionAggregate : AggregateRoot
     Apply((SessionSaved)e);
   }
 
+  public void Delete(AggregateId actorId) => ApplyChange(new SessionDeleted { ActorId = actorId });
+  protected virtual void Apply(SessionDeleted _) { }
+
   public void Refresh(byte[] bytes, Dictionary<string, string>? customAttributes = null)
   {
     if (!IsActive)

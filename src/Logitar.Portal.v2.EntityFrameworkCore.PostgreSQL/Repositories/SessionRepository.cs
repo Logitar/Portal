@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,35 @@ internal class SessionRepository : EventStore, ISessionRepository
   {
   }
 
-  public async Task<IEnumerable<SessionAggregate>> LoadActiveAsync(UserAggregate user, CancellationToken cancellationToken)
+  public async Task<IEnumerable<SessionAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    string aggregateId = realm.Id.Value;
+
+    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Sessions"" s on s.""AggregateId"" = e.""AggregateId"" JOIN ""Users"" u on u.""UserId"" = s.""UserId"" JOIN ""Realms"" r ON r.""RealmId"" = u.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId}")
+      .AsNoTracking()
+      .OrderBy(x => x.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<SessionAggregate>(events);
+  }
+
+  public async Task<IEnumerable<SessionAggregate>> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
   {
     string aggregateId = user.Id.Value;
 
     EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Sessions"" s on s.""AggregateId"" = e.""AggregateId"" JOIN ""Users"" u on u.""UserId"" = s.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""AggregateId"" = {aggregateId}")
+      .AsNoTracking()
+      .OrderBy(x => x.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<SessionAggregate>(events);
+  }
+
+  public async Task<IEnumerable<SessionAggregate>> LoadActiveAsync(UserAggregate user, CancellationToken cancellationToken)
+  {
+    string aggregateId = user.Id.Value;
+
+    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Sessions"" s on s.""AggregateId"" = e.""AggregateId"" JOIN ""Users"" u on u.""UserId"" = s.""UserId"" WHERE e.""AggregateType"" = {AggregateType} AND u.""AggregateId"" = {aggregateId} AND s.""IsActive"" = true")
       .AsNoTracking()
       .OrderBy(x => x.Version)
       .ToArrayAsync(cancellationToken);
