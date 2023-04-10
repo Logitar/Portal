@@ -21,8 +21,9 @@ internal class RealmQuerier : IRealmQuerier
 
   public async Task<Realm> GetAsync(RealmAggregate realm, CancellationToken cancellationToken)
   {
-    RealmEntity? entity = await _realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == realm.Id.Value, cancellationToken);
+    RealmEntity entity = await _realms.AsNoTracking()
+      .SingleOrDefaultAsync(x => x.AggregateId == realm.Id.Value, cancellationToken)
+      ?? throw new InvalidOperationException($"The realm entity '{realm.Id}' could not be found.");
 
     return _mapper.Map<Realm>(entity);
   }

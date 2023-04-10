@@ -28,6 +28,7 @@ internal class DeleteRealmHandler : IRequestHandler<DeleteRealm, Realm>
       ?? throw new AggregateNotFoundException<RealmAggregate>(request.Id);
     Realm output = await _realmQuerier.GetAsync(realm, cancellationToken);
 
+    // TODO(fpion): delete Sessions
     await _mediator.Send(new DeleteUsers(realm), cancellationToken);
 
     realm.Delete(_currentActor.Id);

@@ -106,6 +106,7 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
   public string? CustomAttributes { get; private set; }
 
   public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
+  public List<SessionEntity> Sessions { get; private set; } = new();
 
   public void ChangePassword(PasswordChanged e, ActorEntity actor)
   {
@@ -266,6 +267,13 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
     {
       PhoneVerifiedBy = actor.Serialize();
     }
+  }
+
+  public void SignIn(UserSignedIn e)
+  {
+    SetVersion(e);
+
+    SignedInOn = e.OccurredOn;
   }
 
   public void Update(UserUpdated e, ActorEntity actor)

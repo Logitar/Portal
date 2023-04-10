@@ -21,10 +21,11 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User> GetAsync(UserAggregate user, CancellationToken cancellationToken)
   {
-    UserEntity? entity = await _users.AsNoTracking()
+    UserEntity entity = await _users.AsNoTracking()
       .Include(x => x.ExternalIdentifiers)
       .Include(x => x.Realm)
-      .SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value, cancellationToken)
+      ?? throw new InvalidOperationException($"The user entity '{user.Id}' could not be found.");
 
     return _mapper.Map<User>(entity);
   }

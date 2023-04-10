@@ -1,7 +1,9 @@
 ﻿using Logitar.Portal.v2.Contracts.Realms;
+using Logitar.Portal.v2.Contracts.Sessions;
 using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Core.Configurations;
 using Logitar.Portal.v2.Core.Realms;
+using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -25,6 +27,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IConfigurationService, ConfigurationService>()
       .AddTransient<IRealmService, RealmService>()
+      .AddTransient<ISessionService, SessionService>()
       .AddTransient<IUserService, UserService>();
   }
 }

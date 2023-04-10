@@ -11,6 +11,8 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {
+    [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
+    [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
@@ -44,6 +46,16 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 
       context.Result = new NotFoundObjectResult(value);
     }
+  }
+
+  private static void HandleAccountIsDisabledException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleAccountIsNotConfirmedException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleEmailAddressAlreadyUsedException(ExceptionContext context)

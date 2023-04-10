@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Security;
+using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users.Contact;
 using Logitar.Portal.v2.Core.Users.Events;
 using Logitar.Portal.v2.Core.Users.Validators;
@@ -56,6 +57,8 @@ public class UserAggregate : AggregateRoot
 
   public bool IsDisabled { get; private set; }
 
+  public DateTime? SignedInOn { get; private set; }
+
   public ReadOnlyAddress? Address { get; private set; }
   public ReadOnlyEmail? Email { get; private set; }
   public ReadOnlyPhone? Phone { get; private set; }
@@ -91,7 +94,11 @@ public class UserAggregate : AggregateRoot
 
   public void ChangePassword(AggregateId actorId, RealmAggregate realm, string password, string? current = null)
   {
-    if (current != null && _password?.IsMatch(current) != true)
+    if (realm.Id != RealmId)
+    {
+      throw new ArgumentException("The realm must be the realm in which the user belongs.", nameof(realm));
+    }
+    else if (current != null && _password?.IsMatch(current) != true)
     {
       throw new InvalidCredentialsException("The specified password did not match.");
     }
@@ -216,6 +223,33 @@ public class UserAggregate : AggregateRoot
     ApplyChange(e);
   }
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
+
+  public SessionAggregate SignIn(RealmAggregate realm, string password, bool isPersistent = false,
+    Dictionary<string, string>? customAttributes = null)
+  {
+    if (realm.Id != RealmId)
+    {
+      throw new ArgumentException("The realm must be the realm in which the user belongs.", nameof(realm));
+    }
+    else if (_password?.IsMatch(password) != true)
+    {
+      throw new InvalidCredentialsException("The specified password did not match.");
+    }
+    else if (IsDisabled)
+    {
+      throw new AccountIsDisabledException(this);
+    }
+    else if (realm.RequireConfirmedAccount && !IsConfirmed)
+    {
+      throw new AccountIsNotConfirmedException(this);
+    }
+
+    UserSignedIn e = new();
+    ApplyChange(e);
+
+    return new SessionAggregate(Id, e.OccurredOn, isPersistent, customAttributes);
+  }
+  protected virtual void Apply(UserSignedIn e) => SignedInOn = e.OccurredOn;
 
   public void Update(AggregateId actorId, string? firstName, string? middleName, string? lastName,
     string? nickname, DateTime? birthdate, Gender? gender, CultureInfo? locale, TimeZoneEntry? timeZone,

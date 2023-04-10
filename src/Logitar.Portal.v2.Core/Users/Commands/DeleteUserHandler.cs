@@ -24,6 +24,8 @@ internal class DeleteUserHandler : IRequestHandler<DeleteUser, User>
       ?? throw new AggregateNotFoundException<UserAggregate>(request.Id);
     User output = await _userQuerier.GetAsync(user, cancellationToken);
 
+    // TODO(fpion): delete Sessions
+
     user.Delete(_currentActor.Id);
 
     await _userRepository.SaveAsync(user, cancellationToken);
