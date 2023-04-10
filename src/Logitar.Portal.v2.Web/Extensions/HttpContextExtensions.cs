@@ -14,7 +14,7 @@ internal static class HttpContextExtensions
 
   public static CurrentUser GetCurrentUser(this HttpContext context) => new(context.GetUser());
 
-  public static string? GetIpAddress(this HttpContext context)
+  public static string? GetClientIpAddress(this HttpContext context)
   {
     string? ipAddress = null;
 

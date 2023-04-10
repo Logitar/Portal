@@ -26,7 +26,7 @@ internal class PortalSignInHandler : IRequestHandler<PortalSignIn, Session>
       Username = request.Username,
       Password = request.Password,
       Remember = request.Remember,
-      IpAddress = context?.GetIpAddress(),
+      IpAddress = context?.GetClientIpAddress(),
       AdditionalInformation = context?.GetAdditionalInformation()
     };
 

@@ -25,7 +25,7 @@ public class RefreshSession
           RefreshInput input = new()
           {
             RefreshToken = refreshToken,
-            IpAddress = context.GetIpAddress(),
+            IpAddress = context.GetClientIpAddress(),
             AdditionalInformation = context.GetAdditionalInformation()
           };
           Session session = await sessionService.RefreshAsync(input);
