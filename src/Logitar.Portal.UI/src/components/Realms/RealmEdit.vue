@@ -77,8 +77,6 @@
 </template>
 
 <script>
-// TODO(fpion): Password Recovery
-
 import Vue from 'vue'
 import AliasField from './AliasField.vue'
 import PasswordSettings from './PasswordSettings.vue'
