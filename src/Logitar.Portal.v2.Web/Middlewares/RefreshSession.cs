@@ -36,7 +36,7 @@ public class RefreshSession
           {
             customAttributes.Add(new CustomAttribute
             {
-              Key = "RemoteIpAddress",
+              Key = "RemoteIpAddress", // TODO(fpion): CLIENT-IP header?
               Value = context.Connection.RemoteIpAddress.ToString()
             });
           }

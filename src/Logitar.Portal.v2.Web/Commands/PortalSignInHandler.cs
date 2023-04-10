@@ -33,7 +33,7 @@ internal class PortalSignInHandler : IRequestHandler<PortalSignIn, Session>
       {
         customAttributes.Add(new CustomAttribute
         {
-          Key = "RemoteIpAddress",
+          Key = "RemoteIpAddress", // TODO(fpion): CLIENT-IP header?
           Value = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString()
         });
       }
