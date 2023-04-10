@@ -1,0 +1,7 @@
+﻿@{
+  Layout = "_Layout";
+
+  ViewBag.Title = "Sessions";
+}
+
+<session-list realm="@(Context.Request.Query["realm"])" session="@(Context.GetSessionId())" user="@(Context.Request.Query["user"])"></session-list>
