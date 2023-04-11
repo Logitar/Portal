@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.v2.Contracts.Dictionaries;
+using Logitar.Portal.v2.Contracts.Messages;
 using Logitar.Portal.v2.Contracts.Realms;
 using Logitar.Portal.v2.Contracts.Senders;
 using Logitar.Portal.v2.Contracts.Sessions;
@@ -7,6 +8,7 @@ using Logitar.Portal.v2.Contracts.Tokens;
 using Logitar.Portal.v2.Contracts.Users;
 using Logitar.Portal.v2.Core.Configurations;
 using Logitar.Portal.v2.Core.Dictionaries;
+using Logitar.Portal.v2.Core.Messages;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Sessions;
@@ -36,6 +38,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IConfigurationService, ConfigurationService>()
       .AddTransient<IDictionaryService, DictionaryService>()
+      .AddTransient<IMessageService, MessageService>()
       .AddTransient<IRealmService, RealmService>()
       .AddTransient<ISenderService, SenderService>()
       .AddTransient<ISessionService, SessionService>()

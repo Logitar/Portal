@@ -14,15 +14,15 @@ public record Message : Aggregate
 
   public IEnumerable<Recipient> Recipients { get; set; } = Enumerable.Empty<Recipient>();
 
+  public Guid RealmId { get; set; }
+  public string RealmAlias { get; set; } = string.Empty;
+  public string? RealmDisplayName { get; set; }
+
   public Guid SenderId { get; set; }
   public bool SenderIsDefault { get; set; }
   public ProviderType SenderProvider { get; set; }
   public string SenderAddress { get; set; } = string.Empty;
   public string? SenderDisplayName { get; set; }
-
-  public Guid RealmId { get; set; }
-  public string RealmAlias { get; set; } = string.Empty;
-  public string? RealmDisplayName { get; set; }
 
   public Guid TemplateId { get; set; }
   public string TemplateKey { get; set; } = string.Empty;
