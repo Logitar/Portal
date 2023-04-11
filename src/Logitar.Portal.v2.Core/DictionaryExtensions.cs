@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.v2.Contracts;
 using Logitar.Portal.v2.Contracts.Dictionaries;
+using Logitar.Portal.v2.Contracts.Senders;
 
 namespace Logitar.Portal.v2.Core;
 
@@ -27,10 +28,15 @@ internal static class DictionaryExtensions
       .GroupBy(x => x.Key.Trim())
       .ToDictionary(x => x.Key, x => x.Last().Value);
   }
-
   public static Dictionary<string, string> ToDictionary(this IEnumerable<Entry> entries)
   {
     return entries.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
+      .GroupBy(x => x.Key.Trim())
+      .ToDictionary(x => x.Key, x => x.Last().Value);
+  }
+  public static Dictionary<string, string> ToDictionary(this IEnumerable<Setting> settings)
+  {
+    return settings.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
       .GroupBy(x => x.Key.Trim())
       .ToDictionary(x => x.Key, x => x.Last().Value);
   }

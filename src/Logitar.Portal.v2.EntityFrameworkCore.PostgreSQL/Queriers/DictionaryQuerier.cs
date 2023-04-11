@@ -52,7 +52,11 @@ internal class DictionaryQuerier : IDictionaryQuerier
     }
     if (realm != null)
     {
+      string aggregateId = Guid.TryParse(realm, out Guid realmId)
+        ? new AggregateId(realmId).Value
+        : realm;
 
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId || x.Realm.UniqueNameNormalized == realm.ToUpper());
     }
 
     long total = await query.LongCountAsync(cancellationToken);

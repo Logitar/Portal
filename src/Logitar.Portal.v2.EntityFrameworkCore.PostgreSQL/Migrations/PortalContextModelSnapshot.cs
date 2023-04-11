@@ -294,6 +294,89 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Realms");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SenderEntity", b =>
+                {
+                    b.Property<int>("SenderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SenderId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Settings")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("SenderId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("EmailAddress");
+
+                    b.HasIndex("Provider");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("RealmId", "IsDefault")
+                        .HasFilter("\"IsDefault\" = true");
+
+                    b.ToTable("Senders");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SessionEntity", b =>
                 {
                     b.Property<int>("SessionId")
@@ -696,6 +779,17 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SenderEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
+                        .WithMany("Senders")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.SessionEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", "User")
@@ -723,6 +817,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Dictionaries");
 
                     b.Navigation("ExternalIdentifiers");
+
+                    b.Navigation("Senders");
 
                     b.Navigation("Users");
                 });

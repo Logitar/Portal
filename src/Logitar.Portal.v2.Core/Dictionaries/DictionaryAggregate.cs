@@ -16,7 +16,7 @@ public class DictionaryAggregate : AggregateRoot
   }
 
   public DictionaryAggregate(AggregateId actorId, RealmAggregate realm, CultureInfo locale,
-    Dictionary<string, string>? entries = null)
+    Dictionary<string, string>? entries = null) : base()
   {
     DictionaryCreated e = new()
     {

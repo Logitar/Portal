@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core;
 using Logitar.Portal.v2.Core.Dictionaries;
+using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
   {
     [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
     [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
+    [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
@@ -60,6 +62,11 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
   private static void HandleAccountIsNotConfirmedException(ExceptionContext context)
   {
     context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleCannotDeleteDefaultSenderException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.ExceptionHandled) });
   }
 
   private static void HandleEmailAddressAlreadyUsedException(ExceptionContext context)

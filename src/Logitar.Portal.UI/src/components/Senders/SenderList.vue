@@ -11,17 +11,17 @@
       <provider-select class="col" v-model="provider" />
     </b-row>
     <b-row>
-      <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-      <count-select class="col" v-model="count" />
+      <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+      <count-select class="col" v-model="limit" />
     </b-row>
     <template v-if="senders.length">
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'senders.emailAddress.label'" />
-            <th scope="col" v-t="'senders.displayName.label'" />
+            <th scope="col" v-t="'senders.sort.options.EmailAddress'" />
+            <th scope="col" v-t="'senders.sort.options.DisplayName'" />
             <th scope="col" v-t="'senders.provider.label'" />
-            <th scope="col" v-t="'updated'" />
+            <th scope="col" v-t="'senders.sort.options.UpdatedOn'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -32,7 +32,7 @@
             </td>
             <td v-text="sender.displayName || '—'" />
             <td>{{ $t(`senders.provider.options.${sender.provider}`) }}</td>
-            <td><status-cell :actor="sender.updatedBy" :date="sender.updatedAt" /></td>
+            <td><status-cell :actor="sender.updatedBy" :date="sender.updatedOn" /></td>
             <td>
               <icon-button v-if="sender.isDefault" class="mx-1" disabled icon="star" text="senders.default" variant="info" />
               <icon-button v-else class="mx-1" icon="star" :loading="loading" text="senders.default" variant="warning" @click="onSetDefault(sender)" />
@@ -56,7 +56,7 @@
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </template>
     <p v-else v-t="'senders.empty'" />
   </b-container>
@@ -76,8 +76,8 @@ export default {
   },
   data() {
     return {
-      count: 10,
-      desc: false,
+      isDescending: false,
+      limit: 10,
       loading: false,
       page: 1,
       provider: null,
@@ -98,9 +98,9 @@ export default {
         realm: this.realm,
         search: this.search,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -174,12 +174,12 @@ export default {
       immediate: true,
       async handler(newValue, oldValue) {
         if (
-          newValue?.index &&
+          newValue?.skip &&
           oldValue &&
           (newValue.provider !== oldValue.provider ||
             newValue.realm !== oldValue.realm ||
             newValue.search !== oldValue.search ||
-            newValue.count !== oldValue.count)
+            newValue.limit !== oldValue.limit)
         ) {
           this.page = 1
           await this.refresh()
