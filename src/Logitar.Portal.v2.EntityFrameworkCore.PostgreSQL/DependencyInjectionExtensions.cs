@@ -4,6 +4,7 @@ using Logitar.Portal.v2.Core.Dictionaries;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Sessions;
+using Logitar.Portal.v2.Core.Templates;
 using Logitar.Portal.v2.Core.Tokens;
 using Logitar.Portal.v2.Core.Users;
 using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Actors;
@@ -57,6 +58,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<ISenderQuerier, SenderQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>()
+      .AddScoped<ITemplateQuerier, TemplateQuerier>()
       .AddScoped<IUserQuerier, UserQuerier>();
   }
 
@@ -67,6 +69,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IRealmRepository, RealmRepository>()
       .AddScoped<ISenderRepository, SenderRepository>()
       .AddScoped<ISessionRepository, SessionRepository>()
+      .AddScoped<ITemplateRepository, TemplateRepository>()
       .AddScoped<IUserRepository, UserRepository>();
   }
 }

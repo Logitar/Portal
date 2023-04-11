@@ -14,6 +14,7 @@ public class PortalContext : DbContext
   internal DbSet<RealmEntity> Realms { get; private set; } = null!;
   internal DbSet<SenderEntity> Senders { get; private set; } = null!;
   internal DbSet<SessionEntity> Sessions { get; private set; } = null!;
+  internal DbSet<TemplateEntity> Templates { get; private set; } = null!;
   internal DbSet<BlacklistedTokenEntity> TokenBlacklist { get; private set; } = null!;
   internal DbSet<UserEntity> Users { get; private set; } = null!;
 

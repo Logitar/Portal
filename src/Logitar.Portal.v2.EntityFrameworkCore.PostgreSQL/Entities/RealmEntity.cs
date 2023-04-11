@@ -43,6 +43,7 @@ internal class RealmEntity : AggregateEntity, ICustomAttributes
   public List<DictionaryEntity> Dictionaries { get; private set; } = new();
   public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
   public List<SenderEntity> Senders { get; private set; } = new();
+  public List<TemplateEntity> Templates { get; private set; } = new();
   public List<UserEntity> Users { get; private set; } = new();
 
   public void SetUrl(UrlChanged e, ActorEntity actor)

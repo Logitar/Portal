@@ -14,12 +14,12 @@
               <strong v-t="'templates.key.conflict'" />
             </b-alert>
             <b-row>
-              <realm-select class="col" :disabled="Boolean(template)" v-model="realmId" />
+              <realm-select class="col" :disabled="Boolean(template)" :required="!template" v-model="realmId" />
               <key-field class="col" :disabled="Boolean(template)" ref="key" :required="!template" :validate="!template" v-model="key" />
               <content-type-select class="col" required v-model="contentType" />
             </b-row>
             <form-field id="subject" label="templates.subject.label" :maxLength="256" placeholder="templates.subject.placeholder" required v-model="subject" />
-            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required :rows="20" v-model="contents" />
+            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" :rows="20" v-model="contents" />
           </b-tab>
           <b-tab :title="$t('templates.metadata')">
             <name-field id="displayName" label="templates.displayName.label" placeholder="templates.displayName.placeholder" v-model="displayName" />
@@ -102,7 +102,7 @@ export default {
       )
     },
     hasEmail() {
-      return Boolean(this.userSummary.email)
+      return Boolean(this.userSummary.emailAddress)
     },
     payload() {
       const payload = {
