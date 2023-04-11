@@ -8,31 +8,33 @@
     <b-row>
       <locale-select class="col" v-model="locale" />
       <realm-select class="col" v-model="realm" />
-      <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-      <count-select class="col" v-model="count" />
+      <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+      <count-select class="col" v-model="limit" />
     </b-row>
     <template v-if="dictionaries.length">
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'dictionaries.realmLocale'" />
-            <th scope="col" v-t="'dictionaries.entries.label'" />
-            <th scope="col" v-t="'updated'" />
+            <th scope="col" v-t="'dictionaries.sort.options.RealmLocale'" />
+            <th scope="col" v-t="'dictionaries.sort.options.Entries'" />
+            <th scope="col" v-t="'dictionaries.sort.options.UpdatedOn'" />
             <th scope="col" />
           </tr>
         </thead>
         <tbody>
           <tr v-for="dictionary in dictionaries" :key="dictionary.id">
             <td>
-              <b-link :href="`/dictionaries/${dictionary.id}`">{{ dictionary.realm || $t('realms.select.placeholder') }} | {{ dictionary.locale }}</b-link>
+              <b-link :href="`/dictionaries/${dictionary.id}`">
+                {{ dictionary.realm.displayName ?? dictionary.realm.uniqueName }} | {{ dictionary.locale }}
+              </b-link>
             </td>
-            <td v-text="dictionary.entries" />
-            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedAt" /></td>
+            <td v-text="dictionary.entries.length" />
+            <td><status-cell :actor="dictionary.updatedBy" :date="dictionary.updatedOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${dictionary.id}`" />
               <delete-modal
                 confirm="dictionaries.delete.confirm"
-                :displayName="`${dictionary.realm || $t('realms.select.placeholder')} | ${dictionary.locale}`"
+                :displayName="`${dictionary.realm.displayName ?? dictionary.realm.uniqueName} | ${dictionary.locale}`"
                 :id="`delete_${dictionary.id}`"
                 :loading="loading"
                 title="dictionaries.delete.title"
@@ -42,7 +44,7 @@
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </template>
     <p v-else v-t="'dictionaries.empty'" />
   </b-container>
@@ -60,9 +62,9 @@ export default {
   },
   data() {
     return {
-      count: 10,
-      desc: false,
       dictionaries: [],
+      isDescending: false,
+      limit: 10,
       loading: false,
       locale: null,
       page: 1,
@@ -80,9 +82,9 @@ export default {
         realm: this.realm,
         locale: this.locale,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -137,7 +139,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (newValue?.index && oldValue && (newValue.locale !== oldValue.locale || newValue.realm !== oldValue.realm || newValue.count !== oldValue.count)) {
+        if (newValue?.skip && oldValue && (newValue.locale !== oldValue.locale || newValue.realm !== oldValue.realm || newValue.limit !== oldValue.limit)) {
           this.page = 1
           await this.refresh()
         } else {

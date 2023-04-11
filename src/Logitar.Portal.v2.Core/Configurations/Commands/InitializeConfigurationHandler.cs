@@ -34,7 +34,7 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     }
 
     InitialUserInput input = request.Input.User;
-    CultureInfo? locale = input.Locale.GetCultureInfo(nameof(input.Locale));
+    CultureInfo locale = input.Locale.GetRequiredCultureInfo(nameof(input.Locale));
 
     UserAggregate user = new(_currentActor.Id, realm, input.Username,
       input.FirstName, lastName: input.LastName, locale: locale);

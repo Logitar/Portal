@@ -8,6 +8,7 @@
           :disabled="disabled"
           :id="id"
           :options="options"
+          :ref="id"
           :state="hasRules ? getValidationState(validationContext) : null"
           :value="value"
           @input="$emit('input', $event)"
@@ -77,6 +78,11 @@ export default {
     },
     hasRules() {
       return Object.keys(this.allRules).length
+    }
+  },
+  methods: {
+    focus() {
+      this.$refs[this.id].focus()
     }
   }
 }

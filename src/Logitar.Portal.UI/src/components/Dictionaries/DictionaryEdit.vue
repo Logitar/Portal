@@ -8,11 +8,14 @@
           <icon-submit v-if="dictionary" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
+        <b-alert dismissible variant="warning" v-model="localeConflict">
+          <strong v-t="'dictionaries.localeConflict'" />
+        </b-alert>
         <b-row>
-          <realm-select class="col" :disabled="Boolean(dictionary)" v-model="selectedRealm" />
-          <locale-select class="col" :disabled="Boolean(dictionary)" required v-model="selectedLocale" />
+          <realm-select class="col" :disabled="Boolean(dictionary)" :required="!dictionary" v-model="selectedRealm" />
+          <locale-select class="col" :disabled="Boolean(dictionary)" ref="locale" :required="!dictionary" v-model="selectedLocale" />
         </b-row>
-        <h3 v-t="'dictionaries.entries.label'" />
+        <h3 v-t="'dictionaries.entries.title'" />
         <div class="my-2">
           <icon-button icon="plus" text="dictionaries.entries.add" variant="success" @click="addEntry" />
         </div>
@@ -80,6 +83,7 @@ export default {
       dictionary: null,
       entries: [],
       loading: false,
+      localeConflict: false,
       selectedLocale: null,
       selectedRealm: null
     }
@@ -122,6 +126,7 @@ export default {
     async submit() {
       if (!this.loading) {
         this.loading = true
+        this.localeConflict = false
         try {
           if (await this.$refs.form.validate()) {
             if (this.dictionary) {
@@ -135,7 +140,12 @@ export default {
             }
           }
         } catch (e) {
-          this.handleError(e)
+          if (e.status === 409 && e.data?.code === 'LocaleAlreadyUsed') {
+            this.localeConflict = true
+            this.$refs.locale.focus()
+          } else {
+            this.handleError(e)
+          }
         } finally {
           this.loading = false
         }

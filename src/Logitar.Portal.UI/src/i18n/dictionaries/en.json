@@ -10,15 +10,16 @@
   "entries": {
     "add": "Add entry",
     "key": "Key",
-    "label": "Entries",
+    "title": "Entries",
     "value": "Value"
   },
+  "localeConflict": "The selected locale is already used in this realm.",
   "newTitle": "Create dictionary",
-  "realmLocale": "Realm & Locale",
   "sort": {
     "options": {
+      "Entries": "Entries",
       "RealmLocale": "Realm then Locale",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "title": "Dictionaries",

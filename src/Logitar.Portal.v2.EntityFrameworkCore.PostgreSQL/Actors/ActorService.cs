@@ -44,6 +44,13 @@ internal class ActorService : IActorService
   {
     Guid id = new AggregateId(aggregateId).ToGuid();
 
+    DictionaryEntity[] dictionaries = await _context.Dictionaries.Where(x => x.CreatedById == id || x.UpdatedById == id)
+      .ToArrayAsync(cancellationToken);
+    foreach (DictionaryEntity dictionary in dictionaries)
+    {
+      dictionary.SetActor(id, actor);
+    }
+
     ExternalIdentifierEntity[] externalIdentifiers = await _context.ExternalIdentifiers.Where(x => x.CreatedById == id || x.UpdatedById == id)
       .ToArrayAsync(cancellationToken);
     foreach (ExternalIdentifierEntity externalIdentifier in externalIdentifiers)

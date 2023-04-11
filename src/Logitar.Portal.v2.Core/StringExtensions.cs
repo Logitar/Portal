@@ -16,6 +16,10 @@ internal static class StringExtensions
       throw new InvalidLocaleException(name, paramName, innerException);
     }
   }
+  public static CultureInfo GetRequiredCultureInfo(this string name, string paramName)
+  {
+    return name.GetCultureInfo(paramName) ?? throw new InvalidLocaleException(name, paramName);
+  }
 
   public static Gender? GetGender(this string value)
   {

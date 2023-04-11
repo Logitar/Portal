@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.v2.Core.Dictionaries;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Tokens;
@@ -51,6 +52,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddQueriers(this IServiceCollection services)
   {
     return services
+      .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>()
       .AddScoped<IUserQuerier, UserQuerier>();
@@ -59,6 +61,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddRepositories(this IServiceCollection services)
   {
     return services
+      .AddScoped<IDictionaryRepository, DictionaryRepository>()
       .AddScoped<IRealmRepository, RealmRepository>()
       .AddScoped<ISessionRepository, SessionRepository>()
       .AddScoped<IUserRepository, UserRepository>();
