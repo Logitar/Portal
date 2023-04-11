@@ -21,7 +21,7 @@ public class UserApiController : ControllerBase
   public async Task<ActionResult<User>> CreateAsync([FromBody] CreateUserInput input, CancellationToken cancellationToken)
   {
     User user = await _userService.CreateAsync(input, cancellationToken);
-    var uri = new Uri($"/api/users/{user.Id}", UriKind.Relative);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/users/{user.Id}");
 
     return Created(uri, user);
   }

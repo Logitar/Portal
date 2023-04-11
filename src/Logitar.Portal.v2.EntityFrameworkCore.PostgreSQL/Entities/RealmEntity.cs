@@ -40,6 +40,7 @@ internal class RealmEntity : AggregateEntity, ICustomAttributes
   public string? ClaimMappings { get; private set; }
   public string? CustomAttributes { get; private set; }
 
+  public List<DictionaryEntity> Dictionaries { get; private set; } = new();
   public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
   public List<UserEntity> Users { get; private set; } = new();
 

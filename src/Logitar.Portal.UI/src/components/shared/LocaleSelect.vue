@@ -5,6 +5,7 @@
     :label="label"
     :options="options"
     :placeholder="placeholder"
+    :ref="id"
     :required="required"
     :value="value"
     @input="$emit('input', $event)"
@@ -50,6 +51,11 @@ export default {
         this.locales.map(({ code, displayName }) => ({ text: displayName, value: code })),
         'text'
       )
+    }
+  },
+  methods: {
+    focus() {
+      this.$refs[this.id].focus()
     }
   },
   async created() {

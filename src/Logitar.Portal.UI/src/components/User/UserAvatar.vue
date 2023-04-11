@@ -1,7 +1,7 @@
 <template>
   <span>
-    <b-avatar v-if="user.picture || !user.email" :alt="alt" :size="size" :src="user.picture" variant="dark" />
-    <v-gravatar v-else class="rounded-circle" :email="user.email" :size="size" />
+    <b-avatar v-if="user.picture || !email" :alt="alt" :size="size" :src="user.picture" variant="dark" />
+    <v-gravatar v-else class="rounded-circle" :email="email" :size="size" />
   </span>
 </template>
 
@@ -21,6 +21,9 @@ export default {
   computed: {
     alt() {
       return `${this.user.fullName ?? this.user.username}'s avatar`
+    },
+    email() {
+      return this.user.email?.address ?? this.user.emailAddress ?? null
     }
   }
 }

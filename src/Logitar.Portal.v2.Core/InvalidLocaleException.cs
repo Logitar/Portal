@@ -4,7 +4,7 @@ namespace Logitar.Portal.v2.Core;
 
 public class InvalidLocaleException : Exception, IPropertyFailure
 {
-  public InvalidLocaleException(string value, string paramName, Exception innerException)
+  public InvalidLocaleException(string value, string paramName, Exception? innerException = null)
     : base(GetMessage(value, paramName), innerException)
   {
     Data[nameof(Value)] = value;

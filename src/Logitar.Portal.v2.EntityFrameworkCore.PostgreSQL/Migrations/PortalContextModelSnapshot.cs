@@ -46,6 +46,78 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("TokenBlacklist");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.DictionaryEntity", b =>
+                {
+                    b.Property<int>("DictionaryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DictionaryId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Entries")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("EntryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("DictionaryId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("EntryCount");
+
+                    b.HasIndex("Locale");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("RealmId", "Locale")
+                        .IsUnique();
+
+                    b.ToTable("Dictionaries");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.ExternalIdentifierEntity", b =>
                 {
                     b.Property<int>("ExternalIdentifierId")
@@ -594,6 +666,17 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.DictionaryEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
+                        .WithMany("Dictionaries")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.ExternalIdentifierEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
@@ -637,6 +720,8 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 
             modelBuilder.Entity("Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
                 {
+                    b.Navigation("Dictionaries");
+
                     b.Navigation("ExternalIdentifiers");
 
                     b.Navigation("Users");

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core;
+using Logitar.Portal.v2.Core.Dictionaries;
 using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
+    [typeof(LocaleAlreadyUsedException)] = HandleLocaleAlreadyUsedException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(TooManyResultsException)] = HandleTooManyResultsException,
     [typeof(UniqueNameAlreadyUsedException)] = HandleUniqueNameAlreadyUsedException,
@@ -99,6 +101,14 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     if (context.Exception is InvalidUrlException exception)
     {
       context.Result = new BadRequestObjectResult(GetPropertyFailure(exception));
+    }
+  }
+
+  private static void HandleLocaleAlreadyUsedException(ExceptionContext context)
+  {
+    if (context.Exception is LocaleAlreadyUsedException exception)
+    {
+      context.Result = new ConflictObjectResult(GetPropertyFailure(exception));
     }
   }
 
