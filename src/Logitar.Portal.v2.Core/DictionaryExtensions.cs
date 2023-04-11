@@ -28,9 +28,9 @@ internal static class DictionaryExtensions
       .ToDictionary(x => x.Key, x => x.Last().Value);
   }
 
-  public static Dictionary<string, string> ToDictionary(this IEnumerable<Entry> entry)
+  public static Dictionary<string, string> ToDictionary(this IEnumerable<Entry> entries)
   {
-    return entry.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
+    return entries.Where(x => !string.IsNullOrWhiteSpace(x.Key) && !string.IsNullOrWhiteSpace(x.Value))
       .GroupBy(x => x.Key.Trim())
       .ToDictionary(x => x.Key, x => x.Last().Value);
   }
