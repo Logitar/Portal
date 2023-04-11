@@ -21,7 +21,7 @@ internal class DictionaryUpdatedHandler : INotificationHandler<DictionaryUpdated
   {
     DictionaryEntity dictionary = await _context.Dictionaries
       .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken)
-      ?? throw new InvalidOperationException($"The user entity '{notification.AggregateId}' could not be found.");
+      ?? throw new InvalidOperationException($"The dictionary entity '{notification.AggregateId}' could not be found.");
 
     ActorEntity actor = await _actorService.GetAsync(notification, cancellationToken);
     dictionary.Update(notification, actor);

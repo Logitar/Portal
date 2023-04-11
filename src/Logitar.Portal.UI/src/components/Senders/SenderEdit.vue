@@ -9,7 +9,7 @@
           <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
         <b-row>
-          <realm-select class="col" :disabled="Boolean(sender)" v-model="realmId" />
+          <realm-select class="col" :disabled="Boolean(sender)" :required="!sender" v-model="realmId" />
           <provider-select class="col" :disabled="Boolean(sender)" :required="!sender" v-model="selectedProvider" />
         </b-row>
         <b-row>

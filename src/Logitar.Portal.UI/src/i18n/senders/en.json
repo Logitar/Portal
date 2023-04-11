@@ -39,7 +39,7 @@
     "options": {
       "DisplayName": "Display name",
       "EmailAddress": "Email address",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "title": "Senders",

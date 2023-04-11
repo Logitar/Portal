@@ -18,7 +18,7 @@ internal class DictionaryDeletedHandler : INotificationHandler<DictionaryDeleted
   {
     DictionaryEntity dictionary = await _context.Dictionaries
       .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken)
-      ?? throw new InvalidOperationException($"The Dictionary entity '{notification.AggregateId}' could not be found.");
+      ?? throw new InvalidOperationException($"The dictionary entity '{notification.AggregateId}' could not be found.");
 
     _context.Dictionaries.Remove(dictionary);
     await _context.SaveChangesAsync(cancellationToken);

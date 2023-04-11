@@ -65,6 +65,13 @@ internal class ActorService : IActorService
       realm.SetActor(id, actor);
     }
 
+    SenderEntity[] senders = await _context.Senders.Where(x => x.CreatedById == id || x.UpdatedById == id)
+      .ToArrayAsync(cancellationToken);
+    foreach (SenderEntity sender in senders)
+    {
+      sender.SetActor(id, actor);
+    }
+
     SessionEntity[] sessions = await _context.Sessions.Where(x => x.CreatedById == id
         || x.UpdatedById == id || x.SignedOutById == id)
       .ToArrayAsync(cancellationToken);

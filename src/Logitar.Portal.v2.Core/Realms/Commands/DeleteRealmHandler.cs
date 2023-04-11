@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.v2.Contracts.Realms;
 using Logitar.Portal.v2.Core.Dictionaries.Commands;
+using Logitar.Portal.v2.Core.Senders.Commands;
 using Logitar.Portal.v2.Core.Sessions.Commands;
 using Logitar.Portal.v2.Core.Users.Commands;
 using MediatR;
@@ -34,6 +35,7 @@ internal class DeleteRealmHandler : IRequestHandler<DeleteRealm, Realm>
     await _mediator.Send(new DeleteUsers(realm), cancellationToken);
 
     await _mediator.Send(new DeleteDictionaries(realm), cancellationToken);
+    await _mediator.Send(new DeleteSenders(realm), cancellationToken);
 
     realm.Delete(_currentActor.Id);
 

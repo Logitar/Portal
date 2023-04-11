@@ -2,6 +2,7 @@
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
 using Logitar.Portal.v2.Core.Realms;
+using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +33,12 @@ internal class RealmRepository : EventStore, IRealmRepository
       .ToArrayAsync(cancellationToken);
 
     return Load<RealmAggregate>(events).SingleOrDefault();
+  }
+
+  public async Task<RealmAggregate> LoadAsync(SenderAggregate sender, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<RealmAggregate>(sender.RealmId, cancellationToken)
+      ?? throw new InvalidOperationException($"The realm '{sender.RealmId}' could not be found.");
   }
 
   public async Task<RealmAggregate> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
