@@ -8,17 +8,17 @@
     <b-row>
       <search-field class="col" v-model="search" />
       <realm-select class="col" v-model="realm" />
-      <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-      <count-select class="col" v-model="count" />
+      <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+      <count-select class="col" v-model="limit" />
     </b-row>
     <template v-if="templates.length">
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'templates.key.label'" />
-            <th scope="col" v-t="'templates.displayName.label'" />
+            <th scope="col" v-t="'templates.sort.options.Key'" />
+            <th scope="col" v-t="'templates.sort.options.DisplayName'" />
             <th scope="col" v-t="'templates.contentType.label'" />
-            <th scope="col" v-t="'updated'" />
+            <th scope="col" v-t="'templates.sort.options.UpdatedOn'" />
             <th scope="col" />
           </tr>
         </thead>
@@ -29,7 +29,7 @@
             </td>
             <td v-text="template.displayName || '—'" />
             <td>{{ $t(`templates.contentType.options.${template.contentType}`) }}</td>
-            <td><status-cell :actor="template.updatedBy" :date="template.updatedAt" /></td>
+            <td><status-cell :actor="template.updatedBy" :date="template.updatedOn" /></td>
             <td>
               <icon-button icon="trash-alt" text="actions.delete" variant="danger" v-b-modal="`delete_${template.id}`" />
               <delete-modal
@@ -44,7 +44,7 @@
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </template>
     <p v-else v-t="'templates.empty'" />
   </b-container>
@@ -62,8 +62,8 @@ export default {
   },
   data() {
     return {
-      count: 10,
-      desc: false,
+      isDescending: false,
+      limit: 10,
       loading: false,
       page: 1,
       realm: null,
@@ -82,9 +82,9 @@ export default {
         realm: this.realm,
         search: this.search,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -139,7 +139,7 @@ export default {
       deep: true,
       immediate: true,
       async handler(newValue, oldValue) {
-        if (newValue?.index && oldValue && (newValue.realm !== oldValue.realm || newValue.search !== oldValue.search || newValue.count !== oldValue.count)) {
+        if (newValue?.skip && oldValue && (newValue.realm !== oldValue.realm || newValue.search !== oldValue.search || newValue.limit !== oldValue.limit)) {
           this.page = 1
           await this.refresh()
         } else {

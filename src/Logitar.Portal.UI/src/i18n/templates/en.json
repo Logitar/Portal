@@ -46,7 +46,7 @@
     "options": {
       "DisplayName": "Display name",
       "Key": "Key",
-      "UpdatedAt": "Updated on"
+      "UpdatedOn": "Updated on"
     }
   },
   "status": {

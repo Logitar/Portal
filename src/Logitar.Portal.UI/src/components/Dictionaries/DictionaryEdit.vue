@@ -93,7 +93,7 @@ export default {
       return (
         (!this.dictionary && this.selectedRealm) ||
         (!this.dictionary && this.selectedLocale) ||
-        JSON.stringify(this.entries) !== JSON.stringify(this.dictionary?.entries ?? [])
+        JSON.stringify(this.orderBy(this.entries, 'key')) !== JSON.stringify(this.orderBy(this.dictionary?.entries ?? [], 'key'))
       )
     },
     payload() {

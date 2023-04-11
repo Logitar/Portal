@@ -15,7 +15,7 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.HasIndex(x => x.EmailAddress);
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Provider);
-    builder.HasIndex(x => new { x.RealmId, x.IsDefault }).HasFilter($@"""{nameof(SenderEntity.IsDefault)}"" = true");
+    builder.HasIndex(x => new { x.RealmId, x.IsDefault }).IsUnique().HasFilter($@"""{nameof(SenderEntity.IsDefault)}"" = true");
 
     builder.Property(x => x.EmailAddress).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.DisplayName).HasMaxLength(byte.MaxValue);
