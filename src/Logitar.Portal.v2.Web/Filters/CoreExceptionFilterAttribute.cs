@@ -2,6 +2,8 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.v2.Core;
 using Logitar.Portal.v2.Core.Dictionaries;
+using Logitar.Portal.v2.Core.Messages;
+using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Sessions;
 using Logitar.Portal.v2.Core.Users;
@@ -17,6 +19,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
     [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
     [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
+    [typeof(DefaultSenderRequiredException)] = HandleDefaultSenderRequiredException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
     [typeof(InvalidCredentialsException)] = HandleInvalidCredentialsException,
@@ -24,9 +27,13 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
     [typeof(LocaleAlreadyUsedException)] = HandleLocaleAlreadyUsedException,
+    [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
+    [typeof(TemplateNotInRealmException)] = HandleTemplateNotInRealmException,
     [typeof(TooManyResultsException)] = HandleTooManyResultsException,
     [typeof(UniqueNameAlreadyUsedException)] = HandleUniqueNameAlreadyUsedException,
+    [typeof(UsersHasNoEmailException)] = HandleUsersHasNoEmailException,
+    [typeof(UsersNotFoundException)] = HandleUsersNotFoundException,
     [typeof(ValidationException)] = HandleValidationException
   };
 
@@ -51,6 +58,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
       }
 
       context.Result = new NotFoundObjectResult(value);
+      context.ExceptionHandled = true;
     }
   }
 
@@ -66,7 +74,12 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
 
   private static void HandleCannotDeleteDefaultSenderException(ExceptionContext context)
   {
-    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.ExceptionHandled) });
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleDefaultSenderRequiredException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleEmailAddressAlreadyUsedException(ExceptionContext context)
@@ -119,7 +132,17 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     }
   }
 
+  private static void HandleSenderNotInRealmException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
   private static void HandleSessionIsNotActiveException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleTemplateNotInRealmException(ExceptionContext context)
   {
     context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
@@ -134,6 +157,32 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     if (context.Exception is UniqueNameAlreadyUsedException exception)
     {
       context.Result = new ConflictObjectResult(GetPropertyFailure(exception));
+    }
+  }
+
+  private static void HandleUsersHasNoEmailException(ExceptionContext context)
+  {
+    if (context.Exception is UsersHasNoEmailException exception)
+    {
+      context.Result = new BadRequestObjectResult(new
+      {
+        Code = GetCode(exception),
+        exception.Ids,
+        PropertyName = exception.ParamName
+      });
+    }
+  }
+
+  private static void HandleUsersNotFoundException(ExceptionContext context)
+  {
+    if (context.Exception is UsersNotFoundException exception)
+    {
+      context.Result = new NotFoundObjectResult(new
+      {
+        Code = GetCode(exception),
+        exception.Users,
+        PropertyName = exception.ParamName
+      });
     }
   }
 

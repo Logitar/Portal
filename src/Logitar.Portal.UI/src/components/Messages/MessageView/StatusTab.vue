@@ -4,9 +4,13 @@
     <p>
       <template v-if="realm">
         {{ $t('messages.realmFormat') }}
-        <b-link :href="`/realms/${realm.alias}`" target="_blank">{{ `${realm.name} (${realm.alias})` }} <font-awesome-icon icon="external-link-alt" /></b-link>.
+        <b-link :href="`/realms/${realm.uniqueName}`" target="_blank">
+          {{ `${realm.displayName} (${realm.uniqueName})` }} <font-awesome-icon icon="external-link-alt" /> </b-link
+        >.
       </template>
-      <template v-else-if="message.realmId">{{ $t('messages.realmFormat') }} <strong v-text="`${message.realmName} (${message.realmAlias})`" />.</template>
+      <template v-else-if="message.realmId">
+        {{ $t('messages.realmFormat') }} <strong v-text="`${message.realmDisplayName} (${message.realmUniqueName})`" />.
+      </template>
       <template v-else>{{ $t('messages.noRealm.part1') }} <strong v-t="'messages.noRealm.part2'" />.</template>
       <br />
       <template v-if="sender">
@@ -18,8 +22,8 @@
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}
-        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong>
-        .
+        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong
+        >.
       </template>
       <template v-else>
         {{ $t('messages.sender.format1') }}
@@ -28,8 +32,8 @@
         {{ ' ' }}
         <b-badge v-if="message.senderIsDefault" variant="info" v-t="'messages.sender.default'" />
         {{ $t('messages.sender.format2') }}
-        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong>
-        .
+        <strong>{{ $t(`senders.provider.options.${message.senderProvider}`) }}</strong
+        >.
       </template>
       <br />
       {{ $t('messages.status.format') }} <status-badge :message="message" />
@@ -89,10 +93,8 @@ export default {
   },
   async created() {
     try {
-      if (this.message.realmId) {
-        const { data } = await getRealm(this.message.realmId)
-        this.realm = data
-      }
+      const { data } = await getRealm(this.message.realmId)
+      this.realm = data
     } catch (e) {
       if (e.status !== 404) {
         this.handleError(e)

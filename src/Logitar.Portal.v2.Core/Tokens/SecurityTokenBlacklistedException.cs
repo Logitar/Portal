@@ -15,6 +15,8 @@ public class SecurityTokenBlacklistedException : SecurityTokenValidationExceptio
     StringBuilder message = new();
 
     message.AppendLine("The security token is blacklisted.");
+
+    message.AppendLine();
     message.AppendLine("Blacklisted identifiers:");
     foreach (Guid blacklistedId in blacklistedIds)
     {

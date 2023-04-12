@@ -58,6 +58,13 @@ internal class ActorService : IActorService
       externalIdentifier.SetActor(id, actor);
     }
 
+    MessageEntity[] messages = await _context.Messages.Where(x => x.CreatedById == id || x.UpdatedById == id)
+      .ToArrayAsync(cancellationToken);
+    foreach (MessageEntity message in messages)
+    {
+      message.SetActor(id, actor);
+    }
+
     RealmEntity[] realms = await _context.Realms.Where(x => x.CreatedById == id || x.UpdatedById == id)
       .ToArrayAsync(cancellationToken);
     foreach (RealmEntity realm in realms)
