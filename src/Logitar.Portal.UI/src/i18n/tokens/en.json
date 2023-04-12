@@ -1,0 +1,49 @@
+{
+  "audience": {
+    "label": "Audience",
+    "placeholder": "Specify an audience or leave blank to use default"
+  },
+  "claims": {
+    "add": "Add claim",
+    "label": "Claims",
+    "type": "Type",
+    "value": "Value",
+    "valueType": "Value Type"
+  },
+  "create": "Create",
+  "error": {
+    "code": "Code",
+    "description": "Description"
+  },
+  "isConsumable": "Is consumable",
+  "issuer": {
+    "label": "Issuer",
+    "placeholder": "Specify an issuer or leave blank to use default"
+  },
+  "lifetime": "Lifetime (seconds)",
+  "purpose": {
+    "label": "Purpose",
+    "placeholder": "Enter a token purpose (only letters and '_')"
+  },
+  "result": {
+    "errors": "Errors",
+    "label": "Result"
+  },
+  "secret": {
+    "label": "Secret",
+    "placeholder": "Paste a token secret or leave blank to use default"
+  },
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter a subject claim, typically an ID"
+  },
+  "title": "Tokens",
+  "token": {
+    "clipboard": "Copy to clipboard",
+    "decoder": "Go to decoder",
+    "heading": "Your new token",
+    "label": "Token",
+    "placeholder": "Paste your token"
+  },
+  "validate": "Validate"
+}

@@ -1,0 +1,27 @@
+{
+  "created": "The dictionary has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following dictionary?",
+    "success": "The dictionary has been deleted.",
+    "title": "Delete dictionary"
+  },
+  "editTitle": "Edit dictionary",
+  "empty": "This list is empty.",
+  "entries": {
+    "add": "Add entry",
+    "key": "Key",
+    "title": "Entries",
+    "value": "Value"
+  },
+  "localeConflict": "The selected locale is already used in this realm.",
+  "newTitle": "Create dictionary",
+  "sort": {
+    "options": {
+      "Entries": "Entries",
+      "RealmLocale": "Realm then Locale",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": "Dictionaries",
+  "updated": "The dictionary has been updated."
+}
