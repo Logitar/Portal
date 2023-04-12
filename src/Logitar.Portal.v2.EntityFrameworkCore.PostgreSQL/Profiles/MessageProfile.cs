@@ -16,7 +16,6 @@ internal class MessageProfile : Profile
       .IncludeBase<AggregateEntity, Aggregate>()
       .ForMember(x => x.Id, x => x.MapFrom(MappingHelper.GetId))
       .ForMember(x => x.Recipients, x => x.MapFrom(GetRecipients))
-      .ForMember(x => x.RealmAlias, x => x.MapFrom(y => y.RealmUniqueName))
       .ForMember(x => x.SenderAddress, x => x.MapFrom(y => y.SenderEmailAddress))
       .ForMember(x => x.TemplateKey, x => x.MapFrom(y => y.TemplateUniqueName))
       .ForMember(x => x.Variables, x => x.MapFrom(GetVariables))

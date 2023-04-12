@@ -45,7 +45,7 @@
   "sort": {
     "options": {
       "Subject": "Subject",
-      "UpdatedAt": "Sent on"
+      "UpdatedOn": "Sent on"
     }
   },
   "status": {

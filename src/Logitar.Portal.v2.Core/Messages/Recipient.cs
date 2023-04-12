@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.v2.Contracts.Messages;
+﻿using Logitar.Portal.v2.Contracts.Messages;
 using Logitar.Portal.v2.Core.Users;
 using System.Text.Json.Serialization;
 
@@ -12,7 +11,7 @@ public record Recipient
   public string Address { get; init; } = string.Empty;
   public string? DisplayName { get; init; }
 
-  public AggregateId? UserId { get; init; }
+  public Guid? UserId { get; init; }
   public string? UserLocale { get; init; }
   public string? Username { get; init; }
 
@@ -24,7 +23,7 @@ public record Recipient
     Type = input.Type,
     Address = user?.Email?.Address ?? input.Address ?? string.Empty,
     DisplayName = user?.FullName ?? input.DisplayName,
-    UserId = user?.Id,
+    UserId = user?.Id.ToGuid(),
     UserLocale = user?.Locale?.Name,
     Username = user?.Username
   };

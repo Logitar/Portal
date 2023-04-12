@@ -6,5 +6,5 @@ public record SendDemoMessageInput
 
   public string? Locale { get; set; }
 
-  public IEnumerable<Variable>? Variables { get; set; } // TODO(fpion): Value is now required
+  public IEnumerable<Variable>? Variables { get; set; }
 }

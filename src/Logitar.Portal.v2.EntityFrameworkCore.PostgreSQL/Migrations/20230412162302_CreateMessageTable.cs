@@ -22,6 +22,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                     Subject = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Body = table.Column<string>(type: "text", nullable: false),
                     Recipients = table.Column<string>(type: "jsonb", nullable: false),
+                    RecipientCount = table.Column<int>(type: "integer", nullable: false),
                     RealmId = table.Column<Guid>(type: "uuid", nullable: false),
                     RealmUniqueName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     RealmDisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),

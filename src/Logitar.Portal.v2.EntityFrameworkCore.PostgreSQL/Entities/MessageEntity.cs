@@ -13,6 +13,7 @@ internal class MessageEntity : AggregateEntity
     Body = e.Body;
 
     Recipients = JsonSerializer.Serialize(e.Recipients);
+    RecipientCount = e.Recipients.Count();
 
     RealmId = e.Realm.Id.ToGuid();
     RealmUniqueName = e.Realm.UniqueName;
@@ -47,6 +48,7 @@ internal class MessageEntity : AggregateEntity
   public string Body { get; private set; } = string.Empty;
 
   public string Recipients { get; private set; } = string.Empty;
+  public int RecipientCount { get; private set; }
 
   public Guid RealmId { get; private set; }
   public string RealmUniqueName { get; private set; } = string.Empty;

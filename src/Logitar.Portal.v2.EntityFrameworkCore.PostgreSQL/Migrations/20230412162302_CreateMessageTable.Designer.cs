@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230412144918_CreateMessageTable")]
+    [Migration("20230412162302_CreateMessageTable")]
     partial class CreateMessageTable
     {
         /// <inheritdoc />
@@ -243,6 +243,9 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Recipients")
                         .IsRequired()

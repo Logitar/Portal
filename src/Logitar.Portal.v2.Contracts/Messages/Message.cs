@@ -13,9 +13,10 @@ public record Message : Aggregate
   public string Body { get; set; } = string.Empty;
 
   public IEnumerable<Recipient> Recipients { get; set; } = Enumerable.Empty<Recipient>();
+  public int RecipientCount { get; set; }
 
-  public Guid RealmId { get; set; } // TODO(fpion): not null
-  public string RealmAlias { get; set; } = string.Empty; // TODO(fpion): not null
+  public Guid RealmId { get; set; }
+  public string RealmUniqueName { get; set; } = string.Empty;
   public string? RealmDisplayName { get; set; }
 
   public Guid SenderId { get; set; }
@@ -32,11 +33,11 @@ public record Message : Aggregate
   public bool IgnoreUserLocale { get; set; }
   public string? Locale { get; set; }
 
-  public IEnumerable<Variable> Variables { get; set; } = Enumerable.Empty<Variable>(); // TODO(fpion): Value is now not null
+  public IEnumerable<Variable> Variables { get; set; } = Enumerable.Empty<Variable>();
 
-  public IEnumerable<Error> Errors { get; set; } = Enumerable.Empty<Error>(); // TODO(fpion): Data.Value is now not null
+  public IEnumerable<Error> Errors { get; set; } = Enumerable.Empty<Error>();
   public bool HasErrors => Errors.Any();
 
-  public IEnumerable<ResultData> Result { get; set; } = Enumerable.Empty<ResultData>(); // TODO(fpion): Value is now not null
+  public IEnumerable<ResultData> Result { get; set; } = Enumerable.Empty<ResultData>();
   public bool Succeeded => !HasErrors && Result != null;
 }

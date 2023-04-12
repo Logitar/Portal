@@ -85,14 +85,28 @@ public class MessageAggregate : AggregateRoot
     Variables = e.Variables;
   }
 
-  public void Fail(Error error) => ApplyChange(new MessageFailed { Errors = new[] { error } });
+  public void Fail(Error error)
+  {
+    ApplyChange(new MessageFailed
+    {
+      ActorId = new AggregateId(Guid.Empty),
+      Errors = new[] { error }
+    });
+  }
   protected virtual void Apply(MessageFailed e)
   {
     _errors.Clear();
     _errors.AddRange(e.Errors);
   }
 
-  public void Succeed(SendMessageResult result) => ApplyChange(new MessageSucceeded { Result = result });
+  public void Succeed(SendMessageResult result)
+  {
+    ApplyChange(new MessageSucceeded
+    {
+      ActorId = new AggregateId(Guid.Empty),
+      Result = result
+    });
+  }
   protected virtual void Apply(MessageSucceeded e) => _result = e.Result;
 
   public override string ToString() => $"{Subject} | {base.ToString()}";

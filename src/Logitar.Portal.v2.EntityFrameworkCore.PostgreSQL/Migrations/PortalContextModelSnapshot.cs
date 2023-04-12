@@ -241,6 +241,9 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Recipients")
                         .IsRequired()
                         .HasColumnType("jsonb");

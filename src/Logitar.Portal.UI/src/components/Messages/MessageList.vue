@@ -16,8 +16,8 @@
             <b-form-checkbox id="isDemo" v-model="isDemo">{{ $t('messages.demo.label') }}</b-form-checkbox>
           </template>
         </status-select>
-        <sort-select class="col" :desc="desc" :options="sortOptions" v-model="sort" @desc="desc = $event" />
-        <count-select class="col" v-model="count" />
+        <sort-select class="col" :isDescending="isDescending" :options="sortOptions" v-model="sort" @isDescending="isDescending = $event" />
+        <count-select class="col" v-model="limit" />
       </b-row>
       <p v-if="!messages.length" v-t="'messages.empty'" />
     </b-container>
@@ -25,12 +25,12 @@
       <table id="table" class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" v-t="'messages.subject'" />
+            <th scope="col" v-t="'messages.sort.options.Subject'" />
             <th scope="col" v-t="'messages.recipients'" />
             <th scope="col" v-t="'messages.sender.label'" />
             <th scope="col" v-t="'templates.select.label'" />
             <th scope="col" v-t="'messages.status.label'" />
-            <th scope="col" v-t="'messages.updatedAt'" />
+            <th scope="col" v-t="'messages.sort.options.UpdatedOn'" />
           </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
               &nbsp;
               <b-badge v-if="message.isDemo" variant="info">{{ $t('messages.demo.label') }}</b-badge>
             </td>
-            <td v-text="message.recipients" />
+            <td v-text="message.recipientCount" />
             <td>
               <template v-if="message.senderDisplayName">{{ message.senderDisplayName }} &lt;{{ message.senderAddress }}&gt;</template>
               <template v-else>{{ message.senderAddress }}</template>
@@ -52,11 +52,11 @@
             <td>
               <status-badge :message="message" />
             </td>
-            <td><status-cell :actor="message.updatedBy" :date="message.updatedAt" /></td>
+            <td><status-cell :actor="message.updatedBy" :date="message.updatedOn" /></td>
           </tr>
         </tbody>
       </table>
-      <b-pagination v-model="page" :total-rows="total" :per-page="count" aria-controls="table" />
+      <b-pagination v-model="page" :total-rows="total" :per-page="limit" aria-controls="table" />
     </b-container>
   </div>
 </template>
@@ -78,15 +78,15 @@ export default {
   },
   data() {
     return {
-      count: 10,
-      desc: true,
       isDemo: false,
+      isDescending: false,
+      limit: 10,
       loading: false,
       messages: [],
       page: 1,
       realm: null,
       search: null,
-      sort: 'UpdatedAt',
+      sort: 'UpdatedOn',
       status: null,
       template: null,
       total: 0
@@ -105,9 +105,9 @@ export default {
         succeeded: this.succeeded,
         template: this.template,
         sort: this.sort,
-        desc: this.desc,
-        index: (this.page - 1) * this.count,
-        count: this.count
+        isDescending: this.isDescending,
+        skip: (this.page - 1) * this.limit,
+        limit: this.limit
       }
     },
     sortOptions() {
@@ -142,7 +142,7 @@ export default {
       immediate: true,
       async handler(newValue, oldValue) {
         if (
-          newValue?.index &&
+          newValue?.skip &&
           oldValue &&
           (newValue.hasErrors !== oldValue.hasErrors ||
             newValue.isDemo !== oldValue.isDemo ||
@@ -150,7 +150,7 @@ export default {
             newValue.search !== oldValue.search ||
             newValue.succeeded !== oldValue.succeeded ||
             newValue.template !== oldValue.template ||
-            newValue.count !== oldValue.count)
+            newValue.limit !== oldValue.limit)
         ) {
           this.page = 1
           await this.refresh()
