@@ -2,7 +2,8 @@
 
 namespace Logitar.Portal.v2.Core.Messages;
 
-public record Dictionaries(DictionaryAggregate? Default, DictionaryAggregate? Fallback, DictionaryAggregate? Preferred)
+public record Dictionaries(DictionaryAggregate? Default = null, DictionaryAggregate? Fallback = null,
+  DictionaryAggregate? Preferred = null)
 {
   public string GetEntry(string key)
   {

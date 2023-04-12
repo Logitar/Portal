@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.v2.Core;
+using Logitar.Portal.v2.Infrastructure;
 using Logitar.Portal.v2.Web.Authentication;
 using Logitar.Portal.v2.Web.Authorization;
 using Logitar.Portal.v2.Web.Filters;
@@ -40,7 +41,7 @@ public static class DependencyInjectionExtensions
 
     services.AddHttpContextAccessor();
 
-    services.AddLogitarPortalCore();
+    services.AddLogitarPortalInfrastructure();
 
     services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(DependencyInjectionExtensions).Assembly));
 

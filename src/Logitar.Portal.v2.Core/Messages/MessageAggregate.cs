@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
+using Logitar.Portal.v2.Contracts.Errors;
 using Logitar.Portal.v2.Core.Messages.Events;
 using Logitar.Portal.v2.Core.Messages.Summaries;
 using Logitar.Portal.v2.Core.Messages.Validators;
@@ -12,6 +13,9 @@ namespace Logitar.Portal.v2.Core.Messages;
 
 public class MessageAggregate : AggregateRoot
 {
+  private readonly List<Error> _errors = new();
+  private SendMessageResult? _result = null;
+
   public MessageAggregate(AggregateId id) : base(id)
   {
   }
@@ -56,8 +60,11 @@ public class MessageAggregate : AggregateRoot
 
   public Dictionary<string, string> Variables { get; private set; } = new();
 
-  public bool HasErrors => false; // TODO(fpion): implement errors
-  public bool Succeeded => false; // TODO(fpion): implement success
+  public IReadOnlyCollection<Error> Errors => _errors.AsReadOnly();
+  public bool HasErrors => Errors.Any();
+
+  public IReadOnlyDictionary<string, string>? Result => _result?.AsReadOnly();
+  public bool Succeeded => !HasErrors && Result != null;
 
   protected virtual void Apply(MessageCreated e)
   {
@@ -77,6 +84,16 @@ public class MessageAggregate : AggregateRoot
 
     Variables = e.Variables;
   }
+
+  public void Fail(Error error) => ApplyChange(new MessageFailed { Errors = new[] { error } });
+  protected virtual void Apply(MessageFailed e)
+  {
+    _errors.Clear();
+    _errors.AddRange(e.Errors);
+  }
+
+  public void Succeed(SendMessageResult result) => ApplyChange(new MessageSucceeded { Result = result });
+  protected virtual void Apply(MessageSucceeded e) => _result = e.Result;
 
   public override string ToString() => $"{Subject} | {base.ToString()}";
 }

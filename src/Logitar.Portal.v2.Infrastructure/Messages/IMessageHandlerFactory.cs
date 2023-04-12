@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.v2.Core.Senders;
 
-namespace Logitar.Portal.v2.Core.Messages.Handlers;
+namespace Logitar.Portal.v2.Infrastructure.Messages;
 
 internal interface IMessageHandlerFactory
 {

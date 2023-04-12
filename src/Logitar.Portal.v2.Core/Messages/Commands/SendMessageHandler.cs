@@ -1,9 +1,10 @@
-﻿using Logitar.Portal.v2.Contracts.Messages;
+﻿using FluentValidation;
+using Logitar.Portal.v2.Contracts.Messages;
 using Logitar.Portal.v2.Core.Dictionaries;
+using Logitar.Portal.v2.Core.Messages.Validators;
 using Logitar.Portal.v2.Core.Realms;
 using Logitar.Portal.v2.Core.Senders;
 using Logitar.Portal.v2.Core.Templates;
-using Logitar.Portal.v2.Core.Users;
 using MediatR;
 using System.Globalization;
 
@@ -16,33 +17,24 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
   private readonly IMediator _mediator;
   private readonly IMessageRepository _messageRepository;
   private readonly IRealmRepository _realmRepository;
-  private readonly ISenderRepository _senderRepository;
-  private readonly ITemplateRepository _templateRepository;
-  private readonly IUserRepository _userRepository;
 
   public SendMessageHandler(ICurrentActor currentActor,
     IDictionaryRepository dictionaryRepository,
     IMediator mediator,
     IMessageRepository messageRepository,
-    IRealmRepository realmRepository,
-    ISenderRepository senderRepository,
-    ITemplateRepository templateRepository,
-    IUserRepository userRepository)
+    IRealmRepository realmRepository)
   {
     _currentActor = currentActor;
     _dictionaryRepository = dictionaryRepository;
     _mediator = mediator;
     _messageRepository = messageRepository;
     _realmRepository = realmRepository;
-    _senderRepository = senderRepository;
-    _templateRepository = templateRepository;
-    _userRepository = userRepository;
   }
 
   public async Task<SentMessages> Handle(SendMessage request, CancellationToken cancellationToken)
   {
     SendMessageInput input = request.Input;
-    // TODO(fpion): validate input
+    new SendMessageInputValidator().ValidateAndThrow(input);
 
     RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
@@ -78,7 +70,7 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
       string subject = (userDictionaries ?? dictionaries)?.GetEntry(template.Subject) ?? template.Subject;
 
       CompiledTemplate compiledTemplate = await _mediator.Send(new CompileTemplate(template,
-        userDictionaries ?? dictionaries, recipient.User, variables), cancellationToken); // TODO(fpion): handler
+        userDictionaries ?? dictionaries, recipient.User, variables), cancellationToken);
       string body = compiledTemplate.Value;
 
       IEnumerable<Recipient> recipients = new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc);
@@ -86,14 +78,14 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
       MessageAggregate message = new(_currentActor.Id, realm, sender, template, subject, body,
         recipients, input.IgnoreUserLocale, locale, variables);
 
+      await _mediator.Publish(new SendEmail(message, sender), cancellationToken);
+
       messages.Add(message);
 
       index++;
     }
 
     await _messageRepository.SaveAsync(messages, cancellationToken);
-
-    // TODO(fpion): send messages
 
     return new SentMessages
     {
