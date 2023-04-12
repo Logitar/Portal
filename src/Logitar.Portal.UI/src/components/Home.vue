@@ -51,7 +51,7 @@ export default {
   data() {
     return {
       loading: false,
-      logging: {
+      loggingSettings: {
         extent: 'ActivityOnly',
         onlyErrors: false
       },
@@ -79,10 +79,11 @@ export default {
   computed: {
     payload() {
       return {
-        user: {
-          ...this.user,
-          locale: this.$i18n.locale
-        }
+        defaultLocale: this.$i18n.locale,
+        usernameSettings: { ...this.usernameSettings },
+        passwordSettings: { ...this.passwordSettings },
+        loggingSettings: { ...this.loggingSettings },
+        user: { ...this.user }
       }
     }
   },

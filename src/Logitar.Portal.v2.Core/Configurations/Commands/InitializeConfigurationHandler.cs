@@ -24,22 +24,33 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
 
   public async Task Handle(InitializeConfiguration request, CancellationToken cancellationToken)
   {
+    InitializeConfigurationInput input = request.Input;
+    CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
+
     RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(Constants.PortalRealm.UniqueName, cancellationToken);
     if (realm == null)
     {
+      ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
+      ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
+
+      Dictionary<string, string> customAttributes = new(capacity: 1);
+      if (input.LoggingSettings != null)
+      {
+        customAttributes[nameof(LoggingSettings)] = input.LoggingSettings.Serialize();
+      }
+
       realm = new(_currentActor.Id, Constants.PortalRealm.UniqueName, Constants.PortalRealm.DisplayName,
-        Constants.PortalRealm.Description, Constants.PortalRealm.DefaultLocale);
+        Constants.PortalRealm.Description, defaultLocale, usernameSettings: usernameSettings,
+        passwordSettings: passwordSettings, customAttributes: customAttributes);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
     }
 
-    InitialUserInput input = request.Input.User;
-    CultureInfo locale = input.Locale.GetRequiredCultureInfo(nameof(input.Locale));
-
-    UserAggregate user = new(_currentActor.Id, realm, input.Username,
-      input.FirstName, lastName: input.LastName, locale: locale);
-    user.ChangePassword(_currentActor.Id, realm, input.Password);
-    user.SetEmail(_currentActor.Id, new ReadOnlyEmail(input.EmailAddress));
+    InitialUserInput userInput = input.User;
+    UserAggregate user = new(_currentActor.Id, realm, userInput.Username, userInput.FirstName,
+      lastName: userInput.LastName, locale: defaultLocale);
+    user.ChangePassword(_currentActor.Id, realm, userInput.Password);
+    user.SetEmail(_currentActor.Id, new ReadOnlyEmail(userInput.EmailAddress));
 
     await _userRepository.SaveAsync(user, cancellationToken);
   }
