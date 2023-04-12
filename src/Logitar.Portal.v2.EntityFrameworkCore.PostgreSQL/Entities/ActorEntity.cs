@@ -7,10 +7,7 @@ namespace Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Entities;
 internal record ActorEntity
 {
   private static readonly JsonSerializerOptions _options = new();
-  static ActorEntity()
-  {
-    _options.Converters.Add(new JsonStringEnumConverter());
-  }
+  static ActorEntity() => _options.Converters.Add(new JsonStringEnumConverter());
 
   public static ActorEntity System { get; } = new();
 
