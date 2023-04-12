@@ -56,6 +56,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
+      .AddScoped<IMessageQuerier, MessageQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<ISenderQuerier, SenderQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>()

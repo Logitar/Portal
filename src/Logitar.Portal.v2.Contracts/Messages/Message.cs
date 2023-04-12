@@ -26,8 +26,8 @@ public record Message : Aggregate
 
   public Guid TemplateId { get; set; }
   public string TemplateKey { get; set; } = string.Empty;
-  public string TemplateContentType { get; set; } = string.Empty;
   public string? TemplateDisplayName { get; set; }
+  public string TemplateContentType { get; set; } = string.Empty;
 
   public bool IgnoreUserLocale { get; set; }
   public string? Locale { get; set; }
