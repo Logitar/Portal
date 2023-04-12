@@ -81,6 +81,7 @@ internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedTo
     {
       Error error = new()
       {
+        Severity = ErrorSeverity.Failure,
         Code = exception.GetType().Name.Remove(nameof(Exception)),
         Description = exception.Message
       };
