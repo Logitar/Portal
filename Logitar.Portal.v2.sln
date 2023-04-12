@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -35,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.v2.Web", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal", "src\Logitar.Portal\Logitar.Portal.csproj", "{ABDB69A3-527A-4921-93A5-9E6448705BAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.v2.Infrastructure", "src\Logitar.Portal.v2.Infrastructure\Logitar.Portal.v2.Infrastructure.csproj", "{25881979-28C2-42F3-97DC-ECB49C237FA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.v2.Infrastructure", "src\Logitar.Portal.v2.Infrastructure\Logitar.Portal.v2.Infrastructure.csproj", "{25881979-28C2-42F3-97DC-ECB49C237FA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
