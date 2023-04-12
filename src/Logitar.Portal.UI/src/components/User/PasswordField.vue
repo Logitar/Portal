@@ -27,15 +27,15 @@ export default {
       type: String,
       default: 'user.password.placeholder'
     },
-    realm: {
-      type: Object,
-      default: null
-    },
     required: {
       type: Boolean,
       default: false
     },
     rules: {
+      type: Object,
+      default: null
+    },
+    settings: {
       type: Object,
       default: null
     },
@@ -48,26 +48,14 @@ export default {
   computed: {
     allRules() {
       const rules = { ...this.rules }
-      if (this.validate) {
-        const passwordSettings = this.realm
-          ? this.realm.passwordSettings
-          : {
-              requireDigit: true,
-              requireLowercase: true,
-              requireNonAlphanumeric: true,
-              requireUppercase: true,
-              requiredLength: 8,
-              requiredUniqueChars: 8
-            }
-        if (passwordSettings) {
-          const { requireDigit, requireLowercase, requireNonAlphanumeric, requireUppercase, requiredLength, requiredUniqueChars } = passwordSettings
-          rules.min = requiredLength
-          rules.require_digit = requireDigit
-          rules.require_lowercase = requireLowercase
-          rules.require_non_alphanumeric = requireNonAlphanumeric
-          rules.require_uppercase = requireUppercase
-          rules.required_unique_chars = requiredUniqueChars
-        }
+      if (this.validate && this.settings) {
+        const { requireDigit, requireLowercase, requireNonAlphanumeric, requireUppercase, requiredLength, requiredUniqueChars } = this.settings
+        rules.min = requiredLength
+        rules.require_digit = requireDigit
+        rules.require_lowercase = requireLowercase
+        rules.require_non_alphanumeric = requireNonAlphanumeric
+        rules.require_uppercase = requireUppercase
+        rules.required_unique_chars = requiredUniqueChars
       }
       return rules
     }

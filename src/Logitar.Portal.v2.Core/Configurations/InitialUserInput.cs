@@ -9,6 +9,4 @@ public record InitialUserInput
 
   public string FirstName { get; set; } = string.Empty;
   public string LastName { get; set; } = string.Empty;
-
-  public string Locale { get; set; } = string.Empty;
 }

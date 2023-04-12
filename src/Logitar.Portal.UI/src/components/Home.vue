@@ -7,14 +7,14 @@
         <p><font-awesome-icon icon="info-circle" /> <i v-t="'configuration.initialization.user.help'" /></p>
         <b-row>
           <email-field class="col" required validate v-model="user.emailAddress" />
-          <username-field class="col" required validate v-model="user.username" />
+          <username-field class="col" required :settings="usernameSettings" validate v-model="user.username" />
         </b-row>
         <b-row>
           <first-name-field class="col" required validate v-model="user.firstName" />
           <last-name-field class="col" required validate v-model="user.lastName" />
         </b-row>
         <b-row>
-          <password-field class="col" required validate v-model="user.password" />
+          <password-field class="col" required :settings="passwordSettings" validate v-model="user.password" />
           <password-field
             class="col"
             id="confirm"
@@ -51,23 +51,39 @@ export default {
   data() {
     return {
       loading: false,
+      loggingSettings: {
+        extent: 'ActivityOnly',
+        onlyErrors: false
+      },
       passwordConfirmation: null,
+      passwordSettings: {
+        requiredLength: 6,
+        requiredUniqueChars: 1,
+        requireNonAlphanumeric: false,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigit: true
+      },
       user: {
         emailAddress: null,
         firstName: null,
         lastName: null,
         password: null,
         username: null
+      },
+      usernameSettings: {
+        allowedCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
       }
     }
   },
   computed: {
     payload() {
       return {
-        user: {
-          ...this.user,
-          locale: this.$i18n.locale
-        }
+        defaultLocale: this.$i18n.locale,
+        usernameSettings: { ...this.usernameSettings },
+        passwordSettings: { ...this.passwordSettings },
+        loggingSettings: { ...this.loggingSettings },
+        user: { ...this.user }
       }
     }
   },

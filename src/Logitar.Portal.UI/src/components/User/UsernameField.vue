@@ -33,13 +33,13 @@ export default {
       type: String,
       default: 'user.username.placeholder'
     },
-    realm: {
-      type: Object,
-      default: null
-    },
     required: {
       type: Boolean,
       default: false
+    },
+    settings: {
+      type: Object,
+      default: null
     },
     validate: {
       type: Boolean,
@@ -50,12 +50,9 @@ export default {
   computed: {
     allRules() {
       const rules = {}
-      if (this.validate) {
-        if (this.realm?.allowedUsernameCharacters) {
-          rules.username = this.realm.allowedUsernameCharacters
-        } else if (!this.realm) {
-          rules.username = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'
-        }
+      if (this.validate && this.settings) {
+        const { allowedCharacters } = this.settings
+        rules.username = allowedCharacters
       }
       return rules
     }
