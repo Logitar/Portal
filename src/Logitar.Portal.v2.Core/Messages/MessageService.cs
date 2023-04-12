@@ -30,4 +30,9 @@ internal class MessageService : IMessageService
   {
     return await _pipeline.ExecuteAsync(new SendMessage(input), cancellationToken);
   }
+
+  public async Task<Message> SendDemoAsync(SendDemoMessageInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SendDemoMessage(input), cancellationToken);
+  }
 }

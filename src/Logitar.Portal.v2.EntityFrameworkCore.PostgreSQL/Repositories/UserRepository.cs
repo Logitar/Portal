@@ -18,7 +18,11 @@ internal class UserRepository : EventStore, IUserRepository
 
   public async Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return await LoadAsync<UserAggregate>(new AggregateId(id), cancellationToken);
+    return await LoadAsync(new AggregateId(id), cancellationToken);
+  }
+  public async Task<UserAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<UserAggregate>(id, cancellationToken);
   }
 
   public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)

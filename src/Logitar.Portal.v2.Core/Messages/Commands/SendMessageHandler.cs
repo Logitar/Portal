@@ -51,11 +51,9 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
       _ = allDictionaries.TryGetValue(realm.DefaultLocale, out defaultDictionary);
     }
 
-    Dictionary<string, string>? variables = input.Variables?.ToDictionary();
-
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     Dictionaries? dictionaries = input.IgnoreUserLocale
-      ? GetDictionaries(locale, defaultDictionary, allDictionaries)
+      ? MessageHelper.GetDictionaries(locale, defaultDictionary, allDictionaries)
       : null;
 
     List<MessageAggregate> messages = new(capacity: allRecipients.To.Count());
@@ -64,11 +62,12 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
     {
       CultureInfo? userLocale = recipient.UserLocale == null ? null : CultureInfo.GetCultureInfo(recipient.UserLocale);
       Dictionaries? userDictionaries = (!input.IgnoreUserLocale && recipient.UserLocale != null)
-        ? GetDictionaries(userLocale, defaultDictionary, allDictionaries)
+        ? MessageHelper.GetDictionaries(userLocale, defaultDictionary, allDictionaries)
         : null;
 
       string subject = (userDictionaries ?? dictionaries)?.GetEntry(template.Subject) ?? template.Subject;
 
+      Dictionary<string, string>? variables = input.Variables?.ToDictionary();
       CompiledTemplate compiledTemplate = await _mediator.Send(new CompileTemplate(template,
         userDictionaries ?? dictionaries, recipient.User, variables), cancellationToken);
       string body = compiledTemplate.Value;
@@ -93,25 +92,5 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
       Success = messages.Where(x => x.Succeeded).Select(x => x.Id.ToGuid()),
       Unsent = messages.Where(x => !x.HasErrors && !x.Succeeded).Select(x => x.Id.ToGuid())
     };
-  }
-
-  private static Dictionaries GetDictionaries(CultureInfo? locale,
-    DictionaryAggregate? defaultDictionary,
-    Dictionary<CultureInfo, DictionaryAggregate> dictionaries)
-  {
-    DictionaryAggregate? preferredDictionary = null;
-    DictionaryAggregate? fallbackDictionary = null;
-
-    if (locale != null)
-    {
-      dictionaries.TryGetValue(locale, out preferredDictionary);
-
-      if (locale.Parent != null)
-      {
-        dictionaries.TryGetValue(locale.Parent, out fallbackDictionary);
-      }
-    }
-
-    return new Dictionaries(defaultDictionary, fallbackDictionary, preferredDictionary);
   }
 }
