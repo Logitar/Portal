@@ -26,7 +26,7 @@ internal static class HttpContextExtensions
 
     return ipAddress;
   }
-  public static string? GetAdditionalInformation(this HttpContext context)
+  public static string GetAdditionalInformation(this HttpContext context)
   {
     return JsonSerializer.Serialize(context.Request.Headers);
   }
