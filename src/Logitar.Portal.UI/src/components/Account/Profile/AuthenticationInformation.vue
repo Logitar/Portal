@@ -26,7 +26,15 @@
           v-model="current"
         />
         <b-row>
-          <password-field class="col" label="user.password.new.label" placeholder="user.password.new.placeholder" required validate v-model="password" />
+          <password-field
+            class="col"
+            label="user.password.new.label"
+            placeholder="user.password.new.placeholder"
+            required
+            :settings="user.realm.passwordSettings"
+            validate
+            v-model="password"
+          />
           <password-field
             class="col"
             id="confirm"

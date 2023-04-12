@@ -27,9 +27,9 @@
         <username-field
           :disabled="Boolean(user)"
           placeholder="user.create.usernamePlaceholder"
-          :realm="selectedRealm"
           ref="username"
           :required="!user"
+          :settings="selectedRealm?.usernameSettings"
           :validate="!user"
           v-model="username"
         />
@@ -45,11 +45,19 @@
               class="col"
               label="user.password.new.label"
               placeholder="user.password.new.placeholder"
-              :realm="selectedRealm"
+              :settings="selectedRealm?.passwordSettings"
               validate
               v-model="password"
             />
-            <password-field v-else class="col" placeholder="user.create.passwordPlaceholder" :realm="selectedRealm" required validate v-model="password" />
+            <password-field
+              v-else
+              class="col"
+              placeholder="user.create.passwordPlaceholder"
+              required
+              :settings="selectedRealm?.passwordSettings"
+              validate
+              v-model="password"
+            />
             <password-field
               class="col"
               id="confirm"
@@ -278,6 +286,7 @@ export default {
       this.picture = user.picture
       this.profile = user.profile
       this.realmId = user.realm?.id ?? null
+      this.selectedRealm ??= user.realm
       this.timeZone = user.timeZone
       this.username = user.username
       this.website = user.website
