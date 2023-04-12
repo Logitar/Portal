@@ -1,3 +1,3 @@
 # Portal
 
-Identity management platform.
+Identity management system.
