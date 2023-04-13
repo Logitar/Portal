@@ -1,43 +1,53 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Realms.Models;
-using Logitar.Portal.Core.Realms.Payloads;
-using Microsoft.Extensions.Options;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 
-namespace Logitar.Portal.Client.Implementations
+namespace Logitar.Portal.Client.Implementations;
+
+internal class RealmService : HttpService, IRealmService
 {
-  internal class RealmService : HttpService, IRealmService
+  private const string BasePath = "/realms";
+
+  public RealmService(HttpClient client, PortalSettings settings) : base(client, settings)
   {
-    private const string BasePath = "/realms";
-
-    public RealmService(HttpClient client, IOptions<PortalSettings> settings) : base(client, settings)
-    {
-    }
-
-    public async Task<RealmModel> CreateAsync(CreateRealmPayload payload, CancellationToken cancellationToken)
-      => await PostAsync<RealmModel>(BasePath, payload, cancellationToken);
-
-    public async Task<RealmModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
-      => await DeleteAsync<RealmModel>($"{BasePath}/{id}", cancellationToken);
-
-    public async Task<RealmModel> GetAsync(string id, CancellationToken cancellationToken)
-      => await GetAsync<RealmModel>($"{BasePath}/{id}", cancellationToken);
-
-    public async Task<ListModel<RealmSummary>> GetAsync(string? search, RealmSort? sort, bool desc, int? index, int? count, CancellationToken cancellationToken)
-    {
-      string query = GetQueryString(new Dictionary<string, object?>
-      {
-        [nameof(search)] = search,
-        [nameof(sort)] = sort,
-        [nameof(desc)] = desc,
-        [nameof(index)] = index,
-        [nameof(count)] = count
-      });
-
-      return await GetAsync<ListModel<RealmSummary>>($"{BasePath}?{query}", cancellationToken);
-    }
-
-    public async Task<RealmModel> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
-      => await PutAsync<RealmModel>($"{BasePath}/{id}", payload, cancellationToken);
   }
+
+  public async Task<Realm> CreateAsync(CreateRealmInput input, CancellationToken cancellationToken)
+    => await PostAsync<Realm>(BasePath, input, cancellationToken);
+
+  public async Task<Realm> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    => await DeleteAsync<Realm>($"{BasePath}/{id}", cancellationToken);
+
+  public async Task<Realm?> GetAsync(Guid? id, string? uniqueName, CancellationToken cancellationToken)
+  {
+    if (id != null && uniqueName != null)
+    {
+      throw new NotSupportedException($"You may only specify one of the following parameters: '{nameof(id)}', '{nameof(uniqueName)}'.");
+    }
+    else if (id == null && uniqueName == null)
+    {
+      return null;
+    }
+
+    string? idOrUniqueName = id?.ToString() ?? uniqueName;
+
+    return await GetAsync<Realm>($"{BasePath}/{idOrUniqueName}", cancellationToken);
+  }
+
+  public async Task<PagedList<Realm>> GetAsync(string? search,
+    RealmSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    string query = GetQueryString(new Dictionary<string, object?>
+    {
+      [nameof(search)] = search,
+      [nameof(sort)] = sort,
+      [nameof(isDescending)] = isDescending,
+      [nameof(skip)] = skip,
+      [nameof(limit)] = limit
+    });
+
+    return await GetAsync<PagedList<Realm>>($"{BasePath}?{query}", cancellationToken);
+  }
+
+  public async Task<Realm> UpdateAsync(Guid id, UpdateRealmInput input, CancellationToken cancellationToken)
+    => await PutAsync<Realm>($"{BasePath}/{id}", input, cancellationToken);
 }

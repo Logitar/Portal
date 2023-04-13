@@ -22,8 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reimplemented template management.
 - Reimplemented message management.
 - Updated repository information.
+- Replace AllowedUsernameCharacters by UsernameSettings and extented initial configuration.
 - Updated NPM packages.
-- Replace AllowedUsernameCharacters by UsernameSettings.
+- Updated NuGet packages.
+- Removed V1 projects and renamed V2 projects.
+- Reimplemented HTTP client.
+- Enhanced realm JWT secret.
+- Reimplemented password recovery.
+- Implemented Basic authentication.
 
 ## [1.1.5] - 2022-10-27
 

@@ -1,38 +1,37 @@
-﻿using Logitar.Portal.Application.Emails.Messages;
-using Logitar.Portal.Core.Emails.Messages.Models;
+﻿using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[Authorize(Policy = Policies.PortalActor)]
+[Route("messages")]
+public class MessageController : Controller
 {
-  [ApiExplorerSettings(IgnoreApi = true)]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("messages")]
-  public class MessageController : Controller
+  private readonly IMessageService _messageService;
+
+  public MessageController(IMessageService messageService)
   {
-    private readonly IMessageService _messageService;
+    _messageService = messageService;
+  }
 
-    public MessageController(IMessageService messageService)
+  [HttpGet]
+  public ActionResult MessageList()
+  {
+    return View();
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult> MessageView(Guid id, CancellationToken cancellationToken)
+  {
+    Message? message = await _messageService.GetAsync(id, cancellationToken: cancellationToken);
+    if (message == null)
     {
-      _messageService = messageService;
+      return NotFound();
     }
 
-    [HttpGet]
-    public ActionResult MessageList()
-    {
-      return View();
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> MessageView(Guid id, CancellationToken cancellationToken = default)
-    {
-      MessageModel? message = await _messageService.GetAsync(id, cancellationToken);
-      if (message == null)
-      {
-        return NotFound();
-      }
-
-      return View(message);
-    }
+    return View(message);
   }
 }

@@ -1,19 +1,20 @@
-﻿@using Logitar.Portal.Application.Emails.Senders;
-@using Logitar.Portal.Core.Emails.Senders.Models;
-@using Logitar.Portal.Core.Emails.Templates.Models;
-@using Logitar.Portal.Core.Users;
-@using Logitar.Portal.Web.Models.Users;
+﻿@using Logitar.Portal.Contracts.Senders;
+@using Logitar.Portal.Contracts.Templates;
 
 @inject ISenderService _senderService;
 
-@model TemplateModel
+@model Template
 @{
   Layout = "_Layout";
 
   ViewBag.Title = Model?.DisplayName ?? Model?.Key ?? "Create template";
 
-  SenderModel? sender = await _senderService.GetDefaultAsync(Model?.Realm?.Id.ToString());
-  string? senderJson = sender == null ? null : ModelSerializer.Serialize(sender);
+  string? sender = null;
+  if (Model != null)
+  {
+    Sender? defaultSender = await _senderService.GetAsync(defaultInRealm: Model.Realm.Id.ToString());
+    sender = defaultSender == null ? null : ModelSerializer.Serialize(defaultSender);
+  }
 }
 
 @if (Model == null)
@@ -22,5 +23,5 @@
 }
 else
 {
-  <template-edit json="@(ModelSerializer.Serialize(Model))" sender="@(senderJson)" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></template-edit>
+  <template-edit json="@(ModelSerializer.Serialize(Model))" sender="@(sender)" status="@(Context.Request.Query["status"])" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></template-edit>
 }

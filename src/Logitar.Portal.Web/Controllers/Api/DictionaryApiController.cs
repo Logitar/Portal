@@ -1,73 +1,60 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Dictionaries;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Core.Dictionaries.Models;
-using Logitar.Portal.Core.Dictionaries.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Policies.PortalActor)]
+[Route("api/dictionaries")]
+public class DictionaryApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/dictionaries")]
-  public class DictionaryApiController : ControllerBase
+  private readonly IDictionaryService _dictionaryService;
+
+  public DictionaryApiController(IDictionaryService dictionaryService)
   {
-    private readonly IMapper _mapper;
-    private readonly IDictionaryService _dictionaryService;
+    _dictionaryService = dictionaryService;
+  }
 
-    public DictionaryApiController(IMapper mapper, IDictionaryService dictionaryService)
+  [HttpPost]
+  public async Task<ActionResult<Dictionary>> CreateAsync([FromBody] CreateDictionaryInput input, CancellationToken cancellationToken)
+  {
+    Dictionary dictionary = await _dictionaryService.CreateAsync(input, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/dictionaries/{dictionary.Id}");
+
+    return Created(uri, dictionary);
+  }
+
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Dictionary>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _dictionaryService.DeleteAsync(id, cancellationToken));
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Dictionary>>> GetAsync(string? locale, string? realm,
+    DictionarySort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return Ok(await _dictionaryService.GetAsync(locale, realm, sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Dictionary>> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Dictionary? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
+    if (dictionary == null)
     {
-      _mapper = mapper;
-      _dictionaryService = dictionaryService;
+      return NotFound();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<DictionaryModel>> CreateAsync([FromBody] CreateDictionaryPayload payload, CancellationToken cancellationToken)
-    {
-      DictionaryModel dictionary = await _dictionaryService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/dictionaries/{dictionary.Id}", UriKind.Relative);
+    return Ok(dictionary);
+  }
 
-      return Created(uri, dictionary);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<DictionaryModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _dictionaryService.DeleteAsync(id, cancellationToken));
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<ListModel<DictionarySummary>>> GetAsync(string? locale, string? realm,
-      DictionarySort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken = default)
-    {
-      ListModel<DictionaryModel> dictionaries = await _dictionaryService.GetAsync(locale, realm,
-        sort, desc,
-        index, count,
-        cancellationToken);
-
-      return Ok(dictionaries.To<DictionaryModel, DictionarySummary>(_mapper));
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DictionaryModel>> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-      DictionaryModel? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
-      if (dictionary == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(dictionary);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult<DictionaryModel>> UpdateAsync(Guid id, [FromBody] UpdateDictionaryPayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _dictionaryService.UpdateAsync(id, payload, cancellationToken));
-    }
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Dictionary>> UpdateAsync(Guid id, [FromBody] UpdateDictionaryInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _dictionaryService.UpdateAsync(id, input, cancellationToken));
   }
 }

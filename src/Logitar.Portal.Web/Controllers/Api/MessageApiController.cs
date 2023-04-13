@@ -1,64 +1,53 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Emails.Messages;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Messages;
-using Logitar.Portal.Core.Emails.Messages.Models;
-using Logitar.Portal.Core.Emails.Messages.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Policies.PortalActor)]
+[Route("api/messages")]
+public class MessageApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/messages")]
-  public class MessageApiController : ControllerBase
+  private readonly IMessageService _messageService;
+
+  public MessageApiController(IMessageService messageService)
   {
-    private readonly IMapper _mapper;
-    private readonly IMessageService _messageService;
+    _messageService = messageService;
+  }
 
-    public MessageApiController(IMapper mapper, IMessageService messageService)
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Message>>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
+    MessageSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return Ok(await _messageService.GetAsync(hasErrors, isDemo, realm, search, succeeded, template,
+      sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Message>> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Message? message = await _messageService.GetAsync(id, cancellationToken);
+    if (message == null)
     {
-      _mapper = mapper;
-      _messageService = messageService;
+      return NotFound();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<SentMessagesModel>> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _messageService.SendAsync(payload, cancellationToken));
-    }
+    return Ok(message);
+  }
 
-    [HttpPost("demo")]
-    public async Task<ActionResult<MessageModel>> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _messageService.SendDemoAsync(payload, cancellationToken));
-    }
+  [HttpPost]
+  public async Task<ActionResult<SentMessages>> SendAsync(SendMessageInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _messageService.SendAsync(input, cancellationToken));
+  }
 
-    [HttpGet]
-    public async Task<ActionResult<ListModel<MessageSummary>>> GetAsync(bool? hasErrors, bool? isDemo, string? realm, string? search, bool? succeeded, string? template,
-      MessageSort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken)
-    {
-      ListModel<MessageModel> messages = await _messageService.GetAsync(hasErrors, isDemo, realm, search, succeeded, template,
-        sort, desc,
-        index, count,
-        cancellationToken);
-
-      return Ok(messages.To<MessageModel, MessageSummary>(_mapper));
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<MessageModel>> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-      MessageModel? message = await _messageService.GetAsync(id, cancellationToken);
-      if (message == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(message);
-    }
+  [HttpPost("demo")]
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
+  public async Task<ActionResult<Message>> SendDemoAsync(SendDemoMessageInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _messageService.SendDemoAsync(input, cancellationToken));
   }
 }

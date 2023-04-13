@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.Commands;
+﻿using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
 using MediatR;
 
 namespace Logitar.Portal;

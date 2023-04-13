@@ -1,113 +1,110 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Logitar.Portal.Contracts.Constants;
 using System.Collections;
+using System.Net.Http.Json;
 
-namespace Logitar.Portal.Client.Implementations
+namespace Logitar.Portal.Client.Implementations;
+
+internal abstract class HttpService : IDisposable
 {
-  internal abstract class HttpService
+  private readonly HttpClient _client;
+
+  protected HttpService(HttpClient client, PortalSettings settings)
   {
-    private readonly HttpClient _client;
+    _client = client;
+    _client.BaseAddress = new Uri(settings.BaseUrl);
 
-    protected HttpService(HttpClient client, IOptions<PortalSettings> settings)
+    string? authorization = null;
+    if (settings.BasicAuthentication != null)
     {
-      ArgumentNullException.ThrowIfNull(client);
-      ArgumentNullException.ThrowIfNull(settings);
-
-      _client = client ?? throw new ArgumentNullException(nameof(client));
-      _client.BaseAddress = new Uri(settings.Value.BaseUrl);
-      _client.DefaultRequestHeaders.Add("X-API-Key", settings.Value.ApiKey);
+      authorization = string.Join(' ', Schemes.Basic, settings.BasicAuthentication.Encode());
     }
-
-    protected async Task<T> DeleteAsync<T>(string uri, CancellationToken cancellation)
-      => await ExecuteAsync<T>(HttpMethod.Delete, uri, payload: null, sessionId: null, cancellation);
-
-    protected async Task<T> GetAsync<T>(string uri, CancellationToken cancellationToken)
-      => await GetAsync<T>(uri, sessionId: null, cancellationToken);
-    protected async Task<T> GetAsync<T>(string uri, Guid? sessionId, CancellationToken cancellationToken)
-      => await ExecuteAsync<T>(HttpMethod.Get, uri, payload: null, sessionId, cancellationToken);
-
-    protected async Task<T> PatchAsync<T>(string uri, CancellationToken cancellationToken)
-      => await ExecuteAsync<T>(HttpMethod.Patch, uri, payload: null, sessionId: null, cancellationToken);
-
-    protected async Task PostAsync(string uri, object payload, CancellationToken cancellationToken)
-      => await PostAsync(uri, payload, sessionId: null, cancellationToken);
-    protected async Task PostAsync(string uri, Guid sessionId, CancellationToken cancellationToken)
-      => await PostAsync(uri, payload: null, sessionId, cancellationToken);
-    protected async Task PostAsync(string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-      => await ExecuteAsync(HttpMethod.Post, uri, payload, sessionId, cancellationToken);
-
-    protected async Task<T> PostAsync<T>(string uri, object payload, CancellationToken cancellationToken)
-      => await PostAsync<T>(uri, payload, sessionId: null, cancellationToken);
-    protected async Task<T> PostAsync<T>(string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-      => await ExecuteAsync<T>(HttpMethod.Post, uri, payload, sessionId, cancellationToken);
-
-    protected async Task<T> PutAsync<T>(string uri, object payload, CancellationToken cancellationToken)
-      => await PutAsync<T>(uri, payload, sessionId: null, cancellationToken);
-    protected async Task<T> PutAsync<T>(string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-      => await ExecuteAsync<T>(HttpMethod.Put, uri, payload, sessionId, cancellationToken);
-
-    protected static string GetQueryString(IReadOnlyDictionary<string, object?> parameters)
+    if (authorization != null)
     {
-      ArgumentNullException.ThrowIfNull(parameters);
+      _client.DefaultRequestHeaders.Add(Headers.Authorization, authorization);
+    }
+  }
 
-      return string.Join('&', parameters.Where(x => x.Value != null).SelectMany(x =>
+  public void Dispose()
+  {
+    _client.Dispose();
+  }
+
+  protected async Task<T> DeleteAsync<T>(string uri, CancellationToken cancellation)
+    => await ExecuteAsync<T>(HttpMethod.Delete, uri, payload: null, cancellation);
+
+  protected async Task<T> GetAsync<T>(string uri, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Get, uri, payload: null, cancellationToken);
+
+  protected async Task<T> PatchAsync<T>(string uri, CancellationToken cancellationToken)
+    => await PatchAsync<T>(uri, payload: null, cancellationToken);
+  protected async Task<T> PatchAsync<T>(string uri, object? payload, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Patch, uri, payload, cancellationToken);
+
+  protected async Task PostAsync(string uri, CancellationToken cancellationToken)
+    => await PostAsync(uri, payload: null, cancellationToken);
+  protected async Task PostAsync(string uri, object? payload, CancellationToken cancellationToken)
+    => await ExecuteAsync(HttpMethod.Post, uri, payload, cancellationToken);
+
+  protected async Task<T> PostAsync<T>(string uri, object? payload, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Post, uri, payload, cancellationToken);
+
+  protected async Task<T> PutAsync<T>(string uri, object? payload, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Put, uri, payload, cancellationToken);
+
+  protected static string GetQueryString(IReadOnlyDictionary<string, object?> parameters)
+  {
+    return string.Join('&', parameters.Where(x => x.Value != null).SelectMany(x =>
+    {
+      if (x.Value is not string && x.Value is IEnumerable enumerable)
       {
-        if (x.Value is not string && x.Value is IEnumerable enumerable)
+        List<string> values = new();
+
+        IEnumerator enumerator = enumerable.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-          var values = new List<string>();
-
-          var enumerator = enumerable.GetEnumerator();
-          while(enumerator.MoveNext())
+          object? value = enumerator.Current;
+          if (value != null)
           {
-            var value = enumerator.Current;
-            if (value != null)
-            {
-              values.Add($"{x.Key}={value}");
-            }
+            values.Add(string.Join('=', x.Key, x.Value));
           }
-
-          return values.AsEnumerable();
         }
 
-        return new[] { $"{x.Key}={x.Value}" };
-      }));
-    }
-
-    private async Task ExecuteAsync(HttpMethod method, string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-    {
-      using var response = await ExecuteBaseAsync(method, uri, payload, sessionId, cancellationToken);
-
-      await response.HandleAsync(cancellationToken);
-    }
-    private async Task<T> ExecuteAsync<T>(HttpMethod method, string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-    {
-      using var response = await ExecuteBaseAsync(method, uri, payload, sessionId, cancellationToken);
-
-      return await response.HandleAsync<T>(cancellationToken);
-    }
-    private async Task<HttpResponseMessage> ExecuteBaseAsync(HttpMethod method, string uri, object? payload, Guid? sessionId, CancellationToken cancellationToken)
-    {
-      using var request = GetRequest(method, uri, payload, sessionId);
-
-      return await _client.SendAsync(request, cancellationToken);
-    }
-
-    private static HttpRequestMessage GetRequest(HttpMethod method, string uri, object? payload, Guid? sessionId)
-    {
-      ArgumentNullException.ThrowIfNull(method);
-      ArgumentNullException.ThrowIfNull(uri);
-
-      var request = new HttpRequestMessage(method, new Uri($"/api/{uri.Trim('/')}", UriKind.Relative));
-
-      if (payload != null)
-      {
-        request.Content = new JsonContent(payload);
-      }
-      if (sessionId.HasValue)
-      {
-        request.Headers.Add("X-Session", sessionId.Value.ToString());
+        return values.AsEnumerable();
       }
 
-      return request;
+      return new[] { string.Join('=', x.Key, x.Value) };
+    }));
+  }
+
+  private async Task ExecuteAsync(HttpMethod method, string uri, object? payload, CancellationToken cancellationToken)
+  {
+    using HttpResponseMessage response = await ExecuteBaseAsync(method, uri, payload, cancellationToken);
+
+    await response.HandleAsync(cancellationToken);
+  }
+  private async Task<T> ExecuteAsync<T>(HttpMethod method, string uri, object? payload, CancellationToken cancellationToken)
+  {
+    using HttpResponseMessage response = await ExecuteBaseAsync(method, uri, payload, cancellationToken);
+
+    return await response.HandleAsync<T>(cancellationToken);
+  }
+  private async Task<HttpResponseMessage> ExecuteBaseAsync(HttpMethod method, string uri, object? payload, CancellationToken cancellationToken)
+  {
+    using HttpRequestMessage request = GetRequest(method, uri, payload);
+
+    return await _client.SendAsync(request, cancellationToken);
+  }
+
+  private static HttpRequestMessage GetRequest(HttpMethod method, string uri, object? payload)
+  {
+    Uri requestUri = new($"/api/{uri.Trim('/')}", UriKind.Relative);
+    HttpRequestMessage request = new(method, requestUri);
+
+    if (payload != null)
+    {
+      request.Content = JsonContent.Create(payload);
     }
+
+    return request;
   }
 }

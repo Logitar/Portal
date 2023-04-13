@@ -15,8 +15,9 @@
   "general": "General",
   "jwt": {
     "secret": {
+      "clear": "Clear",
       "label": "Secret",
-      "placeholder": "Paste a JWT secret in the input or let it empty to securely generate a new secret",
+      "placeholder": "Paste a JWT secret in the input or leave it empty to securely generate a new secret",
       "revert": "Revert",
       "warning": "Changing the secret will invalidate all active tokens. Press the button below to revert the change."
     },

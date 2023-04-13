@@ -1,10 +1,10 @@
-﻿@using Logitar.Portal.Core.Realms.Models;
+﻿@using Logitar.Portal.Contracts.Realms;
 
-@model RealmModel
+@model Realm
 @{
   Layout = "_Layout";
 
-  ViewBag.Title = Model?.Name ?? "Create realm";
+  ViewBag.Title = Model?.DisplayName ?? Model?.UniqueName ?? "Create realm";
 }
 
 @if (Model == null)

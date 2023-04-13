@@ -1,51 +1,47 @@
-﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Core.Users.Models;
+﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[Route("user")]
+public class AccountController : Controller
 {
-  [ApiExplorerSettings(IgnoreApi = true)]
-  [Route("user")]
-  public class AccountController : Controller
+  private readonly ISessionService _sessionService;
+
+  public AccountController(ISessionService sessionService)
   {
-    private readonly IAccountService _accountService;
+    _sessionService = sessionService;
+  }
 
-    public AccountController(IAccountService accountService)
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
+  [HttpGet("profile")]
+  public ActionResult Profile()
+  {
+    return View(HttpContext.GetUser());
+  }
+
+  [HttpGet("sign-in")]
+  public ActionResult SignIn()
+  {
+    if (HttpContext.IsSignedIn())
     {
-      _accountService = accountService;
+      return RedirectToAction(actionName: "Profile");
     }
 
-    [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-    [HttpGet("profile")]
-    public async Task<ActionResult> Profile(CancellationToken cancellationToken)
-    {
-      UserModel user = await _accountService.GetProfileAsync(cancellationToken);
+    return View();
+  }
 
-      return View(user);
-    }
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
+  [HttpGet("sign-out")]
+  public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
+  {
+    await _sessionService.SignOutAsync(HttpContext.GetSessionId()!.Value, cancellationToken);
+    HttpContext.SignOut();
 
-    [HttpGet("sign-in")]
-    public ActionResult SignIn()
-    {
-      if (HttpContext.GetSessionId().HasValue)
-      {
-        return RedirectToAction(actionName: "Profile");
-      }
-
-      return View();
-    }
-
-    [Authorize(Policy = Constants.Policies.AuthenticatedUser)]
-    [HttpGet("sign-out")]
-    public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
-    {
-      await _accountService.SignOutAsync(cancellationToken);
-
-      HttpContext.Session.Clear();
-      HttpContext.Response.Cookies.Delete(Constants.Cookies.RenewToken);
-
-      return RedirectToAction(actionName: "SignIn");
-    }
+    return RedirectToAction(actionName: "SignIn");
   }
 }

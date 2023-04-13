@@ -1,58 +1,61 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Core.Emails.Senders.Models;
-using Logitar.Portal.Core.Emails.Senders.Payloads;
-using Microsoft.Extensions.Options;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Senders;
 
-namespace Logitar.Portal.Client.Implementations
+namespace Logitar.Portal.Client.Implementations;
+
+internal class SenderService : HttpService, ISenderService
 {
-  internal class SenderService : HttpService, ISenderService
+  private const string BasePath = "/senders";
+
+  public SenderService(HttpClient client, PortalSettings settings) : base(client, settings)
   {
-    private const string BasePath = "/senders";
-
-    public SenderService(HttpClient client, IOptions<PortalSettings> settings) : base(client, settings)
-    {
-    }
-
-    public async Task<SenderModel> CreateAsync(CreateSenderPayload payload, CancellationToken cancellationToken)
-      => await PostAsync<SenderModel>(BasePath, payload, cancellationToken);
-
-    public async Task<SenderModel> DeleteAsync(Guid id, CancellationToken cancellationToken)
-      => await DeleteAsync<SenderModel>($"{BasePath}/{id}", cancellationToken);
-
-    public async Task<SenderModel> GetAsync(Guid id, CancellationToken cancellationToken)
-      => await GetAsync<SenderModel>($"{BasePath}/{id}", cancellationToken);
-
-    public async Task<ListModel<SenderSummary>> GetAsync(ProviderType? provider, string? realm, string? search, SenderSort? sort, bool desc, int? index, int? count, CancellationToken cancellationToken)
-    {
-      string query = GetQueryString(new Dictionary<string, object?>
-      {
-        [nameof(provider)] = provider,
-        [nameof(realm)] = realm,
-        [nameof(search)] = search,
-        [nameof(sort)] = sort,
-        [nameof(desc)] = desc,
-        [nameof(index)] = index,
-        [nameof(count)] = count
-      });
-
-      return await GetAsync<ListModel<SenderSummary>>($"{BasePath}?{query}", cancellationToken);
-    }
-
-    public async Task<SenderModel> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
-    {
-      string query = GetQueryString(new Dictionary<string, object?>
-      {
-        [nameof(realm)] = realm
-      });
-
-      return await GetAsync<SenderModel>($"{BasePath}/default?{query}", cancellationToken);
-    }
-
-    public async Task<SenderModel> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
-      => await PatchAsync<SenderModel>($"{BasePath}/{id}/default", cancellationToken);
-
-    public async Task<SenderModel> UpdateAsync(Guid id, UpdateSenderPayload payload, CancellationToken cancellationToken)
-      => await PutAsync<SenderModel>($"{BasePath}/{id}", payload, cancellationToken);
   }
+
+  public async Task<Sender> CreateAsync(CreateSenderInput input, CancellationToken cancellationToken)
+    => await PostAsync<Sender>(BasePath, input, cancellationToken);
+
+  public async Task<Sender> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    => await DeleteAsync<Sender>($"{BasePath}/{id}", cancellationToken);
+
+  public async Task<Sender?> GetAsync(Guid? id, string? defaultInRealm, CancellationToken cancellationToken)
+  {
+    if (id.HasValue)
+    {
+      if (defaultInRealm != null)
+      {
+        throw new NotSupportedException($"You may only specify one of the following parameters: '{nameof(id)}', '{nameof(defaultInRealm)}'.");
+      }
+
+      return await GetAsync<Sender>($"{BasePath}/{id.Value}", cancellationToken);
+    }
+    else if (defaultInRealm != null)
+    {
+      return await GetAsync<Sender>($"{BasePath}/default/{defaultInRealm}", cancellationToken);
+    }
+
+    return null;
+  }
+
+  public async Task<PagedList<Sender>> GetAsync(ProviderType? provider, string? realm, string? search,
+    SenderSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    string query = GetQueryString(new Dictionary<string, object?>
+    {
+      [nameof(provider)] = provider,
+      [nameof(realm)] = realm,
+      [nameof(search)] = search,
+      [nameof(sort)] = sort,
+      [nameof(isDescending)] = isDescending,
+      [nameof(skip)] = skip,
+      [nameof(limit)] = limit
+    });
+
+    return await GetAsync<PagedList<Sender>>($"{BasePath}?{query}", cancellationToken);
+  }
+
+  public async Task<Sender> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
+    => await PatchAsync<Sender>($"{BasePath}/{id}/default", cancellationToken);
+
+  public async Task<Sender> UpdateAsync(Guid id, UpdateSenderInput input, CancellationToken cancellationToken)
+    => await PutAsync<Sender>($"{BasePath}/{id}", input, cancellationToken);
 }

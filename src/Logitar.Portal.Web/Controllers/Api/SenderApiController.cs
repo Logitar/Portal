@@ -1,91 +1,79 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Emails.Senders;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Senders;
-using Logitar.Portal.Core.Emails.Senders.Models;
-using Logitar.Portal.Core.Emails.Senders.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Policies.PortalActor)]
+[Route("api/senders")]
+public class SenderApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/senders")]
-  public class SenderApiController : ControllerBase
+  private readonly ISenderService _senderService;
+
+  public SenderApiController(ISenderService senderService)
   {
-    private readonly IMapper _mapper;
-    private readonly ISenderService _senderService;
+    _senderService = senderService;
+  }
 
-    public SenderApiController(IMapper mapper, ISenderService senderService)
+  [HttpPost]
+  public async Task<ActionResult<Sender>> CreateAsync([FromBody] CreateSenderInput input, CancellationToken cancellationToken)
+  {
+    Sender sender = await _senderService.CreateAsync(input, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/senders/{sender.Id}");
+
+    return Created(uri, sender);
+  }
+
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Sender>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _senderService.DeleteAsync(id, cancellationToken));
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Sender>>> GetAsync(ProviderType? provider, string? realm, string? search,
+    SenderSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken = default)
+  {
+    return Ok(await _senderService.GetAsync(provider, realm, search,
+      sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("default/{realm}")]
+  public async Task<ActionResult<Sender>> GetDefaultAsync(string realm, CancellationToken cancellationToken)
+  {
+    Sender? sender = await _senderService.GetAsync(defaultInRealm: realm, cancellationToken: cancellationToken);
+    if (sender == null)
     {
-      _mapper = mapper;
-      _senderService = senderService;
+      return NotFound();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<SenderModel>> CreateAsync([FromBody] CreateSenderPayload payload, CancellationToken cancellationToken)
-    {
-      SenderModel sender = await _senderService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/senders/{sender.Id}", UriKind.Relative);
+    return Ok(sender);
+  }
 
-      return Created(uri, sender);
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Sender>> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Sender? sender = await _senderService.GetAsync(id, cancellationToken: cancellationToken);
+    if (sender == null)
+    {
+      return NotFound();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<SenderModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _senderService.DeleteAsync(id, cancellationToken));
-    }
+    return Ok(sender);
+  }
 
-    [HttpGet]
-    public async Task<ActionResult<ListModel<SenderSummary>>> GetAsync(ProviderType? provider, string? realm, string? search,
-      SenderSort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken = default)
-    {
-      ListModel<SenderModel> senders = await _senderService.GetAsync(provider, realm, search,
-        sort, desc,
-        index, count,
-        cancellationToken);
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Sender>> UpdateAsync(Guid id, [FromBody] UpdateSenderInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _senderService.UpdateAsync(id, input, cancellationToken));
+  }
 
-      return Ok(senders.To<SenderModel, SenderSummary>(_mapper));
-    }
-
-    [HttpGet("default")]
-    public async Task<ActionResult<SenderModel>> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
-    {
-      SenderModel? sender = await _senderService.GetDefaultAsync(realm, cancellationToken);
-      if (sender == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(sender);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<SenderModel>> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-      SenderModel? sender = await _senderService.GetAsync(id, cancellationToken);
-      if (sender == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(sender);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult<SenderModel>> UpdateAsync(Guid id, [FromBody] UpdateSenderPayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _senderService.UpdateAsync(id, payload, cancellationToken));
-    }
-
-    [HttpPatch("{id}/default")]
-    public async Task<ActionResult<SenderModel>> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _senderService.SetDefaultAsync(id, cancellationToken));
-    }
+  [HttpPatch("{id}/default")]
+  public async Task<ActionResult<Sender>> SetDefaultAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _senderService.SetDefaultAsync(id, cancellationToken));
   }
 }

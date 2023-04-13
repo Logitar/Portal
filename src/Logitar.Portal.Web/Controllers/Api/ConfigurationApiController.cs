@@ -1,47 +1,38 @@
-﻿using Logitar.Portal.Application.Accounts;
-using Logitar.Portal.Application.Configurations;
-using Logitar.Portal.Application.Configurations.Payloads;
-using Logitar.Portal.Core.Accounts.Payloads;
-using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Core.Configurations;
+using Logitar.Portal.Web.Commands;
+using Logitar.Portal.Web.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Route("api/configurations")]
+public class ConfigurationApiController : ControllerBase
 {
-  [ApiController]
-  [Route("api/configurations")]
-  public class ConfigurationApiController : ControllerBase
+  private readonly IConfigurationService _configurationService;
+  private readonly IMediator _mediator;
+
+  public ConfigurationApiController(IConfigurationService configurationService, IMediator mediator)
   {
-    private readonly IAccountService _accountService;
-    private readonly IConfigurationService _configurationService;
+    _configurationService = configurationService;
+    _mediator = mediator;
+  }
 
-    public ConfigurationApiController(IAccountService accountService, IConfigurationService configurationService)
+  [HttpPost]
+  public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationInput input, CancellationToken cancellationToken)
+  {
+    if (await _configurationService.IsInitializedAsync(cancellationToken))
     {
-      _accountService = accountService;
-      _configurationService = configurationService;
+      return Forbid();
     }
 
-    [HttpPost]
-    public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
-    {
-      if (payload.User.Password == null)
-      {
-        return BadRequest(new { code = "PasswordIsRequired" });
-      }
+    await _configurationService.InitializeAsync(input, cancellationToken);
 
-      await _configurationService.InitializeAsync(payload, cancellationToken);
+    Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
+    HttpContext.SignIn(session);
 
-      var signInPayload = new SignInPayload
-      {
-        Username = payload.User.Username,
-        Password = payload.User.Password,
-        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-        AdditionalInformation = JsonSerializer.Serialize(HttpContext.Request.Headers)
-      };
-      SessionModel session = await _accountService.SignInAsync(signInPayload, realm: null, cancellationToken);
-      HttpContext.SetSession(session);
-
-      return NoContent();
-    }
+    return NoContent();
   }
 }

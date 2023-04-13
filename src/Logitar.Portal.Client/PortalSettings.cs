@@ -1,8 +1,7 @@
-﻿namespace Logitar.Portal.Client
+﻿namespace Logitar.Portal.Client;
+
+public record PortalSettings
 {
-  public class PortalSettings
-  {
-    public string ApiKey { get; set; } = null!;
-    public string BaseUrl { get; set; } = null!;
-  }
+  public string BaseUrl { get; set; } = string.Empty;
+  public Credentials? BasicAuthentication { get; set; }
 }
