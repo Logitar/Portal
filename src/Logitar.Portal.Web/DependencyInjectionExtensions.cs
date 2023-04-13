@@ -17,11 +17,12 @@ public static class DependencyInjectionExtensions
 
     services
       .AddAuthentication()
+      .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Constants.Schemes.Basic, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Constants.Schemes.Session, options => { });
 
     services.AddAuthorization(options =>
     {
-      options.AddPolicy(Constants.Policies.AuthenticatedPortalUser, new AuthorizationPolicyBuilder(Constants.Schemes.All)
+      options.AddPolicy(Constants.Policies.AuthenticatedPortalUser, new AuthorizationPolicyBuilder(Constants.Schemes.Session)
         .RequireAuthenticatedUser()
         .AddRequirements(new AuthenticatedPortalUserAuthorizationRequirement())
         .Build());

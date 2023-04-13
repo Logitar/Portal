@@ -15,6 +15,11 @@ internal static class Constants
     };
   }
 
+  internal static class Headers
+  {
+    public const string Authorization = nameof(Authorization);
+  }
+
   internal static class Policies
   {
     public const string AuthenticatedPortalUser = nameof(AuthenticatedPortalUser);
@@ -23,9 +28,10 @@ internal static class Constants
 
   internal static class Schemes
   {
+    public const string Basic = nameof(Basic);
     public const string Session = nameof(Session);
 
-    public static string[] All => new[] { Session };
+    public static string[] All => new[] { Basic, Session };
   }
 
   public static readonly Version Version = new(2, 0, 0);

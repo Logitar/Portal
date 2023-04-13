@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Logitar.Portal.Web.Extensions;
 
@@ -11,6 +12,7 @@ public static class OpenApiExtensions
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(config =>
     {
+      config.AddSecurity();
       config.SwaggerDoc(name: $"v{Constants.Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact
@@ -40,5 +42,35 @@ public static class OpenApiExtensions
       url: $"/swagger/v{Constants.Version.Major}/swagger.json",
       name: $"{Title} v{Constants.Version}"
     ));
+  }
+
+  private static void AddSecurity(this SwaggerGenOptions options)
+  {
+    options.AddSecurityDefinition(Constants.Schemes.Basic, new OpenApiSecurityScheme
+    {
+      Description = "Enter your credentials in the inputs below:",
+      In = ParameterLocation.Header,
+      Name = Constants.Headers.Authorization,
+      Scheme = Constants.Schemes.Basic,
+      Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Name = Constants.Headers.Authorization,
+          Reference = new OpenApiReference
+          {
+            Id = Constants.Schemes.Basic,
+            Type = ReferenceType.SecurityScheme
+          },
+          Scheme = Constants.Schemes.Basic,
+          Type = SecuritySchemeType.Http
+        },
+        new List<string>()
+      }
+    });
   }
 }
