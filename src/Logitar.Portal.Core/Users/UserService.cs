@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Core.Users.Commands;
 using Logitar.Portal.Core.Users.Queries;
@@ -50,6 +51,11 @@ internal class UserService : IUserService
   {
     return await _pipeline.ExecuteAsync(new GetUsers(isConfirmed, isDisabled, realm, search,
       sort, isDescending, skip, limit), cancellationToken);
+  }
+
+  public async Task<SentMessages> RecoverPasswordAsync(RecoverPasswordInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new RecoverPassword(input), cancellationToken);
   }
 
   public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)

@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,12 @@ public class UserApiController : ControllerBase
   public async Task<ActionResult<User>> ChangePasswordAsync(Guid id, [FromBody] ChangePasswordInput input, CancellationToken cancellationToken)
   {
     return Ok(await _userService.ChangePasswordAsync(id, input, cancellationToken));
+  }
+
+  [HttpPost("password/recover")]
+  public async Task<ActionResult<SentMessages>> RecoverPasswordAsync([FromBody] RecoverPasswordInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _userService.RecoverPasswordAsync(input, cancellationToken));
   }
 
   [HttpPatch("{id}/disable")]
