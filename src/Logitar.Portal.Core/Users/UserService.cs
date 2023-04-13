@@ -58,6 +58,11 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new RecoverPassword(input), cancellationToken);
   }
 
+  public async Task<User> ResetPasswordAsync(ResetPasswordInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new ResetPassword(input), cancellationToken);
+  }
+
   public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new SetExternalIdentifier(id, key, value), cancellationToken);

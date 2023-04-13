@@ -11,9 +11,6 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class RecoverPasswordHandler : IRequestHandler<RecoverPassword, SentMessages>
 {
-  private const int Lifetime = 7 * 24 * 60 * 60; // 7 days
-  private const string Purpose = "reset_password";
-
   private readonly IMediator _mediator;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserRepository _userRepository;
@@ -62,8 +59,8 @@ internal class RecoverPasswordHandler : IRequestHandler<RecoverPassword, SentMes
     CreateTokenInput createToken = new()
     {
       IsConsumable = true,
-      Lifetime = Lifetime,
-      Purpose = Purpose,
+      Lifetime = Constants.PasswordRecovery.Lifetime,
+      Purpose = Constants.PasswordRecovery.Purpose,
       Realm = realm.Id.ToGuid().ToString(),
       Subject = user.Id.ToGuid().ToString()
     };

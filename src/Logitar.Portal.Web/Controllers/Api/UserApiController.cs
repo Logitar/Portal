@@ -71,6 +71,12 @@ public class UserApiController : ControllerBase
     return Ok(await _userService.RecoverPasswordAsync(input, cancellationToken));
   }
 
+  [HttpPatch("password/reset")]
+  public async Task<ActionResult<User>> ResetPasswordAsync([FromBody] ResetPasswordInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _userService.ResetPasswordAsync(input, cancellationToken));
+  }
+
   [HttpPatch("{id}/disable")]
   public async Task<ActionResult<User>> DisableAsync(Guid id, CancellationToken cancellationToken)
   {
