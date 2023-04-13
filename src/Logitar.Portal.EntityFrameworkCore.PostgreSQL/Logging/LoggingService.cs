@@ -39,14 +39,16 @@ internal class LoggingService : ILoggingService
     return Task.FromResult(_log.StartActivity(activity, startedOn));
   }
 
-  public Task AddErrorAsync(Error error, CancellationToken cancellationToken)
+  public async Task AddErrorAsync(Error error, CancellationToken cancellationToken)
+    => await AddErrorAsync(error, activityId: null, cancellationToken);
+  public Task AddErrorAsync(Error error, Guid? activityId, CancellationToken cancellationToken)
   {
     if (_log == null)
     {
       throw new NotImplementedException(); // TODO(fpion): implement
     }
 
-    _log.AddError(error);
+    _log.AddError(error, activityId);
 
     return Task.CompletedTask;
   }

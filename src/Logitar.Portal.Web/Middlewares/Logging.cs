@@ -30,7 +30,7 @@ public class Logging
     }
     catch (Exception exception)
     {
-      await loggingService.AddErrorAsync(Error.From(exception));
+      await loggingService.AddErrorAsync(Error.From(exception), activityId: null);
 
       throw;
     }

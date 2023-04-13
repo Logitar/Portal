@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Logging;
+﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Logging;
 using MediatR;
 
 namespace Logitar.Portal.Core;
@@ -22,9 +23,11 @@ internal class RequestPipeline : IRequestPipeline
     {
       await _mediator.Send(request, cancellationToken);
     }
-    catch (Exception)
+    catch (Exception exception)
     {
-      throw; // TODO(fpion): implement
+      await _loggingService.AddErrorAsync(Error.From(exception), activityId, cancellationToken);
+
+      throw;
     }
 
     await _loggingService.EndActivityAsync(activityId, cancellationToken);
@@ -38,9 +41,11 @@ internal class RequestPipeline : IRequestPipeline
     {
       return await _mediator.Send(request, cancellationToken);
     }
-    catch (Exception)
+    catch (Exception exception)
     {
-      throw; // TODO(fpion): implement
+      await _loggingService.AddErrorAsync(Error.From(exception), activityId, cancellationToken);
+
+      throw;
     }
     finally
     {

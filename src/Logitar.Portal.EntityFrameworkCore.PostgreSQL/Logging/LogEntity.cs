@@ -83,7 +83,15 @@ internal class LogEntity
     get => _errors.Any() ? $"[{string.Join(',', _errors.Select(error => error.Serialize()))}]" : null;
     private set { }
   }
-  public void AddError(Error error) => _errors.Add(error);
+  public void AddError(Error error, Guid? activityId = null)
+  {
+    _errors.Add(error);
+
+    if (activityId.HasValue && _activities.TryGetValue(activityId.Value, out ActivityEntity? activity))
+    {
+      activity.AddError(error);
+    }
+  }
 
   public List<ActivityEntity> Activities { get; private set; } = new();
   public Guid StartActivity(object data, DateTime? startedOn = null)
