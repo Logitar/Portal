@@ -62,8 +62,14 @@
                 :minLength="256 / 8"
                 :maxLength="512 / 8"
                 placeholder="realms.jwt.secret.placeholder"
+                :type="showSecret ? 'text' : 'password'"
                 v-model="secret"
-              />
+              >
+                <b-input-group-append>
+                  <icon-button :icon="showSecret ? 'eye-slash' : 'eye'" variant="info" @click="showSecret = !showSecret" />
+                  <icon-button :disabled="!secret" icon="times" text="realms.jwt.secret.clear" variant="warning" @click="secret = null" />
+                </b-input-group-append>
+              </form-field>
               <b-alert :show="realm && realm.secret !== secret" variant="warning">
                 <p><strong v-t="'realms.jwt.secret.warning'" /></p>
                 <icon-button icon="history" text="realms.jwt.secret.revert" variant="warning" @click="secret = realm.secret" />
@@ -124,6 +130,7 @@ export default {
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
       secret: null,
+      showSecret: false,
       uniqueName: null,
       uniqueNameConflict: false,
       url: null,
