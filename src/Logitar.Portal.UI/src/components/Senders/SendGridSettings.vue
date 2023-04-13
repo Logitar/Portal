@@ -11,7 +11,7 @@
       v-model="apiKey"
     >
       <b-input-group-append>
-        <icon-button icon="eye" variant="info" @click="showApiKey = !showApiKey" />
+        <icon-button :icon="showApiKey ? 'eye-slash' : 'eye'" variant="info" @click="showApiKey = !showApiKey" />
       </b-input-group-append>
     </form-field>
   </div>
