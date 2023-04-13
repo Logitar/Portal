@@ -19,12 +19,18 @@ internal class RealmService : HttpService, IRealmService
 
   public async Task<Realm?> GetAsync(Guid? id, string? uniqueName, CancellationToken cancellationToken)
   {
-    if (uniqueName != null)
+    if (id != null && uniqueName != null)
     {
-      throw new NotSupportedException("You may only query realms by their identifier.");
+      throw new NotSupportedException($"You may only specify one of the following parameters: '{nameof(id)}', '{nameof(uniqueName)}'.");
+    }
+    else if (id == null && uniqueName == null)
+    {
+      return null;
     }
 
-    return id.HasValue ? await GetAsync<Realm>($"{BasePath}/{id.Value}", cancellationToken) : null;
+    string? idOrUniqueName = id?.ToString() ?? uniqueName;
+
+    return await GetAsync<Realm>($"{BasePath}/{idOrUniqueName}", cancellationToken);
   }
 
   public async Task<PagedList<Realm>> GetAsync(string? search,
