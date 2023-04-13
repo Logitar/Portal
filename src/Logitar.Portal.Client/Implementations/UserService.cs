@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Client.Implementations;
@@ -54,6 +55,12 @@ internal class UserService : HttpService, IUserService
 
     return await GetAsync<PagedList<User>>($"{BasePath}?{query}", cancellationToken);
   }
+
+  public async Task<SentMessages> RecoverPasswordAsync(RecoverPasswordInput input, CancellationToken cancellationToken)
+    => await PostAsync<SentMessages>($"{BasePath}/password/recover", input, cancellationToken);
+
+  public async Task<User> ResetPasswordAsync(ResetPasswordInput input, CancellationToken cancellationToken)
+    => await PostAsync<User>($"{BasePath}/password/reset", input, cancellationToken);
 
   public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)
     => await PatchAsync<User>($"{BasePath}/{id}/external-identifiers/{key}?value={value}", cancellationToken);

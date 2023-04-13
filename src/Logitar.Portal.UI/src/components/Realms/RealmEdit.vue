@@ -41,7 +41,7 @@
             </b-form-group>
             <username-settings v-model="usernameSettings" />
             <password-settings v-model="passwordSettings" />
-            <!-- <div v-if="realm">
+            <div v-if="realm">
               <h5 v-t="'realms.passwordRecovery.title'" />
               <b-row>
                 <sender-select
@@ -53,7 +53,7 @@
                 />
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
-            </div> -->
+            </div>
             <h5 v-t="'realms.jwt.title'" />
             <b-form-group>
               <form-field
@@ -86,8 +86,8 @@
 import Vue from 'vue'
 import AliasField from './AliasField.vue'
 import PasswordSettings from './PasswordSettings.vue'
-// import SenderSelect from '@/components/Senders/SenderSelect.vue'
-// import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
+import SenderSelect from '@/components/Senders/SenderSelect.vue'
+import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
 import UsernameSettings from './UsernameSettings.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
@@ -96,8 +96,8 @@ export default {
   components: {
     AliasField,
     PasswordSettings,
-    // SenderSelect,
-    // TemplateSelect,
+    SenderSelect,
+    TemplateSelect,
     UsernameSettings
   },
   props: {
@@ -145,8 +145,8 @@ export default {
         (this.defaultLocale !== this.realm?.defaultLocale ?? null) ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
         (this.displayName ?? '') !== (this.realm?.displayName ?? '') ||
-        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
-        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
+        this.passwordRecoverySenderId !== (this.realm?.passwordRecoverySender?.id ?? null) ||
+        this.passwordRecoveryTemplateId !== (this.realm?.passwordRecoveryTemplate?.id ?? null) ||
         this.passwordSettings.requireDigit !== (this.realm?.passwordSettings?.requireDigit ?? false) ||
         this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings?.requireLowercase ?? false) ||
         this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings?.requireNonAlphanumeric ?? false) ||
@@ -168,8 +168,6 @@ export default {
         defaultLocale: this.defaultLocale,
         description: this.description,
         displayName: this.displayName,
-        passwordRecoverySenderId: this.passwordRecoverySenderId,
-        passwordRecoveryTemplateId: this.passwordRecoveryTemplateId,
         passwordSettings: { ...this.passwordSettings },
         requireConfirmedAccount: this.requireConfirmedAccount,
         requireUniqueEmail: this.requireUniqueEmail,
@@ -177,7 +175,10 @@ export default {
         url: this.url,
         usernameSettings: { ...this.usernameSettings }
       }
-      if (!this.realm) {
+      if (this.realm) {
+        payload.passwordRecoverySender = this.passwordRecoverySenderId
+        payload.passwordRecoveryTemplate = this.passwordRecoveryTemplateId
+      } else {
         payload.uniqueName = this.uniqueName
       }
       return payload
@@ -189,8 +190,8 @@ export default {
       this.defaultLocale = realm.defaultLocale
       this.description = realm.description
       this.displayName = realm.displayName
-      this.passwordRecoverySenderId = realm.passwordRecoverySenderId
-      this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplateId
+      this.passwordRecoverySenderId = realm.passwordRecoverySender?.id ?? null
+      this.passwordRecoveryTemplateId = realm.passwordRecoveryTemplate?.id ?? null
       Vue.set(this.passwordSettings, 'requireDigit', realm.passwordSettings?.requireDigit ?? false)
       Vue.set(this.passwordSettings, 'requireLowercase', realm.passwordSettings?.requireLowercase ?? false)
       Vue.set(this.passwordSettings, 'requireNonAlphanumeric', realm.passwordSettings?.requireNonAlphanumeric ?? false)

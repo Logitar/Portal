@@ -32,6 +32,8 @@ internal class SenderEntity : AggregateEntity
   public string Provider { get; private set; } = string.Empty;
   public string? Settings { get; private set; }
 
+  public RealmEntity? PasswordRecoveryRealm { get; private set; }
+
   public void SetDefault(SenderSetDefault e, ActorEntity actor)
   {
     Update(e, actor);

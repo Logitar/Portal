@@ -27,6 +27,7 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
     [typeof(LocaleAlreadyUsedException)] = HandleLocaleAlreadyUsedException,
+    [typeof(PasswordRecoveryTemplateRequiredException)] = HandlePasswordRecoveryTemplateRequiredException,
     [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(TemplateNotInRealmException)] = HandleTemplateNotInRealmException,
@@ -130,6 +131,11 @@ internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
     {
       context.Result = new ConflictObjectResult(GetPropertyFailure(exception));
     }
+  }
+
+  private static void HandlePasswordRecoveryTemplateRequiredException(ExceptionContext context)
+  {
+    context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
   }
 
   private static void HandleSenderNotInRealmException(ExceptionContext context)

@@ -40,11 +40,32 @@ internal class RealmEntity : AggregateEntity, ICustomAttributes
   public string? ClaimMappings { get; private set; }
   public string? CustomAttributes { get; private set; }
 
+  public SenderEntity? PasswordRecoverySender { get; private set; }
+  public int? PasswordRecoverySenderId { get; private set; }
+  public TemplateEntity? PasswordRecoveryTemplate { get; private set; }
+  public int? PasswordRecoveryTemplateId { get; private set; }
+
   public List<DictionaryEntity> Dictionaries { get; private set; } = new();
   public List<ExternalIdentifierEntity> ExternalIdentifiers { get; private set; } = new();
   public List<SenderEntity> Senders { get; private set; } = new();
   public List<TemplateEntity> Templates { get; private set; } = new();
   public List<UserEntity> Users { get; private set; } = new();
+
+  public void SetPasswordRecoverySender(PasswordRecoverySenderChanged e, SenderEntity? sender, ActorEntity actor)
+  {
+    Update(e, actor);
+
+    PasswordRecoverySender = sender;
+    PasswordRecoverySenderId = sender?.SenderId;
+  }
+
+  public void SetPasswordRecoveryTemplate(PasswordRecoveryTemplateChanged e, TemplateEntity? template, ActorEntity actor)
+  {
+    Update(e, actor);
+
+    PasswordRecoveryTemplate = template;
+    PasswordRecoveryTemplateId = template?.TemplateId;
+  }
 
   public void SetUrl(UrlChanged e, ActorEntity actor)
   {

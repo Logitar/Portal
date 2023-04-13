@@ -23,5 +23,6 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.Property(x => x.Settings).HasColumnType("jsonb");
 
     builder.HasOne(x => x.Realm).WithMany(x => x.Senders).OnDelete(DeleteBehavior.Restrict);
+    builder.HasOne(x => x.PasswordRecoveryRealm).WithOne(x => x.PasswordRecoverySender).OnDelete(DeleteBehavior.Restrict);
   }
 }

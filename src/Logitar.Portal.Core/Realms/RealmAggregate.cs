@@ -2,6 +2,8 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Core.Realms.Events;
 using Logitar.Portal.Core.Realms.Validators;
+using Logitar.Portal.Core.Senders;
+using Logitar.Portal.Core.Templates;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -62,6 +64,9 @@ public class RealmAggregate : AggregateRoot
   public IReadOnlyDictionary<string, ReadOnlyClaimMapping> ClaimMappings => _claimMappings.AsReadOnly();
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
+  public AggregateId? PasswordRecoverySenderId { get; private set; }
+  public AggregateId? PasswordRecoveryTemplateId { get; private set; }
+
   protected virtual void Apply(RealmCreated e)
   {
     UniqueName = e.UniqueName;
@@ -71,6 +76,32 @@ public class RealmAggregate : AggregateRoot
 
   public void Delete(AggregateId actorId) => ApplyChange(new RealmDeleted { ActorId = actorId });
   protected virtual void Apply(RealmDeleted _) { }
+
+  public void SetPasswordRecoverySender(AggregateId actorId, SenderAggregate? sender)
+  {
+    if (PasswordRecoverySenderId != sender?.Id)
+    {
+      ApplyChange(new PasswordRecoverySenderChanged
+      {
+        ActorId = actorId,
+        SenderId = sender?.Id
+      });
+    }
+  }
+  protected virtual void Apply(PasswordRecoverySenderChanged e) => PasswordRecoverySenderId = e.SenderId;
+
+  public void SetPasswordRecoveryTemplate(AggregateId actorId, TemplateAggregate? template)
+  {
+    if (PasswordRecoveryTemplateId != template?.Id)
+    {
+      ApplyChange(new PasswordRecoveryTemplateChanged
+      {
+        ActorId = actorId,
+        TemplateId = template?.Id
+      });
+    }
+  }
+  protected virtual void Apply(PasswordRecoveryTemplateChanged e) => PasswordRecoveryTemplateId = e.TemplateId;
 
   public void SetUrl(AggregateId actorId, Uri? url) => ApplyChange(new UrlChanged
   {

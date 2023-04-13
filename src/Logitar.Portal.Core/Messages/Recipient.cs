@@ -25,6 +25,7 @@ public record Recipient
     DisplayName = user?.FullName ?? input.DisplayName,
     UserId = user?.Id.ToGuid(),
     UserLocale = user?.Locale?.Name,
-    Username = user?.Username
+    Username = user?.Username,
+    User = user
   };
 }

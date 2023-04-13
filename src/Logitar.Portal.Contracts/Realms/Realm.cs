@@ -1,4 +1,7 @@
-﻿namespace Logitar.Portal.Contracts.Realms;
+﻿using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Contracts.Templates;
+
+namespace Logitar.Portal.Contracts.Realms;
 
 public record Realm : Aggregate
 {
@@ -21,4 +24,7 @@ public record Realm : Aggregate
   public IEnumerable<ClaimMapping> ClaimMappings { get; set; } = Enumerable.Empty<ClaimMapping>();
 
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
+
+  public Sender? PasswordRecoverySender { get; set; }
+  public Template? PasswordRecoveryTemplate { get; set; }
 }
