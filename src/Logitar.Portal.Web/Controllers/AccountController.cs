@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ public class AccountController : Controller
     _sessionService = sessionService;
   }
 
-  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
   [HttpGet("profile")]
   public ActionResult Profile()
   {
@@ -34,7 +35,7 @@ public class AccountController : Controller
     return View();
   }
 
-  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
   [HttpGet("sign-out")]
   public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
   {

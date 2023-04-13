@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Logitar.Portal.Contracts.Constants;
+using System.Collections;
 using System.Net.Http.Json;
 
 namespace Logitar.Portal.Client.Implementations;
@@ -11,6 +12,16 @@ internal abstract class HttpService : IDisposable
   {
     _client = client;
     _client.BaseAddress = new Uri(settings.BaseUrl);
+
+    string? authorization = null;
+    if (settings.BasicAuthentication != null)
+    {
+      authorization = string.Join(' ', Schemes.Basic, settings.BasicAuthentication.Encode());
+    }
+    if (authorization != null)
+    {
+      _client.DefaultRequestHeaders.Add(Headers.Authorization, authorization);
+    }
   }
 
   public void Dispose()

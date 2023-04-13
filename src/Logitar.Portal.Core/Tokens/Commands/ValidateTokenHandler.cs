@@ -34,7 +34,7 @@ internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedTo
      : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
        ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
 
-    if (realm?.UniqueName == Constants.PortalRealm.UniqueName)
+    if (realm?.UniqueName == RealmAggregate.PortalUniqueName)
     {
       AggregateId actorId = new(Guid.Empty);
       realm.SetUrl(actorId, _applicationContext.BaseUrl);

@@ -12,7 +12,7 @@ public static class ClaimExtensions
   }
   public static string GetIssuer(this RealmAggregate realm, Uri? baseUrl)
   {
-    if (realm.UniqueName != Constants.PortalRealm.UniqueName && baseUrl != null)
+    if (realm.UniqueName != RealmAggregate.PortalUniqueName && baseUrl != null)
     {
       return $"{baseUrl.ToString().TrimEnd('/')}/realms/{{UNIQUE_NAME}}".Format(realm);
     }

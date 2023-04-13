@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Core.Claims;
 using Logitar.Portal.Core.Sessions;
+using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -56,8 +57,8 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
       Context.SetSession(session);
       Context.SetUser(session!.User);
 
-      ClaimsPrincipal principal = new(session.User!.GetClaimsIdentity(Constants.Schemes.Session));
-      AuthenticationTicket ticket = new(principal, Constants.Schemes.Session);
+      ClaimsPrincipal principal = new(session.User!.GetClaimsIdentity(Schemes.Session));
+      AuthenticationTicket ticket = new(principal, Schemes.Session);
 
       return AuthenticateResult.Success(ticket);
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Logitar.Portal.Contracts.Constants;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Logitar.Portal.Web.Extensions;
 
@@ -11,7 +13,8 @@ public static class OpenApiExtensions
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(config =>
     {
-      config.SwaggerDoc(name: $"v{Constants.Version.Major}", new OpenApiInfo
+      config.AddSecurity();
+      config.SwaggerDoc(name: $"v{Application.Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact
         {
@@ -26,7 +29,7 @@ public static class OpenApiExtensions
           Url = new Uri("https://github.com/Logitar/Portal/blob/main/LICENSE", UriKind.Absolute)
         },
         Title = Title,
-        Version = $"v{Constants.Version}"
+        Version = $"v{Application.Version}"
       });
     });
 
@@ -37,8 +40,38 @@ public static class OpenApiExtensions
   {
     builder.UseSwagger();
     builder.UseSwaggerUI(config => config.SwaggerEndpoint(
-      url: $"/swagger/v{Constants.Version.Major}/swagger.json",
-      name: $"{Title} v{Constants.Version}"
+      url: $"/swagger/v{Application.Version.Major}/swagger.json",
+      name: $"{Title} v{Application.Version}"
     ));
+  }
+
+  private static void AddSecurity(this SwaggerGenOptions options)
+  {
+    options.AddSecurityDefinition(Schemes.Basic, new OpenApiSecurityScheme
+    {
+      Description = "Enter your credentials in the inputs below:",
+      In = ParameterLocation.Header,
+      Name = Headers.Authorization,
+      Scheme = Schemes.Basic,
+      Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Name = Headers.Authorization,
+          Reference = new OpenApiReference
+          {
+            Id = Schemes.Basic,
+            Type = ReferenceType.SecurityScheme
+          },
+          Scheme = Schemes.Basic,
+          Type = SecuritySchemeType.Http
+        },
+        new List<string>()
+      }
+    });
   }
 }

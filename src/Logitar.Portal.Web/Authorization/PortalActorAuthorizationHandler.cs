@@ -1,8 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
-
-using CoreConstants = Logitar.Portal.Core.Constants;
 
 namespace Logitar.Portal.Web.Authorization;
 
@@ -22,7 +21,7 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
       User? user = _httpContextAccessor.HttpContext.GetUser();
       if (user != null)
       {
-        if (user.Realm.UniqueName == CoreConstants.PortalRealm.UniqueName)
+        if (user.Realm.UniqueName == RealmAggregate.PortalUniqueName)
         {
           context.Succeed(requirement);
         }

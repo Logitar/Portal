@@ -12,6 +12,8 @@ namespace Logitar.Portal.Core.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
+  public const string PortalUniqueName = "portal";
+
   private readonly Dictionary<string, ReadOnlyClaimMapping> _claimMappings = new();
   private readonly Dictionary<string, string> _customAttributes = new();
 

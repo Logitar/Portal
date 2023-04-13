@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Web.Models;
+﻿using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -7,7 +8,7 @@ using System.Globalization;
 namespace Logitar.Portal.Web.Controllers.Api;
 
 [ApiController]
-[Authorize(Policy = Constants.Policies.PortalActor)]
+[Authorize(Policy = Policies.PortalActor)]
 [Route("api")]
 public class ResourceApiController : ControllerBase
 {
