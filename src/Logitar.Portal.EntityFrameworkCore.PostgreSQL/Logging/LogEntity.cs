@@ -1,9 +1,11 @@
 ﻿using Logitar.Portal.Contracts.Errors;
+using System.Collections.Concurrent;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
 internal class LogEntity
 {
+  private readonly ConcurrentDictionary<Guid, ActivityEntity> _activities = new();
   private readonly List<Error> _errors = new();
 
   public LogEntity(string? correlationId = null, string? method = null, string? destination = null,
@@ -82,4 +84,13 @@ internal class LogEntity
     private set { }
   }
   public void AddError(Error error) => _errors.Add(error);
+
+  //public List<ActivityEntity> Activities { get; private set; } = new();
+  public Guid StartActivity(object data)
+  {
+    ActivityEntity activity = new(this, data);
+    _ = _activities.TryAdd(activity.Id, activity);
+
+    return activity.Id;
+  }
 }
