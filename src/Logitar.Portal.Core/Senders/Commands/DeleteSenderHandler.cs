@@ -26,11 +26,11 @@ internal class DeleteSenderHandler : IRequestHandler<DeleteSender, Sender>
   {
     SenderAggregate sender = await _senderRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<SenderAggregate>(request.Id);
+    RealmAggregate realm = await _realmRepository.LoadAsync(sender, cancellationToken);
     Sender output = await _senderQuerier.GetAsync(sender, cancellationToken);
 
     if (sender.IsDefault)
     {
-      RealmAggregate realm = await _realmRepository.LoadAsync(sender, cancellationToken);
       IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(realm, cancellationToken);
       if (senders.Any(s => !s.Equals(sender)))
       {
@@ -38,7 +38,11 @@ internal class DeleteSenderHandler : IRequestHandler<DeleteSender, Sender>
       }
     }
 
-    // TODO(fpion): set null if used as password recovery sender in Realm?
+    if (realm.PasswordRecoverySenderId == sender.Id)
+    {
+      realm.SetPasswordRecoverySender(_currentActor.Id, sender: null);
+      await _realmRepository.SaveAsync(realm, cancellationToken);
+    }
 
     sender.Delete(_currentActor.Id);
 
