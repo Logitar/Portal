@@ -58,6 +58,12 @@ internal class LogEntity
   public Guid ActorId { get; private set; }
   public Guid? UserId { get; private set; }
   public Guid? SessionId { get; private set; }
+  public void SetActors(Guid actorId, Guid? userId = null, Guid? sessionId = null)
+  {
+    ActorId = actorId;
+    UserId = userId;
+    SessionId = sessionId;
+  }
 
   public bool IsCompleted
   {

@@ -26,6 +26,18 @@ internal class LoggingService : ILoggingService
     return Task.CompletedTask;
   }
 
+  public Task SetActorsAsync(Guid actorId, Guid? userId, Guid? sessionId, CancellationToken cancellationToken)
+  {
+    if (_log == null)
+    {
+      throw new NotImplementedException(); // TODO(fpion): implement
+    }
+
+    _log.SetActors(actorId, userId, sessionId);
+
+    return Task.CompletedTask;
+  }
+
   public Task SetOperationAsync(string type, string name, CancellationToken cancellationToken)
   {
     if (_log == null)
