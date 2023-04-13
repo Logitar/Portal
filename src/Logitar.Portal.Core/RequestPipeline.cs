@@ -16,24 +16,26 @@ internal class RequestPipeline : IRequestPipeline
 
   public async Task ExecuteAsync(IRequest request, CancellationToken cancellationToken)
   {
+    Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
+
     try
     {
-      Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
-
       await _mediator.Send(request, cancellationToken);
     }
     catch (Exception)
     {
       throw; // TODO(fpion): implement
     }
+
+    await _loggingService.EndActivityAsync(activityId, cancellationToken);
   }
 
   public async Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken)
   {
+    Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
+
     try
     {
-      Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
-
       return await _mediator.Send(request, cancellationToken);
     }
     catch (Exception)
@@ -42,7 +44,7 @@ internal class RequestPipeline : IRequestPipeline
     }
     finally
     {
-      // TODO(fpion): implement
+      await _loggingService.EndActivityAsync(activityId, cancellationToken);
     }
   }
 }

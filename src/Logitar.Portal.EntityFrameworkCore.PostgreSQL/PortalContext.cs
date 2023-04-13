@@ -20,6 +20,7 @@ public class PortalContext : DbContext
   internal DbSet<BlacklistedTokenEntity> TokenBlacklist { get; private set; } = null!;
   internal DbSet<UserEntity> Users { get; private set; } = null!;
 
+  internal DbSet<ActivityEntity> Activities { get; private set; } = null!;
   internal DbSet<LogEntity> Logs { get; private set; } = null!;
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)

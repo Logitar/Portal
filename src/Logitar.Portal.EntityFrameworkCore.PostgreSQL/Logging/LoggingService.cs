@@ -27,14 +27,16 @@ internal class LoggingService : ILoggingService
     return Task.CompletedTask;
   }
 
-  public Task<Guid> StartActivityAsync(object activity, CancellationToken cancellationToken)
+  public async Task<Guid> StartActivityAsync(object activity, CancellationToken cancellationToken)
+    => await StartActivityAsync(activity, startedOn: null, cancellationToken);
+  public Task<Guid> StartActivityAsync(object activity, DateTime? startedOn, CancellationToken cancellationToken)
   {
     if (_log == null)
     {
       throw new NotImplementedException(); // TODO(fpion): implement
     }
 
-    return Task.FromResult(_log.StartActivity(activity));
+    return Task.FromResult(_log.StartActivity(activity, startedOn));
   }
 
   public Task AddErrorAsync(Error error, CancellationToken cancellationToken)
@@ -69,6 +71,20 @@ internal class LoggingService : ILoggingService
     }
 
     _log.SetOperation(type, name);
+
+    return Task.CompletedTask;
+  }
+
+  public async Task EndActivityAsync(Guid id, CancellationToken cancellationToken)
+    => await EndActivityAsync(id, endedOn: null, cancellationToken);
+  public Task EndActivityAsync(Guid id, DateTime? endedOn, CancellationToken cancellationToken)
+  {
+    if (_log == null)
+    {
+      throw new NotImplementedException(); // TODO(fpion): implement
+    }
+
+    _log.EndActivity(id, endedOn);
 
     return Task.CompletedTask;
   }

@@ -69,7 +69,7 @@ internal class LogEntity
 
   public bool IsCompleted
   {
-    get => StatusCode.HasValue;
+    get => EndedOn.HasValue;
     private set { }
   }
   public string Level
@@ -85,12 +85,20 @@ internal class LogEntity
   }
   public void AddError(Error error) => _errors.Add(error);
 
-  //public List<ActivityEntity> Activities { get; private set; } = new();
-  public Guid StartActivity(object data)
+  public List<ActivityEntity> Activities { get; private set; } = new();
+  public Guid StartActivity(object data, DateTime? startedOn = null)
   {
-    ActivityEntity activity = new(this, data);
+    ActivityEntity activity = new(this, data, startedOn);
     _ = _activities.TryAdd(activity.Id, activity);
 
     return activity.Id;
+  }
+  public void EndActivity(Guid id, DateTime? endedOn = null)
+  {
+    if (_activities.Remove(id, out ActivityEntity? activity))
+    {
+      activity.Complete(endedOn);
+      Activities.Add(activity);
+    }
   }
 }
