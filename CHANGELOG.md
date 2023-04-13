@@ -22,9 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reimplemented template management.
 - Reimplemented message management.
 - Updated repository information.
+- Replace AllowedUsernameCharacters by UsernameSettings and extented initial configuration.
 - Updated NPM packages.
 - Updated NuGet packages.
 - Removed V1 projects and renamed V2 projects.
+- Reimplemented HTTP client.
 
 ## [1.1.5] - 2022-10-27
 
