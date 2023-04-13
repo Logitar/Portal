@@ -1,0 +1,17 @@
+﻿@using Logitar.Portal.Contracts.Users;
+
+@model User
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = Model?.FullName ?? Model?.Username ?? "Create user";
+}
+
+@if (Model == null)
+{
+  <user-edit realm="@(Context.Request.Query["realm"])"></user-edit>
+}
+else
+{
+  <user-edit current="@(Context.GetUser()?.Id)" json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></user-edit>
+}

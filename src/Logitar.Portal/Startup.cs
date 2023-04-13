@@ -1,8 +1,8 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
-using Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL;
-using Logitar.Portal.v2.Web;
-using Logitar.Portal.v2.Web.Extensions;
-using Logitar.Portal.v2.Web.Middlewares;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.Web;
+using Logitar.Portal.Web.Extensions;
+using Logitar.Portal.Web.Middlewares;
 
 namespace Logitar.Portal;
 

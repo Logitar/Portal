@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL\Logitar.Portal.v2.EntityFrameworkCore.PostgreSQL.csproj" />
-    <ProjectReference Include="..\Logitar.Portal.v2.Web\Logitar.Portal.v2.Web.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.EntityFrameworkCore.PostgreSQL\Logitar.Portal.EntityFrameworkCore.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.Web\Logitar.Portal.Web.csproj" />
   </ItemGroup>
 
 </Project>
