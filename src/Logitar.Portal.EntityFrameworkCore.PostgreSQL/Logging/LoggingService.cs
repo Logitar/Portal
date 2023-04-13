@@ -1,5 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Logging;
+using Logitar.Portal.Core.Realms;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
@@ -8,10 +10,12 @@ internal class LoggingService : ILoggingService
   private LogEntity? _log = null;
 
   private readonly PortalContext _context;
+  private readonly IRealmRepository _realmRepository;
 
-  public LoggingService(PortalContext context)
+  public LoggingService(PortalContext context, IRealmRepository realmRepository)
   {
     _context = context;
+    _realmRepository = realmRepository;
   }
 
   public Task StartAsync(string? correlationId, string? method, string? destination,
@@ -100,8 +104,18 @@ internal class LoggingService : ILoggingService
 
     _log.Complete(statusCode, endedOn);
 
-    _context.Logs.Add(_log);
-    await _context.SaveChangesAsync(cancellationToken);
+    RealmAggregate realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken)
+      ?? throw new InvalidOperationException("The Portal realm could not be found."); // TODO(fpion): caching
+    if (realm.CustomAttributes.TryGetValue(nameof(LoggingSettings), out string? json))
+    {
+      LoggingSettings settings = LoggingSettings.Deserialize(json);
+      if ((settings.Extent == LoggingExtent.Full || (settings.Extent == LoggingExtent.ActivityOnly && _log.Activities.Any()))
+        && (!settings.OnlyErrors || _log.HasErrors))
+      {
+        _context.Logs.Add(_log);
+        await _context.SaveChangesAsync(cancellationToken);
+      }
+    }
 
     _log = null;
   }
