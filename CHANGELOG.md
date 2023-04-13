@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated NuGet packages.
 - Removed V1 projects and renamed V2 projects.
 - Reimplemented HTTP client.
+- Enhanced realm JWT secret.
 
 ## [1.1.5] - 2022-10-27
 
