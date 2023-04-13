@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.Core.Dictionaries;
+using Logitar.Portal.Core.Logging;
 using Logitar.Portal.Core.Messages;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Senders;
@@ -10,6 +11,7 @@ using Logitar.Portal.Core.Tokens;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Actors;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Converters;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Queriers;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Repositories;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Tokens;
@@ -49,6 +51,7 @@ public static class DependencyInjectionExtensions
       .AddRepositories()
       .AddScoped<IActorService, ActorService>()
       .AddScoped<IEventBus, EventBus>()
+      .AddScoped<ILoggingService, LoggingService>()
       .AddScoped<ITokenBlacklist, TokenBlacklist>();
   }
 
