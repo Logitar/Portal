@@ -81,4 +81,5 @@ internal class LogEntity
     get => _errors.Any() ? $"[{string.Join(',', _errors.Select(error => error.Serialize()))}]" : null;
     private set { }
   }
+  public void AddError(Error error) => _errors.Add(error);
 }

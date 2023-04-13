@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Logging;
+﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Logging;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
@@ -22,6 +23,18 @@ internal class LoggingService : ILoggingService
     }
 
     _log = new(correlationId, method, destination, source, additionalInformation, startedOn);
+
+    return Task.CompletedTask;
+  }
+
+  public Task AddErrorAsync(Error error, CancellationToken cancellationToken)
+  {
+    if (_log == null)
+    {
+      throw new NotImplementedException(); // TODO(fpion): implement
+    }
+
+    _log.AddError(error);
 
     return Task.CompletedTask;
   }

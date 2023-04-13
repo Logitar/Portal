@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core;
+﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core;
 using Logitar.Portal.Core.Logging;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -23,7 +24,16 @@ public class Logging
       destination: request.GetDisplayUrl(), source: context.GetClientIpAddress(),
       context.GetAdditionalInformation());
 
-    await _next(context);
+    try
+    {
+      await _next(context);
+    }
+    catch (Exception exception)
+    {
+      await loggingService.AddErrorAsync(Error.From(exception));
+
+      throw;
+    }
 
     await loggingService.SetActorsAsync(_currentActor.Id.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
 
