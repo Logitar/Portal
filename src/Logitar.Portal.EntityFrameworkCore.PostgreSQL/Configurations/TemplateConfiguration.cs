@@ -23,5 +23,6 @@ internal class TemplateConfiguration : AggregateConfiguration<TemplateEntity>, I
     builder.Property(x => x.ContentType).HasMaxLength(byte.MaxValue);
 
     builder.HasOne(x => x.Realm).WithMany(x => x.Templates).OnDelete(DeleteBehavior.Restrict);
+    builder.HasOne(x => x.PasswordRecoveryRealm).WithOne(x => x.PasswordRecoveryTemplate).OnDelete(DeleteBehavior.Restrict);
   }
 }

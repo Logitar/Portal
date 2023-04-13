@@ -18,4 +18,7 @@ public record UpdateRealmInput
   public IEnumerable<ClaimMapping>? ClaimMappings { get; set; }
 
   public IEnumerable<CustomAttribute>? CustomAttributes { get; set; }
+
+  public Guid? PasswordRecoverySender { get; set; }
+  public string? PasswordRecoveryTemplate { get; set; }
 }

@@ -38,6 +38,8 @@ internal class DeleteSenderHandler : IRequestHandler<DeleteSender, Sender>
       }
     }
 
+    // TODO(fpion): set null if used as password recovery sender in Realm?
+
     sender.Delete(_currentActor.Id);
 
     await _senderRepository.SaveAsync(sender, cancellationToken);

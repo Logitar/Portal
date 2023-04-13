@@ -24,6 +24,8 @@ internal class DeleteTemplateHandler : IRequestHandler<DeleteTemplate, Template>
       ?? throw new AggregateNotFoundException<TemplateAggregate>(request.Id);
     Template output = await _templateQuerier.GetAsync(template, cancellationToken);
 
+    // TODO(fpion): set null if used as password recovery template in Realm?
+
     template.Delete(_currentActor.Id);
 
     await _templateRepository.SaveAsync(template, cancellationToken);

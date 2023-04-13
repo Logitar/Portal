@@ -36,6 +36,8 @@ internal class TemplateEntity : AggregateEntity
   public string ContentType { get; private set; } = string.Empty;
   public string? Contents { get; private set; }
 
+  public RealmEntity? PasswordRecoveryRealm { get; private set; }
+
   public void Update(TemplateUpdated e, ActorEntity actor)
   {
     base.Update(e, actor);
