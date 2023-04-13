@@ -1,8 +1,10 @@
-﻿using Logitar.Portal.Contracts.Errors;
+﻿using FluentValidation;
+using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Tokens.Commands;
+using Logitar.Portal.Core.Users.Validators;
 using MediatR;
 using System.Text;
 using System.Text.Json;
@@ -36,6 +38,7 @@ internal class ResetPasswordHandler : IRequestHandler<ResetPassword, User>
 
     RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    new PasswordValidator(realm.PasswordSettings).ValidateAndThrow(input.Password);
 
     ValidateTokenInput validateToken = new()
     {

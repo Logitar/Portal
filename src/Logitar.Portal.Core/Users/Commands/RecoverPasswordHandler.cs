@@ -30,6 +30,10 @@ internal class RecoverPasswordHandler : IRequestHandler<RecoverPassword, SentMes
 
     RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    if (!realm.PasswordRecoveryTemplateId.HasValue)
+    {
+      throw new PasswordRecoveryTemplateRequiredException(realm);
+    }
 
     string username = input.Username.Trim();
     UserAggregate? user = await _userRepository.LoadAsync(realm, username, cancellationToken);
@@ -69,8 +73,8 @@ internal class RecoverPasswordHandler : IRequestHandler<RecoverPassword, SentMes
     SendMessageInput sendMessage = new()
     {
       Realm = realm.Id.ToGuid().ToString(),
-      //Template = null, // TODO(fpion): implement
-      //SenderId = null, // TODO(fpion): implement
+      Template = realm.PasswordRecoveryTemplateId.Value.ToGuid().ToString(),
+      SenderId = realm.PasswordRecoverySenderId?.ToGuid(),
       IgnoreUserLocale = input.IgnoreUserLocale,
       Locale = input.Locale,
       Recipients = new[]

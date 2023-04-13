@@ -145,8 +145,8 @@ export default {
         (this.defaultLocale !== this.realm?.defaultLocale ?? null) ||
         (this.description ?? '') !== (this.realm?.description ?? '') ||
         (this.displayName ?? '') !== (this.realm?.displayName ?? '') ||
-        this.passwordRecoverySenderId !== this.realm?.passwordRecoverySenderId ||
-        this.passwordRecoveryTemplateId !== this.realm?.passwordRecoveryTemplateId ||
+        this.passwordRecoverySenderId !== (this.realm?.passwordRecoverySender?.id ?? null) ||
+        this.passwordRecoveryTemplateId !== (this.realm?.passwordRecoveryTemplate?.id ?? null) ||
         this.passwordSettings.requireDigit !== (this.realm?.passwordSettings?.requireDigit ?? false) ||
         this.passwordSettings.requireLowercase !== (this.realm?.passwordSettings?.requireLowercase ?? false) ||
         this.passwordSettings.requireNonAlphanumeric !== (this.realm?.passwordSettings?.requireNonAlphanumeric ?? false) ||
