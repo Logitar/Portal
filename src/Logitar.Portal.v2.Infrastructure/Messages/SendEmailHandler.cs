@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.v2.Contracts.Errors;
+﻿using Logitar.Portal.v2.Contracts.Errors;
 using Logitar.Portal.v2.Core.Messages;
 using MediatR;
 
@@ -31,14 +30,7 @@ internal class SendEmailHandler : INotificationHandler<SendEmail>
     }
     catch (Exception exception)
     {
-      Error error = new()
-      {
-        Severity = ErrorSeverity.Failure,
-        Code = exception.GetType().Name.Remove(nameof(Exception)),
-        Description = exception.Message
-      };
-
-      message.Fail(error);
+      message.Fail(Error.From(exception));
     }
   }
 }

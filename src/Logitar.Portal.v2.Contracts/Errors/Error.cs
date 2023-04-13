@@ -13,5 +13,30 @@ public record Error
   public string? Description { get; set; }
   public IEnumerable<ErrorData> Data { get; set; } = Enumerable.Empty<ErrorData>();
 
+  public static Error From(Exception exception, ErrorSeverity severity = ErrorSeverity.Failure)
+  {
+    List<ErrorData> data = new(exception.Data.Count);
+    foreach (object key in exception.Data.Keys)
+    {
+      object? value = exception.Data[key];
+      if (value != null)
+      {
+        data.Add(new ErrorData
+        {
+          Key = JsonSerializer.Serialize(key, _options),
+          Value = JsonSerializer.Serialize(value, _options)
+        });
+      }
+    }
+
+    return new Error
+    {
+      Severity = severity,
+      Code = exception.GetType().Name.Replace(nameof(Exception), string.Empty),
+      Description = exception.Message,
+      Data = data
+    };
+  }
+
   public string Serialize() => JsonSerializer.Serialize(this, GetType(), _options);
 }
