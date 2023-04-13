@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Logitar.Portal.Web.Filters;
 
-internal class CoreExceptionFilterAttribute : ExceptionFilterAttribute
+internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 {
   private static readonly Dictionary<Type, Action<ExceptionContext>> _handlers = new()
   {

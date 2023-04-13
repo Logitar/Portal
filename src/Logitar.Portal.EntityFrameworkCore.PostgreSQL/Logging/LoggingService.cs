@@ -26,6 +26,18 @@ internal class LoggingService : ILoggingService
     return Task.CompletedTask;
   }
 
+  public Task SetOperationAsync(string type, string name, CancellationToken cancellationToken)
+  {
+    if (_log == null)
+    {
+      throw new NotImplementedException(); // TODO(fpion): implement
+    }
+
+    _log.SetOperation(type, name);
+
+    return Task.CompletedTask;
+  }
+
   public async Task EndAsync(int? statusCode, DateTime? endedOn, CancellationToken cancellationToken)
   {
     if (_log == null)

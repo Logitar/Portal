@@ -33,6 +33,11 @@ internal class LogEntity
 
   public string? OperationType { get; private set; }
   public string? OperationName { get; private set; }
+  public void SetOperation(string type, string name)
+  {
+    OperationType = type;
+    OperationName = name;
+  }
 
   public int? StatusCode { get; private set; }
   public void Complete(int? statusCode = null, DateTime? endedOn = null)
