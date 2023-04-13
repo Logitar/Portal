@@ -1,14 +1,14 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using CoreConstants = Logitar.Portal.Core.Constants;
 
 namespace Logitar.Portal.Web.Controllers.Api;
 
 [ApiController]
-[Authorize(Policy = Constants.Policies.PortalActor)]
+[Authorize(Policy = Policies.PortalActor)]
 [Route("api/sessions")]
 public class SessionApiController : ControllerBase
 {
@@ -48,7 +48,7 @@ public class SessionApiController : ControllerBase
   [HttpPost("sign/in")]
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, CancellationToken cancellationToken)
   {
-    if (input.Realm == CoreConstants.PortalRealm.UniqueName)
+    if (input.Realm == RealmAggregate.PortalUniqueName)
     {
       return Forbid();
     }

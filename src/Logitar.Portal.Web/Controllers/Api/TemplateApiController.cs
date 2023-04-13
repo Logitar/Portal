@@ -1,12 +1,13 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api;
 
 [ApiController]
-[Authorize(Policy = Constants.Policies.PortalActor)]
+[Authorize(Policy = Policies.PortalActor)]
 [Route("api/templates")]
 public class TemplateApiController : ControllerBase
 {

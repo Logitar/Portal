@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Core.Claims;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
@@ -34,7 +35,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
   {
-    if (Context.Request.Headers.TryGetValue(Constants.Headers.Authorization, out StringValues authorization))
+    if (Context.Request.Headers.TryGetValue(Headers.Authorization, out StringValues authorization))
     {
       string? value = authorization.Single();
       if (!string.IsNullOrWhiteSpace(value))
@@ -44,7 +45,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
         {
           return AuthenticateResult.Fail($"The Authorization header value is not valid: '{value}'.");
         }
-        else if (values[0] == Constants.Schemes.Basic)
+        else if (values[0] == Schemes.Basic)
         {
           byte[] bytes = Convert.FromBase64String(values[1]);
           string credentials = Encoding.UTF8.GetString(bytes);
@@ -57,10 +58,10 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
           string username = credentials[..index];
           string password = credentials[(index + 1)..];
 
-          RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(Core.Constants.PortalRealm.UniqueName); // TODO(fpion): caching
+          RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName); // TODO(fpion): caching
           if (realm == null)
           {
-            return AuthenticateResult.Fail($"The realm '{Core.Constants.PortalRealm.UniqueName}' could not be found.");
+            return AuthenticateResult.Fail("The Portal realm could not be found.");
           }
 
           UserAggregate? user = await _userRepository.LoadAsync(realm, username);
@@ -92,8 +93,8 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
 
           Context.SetUser(userModel);
 
-          ClaimsPrincipal principal = new(userModel.GetClaimsIdentity(Constants.Schemes.Basic));
-          AuthenticationTicket ticket = new(principal, Constants.Schemes.Basic);
+          ClaimsPrincipal principal = new(userModel.GetClaimsIdentity(Schemes.Basic));
+          AuthenticationTicket ticket = new(principal, Schemes.Basic);
 
           return AuthenticateResult.Success(ticket);
         }

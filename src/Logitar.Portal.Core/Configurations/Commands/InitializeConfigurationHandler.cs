@@ -8,6 +8,9 @@ namespace Logitar.Portal.Core.Configurations.Commands;
 
 internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration>
 {
+  private const string PortalDisplayName = "Portal";
+  private const string PortalDescription = "The realm in which the administrator users of the Portal belong to.";
+
   private readonly ICurrentActor _currentActor;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserRepository _userRepository;
@@ -27,7 +30,7 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     InitializeConfigurationInput input = request.Input;
     CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
 
-    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(Constants.PortalRealm.UniqueName, cancellationToken);
+    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken);
     if (realm == null)
     {
       ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
@@ -39,9 +42,9 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
         customAttributes[nameof(LoggingSettings)] = input.LoggingSettings.Serialize();
       }
 
-      realm = new(_currentActor.Id, Constants.PortalRealm.UniqueName, Constants.PortalRealm.DisplayName,
-        Constants.PortalRealm.Description, defaultLocale, usernameSettings: usernameSettings,
-        passwordSettings: passwordSettings, customAttributes: customAttributes);
+      realm = new(_currentActor.Id, RealmAggregate.PortalUniqueName, PortalDisplayName, PortalDescription,
+        defaultLocale, usernameSettings: usernameSettings, passwordSettings: passwordSettings,
+        customAttributes: customAttributes);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
     }

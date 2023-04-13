@@ -1,12 +1,13 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers.Api;
 
 [ApiController]
-[Authorize(Policy = Constants.Policies.PortalActor)]
+[Authorize(Policy = Policies.PortalActor)]
 [Route("api/messages")]
 public class MessageApiController : ControllerBase
 {
@@ -44,7 +45,7 @@ public class MessageApiController : ControllerBase
   }
 
   [HttpPost("demo")]
-  [Authorize(Policy = Constants.Policies.AuthenticatedPortalUser)]
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
   public async Task<ActionResult<Message>> SendDemoAsync(SendDemoMessageInput input, CancellationToken cancellationToken)
   {
     return Ok(await _messageService.SendDemoAsync(input, cancellationToken));

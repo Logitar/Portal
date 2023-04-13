@@ -17,7 +17,7 @@ internal class IsConfigurationInitializedHandler : IRequestHandler<IsConfigurati
 
   public async Task<bool> Handle(IsConfigurationInitialized request, CancellationToken cancellationToken)
   {
-    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(Constants.PortalRealm.UniqueName, cancellationToken);
+    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken);
     if (realm == null)
     {
       return false;

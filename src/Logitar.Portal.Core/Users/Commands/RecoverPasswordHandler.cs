@@ -63,8 +63,8 @@ internal class RecoverPasswordHandler : IRequestHandler<RecoverPassword, SentMes
     CreateTokenInput createToken = new()
     {
       IsConsumable = true,
-      Lifetime = Constants.PasswordRecovery.Lifetime,
-      Purpose = Constants.PasswordRecovery.Purpose,
+      Lifetime = PasswordRecovery.Lifetime,
+      Purpose = PasswordRecovery.Purpose,
       Realm = realm.Id.ToGuid().ToString(),
       Subject = user.Id.ToGuid().ToString()
     };

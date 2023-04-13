@@ -43,7 +43,7 @@ internal class ResetPasswordHandler : IRequestHandler<ResetPassword, User>
     ValidateTokenInput validateToken = new()
     {
       Token = input.Token,
-      Purpose = Constants.PasswordRecovery.Purpose,
+      Purpose = PasswordRecovery.Purpose,
       Realm = realm.Id.ToGuid().ToString()
     };
     ValidatedToken validatedToken = await _mediator.Send(new ValidateToken(validateToken, Consume: true), cancellationToken);

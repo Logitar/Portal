@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web.Middlewares;
@@ -18,7 +19,7 @@ public class RefreshSession
     {
       HttpRequest request = context.Request;
 
-      if (request.Cookies.TryGetValue(Constants.Cookies.RefreshToken, out string? refreshToken))
+      if (request.Cookies.TryGetValue(Cookies.RefreshToken, out string? refreshToken))
       {
         try
         {

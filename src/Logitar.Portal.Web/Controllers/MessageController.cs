@@ -1,11 +1,12 @@
 ﻿using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
 
 [ApiExplorerSettings(IgnoreApi = true)]
-[Authorize(Policy = Constants.Policies.PortalActor)]
+[Authorize(Policy = Policies.PortalActor)]
 [Route("messages")]
 public class MessageController : Controller
 {

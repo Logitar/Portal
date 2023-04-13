@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Models;
 using Microsoft.Extensions.Primitives;
 using System.Text.Json;
@@ -65,13 +66,13 @@ internal static class HttpContextExtensions
 
     if (session.RefreshToken != null)
     {
-      context.Response.Cookies.Append(Constants.Cookies.RefreshToken, session.RefreshToken, Constants.Cookies.RefreshTokenOptions);
+      context.Response.Cookies.Append(Cookies.RefreshToken, session.RefreshToken, Cookies.RefreshTokenOptions);
     }
   }
   public static void SignOut(this HttpContext context)
   {
     context.Session.Clear();
 
-    context.Response.Cookies.Delete(Constants.Cookies.RefreshToken);
+    context.Response.Cookies.Delete(Cookies.RefreshToken);
   }
 }
