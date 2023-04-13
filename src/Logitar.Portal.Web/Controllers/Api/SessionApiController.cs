@@ -1,63 +1,70 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Sessions;
-using Logitar.Portal.Core.Sessions.Models;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+using CoreConstants = Logitar.Portal.Core.Constants;
+
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("api/sessions")]
+public class SessionApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/sessions")]
-  public class SessionApiController : ControllerBase
+  private readonly ISessionService _sessionService;
+
+  public SessionApiController(ISessionService sessionService)
   {
-    private readonly IMapper _mapper;
-    private readonly ISessionService _sessionService;
+    _sessionService = sessionService;
+  }
 
-    public SessionApiController(IMapper mapper, ISessionService sessionService)
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Session>>> GetAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
+      SessionSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.GetAsync(isActive, isPersistent, realm, userId,
+      sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Session>> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Session? session = await _sessionService.GetAsync(id, cancellationToken);
+    if (session == null)
     {
-      _mapper = mapper;
-      _sessionService = sessionService;
+      return NotFound(session);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<ListModel<SessionSummary>>> GetAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
-      SessionSort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken)
-    {
-      ListModel<SessionModel> sessions = await _sessionService.GetAsync(isActive, isPersistent, realm, userId,
-        sort, desc,
-        index, count,
-        cancellationToken);
+    return Ok(session);
+  }
 
-      return Ok(sessions.To<SessionModel, SessionSummary>(_mapper));
+  [HttpPost("refresh")]
+  public async Task<ActionResult<Session>> RefreshAsync(RefreshInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.RefreshAsync(input, cancellationToken));
+  }
+
+  [HttpPost("sign/in")]
+  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, CancellationToken cancellationToken)
+  {
+    if (input.Realm == CoreConstants.PortalRealm.UniqueName)
+    {
+      return Forbid();
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<SessionModel>> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-      SessionModel? session = await _sessionService.GetAsync(id, cancellationToken);
-      if (session == null)
-      {
-        return NotFound(session);
-      }
+    return Ok(await _sessionService.SignInAsync(input, cancellationToken));
+  }
 
-      return Ok(session);
-    }
+  [HttpPatch("{id}/sign/out")]
+  public async Task<ActionResult<Session>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
+  }
 
-    [HttpPatch("/api/users/{id}/sessions/sign/out")]
-    public async Task<ActionResult<IEnumerable<SessionModel>>> SignOutAllAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _sessionService.SignOutAllAsync(id, cancellationToken));
-    }
-
-    [HttpPatch("{id}/sign/out")]
-    public async Task<ActionResult<SessionModel>> SignOutAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _sessionService.SignOutAsync(id, cancellationToken));
-    }
+  [HttpPatch("sign/out/user/{id}")]
+  public async Task<ActionResult<IEnumerable<Session>>> SignOutUserAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _sessionService.SignOutUserAsync(id, cancellationToken));
   }
 }

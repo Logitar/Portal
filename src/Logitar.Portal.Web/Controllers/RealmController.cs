@@ -1,44 +1,48 @@
-﻿using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Core.Realms.Models;
+﻿using Logitar.Portal.Contracts.Realms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("realms")]
+public class RealmController : Controller
 {
-  [ApiExplorerSettings(IgnoreApi = true)]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("realms")]
-  public class RealmController : Controller
+  private readonly IRealmService _realmService;
+
+  public RealmController(IRealmService realmService)
   {
-    private readonly IRealmService _realmService;
+    _realmService = realmService;
+  }
 
-    public RealmController(IRealmService realmService)
+  [HttpGet("/create-realm")]
+  public ActionResult CreateRealm()
+  {
+    return View(nameof(RealmEdit));
+  }
+
+  [HttpGet("{idOrUniqueName}")]
+  public async Task<ActionResult> RealmEdit(string idOrUniqueName, CancellationToken cancellationToken = default)
+  {
+    Guid? id = null;
+    if (Guid.TryParse(idOrUniqueName, out Guid realmId))
     {
-      _realmService = realmService;
+      id = realmId;
     }
 
-    [HttpGet("/create-realm")]
-    public ActionResult CreateRealm()
+    Realm? realm = await _realmService.GetAsync(id, idOrUniqueName, cancellationToken);
+    if (realm == null)
     {
-      return View(nameof(RealmEdit));
+      return NotFound();
     }
 
-    [HttpGet]
-    public ActionResult RealmList()
-    {
-      return View();
-    }
+    return View(realm);
+  }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult> RealmEdit(string id, CancellationToken cancellationToken = default)
-    {
-      RealmModel? realm = await _realmService.GetAsync(id, cancellationToken);
-      if (realm == null)
-      {
-        return NotFound();
-      }
-
-      return View(realm);
-    }
+  [HttpGet]
+  public ActionResult RealmList()
+  {
+    return View();
   }
 }

@@ -1,44 +1,42 @@
-﻿using Logitar.Portal.Application.Emails.Templates;
-using Logitar.Portal.Core.Emails.Templates.Models;
+﻿using Logitar.Portal.Contracts.Templates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("templates")]
+public class TemplateController : Controller
 {
-  [ApiExplorerSettings(IgnoreApi = true)]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("templates")]
-  public class TemplateController : Controller
+  private readonly ITemplateService _templateService;
+
+  public TemplateController(ITemplateService templateService)
   {
-    private readonly ITemplateService _templateService;
+    _templateService = templateService;
+  }
 
-    public TemplateController(ITemplateService templateService)
+  [HttpGet("/create-template")]
+  public ActionResult CreateTemplate()
+  {
+    return View(nameof(TemplateEdit));
+  }
+
+  [HttpGet]
+  public ActionResult TemplateList()
+  {
+    return View();
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult> TemplateEdit(Guid id, CancellationToken cancellationToken = default)
+  {
+    Template? template = await _templateService.GetAsync(id, cancellationToken: cancellationToken);
+    if (template == null)
     {
-      _templateService = templateService;
+      return NotFound();
     }
 
-    [HttpGet("/create-template")]
-    public ActionResult CreateTemplate()
-    {
-      return View(nameof(TemplateEdit));
-    }
-
-    [HttpGet]
-    public ActionResult TemplateList()
-    {
-      return View();
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> TemplateEdit(Guid id, CancellationToken cancellationToken = default)
-    {
-      TemplateModel? template = await _templateService.GetAsync(id, cancellationToken);
-      if (template == null)
-      {
-        return NotFound();
-      }
-
-      return View(template);
-    }
+    return View(template);
   }
 }

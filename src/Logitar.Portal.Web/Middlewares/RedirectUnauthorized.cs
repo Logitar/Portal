@@ -1,26 +1,25 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 
-namespace Logitar.Portal.Web.Middlewares
+namespace Logitar.Portal.Web.Middlewares;
+
+public class RedirectUnauthorized
 {
-  internal class RedirectUnauthorized
+  private readonly RequestDelegate _next;
+
+  public RedirectUnauthorized(RequestDelegate next)
   {
-    private readonly RequestDelegate _next;
+    _next = next;
+  }
 
-    public RedirectUnauthorized(RequestDelegate next)
+  public async Task InvokeAsync(HttpContext context)
+  {
+    await _next(context);
+
+    if (context.Response.StatusCode == StatusCodes.Status401Unauthorized && !context.Request.Path.StartsWithSegments("/api"))
     {
-      _next = next;
-    }
+      string returnUrl = UriHelper.GetEncodedPathAndQuery(context.Request);
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-      await _next(context);
-
-      if (context.Response.StatusCode == StatusCodes.Status401Unauthorized && !context.Request.Path.StartsWithSegments("/api"))
-      {
-        string returnUrl = UriHelper.GetEncodedPathAndQuery(context.Request);
-
-        context.Response.Redirect($"/user/sign-in?returnUrl={returnUrl}");
-      }
+      context.Response.Redirect($"/user/sign-in?returnUrl={returnUrl}");
     }
   }
 }

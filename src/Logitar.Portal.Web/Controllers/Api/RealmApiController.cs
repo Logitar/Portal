@@ -1,73 +1,65 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Realms.Models;
-using Logitar.Portal.Core.Realms.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("api/realms")]
+public class RealmApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/realms")]
-  public class RealmApiController : ControllerBase
+  private readonly IRealmService _realmService;
+
+  public RealmApiController(IRealmService realmService)
   {
-    private readonly IMapper _mapper;
-    private readonly IRealmService _realmService;
+    _realmService = realmService;
+  }
 
-    public RealmApiController(IMapper mapper, IRealmService realmService)
+  [HttpPost]
+  public async Task<ActionResult<Realm>> CreateAsync([FromBody] CreateRealmInput input, CancellationToken cancellationToken)
+  {
+    Realm realm = await _realmService.CreateAsync(input, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/realms/{realm.Id}");
+
+    return Created(uri, realm);
+  }
+
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Realm>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _realmService.DeleteAsync(id, cancellationToken));
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Realm>>> GetAsync(string? search, RealmSort? sort,
+    bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return Ok(await _realmService.GetAsync(search, sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("{idOrUniqueName}")]
+  public async Task<ActionResult<Realm>> GetAsync(string idOrUniqueName, CancellationToken cancellationToken)
+  {
+    Guid? id = null;
+    if (Guid.TryParse(idOrUniqueName, out Guid realmId))
     {
-      _mapper = mapper;
-      _realmService = realmService;
+      id = realmId;
     }
 
-    [HttpPost]
-    public async Task<ActionResult<RealmModel>> CreateAsync([FromBody] CreateRealmPayload payload, CancellationToken cancellationToken)
+    Realm? realm = await _realmService.GetAsync(id, idOrUniqueName, cancellationToken);
+    if (realm == null)
     {
-      RealmModel realm = await _realmService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/realms/{realm.Id}", UriKind.Relative);
-
-      return Created(uri, realm);
+      return NotFound();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<RealmModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _realmService.DeleteAsync(id, cancellationToken));
-    }
+    return Ok(realm);
+  }
 
-    [HttpGet]
-    public async Task<ActionResult<ListModel<RealmSummary>>> GetAsync(string? search,
-      RealmSort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken = default)
-    {
-      ListModel<RealmModel> realms = await _realmService.GetAsync(search,
-        sort, desc,
-        index, count,
-        cancellationToken);
-
-      return Ok(realms.To<RealmModel, RealmSummary>(_mapper));
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<RealmModel>> GetAsync(string id, CancellationToken cancellationToken)
-    {
-      RealmModel? realm = await _realmService.GetAsync(id, cancellationToken);
-      if (realm == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(realm);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult<RealmModel>> UpdateAsync(Guid id, [FromBody] UpdateRealmPayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _realmService.UpdateAsync(id, payload, cancellationToken));
-    }
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Realm>> UpdateAsync(Guid id, [FromBody] UpdateRealmInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _realmService.UpdateAsync(id, input, cancellationToken));
   }
 }

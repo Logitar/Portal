@@ -1,44 +1,42 @@
-﻿using Logitar.Portal.Application.Dictionaries;
-using Logitar.Portal.Core.Dictionaries.Models;
+﻿using Logitar.Portal.Contracts.Dictionaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers
+namespace Logitar.Portal.Web.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("dictionaries")]
+public class DictionaryController : Controller
 {
-  [ApiExplorerSettings(IgnoreApi = true)]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("dictionaries")]
-  public class DictionaryController : Controller
+  private readonly IDictionaryService _dictionaryService;
+
+  public DictionaryController(IDictionaryService dictionaryService)
   {
-    private readonly IDictionaryService _dictionaryService;
+    _dictionaryService = dictionaryService;
+  }
 
-    public DictionaryController(IDictionaryService dictionaryService)
+  [HttpGet("/create-dictionary")]
+  public ActionResult CreateDictionary()
+  {
+    return View(nameof(DictionaryEdit));
+  }
+
+  [HttpGet]
+  public ActionResult DictionaryList()
+  {
+    return View();
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult> DictionaryEdit(Guid id, CancellationToken cancellationToken = default)
+  {
+    Dictionary? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
+    if (dictionary == null)
     {
-      _dictionaryService = dictionaryService;
+      return NotFound();
     }
 
-    [HttpGet("/create-dictionary")]
-    public ActionResult CreateDictionary()
-    {
-      return View(nameof(DictionaryEdit));
-    }
-
-    [HttpGet]
-    public ActionResult DictionaryList()
-    {
-      return View();
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> DictionaryEdit(Guid id, CancellationToken cancellationToken = default)
-    {
-      DictionaryModel? dictionary = await _dictionaryService.GetAsync(id, cancellationToken);
-      if (dictionary == null)
-      {
-        return NotFound();
-      }
-
-      return View(dictionary);
-    }
+    return View(dictionary);
   }
 }

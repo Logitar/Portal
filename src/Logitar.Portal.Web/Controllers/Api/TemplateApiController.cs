@@ -1,73 +1,60 @@
-﻿using AutoMapper;
-using Logitar.Portal.Application.Emails.Templates;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Emails.Templates;
-using Logitar.Portal.Core.Emails.Templates.Models;
-using Logitar.Portal.Core.Emails.Templates.Payloads;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Templates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Logitar.Portal.Web.Controllers.Api
+namespace Logitar.Portal.Web.Controllers.Api;
+
+[ApiController]
+[Authorize(Policy = Constants.Policies.PortalActor)]
+[Route("api/templates")]
+public class TemplateApiController : ControllerBase
 {
-  [ApiController]
-  [Authorize(Policy = Constants.Policies.PortalIdentity)]
-  [Route("api/templates")]
-  public class TemplateApiController : ControllerBase
+  private readonly ITemplateService _templateService;
+
+  public TemplateApiController(ITemplateService templateService)
   {
-    private readonly IMapper _mapper;
-    private readonly ITemplateService _templateService;
+    _templateService = templateService;
+  }
 
-    public TemplateApiController(IMapper mapper, ITemplateService templateService)
+  [HttpPost]
+  public async Task<ActionResult<Template>> CreateAsync([FromBody] CreateTemplateInput input, CancellationToken cancellationToken)
+  {
+    Template template = await _templateService.CreateAsync(input, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/templates/{template.Id}");
+
+    return Created(uri, template);
+  }
+
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Template>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Ok(await _templateService.DeleteAsync(id, cancellationToken));
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<PagedList<Template>>> GetAsync(string? realm, string? search,
+    TemplateSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)
+  {
+    return Ok(await _templateService.GetAsync(realm, search,
+      sort, isDescending, skip, limit, cancellationToken));
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Template>> GetAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Template? template = await _templateService.GetAsync(id, cancellationToken: cancellationToken);
+    if (template == null)
     {
-      _mapper = mapper;
-      _templateService = templateService;
+      return NotFound();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<TemplateModel>> CreateAsync([FromBody] CreateTemplatePayload payload, CancellationToken cancellationToken)
-    {
-      TemplateModel template = await _templateService.CreateAsync(payload, cancellationToken);
-      var uri = new Uri($"/api/templates/{template.Id}", UriKind.Relative);
+    return Ok(template);
+  }
 
-      return Created(uri, template);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<TemplateModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-      return Ok(await _templateService.DeleteAsync(id, cancellationToken));
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<ListModel<TemplateSummary>>> GetAsync(string? realm, string? search,
-      TemplateSort? sort, bool desc,
-      int? index, int? count,
-      CancellationToken cancellationToken = default)
-    {
-      ListModel<TemplateModel> templates = await _templateService.GetAsync(realm, search,
-        sort, desc,
-        index, count,
-        cancellationToken);
-
-      return Ok(templates.To<TemplateModel, TemplateSummary>(_mapper));
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<TemplateModel>> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-      TemplateModel? template = await _templateService.GetAsync(id, cancellationToken);
-      if (template == null)
-      {
-        return NotFound();
-      }
-
-      return Ok(template);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult<TemplateModel>> UpdateAsync(Guid id, [FromBody] UpdateTemplatePayload payload, CancellationToken cancellationToken)
-    {
-      return Ok(await _templateService.UpdateAsync(id, payload, cancellationToken));
-    }
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Template>> UpdateAsync(Guid id, [FromBody] UpdateTemplateInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _templateService.UpdateAsync(id, input, cancellationToken));
   }
 }
