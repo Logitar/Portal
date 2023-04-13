@@ -7,13 +7,15 @@ internal class LogEntity
   private readonly List<Error> _errors = new();
 
   public LogEntity(string? correlationId = null, string? method = null, string? destination = null,
-    string? source = null, string? additionalInformation = null)
+    string? source = null, string? additionalInformation = null, DateTime? startedOn = null)
   {
     CorrelationId = correlationId;
     Method = method;
     Destination = destination;
     Source = source;
     AdditionalInformation = additionalInformation;
+
+    StartedOn = startedOn ?? DateTime.UtcNow;
   }
 
   private LogEntity()
@@ -33,8 +35,14 @@ internal class LogEntity
   public string? OperationName { get; private set; }
 
   public int? StatusCode { get; private set; }
+  public void Complete(int? statusCode = null, DateTime? endedOn = null)
+  {
+    StatusCode = statusCode;
 
-  public DateTime StartedOn { get; private set; } = DateTime.UtcNow;
+    EndedOn = endedOn ?? DateTime.UtcNow;
+  }
+
+  public DateTime StartedOn { get; private set; }
   public DateTime? EndedOn { get; private set; }
   public TimeSpan? Duration
   {
@@ -51,7 +59,7 @@ internal class LogEntity
     get => StatusCode.HasValue;
     private set { }
   }
-  public string LogLevel
+  public string Level
   {
     get => _errors.GetLogLevel().ToString();
     private set { }

@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL;
@@ -18,6 +19,8 @@ public class PortalContext : DbContext
   internal DbSet<TemplateEntity> Templates { get; private set; } = null!;
   internal DbSet<BlacklistedTokenEntity> TokenBlacklist { get; private set; } = null!;
   internal DbSet<UserEntity> Users { get; private set; } = null!;
+
+  internal DbSet<LogEntity> Logs { get; private set; } = null!;
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

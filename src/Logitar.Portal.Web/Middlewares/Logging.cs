@@ -21,5 +21,8 @@ public class Logging
       context.GetAdditionalInformation());
 
     await _next(context);
+
+    HttpResponse response = context.Response;
+    await loggingService.EndAsync(response.StatusCode);
   }
 }
