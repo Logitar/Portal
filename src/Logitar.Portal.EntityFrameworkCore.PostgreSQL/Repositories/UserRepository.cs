@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Contact;
@@ -12,8 +13,13 @@ internal class UserRepository : EventStore, IUserRepository
 {
   private static string AggregateType { get; } = typeof(UserAggregate).GetName();
 
-  public UserRepository(EventContext context, IEventBus eventBus) : base(context, eventBus)
+  private readonly ICacheService _cacheService;
+
+  public UserRepository(ICacheService cacheService,
+    EventContext context,
+    IEventBus eventBus) : base(context, eventBus)
   {
+    _cacheService = cacheService;
   }
 
   public async Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
@@ -76,11 +82,24 @@ internal class UserRepository : EventStore, IUserRepository
 
   public async Task SaveAsync(UserAggregate user, CancellationToken cancellationToken)
   {
+    if (user.HasChanges)
+    {
+      _cacheService.RemoveUser(user);
+    }
+
     await base.SaveAsync(user, cancellationToken);
   }
 
   public async Task SaveAsync(IEnumerable<UserAggregate> users, CancellationToken cancellationToken)
   {
+    foreach (UserAggregate user in users)
+    {
+      if (user.HasChanges)
+      {
+        _cacheService.RemoveUser(user);
+      }
+    }
+
     await base.SaveAsync(users, cancellationToken);
   }
 }

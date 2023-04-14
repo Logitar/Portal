@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users;
@@ -12,8 +13,13 @@ internal class SessionRepository : EventStore, ISessionRepository
 {
   private static string AggregateType { get; } = typeof(SessionAggregate).GetName();
 
-  public SessionRepository(EventContext context, IEventBus eventBus) : base(context, eventBus)
+  private readonly ICacheService _cacheService;
+
+  public SessionRepository(ICacheService cacheService,
+    EventContext context,
+    IEventBus eventBus) : base(context, eventBus)
   {
+    _cacheService = cacheService;
   }
 
   public async Task<IEnumerable<SessionAggregate>> LoadActiveAsync(UserAggregate user, CancellationToken cancellationToken)
@@ -59,11 +65,24 @@ internal class SessionRepository : EventStore, ISessionRepository
 
   public async Task SaveAsync(SessionAggregate session, CancellationToken cancellationToken)
   {
+    if (session.HasChanges)
+    {
+      _cacheService.RemoveSession(session);
+    }
+
     await base.SaveAsync(session, cancellationToken);
   }
 
   public async Task SaveAsync(IEnumerable<SessionAggregate> sessions, CancellationToken cancellationToken)
   {
+    foreach (SessionAggregate session in sessions)
+    {
+      if (session.HasChanges)
+      {
+        _cacheService.RemoveSession(session);
+      }
+    }
+
     await base.SaveAsync(sessions, cancellationToken);
   }
 }

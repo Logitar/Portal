@@ -65,7 +65,8 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
             return AuthenticateResult.Fail("The Portal realm could not be found.");
           }
 
-          UserAggregate? user = await _userRepository.LoadAsync(realm, username);
+          CachedUser? cached = _cacheService.GetUser(username);
+          UserAggregate? user = cached?.Aggregate ?? await _userRepository.LoadAsync(realm, username);
           if (user == null && realm.RequireUniqueEmail)
           {
             ReadOnlyEmail email = new(username);
@@ -90,7 +91,10 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
             return AuthenticateResult.Fail(exception);
           }
 
-          User userModel = await _userQuerier.GetAsync(user);
+          User userModel = cached?.Model ?? await _userQuerier.GetAsync(user);
+
+          cached = new(user, userModel);
+          _cacheService.SetUser(username, cached);
 
           Context.SetUser(userModel);
 
