@@ -1,25 +1,20 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Contracts.Errors;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Logitar.Portal.Core.Logging;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
 internal class ActivityEntity
 {
-  private static readonly JsonSerializerOptions _options = new();
-  static ActivityEntity() => _options.Converters.Add(new JsonStringEnumConverter());
-
   private readonly List<Error> _errors = new();
 
-  public ActivityEntity(LogEntity log, object data, DateTime? startedOn = null)
+  public ActivityEntity(LogEntity log, Activity activity, DateTime? startedOn = null)
   {
     Log = log;
     LogId = log.LogId;
 
-    Type type = data.GetType();
-    Type = type.GetName();
-    Data = JsonSerializer.Serialize(data, type);
+    Type = activity.Type.GetName();
+    Data = activity.Data;
 
     StartedOn = startedOn ?? DateTime.UtcNow;
   }

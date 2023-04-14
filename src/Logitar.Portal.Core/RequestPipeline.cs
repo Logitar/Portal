@@ -21,7 +21,8 @@ internal class RequestPipeline : IRequestPipeline
 
   public async Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken)
   {
-    Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
+    Activity activity = request.GetActivity();
+    Guid activityId = await _loggingService.StartActivityAsync(activity, cancellationToken);
     _applicationContext.ActivityId = activityId;
 
     try

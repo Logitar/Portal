@@ -49,4 +49,6 @@ internal static class StringExtensions
       throw new InvalidUrlException(url, paramName, innerException);
     }
   }
+
+  public static string Mask(this string s) => new(s.Select(c => '*').ToArray());
 }

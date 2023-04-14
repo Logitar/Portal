@@ -38,9 +38,9 @@ internal class LoggingService : ILoggingService
     return Task.CompletedTask;
   }
 
-  public async Task<Guid> StartActivityAsync(object activity, CancellationToken cancellationToken)
+  public async Task<Guid> StartActivityAsync(Activity activity, CancellationToken cancellationToken)
     => await StartActivityAsync(activity, startedOn: null, cancellationToken);
-  public Task<Guid> StartActivityAsync(object activity, DateTime? startedOn, CancellationToken cancellationToken)
+  public Task<Guid> StartActivityAsync(Activity activity, DateTime? startedOn, CancellationToken cancellationToken)
   {
     AssertLogHasBeenStarted();
 

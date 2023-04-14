@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
 using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Logging;
 using System.Collections.Concurrent;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
@@ -97,12 +98,12 @@ internal class LogEntity
   }
 
   public List<ActivityEntity> Activities { get; private set; } = new();
-  public Guid StartActivity(object data, DateTime? startedOn = null)
+  public Guid StartActivity(Activity activity, DateTime? startedOn = null)
   {
-    ActivityEntity activity = new(this, data, startedOn);
-    _ = _activities.TryAdd(activity.Id, activity);
+    ActivityEntity entity = new(this, activity, startedOn);
+    _ = _activities.TryAdd(entity.Id, entity);
 
-    return activity.Id;
+    return entity.Id;
   }
   public void EndActivity(Guid id, DateTime? endedOn = null)
   {

@@ -8,8 +8,8 @@ public interface ILoggingService
   Task StartAsync(string? correlationId = null, string? method = null, string? destination = null,
     string? source = null, string? additionalInformation = null, DateTime? startedOn = null,
     CancellationToken cancellationToken = default);
-  Task<Guid> StartActivityAsync(object activity, CancellationToken cancellationToken = default);
-  Task<Guid> StartActivityAsync(object activity, DateTime? startedOn = null, CancellationToken cancellationToken = default);
+  Task<Guid> StartActivityAsync(Activity activity, CancellationToken cancellationToken = default);
+  Task<Guid> StartActivityAsync(Activity activity, DateTime? startedOn = null, CancellationToken cancellationToken = default);
   Task AddErrorAsync(Error error, CancellationToken cancellationToken = default);
   Task AddErrorAsync(Error error, Guid? activityId = null, CancellationToken cancellationToken = default);
   Task AddEventAsync(DomainEvent change, CancellationToken cancellationToken = default);
