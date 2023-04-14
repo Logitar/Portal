@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Logitar.Portal.Core.Configurations.Commands;
 
-internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration>
+internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration, Unit>
 {
   private const string PortalDisplayName = "Portal";
   private const string PortalDescription = "The realm in which the administrator users of the Portal belong to.";
@@ -28,7 +28,7 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     _userRepository = userRepository;
   }
 
-  public async Task Handle(InitializeConfiguration request, CancellationToken cancellationToken)
+  public async Task<Unit> Handle(InitializeConfiguration request, CancellationToken cancellationToken)
   {
     InitializeConfigurationInput input = request.Input;
     CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
@@ -61,5 +61,7 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     user.SetEmail(_currentActor.Id, new ReadOnlyEmail(userInput.EmailAddress));
 
     await _userRepository.SaveAsync(user, cancellationToken);
+
+    return Unit.Value;
   }
 }

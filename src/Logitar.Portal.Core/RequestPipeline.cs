@@ -15,24 +15,6 @@ internal class RequestPipeline : IRequestPipeline
     _mediator = mediator;
   }
 
-  public async Task ExecuteAsync(IRequest request, CancellationToken cancellationToken)
-  {
-    Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
-
-    try
-    {
-      await _mediator.Send(request, cancellationToken);
-    }
-    catch (Exception exception)
-    {
-      await _loggingService.AddErrorAsync(Error.From(exception), activityId, cancellationToken);
-
-      throw;
-    }
-
-    await _loggingService.EndActivityAsync(activityId, cancellationToken);
-  }
-
   public async Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken)
   {
     Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
