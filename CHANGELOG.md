@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented Basic authentication.
 - Reimplemented logging.
 - Reimplemented caching.
+- Reverted to V1 realm handling.
+- Implemented basic Portal configuration.
+- Merged ICurrentActor into IApplicationContext.
+- Merged database migrations.
 
 ## [1.1.5] - 2022-10-27
 
