@@ -34,10 +34,12 @@ public class Logging
 
       throw;
     }
+    finally
+    {
+      await loggingService.SetActorsAsync(_currentActor.Id.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
 
-    await loggingService.SetActorsAsync(_currentActor.Id.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
-
-    HttpResponse response = context.Response;
-    await loggingService.EndAsync(response.StatusCode);
+      HttpResponse response = context.Response;
+      await loggingService.EndAsync(response.StatusCode);
+    }
   }
 }
