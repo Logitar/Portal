@@ -12,9 +12,10 @@ internal class ValidateTokenValidator : AbstractValidator<ValidateTokenInput>
     RuleFor(x => x.Purpose).Purpose();
 
     RuleFor(x => x.Realm).NullOrNotEmpty();
-    When(x => x.Realm == null, () => RuleFor(x => x.Secret).NotEmpty()
+
+    RuleFor(x => x.Secret).NullOrNotEmpty()
       .MinimumLength(256 / 8)
-      .MaximumLength(512 / 8));
+      .MaximumLength(512 / 8);
 
     RuleFor(x => x.Audience).NullOrNotEmpty();
 

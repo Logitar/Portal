@@ -16,7 +16,7 @@
         </b-row>
         <b-row>
           <purpose-field class="col" v-model="purpose" />
-          <secret-field class="col" :required="!realm" v-model="secret" />
+          <secret-field class="col" v-model="secret" />
         </b-row>
         <b-row>
           <audience-field class="col" v-model="audience" />

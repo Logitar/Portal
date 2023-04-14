@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Portal.Contracts.Tokens;
+using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Claims;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Tokens.Validators;
@@ -12,14 +13,17 @@ namespace Logitar.Portal.Core.Tokens.Commands;
 internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly ICacheService _cacheService;
   private readonly IRealmRepository _realmRepository;
   private readonly ITokenManager _tokenManager;
 
   public CreateTokenHandler(IApplicationContext applicationContext,
+    ICacheService cacheService,
     IRealmRepository realmRepository,
     ITokenManager tokenManager)
   {
     _applicationContext = applicationContext;
+    _cacheService = cacheService;
     _realmRepository = realmRepository;
     _tokenManager = tokenManager;
   }
@@ -29,14 +33,18 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
     CreateTokenInput input = request.Input;
     new CreateTokenValidator().ValidateAndThrow(input);
 
-    RealmAggregate? realm = input.Realm == null ? null
-      : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-          ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
-
-    if (realm?.UniqueName == RealmAggregate.PortalUniqueName)
+    RealmAggregate realm;
+    if (input.Realm == null)
     {
+      realm = _cacheService.PortalRealm ?? throw new InvalidOperationException("The Portal realm was not cached.");
+
       AggregateId actorId = new(Guid.Empty);
       realm.SetUrl(actorId, _applicationContext.BaseUrl);
+    }
+    else
+    {
+      realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+        ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
     }
 
     ClaimsIdentity identity = new();
@@ -69,9 +77,9 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
       identity.AddClaims(input.Claims.Select(CreateClaim));
     }
 
-    string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl);
-    string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
+    string audience = input.Audience?.Format(realm) ?? realm.GetAudience();
+    string issuer = input.Issuer?.Format(realm) ?? realm.GetIssuer(_applicationContext.BaseUrl);
+    string secret = input.Secret ?? realm.Secret;
 
     return new CreatedToken
     {

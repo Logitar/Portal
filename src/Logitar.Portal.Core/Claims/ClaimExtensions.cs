@@ -19,12 +19,9 @@ public static class ClaimExtensions
 
     return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
   }
-  public static string Format(this string value, RealmAggregate? realm)
+  public static string Format(this string value, RealmAggregate realm)
   {
-    return (realm == null
-      ? value
-      : value.Replace("{UNIQUE_NAME}", realm.UniqueName).Replace("{URL}", realm.Url?.ToString())
-    ).ToLower();
+    return value.Replace("{UNIQUE_NAME}", realm.UniqueName).Replace("{URL}", realm.Url?.ToString()).ToLower();
   }
 
   public static ClaimsIdentity GetClaimsIdentity(this User user, string? authenticationType = null)
