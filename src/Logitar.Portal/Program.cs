@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
+﻿using Logitar.Portal.Core.Caching;
+using Logitar.Portal.Core.Realms;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
 using MediatR;
 
 namespace Logitar.Portal;
@@ -16,6 +18,8 @@ public class Program
 
     startup.Configure(application);
 
+    using IServiceScope scope = application.Services.CreateScope();
+
     if (application.Configuration.GetValue<bool>("MigrateDatabase"))
     {
       IRequest? migrateDatabase = null;
@@ -29,11 +33,15 @@ public class Program
 
       if (migrateDatabase != null)
       {
-        using IServiceScope scope = application.Services.CreateScope();
         IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         await mediator.Send(migrateDatabase);
       }
     }
+
+    ICacheService cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+    IRealmRepository realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
+    RealmAggregate? realm = await realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName);
+    cacheService.PortalRealm = realm;
 
     application.Run();
   }

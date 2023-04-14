@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Realms;
+﻿using Logitar.Portal.Core.Caching;
+using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Contact;
 using MediatR;
@@ -11,15 +12,17 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
   private const string PortalDisplayName = "Portal";
   private const string PortalDescription = "The realm in which the administrator users of the Portal belong to.";
 
+  private readonly ICacheService _cacheService;
   private readonly ICurrentActor _currentActor;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserRepository _userRepository;
 
-  public InitializeConfigurationHandler(
+  public InitializeConfigurationHandler(ICacheService cacheService,
     ICurrentActor currentActor,
     IRealmRepository realmRepository,
     IUserRepository userRepository)
   {
+    _cacheService = cacheService;
     _currentActor = currentActor;
     _realmRepository = realmRepository;
     _userRepository = userRepository;
@@ -47,6 +50,8 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
         customAttributes: customAttributes);
 
       await _realmRepository.SaveAsync(realm, cancellationToken);
+
+      _cacheService.PortalRealm = realm;
     }
 
     InitialUserInput userInput = input.User;

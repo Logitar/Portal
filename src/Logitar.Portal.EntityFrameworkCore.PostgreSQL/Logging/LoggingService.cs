@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Logging;
 using Logitar.Portal.Core.Realms;
@@ -9,13 +10,13 @@ internal class LoggingService : ILoggingService
 {
   private LogEntity? _log = null;
 
+  private readonly ICacheService _cacheService;
   private readonly PortalContext _context;
-  private readonly IRealmRepository _realmRepository;
 
-  public LoggingService(PortalContext context, IRealmRepository realmRepository)
+  public LoggingService(ICacheService cacheService, PortalContext context)
   {
+    _cacheService = cacheService;
     _context = context;
-    _realmRepository = realmRepository;
   }
 
   public Task StartAsync(string? correlationId, string? method, string? destination,
@@ -86,9 +87,8 @@ internal class LoggingService : ILoggingService
 
     _log!.Complete(statusCode, endedOn);
 
-    RealmAggregate realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken)
-      ?? throw new InvalidOperationException("The Portal realm could not be found."); // TODO(fpion): caching
-    if (realm.CustomAttributes.TryGetValue(nameof(LoggingSettings), out string? json))
+    RealmAggregate? realm = _cacheService.PortalRealm;
+    if (realm?.CustomAttributes.TryGetValue(nameof(LoggingSettings), out string? json) == true)
     {
       LoggingSettings settings = LoggingSettings.Deserialize(json);
       if ((settings.Extent == LoggingExtent.Full || (settings.Extent == LoggingExtent.ActivityOnly && _log.Activities.Any()))
