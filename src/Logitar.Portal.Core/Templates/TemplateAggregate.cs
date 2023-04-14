@@ -13,7 +13,7 @@ public class TemplateAggregate : AggregateRoot
   }
 
   public TemplateAggregate(AggregateId actorId, RealmAggregate realm, string uniqueName, string subject,
-    string contentType, string? contents = null, string? displayName = null, string? description = null) : base()
+    string contentType, string contents, string? displayName = null, string? description = null) : base()
   {
     TemplateCreated e = new()
     {
@@ -24,7 +24,7 @@ public class TemplateAggregate : AggregateRoot
       Description = description?.CleanTrim(),
       Subject = subject.Trim(),
       ContentType = contentType.Trim(),
-      Contents = contents?.CleanTrim()
+      Contents = contents.Trim()
     };
     new TemplateCreatedValidator().ValidateAndThrow(e);
 
@@ -39,7 +39,7 @@ public class TemplateAggregate : AggregateRoot
 
   public string Subject { get; private set; } = string.Empty;
   public string ContentType { get; private set; } = string.Empty;
-  public string? Contents { get; private set; }
+  public string Contents { get; private set; } = string.Empty;
 
   protected virtual void Apply(TemplateCreated e)
   {
@@ -54,7 +54,7 @@ public class TemplateAggregate : AggregateRoot
   protected virtual void Apply(TemplateDeleted _) { }
 
   public void Update(AggregateId actorId, string subject, string contentType,
-    string? contents = null, string? displayName = null, string? description = null)
+    string contents, string? displayName = null, string? description = null)
   {
     TemplateUpdated e = new()
     {
@@ -63,7 +63,7 @@ public class TemplateAggregate : AggregateRoot
       Description = description?.CleanTrim(),
       Subject = subject.Trim(),
       ContentType = contentType.Trim(),
-      Contents = contents?.CleanTrim()
+      Contents = contents.Trim()
     };
     new TemplateUpdatedValidator().ValidateAndThrow(e);
 
