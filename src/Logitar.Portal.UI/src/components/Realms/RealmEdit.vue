@@ -6,13 +6,19 @@
       <b-form @submit.prevent="submit">
         <div class="my-2">
           <icon-submit v-if="realm" :disabled="!hasChanges || loading" icon="save" :loading="loading" text="actions.save" variant="primary" />
-          <icon-submit v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
+          <icon-submit
+            v-else
+            :disabled="!hasChanges || loading || uniqueNameForbidden"
+            icon="plus"
+            :loading="loading"
+            text="actions.create"
+            variant="success"
+          />
         </div>
         <b-tabs content-class="mt-3">
           <b-tab :title="$t('realms.general')">
-            <b-alert dismissible variant="warning" v-model="uniqueNameConflict">
-              <strong v-t="'realms.uniqueName.conflict'" />
-            </b-alert>
+            <b-alert dismissible variant="warning" v-model="uniqueNameConflict"><strong v-t="'realms.uniqueName.conflict'" /></b-alert>
+            <b-alert :show="uniqueNameForbidden" variant="warning"><strong v-t="'realms.uniqueName.forbidden'" /></b-alert>
             <b-row>
               <name-field class="col" label="realms.displayName.label" placeholder="realms.displayName.placeholder" v-model="displayName" />
               <alias-field class="col" v-if="realm" disabled :value="uniqueName" />
@@ -182,6 +188,9 @@ export default {
         payload.uniqueName = this.uniqueName
       }
       return payload
+    },
+    uniqueNameForbidden() {
+      return this.uniqueName?.trim().toLowerCase() === 'portal'
     }
   },
   methods: {
