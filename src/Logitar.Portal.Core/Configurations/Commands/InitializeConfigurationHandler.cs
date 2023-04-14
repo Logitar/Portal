@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Contracts.Realms;
+﻿using AutoMapper;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Contact;
@@ -11,14 +11,17 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IConfigurationRepository _configurationRepository;
+  private readonly IMapper _mapper;
   private readonly IUserRepository _userRepository;
 
   public InitializeConfigurationHandler(IApplicationContext applicationContext,
     IConfigurationRepository configurationRepository,
+    IMapper mapper,
     IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
     _configurationRepository = configurationRepository;
+    _mapper = mapper;
     _userRepository = userRepository;
   }
 
@@ -44,27 +47,6 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
 
     await _userRepository.SaveAsync(user, cancellationToken);
 
-    return new Configuration
-    {
-      DefaultLocale = configuration.DefaultLocale.Name,
-      UsernameSettings = new UsernameSettings
-      {
-        AllowedCharacters = configuration.UsernameSettings.AllowedCharacters
-      },
-      PasswordSettings = new PasswordSettings
-      {
-        RequiredLength = configuration.PasswordSettings.RequiredLength,
-        RequiredUniqueChars = configuration.PasswordSettings.RequiredUniqueChars,
-        RequireNonAlphanumeric = configuration.PasswordSettings.RequireNonAlphanumeric,
-        RequireLowercase = configuration.PasswordSettings.RequireLowercase,
-        RequireUppercase = configuration.PasswordSettings.RequireUppercase,
-        RequireDigit = configuration.PasswordSettings.RequireDigit
-      },
-      LoggingSettings = new LoggingSettings
-      {
-        Extent = configuration.LoggingSettings.Extent,
-        OnlyErrors = configuration.LoggingSettings.OnlyErrors
-      }
-    };
+    return _mapper.Map<Configuration>(configuration);
   }
 }

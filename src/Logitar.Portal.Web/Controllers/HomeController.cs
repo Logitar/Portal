@@ -17,7 +17,7 @@ public class HomeController : Controller
   [HttpGet]
   public async Task<ActionResult> Index(CancellationToken cancellationToken)
   {
-    if (await _configurationService.IsInitializedAsync(cancellationToken))
+    if (await _configurationService.GetAsync(cancellationToken) != null)
     {
       return RedirectToAction(actionName: "SignIn", controllerName: "Account");
     }

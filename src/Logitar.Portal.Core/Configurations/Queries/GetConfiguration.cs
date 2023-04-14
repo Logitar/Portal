@@ -2,4 +2,4 @@
 
 namespace Logitar.Portal.Core.Configurations.Queries;
 
-internal record IsConfigurationInitialized : IRequest<bool>;
+internal record GetConfiguration : IRequest<Configuration?>;

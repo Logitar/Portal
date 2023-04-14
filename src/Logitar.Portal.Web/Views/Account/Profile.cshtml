@@ -1,10 +1,18 @@
-﻿@using Logitar.Portal.Contracts.Users;
+﻿@using AutoMapper;
+@using Logitar.Portal.Contracts.Users;
+@using Logitar.Portal.Core;
+@using Logitar.Portal.Core.Configurations;
+
+@inject IApplicationContext _applicationContext;
+@inject IMapper _mapper;
 
 @model User
 @{
   Layout = "_Layout";
 
   ViewBag.Title = "Profile";
+
+  Configuration configuration = _mapper.Map<Configuration>(_applicationContext.Configuration);
 }
 
-<profile json="@(ModelSerializer.Serialize(Model))" session="@(Context.GetSessionId())"></profile>
+<profile configuration="@(ModelSerializer.Serialize(configuration))" json="@(ModelSerializer.Serialize(Model))" session="@(Context.GetSessionId())"></profile>

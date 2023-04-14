@@ -31,7 +31,7 @@
             label="user.password.new.label"
             placeholder="user.password.new.placeholder"
             required
-            :settings="user.realm.passwordSettings"
+            :settings="passwordSettings"
             validate
             v-model="password"
           />
@@ -61,6 +61,10 @@ export default {
     PasswordField
   },
   props: {
+    passwordSettings: {
+      type: Object,
+      default: null
+    },
     user: {
       type: Object,
       required: true
