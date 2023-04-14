@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
+using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Templates;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -42,14 +43,20 @@ internal class TemplateQuerier : ITemplateQuerier
 
   public async Task<Template?> GetAsync(string realm, string key, CancellationToken cancellationToken)
   {
-    string aggregateId = (Guid.TryParse(realm, out Guid realmId)
-      ? new AggregateId(realmId)
-      : new(realm)).Value;
+    IQueryable<TemplateEntity> query = _templates.AsNoTracking()
+      .Include(x => x.Realm);
 
-    TemplateEntity? template = await _templates.AsNoTracking()
-      .Include(x => x.Realm)
-      .SingleOrDefaultAsync(x => x.Realm!.AggregateId == aggregateId
-        && x.UniqueNameNormalized == key.ToUpper(), cancellationToken);
+    if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
+    TemplateEntity? template = await query.SingleOrDefaultAsync(x => x.UniqueNameNormalized == key.ToUpper(), cancellationToken);
 
     return _mapper.Map<Template>(template);
   }
@@ -60,14 +67,20 @@ internal class TemplateQuerier : ITemplateQuerier
     IQueryable<TemplateEntity> query = _templates.AsNoTracking()
      .Include(x => x.Realm);
 
-    if (realm != null)
+    if (realm == null)
     {
-      string aggregateId = Guid.TryParse(realm, out Guid realmId)
-        ? new AggregateId(realmId).Value
-        : realm;
-
-      query = query.Where(x => x.Realm!.AggregateId == aggregateId || x.Realm.UniqueNameNormalized == realm.ToUpper());
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == RealmAggregate.PortalUniqueName.ToUpper());
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
     if (search != null)
     {
       foreach (string term in search.Split().Where(x => !string.IsNullOrEmpty(x)))

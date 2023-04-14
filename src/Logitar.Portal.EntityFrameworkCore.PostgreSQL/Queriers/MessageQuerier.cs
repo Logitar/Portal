@@ -3,6 +3,7 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Core.Messages;
+using Logitar.Portal.Core.Realms;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,12 +52,20 @@ internal class MessageQuerier : IMessageQuerier
     {
       query = query.Where(x => x.IsDemo == isDemo.Value);
     }
-    if (realm != null)
+
+    if (realm == null)
     {
-      query = Guid.TryParse(realm, out Guid realmId)
-        ? query.Where(x => x.RealmId == realmId)
-        : query.Where(x => x.RealmUniqueName.ToUpper() == realm.ToUpper());
+      query = query.Where(x => x.RealmUniqueName == RealmAggregate.PortalUniqueName);
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      query = query.Where(x => x.RealmId == realmId);
+    }
+    else
+    {
+      query = query.Where(x => x.RealmUniqueName.ToUpper() == realm.ToUpper());
+    }
+
     if (search != null)
     {
       foreach (string term in search.Split())
