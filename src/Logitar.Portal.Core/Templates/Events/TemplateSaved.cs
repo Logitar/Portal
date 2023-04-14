@@ -9,5 +9,5 @@ public abstract record TemplateSaved : DomainEvent
 
   public string Subject { get; init; } = string.Empty;
   public string ContentType { get; init; } = string.Empty;
-  public string? Contents { get; init; }
+  public string Contents { get; init; } = string.Empty;
 }

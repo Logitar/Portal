@@ -26,6 +26,6 @@ internal abstract class TemplateSavedValidator<T> : AbstractValidator<T> where T
       .Must(_allowedContentTypes.Contains).WithErrorCode("ContentTypeValidator")
       .WithMessage($"'{{PropertyName}}' may only be one of the following: {string.Join(", ", _allowedContentTypes)}");
 
-    RuleFor(x => x.Contents).NullOrNotEmpty();
+    RuleFor(x => x.Contents).NotEmpty();
   }
 }

@@ -34,7 +34,7 @@ internal class TemplateEntity : AggregateEntity
 
   public string Subject { get; private set; } = string.Empty;
   public string ContentType { get; private set; } = string.Empty;
-  public string? Contents { get; private set; }
+  public string Contents { get; private set; } = string.Empty;
 
   public RealmEntity? PasswordRecoveryRealm { get; private set; }
 
