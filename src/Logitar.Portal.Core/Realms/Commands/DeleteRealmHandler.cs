@@ -30,6 +30,11 @@ internal class DeleteRealmHandler : IRequestHandler<DeleteRealm, Realm>
   {
     RealmAggregate realm = await _realmRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(request.Id);
+    if (realm.UniqueName.ToLower() == RealmAggregate.PortalUniqueName)
+    {
+      throw new CannotManagePortalRealmException(_currentActor.Id);
+    }
+
     Realm output = await _realmQuerier.GetAsync(realm, cancellationToken);
 
     await _mediator.Send(new DeleteSessions(realm), cancellationToken);

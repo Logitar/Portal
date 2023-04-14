@@ -24,7 +24,11 @@ internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
     CreateRealmInput input = request.Input;
 
     string uniqueName = input.UniqueName.Trim();
-    if (await _realmRepository.LoadByUniqueNameAsync(uniqueName, cancellationToken) != null)
+    if (uniqueName.ToLower() == RealmAggregate.PortalUniqueName)
+    {
+      throw new CannotManagePortalRealmException(_currentActor.Id);
+    }
+    else if (await _realmRepository.LoadByUniqueNameAsync(uniqueName, cancellationToken) != null)
     {
       throw new UniqueNameAlreadyUsedException(uniqueName, nameof(input.UniqueName));
     }

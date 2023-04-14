@@ -31,6 +31,10 @@ internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
   {
     RealmAggregate realm = await _realmRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(request.Id);
+    if (realm.UniqueName.ToLower() == RealmAggregate.PortalUniqueName)
+    {
+      throw new CannotManagePortalRealmException(_currentActor.Id);
+    }
 
     UpdateRealmInput input = request.Input;
 
