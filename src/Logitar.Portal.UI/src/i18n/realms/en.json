@@ -47,7 +47,7 @@
   },
   "select": {
     "label": "Realm",
-    "placeholder": "Select a realm"
+    "placeholder": "Portal (no realm)"
   },
   "settings": "Settings",
   "sort": {
