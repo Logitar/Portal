@@ -21,24 +21,40 @@ internal class DictionaryRepository : EventStore, IDictionaryRepository
     return await LoadAsync<DictionaryAggregate>(new AggregateId(id), cancellationToken);
   }
 
-  public async Task<IEnumerable<DictionaryAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  public async Task<IEnumerable<DictionaryAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    string aggregateId = realm.Id.Value;
+    IQueryable<EventEntity> query;
+    if (realm == null)
+    {
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND d.""RealmId"" IS NULL");
+    }
+    else
+    {
+      string aggregateId = realm.Id.Value;
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = d.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId}");
+    }
 
-    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = d.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId}")
-      .AsNoTracking()
+    EventEntity[] events = await query.AsNoTracking()
       .OrderBy(x => x.Version)
       .ToArrayAsync(cancellationToken);
 
     return Load<DictionaryAggregate>(events);
   }
 
-  public async Task<DictionaryAggregate?> LoadAsync(RealmAggregate realm, CultureInfo locale, CancellationToken cancellationToken)
+  public async Task<DictionaryAggregate?> LoadAsync(RealmAggregate? realm, CultureInfo locale, CancellationToken cancellationToken)
   {
-    string aggregateId = realm.Id.Value;
+    IQueryable<EventEntity> query;
+    if (realm == null)
+    {
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND d.""RealmId"" IS NULL AND d.""Locale"" = {locale.Name}");
+    }
+    else
+    {
+      string aggregateId = realm.Id.Value;
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = d.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND d.""Locale"" = {locale.Name}");
+    }
 
-    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Dictionaries"" d ON d.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = d.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND d.""Locale"" = {locale.Name}")
-      .AsNoTracking()
+    EventEntity[] events = await query.AsNoTracking()
       .OrderBy(x => x.Version)
       .ToArrayAsync(cancellationToken);
 

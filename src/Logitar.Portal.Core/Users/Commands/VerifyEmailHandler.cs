@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class VerifyEmailHandler : IRequestHandler<VerifyEmail, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public VerifyEmailHandler(ICurrentActor currentActor,
+  public VerifyEmailHandler(IApplicationContext applicationContext,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -25,7 +25,7 @@ internal class VerifyEmailHandler : IRequestHandler<VerifyEmail, User>
 
     if (user.Email != null)
     {
-      user.SetEmail(_currentActor.Id, user.Email.AsVerified());
+      user.SetEmail(_applicationContext.ActorId, user.Email.AsVerified());
 
       await _userRepository.SaveAsync(user, cancellationToken);
     }

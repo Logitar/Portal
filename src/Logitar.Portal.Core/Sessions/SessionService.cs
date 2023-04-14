@@ -31,9 +31,9 @@ internal class SessionService : ISessionService
     return await _pipeline.ExecuteAsync(new Refresh(input), cancellationToken);
   }
 
-  public async Task<Session> SignInAsync(SignInInput input, CancellationToken cancellationToken)
+  public async Task<Session> SignInAsync(SignInInput input, string? realm, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new SignIn(input), cancellationToken);
+    return await _pipeline.ExecuteAsync(new SignIn(input, realm), cancellationToken);
   }
 
   public async Task<Session> SignOutAsync(Guid id, CancellationToken cancellationToken)

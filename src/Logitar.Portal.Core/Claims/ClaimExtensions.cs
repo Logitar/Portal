@@ -10,21 +10,18 @@ public static class ClaimExtensions
   {
     return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
   }
-  public static string GetIssuer(this RealmAggregate realm, Uri? baseUrl)
+  public static string GetIssuer(this RealmAggregate realm, Uri? baseUrl = null)
   {
-    if (realm.UniqueName != RealmAggregate.PortalUniqueName && baseUrl != null)
+    return $"{baseUrl?.ToString().TrimEnd('/') ?? Constants.DefaultIdentifier}/realms/{{UNIQUE_NAME}}".Format(realm);
+  }
+  public static string Format(this string value, RealmAggregate? realm = null)
+  {
+    if (realm == null)
     {
-      return $"{baseUrl.ToString().TrimEnd('/')}/realms/{{UNIQUE_NAME}}".Format(realm);
+      return value.ToLower();
     }
 
-    return (realm.Url?.ToString() ?? realm.UniqueName).ToLower();
-  }
-  public static string Format(this string value, RealmAggregate? realm)
-  {
-    return (realm == null
-      ? value
-      : value.Replace("{UNIQUE_NAME}", realm.UniqueName).Replace("{URL}", realm.Url?.ToString())
-    ).ToLower();
+    return value.Replace("{UNIQUE_NAME}", realm.UniqueName).Replace("{URL}", realm.Url?.ToString()).ToLower();
   }
 
   public static ClaimsIdentity GetClaimsIdentity(this User user, string? authenticationType = null)

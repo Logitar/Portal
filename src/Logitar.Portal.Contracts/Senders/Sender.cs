@@ -14,5 +14,5 @@ public record Sender : Aggregate
   public ProviderType Provider { get; set; }
   public IEnumerable<Setting> Settings { get; set; } = Enumerable.Empty<Setting>();
 
-  public Realm Realm { get; set; } = new();
+  public Realm? Realm { get; set; }
 }

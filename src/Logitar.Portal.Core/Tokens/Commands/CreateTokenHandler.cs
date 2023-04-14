@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.EventSourcing;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Core.Claims;
 using Logitar.Portal.Core.Realms;
@@ -29,15 +28,7 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
     CreateTokenInput input = request.Input;
     new CreateTokenValidator().ValidateAndThrow(input);
 
-    RealmAggregate? realm = input.Realm == null ? null
-      : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-          ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
-
-    if (realm?.UniqueName == RealmAggregate.PortalUniqueName)
-    {
-      AggregateId actorId = new(Guid.Empty);
-      realm.SetUrl(actorId, _applicationContext.BaseUrl);
-    }
+    RealmAggregate? realm = await LoadRealmAsync(input, cancellationToken);
 
     ClaimsIdentity identity = new();
 
@@ -69,14 +60,27 @@ internal class CreateTokenHandler : IRequestHandler<CreateToken, CreatedToken>
       identity.AddClaims(input.Claims.Select(CreateClaim));
     }
 
-    string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl);
-    string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
+    string audience = input.Audience?.Format(realm) ?? realm?.GetAudience()
+      ?? _applicationContext.BaseUrl?.ToString() ?? Constants.DefaultIdentifier;
+    string issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl)
+      ?? _applicationContext.BaseUrl?.ToString() ?? Constants.DefaultIdentifier;
+    string secret = input.Secret ?? realm?.Secret ?? _applicationContext.Configuration.Secret;
 
     return new CreatedToken
     {
       Token = _tokenManager.Create(identity, secret, input.Algorithm, expires, audience, issuer)
     };
+  }
+
+  private async Task<RealmAggregate?> LoadRealmAsync(CreateTokenInput input, CancellationToken cancellationToken)
+  {
+    if (input.Realm == null)
+    {
+      return null;
+    }
+
+    return await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
   }
 
   private static Claim CreateClaim(TokenClaim claim)

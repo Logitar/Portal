@@ -19,7 +19,7 @@
           </template>
           <icon-submit class="mx-1" v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <realm-select :disabled="Boolean(user)" :required="!user" v-model="realmId" />
+        <realm-select :disabled="Boolean(user)" v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
         <b-alert dismissible variant="warning" v-model="usernameConflict">
           <strong v-t="'user.username.conflict'" />
@@ -29,7 +29,7 @@
           placeholder="user.create.usernamePlaceholder"
           ref="username"
           :required="!user"
-          :settings="selectedRealm?.usernameSettings"
+          :settings="selectedRealm?.usernameSettings ?? usernameSettings"
           :validate="!user"
           v-model="username"
         />
@@ -45,7 +45,7 @@
               class="col"
               label="user.password.new.label"
               placeholder="user.password.new.placeholder"
-              :settings="selectedRealm?.passwordSettings"
+              :settings="selectedRealm?.passwordSettings ?? passwordSettings"
               validate
               v-model="password"
             />
@@ -54,7 +54,7 @@
               class="col"
               placeholder="user.create.passwordPlaceholder"
               required
-              :settings="selectedRealm?.passwordSettings"
+              :settings="selectedRealm?.passwordSettings ?? passwordSettings"
               validate
               v-model="password"
             />
@@ -168,6 +168,10 @@ export default {
     WebsiteField
   },
   props: {
+    configuration: {
+      type: String,
+      required: true
+    },
     current: {
       type: String,
       default: ''
@@ -200,6 +204,7 @@ export default {
       nickname: null,
       password: null,
       passwordConfirmation: null,
+      passwordSettings: null,
       phoneNumber: null,
       picture: null,
       profile: null,
@@ -209,6 +214,7 @@ export default {
       user: null,
       username: null,
       usernameConflict: false,
+      usernameSettings: null,
       website: null
     }
   },
@@ -329,6 +335,10 @@ export default {
     }
   },
   created() {
+    const { passwordSettings, usernameSettings } = JSON.parse(this.configuration)
+    this.passwordSettings = passwordSettings
+    this.usernameSettings = usernameSettings
+
     if (this.json) {
       this.setModel(JSON.parse(this.json))
     }

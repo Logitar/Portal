@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class DisableUserHandler : IRequestHandler<DisableUser, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public DisableUserHandler(ICurrentActor currentActor,
+  public DisableUserHandler(IApplicationContext applicationContext,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -23,7 +23,7 @@ internal class DisableUserHandler : IRequestHandler<DisableUser, User>
     UserAggregate user = await _userRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<UserAggregate>(request.Id);
 
-    user.Disable(_currentActor.Id);
+    user.Disable(_applicationContext.ActorId);
 
     await _userRepository.SaveAsync(user, cancellationToken);
 

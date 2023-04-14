@@ -7,17 +7,17 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class SetExternalIdentifierHandler : IRequestHandler<SetExternalIdentifier, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public SetExternalIdentifierHandler(ICurrentActor currentActor,
+  public SetExternalIdentifierHandler(IApplicationContext applicationContext,
     IRealmRepository realmRepository,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _realmRepository = realmRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -33,14 +33,14 @@ internal class SetExternalIdentifierHandler : IRequestHandler<SetExternalIdentif
 
     if (value != null)
     {
-      RealmAggregate realm = await _realmRepository.LoadAsync(user, cancellationToken);
+      RealmAggregate? realm = await _realmRepository.LoadAsync(user, cancellationToken);
       if (await _userRepository.LoadAsync(realm, key, value, cancellationToken) != null)
       {
         throw new ExternalIdentifierAlreadyUsedException(realm, key, value);
       }
     }
 
-    user.SetExternalIdentifier(_currentActor.Id, key, value);
+    user.SetExternalIdentifier(_applicationContext.ActorId, key, value);
 
     await _userRepository.SaveAsync(user, cancellationToken);
 

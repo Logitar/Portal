@@ -24,12 +24,30 @@ public class UserAggregate : AggregateRoot
     string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
     DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
     Uri? picture = null, Uri? profile = null, Uri? website = null,
+    Dictionary<string, string>? customAttributes = null)
+    : this(actorId, realm, realm.UsernameSettings, username, firstName, middleName, lastName,
+        nickname, birthdate, gender, locale, timeZone, picture, profile, website, customAttributes)
+  {
+  }
+  public UserAggregate(AggregateId actorId, IUsernameSettings usernameSettings, string username,
+    string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
+    DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
+    Uri? picture = null, Uri? profile = null, Uri? website = null,
+    Dictionary<string, string>? customAttributes = null)
+    : this(actorId, realm: null, usernameSettings, username, firstName, middleName, lastName, nickname, birthdate,
+        gender, locale, timeZone, picture, profile, website, customAttributes)
+  {
+  }
+  private UserAggregate(AggregateId actorId, RealmAggregate? realm, IUsernameSettings usernameSettings, string username,
+    string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
+    DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
+    Uri? picture = null, Uri? profile = null, Uri? website = null,
     Dictionary<string, string>? customAttributes = null) : base()
   {
     UserCreated e = new()
     {
       ActorId = actorId,
-      RealmId = realm.Id,
+      RealmId = realm?.Id,
       Username = username.Trim(),
       FirstName = firstName?.CleanTrim(),
       MiddleName = middleName?.CleanTrim(),
@@ -45,12 +63,12 @@ public class UserAggregate : AggregateRoot
       Website = website,
       CustomAttributes = customAttributes?.CleanTrim() ?? new()
     };
-    new UserCreatedValidator(realm.UsernameSettings).ValidateAndThrow(e);
+    new UserCreatedValidator(usernameSettings).ValidateAndThrow(e);
 
     ApplyChange(e);
   }
 
-  public AggregateId RealmId { get; private set; }
+  public AggregateId? RealmId { get; private set; }
 
   public string Username { get; private set; } = string.Empty;
   public bool HasPassword => _password != null;
@@ -98,12 +116,17 @@ public class UserAggregate : AggregateRoot
     {
       throw new ArgumentException("The realm must be the realm in which the user belongs.", nameof(realm));
     }
-    else if (current != null && _password?.IsMatch(current) != true)
+
+    ChangePassword(actorId, realm.PasswordSettings, password, current);
+  }
+  public void ChangePassword(AggregateId actorId, IPasswordSettings passwordSettings, string password, string? current = null)
+  {
+    if (current != null && _password?.IsMatch(current) != true)
     {
       throw new InvalidCredentialsException("The specified password did not match.");
     }
 
-    new PasswordValidator(realm.PasswordSettings).ValidateAndThrow(password);
+    new PasswordValidator(passwordSettings).ValidateAndThrow(password);
 
     ApplyChange(new PasswordChanged()
     {
@@ -224,11 +247,14 @@ public class UserAggregate : AggregateRoot
   }
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
 
-  public SessionAggregate SignIn(RealmAggregate realm, string password, bool isPersistent = false,
+  public SessionAggregate SignIn(string password, bool isPersistent = false, string? ipAddress = null,
+    string? additionalInformation = null, Dictionary<string, string>? customAttributes = null)
+    => SignIn(realm: null, password, isPersistent, ipAddress, additionalInformation, customAttributes);
+  public SessionAggregate SignIn(RealmAggregate? realm, string password, bool isPersistent = false,
     string? ipAddress = null, string? additionalInformation = null,
     Dictionary<string, string>? customAttributes = null)
   {
-    if (realm.Id != RealmId)
+    if (realm?.Id != RealmId)
     {
       throw new ArgumentException("The realm must be the realm in which the user belongs.", nameof(realm));
     }
@@ -240,7 +266,7 @@ public class UserAggregate : AggregateRoot
     {
       throw new AccountIsDisabledException(this);
     }
-    else if (realm.RequireConfirmedAccount && !IsConfirmed)
+    else if (realm?.RequireConfirmedAccount == true && !IsConfirmed)
     {
       throw new AccountIsNotConfirmedException(this);
     }
@@ -305,5 +331,5 @@ public class UserAggregate : AggregateRoot
 
   private static string? GetFullName(params string?[] names) => string.Join(' ', names
     .SelectMany(name => name?.Split() ?? Array.Empty<string>())
-    .Where(name => !string.IsNullOrEmpty(name)));
+    .Where(name => !string.IsNullOrEmpty(name)))?.CleanTrim();
 }

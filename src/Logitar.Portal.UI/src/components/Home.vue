@@ -80,6 +80,7 @@ export default {
     payload() {
       return {
         defaultLocale: this.$i18n.locale,
+        secret: null,
         usernameSettings: { ...this.usernameSettings },
         passwordSettings: { ...this.passwordSettings },
         loggingSettings: { ...this.loggingSettings },

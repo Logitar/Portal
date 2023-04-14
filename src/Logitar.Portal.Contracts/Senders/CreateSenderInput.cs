@@ -2,7 +2,7 @@
 
 public record CreateSenderInput
 {
-  public string Realm { get; set; } = string.Empty;
+  public string? Realm { get; set; }
 
   public ProviderType Provider { get; set; }
 

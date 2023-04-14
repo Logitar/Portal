@@ -8,17 +8,17 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public UpdateUserHandler(ICurrentActor currentActor,
+  public UpdateUserHandler(IApplicationContext applicationContext,
     IRealmRepository realmRepository,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _realmRepository = realmRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -28,12 +28,12 @@ internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
   {
     UserAggregate user = await _userRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<UserAggregate>(request.Id);
-    RealmAggregate realm = await _realmRepository.LoadAsync(user, cancellationToken);
+    RealmAggregate? realm = await _realmRepository.LoadAsync(user, cancellationToken);
 
     UpdateUserInput input = request.Input;
 
     ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
-    if (realm.RequireUniqueEmail && email != null)
+    if (realm?.RequireUniqueEmail == true && email != null)
     {
       IEnumerable<UserAggregate> users = (await _userRepository.LoadAsync(realm, email, cancellationToken));
       if (users.Any(u => !u.Equals(user)))
@@ -51,18 +51,25 @@ internal class UpdateUserHandler : IRequestHandler<UpdateUser, User>
     Uri? profile = input.Profile?.GetUri(nameof(input.Profile));
     Uri? website = input.Website?.GetUri(nameof(input.Website));
 
-    user.Update(_currentActor.Id, input.FirstName, input.MiddleName, input.LastName, input.Nickname,
+    user.Update(_applicationContext.ActorId, input.FirstName, input.MiddleName, input.LastName, input.Nickname,
       input.Birthdate, gender, locale, timeZone, picture, profile, website,
       input.CustomAttributes?.ToDictionary());
 
     if (input.Password != null)
     {
-      user.ChangePassword(_currentActor.Id, realm, input.Password);
+      if (realm == null)
+      {
+        user.ChangePassword(_applicationContext.ActorId, _applicationContext.Configuration.PasswordSettings, input.Password);
+      }
+      else
+      {
+        user.ChangePassword(_applicationContext.ActorId, realm, input.Password);
+      }
     }
 
-    user.SetAddress(_currentActor.Id, address);
-    user.SetEmail(_currentActor.Id, email);
-    user.SetPhone(_currentActor.Id, phone);
+    user.SetAddress(_applicationContext.ActorId, address);
+    user.SetEmail(_applicationContext.ActorId, email);
+    user.SetPhone(_applicationContext.ActorId, phone);
 
     await _userRepository.SaveAsync(user, cancellationToken);
 

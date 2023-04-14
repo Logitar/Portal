@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users.Contact;
 using MediatR;
@@ -8,17 +9,17 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class CreateUserHandler : IRequestHandler<CreateUser, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public CreateUserHandler(ICurrentActor currentActor,
+  public CreateUserHandler(IApplicationContext applicationContext,
     IRealmRepository realmRepository,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _realmRepository = realmRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -28,8 +29,7 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
   {
     CreateUserInput input = request.Input;
 
-    RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    RealmAggregate? realm = await LoadRealmAsync(input, cancellationToken);
 
     string username = input.Username.Trim();
     if (await _userRepository.LoadAsync(realm, username, cancellationToken) != null)
@@ -38,7 +38,7 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
     }
 
     ReadOnlyEmail? email = ReadOnlyEmail.From(input.Email);
-    if (realm.RequireUniqueEmail && email != null)
+    if (realm?.RequireUniqueEmail == true && email != null)
     {
       if ((await _userRepository.LoadAsync(realm, email, cancellationToken)).Any())
       {
@@ -55,30 +55,57 @@ internal class CreateUserHandler : IRequestHandler<CreateUser, User>
     Uri? profile = input.Profile?.GetUri(nameof(input.Profile));
     Uri? website = input.Website?.GetUri(nameof(input.Website));
 
-    UserAggregate user = new(_currentActor.Id, realm, username, input.FirstName, input.MiddleName,
-      input.LastName, input.Nickname, input.Birthdate, gender, locale, timeZone,
-      picture, profile, website, input.CustomAttributes?.ToDictionary());
-
-    if (input.Password != null)
+    UserAggregate user;
+    if (realm == null)
     {
-      user.ChangePassword(_currentActor.Id, realm, input.Password);
+      ConfigurationAggregate configuration = _applicationContext.Configuration;
+      user = new(_applicationContext.ActorId, configuration.UsernameSettings, username, input.FirstName, input.MiddleName,
+        input.LastName, input.Nickname, input.Birthdate, gender, locale, timeZone,
+        picture, profile, website, input.CustomAttributes?.ToDictionary());
+
+      if (input.Password != null)
+      {
+        user.ChangePassword(_applicationContext.ActorId, configuration.PasswordSettings, input.Password);
+      }
+    }
+    else
+    {
+      user = new(_applicationContext.ActorId, realm, username, input.FirstName, input.MiddleName,
+        input.LastName, input.Nickname, input.Birthdate, gender, locale, timeZone,
+        picture, profile, website, input.CustomAttributes?.ToDictionary());
+
+      if (input.Password != null)
+      {
+        user.ChangePassword(_applicationContext.ActorId, realm, input.Password);
+      }
     }
 
     if (address != null)
     {
-      user.SetAddress(_currentActor.Id, address);
+      user.SetAddress(_applicationContext.ActorId, address);
     }
     if (email != null)
     {
-      user.SetEmail(_currentActor.Id, email);
+      user.SetEmail(_applicationContext.ActorId, email);
     }
     if (phone != null)
     {
-      user.SetPhone(_currentActor.Id, phone);
+      user.SetPhone(_applicationContext.ActorId, phone);
     }
 
     await _userRepository.SaveAsync(user, cancellationToken);
 
     return await _userQuerier.GetAsync(user, cancellationToken);
+  }
+
+  private async Task<RealmAggregate?> LoadRealmAsync(CreateUserInput input, CancellationToken cancellationToken)
+  {
+    if (input.Realm == null)
+    {
+      return null;
+    }
+
+    return await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
   }
 }

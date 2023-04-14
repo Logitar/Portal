@@ -12,7 +12,7 @@
           <strong v-t="'dictionaries.localeConflict'" />
         </b-alert>
         <b-row>
-          <realm-select class="col" :disabled="Boolean(dictionary)" :required="!dictionary" v-model="selectedRealm" />
+          <realm-select class="col" :disabled="Boolean(dictionary)" v-model="selectedRealm" />
           <locale-select class="col" :disabled="Boolean(dictionary)" ref="locale" :required="!dictionary" v-model="selectedLocale" />
         </b-row>
         <h3 v-t="'dictionaries.entries.title'" />

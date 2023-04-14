@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class VerifyAddressHandler : IRequestHandler<VerifyAddress, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public VerifyAddressHandler(ICurrentActor currentActor,
+  public VerifyAddressHandler(IApplicationContext applicationContext,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -25,7 +25,7 @@ internal class VerifyAddressHandler : IRequestHandler<VerifyAddress, User>
 
     if (user.Address != null)
     {
-      user.SetAddress(_currentActor.Id, user.Address.AsVerified());
+      user.SetAddress(_applicationContext.ActorId, user.Address.AsVerified());
 
       await _userRepository.SaveAsync(user, cancellationToken);
     }

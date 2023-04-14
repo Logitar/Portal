@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
 using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Logging;
 using System.Collections.Concurrent;
 
@@ -126,5 +127,12 @@ internal class LogEntity
     LogEventEntity logEvent = new(@event, this, activity);
     Events.Add(logEvent);
     activity?.Events.Add(logEvent);
+  }
+
+  public bool ShouldBeSaved(ReadOnlyLoggingSettings loggingSettings)
+  {
+    return (loggingSettings.Extent == LoggingExtent.Full
+        || loggingSettings.Extent == LoggingExtent.ActivityOnly && Activities.Any())
+      && (!loggingSettings.OnlyErrors || HasErrors);
   }
 }

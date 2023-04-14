@@ -9,7 +9,7 @@ public record RealmSummary
   public string UniqueName { get; init; } = string.Empty;
   public string? DisplayName { get; init; }
 
-  public static RealmSummary From(RealmAggregate realm) => new()
+  public static RealmSummary? From(RealmAggregate? realm) => realm == null ? null : new()
   {
     Id = realm.Id,
     UniqueName = realm.UniqueName,

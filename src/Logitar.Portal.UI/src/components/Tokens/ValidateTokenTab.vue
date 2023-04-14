@@ -7,11 +7,16 @@
         </div>
         <form-field id="token" label="tokens.token.label" placeholder="tokens.token.placeholder" required v-model="token" />
         <b-row>
+          <b-form-group class="col">
+            <b-form-checkbox v-model="consume">{{ $t('tokens.consume') }}</b-form-checkbox>
+          </b-form-group>
+        </b-row>
+        <b-row>
           <realm-select class="col" v-model="realm" />
         </b-row>
         <b-row>
           <purpose-field class="col" v-model="purpose" />
-          <secret-field class="col" :required="!realm" v-model="secret" />
+          <secret-field class="col" v-model="secret" />
         </b-row>
         <b-row>
           <audience-field class="col" v-model="audience" />
@@ -79,7 +84,7 @@ import IssuerField from './IssuerField.vue'
 import PurposeField from './PurposeField.vue'
 import RealmSelect from '@/components/Realms/RealmSelect.vue'
 import SecretField from './SecretField.vue'
-import { validateToken } from '@/api/tokens'
+import { consumeToken, validateToken } from '@/api/tokens'
 
 export default {
   name: 'ValidateTokenTab',
@@ -94,6 +99,7 @@ export default {
   data() {
     return {
       audience: null,
+      consume: false,
       issuer: null,
       loading: false,
       purpose: null,
@@ -128,7 +134,7 @@ export default {
         this.loading = true
         try {
           if (await this.$refs.form.validate()) {
-            const { data } = await validateToken(this.payload)
+            const { data } = this.consume ? await consumeToken(this.payload) : await validateToken(this.payload)
             this.result = data
             this.$refs.form.reset()
           }

@@ -5,7 +5,6 @@ using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Logging;
-using Logitar.Portal.Core.Realms;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
@@ -104,28 +103,23 @@ internal class LoggingService : ILoggingService
 
     _log!.Complete(statusCode, endedOn);
 
-    RealmAggregate? realm = _cacheService.PortalRealm;
-    if (realm?.CustomAttributes.TryGetValue(nameof(LoggingSettings), out string? json) == true)
+    ConfigurationAggregate? configuration = _cacheService.Configuration;
+    if (configuration != null && _log.ShouldBeSaved(configuration.LoggingSettings))
     {
-      LoggingSettings settings = LoggingSettings.Deserialize(json);
-      if ((settings.Extent == LoggingExtent.Full || (settings.Extent == LoggingExtent.ActivityOnly && _log.Activities.Any()))
-        && (!settings.OnlyErrors || _log.HasErrors))
+      IReadOnlyDictionary<Guid, ActivityEntity?> pendingEvents = _log.PendingEvents;
+      Dictionary<Guid, EventEntity> eventIds = await _eventContext.Events.AsNoTracking()
+        .Where(e => pendingEvents.Keys.Contains(e.Id))
+        .ToDictionaryAsync(e => e.Id, e => e, cancellationToken);
+      foreach (var (id, activity) in pendingEvents)
       {
-        IReadOnlyDictionary<Guid, ActivityEntity?> pendingEvents = _log.PendingEvents;
-        Dictionary<Guid, EventEntity> eventIds = await _eventContext.Events.AsNoTracking()
-          .Where(e => pendingEvents.Keys.Contains(e.Id))
-          .ToDictionaryAsync(e => e.Id, e => e, cancellationToken);
-        foreach (var (id, activity) in pendingEvents)
+        if (eventIds.TryGetValue(id, out EventEntity? @event))
         {
-          if (eventIds.TryGetValue(id, out EventEntity? @event))
-          {
-            _log.AddEvent(@event, activity);
-          }
+          _log.AddEvent(@event, activity);
         }
-
-        _portalContext.Logs.Add(_log);
-        await _portalContext.SaveChangesAsync(cancellationToken);
       }
+
+      _portalContext.Logs.Add(_log);
+      await _portalContext.SaveChangesAsync(cancellationToken);
     }
 
     _log = null;

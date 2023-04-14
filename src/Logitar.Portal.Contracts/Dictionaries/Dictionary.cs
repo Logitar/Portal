@@ -10,5 +10,5 @@ public record Dictionary : Aggregate
 
   public IEnumerable<Entry> Entries { get; set; } = Enumerable.Empty<Entry>();
 
-  public Realm Realm { get; set; } = new();
+  public Realm? Realm { get; set; }
 }

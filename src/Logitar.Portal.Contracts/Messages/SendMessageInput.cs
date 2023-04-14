@@ -2,7 +2,7 @@
 
 public record SendMessageInput
 {
-  public string Realm { get; set; } = string.Empty;
+  public string? Realm { get; set; }
   public string Template { get; set; } = string.Empty;
   public Guid? SenderId { get; set; }
 

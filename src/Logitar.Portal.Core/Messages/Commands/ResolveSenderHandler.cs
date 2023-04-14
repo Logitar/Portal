@@ -27,7 +27,7 @@ internal class ResolveSenderHandler : IRequestHandler<ResolveSender, SenderAggre
         ?? throw new DefaultSenderRequiredException(request.Realm);
     }
 
-    if (request.Realm.Id != sender.RealmId)
+    if (request.Realm?.Id != sender.RealmId)
     {
       throw new SenderNotInRealmException(sender, request.Realm, request.ParamName);
     }

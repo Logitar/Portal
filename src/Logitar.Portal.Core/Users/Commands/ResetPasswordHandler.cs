@@ -13,19 +13,19 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class ResetPasswordHandler : IRequestHandler<ResetPassword, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IMediator _mediator;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ResetPasswordHandler(ICurrentActor currentActor,
+  public ResetPasswordHandler(IApplicationContext applicationContext,
     IMediator mediator,
     IRealmRepository realmRepository,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _mediator = mediator;
     _realmRepository = realmRepository;
     _userQuerier = userQuerier;
@@ -76,7 +76,7 @@ internal class ResetPasswordHandler : IRequestHandler<ResetPassword, User>
     UserAggregate user = await _userRepository.LoadAsync(userId, cancellationToken)
       ?? throw new AggregateNotFoundException<UserAggregate>(userId, nameof(input.Token));
 
-    user.ChangePassword(_currentActor.Id, realm, input.Password);
+    user.ChangePassword(_applicationContext.ActorId, realm, input.Password);
 
     await _userRepository.SaveAsync(user, cancellationToken);
 

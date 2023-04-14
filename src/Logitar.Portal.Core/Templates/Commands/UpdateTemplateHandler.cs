@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Templates.Commands;
 
 internal class UpdateTemplateHandler : IRequestHandler<UpdateTemplate, Template>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ITemplateQuerier _templateQuerier;
   private readonly ITemplateRepository _templateRepository;
 
-  public UpdateTemplateHandler(ICurrentActor currentActor,
+  public UpdateTemplateHandler(IApplicationContext applicationContext,
     ITemplateQuerier templateQuerier,
     ITemplateRepository templateRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _templateQuerier = templateQuerier;
     _templateRepository = templateRepository;
   }
@@ -25,7 +25,7 @@ internal class UpdateTemplateHandler : IRequestHandler<UpdateTemplate, Template>
 
     UpdateTemplateInput input = request.Input;
 
-    template.Update(_currentActor.Id, input.Subject, input.ContentType, input.Contents,
+    template.Update(_applicationContext.ActorId, input.Subject, input.ContentType, input.Contents,
       input.DisplayName, input.Description);
 
     await _templateRepository.SaveAsync(template, cancellationToken);

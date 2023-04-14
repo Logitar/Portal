@@ -26,14 +26,13 @@ internal class SignInHandler : IRequestHandler<SignIn, Session>
 
   public async Task<Session> Handle(SignIn request, CancellationToken cancellationToken)
   {
-    SignInInput input = request.Input;
+    RealmAggregate? realm = await LoadRealmAsync(request, cancellationToken);
 
-    RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    SignInInput input = request.Input;
 
     string username = input.Username.Trim();
     UserAggregate? user = await _userRepository.LoadAsync(realm, username, cancellationToken);
-    if (user == null && realm.RequireUniqueEmail)
+    if (user == null && realm?.RequireUniqueEmail == true)
     {
       ReadOnlyEmail email = new(input.Username);
       IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, email, cancellationToken);
@@ -58,5 +57,16 @@ internal class SignInHandler : IRequestHandler<SignIn, Session>
     output.RefreshToken = session.RefreshToken?.ToString();
 
     return output;
+  }
+
+  private async Task<RealmAggregate?> LoadRealmAsync(SignIn request, CancellationToken cancellationToken)
+  {
+    if (request.Realm == null)
+    {
+      return null;
+    }
+
+    return await _realmRepository.LoadAsync(request.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(request.Realm, nameof(request.Realm));
   }
 }

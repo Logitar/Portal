@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Web.Extensions;
 using MediatR;
 
@@ -22,7 +21,6 @@ internal class PortalSignInHandler : IRequestHandler<PortalSignIn, Session>
 
     SignInInput input = new()
     {
-      Realm = RealmAggregate.PortalUniqueName,
       Username = request.Username,
       Password = request.Password,
       Remember = request.Remember,
@@ -30,6 +28,6 @@ internal class PortalSignInHandler : IRequestHandler<PortalSignIn, Session>
       AdditionalInformation = context?.GetAdditionalInformation()
     };
 
-    return await _sessionService.SignInAsync(input, cancellationToken);
+    return await _sessionService.SignInAsync(input, realm: null, cancellationToken);
   }
 }

@@ -50,13 +50,19 @@ internal class DictionaryQuerier : IDictionaryQuerier
     {
       query = query.Where(x => x.Locale == locale);
     }
-    if (realm != null)
-    {
-      string aggregateId = Guid.TryParse(realm, out Guid realmId)
-        ? new AggregateId(realmId).Value
-        : realm;
 
-      query = query.Where(x => x.Realm!.AggregateId == aggregateId || x.Realm.UniqueNameNormalized == realm.ToUpper());
+    if (realm == null)
+    {
+      query = query.Where(x => x.RealmId == null);
+    }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
     }
 
     long total = await query.LongCountAsync(cancellationToken);

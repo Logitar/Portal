@@ -50,14 +50,21 @@ internal class SenderQuerier : ISenderQuerier
     {
       query = query.Where(x => x.Provider == provider.Value.ToString());
     }
-    if (realm != null)
-    {
-      string aggregateId = Guid.TryParse(realm, out Guid realmId)
-        ? new AggregateId(realmId).Value
-        : realm;
 
-      query = query.Where(x => x.Realm!.AggregateId == aggregateId || x.Realm.UniqueNameNormalized == realm.ToUpper());
+    if (realm == null)
+    {
+      query = query.Where(x => x.RealmId == null);
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
     if (search != null)
     {
       foreach (string term in search.Split().Where(x => !string.IsNullOrEmpty(x)))
@@ -93,16 +100,26 @@ internal class SenderQuerier : ISenderQuerier
     };
   }
 
-  public async Task<Sender?> GetDefaultAsync(string realm, CancellationToken cancellationToken)
+  public async Task<Sender?> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
   {
-    string aggregateId = (Guid.TryParse(realm, out Guid realmId)
-      ? new AggregateId(realmId)
-      : new(realm)).Value;
+    IQueryable<SenderEntity> query = _senders.AsNoTracking()
+      .Include(x => x.Realm);
 
-    SenderEntity? sender = await _senders.AsNoTracking()
-      .Include(x => x.Realm)
-      .SingleOrDefaultAsync(x => x.Realm!.AggregateId == aggregateId
-        || x.Realm.UniqueNameNormalized == realm.ToUpper(), cancellationToken);
+    if (realm == null)
+    {
+      query = query.Where(x => x.RealmId == null);
+    }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
+    SenderEntity? sender = await query.SingleOrDefaultAsync(x => x.IsDefault, cancellationToken);
 
     return _mapper.Map<Sender>(sender);
   }

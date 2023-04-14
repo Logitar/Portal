@@ -2,7 +2,7 @@
   <b-container>
     <h1 v-t="'user.profile.title'" />
     <personal-information :user="user" @updated="setModel" />
-    <authentication-information :user="user" @updated="setModel" />
+    <authentication-information :passwordSettings="passwordSettings" :user="user" @updated="setModel" />
   </b-container>
 </template>
 
@@ -17,6 +17,10 @@ export default {
     PersonalInformation
   },
   props: {
+    configuration: {
+      type: String,
+      required: true
+    },
     json: {
       type: String,
       required: true
@@ -24,6 +28,7 @@ export default {
   },
   data() {
     return {
+      passwordSettings: null,
       user: null
     }
   },
@@ -33,6 +38,9 @@ export default {
     }
   },
   created() {
+    const { passwordSettings } = JSON.parse(this.configuration)
+    this.passwordSettings = passwordSettings
+
     this.setModel(JSON.parse(this.json))
   }
 }

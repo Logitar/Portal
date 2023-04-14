@@ -80,7 +80,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UpdatedBy")
@@ -233,11 +233,14 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("RealmId")
+                    b.Property<Guid?>("RealmId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("RealmUniqueName")
-                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RealmUniqueNameNormalized")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -513,7 +516,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Settings")
@@ -689,7 +692,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Subject")
@@ -926,7 +929,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(65535)
                         .HasColumnType("character varying(65535)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("SignedInOn")
@@ -1177,8 +1180,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Dictionaries")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -1224,8 +1226,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Senders")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -1246,8 +1247,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Templates")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -1257,8 +1257,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Users")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });

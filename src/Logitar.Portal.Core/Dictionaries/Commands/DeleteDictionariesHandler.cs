@@ -4,12 +4,12 @@ namespace Logitar.Portal.Core.Dictionaries.Commands;
 
 internal class DeleteDictionariesHandler : IRequestHandler<DeleteDictionaries>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  public DeleteDictionariesHandler(ICurrentActor currentActor, IDictionaryRepository dictionaryRepository)
+  public DeleteDictionariesHandler(IApplicationContext applicationContext, IDictionaryRepository dictionaryRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _dictionaryRepository = dictionaryRepository;
   }
 
@@ -18,7 +18,7 @@ internal class DeleteDictionariesHandler : IRequestHandler<DeleteDictionaries>
     IEnumerable<DictionaryAggregate> dictionaries = await _dictionaryRepository.LoadAsync(request.Realm, cancellationToken);
     foreach (DictionaryAggregate dictionary in dictionaries)
     {
-      dictionary.Delete(_currentActor.Id);
+      dictionary.Delete(_applicationContext.ActorId);
     }
 
     await _dictionaryRepository.SaveAsync(dictionaries, cancellationToken);

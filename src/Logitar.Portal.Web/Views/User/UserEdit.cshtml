@@ -1,17 +1,25 @@
-﻿@using Logitar.Portal.Contracts.Users;
+﻿@using AutoMapper;
+@using Logitar.Portal.Contracts.Users;
+@using Logitar.Portal.Core;
+@using Logitar.Portal.Core.Configurations;
+
+@inject IApplicationContext _applicationContext;
+@inject IMapper _mapper;
 
 @model User
 @{
   Layout = "_Layout";
 
   ViewBag.Title = Model?.FullName ?? Model?.Username ?? "Create user";
+
+  Configuration configuration = _mapper.Map<Configuration>(_applicationContext.Configuration);
 }
 
 @if (Model == null)
 {
-  <user-edit realm="@(Context.Request.Query["realm"])"></user-edit>
+  <user-edit configuration="@(ModelSerializer.Serialize(configuration))" realm="@(Context.Request.Query["realm"])"></user-edit>
 }
 else
 {
-  <user-edit current="@(Context.GetUser()?.Id)" json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></user-edit>
+  <user-edit configuration="@(ModelSerializer.Serialize(configuration))" current="@(Context.GetUser()?.Id)" json="@(ModelSerializer.Serialize(Model))" status="@(Context.Request.Query["status"])"></user-edit>
 }

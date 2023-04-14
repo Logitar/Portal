@@ -15,13 +15,13 @@ public class DictionaryAggregate : AggregateRoot
   {
   }
 
-  public DictionaryAggregate(AggregateId actorId, RealmAggregate realm, CultureInfo locale,
+  public DictionaryAggregate(AggregateId actorId, RealmAggregate? realm, CultureInfo locale,
     Dictionary<string, string>? entries = null) : base()
   {
     DictionaryCreated e = new()
     {
       ActorId = actorId,
-      RealmId = realm.Id,
+      RealmId = realm?.Id,
       Locale = locale,
       Entries = entries?.CleanTrim() ?? new()
     };
@@ -30,7 +30,7 @@ public class DictionaryAggregate : AggregateRoot
     ApplyChange(e);
   }
 
-  public AggregateId RealmId { get; private set; }
+  public AggregateId? RealmId { get; private set; }
   public CultureInfo Locale { get; private set; } = null!;
 
   public IReadOnlyDictionary<string, string> Entries => _entries.AsReadOnly();

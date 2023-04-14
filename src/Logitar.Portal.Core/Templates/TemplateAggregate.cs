@@ -12,13 +12,13 @@ public class TemplateAggregate : AggregateRoot
   {
   }
 
-  public TemplateAggregate(AggregateId actorId, RealmAggregate realm, string uniqueName, string subject,
+  public TemplateAggregate(AggregateId actorId, RealmAggregate? realm, string uniqueName, string subject,
     string contentType, string contents, string? displayName = null, string? description = null) : base()
   {
     TemplateCreated e = new()
     {
       ActorId = actorId,
-      RealmId = realm.Id,
+      RealmId = realm?.Id,
       UniqueName = uniqueName.Trim(),
       DisplayName = displayName?.CleanTrim(),
       Description = description?.CleanTrim(),
@@ -31,7 +31,7 @@ public class TemplateAggregate : AggregateRoot
     ApplyChange(e);
   }
 
-  public AggregateId RealmId { get; private set; }
+  public AggregateId? RealmId { get; private set; }
 
   public string UniqueName { get; private set; } = string.Empty;
   public string? DisplayName { get; private set; }

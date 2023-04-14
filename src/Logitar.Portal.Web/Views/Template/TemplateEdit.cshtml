@@ -1,7 +1,8 @@
 ﻿@using Logitar.Portal.Contracts.Senders;
 @using Logitar.Portal.Contracts.Templates;
+@using Logitar.Portal.Core.Senders;
 
-@inject ISenderService _senderService;
+@inject ISenderQuerier _senderQuerier;
 
 @model Template
 @{
@@ -12,8 +13,16 @@
   string? sender = null;
   if (Model != null)
   {
-    Sender? defaultSender = await _senderService.GetAsync(defaultInRealm: Model.Realm.Id.ToString());
-    sender = defaultSender == null ? null : ModelSerializer.Serialize(defaultSender);
+    Sender? defaultSender;
+    if (Model.Realm == null)
+    {
+      defaultSender = await _senderQuerier.GetDefaultAsync(realm: null);
+    }
+    else
+    {
+      defaultSender = await _senderQuerier.GetDefaultAsync(Model.Realm.Id.ToString());
+    }
+    sender = ModelSerializer.Serialize(defaultSender);
   }
 }
 

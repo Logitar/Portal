@@ -14,7 +14,7 @@
               <strong v-t="'templates.key.conflict'" />
             </b-alert>
             <b-row>
-              <realm-select class="col" :disabled="Boolean(template)" :required="!template" v-model="realmId" />
+              <realm-select class="col" :disabled="Boolean(template)" v-model="realmId" />
               <key-field class="col" :disabled="Boolean(template)" ref="key" :required="!template" :validate="!template" v-model="key" />
               <content-type-select class="col" required v-model="contentType" />
             </b-row>

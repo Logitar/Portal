@@ -29,6 +29,7 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.Property(x => x.Subject).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Recipients).HasColumnType("jsonb");
     builder.Property(x => x.RealmUniqueName).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.RealmUniqueNameNormalized).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.RealmDisplayName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.SenderProvider).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.SenderEmailAddress).HasMaxLength(byte.MaxValue);

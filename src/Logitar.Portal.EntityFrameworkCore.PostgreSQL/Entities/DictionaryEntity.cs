@@ -5,10 +5,10 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 
 internal class DictionaryEntity : AggregateEntity
 {
-  public DictionaryEntity(DictionaryCreated e, RealmEntity realm, ActorEntity actor) : base(e, actor)
+  public DictionaryEntity(DictionaryCreated e, RealmEntity? realm, ActorEntity actor) : base(e, actor)
   {
     Realm = realm;
-    RealmId = realm.RealmId;
+    RealmId = realm?.RealmId;
 
     Locale = e.Locale.Name;
 
@@ -22,7 +22,7 @@ internal class DictionaryEntity : AggregateEntity
   public int DictionaryId { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
-  public int RealmId { get; private set; }
+  public int? RealmId { get; private set; }
 
   public string Locale { get; private set; } = string.Empty;
 

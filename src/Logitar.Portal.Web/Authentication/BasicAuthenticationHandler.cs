@@ -2,9 +2,7 @@
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Claims;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
-using Logitar.Portal.Core.Users.Contact;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -59,24 +57,8 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
           string username = credentials[..index];
           string password = credentials[(index + 1)..];
 
-          RealmAggregate? realm = _cacheService.PortalRealm;
-          if (realm == null)
-          {
-            return AuthenticateResult.Fail("The Portal realm could not be found.");
-          }
-
           CachedUser? cached = _cacheService.GetUser(username);
-          UserAggregate? user = cached?.Aggregate ?? await _userRepository.LoadAsync(realm, username);
-          if (user == null && realm.RequireUniqueEmail)
-          {
-            ReadOnlyEmail email = new(username);
-            IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, email);
-            if (users.Count() == 1)
-            {
-              user = users.Single();
-            }
-          }
-
+          UserAggregate? user = cached?.Aggregate ?? await _userRepository.LoadAsync(realm: null, username);
           if (user == null)
           {
             return AuthenticateResult.Fail($"The Portal user could not be found: '{username}'.");
@@ -84,7 +66,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
 
           try
           {
-            _ = user.SignIn(realm, password);
+            _ = user.SignIn(password);
           }
           catch (Exception exception)
           {

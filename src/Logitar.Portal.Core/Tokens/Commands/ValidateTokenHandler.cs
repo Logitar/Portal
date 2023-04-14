@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.EventSourcing;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Core.Claims;
@@ -30,19 +29,13 @@ internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedTo
     ValidateTokenInput input = request.Input;
     new ValidateTokenValidator().ValidateAndThrow(input);
 
-    RealmAggregate? realm = input.Realm == null ? null
-     : await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-       ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    RealmAggregate? realm = await LoadRealmAsync(input, cancellationToken);
 
-    if (realm?.UniqueName == RealmAggregate.PortalUniqueName)
-    {
-      AggregateId actorId = new(Guid.Empty);
-      realm.SetUrl(actorId, _applicationContext.BaseUrl);
-    }
-
-    string? audience = input.Audience?.Format(realm) ?? realm?.GetAudience();
-    string? issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl);
-    string? secret = input.Secret ?? realm?.Secret ?? string.Empty;
+    string audience = input.Audience?.Format(realm) ?? realm?.GetAudience()
+      ?? _applicationContext.BaseUrl?.ToString() ?? Constants.DefaultIdentifier;
+    string issuer = input.Issuer?.Format(realm) ?? realm?.GetIssuer(_applicationContext.BaseUrl)
+      ?? _applicationContext.BaseUrl?.ToString() ?? Constants.DefaultIdentifier;
+    string secret = input.Secret ?? realm?.Secret ?? _applicationContext.Configuration.Secret;
 
     try
     {
@@ -84,5 +77,16 @@ internal class ValidateTokenHandler : IRequestHandler<ValidateToken, ValidatedTo
         Errors = new[] { Error.From(exception) }
       };
     }
+  }
+
+  private async Task<RealmAggregate?> LoadRealmAsync(ValidateTokenInput input, CancellationToken cancellationToken)
+  {
+    if (input.Realm == null)
+    {
+      return null;
+    }
+
+    return await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
   }
 }

@@ -27,6 +27,7 @@ public static class DependencyInjectionExtensions
     Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
     return services
+      .AddAutoMapper(assembly)
       .AddFacades()
       .AddMediatR(options => options.RegisterServicesFromAssembly(assembly))
       .AddTransient<IRequestPipeline, RequestPipeline>()

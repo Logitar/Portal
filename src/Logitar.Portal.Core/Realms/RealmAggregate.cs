@@ -2,18 +2,15 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Core.Realms.Events;
 using Logitar.Portal.Core.Realms.Validators;
+using Logitar.Portal.Core.Security;
 using Logitar.Portal.Core.Senders;
 using Logitar.Portal.Core.Templates;
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Logitar.Portal.Core.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
-  public const string PortalUniqueName = "portal";
-
   private readonly Dictionary<string, ReadOnlyClaimMapping> _claimMappings = new();
   private readonly Dictionary<string, string> _customAttributes = new();
 
@@ -35,7 +32,7 @@ public class RealmAggregate : AggregateRoot
       DisplayName = displayName?.CleanTrim(),
       Description = description?.CleanTrim(),
       DefaultLocale = defaultLocale,
-      Secret = secret?.CleanTrim() ?? GenerateSecret(),
+      Secret = secret?.CleanTrim() ?? SecurityHelper.GenerateSecret(),
       Url = url,
       RequireConfirmedAccount = requireConfirmedAccount,
       RequireUniqueEmail = requireUniqueEmail,
@@ -125,7 +122,7 @@ public class RealmAggregate : AggregateRoot
       DisplayName = displayName?.CleanTrim(),
       Description = description?.CleanTrim(),
       DefaultLocale = defaultLocale,
-      Secret = secret?.CleanTrim() ?? GenerateSecret(),
+      Secret = secret?.CleanTrim() ?? SecurityHelper.GenerateSecret(),
       Url = url,
       RequireConfirmedAccount = requireConfirmedAccount,
       RequireUniqueEmail = requireUniqueEmail,
@@ -163,30 +160,4 @@ public class RealmAggregate : AggregateRoot
   }
 
   public override string ToString() => $"{DisplayName ?? UniqueName} | {base.ToString()}";
-
-  private static string GenerateSecret(int length = 256 / 8)
-  {
-    while (true)
-    {
-      /* In the ASCII table, there are 94 characters between 33 '!' and 126 '~' (126 - 33 + 1 = 94).
-       * Since there are a total of 256 possibilities, by dividing per 94 and adding a 10% margin we
-       * generate just a little more bytes than required, obtaining the factor 3. */
-      byte[] bytes = RandomNumberGenerator.GetBytes(length * 3);
-
-      List<byte> secret = new(capacity: length);
-      for (int i = 0; i < bytes.Length; i++)
-      {
-        byte @byte = bytes[i];
-        if (@byte >= 33 && @byte <= 126)
-        {
-          secret.Add(@byte);
-
-          if (secret.Count == length)
-          {
-            return Encoding.ASCII.GetString(secret.ToArray());
-          }
-        }
-      }
-    }
-  }
 }

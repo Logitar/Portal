@@ -15,9 +15,12 @@ internal class MessageEntity : AggregateEntity
     Recipients = JsonSerializer.Serialize(e.Recipients);
     RecipientCount = e.Recipients.Count();
 
-    RealmId = e.Realm.Id.ToGuid();
-    RealmUniqueName = e.Realm.UniqueName;
-    RealmDisplayName = e.Realm.DisplayName;
+    if (e.Realm != null)
+    {
+      RealmId = e.Realm.Id.ToGuid();
+      RealmUniqueName = e.Realm.UniqueName;
+      RealmDisplayName = e.Realm.DisplayName;
+    }
 
     SenderId = e.Sender.Id.ToGuid();
     SenderProvider = e.Sender.Provider.ToString();
@@ -50,8 +53,13 @@ internal class MessageEntity : AggregateEntity
   public string Recipients { get; private set; } = string.Empty;
   public int RecipientCount { get; private set; }
 
-  public Guid RealmId { get; private set; }
-  public string RealmUniqueName { get; private set; } = string.Empty;
+  public Guid? RealmId { get; private set; }
+  public string? RealmUniqueName { get; private set; }
+  public string? RealmUniqueNameNormalized
+  {
+    get => RealmUniqueName?.ToUpper();
+    private set { }
+  }
   public string? RealmDisplayName { get; private set; }
 
   public Guid SenderId { get; private set; }

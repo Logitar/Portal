@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,7 +22,7 @@ internal class AuthenticatedPortalUserAuthorizationHandler : AuthorizationHandle
       {
         context.Fail(new AuthorizationFailureReason(this, "The User is required."));
       }
-      else if (user.Realm.UniqueName != RealmAggregate.PortalUniqueName)
+      else if (user.Realm != null)
       {
         context.Fail(new AuthorizationFailureReason(this, "The User should not belong to a Realm."));
       }

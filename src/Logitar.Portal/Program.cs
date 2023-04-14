@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Core.Caching;
-using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
 using MediatR;
 
@@ -39,9 +39,9 @@ public class Program
     }
 
     ICacheService cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-    IRealmRepository realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
-    RealmAggregate? realm = await realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName);
-    cacheService.PortalRealm = realm;
+    IConfigurationRepository configurationRepository = scope.ServiceProvider.GetRequiredService<IConfigurationRepository>();
+    ConfigurationAggregate? configuration = await configurationRepository.LoadAsync();
+    cacheService.Configuration = configuration;
 
     application.Run();
   }

@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,15 +44,10 @@ public class SessionApiController : ControllerBase
     return Ok(await _sessionService.RefreshAsync(input, cancellationToken));
   }
 
-  [HttpPost("sign/in")]
-  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, CancellationToken cancellationToken)
+  [HttpPost("sign/in/realm/{realm}")]
+  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInInput input, string realm, CancellationToken cancellationToken)
   {
-    if (input.Realm == RealmAggregate.PortalUniqueName)
-    {
-      return Forbid();
-    }
-
-    return Ok(await _sessionService.SignInAsync(input, cancellationToken));
+    return Ok(await _sessionService.SignInAsync(input, realm, cancellationToken));
   }
 
   [HttpPatch("{id}/sign/out")]

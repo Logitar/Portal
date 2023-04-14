@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Core.Caching;
-using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users;
 using Microsoft.Extensions.Caching.Memory;
@@ -10,8 +10,6 @@ namespace Logitar.Portal.Infrastructure.Caching;
 
 internal class CacheService : ICacheService
 {
-  private const string PortalRealmKey = nameof(PortalRealm);
-
   private readonly IMemoryCache _memoryCache;
 
   public CacheService(IMemoryCache memoryCache)
@@ -19,10 +17,10 @@ internal class CacheService : ICacheService
     _memoryCache = memoryCache;
   }
 
-  public RealmAggregate? PortalRealm
+  public ConfigurationAggregate? Configuration
   {
-    get => GetItem<RealmAggregate>(PortalRealmKey);
-    set => SetItem(PortalRealmKey, value);
+    get => GetItem<ConfigurationAggregate>(nameof(Configuration));
+    set => SetItem(nameof(Configuration), value);
   }
 
   public Actor? GetActor(Guid id) => GetItem<Actor>(GetActorCacheKey(id));
@@ -44,7 +42,7 @@ internal class CacheService : ICacheService
 
       if (sessions.Any())
       {
-        SetItem(userSessionsKey, session, TimeSpan.FromMinutes(1));
+        SetItem(userSessionsKey, sessions, TimeSpan.FromMinutes(1));
       }
       else
       {

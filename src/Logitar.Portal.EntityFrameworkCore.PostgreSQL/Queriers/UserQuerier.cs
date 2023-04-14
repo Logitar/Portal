@@ -44,30 +44,43 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User?> GetAsync(string realm, string username, CancellationToken cancellationToken)
   {
-    string aggregateId = Guid.TryParse(realm, out Guid realmId)
-      ? new AggregateId(realmId).Value
-      : realm;
-
-    UserEntity? user = await _users.AsNoTracking()
+    IQueryable<UserEntity> query = _users.AsNoTracking()
       .Include(x => x.ExternalIdentifiers)
-      .Include(x => x.Realm)
-      .SingleOrDefaultAsync(x => (x.Realm!.AggregateId == aggregateId || x.Realm.UniqueName == realm.ToUpper())
-        && x.UsernameNormalized == username.ToUpper(), cancellationToken);
+      .Include(x => x.Realm);
+
+    if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
+    UserEntity? user = await query.SingleOrDefaultAsync(x => x.UsernameNormalized == username.ToUpper(), cancellationToken);
 
     return _mapper.Map<User>(user);
   }
 
   public async Task<User?> GetAsync(string realm, string externalKey, string externalValue, CancellationToken cancellationToken)
   {
-    string aggregateId = Guid.TryParse(realm, out Guid realmId)
-      ? new AggregateId(realmId).Value
-      : realm;
-
-    UserEntity? user = await _users.AsNoTracking()
+    IQueryable<UserEntity> query = _users.AsNoTracking()
       .Include(x => x.ExternalIdentifiers)
-      .Include(x => x.Realm)
-      .SingleOrDefaultAsync(x => (x.Realm!.AggregateId == aggregateId || x.Realm.UniqueName == realm.ToUpper())
-        && x.ExternalIdentifiers.Any(y => y.Key == externalKey && y.ValueNormalized == externalValue), cancellationToken);
+      .Include(x => x.Realm);
+
+    if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
+    UserEntity? user = await query.SingleOrDefaultAsync(x => x.ExternalIdentifiers
+      .Any(y => y.Key == externalKey && y.ValueNormalized == externalValue.ToUpper()), cancellationToken);
 
     return _mapper.Map<User>(user);
   }
@@ -87,14 +100,21 @@ internal class UserQuerier : IUserQuerier
     {
       query = query.Where(x => x.IsDisabled == isDisabled.Value);
     }
-    if (realm != null)
-    {
-      string aggregateId = Guid.TryParse(realm, out Guid realmId)
-        ? new AggregateId(realmId).Value
-        : realm;
 
-      query = query.Where(x => x.Realm!.AggregateId == aggregateId || x.Realm.UniqueNameNormalized == realm.ToUpper());
+    if (realm == null)
+    {
+      query = query.Where(x => x.RealmId == null);
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
     if (search != null)
     {
       foreach (string term in search.Split().Where(x => !string.IsNullOrEmpty(x)))

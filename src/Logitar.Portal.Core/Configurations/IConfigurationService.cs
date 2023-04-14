@@ -2,6 +2,6 @@
 
 public interface IConfigurationService
 {
-  Task InitializeAsync(InitializeConfigurationInput input, CancellationToken cancellationToken = default);
-  Task<bool> IsInitializedAsync(CancellationToken cancellationToken = default);
+  Task<Configuration?> GetAsync(CancellationToken cancellationToken = default);
+  Task<Configuration> InitializeAsync(InitializeConfigurationInput input, CancellationToken cancellationToken = default);
 }

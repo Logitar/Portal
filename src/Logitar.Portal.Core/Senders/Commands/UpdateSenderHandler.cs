@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Senders.Commands;
 
 internal class UpdateSenderHandler : IRequestHandler<UpdateSender, Sender>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
 
-  public UpdateSenderHandler(ICurrentActor currentActor,
+  public UpdateSenderHandler(IApplicationContext applicationContext,
     ISenderQuerier senderQuerier,
     ISenderRepository senderRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _senderQuerier = senderQuerier;
     _senderRepository = senderRepository;
   }
@@ -25,7 +25,7 @@ internal class UpdateSenderHandler : IRequestHandler<UpdateSender, Sender>
 
     UpdateSenderInput input = request.Input;
 
-    sender.Update(_currentActor.Id, input.EmailAddress, input.DisplayName, input.Settings?.ToDictionary());
+    sender.Update(_applicationContext.ActorId, input.EmailAddress, input.DisplayName, input.Settings?.ToDictionary());
 
     await _senderRepository.SaveAsync(sender, cancellationToken);
 

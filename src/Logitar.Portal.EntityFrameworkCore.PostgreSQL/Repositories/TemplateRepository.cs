@@ -32,12 +32,20 @@ internal class TemplateRepository : EventStore, ITemplateRepository
     return Load<TemplateAggregate>(events);
   }
 
-  public async Task<TemplateAggregate?> LoadByUniqueNameAsync(RealmAggregate realm, string uniqueName, CancellationToken cancellationToken)
+  public async Task<TemplateAggregate?> LoadByUniqueNameAsync(RealmAggregate? realm, string uniqueName, CancellationToken cancellationToken)
   {
-    string aggregateId = realm.Id.Value;
+    IQueryable<EventEntity> query;
+    if (realm == null)
+    {
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Templates"" t ON t.""AggregateId"" = e.""AggregateId"" WHERE e.""AggregateType"" = {AggregateType} AND t.""RealmId"" IS NULL AND t.""UniqueNameNormalized"" = {uniqueName.ToUpper()}");
+    }
+    else
+    {
+      string aggregateId = realm.Id.Value;
+      query = Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Templates"" t ON t.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = t.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND t.""UniqueNameNormalized"" = {uniqueName.ToUpper()}");
+    }
 
-    EventEntity[] events = await Context.Events.FromSqlInterpolated($@"SELECT e.* FROM ""Events"" e JOIN ""Templates"" t ON t.""AggregateId"" = e.""AggregateId"" JOIN ""Realms"" r ON r.""RealmId"" = t.""RealmId"" WHERE e.""AggregateType"" = {AggregateType} AND r.""AggregateId"" = {aggregateId} AND t.""UniqueNameNormalized"" = {uniqueName.ToUpper()}")
-      .AsNoTracking()
+    EventEntity[] events = await query.AsNoTracking()
       .OrderBy(x => x.Version)
       .ToArrayAsync(cancellationToken);
 

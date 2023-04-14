@@ -70,14 +70,21 @@ internal class SessionQuerier : ISessionQuerier
     {
       query = query.Where(x => x.IsPersistent == isPersistent.Value);
     }
-    if (realm != null)
-    {
-      string aggregateId = Guid.TryParse(realm, out Guid realmId)
-        ? new AggregateId(realmId).Value
-        : realm;
 
-      query = query.Where(x => x.User!.Realm!.AggregateId == aggregateId || x.User!.Realm.UniqueNameNormalized == realm.ToUpper());
+    if (realm == null)
+    {
+      query = query.Where(x => x.User!.RealmId == null);
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      string aggregateId = new AggregateId(realmId).Value;
+      query = query.Where(x => x.User!.Realm!.AggregateId == aggregateId);
+    }
+    else
+    {
+      query = query.Where(x => x.User!.Realm!.UniqueNameNormalized == realm.ToUpper());
+    }
+
     if (userId.HasValue)
     {
       string aggregateId = new AggregateId(userId.Value).Value;

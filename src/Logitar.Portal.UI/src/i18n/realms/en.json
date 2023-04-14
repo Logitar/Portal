@@ -47,7 +47,7 @@
   },
   "select": {
     "label": "Realm",
-    "placeholder": "Select a realm"
+    "placeholder": "Portal (no realm)"
   },
   "settings": "Settings",
   "sort": {
@@ -61,6 +61,7 @@
   "uniqueName": {
     "conflict": "This alias is already used by another realm.",
     "custom": "Custom",
+    "forbidden": "The unique name 'portal' cannot be used.",
     "label": "Unique name (alias)",
     "placeholder": "Enter an unique alias"
   },

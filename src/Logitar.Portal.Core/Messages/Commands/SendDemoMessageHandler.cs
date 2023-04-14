@@ -11,7 +11,7 @@ namespace Logitar.Portal.Core.Messages.Commands;
 
 internal class SendDemoMessageHandler : IRequestHandler<SendDemoMessage, Message>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IMediator _mediator;
   private readonly IMessageQuerier _messageQuerier;
@@ -21,7 +21,7 @@ internal class SendDemoMessageHandler : IRequestHandler<SendDemoMessage, Message
   private readonly ITemplateRepository _templateRepository;
   private readonly IUserRepository _userRepository;
 
-  public SendDemoMessageHandler(ICurrentActor currentActor,
+  public SendDemoMessageHandler(IApplicationContext applicationContext,
     IDictionaryRepository dictionaryRepository,
     IMediator mediator,
     IMessageQuerier messageQuerier,
@@ -31,7 +31,7 @@ internal class SendDemoMessageHandler : IRequestHandler<SendDemoMessage, Message
     ITemplateRepository templateRepository,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _dictionaryRepository = dictionaryRepository;
     _mediator = mediator;
     _messageQuerier = messageQuerier;
@@ -44,25 +44,22 @@ internal class SendDemoMessageHandler : IRequestHandler<SendDemoMessage, Message
 
   public async Task<Message> Handle(SendDemoMessage request, CancellationToken cancellationToken)
   {
-    UserAggregate user = await _userRepository.LoadAsync(_currentActor.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The user '{_currentActor.Id}' could not be found.");
+    UserAggregate user = await _userRepository.LoadAsync(_applicationContext.ActorId, cancellationToken)
+      ?? throw new InvalidOperationException($"The user '{_applicationContext.ActorId}' could not be found.");
     Recipient[] recipients = new[] { Recipient.From(new RecipientInput(), user) };
 
     SendDemoMessageInput input = request.Input;
 
     TemplateAggregate template = await _templateRepository.LoadAsync(input.TemplateId, cancellationToken)
       ?? throw new AggregateNotFoundException<TemplateAggregate>(input.TemplateId, nameof(input.TemplateId));
-    RealmAggregate realm = await _realmRepository.LoadAsync(template, cancellationToken);
+    RealmAggregate? realm = await _realmRepository.LoadAsync(template, cancellationToken);
     SenderAggregate sender = await _senderRepository.LoadDefaultAsync(realm, cancellationToken)
       ?? throw new DefaultSenderRequiredException(realm);
 
     Dictionary<CultureInfo, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
-    DictionaryAggregate? defaultDictionary = null;
-    if (realm.DefaultLocale != null)
-    {
-      _ = allDictionaries.TryGetValue(realm.DefaultLocale, out defaultDictionary);
-    }
+    CultureInfo defaultLocale = realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale;
+    _ = allDictionaries.TryGetValue(defaultLocale, out DictionaryAggregate? defaultDictionary);
 
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     Dictionaries dictionaries = MessageHelper.GetDictionaries(locale ?? user.Locale, defaultDictionary, allDictionaries);

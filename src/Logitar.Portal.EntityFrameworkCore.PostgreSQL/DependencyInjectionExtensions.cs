@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Logging;
 using Logitar.Portal.Core.Messages;
@@ -70,6 +71,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddRepositories(this IServiceCollection services)
   {
     return services
+      .AddScoped<IConfigurationRepository, ConfigurationRepository>()
       .AddScoped<IDictionaryRepository, DictionaryRepository>()
       .AddScoped<IMessageRepository, MessageRepository>()
       .AddScoped<IRealmRepository, RealmRepository>()

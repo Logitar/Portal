@@ -6,17 +6,17 @@ namespace Logitar.Portal.Core.Sessions.Commands;
 
 internal class SignOutUserHandler : IRequestHandler<SignOutUser, IEnumerable<Session>>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
-  public SignOutUserHandler(ICurrentActor currentActor,
+  public SignOutUserHandler(IApplicationContext applicationContext,
     ISessionQuerier sessionQuerier,
     ISessionRepository sessionRepository,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _sessionQuerier = sessionQuerier;
     _sessionRepository = sessionRepository;
     _userRepository = userRepository;
@@ -30,7 +30,7 @@ internal class SignOutUserHandler : IRequestHandler<SignOutUser, IEnumerable<Ses
     IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadActiveAsync(user, cancellationToken);
     foreach (SessionAggregate session in sessions)
     {
-      session.SignOut(_currentActor.Id);
+      session.SignOut(_applicationContext.ActorId);
     }
 
     await _sessionRepository.SaveAsync(sessions, cancellationToken);

@@ -6,15 +6,15 @@ namespace Logitar.Portal.Core.Realms.Commands;
 
 internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
 
-  public CreateRealmHandler(ICurrentActor currentActor,
+  public CreateRealmHandler(IApplicationContext applicationContext,
     IRealmQuerier realmQuerier,
     IRealmRepository realmRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
   }
@@ -34,7 +34,7 @@ internal class CreateRealmHandler : IRequestHandler<CreateRealm, Realm>
     ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
     ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
 
-    RealmAggregate realm = new(_currentActor.Id, uniqueName, input.DisplayName, input.Description,
+    RealmAggregate realm = new(_applicationContext.ActorId, uniqueName, input.DisplayName, input.Description,
       defaultLocale, input.Secret, url,
       input.RequireConfirmedAccount, input.RequireUniqueEmail, usernameSettings, passwordSettings,
       input.ClaimMappings?.ToDictionary(), input.CustomAttributes?.ToDictionary());

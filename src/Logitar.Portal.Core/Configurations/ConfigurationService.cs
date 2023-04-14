@@ -12,13 +12,13 @@ internal class ConfigurationService : IConfigurationService
     _pipeline = pipeline;
   }
 
-  public async Task InitializeAsync(InitializeConfigurationInput input, CancellationToken cancellationToken)
+  public async Task<Configuration?> GetAsync(CancellationToken cancellationToken)
   {
-    await _pipeline.ExecuteAsync(new InitializeConfiguration(input), cancellationToken);
+    return await _pipeline.ExecuteAsync(new GetConfiguration(), cancellationToken);
   }
 
-  public async Task<bool> IsInitializedAsync(CancellationToken cancellationToken)
+  public async Task<Configuration> InitializeAsync(InitializeConfigurationInput input, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new IsConfigurationInitialized(), cancellationToken);
+    return await _pipeline.ExecuteAsync(new InitializeConfiguration(input), cancellationToken);
   }
 }

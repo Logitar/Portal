@@ -8,19 +8,19 @@ namespace Logitar.Portal.Core.Realms.Commands;
 
 internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
   private readonly ISenderRepository _senderRepository;
   private readonly ITemplateRepository _templateRepository;
 
-  public UpdateRealmHandler(ICurrentActor currentActor,
+  public UpdateRealmHandler(IApplicationContext applicationContext,
     IRealmQuerier realmQuerier,
     IRealmRepository realmRepository,
     ISenderRepository senderRepository,
     ITemplateRepository templateRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
     _senderRepository = senderRepository;
@@ -55,13 +55,13 @@ internal class UpdateRealmHandler : IRequestHandler<UpdateRealm, Realm>
     ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
     ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
 
-    realm.Update(_currentActor.Id, input.DisplayName, input.Description,
+    realm.Update(_applicationContext.ActorId, input.DisplayName, input.Description,
       defaultLocale, input.Secret, url,
       input.RequireConfirmedAccount, input.RequireUniqueEmail, usernameSettings, passwordSettings,
       input.ClaimMappings?.ToDictionary(), input.CustomAttributes?.ToDictionary());
 
-    realm.SetPasswordRecoverySender(_currentActor.Id, passwordRecoverySender);
-    realm.SetPasswordRecoveryTemplate(_currentActor.Id, passwordRecoveryTemplate);
+    realm.SetPasswordRecoverySender(_applicationContext.ActorId, passwordRecoverySender);
+    realm.SetPasswordRecoveryTemplate(_applicationContext.ActorId, passwordRecoveryTemplate);
 
     await _realmRepository.SaveAsync(realm, cancellationToken);
 

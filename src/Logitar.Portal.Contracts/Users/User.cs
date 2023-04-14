@@ -45,5 +45,5 @@ public record User : Aggregate
 
   public IEnumerable<ExternalIdentifier> ExternalIdentifiers { get; set; } = Enumerable.Empty<ExternalIdentifier>();
 
-  public Realm Realm { get; set; } = new();
+  public Realm? Realm { get; set; }
 }

@@ -51,12 +51,20 @@ internal class MessageQuerier : IMessageQuerier
     {
       query = query.Where(x => x.IsDemo == isDemo.Value);
     }
-    if (realm != null)
+
+    if (realm == null)
     {
-      query = Guid.TryParse(realm, out Guid realmId)
-        ? query.Where(x => x.RealmId == realmId)
-        : query.Where(x => x.RealmUniqueName.ToUpper() == realm.ToUpper());
+      query = query.Where(x => x.RealmId == null);
     }
+    else if (Guid.TryParse(realm, out Guid realmId))
+    {
+      query = query.Where(x => x.RealmId == realmId);
+    }
+    else
+    {
+      query = query.Where(x => x.RealmUniqueNameNormalized == realm.ToUpper());
+    }
+
     if (search != null)
     {
       foreach (string term in search.Split())
@@ -66,7 +74,7 @@ internal class MessageQuerier : IMessageQuerier
           string pattern = $"%{term}%";
 
           query = query.Where(x => EF.Functions.ILike(x.Subject, pattern)
-            || EF.Functions.ILike(x.RealmUniqueName, pattern)
+            || EF.Functions.ILike(x.RealmUniqueName!, pattern)
             || EF.Functions.ILike(x.RealmDisplayName!, pattern)
             || EF.Functions.ILike(x.SenderEmailAddress, pattern)
             || EF.Functions.ILike(x.SenderDisplayName!, pattern)

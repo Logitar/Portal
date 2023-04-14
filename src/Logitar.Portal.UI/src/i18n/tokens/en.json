@@ -10,6 +10,7 @@
     "value": "Value",
     "valueType": "Value Type"
   },
+  "consume": "Consume",
   "create": "Create",
   "error": {
     "code": "Code",
