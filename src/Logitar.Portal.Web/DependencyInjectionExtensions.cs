@@ -15,7 +15,12 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services)
   {
-    services.AddControllersWithViews(options => options.Filters.Add<CoreExceptionFilterAttribute>())
+    services
+      .AddControllersWithViews(options =>
+      {
+        options.Filters.Add<ExceptionHandlingFilter>();
+        options.Filters.Add<LoggingFilter>();
+      })
       .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     services

@@ -27,8 +27,6 @@ internal class HttpCurrentActor : ICurrentActor
         {
           id = user.Id;
         }
-
-        // TODO(fpion): ApiKey
       }
 
       return new AggregateId(id);

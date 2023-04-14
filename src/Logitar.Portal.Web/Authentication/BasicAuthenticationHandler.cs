@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Claims;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
@@ -16,11 +17,11 @@ namespace Logitar.Portal.Web.Authentication;
 
 internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
 {
-  private readonly IRealmRepository _realmRepository;
+  private readonly ICacheService _cacheService;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public BasicAuthenticationHandler(IRealmRepository realmRepository,
+  public BasicAuthenticationHandler(ICacheService cacheService,
     IUserQuerier userQuerier,
     IUserRepository userRepository,
     IOptionsMonitor<BasicAuthenticationOptions> options,
@@ -28,7 +29,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
     UrlEncoder encoder,
     ISystemClock clock) : base(options, logger, encoder, clock)
   {
-    _realmRepository = realmRepository;
+    _cacheService = cacheService;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -58,7 +59,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
           string username = credentials[..index];
           string password = credentials[(index + 1)..];
 
-          RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName); // TODO(fpion): caching
+          RealmAggregate? realm = _cacheService.PortalRealm;
           if (realm == null)
           {
             return AuthenticateResult.Fail("The Portal realm could not be found.");

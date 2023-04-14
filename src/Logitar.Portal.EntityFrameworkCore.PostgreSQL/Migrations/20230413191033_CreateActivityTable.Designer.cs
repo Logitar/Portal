@@ -3,6 +3,7 @@ using System;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230413191033_CreateActivityTable")]
+    partial class CreateActivityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1151,26 +1154,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Logs", "Logging");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
-                {
-                    b.Property<long>("EventId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ActivityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("LogId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("EventId");
-
-                    b.HasIndex("ActivityId");
-
-                    b.HasIndex("LogId");
-
-                    b.ToTable("Events", "Logging");
-                });
-
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.DictionaryEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
@@ -1273,24 +1256,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Log");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
-                {
-                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", "Activity")
-                        .WithMany("Events")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", "Log")
-                        .WithMany("Events")
-                        .HasForeignKey("LogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-
-                    b.Navigation("Log");
-                });
-
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
                 {
                     b.Navigation("Dictionaries");
@@ -1321,16 +1286,9 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Sessions");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
-                {
-                    b.Navigation("Events");
-                });
-
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", b =>
                 {
                     b.Navigation("Activities");
-
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Core;
+using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web;
 
@@ -9,6 +10,12 @@ public class HttpApplicationContext : IApplicationContext
   public HttpApplicationContext(IHttpContextAccessor httpContextAccessor)
   {
     _httpContextAccessor = httpContextAccessor;
+  }
+
+  public Guid? ActivityId
+  {
+    get => _httpContextAccessor.HttpContext?.GetActivityId();
+    set => _httpContextAccessor.HttpContext?.SetActivityId(value);
   }
 
   public Uri? BaseUrl

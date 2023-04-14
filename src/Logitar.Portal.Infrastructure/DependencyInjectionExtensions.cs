@@ -1,4 +1,6 @@
 ﻿using Logitar.Portal.Core;
+using Logitar.Portal.Core.Caching;
+using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Messages;
 using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddLogitarPortalCore()
       .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
+      .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IMessageHandlerFactory, MessageHandlerFactory>()
       .AddStrategies();
   }

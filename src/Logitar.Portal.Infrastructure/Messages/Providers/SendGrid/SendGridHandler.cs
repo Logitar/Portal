@@ -40,6 +40,7 @@ internal class SendGridHandler : IMessageHandler
     {
       Error error = new()
       {
+        Severity = ErrorSeverity.Failure,
         Code = response.StatusCode.ToString(),
         Description = "The message sending failed.",
         Data = result.Select(pair => new ErrorData

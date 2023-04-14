@@ -30,10 +30,6 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
           context.Fail(new AuthorizationFailureReason(this, "The User should not belong to a Realm."));
         }
       }
-      //else if (_httpContextAccessor.HttpContext.GetApiKey() != null)
-      //{
-      //  context.Succeed(requirement);
-      //} // TODO(fpion): ApiKey
     }
 
     return Task.CompletedTask;

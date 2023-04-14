@@ -245,7 +245,7 @@ public class UserAggregate : AggregateRoot
       throw new AccountIsNotConfirmedException(this);
     }
 
-    UserSignedIn e = new();
+    UserSignedIn e = new() { ActorId = Id };
     ApplyChange(e);
 
     return new SessionAggregate(Id, e.OccurredOn, isPersistent, ipAddress, additionalInformation, customAttributes);

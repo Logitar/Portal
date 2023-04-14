@@ -3,6 +3,7 @@ using System;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230413180241_CreateLogTable")]
+    partial class CreateLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1020,59 +1023,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
-                {
-                    b.Property<long>("ActivityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ActivityId"));
-
-                    b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<TimeSpan?>("Duration")
-                        .HasColumnType("interval");
-
-                    b.Property<DateTime?>("EndedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Errors")
-                        .HasColumnType("jsonb");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<long>("LogId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("StartedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("ActivityId");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("LogId");
-
-                    b.ToTable("Activities", "Logging");
-                });
-
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", b =>
                 {
                     b.Property<long>("LogId")
@@ -1149,26 +1099,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .IsUnique();
 
                     b.ToTable("Logs", "Logging");
-                });
-
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
-                {
-                    b.Property<long>("EventId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ActivityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("LogId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("EventId");
-
-                    b.HasIndex("ActivityId");
-
-                    b.HasIndex("LogId");
-
-                    b.ToTable("Events", "Logging");
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.DictionaryEntity", b =>
@@ -1262,35 +1192,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Realm");
                 });
 
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
-                {
-                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", "Log")
-                        .WithMany("Activities")
-                        .HasForeignKey("LogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Log");
-                });
-
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
-                {
-                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", "Activity")
-                        .WithMany("Events")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", "Log")
-                        .WithMany("Events")
-                        .HasForeignKey("LogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-
-                    b.Navigation("Log");
-                });
-
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
                 {
                     b.Navigation("Dictionaries");
@@ -1319,18 +1220,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("ExternalIdentifiers");
 
                     b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
-                {
-                    b.Navigation("Events");
-                });
-
-            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", b =>
-                {
-                    b.Navigation("Activities");
-
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

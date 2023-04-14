@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Logitar.Portal.v2.Web": {
+    "Logitar.Portal.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
