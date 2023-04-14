@@ -23,7 +23,7 @@ internal class LoggingService : ILoggingService
   {
     if (_log != null)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new InvalidOperationException($"You must end the current log by calling one of the '{nameof(EndAsync)}' methods before starting a new log.");
     }
 
     _log = new(correlationId, method, destination, source, additionalInformation, startedOn);
@@ -35,48 +35,36 @@ internal class LoggingService : ILoggingService
     => await StartActivityAsync(activity, startedOn: null, cancellationToken);
   public Task<Guid> StartActivityAsync(object activity, DateTime? startedOn, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    return Task.FromResult(_log.StartActivity(activity, startedOn));
+    return Task.FromResult(_log!.StartActivity(activity, startedOn));
   }
 
   public async Task AddErrorAsync(Error error, CancellationToken cancellationToken)
     => await AddErrorAsync(error, activityId: null, cancellationToken);
   public Task AddErrorAsync(Error error, Guid? activityId, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    _log.AddError(error, activityId);
+    _log!.AddError(error, activityId);
 
     return Task.CompletedTask;
   }
 
   public Task SetActorsAsync(Guid actorId, Guid? userId, Guid? sessionId, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    _log.SetActors(actorId, userId, sessionId);
+    _log!.SetActors(actorId, userId, sessionId);
 
     return Task.CompletedTask;
   }
 
   public Task SetOperationAsync(string type, string name, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    _log.SetOperation(type, name);
+    _log!.SetOperation(type, name);
 
     return Task.CompletedTask;
   }
@@ -85,24 +73,18 @@ internal class LoggingService : ILoggingService
     => await EndActivityAsync(id, endedOn: null, cancellationToken);
   public Task EndActivityAsync(Guid id, DateTime? endedOn, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    _log.EndActivity(id, endedOn);
+    _log!.EndActivity(id, endedOn);
 
     return Task.CompletedTask;
   }
 
   public async Task EndAsync(int? statusCode, DateTime? endedOn, CancellationToken cancellationToken)
   {
-    if (_log == null)
-    {
-      throw new NotImplementedException(); // TODO(fpion): implement
-    }
+    AssertLogHasBeenStarted();
 
-    _log.Complete(statusCode, endedOn);
+    _log!.Complete(statusCode, endedOn);
 
     RealmAggregate realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken)
       ?? throw new InvalidOperationException("The Portal realm could not be found."); // TODO(fpion): caching
@@ -118,5 +100,13 @@ internal class LoggingService : ILoggingService
     }
 
     _log = null;
+  }
+
+  private void AssertLogHasBeenStarted()
+  {
+    if (_log == null)
+    {
+      throw new InvalidOperationException($"You must start a log by calling one of the '{nameof(StartAsync)}' methods before calling the current method.");
+    }
   }
 }
