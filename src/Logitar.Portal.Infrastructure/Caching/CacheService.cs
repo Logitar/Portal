@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Users;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Logitar.Portal.Infrastructure.Caching;
@@ -25,7 +26,28 @@ internal class CacheService : ICacheService
   public Actor? GetActor(Guid id) => GetItem<Actor>(GetActorCacheKey(id));
   public void RemoveActor(Guid id) => RemoveItem(GetActorCacheKey(id));
   public void SetActor(Actor actor) => SetItem(GetActorCacheKey(actor.Id), actor, TimeSpan.FromMinutes(10));
-  private string GetActorCacheKey(Guid id) => string.Join('_', nameof(Actor), id);
+  private static string GetActorCacheKey(Guid id) => string.Join(':', nameof(Actor), id);
+
+  public CachedUser? GetUser(string username) => GetItem<CachedUser>(GetUserCacheKey(username));
+  public void RemoveUser(UserAggregate user)
+  {
+    string key = GetUsernameCacheKey(user);
+    string? usernameKey = GetItem<string>(key);
+    if (usernameKey != null)
+    {
+      RemoveItem(key);
+      RemoveItem(usernameKey);
+    }
+  }
+  public void SetUser(string username, CachedUser user)
+  {
+    TimeSpan expires = TimeSpan.FromMinutes(1);
+    object key = GetUserCacheKey(username);
+    SetItem(key, user, expires);
+    SetItem(GetUsernameCacheKey(user.Aggregate), key, expires);
+  }
+  private static string GetUserCacheKey(string username) => string.Join(':', "User", "Username", username.Trim().ToUpper());
+  private static string GetUsernameCacheKey(UserAggregate user) => string.Join(':', "Username", user.Id);
 
   private T? GetItem<T>(object key) => _memoryCache.TryGetValue(key, out object? value) ? (T?)value : default;
   private void RemoveItem(object key) => _memoryCache.Remove(key);
