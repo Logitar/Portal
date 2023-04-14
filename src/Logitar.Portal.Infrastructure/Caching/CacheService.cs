@@ -1,6 +1,8 @@
 ﻿using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Realms;
+using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.Core.Users;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -27,6 +29,11 @@ internal class CacheService : ICacheService
   public void RemoveActor(Guid id) => RemoveItem(GetActorCacheKey(id));
   public void SetActor(Actor actor) => SetItem(GetActorCacheKey(actor.Id), actor, TimeSpan.FromMinutes(10));
   private static string GetActorCacheKey(Guid id) => string.Join(':', nameof(Actor), id);
+
+  public Session? GetSession(Guid id) => GetItem<Session>(GetSessionCacheKey(id));
+  public void RemoveSession(SessionAggregate session) => RemoveItem(GetSessionCacheKey(session.Id.ToGuid()));
+  public void SetSession(Session session) => SetItem(GetSessionCacheKey(session.Id), session, TimeSpan.FromMinutes(1));
+  private static string GetSessionCacheKey(Guid id) => string.Join(':', "Session", id);
 
   public CachedUser? GetUser(string username) => GetItem<CachedUser>(GetUserCacheKey(username));
   public void RemoveUser(UserAggregate user)
