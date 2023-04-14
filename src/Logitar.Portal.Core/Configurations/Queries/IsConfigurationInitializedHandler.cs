@@ -1,30 +1,20 @@
-﻿using Logitar.Portal.Core.Realms;
-using Logitar.Portal.Core.Users;
-using MediatR;
+﻿using MediatR;
 
 namespace Logitar.Portal.Core.Configurations.Queries;
 
 internal class IsConfigurationInitializedHandler : IRequestHandler<IsConfigurationInitialized, bool>
 {
-  private readonly IRealmRepository _realmRepository;
-  private readonly IUserRepository _userRepository;
+  private readonly IConfigurationRepository _configurationRepository;
 
-  public IsConfigurationInitializedHandler(IRealmRepository realmRepository, IUserRepository userRepository)
+  public IsConfigurationInitializedHandler(IConfigurationRepository configurationRepository)
   {
-    _realmRepository = realmRepository;
-    _userRepository = userRepository;
+    _configurationRepository = configurationRepository;
   }
 
   public async Task<bool> Handle(IsConfigurationInitialized request, CancellationToken cancellationToken)
   {
-    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken);
-    if (realm == null)
-    {
-      return false;
-    }
+    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
 
-    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, cancellationToken);
-
-    return users.Any();
+    return configuration != null;
   }
 }

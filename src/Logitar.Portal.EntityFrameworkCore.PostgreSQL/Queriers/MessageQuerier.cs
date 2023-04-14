@@ -3,7 +3,6 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Core.Messages;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,7 +54,7 @@ internal class MessageQuerier : IMessageQuerier
 
     if (realm == null)
     {
-      query = query.Where(x => x.RealmUniqueName == RealmAggregate.PortalUniqueName);
+      query = query.Where(x => x.RealmId == null);
     }
     else if (Guid.TryParse(realm, out Guid realmId))
     {
@@ -63,7 +62,7 @@ internal class MessageQuerier : IMessageQuerier
     }
     else
     {
-      query = query.Where(x => x.RealmUniqueName.ToUpper() == realm.ToUpper());
+      query = query.Where(x => x.RealmUniqueNameNormalized == realm.ToUpper());
     }
 
     if (search != null)
@@ -75,7 +74,7 @@ internal class MessageQuerier : IMessageQuerier
           string pattern = $"%{term}%";
 
           query = query.Where(x => EF.Functions.ILike(x.Subject, pattern)
-            || EF.Functions.ILike(x.RealmUniqueName, pattern)
+            || EF.Functions.ILike(x.RealmUniqueName!, pattern)
             || EF.Functions.ILike(x.RealmDisplayName!, pattern)
             || EF.Functions.ILike(x.SenderEmailAddress, pattern)
             || EF.Functions.ILike(x.SenderDisplayName!, pattern)

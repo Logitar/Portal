@@ -17,10 +17,10 @@
               <font-awesome-icon icon="chess-rook" />
               {{ $t('realms.title') }}
             </b-nav-item>
-            <b-nav-item href="/api-keys">
+            <!-- <b-nav-item href="/api-keys">
               <font-awesome-icon icon="key" />
               {{ $t('apiKeys.title') }}
-            </b-nav-item>
+            </b-nav-item> -->
             <b-nav-item href="/users">
               <font-awesome-icon icon="users" />
               {{ $t('user.title') }}

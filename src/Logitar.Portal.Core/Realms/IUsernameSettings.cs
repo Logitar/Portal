@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core.Realms;
 
-internal interface IUsernameSettings
+public interface IUsernameSettings
 {
   string? AllowedCharacters { get; }
 }

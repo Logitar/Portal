@@ -4,12 +4,12 @@ namespace Logitar.Portal.Core.Senders.Commands;
 
 internal class DeleteSendersHandler : IRequestHandler<DeleteSenders>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ISenderRepository _senderRepository;
 
-  public DeleteSendersHandler(ICurrentActor currentActor, ISenderRepository senderRepository)
+  public DeleteSendersHandler(IApplicationContext applicationContext, ISenderRepository senderRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _senderRepository = senderRepository;
   }
 
@@ -18,7 +18,7 @@ internal class DeleteSendersHandler : IRequestHandler<DeleteSenders>
     IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(request.Realm, cancellationToken);
     foreach (SenderAggregate sender in senders)
     {
-      sender.Delete(_currentActor.Id);
+      sender.Delete(_applicationContext.ActorId);
     }
 
     await _senderRepository.SaveAsync(senders, cancellationToken);

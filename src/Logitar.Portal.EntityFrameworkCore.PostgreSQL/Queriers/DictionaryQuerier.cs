@@ -3,7 +3,6 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Core.Dictionaries;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,7 +53,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
 
     if (realm == null)
     {
-      query = query.Where(x => x.Realm!.UniqueNameNormalized == RealmAggregate.PortalUniqueName.ToUpper());
+      query = query.Where(x => x.RealmId == null);
     }
     else if (Guid.TryParse(realm, out Guid realmId))
     {

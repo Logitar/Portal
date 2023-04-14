@@ -19,7 +19,6 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
     [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
     [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
-    [typeof(CannotManagePortalRealmException)] = HandleCannotManagePortalRealmException,
     [typeof(DefaultSenderRequiredException)] = HandleDefaultSenderRequiredException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
@@ -77,11 +76,6 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static void HandleCannotDeleteDefaultSenderException(ExceptionContext context)
   {
     context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
-  }
-
-  private static void HandleCannotManagePortalRealmException(ExceptionContext context)
-  {
-    context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
   }
 
   private static void HandleDefaultSenderRequiredException(ExceptionContext context)

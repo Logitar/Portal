@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Sessions.Commands;
 
 internal class SignOutHandler : IRequestHandler<SignOut, Session>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
 
-  public SignOutHandler(ICurrentActor currentActor,
+  public SignOutHandler(IApplicationContext applicationContext,
     ISessionQuerier sessionQuerier,
     ISessionRepository sessionRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _sessionQuerier = sessionQuerier;
     _sessionRepository = sessionRepository;
   }
@@ -23,7 +23,7 @@ internal class SignOutHandler : IRequestHandler<SignOut, Session>
     SessionAggregate session = await _sessionRepository.LoadAsync(request.Id, cancellationToken)
       ?? throw new AggregateNotFoundException<SessionAggregate>(request.Id);
 
-    session.SignOut(_currentActor.Id);
+    session.SignOut(_applicationContext.ActorId);
 
     await _sessionRepository.SaveAsync(session, cancellationToken);
 

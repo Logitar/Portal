@@ -2,7 +2,6 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Sessions;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -74,7 +73,7 @@ internal class SessionQuerier : ISessionQuerier
 
     if (realm == null)
     {
-      query = query.Where(x => x.User!.Realm!.UniqueNameNormalized == RealmAggregate.PortalUniqueName.ToUpper());
+      query = query.Where(x => x.User!.RealmId == null);
     }
     else if (Guid.TryParse(realm, out Guid realmId))
     {

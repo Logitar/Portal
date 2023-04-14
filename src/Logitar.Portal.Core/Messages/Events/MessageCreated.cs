@@ -14,7 +14,7 @@ public record MessageCreated : DomainEvent, INotification
 
   public IEnumerable<Recipient> Recipients { get; init; } = Enumerable.Empty<Recipient>();
 
-  public RealmSummary Realm { get; init; } = new();
+  public RealmSummary? Realm { get; init; }
   public SenderSummary Sender { get; init; } = new();
   public TemplateSummary Template { get; init; } = new();
 

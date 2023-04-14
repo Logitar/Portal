@@ -19,7 +19,7 @@
           </template>
           <icon-submit class="mx-1" v-else :disabled="!hasChanges || loading" icon="plus" :loading="loading" text="actions.create" variant="success" />
         </div>
-        <realm-select :disabled="Boolean(user)" :required="!user" v-model="realmId" />
+        <realm-select :disabled="Boolean(user)" v-model="realmId" />
         <h3 v-t="'user.information.authentication'" />
         <b-alert dismissible variant="warning" v-model="usernameConflict">
           <strong v-t="'user.username.conflict'" />

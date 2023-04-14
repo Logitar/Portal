@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Core.Realms;
 
-internal interface IPasswordSettings
+public interface IPasswordSettings
 {
   int RequiredLength { get; }
   int RequiredUniqueChars { get; }

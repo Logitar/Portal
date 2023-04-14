@@ -6,6 +6,6 @@ namespace Logitar.Portal.Core.Dictionaries.Events;
 
 public record DictionaryCreated : DictionarySaved, INotification
 {
-  public AggregateId RealmId { get; init; }
+  public AggregateId? RealmId { get; init; }
   public CultureInfo Locale { get; init; } = null!;
 }

@@ -42,10 +42,6 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
       {
         failure = AuthenticateResult.Fail($"The session 'Id={session.Id}' has ended.");
       }
-      else if (session.User == null)
-      {
-        failure = AuthenticateResult.Fail($"The User was null for session 'Id={session.Id}'.");
-      }
       else if (session.User.IsDisabled)
       {
         failure = AuthenticateResult.Fail($"The User is disabled for session 'Id={session.Id}'.");
@@ -63,7 +59,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
       Context.SetSession(session);
       Context.SetUser(session!.User);
 
-      ClaimsPrincipal principal = new(session.User!.GetClaimsIdentity(Schemes.Session));
+      ClaimsPrincipal principal = new(session.User.GetClaimsIdentity(Schemes.Session));
       AuthenticationTicket ticket = new(principal, Schemes.Session);
 
       return AuthenticateResult.Success(ticket);

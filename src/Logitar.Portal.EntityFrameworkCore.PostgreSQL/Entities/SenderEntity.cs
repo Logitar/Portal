@@ -5,10 +5,10 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 
 internal class SenderEntity : AggregateEntity
 {
-  public SenderEntity(SenderCreated e, RealmEntity realm, ActorEntity actor) : base(e, actor)
+  public SenderEntity(SenderCreated e, RealmEntity? realm, ActorEntity actor) : base(e, actor)
   {
     Realm = realm;
-    RealmId = realm.RealmId;
+    RealmId = realm?.RealmId;
 
     Provider = e.Provider.ToString();
 
@@ -22,7 +22,7 @@ internal class SenderEntity : AggregateEntity
   public int SenderId { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
-  public int RealmId { get; private set; }
+  public int? RealmId { get; private set; }
 
   public bool IsDefault { get; private set; }
 

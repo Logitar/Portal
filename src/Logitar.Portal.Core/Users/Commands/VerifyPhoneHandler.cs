@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class VerifyPhoneHandler : IRequestHandler<VerifyPhone, User>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public VerifyPhoneHandler(ICurrentActor currentActor,
+  public VerifyPhoneHandler(IApplicationContext applicationContext,
     IUserQuerier userQuerier,
     IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -25,7 +25,7 @@ internal class VerifyPhoneHandler : IRequestHandler<VerifyPhone, User>
 
     if (user.Phone != null)
     {
-      user.SetPhone(_currentActor.Id, user.Phone.AsVerified());
+      user.SetPhone(_applicationContext.ActorId, user.Phone.AsVerified());
 
       await _userRepository.SaveAsync(user, cancellationToken);
     }

@@ -8,12 +8,12 @@ namespace Logitar.Portal.Web.Middlewares;
 
 public class Logging
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly RequestDelegate _next;
 
-  public Logging(ICurrentActor currentActor, RequestDelegate next)
+  public Logging(IApplicationContext applicationContext, RequestDelegate next)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _next = next;
   }
 
@@ -36,7 +36,7 @@ public class Logging
     }
     finally
     {
-      await loggingService.SetActorsAsync(_currentActor.Id.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
+      await loggingService.SetActorsAsync(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
 
       HttpResponse response = context.Response;
       await loggingService.EndAsync(response.StatusCode);

@@ -12,19 +12,19 @@ namespace Logitar.Portal.Core.Messages.Commands;
 
 internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IMediator _mediator;
   private readonly IMessageRepository _messageRepository;
   private readonly IRealmRepository _realmRepository;
 
-  public SendMessageHandler(ICurrentActor currentActor,
+  public SendMessageHandler(IApplicationContext applicationContext,
     IDictionaryRepository dictionaryRepository,
     IMediator mediator,
     IMessageRepository messageRepository,
     IRealmRepository realmRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _dictionaryRepository = dictionaryRepository;
     _mediator = mediator;
     _messageRepository = messageRepository;
@@ -36,8 +36,7 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
     SendMessageInput input = request.Input;
     new SendMessageInputValidator().ValidateAndThrow(input);
 
-    RealmAggregate realm = await _realmRepository.LoadAsync(input.Realm, cancellationToken)
-      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
+    RealmAggregate? realm = await LoadRealmAsync(input, cancellationToken);
 
     Recipients allRecipients = await _mediator.Send(new ResolveRecipients(realm, input.Recipients, nameof(input.Recipients)), cancellationToken);
     SenderAggregate sender = await _mediator.Send(new ResolveSender(realm, input.SenderId, nameof(input.SenderId)), cancellationToken);
@@ -45,11 +44,8 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
 
     Dictionary<CultureInfo, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
-    DictionaryAggregate? defaultDictionary = null;
-    if (realm.DefaultLocale != null)
-    {
-      _ = allDictionaries.TryGetValue(realm.DefaultLocale, out defaultDictionary);
-    }
+    CultureInfo defaultLocale = realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale;
+    _ = allDictionaries.TryGetValue(defaultLocale, out DictionaryAggregate? defaultDictionary);
 
     CultureInfo? locale = input.Locale?.GetCultureInfo(nameof(input.Locale));
     Dictionaries? dictionaries = input.IgnoreUserLocale
@@ -74,7 +70,7 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
 
       IEnumerable<Recipient> recipients = new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc);
 
-      MessageAggregate message = new(_currentActor.Id, realm, sender, template, subject, body,
+      MessageAggregate message = new(_applicationContext.ActorId, realm, sender, template, subject, body,
         recipients, input.IgnoreUserLocale, locale, variables);
 
       await _mediator.Publish(new SendEmail(message, sender), cancellationToken);
@@ -92,5 +88,16 @@ internal class SendMessageHandler : IRequestHandler<SendMessage, SentMessages>
       Success = messages.Where(x => x.Succeeded).Select(x => x.Id.ToGuid()),
       Unsent = messages.Where(x => !x.HasErrors && !x.Succeeded).Select(x => x.Id.ToGuid())
     };
+  }
+
+  private async Task<RealmAggregate?> LoadRealmAsync(SendMessageInput input, CancellationToken cancellationToken)
+  {
+    if (input.Realm == null)
+    {
+      return null;
+    }
+
+    return await _realmRepository.LoadAsync(input.Realm, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(input.Realm, nameof(input.Realm));
   }
 }

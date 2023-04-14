@@ -26,7 +26,7 @@ internal class ResolveTemplateHandler : IRequestHandler<ResolveTemplate, Templat
     {
       throw new AggregateNotFoundException<TemplateAggregate>(request.IdOrUniqueName, request.ParamName);
     }
-    else if (request.Realm.Id != template.RealmId)
+    else if (request.Realm?.Id != template.RealmId)
     {
       throw new TemplateNotInRealmException(template, request.Realm, request.ParamName);
     }

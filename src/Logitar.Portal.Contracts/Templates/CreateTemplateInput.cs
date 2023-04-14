@@ -2,7 +2,7 @@
 
 public record CreateTemplateInput
 {
-  public string Realm { get; set; } = string.Empty;
+  public string? Realm { get; set; }
 
   public string Key { get; set; } = string.Empty;
 

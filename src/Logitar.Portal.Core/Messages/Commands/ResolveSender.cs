@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Core.Messages.Commands;
 
-internal record ResolveSender(RealmAggregate Realm, Guid? Id, string ParamName) : IRequest<SenderAggregate>;
+internal record ResolveSender(RealmAggregate? Realm, Guid? Id, string ParamName) : IRequest<SenderAggregate>;

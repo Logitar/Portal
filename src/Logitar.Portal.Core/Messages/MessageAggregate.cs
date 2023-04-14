@@ -20,7 +20,7 @@ public class MessageAggregate : AggregateRoot
   {
   }
 
-  public MessageAggregate(AggregateId actorId, RealmAggregate realm, SenderAggregate sender,
+  public MessageAggregate(AggregateId actorId, RealmAggregate? realm, SenderAggregate sender,
     TemplateAggregate template, string subject, string body, IEnumerable<Recipient> recipients,
     bool ignoreUserLocale = false, CultureInfo? locale = null,
     Dictionary<string, string>? variables = null, bool isDemo = false)
@@ -51,7 +51,7 @@ public class MessageAggregate : AggregateRoot
 
   public IEnumerable<Recipient> Recipients { get; private set; } = Enumerable.Empty<Recipient>();
 
-  public RealmSummary Realm { get; private set; } = new();
+  public RealmSummary? Realm { get; private set; }
   public SenderSummary Sender { get; private set; } = new();
   public TemplateSummary Template { get; private set; } = new();
 

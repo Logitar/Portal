@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,22 +69,12 @@ public class UserApiController : ControllerBase
   [HttpPost("password/recover")]
   public async Task<ActionResult<SentMessages>> RecoverPasswordAsync([FromBody] RecoverPasswordInput input, CancellationToken cancellationToken)
   {
-    if (input.Realm == RealmAggregate.PortalUniqueName)
-    {
-      return Forbid();
-    }
-
     return Ok(await _userService.RecoverPasswordAsync(input, cancellationToken));
   }
 
   [HttpPatch("password/reset")]
   public async Task<ActionResult<User>> ResetPasswordAsync([FromBody] ResetPasswordInput input, CancellationToken cancellationToken)
   {
-    if (input.Realm == RealmAggregate.PortalUniqueName)
-    {
-      return Forbid();
-    }
-
     return Ok(await _userService.ResetPasswordAsync(input, cancellationToken));
   }
 

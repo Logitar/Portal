@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Dictionaries.Commands;
 
 internal class DeleteDictionaryHandler : IRequestHandler<DeleteDictionary, Dictionary>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryQuerier _dictionaryQuerier;
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  public DeleteDictionaryHandler(ICurrentActor currentActor,
+  public DeleteDictionaryHandler(IApplicationContext applicationContext,
     IDictionaryQuerier dictionaryQuerier,
     IDictionaryRepository dictionaryRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _dictionaryQuerier = dictionaryQuerier;
     _dictionaryRepository = dictionaryRepository;
   }
@@ -24,7 +24,7 @@ internal class DeleteDictionaryHandler : IRequestHandler<DeleteDictionary, Dicti
       ?? throw new AggregateNotFoundException<DictionaryAggregate>(request.Id);
     Dictionary output = await _dictionaryQuerier.GetAsync(dictionary, cancellationToken);
 
-    dictionary.Delete(_currentActor.Id);
+    dictionary.Delete(_applicationContext.ActorId);
 
     await _dictionaryRepository.SaveAsync(dictionary, cancellationToken);
 

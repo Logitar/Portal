@@ -2,7 +2,6 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Senders;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +53,7 @@ internal class SenderQuerier : ISenderQuerier
 
     if (realm == null)
     {
-      query = query.Where(x => x.Realm!.UniqueNameNormalized == RealmAggregate.PortalUniqueName.ToUpper());
+      query = query.Where(x => x.RealmId == null);
     }
     else if (Guid.TryParse(realm, out Guid realmId))
     {
@@ -101,12 +100,16 @@ internal class SenderQuerier : ISenderQuerier
     };
   }
 
-  public async Task<Sender?> GetDefaultAsync(string realm, CancellationToken cancellationToken)
+  public async Task<Sender?> GetDefaultAsync(string? realm, CancellationToken cancellationToken)
   {
     IQueryable<SenderEntity> query = _senders.AsNoTracking()
       .Include(x => x.Realm);
 
-    if (Guid.TryParse(realm, out Guid realmId))
+    if (realm == null)
+    {
+      query = query.Where(x => x.RealmId == null);
+    }
+    else if (Guid.TryParse(realm, out Guid realmId))
     {
       string aggregateId = new AggregateId(realmId).Value;
       query = query.Where(x => x.Realm!.AggregateId == aggregateId);

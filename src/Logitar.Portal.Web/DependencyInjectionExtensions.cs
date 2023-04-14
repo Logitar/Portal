@@ -57,7 +57,6 @@ public static class DependencyInjectionExtensions
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
     services.AddSingleton<IAuthorizationHandler, AuthenticatedPortalUserAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
-    services.AddSingleton<ICurrentActor, HttpCurrentActor>();
 
     return services;
   }

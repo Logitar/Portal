@@ -16,13 +16,13 @@ public class SenderAggregate : AggregateRoot
   {
   }
 
-  public SenderAggregate(AggregateId actorId, RealmAggregate realm, ProviderType provider,
+  public SenderAggregate(AggregateId actorId, RealmAggregate? realm, ProviderType provider,
     string emailAddress, string? displayName = null, Dictionary<string, string>? settings = null) : base()
   {
     SenderCreated e = new()
     {
       ActorId = actorId,
-      RealmId = realm.Id,
+      RealmId = realm?.Id,
       Provider = provider,
       EmailAddress = emailAddress.Trim(),
       DisplayName = displayName?.CleanTrim(),
@@ -33,7 +33,7 @@ public class SenderAggregate : AggregateRoot
     ApplyChange(e);
   }
 
-  public AggregateId RealmId { get; private set; }
+  public AggregateId? RealmId { get; private set; }
 
   public ProviderType Provider { get; private set; }
 

@@ -21,18 +21,18 @@ public class ConfigurationApiController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationInput input, CancellationToken cancellationToken)
+  public async Task<ActionResult<Configuration>> InitializeAsync([FromBody] InitializeConfigurationInput input, CancellationToken cancellationToken)
   {
     if (await _configurationService.IsInitializedAsync(cancellationToken))
     {
       return Forbid();
     }
 
-    await _configurationService.InitializeAsync(input, cancellationToken);
+    Configuration configuration = await _configurationService.InitializeAsync(input, cancellationToken);
 
     Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
     HttpContext.SignIn(session);
 
-    return NoContent();
+    return Ok(configuration);
   }
 }

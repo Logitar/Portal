@@ -14,5 +14,5 @@ public record Template : Aggregate
   public string ContentType { get; set; } = string.Empty;
   public string Contents { get; set; } = string.Empty;
 
-  public Realm Realm { get; set; } = new();
+  public Realm? Realm { get; set; }
 }

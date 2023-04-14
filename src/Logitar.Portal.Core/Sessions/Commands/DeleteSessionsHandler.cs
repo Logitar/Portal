@@ -4,12 +4,12 @@ namespace Logitar.Portal.Core.Sessions.Commands;
 
 internal class DeleteSessionsHandler : IRequestHandler<DeleteSessions>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly ISessionRepository _sessionRepository;
 
-  public DeleteSessionsHandler(ICurrentActor currentActor, ISessionRepository sessionRepository)
+  public DeleteSessionsHandler(IApplicationContext applicationContext, ISessionRepository sessionRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _sessionRepository = sessionRepository;
   }
 
@@ -20,7 +20,7 @@ internal class DeleteSessionsHandler : IRequestHandler<DeleteSessions>
       IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadAsync(request.Realm, cancellationToken);
       foreach (SessionAggregate session in sessions)
       {
-        session.Delete(_currentActor.Id);
+        session.Delete(_applicationContext.ActorId);
       }
 
       await _sessionRepository.SaveAsync(sessions, cancellationToken);
@@ -31,7 +31,7 @@ internal class DeleteSessionsHandler : IRequestHandler<DeleteSessions>
       IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadAsync(request.User, cancellationToken);
       foreach (SessionAggregate session in sessions)
       {
-        session.Delete(_currentActor.Id);
+        session.Delete(_applicationContext.ActorId);
       }
 
       await _sessionRepository.SaveAsync(sessions, cancellationToken);

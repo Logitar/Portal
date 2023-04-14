@@ -24,7 +24,6 @@ internal class RealmQuerier : IRealmQuerier
     RealmEntity entity = await _realms.AsNoTracking()
       .Include(x => x.PasswordRecoverySender)
       .Include(x => x.PasswordRecoveryTemplate)
-      .Where(x => x.UniqueNameNormalized != RealmAggregate.PortalUniqueName.ToUpper())
       .SingleOrDefaultAsync(x => x.AggregateId == realm.Id.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The realm entity '{realm.Id}' could not be found.");
 
@@ -38,7 +37,6 @@ internal class RealmQuerier : IRealmQuerier
     RealmEntity? realm = await _realms.AsNoTracking()
       .Include(x => x.PasswordRecoverySender)
       .Include(x => x.PasswordRecoveryTemplate)
-      .Where(x => x.UniqueNameNormalized != RealmAggregate.PortalUniqueName.ToUpper())
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
     return _mapper.Map<Realm>(realm);
@@ -49,7 +47,6 @@ internal class RealmQuerier : IRealmQuerier
     RealmEntity? realm = await _realms.AsNoTracking()
       .Include(x => x.PasswordRecoverySender)
       .Include(x => x.PasswordRecoveryTemplate)
-      .Where(x => x.UniqueNameNormalized != RealmAggregate.PortalUniqueName.ToUpper())
       .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueName.ToUpper(), cancellationToken);
 
     return _mapper.Map<Realm>(realm);
@@ -60,8 +57,7 @@ internal class RealmQuerier : IRealmQuerier
   {
     IQueryable<RealmEntity> query = _realms.AsNoTracking()
       .Include(x => x.PasswordRecoverySender)
-      .Include(x => x.PasswordRecoveryTemplate)
-      .Where(x => x.UniqueNameNormalized != RealmAggregate.PortalUniqueName.ToUpper());
+      .Include(x => x.PasswordRecoveryTemplate);
 
     if (search != null)
     {

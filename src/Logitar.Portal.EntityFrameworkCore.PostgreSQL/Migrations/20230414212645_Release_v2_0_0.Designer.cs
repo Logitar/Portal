@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230411155552_CreateTemplateTable")]
-    partial class CreateTemplateTable
+    [Migration("20230414212645_Release_v2_0_0")]
+    partial class Release_v2_0_0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -83,7 +83,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UpdatedBy")
@@ -189,6 +189,176 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("ExternalIdentifiers");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.MessageEntity", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Errors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IgnoreUserLocale")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RealmDisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid?>("RealmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RealmUniqueName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RealmUniqueNameNormalized")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Recipients")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SenderDisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SenderEmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("SenderIsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SenderProvider")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("Succeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TemplateContentType")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("TemplateDisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid>("TemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TemplateUniqueName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Variables")
+                        .HasColumnType("jsonb");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("HasErrors");
+
+                    b.HasIndex("IsDemo");
+
+                    b.HasIndex("RealmDisplayName");
+
+                    b.HasIndex("RealmId");
+
+                    b.HasIndex("RealmUniqueName");
+
+                    b.HasIndex("SenderDisplayName");
+
+                    b.HasIndex("SenderEmailAddress");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("Subject");
+
+                    b.HasIndex("Succeeded");
+
+                    b.HasIndex("TemplateDisplayName");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("TemplateUniqueName");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
                 {
                     b.Property<int>("RealmId")
@@ -228,6 +398,12 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Property<string>("DisplayName")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("PasswordRecoverySenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PasswordRecoveryTemplateId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PasswordSettings")
                         .IsRequired()
@@ -285,6 +461,12 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.HasIndex("DisplayName");
 
+                    b.HasIndex("PasswordRecoverySenderId")
+                        .IsUnique();
+
+                    b.HasIndex("PasswordRecoveryTemplateId")
+                        .IsUnique();
+
                     b.HasIndex("UniqueName");
 
                     b.HasIndex("UniqueNameNormalized")
@@ -337,7 +519,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Settings")
@@ -493,6 +675,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("Contents")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("CreatedBy")
@@ -512,7 +695,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Subject")
@@ -749,7 +932,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(65535)
                         .HasColumnType("character varying(65535)");
 
-                    b.Property<int>("RealmId")
+                    b.Property<int?>("RealmId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("SignedInOn")
@@ -844,13 +1027,163 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
+                {
+                    b.Property<long>("ActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ActivityId"));
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("interval");
+
+                    b.Property<DateTime?>("EndedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Errors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<long>("LogId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("ActivityId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("LogId");
+
+                    b.ToTable("Activities", "Logging");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", b =>
+                {
+                    b.Property<long>("LogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("LogId"));
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AdditionalInformation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Destination")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("interval");
+
+                    b.Property<DateTime?>("EndedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Errors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Method")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("OperationName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("OperationType")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid?>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(65535)
+                        .HasColumnType("character varying(65535)");
+
+                    b.Property<DateTime>("StartedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("StatusCode")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("LogId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Logs", "Logging");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
+                {
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ActivityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LogId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("EventId");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("LogId");
+
+                    b.ToTable("Events", "Logging");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.DictionaryEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Dictionaries")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -874,13 +1207,29 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.SenderEntity", "PasswordRecoverySender")
+                        .WithOne("PasswordRecoveryRealm")
+                        .HasForeignKey("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "PasswordRecoverySenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.TemplateEntity", "PasswordRecoveryTemplate")
+                        .WithOne("PasswordRecoveryRealm")
+                        .HasForeignKey("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "PasswordRecoveryTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PasswordRecoverySender");
+
+                    b.Navigation("PasswordRecoveryTemplate");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.SenderEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Senders")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -901,8 +1250,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Templates")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
                 });
@@ -912,10 +1260,38 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", "Realm")
                         .WithMany("Users")
                         .HasForeignKey("RealmId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", "Log")
+                        .WithMany("Activities")
+                        .HasForeignKey("LogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Log");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEventEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", "Activity")
+                        .WithMany("Events")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", "Log")
+                        .WithMany("Events")
+                        .HasForeignKey("LogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("Log");
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.RealmEntity", b =>
@@ -931,11 +1307,33 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.SenderEntity", b =>
+                {
+                    b.Navigation("PasswordRecoveryRealm");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.TemplateEntity", b =>
+                {
+                    b.Navigation("PasswordRecoveryRealm");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities.UserEntity", b =>
                 {
                     b.Navigation("ExternalIdentifiers");
 
                     b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.ActivityEntity", b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging.LogEntity", b =>
+                {
+                    b.Navigation("Activities");
+
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

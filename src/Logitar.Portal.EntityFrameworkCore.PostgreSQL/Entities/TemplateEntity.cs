@@ -4,10 +4,10 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 
 internal class TemplateEntity : AggregateEntity
 {
-  public TemplateEntity(TemplateCreated e, RealmEntity realm, ActorEntity actor) : base(e, actor)
+  public TemplateEntity(TemplateCreated e, RealmEntity? realm, ActorEntity actor) : base(e, actor)
   {
     Realm = realm;
-    RealmId = realm.RealmId;
+    RealmId = realm?.RealmId;
 
     UniqueName = e.UniqueName;
 
@@ -21,7 +21,7 @@ internal class TemplateEntity : AggregateEntity
   public int TemplateId { get; private set; }
 
   public RealmEntity? Realm { get; private set; }
-  public int RealmId { get; private set; }
+  public int? RealmId { get; private set; }
 
   public string UniqueName { get; private set; } = string.Empty;
   public string UniqueNameNormalized

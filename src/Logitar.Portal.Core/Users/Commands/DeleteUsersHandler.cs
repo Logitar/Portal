@@ -4,12 +4,12 @@ namespace Logitar.Portal.Core.Users.Commands;
 
 internal class DeleteUsersHandler : IRequestHandler<DeleteUsers>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IUserRepository _userRepository;
 
-  public DeleteUsersHandler(ICurrentActor currentActor, IUserRepository userRepository)
+  public DeleteUsersHandler(IApplicationContext applicationContext, IUserRepository userRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _userRepository = userRepository;
   }
 
@@ -18,7 +18,7 @@ internal class DeleteUsersHandler : IRequestHandler<DeleteUsers>
     IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(request.Realm, cancellationToken);
     foreach (UserAggregate user in users)
     {
-      user.Delete(_currentActor.Id);
+      user.Delete(_applicationContext.ActorId);
     }
 
     await _userRepository.SaveAsync(users, cancellationToken);

@@ -5,15 +5,15 @@ namespace Logitar.Portal.Core.Dictionaries.Commands;
 
 internal class UpdateDictionaryHandler : IRequestHandler<UpdateDictionary, Dictionary>
 {
-  private readonly ICurrentActor _currentActor;
+  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryQuerier _dictionaryQuerier;
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  public UpdateDictionaryHandler(ICurrentActor currentActor,
+  public UpdateDictionaryHandler(IApplicationContext applicationContext,
     IDictionaryQuerier dictionaryQuerier,
     IDictionaryRepository dictionaryRepository)
   {
-    _currentActor = currentActor;
+    _applicationContext = applicationContext;
     _dictionaryQuerier = dictionaryQuerier;
     _dictionaryRepository = dictionaryRepository;
   }
@@ -25,7 +25,7 @@ internal class UpdateDictionaryHandler : IRequestHandler<UpdateDictionary, Dicti
 
     UpdateDictionaryInput input = request.Input;
 
-    dictionary.Update(_currentActor.Id, input.Entries?.ToDictionary());
+    dictionary.Update(_applicationContext.ActorId, input.Entries?.ToDictionary());
 
     await _dictionaryRepository.SaveAsync(dictionary, cancellationToken);
 

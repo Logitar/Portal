@@ -2,7 +2,6 @@
 using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -104,7 +103,7 @@ internal class UserQuerier : IUserQuerier
 
     if (realm == null)
     {
-      query = query.Where(x => x.Realm!.UniqueNameNormalized == RealmAggregate.PortalUniqueName.ToUpper());
+      query = query.Where(x => x.RealmId == null);
     }
     else if (Guid.TryParse(realm, out Guid realmId))
     {

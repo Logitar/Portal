@@ -36,21 +36,36 @@ internal class RealmRepository : EventStore, IRealmRepository
     return Load<RealmAggregate>(events).SingleOrDefault();
   }
 
-  public async Task<RealmAggregate> LoadAsync(SenderAggregate sender, CancellationToken cancellationToken)
+  public async Task<RealmAggregate?> LoadAsync(SenderAggregate sender, CancellationToken cancellationToken)
   {
-    return await LoadAsync<RealmAggregate>(sender.RealmId, cancellationToken)
+    if (!sender.RealmId.HasValue)
+    {
+      return null;
+    }
+
+    return await LoadAsync<RealmAggregate>(sender.RealmId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The realm '{sender.RealmId}' could not be found.");
   }
 
-  public async Task<RealmAggregate> LoadAsync(TemplateAggregate template, CancellationToken cancellationToken)
+  public async Task<RealmAggregate?> LoadAsync(TemplateAggregate template, CancellationToken cancellationToken)
   {
-    return await LoadAsync<RealmAggregate>(template.RealmId, cancellationToken)
+    if (!template.RealmId.HasValue)
+    {
+      return null;
+    }
+
+    return await LoadAsync<RealmAggregate>(template.RealmId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The realm '{template.RealmId}' could not be found.");
   }
 
-  public async Task<RealmAggregate> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
+  public async Task<RealmAggregate?> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
   {
-    return await LoadAsync<RealmAggregate>(user.RealmId, cancellationToken)
+    if (!user.RealmId.HasValue)
+    {
+      return null;
+    }
+
+    return await LoadAsync<RealmAggregate>(user.RealmId.Value, cancellationToken)
       ?? throw new InvalidOperationException($"The realm '{user.RealmId}' could not be found.");
   }
 

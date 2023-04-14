@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Caching;
+﻿using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Contact;
@@ -7,61 +7,64 @@ using System.Globalization;
 
 namespace Logitar.Portal.Core.Configurations.Commands;
 
-internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration, Unit>
+internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration, Configuration>
 {
-  private const string PortalDisplayName = "Portal";
-  private const string PortalDescription = "The realm in which the administrator users of the Portal belong to.";
-
-  private readonly ICacheService _cacheService;
-  private readonly ICurrentActor _currentActor;
-  private readonly IRealmRepository _realmRepository;
+  private readonly IApplicationContext _applicationContext;
+  private readonly IConfigurationRepository _configurationRepository;
   private readonly IUserRepository _userRepository;
 
-  public InitializeConfigurationHandler(ICacheService cacheService,
-    ICurrentActor currentActor,
-    IRealmRepository realmRepository,
+  public InitializeConfigurationHandler(IApplicationContext applicationContext,
+    IConfigurationRepository configurationRepository,
     IUserRepository userRepository)
   {
-    _cacheService = cacheService;
-    _currentActor = currentActor;
-    _realmRepository = realmRepository;
+    _applicationContext = applicationContext;
+    _configurationRepository = configurationRepository;
     _userRepository = userRepository;
   }
 
-  public async Task<Unit> Handle(InitializeConfiguration request, CancellationToken cancellationToken)
+  public async Task<Configuration> Handle(InitializeConfiguration request, CancellationToken cancellationToken)
   {
     InitializeConfigurationInput input = request.Input;
+
     CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
+    ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
+    ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
+    ReadOnlyLoggingSettings? loggingSettings = ReadOnlyLoggingSettings.From(input.LoggingSettings);
 
-    RealmAggregate? realm = await _realmRepository.LoadByUniqueNameAsync(RealmAggregate.PortalUniqueName, cancellationToken);
-    if (realm == null)
-    {
-      ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
-      ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
+    ConfigurationAggregate configuration = new(_applicationContext.ActorId, defaultLocale, input.Secret,
+      usernameSettings, passwordSettings, loggingSettings);
 
-      Dictionary<string, string> customAttributes = new(capacity: 1);
-      if (input.LoggingSettings != null)
-      {
-        customAttributes[nameof(LoggingSettings)] = input.LoggingSettings.Serialize();
-      }
-
-      realm = new(_currentActor.Id, RealmAggregate.PortalUniqueName, PortalDisplayName, PortalDescription,
-        defaultLocale, usernameSettings: usernameSettings, passwordSettings: passwordSettings,
-        customAttributes: customAttributes);
-
-      await _realmRepository.SaveAsync(realm, cancellationToken);
-
-      _cacheService.PortalRealm = realm;
-    }
+    await _configurationRepository.SaveAsync(configuration, cancellationToken);
 
     InitialUserInput userInput = input.User;
-    UserAggregate user = new(_currentActor.Id, realm, userInput.Username, userInput.FirstName,
+    UserAggregate user = new(_applicationContext.ActorId, configuration.UsernameSettings, userInput.Username, userInput.FirstName,
       lastName: userInput.LastName, locale: defaultLocale);
-    user.ChangePassword(_currentActor.Id, realm, userInput.Password);
-    user.SetEmail(_currentActor.Id, new ReadOnlyEmail(userInput.EmailAddress));
+    user.ChangePassword(_applicationContext.ActorId, configuration.PasswordSettings, userInput.Password);
+    user.SetEmail(_applicationContext.ActorId, new ReadOnlyEmail(userInput.EmailAddress));
 
     await _userRepository.SaveAsync(user, cancellationToken);
 
-    return Unit.Value;
+    return new Configuration
+    {
+      DefaultLocale = configuration.DefaultLocale.Name,
+      UsernameSettings = new UsernameSettings
+      {
+        AllowedCharacters = configuration.UsernameSettings.AllowedCharacters
+      },
+      PasswordSettings = new PasswordSettings
+      {
+        RequiredLength = configuration.PasswordSettings.RequiredLength,
+        RequiredUniqueChars = configuration.PasswordSettings.RequiredUniqueChars,
+        RequireNonAlphanumeric = configuration.PasswordSettings.RequireNonAlphanumeric,
+        RequireLowercase = configuration.PasswordSettings.RequireLowercase,
+        RequireUppercase = configuration.PasswordSettings.RequireUppercase,
+        RequireDigit = configuration.PasswordSettings.RequireDigit
+      },
+      LoggingSettings = new LoggingSettings
+      {
+        Extent = configuration.LoggingSettings.Extent,
+        OnlyErrors = configuration.LoggingSettings.OnlyErrors
+      }
+    };
   }
 }

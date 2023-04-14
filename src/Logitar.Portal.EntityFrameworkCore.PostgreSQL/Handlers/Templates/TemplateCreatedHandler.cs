@@ -19,9 +19,13 @@ internal class TemplateCreatedHandler : INotificationHandler<TemplateCreated>
 
   public async Task Handle(TemplateCreated notification, CancellationToken cancellationToken)
   {
-    RealmEntity realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == notification.RealmId.Value, cancellationToken)
-      ?? throw new InvalidOperationException($"The template entity '{notification.RealmId}' could not be found.");
+    RealmEntity? realm = null;
+    if (notification.RealmId.HasValue)
+    {
+      realm = await _context.Realms
+        .SingleOrDefaultAsync(x => x.AggregateId == notification.RealmId.Value.Value, cancellationToken)
+        ?? throw new InvalidOperationException($"The realm entity '{notification.RealmId}' could not be found.");
+    }
 
     ActorEntity actor = await _actorService.GetAsync(notification, cancellationToken);
     TemplateEntity template = new(notification, realm, actor);
