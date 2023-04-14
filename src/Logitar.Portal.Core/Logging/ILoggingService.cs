@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Errors;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Contracts.Errors;
 
 namespace Logitar.Portal.Core.Logging;
 
@@ -11,6 +12,8 @@ public interface ILoggingService
   Task<Guid> StartActivityAsync(object activity, DateTime? startedOn = null, CancellationToken cancellationToken = default);
   Task AddErrorAsync(Error error, CancellationToken cancellationToken = default);
   Task AddErrorAsync(Error error, Guid? activityId = null, CancellationToken cancellationToken = default);
+  Task AddEventAsync(DomainEvent change, CancellationToken cancellationToken = default);
+  Task AddEventAsync(DomainEvent change, Guid? activityId = null, CancellationToken cancellationToken = default);
   Task SetActorsAsync(Guid actorId, Guid? userId = null, Guid? sessionId = null, CancellationToken cancellationToken = default);
   Task SetOperationAsync(string type, string name, CancellationToken cancellationToken = default);
   Task EndActivityAsync(Guid id, CancellationToken cancellationToken = default);

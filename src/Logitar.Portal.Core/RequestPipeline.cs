@@ -6,11 +6,15 @@ namespace Logitar.Portal.Core;
 
 internal class RequestPipeline : IRequestPipeline
 {
+  private readonly IApplicationContext _applicationContext;
   private readonly ILoggingService _loggingService;
   private readonly IMediator _mediator;
 
-  public RequestPipeline(ILoggingService loggingService, IMediator mediator)
+  public RequestPipeline(IApplicationContext applicationContext,
+    ILoggingService loggingService,
+    IMediator mediator)
   {
+    _applicationContext = applicationContext;
     _loggingService = loggingService;
     _mediator = mediator;
   }
@@ -18,6 +22,7 @@ internal class RequestPipeline : IRequestPipeline
   public async Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken)
   {
     Guid activityId = await _loggingService.StartActivityAsync(request, cancellationToken);
+    _applicationContext.ActivityId = activityId;
 
     try
     {

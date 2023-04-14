@@ -63,4 +63,6 @@ internal class ActivityEntity
   }
   public void AddError(Error error) => _errors.Add(error);
   public void Complete(DateTime? endedOn = null) => EndedOn = endedOn ?? DateTime.UtcNow;
+
+  public List<LogEventEntity> Events { get; private set; } = new();
 }

@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Configurations;
+﻿namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 
 internal static class Schemas
 {

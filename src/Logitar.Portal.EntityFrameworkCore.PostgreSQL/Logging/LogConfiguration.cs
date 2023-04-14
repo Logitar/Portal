@@ -1,8 +1,7 @@
-﻿using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Configurations;
+namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
 internal class LogConfiguration : IEntityTypeConfiguration<LogEntity>
 {

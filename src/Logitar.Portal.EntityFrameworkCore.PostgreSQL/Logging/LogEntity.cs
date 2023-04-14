@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.Contracts.Errors;
+﻿using Logitar.EventSourcing;
+using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.Contracts.Errors;
 using System.Collections.Concurrent;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
@@ -7,6 +9,7 @@ internal class LogEntity
 {
   private readonly ConcurrentDictionary<Guid, ActivityEntity> _activities = new();
   private readonly List<Error> _errors = new();
+  private readonly ConcurrentDictionary<Guid, ActivityEntity?> _events = new();
 
   public LogEntity(string? correlationId = null, string? method = null, string? destination = null,
     string? source = null, string? additionalInformation = null, DateTime? startedOn = null)
@@ -108,5 +111,19 @@ internal class LogEntity
       activity.Complete(endedOn);
       Activities.Add(activity);
     }
+  }
+
+  public List<LogEventEntity> Events { get; private set; } = new();
+  public IReadOnlyDictionary<Guid, ActivityEntity?> PendingEvents => _events.AsReadOnly();
+  public void AddEvent(DomainEvent change, Guid? activityId = null)
+  {
+    ActivityEntity? activity = activityId.HasValue ? _activities[activityId.Value] : null;
+    _events[change.Id] = activity;
+  }
+  public void AddEvent(EventEntity @event, ActivityEntity? activity = null)
+  {
+    LogEventEntity logEvent = new(@event, this, activity);
+    Events.Add(logEvent);
+    activity?.Events.Add(logEvent);
   }
 }

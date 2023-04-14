@@ -1,22 +1,28 @@
-﻿using Logitar.Portal.Contracts.Errors;
+﻿using Logitar.EventSourcing;
+using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL;
+using Logitar.EventSourcing.EntityFrameworkCore.PostgreSQL.Entities;
+using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Core.Caching;
 using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Logging;
 using Logitar.Portal.Core.Realms;
+using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Logging;
 
 internal class LoggingService : ILoggingService
 {
-  private LogEntity? _log = null;
+  private LogEntity? _log;
 
   private readonly ICacheService _cacheService;
-  private readonly PortalContext _context;
+  private readonly EventContext _eventContext;
+  private readonly PortalContext _portalContext;
 
-  public LoggingService(ICacheService cacheService, PortalContext context)
+  public LoggingService(ICacheService cacheService, EventContext eventContext, PortalContext portalContext)
   {
     _cacheService = cacheService;
-    _context = context;
+    _eventContext = eventContext;
+    _portalContext = portalContext;
   }
 
   public Task StartAsync(string? correlationId, string? method, string? destination,
@@ -48,6 +54,17 @@ internal class LoggingService : ILoggingService
     AssertLogHasBeenStarted();
 
     _log!.AddError(error, activityId);
+
+    return Task.CompletedTask;
+  }
+
+  public async Task AddEventAsync(DomainEvent change, CancellationToken cancellationToken)
+    => await AddEventAsync(change, activityId: null, cancellationToken);
+  public Task AddEventAsync(DomainEvent change, Guid? activityId, CancellationToken cancellationToken)
+  {
+    AssertLogHasBeenStarted();
+
+    _log!.AddEvent(change, activityId);
 
     return Task.CompletedTask;
   }
@@ -94,8 +111,20 @@ internal class LoggingService : ILoggingService
       if ((settings.Extent == LoggingExtent.Full || (settings.Extent == LoggingExtent.ActivityOnly && _log.Activities.Any()))
         && (!settings.OnlyErrors || _log.HasErrors))
       {
-        _context.Logs.Add(_log);
-        await _context.SaveChangesAsync(cancellationToken);
+        IReadOnlyDictionary<Guid, ActivityEntity?> pendingEvents = _log.PendingEvents;
+        Dictionary<Guid, EventEntity> eventIds = await _eventContext.Events.AsNoTracking()
+          .Where(e => pendingEvents.Keys.Contains(e.Id))
+          .ToDictionaryAsync(e => e.Id, e => e, cancellationToken);
+        foreach (var (id, activity) in pendingEvents)
+        {
+          if (eventIds.TryGetValue(id, out EventEntity? @event))
+          {
+            _log.AddEvent(@event, activity);
+          }
+        }
+
+        _portalContext.Logs.Add(_log);
+        await _portalContext.SaveChangesAsync(cancellationToken);
       }
     }
 

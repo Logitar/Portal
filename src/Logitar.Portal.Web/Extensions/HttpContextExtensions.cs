@@ -9,6 +9,7 @@ namespace Logitar.Portal.Web.Extensions;
 
 internal static class HttpContextExtensions
 {
+  private const string ActivityIdKey = "ActivityId";
   private const string SessionIdKey = "SessionId";
   private const string SessionKey = "Session";
   private const string UserKey = "User";
@@ -32,6 +33,7 @@ internal static class HttpContextExtensions
     return JsonSerializer.Serialize(context.Request.Headers);
   }
 
+  public static Guid? GetActivityId(this HttpContext context) => context.GetItem<Guid>(ActivityIdKey);
   public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key)
@@ -39,6 +41,7 @@ internal static class HttpContextExtensions
     return context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
   }
 
+  public static void SetActivityId(this HttpContext context, Guid? activityId) => context.SetItem(ActivityIdKey, activityId);
   public static void SetSession(this HttpContext context, Session? session) => context.SetItem(SessionKey, session);
   public static void SetUser(this HttpContext context, User? user) => context.SetItem(UserKey, user);
   private static void SetItem<T>(this HttpContext context, object key, T? value)
