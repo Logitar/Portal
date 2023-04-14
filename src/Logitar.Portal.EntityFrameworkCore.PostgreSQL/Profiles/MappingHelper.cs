@@ -17,15 +17,7 @@ internal static class MappingHelper
 
     ActorEntity entity = ActorEntity.Deserialize(json);
 
-    return new Actor
-    {
-      Id = id.Value,
-      Type = entity.Type,
-      IsDeleted = entity.IsDeleted,
-      DisplayName = entity.DisplayName,
-      EmailAddress = entity.EmailAddress,
-      Picture = entity.Picture
-    };
+    return entity.ToActor(id.Value);
   }
 
   public static IEnumerable<CustomAttribute> GetCustomAttributes(ICustomAttributes entity, object? _)
