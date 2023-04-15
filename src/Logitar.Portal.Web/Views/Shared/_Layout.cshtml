@@ -1,5 +1,7 @@
 ﻿@using Logitar.Portal.Contracts.Constants;
 
+@inject IHostEnvironment _environment;
+
 <!DOCTYPE html>
 <html lang="@Thread.CurrentThread.CurrentUICulture.Name">
 <head>
@@ -27,7 +29,7 @@
 </head>
 <body>
   <div id="app">
-    <navbar user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
+    <navbar environment="@(_environment.EnvironmentName)" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
     @RenderBody()
     <app-footer version="v@(Application.Version)"></app-footer>
   </div>

@@ -4,7 +4,7 @@
       <b-navbar-brand href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
         Portal
-        <b-badge v-if="environment" variant="warning">{{ environment }}</b-badge>
+        <b-badge v-if="environment" variant="warning">{{ environment.toLowerCase() }}</b-badge>
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -104,6 +104,10 @@ export default {
     UserAvatar
   },
   props: {
+    environment: {
+      type: String,
+      default: ''
+    },
     user: {
       type: String,
       required: true
@@ -112,11 +116,6 @@ export default {
   data() {
     return {
       currentUser: null
-    }
-  },
-  computed: {
-    environment() {
-      return process.env.VUE_APP_ENV
     }
   },
   methods: {

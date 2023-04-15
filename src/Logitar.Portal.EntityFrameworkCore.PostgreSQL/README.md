@@ -1,6 +1,6 @@
 # Logitar.Portal.EntityFrameworkCore.PostgreSQL
 
-EntityFrameworkCore PostgreSQL store integration for Portal.
+EntityFrameworkCore PostgreSQL store integration of the Portal system.
 
 ## Migrations
 
