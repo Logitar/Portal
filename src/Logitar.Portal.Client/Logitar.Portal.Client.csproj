@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Logitar.Portal.Client.IntegrationTests" />
+  </ItemGroup>
+
 </Project>
