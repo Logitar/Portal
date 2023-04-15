@@ -42,5 +42,5 @@ internal class SessionService : HttpService, ISessionService
     => await PatchAsync<Session>($"{BasePath}/{id}/sign/out", cancellationToken);
 
   public async Task<IEnumerable<Session>> SignOutUserAsync(Guid id, CancellationToken cancellationToken)
-    => await PatchAsync<IEnumerable<Session>>($"sign/out/user/{id}", cancellationToken);
+    => await PatchAsync<IEnumerable<Session>>($"{BasePath}/sign/out/user/{id}", cancellationToken);
 }
