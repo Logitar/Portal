@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230414212645_Release_v2_0_0")]
+    [Migration("20230415044658_Release_v2_0_0")]
     partial class Release_v2_0_0
     {
         /// <inheritdoc />
@@ -1048,6 +1048,9 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Property<string>("Errors")
                         .HasColumnType("jsonb");
 
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
@@ -1110,6 +1113,9 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.Property<string>("Errors")
                         .HasColumnType("jsonb");
+
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

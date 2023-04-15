@@ -50,7 +50,11 @@ internal class ActivityEntity
     get => _errors.GetLogLevel().ToString();
     private set { }
   }
-  public bool HasErrors => _errors.Any(); // TODO(fpion): invalid column
+  public bool HasErrors
+  {
+    get => _errors.Any();
+    private set { }
+  }
   public string? Errors
   {
     get => _errors.Any() ? $"[{string.Join(',', _errors.Select(error => error.Serialize()))}]" : null;

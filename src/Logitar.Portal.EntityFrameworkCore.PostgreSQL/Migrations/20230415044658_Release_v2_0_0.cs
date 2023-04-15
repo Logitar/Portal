@@ -39,6 +39,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     SessionId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Level = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    HasErrors = table.Column<bool>(type: "boolean", nullable: false),
                     Errors = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
@@ -121,6 +122,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     Duration = table.Column<TimeSpan>(type: "interval", nullable: true),
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Level = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    HasErrors = table.Column<bool>(type: "boolean", nullable: false),
                     Errors = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
