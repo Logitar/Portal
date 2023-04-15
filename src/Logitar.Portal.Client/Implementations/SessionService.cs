@@ -38,9 +38,6 @@ internal class SessionService : HttpService, ISessionService
   public async Task<Session> SignInAsync(SignInInput input, string? realm, CancellationToken cancellationToken)
     => await PostAsync<Session>($"{BasePath}/sign/in/realm/{realm}", input, cancellationToken);
 
-  public async Task<IEnumerable<Session>> SignOutAllAsync(Guid userId, CancellationToken cancellationToken)
-    => await PatchAsync<IEnumerable<Session>>($"users/{userId}/sessions/sign/out", cancellationToken);
-
   public async Task<Session> SignOutAsync(Guid id, CancellationToken cancellationToken)
     => await PatchAsync<Session>($"{BasePath}/{id}/sign/out", cancellationToken);
 
