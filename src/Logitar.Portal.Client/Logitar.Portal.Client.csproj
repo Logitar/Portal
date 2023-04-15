@@ -5,6 +5,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>2.0.0</Version>
+    <Authors>Francis Pion</Authors>
+    <Company>Logitar</Company>
+    <Description>HTTP client integration of the Portal system.</Description>
+    <Copyright>© 2023 Logitar All Rights Reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/Utar94/Portal/tree/main/src/Logitar.Portal.Client</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Utar94/Portal</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Rewrote the entire Portal system to version 2.</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>portal;api;http;client;net7.0;asp;net</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageIcon>logitar_portal.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +33,21 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Logitar.Portal.Client.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+    <None Update="logitar_portal.png">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
   </ItemGroup>
 
 </Project>
