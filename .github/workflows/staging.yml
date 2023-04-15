@@ -6,6 +6,7 @@ on:
       - dev
       - "hotfix_**"
       - "release_**"
+      - "218"
   workflow_dispatch:
 
 jobs:
@@ -24,6 +25,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           cd ./src/Logitar.Portal.UI
+          node -v
           npm ci
           npm run build:staging
           cd ../..
