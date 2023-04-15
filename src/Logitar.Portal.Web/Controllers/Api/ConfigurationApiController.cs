@@ -40,7 +40,7 @@ public class ConfigurationApiController : ControllerBase
   {
     if (await _configurationService.GetAsync(cancellationToken) != null)
     {
-      return Forbid();
+      return StatusCode(StatusCodes.Status403Forbidden);
     }
 
     Configuration configuration = await _configurationService.InitializeAsync(input, cancellationToken);

@@ -82,7 +82,7 @@ internal class LogEntity
     get => _errors.GetLogLevel().ToString();
     private set { }
   }
-  public bool HasErrors => _errors.Any();
+  public bool HasErrors => _errors.Any(); // TODO(fpion): invalid column
   public string? Errors
   {
     get => _errors.Any() ? $"[{string.Join(',', _errors.Select(error => error.Serialize()))}]" : null;
