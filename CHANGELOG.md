@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [2.0.0] - 2023-04-15
+
 ### Added
 
 - Implemented Basic authentication.
@@ -48,5 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Utar94/Portal/compare/v1.1.5...HEAD
+[unreleased]: https://github.com/Utar94/Portal/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Utar94/Portal/compare/v1.1.5...v2.0.0
 [1.1.5]: https://github.com/Utar94/Portal/releases/tag/v1.1.5
