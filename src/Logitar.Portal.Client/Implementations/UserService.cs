@@ -60,7 +60,7 @@ internal class UserService : HttpService, IUserService
     => await PostAsync<SentMessages>($"{BasePath}/password/recover", input, cancellationToken);
 
   public async Task<User> ResetPasswordAsync(ResetPasswordInput input, CancellationToken cancellationToken)
-    => await PostAsync<User>($"{BasePath}/password/reset", input, cancellationToken);
+    => await PatchAsync<User>($"{BasePath}/password/reset", input, cancellationToken);
 
   public async Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken)
     => await PatchAsync<User>($"{BasePath}/{id}/external-identifiers/{key}?value={value}", cancellationToken);
