@@ -20,7 +20,7 @@ public class TokenApiController : ControllerBase
   [HttpPost("consume")]
   public async Task<ActionResult<ValidatedToken>> ConsumeAsync([FromBody] ValidateTokenInput input, CancellationToken cancellationToken)
   {
-    return Ok(await _tokenService.ValidateAsync(input, consume: true, cancellationToken));
+    return Ok(await _tokenService.ConsumeAsync(input, cancellationToken));
   }
 
   [HttpPost("create")]
@@ -32,6 +32,6 @@ public class TokenApiController : ControllerBase
   [HttpPost("validate")]
   public async Task<ActionResult<ValidatedToken>> ValidateAsync([FromBody] ValidateTokenInput input, CancellationToken cancellationToken)
   {
-    return Ok(await _tokenService.ValidateAsync(input, consume: false, cancellationToken));
+    return Ok(await _tokenService.ValidateAsync(input, cancellationToken));
   }
 }
