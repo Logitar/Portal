@@ -291,7 +291,7 @@ internal class UserEntity : AggregateEntity, ICustomAttributes
     FullName = e.FullName;
     Nickname = e.Nickname;
 
-    Birthdate = e.Birthdate;
+    Birthdate = e.Birthdate?.ToUniversalTime();
     Gender = e.Gender?.Value;
 
     Locale = e.Locale?.ToString();

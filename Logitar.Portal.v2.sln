@@ -26,7 +26,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal", "src\Logit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{25881979-28C2-42F3-97DC-ECB49C237FA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Client", "src\Logitar.Portal.Client\Logitar.Portal.Client.csproj", "{40117CD5-06DA-416E-9F9E-7974569C7449}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Client", "src\Logitar.Portal.Client\Logitar.Portal.Client.csproj", "{40117CD5-06DA-416E-9F9E-7974569C7449}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DF8B5B10-AAC4-491D-8E22-3E6A72BC7468}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Client.IntegrationTests", "tests\Logitar.Portal.Client.IntegrationTests\Logitar.Portal.Client.IntegrationTests.csproj", "{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,9 +66,16 @@ Global
 		{40117CD5-06DA-416E-9F9E-7974569C7449}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40117CD5-06DA-416E-9F9E-7974569C7449}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40117CD5-06DA-416E-9F9E-7974569C7449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66650554-C3C2-4607-A5D9-CBD1EDC5D5C6} = {DF8B5B10-AAC4-491D-8E22-3E6A72BC7468}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55C506C2-F420-403F-B2E6-A47E2DF4C4B6}

@@ -1045,6 +1045,9 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Property<string>("Errors")
                         .HasColumnType("jsonb");
 
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
@@ -1107,6 +1110,9 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.Property<string>("Errors")
                         .HasColumnType("jsonb");
+
+                    b.Property<bool>("HasErrors")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

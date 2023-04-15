@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Implemented Basic authentication.
+- Added client endpoint tests.
+
 ### Changed
 
 - Archived V1.
@@ -22,18 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reimplemented template management.
 - Reimplemented message management.
 - Updated repository information.
-- Replace AllowedUsernameCharacters by UsernameSettings and extented initial configuration.
+- Replaced AllowedUsernameCharacters by UsernameSettings and extented initial configuration.
 - Updated NPM packages.
 - Updated NuGet packages.
 - Removed V1 projects and renamed V2 projects.
 - Reimplemented HTTP client.
 - Enhanced realm JWT secret.
 - Reimplemented password recovery.
-- Implemented Basic authentication.
 - Reimplemented logging.
 - Reimplemented caching.
 - Reverted to V1 realm handling.
-- Implemented basic Portal configuration.
+- Reimplemented basic Portal configuration.
 - Merged ICurrentActor into IApplicationContext.
 - Merged database migrations.
 

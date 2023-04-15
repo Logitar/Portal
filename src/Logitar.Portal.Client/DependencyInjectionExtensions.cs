@@ -14,12 +14,12 @@ namespace Logitar.Portal.Client;
 
 public static class DependencyInjectionExtensions
 {
-  public static IServiceCollection AddPortalClient(this IServiceCollection services, IConfiguration configuration)
+  public static IServiceCollection AddLogitarPortalClient(this IServiceCollection services, IConfiguration configuration)
   {
-    return services.AddPortalClient(configuration.GetSection("Portal").Get<PortalSettings>());
+    return services.AddLogitarPortalClient(configuration.GetSection("Portal").Get<PortalSettings>());
   }
 
-  public static IServiceCollection AddPortalClient(this IServiceCollection services, PortalSettings? settings = null)
+  public static IServiceCollection AddLogitarPortalClient(this IServiceCollection services, PortalSettings? settings = null)
   {
     if (settings != null)
     {
@@ -28,13 +28,13 @@ public static class DependencyInjectionExtensions
 
     return services
       .AddHttpClient()
-      .AddScoped<IDictionaryService, DictionaryService>()
-      .AddScoped<IMessageService, MessageService>()
-      .AddScoped<IRealmService, RealmService>()
-      .AddScoped<ISenderService, SenderService>()
-      .AddScoped<ISessionService, SessionService>()
-      .AddScoped<ITemplateService, TemplateService>()
-      .AddScoped<ITokenService, TokenService>()
-      .AddScoped<IUserService, UserService>();
+      .AddTransient<IDictionaryService, DictionaryService>()
+      .AddTransient<IMessageService, MessageService>()
+      .AddTransient<IRealmService, RealmService>()
+      .AddTransient<ISenderService, SenderService>()
+      .AddTransient<ISessionService, SessionService>()
+      .AddTransient<ITemplateService, TemplateService>()
+      .AddTransient<ITokenService, TokenService>()
+      .AddTransient<IUserService, UserService>();
   }
 }
