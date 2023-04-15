@@ -1,0 +1,10 @@
+{
+  "initialization": {
+    "initialize": "Initialize",
+    "title": "Initialization",
+    "user": {
+      "help": "Fill the form below to create the first administrator account.",
+      "label": "User"
+    }
+  }
+}

@@ -3,8 +3,7 @@ name: Deploy Production Portal to Azure
 on:
   push:
     branches:
-      - 'hotfix_**'
-      - 'release_**'
+      - main
   workflow_dispatch:
 
 jobs:
@@ -12,22 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - uses: azure/docker-login@v1
         with:
           login-server: francispion.azurecr.io
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          cd ./frontend
+          cd ./src/Logitar.Portal.UI
           npm ci
           npm run build
-          cd ../backend
-          docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Logitar.Portal.Web/Dockerfile
+          cd ../..
+          docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Logitar.Portal/Dockerfile
           docker push francispion.azurecr.io/portal:${{ github.sha }}
 
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: 'portal-francispion'
+          app-name: "portal-francispion"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'francispion.azurecr.io/portal:${{ github.sha }}'
+          images: "francispion.azurecr.io/portal:${{ github.sha }}"
