@@ -27,7 +27,21 @@ internal class UserCreatedHandler : INotificationHandler<UserCreated>
         ?? throw new InvalidOperationException($"The realm entity '{notification.RealmId}' could not be found.");
     }
 
-    ActorEntity actor = await _actorService.GetAsync(notification, cancellationToken);
+    ActorEntity actor;
+    if (notification.ActorId == notification.AggregateId)
+    {
+      actor = new()
+      {
+        Type = Contracts.Actors.ActorType.User,
+        DisplayName = notification.FullName ?? notification.Username,
+        Picture = notification.Picture?.ToString()
+      };
+    }
+    else
+    {
+      actor = await _actorService.GetAsync(notification, cancellationToken);
+    }
+
     UserEntity user = new(notification, realm, actor);
 
     _context.Users.Add(user);
