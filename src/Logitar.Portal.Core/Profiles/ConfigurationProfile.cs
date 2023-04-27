@@ -9,7 +9,7 @@ internal class ConfigurationProfile : Profile
 {
   public ConfigurationProfile()
   {
-    CreateMap<ConfigurationAggregate, Configuration>();
+    CreateMap<ConfigurationAggregate, Configuration>(); // TODO(fpion): CreatedBy & UpdatedBy
     CreateMap<ReadOnlyLoggingSettings, LoggingSettings>();
     CreateMap<ReadOnlyPasswordSettings, PasswordSettings>();
     CreateMap<ReadOnlyUsernameSettings, UsernameSettings>();

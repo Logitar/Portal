@@ -39,4 +39,11 @@ public class ConfigurationApiController : ControllerBase
 
     return Ok(configuration);
   }
+
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
+  [HttpPut]
+  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.UpdateAsync(input, cancellationToken));
+  }
 }

@@ -21,4 +21,9 @@ internal class ConfigurationService : IConfigurationService
   {
     return await _pipeline.ExecuteAsync(new InitializeConfiguration(input), cancellationToken);
   }
+
+  public async Task<Configuration> UpdateAsync(UpdateConfigurationInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new UpdateConfiguration(input), cancellationToken);
+  }
 }

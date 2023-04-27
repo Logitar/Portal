@@ -40,7 +40,28 @@ public class ConfigurationAggregate : AggregateRoot
 
   public ReadOnlyLoggingSettings LoggingSettings { get; private set; } = new();
 
-  protected virtual void Apply(ConfigurationInitialized e)
+  protected virtual void Apply(ConfigurationInitialized e) => Apply((ConfigurationSaved)e);
+
+  public void Update(AggregateId actorId, CultureInfo defaultLocale, string? secret,
+    ReadOnlyUsernameSettings? usernameSettings, ReadOnlyPasswordSettings? passwordSettings,
+    ReadOnlyLoggingSettings? loggingSettings)
+  {
+    ConfigurationUpdated e = new()
+    {
+      ActorId = actorId,
+      DefaultLocale = defaultLocale,
+      Secret = secret?.CleanTrim() ?? SecurityHelper.GenerateSecret(),
+      UsernameSettings = usernameSettings ?? new(),
+      PasswordSettings = passwordSettings ?? new(),
+      LoggingSettings = loggingSettings ?? new()
+    };
+    new ConfigurationUpdatedValidator().ValidateAndThrow(e);
+
+    ApplyChange(e);
+  }
+  protected virtual void Apply(ConfigurationUpdated e) => Apply((ConfigurationSaved)e);
+
+  protected virtual void Apply(ConfigurationSaved e)
   {
     DefaultLocale = e.DefaultLocale;
     Secret = e.Secret;
