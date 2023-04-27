@@ -4,7 +4,7 @@
       <b-navbar-brand href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
         Portal
-        <b-badge v-if="environment" variant="warning">{{ environment.toLowerCase() }}</b-badge>
+        <b-badge v-if="environment && environment.toLowerCase() !== 'production'" variant="warning">{{ environment.toLowerCase() }}</b-badge>
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -110,7 +110,7 @@ export default {
   props: {
     environment: {
       type: String,
-      default: ''
+      required: true
     },
     user: {
       type: String,
