@@ -21,6 +21,7 @@ public class Program
 
     using IServiceScope scope = application.Services.CreateScope();
 
+    #region TODO(fpion): refactor
     if (application.Configuration.GetValue<bool>("MigrateDatabase"))
     {
       IRequest? migrateDatabase = null;
@@ -43,6 +44,7 @@ public class Program
     IConfigurationRepository configurationRepository = scope.ServiceProvider.GetRequiredService<IConfigurationRepository>();
     ConfigurationAggregate? configuration = await configurationRepository.LoadAsync();
     cacheService.Configuration = configuration;
+    #endregion
 
     application.Run();
   }

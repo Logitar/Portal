@@ -1,4 +1,5 @@
 {
+  "defaultLocale": "Default Locale",
   "initialization": {
     "initialize": "Initialize",
     "title": "Initialization",
@@ -6,5 +7,19 @@
       "help": "Fill the form below to create the first administrator account.",
       "label": "User"
     }
-  }
+  },
+  "logging": {
+    "extent": {
+      "label": "Extent",
+      "onlyErrors": "Only log requests with errors",
+      "options": {
+        "ActivityOnly": "Log only requests with activities",
+        "Full": "Log all requests",
+        "None": "Never log requests"
+      },
+      "placeholder": "Select a logging extent"
+    }
+  },
+  "title": "Configuration",
+  "updated": "The configuration has been updated."
 }

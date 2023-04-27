@@ -1,8 +1,9 @@
-﻿using Logitar.Portal.Contracts.Realms;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.Core.Configurations;
 
-public record Configuration
+public record Configuration : Aggregate
 {
   public string DefaultLocale { get; set; } = string.Empty;
   public string Secret { get; set; } = string.Empty;

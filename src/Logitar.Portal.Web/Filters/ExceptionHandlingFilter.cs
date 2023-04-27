@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Portal.Core;
+using Logitar.Portal.Core.Configurations;
 using Logitar.Portal.Core.Dictionaries;
 using Logitar.Portal.Core.Messages;
 using Logitar.Portal.Core.Realms;
@@ -19,6 +20,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(AccountIsDisabledException)] = HandleAccountIsDisabledException,
     [typeof(AccountIsNotConfirmedException)] = HandleAccountIsNotConfirmedException,
     [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
+    [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(DefaultSenderRequiredException)] = HandleDefaultSenderRequiredException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(ExternalIdentifierAlreadyUsedException)] = HandleExternalIdentifierAlreadyUsedException,
@@ -76,6 +78,14 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static void HandleCannotDeleteDefaultSenderException(ExceptionContext context)
   {
     context.Result = new BadRequestObjectResult(new { Code = GetCode(context.Exception) });
+  }
+
+  private static void HandleConfigurationAlreadyInitializedException(ExceptionContext context)
+  {
+    context.Result = new JsonResult(new { Code = GetCode(context.Exception) })
+    {
+      StatusCode = StatusCodes.Status403Forbidden
+    };
   }
 
   private static void HandleDefaultSenderRequiredException(ExceptionContext context)

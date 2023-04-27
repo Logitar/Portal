@@ -69,6 +69,10 @@
           </b-nav-item-dropdown> -->
 
           <template v-if="currentUser.isAuthenticated">
+            <b-nav-item href="/configuration">
+              <font-awesome-icon icon="cog" />
+              {{ $t('configuration.title') }}
+            </b-nav-item>
             <b-nav-item-dropdown right>
               <template #button-content>
                 <user-avatar :user="currentUser" :size="24" />

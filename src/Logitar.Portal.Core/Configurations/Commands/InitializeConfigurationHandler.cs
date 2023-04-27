@@ -27,24 +27,30 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
 
   public async Task<Configuration> Handle(InitializeConfiguration request, CancellationToken cancellationToken)
   {
+    if (await _configurationRepository.LoadAsync(cancellationToken) != null)
+    {
+      throw new ConfigurationAlreadyInitializedException();
+    }
+
     InitializeConfigurationInput input = request.Input;
+    InitialUserInput userInput = input.User;
 
     CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
     ReadOnlyUsernameSettings? usernameSettings = ReadOnlyUsernameSettings.From(input.UsernameSettings);
     ReadOnlyPasswordSettings? passwordSettings = ReadOnlyPasswordSettings.From(input.PasswordSettings);
     ReadOnlyLoggingSettings? loggingSettings = ReadOnlyLoggingSettings.From(input.LoggingSettings);
 
+    // TODO(fpion): user should create itself and the configuration
+
     ConfigurationAggregate configuration = new(_applicationContext.ActorId, defaultLocale, input.Secret,
       usernameSettings, passwordSettings, loggingSettings);
 
-    await _configurationRepository.SaveAsync(configuration, cancellationToken);
-
-    InitialUserInput userInput = input.User;
     UserAggregate user = new(_applicationContext.ActorId, configuration.UsernameSettings, userInput.Username, userInput.FirstName,
       lastName: userInput.LastName, locale: defaultLocale);
     user.ChangePassword(_applicationContext.ActorId, configuration.PasswordSettings, userInput.Password);
     user.SetEmail(_applicationContext.ActorId, new ReadOnlyEmail(userInput.EmailAddress));
 
+    await _configurationRepository.SaveAsync(configuration, cancellationToken);
     await _userRepository.SaveAsync(user, cancellationToken);
 
     return _mapper.Map<Configuration>(configuration);
