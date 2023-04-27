@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The initial user is now the actor in its creation and initialization of the configuration.
 - Refactored database & caching initialization.
+- Renamed alias to slug and remove accents in slugs.
 
 ## [2.0.0] - 2023-04-15
 
