@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Core.Caching.Commands;
-using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
+using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
 namespace Logitar.Portal;
@@ -21,27 +21,8 @@ public class Program
     using IServiceScope scope = application.Services.CreateScope();
 
     IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+    await mediator.Publish(new InitializeDatabase());
     await mediator.Publish(new InitializeCaching());
-
-    #region TODO(fpion): refactor
-    if (application.Configuration.GetValue<bool>("MigrateDatabase"))
-    {
-      IRequest? migrateDatabase = null;
-      DatabaseProvider databaseProvider = application.Configuration.GetValue<DatabaseProvider>("DatabaseProvider");
-      switch (databaseProvider)
-      {
-        case DatabaseProvider.EntityFrameworkCorePostgreSQL:
-          migrateDatabase = new MigrateDatabase();
-          break;
-      }
-
-      if (migrateDatabase != null)
-      {
-        mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(migrateDatabase);
-      }
-    }
-    #endregion
 
     application.Run();
   }
