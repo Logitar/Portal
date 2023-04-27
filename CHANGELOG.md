@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a configuration interface.
 
+### Changed
+
+- The initial user is now the actor in its creation and initialization of the configuration.
+
 ## [2.0.0] - 2023-04-15
 
 ### Added
