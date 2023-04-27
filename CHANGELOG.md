@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added a configuration interface.
+- Added a configuration interface and actors.
 
 ### Fixed
 
