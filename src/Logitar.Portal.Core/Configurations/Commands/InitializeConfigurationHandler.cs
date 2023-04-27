@@ -27,6 +27,11 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
 
   public async Task<Configuration> Handle(InitializeConfiguration request, CancellationToken cancellationToken)
   {
+    if (await _configurationRepository.LoadAsync(cancellationToken) != null)
+    {
+      throw new ConfigurationAlreadyInitializedException();
+    }
+
     InitializeConfigurationInput input = request.Input;
 
     CultureInfo defaultLocale = input.DefaultLocale.GetRequiredCultureInfo(nameof(input.DefaultLocale));
