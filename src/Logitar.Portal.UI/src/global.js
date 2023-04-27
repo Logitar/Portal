@@ -10,14 +10,17 @@ import FormTextarea from './components/shared/FormTextarea.vue'
 import FormUrl from './components/shared/FormUrl.vue'
 import IconButton from './components/shared/IconButton.vue'
 import IconSubmit from './components/shared/IconSubmit.vue'
+import JwtSecretField from './components/shared/JwtSecretField.vue'
 import LocaleSelect from './components/shared/LocaleSelect.vue'
 import NameField from './components/shared/NameField.vue'
+import PasswordSettings from './components/shared/PasswordSettings.vue'
 import SearchField from './components/shared/SearchField.vue'
 import SortSelect from './components/shared/SortSelect.vue'
 import StatusCell from './components/shared/StatusCell.vue'
 import StatusDetail from './components/shared/StatusDetail.vue'
 import StatusInfo from './components/shared/StatusInfo.vue'
 import TimeZoneSelect from './components/shared/TimeZoneSelect.vue'
+import UsernameSettings from './components/shared/UsernameSettings.vue'
 
 Vue.component('count-select', CountSelect)
 Vue.component('delete-modal', DeleteModal)
@@ -29,14 +32,17 @@ Vue.component('form-textarea', FormTextarea)
 Vue.component('form-url', FormUrl)
 Vue.component('icon-button', IconButton)
 Vue.component('icon-submit', IconSubmit)
+Vue.component('jwt-secret-field', JwtSecretField)
 Vue.component('locale-select', LocaleSelect)
 Vue.component('name-field', NameField)
+Vue.component('password-settings', PasswordSettings)
 Vue.component('search-field', SearchField)
 Vue.component('sort-select', SortSelect)
 Vue.component('status-cell', StatusCell)
 Vue.component('status-detail', StatusDetail)
 Vue.component('status-info', StatusInfo)
 Vue.component('timezone-select', TimeZoneSelect)
+Vue.component('username-settings', UsernameSettings)
 
 Vue.mixin({
   methods: {

@@ -60,27 +60,8 @@
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
-            <h5 v-t="'realms.jwt.title'" />
-            <b-form-group>
-              <form-field
-                id="secret"
-                label="realms.jwt.secret.label"
-                :minLength="256 / 8"
-                :maxLength="512 / 8"
-                placeholder="realms.jwt.secret.placeholder"
-                :type="showSecret ? 'text' : 'password'"
-                v-model="secret"
-              >
-                <b-input-group-append>
-                  <icon-button :icon="showSecret ? 'eye-slash' : 'eye'" variant="info" @click="showSecret = !showSecret" />
-                  <icon-button :disabled="!secret" icon="times" text="realms.jwt.secret.clear" variant="warning" @click="secret = null" />
-                </b-input-group-append>
-              </form-field>
-              <b-alert :show="realm && realm.secret !== secret" variant="warning">
-                <p><strong v-t="'realms.jwt.secret.warning'" /></p>
-                <icon-button icon="history" text="realms.jwt.secret.revert" variant="warning" @click="secret = realm.secret" />
-              </b-alert>
-            </b-form-group>
+            <h5 v-t="'jwt.title'" />
+            <jwt-secret-field :oldValue="realm?.secret" warning="realms.jwtSecretWarning" v-model="secret" />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -91,20 +72,16 @@
 <script>
 import Vue from 'vue'
 import AliasField from './AliasField.vue'
-import PasswordSettings from './PasswordSettings.vue'
 import SenderSelect from '@/components/Senders/SenderSelect.vue'
 import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
-import UsernameSettings from './UsernameSettings.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
 export default {
   name: 'RealmEdit',
   components: {
     AliasField,
-    PasswordSettings,
     SenderSelect,
-    TemplateSelect,
-    UsernameSettings
+    TemplateSelect
   },
   props: {
     json: {
@@ -136,7 +113,6 @@ export default {
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
       secret: null,
-      showSecret: false,
       uniqueName: null,
       uniqueNameConflict: false,
       url: null,
