@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Logitar.EventSourcing;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Core.Configurations.Queries;
 using Logitar.Portal.Core.Realms;
 using Logitar.Portal.Core.Users;
 using Logitar.Portal.Core.Users.Contact;
@@ -11,15 +11,15 @@ namespace Logitar.Portal.Core.Configurations.Commands;
 internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfiguration, Configuration>
 {
   private readonly IConfigurationRepository _configurationRepository;
-  private readonly IMapper _mapper;
+  private readonly IMediator _mediator;
   private readonly IUserRepository _userRepository;
 
   public InitializeConfigurationHandler(IConfigurationRepository configurationRepository,
-    IMapper mapper,
+    IMediator mediator,
     IUserRepository userRepository)
   {
     _configurationRepository = configurationRepository;
-    _mapper = mapper;
+    _mediator = mediator;
     _userRepository = userRepository;
   }
 
@@ -51,6 +51,6 @@ internal class InitializeConfigurationHandler : IRequestHandler<InitializeConfig
     await _configurationRepository.SaveAsync(configuration, cancellationToken);
     await _userRepository.SaveAsync(user, cancellationToken);
 
-    return _mapper.Map<Configuration>(configuration);
+    return await _mediator.Send(new ProjectToConfigurationOutput(configuration), cancellationToken);
   }
 }

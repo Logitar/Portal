@@ -31,6 +31,11 @@ internal class UserRepository : EventStore, IUserRepository
     return await LoadAsync<UserAggregate>(id, cancellationToken);
   }
 
+  public async Task<IEnumerable<UserAggregate>> LoadAsync(IEnumerable<AggregateId> ids, bool includeDeleted, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<UserAggregate>(ids, includeDeleted, cancellationToken);
+  }
+
   public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
     IQueryable<EventEntity> query;

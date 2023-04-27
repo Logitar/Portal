@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Logitar.Portal.Core.Configurations.Queries;
 using Logitar.Portal.Core.Realms;
 using MediatR;
 using System.Globalization;
@@ -9,15 +9,15 @@ internal class UpdateConfigurationHandler : IRequestHandler<UpdateConfiguration,
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IConfigurationRepository _configurationRepository;
-  private readonly IMapper _mapper;
+  private readonly IMediator _mediator;
 
   public UpdateConfigurationHandler(IApplicationContext applicationContext,
     IConfigurationRepository configurationRepository,
-    IMapper mapper)
+    IMediator mediator)
   {
     _applicationContext = applicationContext;
     _configurationRepository = configurationRepository;
-    _mapper = mapper;
+    _mediator = mediator;
   }
 
   public async Task<Configuration> Handle(UpdateConfiguration request, CancellationToken cancellationToken)
@@ -35,6 +35,6 @@ internal class UpdateConfigurationHandler : IRequestHandler<UpdateConfiguration,
 
     await _configurationRepository.SaveAsync(configuration, cancellationToken);
 
-    return _mapper.Map<Configuration>(configuration);
+    return await _mediator.Send(new ProjectToConfigurationOutput(configuration), cancellationToken);
   }
 }
