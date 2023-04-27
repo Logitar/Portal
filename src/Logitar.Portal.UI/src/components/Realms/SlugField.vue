@@ -7,7 +7,7 @@
     :placeholder="placeholder"
     :ref="id"
     :required="required"
-    :rules="{ alias: validate }"
+    :rules="{ slug: validate }"
     :value="value"
     @input="$emit('input', $event)"
   >
@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import { isLetterOrDigit } from '@/helpers/stringUtils'
+import { slugify } from '@/helpers/stringUtils'
 
 export default {
-  name: 'AliasField',
+  name: 'SlugField',
   props: {
     disabled: {
       type: Boolean,
@@ -59,24 +59,6 @@ export default {
     }
   },
   methods: {
-    aliasify(value) {
-      value = value ?? ''
-      const words = []
-      let word = ''
-      for (let i = 0; i < value.length; i++) {
-        const c = value[i]
-        if (isLetterOrDigit(c)) {
-          word += c
-        } else if (word.length) {
-          words.push(word)
-          word = ''
-        }
-      }
-      if (word.length) {
-        words.push(word)
-      }
-      return words.join('-').toLowerCase()
-    },
     customize() {
       this.custom = true
     },
@@ -89,12 +71,12 @@ export default {
       if (custom) {
         this.$emit('input', '')
       } else {
-        this.$emit('input', this.aliasify(this.name))
+        this.$emit('input', slugify(this.name))
       }
     },
     name(name) {
       if (!this.custom) {
-        this.$emit('input', this.aliasify(name))
+        this.$emit('input', slugify(name))
       }
     }
   }

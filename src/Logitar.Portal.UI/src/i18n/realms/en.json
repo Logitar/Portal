@@ -35,17 +35,17 @@
   "sort": {
     "options": {
       "DisplayName": "Display name",
-      "UniqueName": "Unique name (alias)",
+      "UniqueName": "Unique name (slug)",
       "UpdatedOn": "Updated on"
     }
   },
   "title": "Realms",
   "uniqueName": {
-    "conflict": "This alias is already used by another realm.",
+    "conflict": "This unique name is already used by another realm.",
     "custom": "Custom",
     "forbidden": "The unique name 'portal' cannot be used.",
-    "label": "Unique name (alias)",
-    "placeholder": "Enter an unique alias"
+    "label": "Unique name (slug)",
+    "placeholder": "Enter an unique slug"
   },
   "updated": "The realm has been updated.",
   "url": {

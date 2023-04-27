@@ -21,8 +21,8 @@
             <b-alert :show="uniqueNameForbidden" variant="warning"><strong v-t="'realms.uniqueName.forbidden'" /></b-alert>
             <b-row>
               <name-field class="col" label="realms.displayName.label" placeholder="realms.displayName.placeholder" v-model="displayName" />
-              <alias-field class="col" v-if="realm" disabled :value="uniqueName" />
-              <alias-field class="col" v-else :name="displayName" ref="uniqueName" required validate v-model="uniqueName" />
+              <slug-field class="col" v-if="realm" disabled :value="uniqueName" />
+              <slug-field class="col" v-else :name="displayName" ref="uniqueName" required validate v-model="uniqueName" />
             </b-row>
             <b-row>
               <locale-select class="col" label="realms.defaultLocale" v-model="defaultLocale" />
@@ -71,16 +71,16 @@
 
 <script>
 import Vue from 'vue'
-import AliasField from './AliasField.vue'
 import SenderSelect from '@/components/Senders/SenderSelect.vue'
+import SlugField from './SlugField.vue'
 import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
 export default {
   name: 'RealmEdit',
   components: {
-    AliasField,
     SenderSelect,
+    SlugField,
     TemplateSelect
   },
   props: {
