@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The initial user is now the actor in its creation and initialization of the configuration.
+- Refactored caching initialization.
 
 ## [2.0.0] - 2023-04-15
 
