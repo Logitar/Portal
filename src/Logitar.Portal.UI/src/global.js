@@ -60,17 +60,6 @@ Vue.mixin({
         ? [...items].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0))
         : [...items].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     },
-    roll(roll) {
-      const dice = roll.split('d')
-      let result = 0
-      for (let i = 0; i < Number(dice[0]); i++) {
-        result += Math.floor(Math.random() * Number(dice[1])) + 1
-      }
-      return result
-    },
-    shortify(text, length) {
-      return text?.length > length ? text.substring(0, length - 1) + '…' : text
-    },
     toast(title, body = '', variant = 'success') {
       this.$bvToast.toast(this.$i18n.t(body), {
         solid: true,

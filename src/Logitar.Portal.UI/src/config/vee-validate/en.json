@@ -1,7 +1,6 @@
 {
   "code": "en",
   "messages": {
-    "alias": "The {_field_} must be composed of non-empty alphanumeric words separated by hyphens (-).",
     "alpha_num": "The {_field_} can only contain letters and digits.",
     "confirmed": "The {target} and the {_field_} must match.",
     "email": "Please enter a valid email address.",
@@ -17,6 +16,7 @@
     "require_uppercase": "The {_field_} must contain at least one uppercase letter (A-Z).",
     "required": "The {_field_} is required.",
     "required_unique_chars": "The {_field_} must contain at least {count} different characters.",
+    "slug": "The {_field_} must be composed of non-empty alphanumeric words separated by hyphens (-).",
     "url": "Please enter a valid URL. Valid URLs start with http:// or https://.",
     "username": "The {_field_} may only contain the following characters: {allowedCharacters}"
   }
