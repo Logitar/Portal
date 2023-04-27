@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.Core\Logitar.Portal.Core.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
