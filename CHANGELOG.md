@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a configuration interface.
 
+### Fixed
+
+- Do not display environment tag in Production environment.
+
 ### Changed
 
 - The initial user is now the actor in its creation and initialization of the configuration.
