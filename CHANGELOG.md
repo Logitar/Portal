@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Do not display environment tag in Production environment.
 - Fixed session properties when refreshed.
+- Increment session version when signing-out.
 
 ### Changed
 
