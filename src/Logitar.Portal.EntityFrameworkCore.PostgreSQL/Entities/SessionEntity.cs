@@ -69,6 +69,8 @@ internal class SessionEntity : AggregateEntity, ICustomAttributes
 
   public void SignOut(SessionSignedOut e, ActorEntity actor)
   {
+    SetVersion(e);
+
     SignedOutById = e.ActorId.ToGuid();
     SignedOutBy = actor.Serialize();
     SignedOutOn = e.OccurredOn;
