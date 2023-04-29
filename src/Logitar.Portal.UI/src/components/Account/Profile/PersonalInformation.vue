@@ -15,7 +15,7 @@
           </td>
         </tr>
         <tr v-if="user.phone">
-          <th scope="row" v-t="'user.phone.label'" />
+          <th scope="row" v-t="'user.phone.e164'" />
           <td>
             {{ user.phone.e164Formatted }}
             <b-badge v-if="user.phone.isVerified" variant="info">{{ $t('user.phone.verified') }}</b-badge>
@@ -43,8 +43,11 @@
     <validation-observer ref="form">
       <b-form @submit.prevent="submit">
         <b-row>
-          <email-field class="col" :verified="user.email?.isVerified" validate v-model="emailAddress" />
-          <phone-field class="col" :verified="user.phone?.isVerified" validate v-model="phoneNumber" />
+          <email-field class="col" validate :verified="user.email?.isVerified" v-model="email.address" />
+        </b-row>
+        <b-row>
+          <phone-field class="col" ref="phone" :required="Boolean(phone.extension)" :verified="user.phone?.isVerified" v-model="phone" />
+          <phone-extension-field class="col" validate v-model="phone.extension" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
@@ -78,6 +81,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import BirthdateField from '@/components/User/BirthdateField.vue'
 import EmailField from '@/components/User/EmailField.vue'
 import FirstNameField from '@/components/User/FirstNameField.vue'
@@ -85,6 +89,7 @@ import GenderSelect from '@/components/User/GenderSelect.vue'
 import LastNameField from '@/components/User/LastNameField.vue'
 import MiddleNameField from '@/components/User/MiddleNameField.vue'
 import NicknameField from '@/components/User/NicknameField.vue'
+import PhoneExtensionField from '@/components/User/PhoneExtensionField.vue'
 import PhoneField from '@/components/User/PhoneField.vue'
 import PictureField from '@/components/User/PictureField.vue'
 import ProfileField from '@/components/User/ProfileField.vue'
@@ -101,6 +106,7 @@ export default {
     LastNameField,
     MiddleNameField,
     NicknameField,
+    PhoneExtensionField,
     PhoneField,
     PictureField,
     ProfileField,
@@ -115,7 +121,9 @@ export default {
   data() {
     return {
       birthdate: null,
-      emailAddress: null,
+      email: {
+        address: null
+      },
       firstName: null,
       gender: null,
       lastName: null,
@@ -123,7 +131,11 @@ export default {
       locale: null,
       middleName: null,
       nickname: null,
-      phoneNumber: null,
+      phone: {
+        countryCode: null,
+        extension: null,
+        number: null
+      },
       picture: null,
       profile: null,
       timeZone: null,
@@ -133,8 +145,10 @@ export default {
   computed: {
     hasChanges() {
       return (
-        (this.emailAddress ?? '') !== (this.user?.email?.address ?? '') ||
-        (this.phoneNumber ?? '') !== (this.user?.phone?.number ?? '') ||
+        (this.email.address ?? '') !== (this.user?.email?.address ?? '') ||
+        (this.phone.number && (this.phone.countryCode ?? '') !== (this.user?.phone?.countryCode ?? '')) ||
+        (this.phone.number ?? '') !== (this.user?.phone?.number ?? '') ||
+        (this.phone.extension ?? '') !== (this.user?.phone?.extension ?? '') ||
         (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
         (this.middleName ?? '') !== (this.user?.middleName ?? '') ||
         (this.lastName ?? '') !== (this.user?.lastName ?? '') ||
@@ -151,14 +165,8 @@ export default {
     payload() {
       return {
         address: this.user?.address ?? null,
-        email: this.emailAddress ? { address: this.emailAddress } : null,
-        phone: this.phoneNumber
-          ? {
-              countryCode: this.user?.phone?.countryCode ?? null,
-              number: this.phoneNumber,
-              extension: this.user?.phone?.extension ?? null
-            }
-          : null,
+        email: this.email.address ? { ...this.email } : null,
+        phone: this.phone.number ? { ...this.phone } : null,
         firstName: this.firstName,
         middleName: this.middleName,
         lastName: this.lastName,
@@ -177,14 +185,16 @@ export default {
   methods: {
     setModel(user) {
       this.birthdate = user.birthdate
-      this.emailAddress = user.email?.address ?? null
+      Vue.set(this.email, 'address', user.email?.address ?? null)
       this.firstName = user.firstName
       this.gender = user.gender
       this.lastName = user.lastName
       this.locale = user.locale
       this.middleName = user.middleName
       this.nickname = user.nickname
-      this.phoneNumber = user.phone?.number ?? null
+      Vue.set(this.phone, 'countryCode', user.phone?.countryCode ?? null)
+      Vue.set(this.phone, 'number', user.phone?.number ?? null)
+      Vue.set(this.phone, 'extension', user.phone?.extension ?? null)
       this.picture = user.picture
       this.profile = user.profile
       this.timeZone = user.timeZone
@@ -194,7 +204,7 @@ export default {
       if (!this.loading) {
         this.loading = true
         try {
-          if (await this.$refs.form.validate()) {
+          if ((await this.$refs.form.validate()) && this.$refs.phone.isValid) {
             const { data } = await updateUser(this.user.id, this.payload)
             this.$refs.form.reset()
             this.$emit('updated', data)
