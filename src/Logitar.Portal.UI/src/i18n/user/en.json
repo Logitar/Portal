@@ -105,8 +105,21 @@
   },
   "passwordChangedOn": "Password changed on",
   "phone": {
-    "label": "Phone Number",
-    "placeholder": "Enter a phone number",
+    "countryCode": {
+      "label": "Country Code",
+      "placeholder": "Select a country code"
+    },
+    "e164": "Phone Number (E164)",
+    "extension": {
+      "label": "Phone Extension",
+      "placeholder": "Enter a phone extension"
+    },
+    "invalid": "The phone is not valid.",
+    "number": {
+      "example": "Example:",
+      "label": "Phone Number",
+      "placeholder": "Enter a phone number"
+    },
     "verified": "Verified"
   },
   "picture": {

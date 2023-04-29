@@ -1,5 +1,4 @@
 ﻿using PhoneNumbers;
-using System.Text;
 
 namespace Logitar.Portal.Core.Users.Contact;
 
@@ -30,22 +29,10 @@ public static class PhoneNumberExtensions
 
   private static PhoneNumber Parse(this IPhoneNumber phoneNumber)
   {
-    StringBuilder phone = new();
+    string phone = string.IsNullOrEmpty(phoneNumber.Extension)
+      ? phoneNumber.Number
+      : $"{phoneNumber.Number} x{phoneNumber.Extension}";
 
-    if (!string.IsNullOrEmpty(phoneNumber.CountryCode))
-    {
-      phone.Append(phoneNumber.CountryCode);
-      phone.Append(' ');
-    }
-
-    phone.Append(phoneNumber.Number);
-
-    if (!string.IsNullOrEmpty(phoneNumber.Extension))
-    {
-      phone.Append(" x");
-      phone.Append(phoneNumber.Extension);
-    }
-
-    return PhoneNumberUtil.GetInstance().Parse(phone.ToString(), DefaultRegion);
+    return PhoneNumberUtil.GetInstance().Parse(phone.ToString(), phoneNumber.CountryCode ?? DefaultRegion);
   }
 }

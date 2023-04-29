@@ -1,6 +1,11 @@
 ﻿@using Logitar.Portal.Contracts.Constants;
 
+@inject IConfiguration _configuration;
 @inject IHostEnvironment _environment;
+
+@{
+  bool enableOpenApi = _configuration.GetValue<bool>("EnableOpenApi");
+}
 
 <!DOCTYPE html>
 <html lang="@Thread.CurrentThread.CurrentUICulture.Name">
@@ -29,7 +34,7 @@
 </head>
 <body>
   <div id="app">
-    <navbar environment="@(_environment.EnvironmentName)" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
+    <navbar enable-open-api="@(enableOpenApi)" environment="@(_environment.EnvironmentName)" user="@(ModelSerializer.Serialize(Context.GetCurrentUser()))"></navbar>
     @RenderBody()
     <app-footer version="v@(Application.Version)"></app-footer>
   </div>
