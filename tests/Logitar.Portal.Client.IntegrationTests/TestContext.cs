@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Realms;
+﻿using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.Client;
 
@@ -42,7 +43,15 @@ internal class TestContext
   public void Fail(string name, Exception exception)
   {
     Console.WriteLine("[{0}%] ({1}/{2}) X Test '{3}' failed", Percentage, _index, _count, name);
-    Console.WriteLine(exception);
+
+    if (exception is ErrorException errorException)
+    {
+      Console.WriteLine(errorException.Error.Serialize());
+    }
+    else
+    {
+      Console.WriteLine(exception);
+    }
 
     _index++;
 
