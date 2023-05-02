@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Core.Caching.Commands;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Core.Caching.Commands;
 using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
@@ -17,6 +18,8 @@ public class Program
     WebApplication application = builder.Build();
 
     startup.Configure(application);
+
+    TypeExtensions.DoNotUseFullAssemblyName = true;
 
     using IServiceScope scope = application.Services.CreateScope();
 
