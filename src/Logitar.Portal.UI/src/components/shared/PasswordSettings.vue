@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h5 v-t="'realms.password.title'" />
+    <h5 v-t="'password.title'" />
     <b-row>
       <form-field
         class="col"
         id="requiredLength"
-        label="realms.password.requiredLength"
+        label="password.requiredLength"
         :minValue="1"
         type="number"
         :value="value.requiredLength"
@@ -14,7 +14,7 @@
       <form-field
         class="col"
         id="requiredUniqueChars"
-        label="realms.password.requiredUniqueChars"
+        label="password.requiredUniqueChars"
         :minValue="1"
         :maxValue="value.requiredLength"
         type="number"
@@ -24,16 +24,16 @@
     </b-row>
     <b-form-group>
       <b-form-checkbox id="requireLowercase" :checked="value.requireLowercase" @input="onInput({ requireLowercase: $event })">
-        {{ $t('realms.password.requireLowercase') }}
+        {{ $t('password.requireLowercase') }}
       </b-form-checkbox>
       <b-form-checkbox id="requireUppercase" :checked="value.requireUppercase" @input="onInput({ requireUppercase: $event })">
-        {{ $t('realms.password.requireUppercase') }}
+        {{ $t('password.requireUppercase') }}
       </b-form-checkbox>
       <b-form-checkbox id="requireDigit" :checked="value.requireDigit" @input="onInput({ requireDigit: $event })">{{
-        $t('realms.password.requireDigit')
+        $t('password.requireDigit')
       }}</b-form-checkbox>
       <b-form-checkbox id="requireNonAlphanumeric" :checked="value.requireNonAlphanumeric" @input="onInput({ requireNonAlphanumeric: $event })">
-        {{ $t('realms.password.requireNonAlphanumeric') }}
+        {{ $t('password.requireNonAlphanumeric') }}
       </b-form-checkbox>
     </b-form-group>
   </div>

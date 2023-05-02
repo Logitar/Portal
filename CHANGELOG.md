@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [2.1.0] - 2023-05-01
+
+### Added
+
+- Added a configuration interface and actors.
+- Added phone country code & extension fields.
+
+### Fixed
+
+- Do not display environment tag in Production environment.
+- Fixed session properties when refreshed.
+- Increment session version when signing-out.
+
+### Changed
+
+- The initial user is now the actor in its creation and initialization of the configuration.
+- Refactored database & caching initialization.
+- Renamed alias to slug and remove accents in slugs.
+- Updated NuGet packages and set DoNotUseFullAssemblyName to true.
+
 ## [2.0.0] - 2023-04-15
 
 ### Added
@@ -52,6 +72,7 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Utar94/Portal/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/Utar94/Portal/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/Utar94/Portal/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Utar94/Portal/compare/v1.1.5...v2.0.0
 [1.1.5]: https://github.com/Utar94/Portal/releases/tag/v1.1.5

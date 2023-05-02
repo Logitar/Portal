@@ -8,6 +8,7 @@ public interface IUserRepository
 {
   Task<UserAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken = default);
   Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<IEnumerable<UserAggregate>> LoadAsync(IEnumerable<AggregateId> ids, bool includeDeleted = false, CancellationToken cancellationToken = default);
   Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken = default);
   Task<UserAggregate?> LoadAsync(RealmAggregate? realm, string username, CancellationToken cancellationToken = default);
   Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, ReadOnlyEmail email, CancellationToken cancellationToken = default);

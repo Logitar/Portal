@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h5 v-t="'realms.username.title'" />
+    <h5 v-t="'username.title'" />
     <form-field
       id="allowedCharacters"
-      label="realms.username.allowedCharacters.label"
-      placeholder="realms.username.allowedCharacters.placeholder"
+      label="username.allowedCharacters.label"
+      placeholder="username.allowedCharacters.placeholder"
       :value="value.allowedCharacters"
       @input="onInput({ allowedCharacters: $event })"
     />

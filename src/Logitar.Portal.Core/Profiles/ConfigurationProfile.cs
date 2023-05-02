@@ -9,7 +9,9 @@ internal class ConfigurationProfile : Profile
 {
   public ConfigurationProfile()
   {
-    CreateMap<ConfigurationAggregate, Configuration>();
+    CreateMap<ConfigurationAggregate, Configuration>()
+      .ForMember(x => x.CreatedBy, x => x.MapFrom((y, _, __, context) => context.GetActor(y.CreatedById)))
+      .ForMember(x => x.UpdatedBy, x => x.MapFrom((y, _, __, context) => context.GetActor(y.UpdatedById)));
     CreateMap<ReadOnlyLoggingSettings, LoggingSettings>();
     CreateMap<ReadOnlyPasswordSettings, PasswordSettings>();
     CreateMap<ReadOnlyUsernameSettings, UsernameSettings>();

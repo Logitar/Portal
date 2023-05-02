@@ -26,28 +26,24 @@ public class ConfigurationApiController : ControllerBase
   [HttpGet]
   public async Task<ActionResult<Configuration>> GetAsync(CancellationToken cancellationToken)
   {
-    Configuration? configuration = await _configurationService.GetAsync(cancellationToken);
-    if (configuration == null)
-    {
-      return NotFound();
-    }
-
-    return Ok(configuration);
+    return Ok(await _configurationService.GetAsync(cancellationToken));
   }
 
   [HttpPost]
   public async Task<ActionResult<Configuration>> InitializeAsync([FromBody] InitializeConfigurationInput input, CancellationToken cancellationToken)
   {
-    if (await _configurationService.GetAsync(cancellationToken) != null)
-    {
-      return StatusCode(StatusCodes.Status403Forbidden);
-    }
-
     Configuration configuration = await _configurationService.InitializeAsync(input, cancellationToken);
 
     Session session = await _mediator.Send(new PortalSignIn(input), cancellationToken);
     HttpContext.SignIn(session);
 
     return Ok(configuration);
+  }
+
+  [Authorize(Policy = Policies.AuthenticatedPortalUser)]
+  [HttpPut]
+  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationInput input, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.UpdateAsync(input, cancellationToken));
   }
 }

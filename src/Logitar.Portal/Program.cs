@@ -1,6 +1,6 @@
-﻿using Logitar.Portal.Core.Caching;
-using Logitar.Portal.Core.Configurations;
-using Logitar.Portal.EntityFrameworkCore.PostgreSQL.Commands;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Core.Caching.Commands;
+using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
 namespace Logitar.Portal;
@@ -19,30 +19,13 @@ public class Program
 
     startup.Configure(application);
 
+    TypeExtensions.DoNotUseFullAssemblyName = true;
+
     using IServiceScope scope = application.Services.CreateScope();
 
-    if (application.Configuration.GetValue<bool>("MigrateDatabase"))
-    {
-      IRequest? migrateDatabase = null;
-      DatabaseProvider databaseProvider = application.Configuration.GetValue<DatabaseProvider>("DatabaseProvider");
-      switch (databaseProvider)
-      {
-        case DatabaseProvider.EntityFrameworkCorePostgreSQL:
-          migrateDatabase = new MigrateDatabase();
-          break;
-      }
-
-      if (migrateDatabase != null)
-      {
-        IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(migrateDatabase);
-      }
-    }
-
-    ICacheService cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-    IConfigurationRepository configurationRepository = scope.ServiceProvider.GetRequiredService<IConfigurationRepository>();
-    ConfigurationAggregate? configuration = await configurationRepository.LoadAsync();
-    cacheService.Configuration = configuration;
+    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+    await mediator.Publish(new InitializeDatabase());
+    await mediator.Publish(new InitializeCaching());
 
     application.Run();
   }

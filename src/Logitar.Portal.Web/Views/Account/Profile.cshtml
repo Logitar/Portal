@@ -1,10 +1,11 @@
-﻿@using AutoMapper;
-@using Logitar.Portal.Contracts.Users;
+﻿@using Logitar.Portal.Contracts.Users;
 @using Logitar.Portal.Core;
 @using Logitar.Portal.Core.Configurations;
+@using Logitar.Portal.Core.Configurations.Queries;
+@using MediatR;
 
 @inject IApplicationContext _applicationContext;
-@inject IMapper _mapper;
+@inject IMediator _mediator;
 
 @model User
 @{
@@ -12,7 +13,7 @@
 
   ViewBag.Title = "Profile";
 
-  Configuration configuration = _mapper.Map<Configuration>(_applicationContext.Configuration);
+  Configuration configuration = await _mediator.Send(new ProjectToConfigurationOutput(_applicationContext.Configuration));
 }
 
 <profile configuration="@(ModelSerializer.Serialize(configuration))" json="@(ModelSerializer.Serialize(Model))" session="@(Context.GetSessionId())"></profile>

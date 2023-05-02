@@ -4,14 +4,14 @@
       <b-navbar-brand href="/">
         <img src="@/assets/logo.png" alt="Portal Logo" height="32" />
         Portal
-        <b-badge v-if="environment" variant="warning">{{ environment.toLowerCase() }}</b-badge>
+        <b-badge v-if="environmentFormatted !== 'production'" variant="warning">{{ environmentFormatted }}</b-badge>
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item v-if="environment === 'development'" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
+          <b-nav-item v-if="isOpenApiEnabled" href="/swagger" target="_blank"><font-awesome-icon icon="vial" /> Swagger</b-nav-item>
           <template v-if="currentUser.isAuthenticated">
             <b-nav-item href="/realms">
               <font-awesome-icon icon="chess-rook" />
@@ -69,6 +69,10 @@
           </b-nav-item-dropdown> -->
 
           <template v-if="currentUser.isAuthenticated">
+            <b-nav-item href="/configuration">
+              <font-awesome-icon icon="cog" />
+              {{ $t('configuration.title') }}
+            </b-nav-item>
             <b-nav-item-dropdown right>
               <template #button-content>
                 <user-avatar :user="currentUser" :size="24" />
@@ -104,9 +108,13 @@ export default {
     UserAvatar
   },
   props: {
-    environment: {
+    enableOpenApi: {
       type: String,
       default: ''
+    },
+    environment: {
+      type: String,
+      required: true
     },
     user: {
       type: String,
@@ -115,16 +123,15 @@ export default {
   },
   data() {
     return {
-      currentUser: null
-    }
-  },
-  methods: {
-    setModel(currentUser) {
-      this.currentUser = currentUser
+      currentUser: null,
+      environmentFormatted: null,
+      isOpenApiEnabled: false
     }
   },
   created() {
-    this.setModel(JSON.parse(this.user))
+    this.currentUser = JSON.parse(this.user)
+    this.environmentFormatted = this.environment.toLowerCase()
+    this.isOpenApiEnabled = this.enableOpenApi.toLowerCase() === 'enable-open-api'
   }
 }
 </script>

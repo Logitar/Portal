@@ -16,4 +16,9 @@ internal class ConfigurationService : HttpService, IConfigurationService
 
   public async Task<Configuration> InitializeAsync(InitializeConfigurationInput input, CancellationToken cancellationToken)
     => await PostAsync<Configuration>("configurations", input, cancellationToken);
+
+  public Task<Configuration> UpdateAsync(UpdateConfigurationInput input, CancellationToken cancellationToken)
+  {
+    throw new NotSupportedException();
+  }
 }

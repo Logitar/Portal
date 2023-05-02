@@ -7,14 +7,6 @@ namespace Logitar.Portal.Core;
 
 internal static class FluentValidationExtensions
 {
-  public static IRuleBuilder<T, string?> Alias<T>(this IRuleBuilder<T, string?> ruleBuilder)
-  {
-    return ruleBuilder.Must(BeAValidAlias).WithErrorCode("AliasValidator")
-      .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words separated by hyphens.");
-  }
-  private static bool BeAValidAlias(string? alias) => alias == null
-    || alias.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
-
   public static IRuleBuilder<T, string?> Country<T>(this IRuleBuilder<T, string?> ruleBuilder)
   {
     return ruleBuilder.Must(BeAValidCountry).WithErrorCode("CountryValidator")
@@ -67,6 +59,14 @@ internal static class FluentValidationExtensions
   }
   private static bool BeAValidPurpose(string? purpose) => purpose == null
     || purpose.Split('_').All(w => !string.IsNullOrEmpty(w) && w.All(char.IsLetter));
+
+  public static IRuleBuilder<T, string?> Slug<T>(this IRuleBuilder<T, string?> ruleBuilder)
+  {
+    return ruleBuilder.Must(BeAValidSlug).WithErrorCode("SlugValidator")
+      .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words separated by hyphens.");
+  }
+  private static bool BeAValidSlug(string? slug) => slug == null
+    || slug.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
 
   public static IRuleBuilder<T, string?> Username<T>(this IRuleBuilder<T, string?> ruleBuilder, IUsernameSettings usernameSettings)
   {

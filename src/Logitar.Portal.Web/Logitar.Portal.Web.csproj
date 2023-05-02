@@ -10,10 +10,10 @@
     <DockerfileContext>..\..</DockerfileContext>
     <IsPackable>True</IsPackable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Francis Pion</Authors>
     <Company>Logitar</Company>
-    <Description>Web interface of the Portal system.</Description>
+    <Description>Refactored configuration &amp; added configuration management endpoints.</Description>
     <Copyright>© 2023 Logitar All Rights Reserved.</Copyright>
     <PackageProjectUrl>https://github.com/Utar94/Portal/tree/main/src/Logitar.Portal.Web</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Utar94/Portal</RepositoryUrl>

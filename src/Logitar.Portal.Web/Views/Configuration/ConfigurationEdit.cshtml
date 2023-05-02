@@ -1,0 +1,12 @@
+﻿@using Logitar.Portal.Contracts.Senders;
+@using Logitar.Portal.Contracts.Templates;
+@using Logitar.Portal.Core.Configurations;
+
+@model Configuration
+@{
+  Layout = "_Layout";
+
+  ViewBag.Title = "Configuration";
+}
+
+<configuration-edit json="@(ModelSerializer.Serialize(Model))"></configuration-edit>

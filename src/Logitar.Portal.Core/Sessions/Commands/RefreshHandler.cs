@@ -31,13 +31,13 @@ internal class RefreshHandler : IRequestHandler<Refresh, Session>
 
     SessionAggregate session = await _sessionRepository.LoadAsync(refreshToken.Id, cancellationToken)
       ?? throw new InvalidCredentialsException($"The session aggregate '{refreshToken.Id}' could not be found.");
-    Session output = await _sessionQuerier.GetAsync(session, cancellationToken);
 
     session.Refresh(refreshToken.Key, input.IpAddress, input.AdditionalInformation,
       input.CustomAttributes?.ToDictionary());
 
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
+    Session output = await _sessionQuerier.GetAsync(session, cancellationToken);
     output.RefreshToken = session.RefreshToken?.ToString();
 
     return output;

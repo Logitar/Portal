@@ -24,25 +24,25 @@ public class UserAggregate : AggregateRoot
     string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
     DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
     Uri? picture = null, Uri? profile = null, Uri? website = null,
-    Dictionary<string, string>? customAttributes = null)
+    Dictionary<string, string>? customAttributes = null, AggregateId? id = null)
     : this(actorId, realm, realm.UsernameSettings, username, firstName, middleName, lastName,
-        nickname, birthdate, gender, locale, timeZone, picture, profile, website, customAttributes)
+        nickname, birthdate, gender, locale, timeZone, picture, profile, website, customAttributes, id)
   {
   }
   public UserAggregate(AggregateId actorId, IUsernameSettings usernameSettings, string username,
     string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
     DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
     Uri? picture = null, Uri? profile = null, Uri? website = null,
-    Dictionary<string, string>? customAttributes = null)
+    Dictionary<string, string>? customAttributes = null, AggregateId? id = null)
     : this(actorId, realm: null, usernameSettings, username, firstName, middleName, lastName, nickname, birthdate,
-        gender, locale, timeZone, picture, profile, website, customAttributes)
+        gender, locale, timeZone, picture, profile, website, customAttributes, id)
   {
   }
   private UserAggregate(AggregateId actorId, RealmAggregate? realm, IUsernameSettings usernameSettings, string username,
     string? firstName = null, string? middleName = null, string? lastName = null, string? nickname = null,
     DateTime? birthdate = null, Gender? gender = null, CultureInfo? locale = null, TimeZoneEntry? timeZone = null,
     Uri? picture = null, Uri? profile = null, Uri? website = null,
-    Dictionary<string, string>? customAttributes = null) : base()
+    Dictionary<string, string>? customAttributes = null, AggregateId? id = null) : base(id ?? AggregateId.NewId())
   {
     UserCreated e = new()
     {

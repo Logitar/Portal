@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Francis Pion</Authors>
     <Company>Logitar</Company>
     <Description>Core business logic of the Portal system.</Description>
@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/Utar94/Portal/tree/main/src/Logitar.Portal.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Utar94/Portal</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Rewrote the entire Portal system to version 2.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored configuration &amp; initialization, fixed session refresh.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>portal;api;core;business;logic;domain;application;net7.0;asp;net</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -29,13 +29,13 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="FluentValidation" Version="11.5.2" />
-    <PackageReference Include="libphonenumber-csharp" Version="8.13.9" />
-    <PackageReference Include="Logitar.EventSourcing" Version="2.1.0" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.11" />
+    <PackageReference Include="Logitar.EventSourcing" Version="2.2.0" />
     <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="7.0.5" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.28.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.30.0" />
     <PackageReference Include="NodaTime" Version="3.1.9" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.28.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
   </ItemGroup>
 
   <ItemGroup>

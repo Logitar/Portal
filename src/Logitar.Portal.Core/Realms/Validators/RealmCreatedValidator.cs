@@ -9,6 +9,6 @@ internal class RealmCreatedValidator : RealmSavedValidator<RealmCreated>
   {
     RuleFor(x => x.UniqueName).NotEmpty()
       .MaximumLength(byte.MaxValue)
-      .Alias();
+      .Slug();
   }
 }

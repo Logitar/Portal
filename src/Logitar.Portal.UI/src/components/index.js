@@ -5,6 +5,7 @@ export default {
   ApiKeyEdit: () => import(/* webpackChunkName: "apiKeyEdit" */ './ApiKeys/ApiKeyEdit.vue'),
   ApiKeyList: () => import(/* webpackChunkName: "apiKeyList" */ './ApiKeys/ApiKeyList.vue'),
   AppFooter,
+  ConfigurationEdit: () => import(/* webpackChunkName: "configurationEdit" */ './Configuration/ConfigurationEdit.vue'),
   DictionaryEdit: () => import(/* webpackChunkName: "dictionaryEdit" */ './Dictionaries/DictionaryEdit.vue'),
   DictionaryList: () => import(/* webpackChunkName: "dictionaryList" */ './Dictionaries/DictionaryList.vue'),
   Home: () => import(/* webpackChunkName: "home" */ './Home.vue'),

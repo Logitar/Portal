@@ -2,5 +2,5 @@
 
 public static class Application
 {
-  public static readonly Version Version = new(2, 0, 0);
+  public static readonly Version Version = new(2, 1, 0);
 }

@@ -13,26 +13,8 @@
   "editTitle": "Edit realm",
   "empty": "This list is empty.",
   "general": "General",
-  "jwt": {
-    "secret": {
-      "clear": "Clear",
-      "label": "Secret",
-      "placeholder": "Paste a JWT secret in the input or leave it empty to securely generate a new secret",
-      "revert": "Revert",
-      "warning": "Changing the secret will invalidate all active tokens. Press the button below to revert the change."
-    },
-    "title": "JSON Web Tokens"
-  },
+  "jwtSecretWarning": "Changing the secret will invalidate all active tokens in this realm. Press the button below to revert the change.",
   "newTitle": "Create realm",
-  "password": {
-    "requireDigit": "Require digit",
-    "requireLowercase": "Require lowercase",
-    "requireNonAlphanumeric": "Require non alphanumeric",
-    "requireUppercase": "Require uppercase",
-    "requiredLength": "Required length",
-    "requiredUniqueChars": "Required unique characters",
-    "title": "Password"
-  },
   "passwordRecovery": {
     "senderPlaceholder": "Use default sender",
     "title": "Password recovery"
@@ -53,28 +35,21 @@
   "sort": {
     "options": {
       "DisplayName": "Display name",
-      "UniqueName": "Unique name (alias)",
+      "UniqueName": "Unique name (slug)",
       "UpdatedOn": "Updated on"
     }
   },
   "title": "Realms",
   "uniqueName": {
-    "conflict": "This alias is already used by another realm.",
+    "conflict": "This unique name is already used by another realm.",
     "custom": "Custom",
     "forbidden": "The unique name 'portal' cannot be used.",
-    "label": "Unique name (alias)",
-    "placeholder": "Enter an unique alias"
+    "label": "Unique name (slug)",
+    "placeholder": "Enter an unique slug"
   },
   "updated": "The realm has been updated.",
   "url": {
     "label": "Application URL",
     "placeholder": "Enter the web address (URL) of the application corresponding to this realm"
-  },
-  "username": {
-    "allowedCharacters": {
-      "label": "Allowed characters",
-      "placeholder": "Enter all the characters allowed for usernames (e.g.: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+)"
-    },
-    "title": "Username"
   }
 }

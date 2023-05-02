@@ -76,8 +76,11 @@
         </b-alert>
         <p v-if="user?.isConfirmed" class="text-warning"><font-awesome-icon icon="exclamation-triangle" /> <i v-t="'user.verifiedWarning'" /></p>
         <b-row>
-          <email-field class="col" :verified="user?.email?.isVerified" ref="email" validate v-model="emailAddress" />
-          <phone-field class="col" :verified="user?.phone?.isVerified" validate v-model="phoneNumber" />
+          <email-field class="col" ref="email" validate :verified="user?.email?.isVerified" v-model="email.address" />
+        </b-row>
+        <b-row>
+          <phone-field class="col" ref="phone" :required="Boolean(phone.extension)" :verified="user.phone?.isVerified" v-model="phone" />
+          <phone-extension-field class="col" validate v-model="phone.extension" />
         </b-row>
         <b-row>
           <first-name-field class="col" validate v-model="firstName" />
@@ -129,6 +132,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import BirthdateField from './BirthdateField.vue'
 import EmailField from './EmailField.vue'
 import FirstNameField from './FirstNameField.vue'
@@ -137,6 +141,7 @@ import LastNameField from './LastNameField.vue'
 import MiddleNameField from './MiddleNameField.vue'
 import NicknameField from './NicknameField.vue'
 import PasswordField from './PasswordField.vue'
+import PhoneExtensionField from './PhoneExtensionField.vue'
 import PhoneField from './PhoneField.vue'
 import PictureField from './PictureField.vue'
 import ProfileField from './ProfileField.vue'
@@ -159,6 +164,7 @@ export default {
     MiddleNameField,
     NicknameField,
     PasswordField,
+    PhoneExtensionField,
     PhoneField,
     PictureField,
     ProfileField,
@@ -193,7 +199,9 @@ export default {
     return {
       birthdate: null,
       currentUser: null,
-      emailAddress: null,
+      email: {
+        address: null
+      },
       emailConflict: null,
       firstName: null,
       gender: null,
@@ -205,7 +213,11 @@ export default {
       password: null,
       passwordConfirmation: null,
       passwordSettings: null,
-      phoneNumber: null,
+      phone: {
+        countryCode: null,
+        extension: null,
+        number: null
+      },
       picture: null,
       profile: null,
       realmId: null,
@@ -225,8 +237,10 @@ export default {
         (!this.user && this.username) ||
         this.password ||
         this.passwordConfirmation ||
-        (this.emailAddress ?? '') !== (this.user?.email?.address ?? '') ||
-        (this.phoneNumber ?? '') !== (this.user?.phone?.number ?? '') ||
+        (this.email.address ?? '') !== (this.user?.email?.address ?? '') ||
+        (this.phone.number && (this.phone.countryCode ?? '') !== (this.user?.phone?.countryCode ?? '')) ||
+        (this.phone.number ?? '') !== (this.user?.phone?.number ?? '') ||
+        (this.phone.extension ?? '') !== (this.user?.phone?.extension ?? '') ||
         (this.firstName ?? '') !== (this.user?.firstName ?? '') ||
         (this.middleName ?? '') !== (this.user?.middleName ?? '') ||
         (this.lastName ?? '') !== (this.user?.lastName ?? '') ||
@@ -244,14 +258,8 @@ export default {
       const payload = {
         password: this.password || null,
         address: this.user?.address ?? null,
-        email: this.emailAddress ? { address: this.emailAddress } : null,
-        phone: this.phoneNumber
-          ? {
-              countryCode: this.user?.phone?.countryCode ?? null,
-              number: this.phoneNumber,
-              extension: this.user?.phone?.extension ?? null
-            }
-          : null,
+        email: this.email.address ? { ...this.email } : null,
+        phone: this.phone.number ? { ...this.phone } : null,
         firstName: this.firstName,
         middleName: this.middleName,
         lastName: this.lastName,
@@ -279,7 +287,7 @@ export default {
     setModel(user) {
       this.user = user
       this.birthdate = user.birthdate
-      this.emailAddress = user.email?.address ?? null
+      Vue.set(this.email, 'address', user.email?.address ?? null)
       this.firstName = user.firstName
       this.gender = user.gender
       this.lastName = user.lastName
@@ -288,7 +296,9 @@ export default {
       this.nickname = user.nickname
       this.password = null
       this.passwordConfirmation = null
-      this.phoneNumber = user.phone?.number ?? null
+      Vue.set(this.phone, 'countryCode', user.phone?.countryCode ?? null)
+      Vue.set(this.phone, 'number', user.phone?.number ?? null)
+      Vue.set(this.phone, 'extension', user.phone?.extension ?? null)
       this.picture = user.picture
       this.profile = user.profile
       this.realmId = user.realm?.id ?? null
@@ -303,7 +313,7 @@ export default {
         this.emailConflict = false
         this.usernameConflict = false
         try {
-          if (await this.$refs.form.validate()) {
+          if ((await this.$refs.form.validate()) && this.$refs.phone.isValid) {
             if (this.user) {
               const { data } = await updateUser(this.user.id, this.payload)
               this.setModel(data)

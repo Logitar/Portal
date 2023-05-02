@@ -21,8 +21,8 @@
             <b-alert :show="uniqueNameForbidden" variant="warning"><strong v-t="'realms.uniqueName.forbidden'" /></b-alert>
             <b-row>
               <name-field class="col" label="realms.displayName.label" placeholder="realms.displayName.placeholder" v-model="displayName" />
-              <alias-field class="col" v-if="realm" disabled :value="uniqueName" />
-              <alias-field class="col" v-else :name="displayName" ref="uniqueName" required validate v-model="uniqueName" />
+              <slug-field class="col" v-if="realm" disabled :value="uniqueName" />
+              <slug-field class="col" v-else :name="displayName" ref="uniqueName" required validate v-model="uniqueName" />
             </b-row>
             <b-row>
               <locale-select class="col" label="realms.defaultLocale" v-model="defaultLocale" />
@@ -60,27 +60,8 @@
                 <template-select class="col" id="passwordRecoveryTemplateId" :realm="realm.id" v-model="passwordRecoveryTemplateId" />
               </b-row>
             </div>
-            <h5 v-t="'realms.jwt.title'" />
-            <b-form-group>
-              <form-field
-                id="secret"
-                label="realms.jwt.secret.label"
-                :minLength="256 / 8"
-                :maxLength="512 / 8"
-                placeholder="realms.jwt.secret.placeholder"
-                :type="showSecret ? 'text' : 'password'"
-                v-model="secret"
-              >
-                <b-input-group-append>
-                  <icon-button :icon="showSecret ? 'eye-slash' : 'eye'" variant="info" @click="showSecret = !showSecret" />
-                  <icon-button :disabled="!secret" icon="times" text="realms.jwt.secret.clear" variant="warning" @click="secret = null" />
-                </b-input-group-append>
-              </form-field>
-              <b-alert :show="realm && realm.secret !== secret" variant="warning">
-                <p><strong v-t="'realms.jwt.secret.warning'" /></p>
-                <icon-button icon="history" text="realms.jwt.secret.revert" variant="warning" @click="secret = realm.secret" />
-              </b-alert>
-            </b-form-group>
+            <h5 v-t="'jwt.title'" />
+            <jwt-secret-field :oldValue="realm?.secret" warning="realms.jwtSecretWarning" v-model="secret" />
           </b-tab>
         </b-tabs>
       </b-form>
@@ -90,21 +71,17 @@
 
 <script>
 import Vue from 'vue'
-import AliasField from './AliasField.vue'
-import PasswordSettings from './PasswordSettings.vue'
 import SenderSelect from '@/components/Senders/SenderSelect.vue'
+import SlugField from './SlugField.vue'
 import TemplateSelect from '@/components/Templates/TemplateSelect.vue'
-import UsernameSettings from './UsernameSettings.vue'
 import { createRealm, updateRealm } from '@/api/realms'
 
 export default {
   name: 'RealmEdit',
   components: {
-    AliasField,
-    PasswordSettings,
     SenderSelect,
-    TemplateSelect,
-    UsernameSettings
+    SlugField,
+    TemplateSelect
   },
   props: {
     json: {
@@ -136,7 +113,6 @@ export default {
       requireConfirmedAccount: false,
       requireUniqueEmail: false,
       secret: null,
-      showSecret: false,
       uniqueName: null,
       uniqueNameConflict: false,
       url: null,
