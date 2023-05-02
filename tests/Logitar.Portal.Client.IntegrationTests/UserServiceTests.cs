@@ -58,7 +58,7 @@ internal class UserServiceTests
         },
         Phone = new PhoneInput
         {
-          CountryCode = "+1",
+          CountryCode = "CA",
           Number = "(514) 932-2582"
         },
         FirstName = _faker.Person.FirstName,
