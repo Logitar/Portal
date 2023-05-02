@@ -27,6 +27,7 @@ Nothing yet.
 - The initial user is now the actor in its creation and initialization of the configuration.
 - Refactored database & caching initialization.
 - Renamed alias to slug and remove accents in slugs.
+- Updated NuGet packages and set DoNotUseFullAssemblyName to true.
 
 ## [2.0.0] - 2023-04-15
 
