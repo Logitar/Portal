@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Added `secrets.example.json` file and documentation for Docker PostgreSQL image.
 
 ## [2.1.0] - 2023-05-01
 
