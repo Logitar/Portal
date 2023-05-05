@@ -251,8 +251,8 @@ public class UserAggregate : AggregateRoot
   public SessionAggregate SignIn(string password, bool isPersistent = false, string? ipAddress = null,
     string? additionalInformation = null, Dictionary<string, string>? customAttributes = null)
     => SignIn(realm: null, password, isPersistent, ipAddress, additionalInformation, customAttributes);
-  public SessionAggregate SignIn(RealmAggregate? realm, string password, bool isPersistent = false,
-    string? ipAddress = null, string? additionalInformation = null,
+  public SessionAggregate SignIn(RealmAggregate? realm, string? password = null,
+    bool isPersistent = false, string? ipAddress = null, string? additionalInformation = null,
     Dictionary<string, string>? customAttributes = null)
   {
     if (realm?.Id != RealmId)
