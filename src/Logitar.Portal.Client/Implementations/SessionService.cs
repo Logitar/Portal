@@ -11,6 +11,9 @@ internal class SessionService : HttpService, ISessionService
   {
   }
 
+  public async Task<Session> CreateAsync(CreateSessionInput input, CancellationToken cancellationToken = default)
+    => await PostAsync<Session>(BasePath, input, cancellationToken);
+
   public async Task<Session?> GetAsync(Guid? id, CancellationToken cancellationToken)
     => id.HasValue ? await GetAsync<Session>($"{BasePath}/{id.Value}", cancellationToken) : null;
 

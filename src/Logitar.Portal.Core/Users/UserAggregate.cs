@@ -247,18 +247,19 @@ public class UserAggregate : AggregateRoot
   }
   protected virtual void Apply(PhoneChanged e) => Phone = e.Phone;
 
+  [Obsolete("NOTE(fpion): will be removed in V3.")]
   public SessionAggregate SignIn(string password, bool isPersistent = false, string? ipAddress = null,
     string? additionalInformation = null, Dictionary<string, string>? customAttributes = null)
     => SignIn(realm: null, password, isPersistent, ipAddress, additionalInformation, customAttributes);
-  public SessionAggregate SignIn(RealmAggregate? realm, string password, bool isPersistent = false,
-    string? ipAddress = null, string? additionalInformation = null,
+  public SessionAggregate SignIn(RealmAggregate? realm, string? password = null,
+    bool isPersistent = false, string? ipAddress = null, string? additionalInformation = null,
     Dictionary<string, string>? customAttributes = null)
   {
     if (realm?.Id != RealmId)
     {
       throw new ArgumentException("The realm must be the realm in which the user belongs.", nameof(realm));
     }
-    else if (_password?.IsMatch(password) != true)
+    else if (password != null && _password?.IsMatch(password) != true)
     {
       throw new InvalidCredentialsException("The specified password did not match.");
     }

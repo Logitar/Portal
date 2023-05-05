@@ -18,6 +18,15 @@ public class SessionApiController : ControllerBase
     _sessionService = sessionService;
   }
 
+  [HttpPost]
+  public async Task<ActionResult<Session>> CreateAsync([FromBody] CreateSessionInput input, CancellationToken cancellationToken)
+  {
+    Session session = await _sessionService.CreateAsync(input, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/sessions/{session.Id}");
+
+    return Created(uri, session);
+  }
+
   [HttpGet]
   public async Task<ActionResult<PagedList<Session>>> GetAsync(bool? isActive, bool? isPersistent, string? realm, Guid? userId,
       SessionSort? sort, bool isDescending, int? skip, int? limit, CancellationToken cancellationToken)

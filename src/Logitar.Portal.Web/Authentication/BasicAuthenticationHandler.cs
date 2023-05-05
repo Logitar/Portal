@@ -66,7 +66,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
 
           try
           {
-            _ = user.SignIn(password);
+            _ = user.SignIn(realm: null, password);
           }
           catch (Exception exception)
           {

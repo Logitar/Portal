@@ -14,6 +14,11 @@ internal class SessionService : ISessionService
     _pipeline = pipeline;
   }
 
+  public async Task<Session> CreateAsync(CreateSessionInput input, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new CreateSession(input), cancellationToken);
+  }
+
   public async Task<Session?> GetAsync(Guid? id, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new GetSession(id), cancellationToken);
