@@ -79,7 +79,7 @@
           <email-field class="col" ref="email" validate :verified="user?.email?.isVerified" v-model="email.address" />
         </b-row>
         <b-row>
-          <phone-field class="col" ref="phone" :required="Boolean(phone.extension)" :verified="user.phone?.isVerified" v-model="phone" />
+          <phone-field class="col" ref="phone" :required="Boolean(phone.extension)" :verified="user?.phone?.isVerified" v-model="phone" />
           <phone-extension-field class="col" validate v-model="phone.extension" />
         </b-row>
         <b-row>
