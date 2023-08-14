@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Extensions;
 
-public static class OpenApiExtensions
+internal static class OpenApiExtensions
 {
   private const string Title = "Portal API";
 

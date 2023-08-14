@@ -1,8 +1,10 @@
-﻿using Logitar.Portal.Extensions;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;
 
-public class Startup : StartupBase
+internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
 
@@ -24,6 +26,28 @@ public class Startup : StartupBase
     if (_enableOpenApi)
     {
       services.AddOpenApi();
+    }
+
+    // TODO(fpion): add logging & monitoring
+    // TODO(fpion): implement a SqlServer implementation
+
+    services.AddMemoryCache();
+    services.AddSingleton<ICacheService, CacheService>();
+
+    services.AddHttpContextAccessor();
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
+
+    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
+      ?? DatabaseProvider.EntityFrameworkCorePostgreSQL;
+    string connectionString;
+    switch (databaseProvider)
+    {
+      case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+        connectionString = _configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal") ?? string.Empty;
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        break;
+      default:
+        throw new DatabaseProviderNotSupportedException(databaseProvider);
     }
   }
 

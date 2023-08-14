@@ -1,8 +1,12 @@
-﻿namespace Logitar.Portal;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational;
+using Microsoft.EntityFrameworkCore;
+
+namespace Logitar.Portal;
 
 public class Program
 {
-  public static void Main(string[] args)
+  public static async Task Main(string[] args)
   {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +16,19 @@ public class Program
     WebApplication application = builder.Build();
 
     startup.Configure(application);
+
+    if (application.Configuration.GetValue<bool>("EnableMigrations"))
+    {
+      using IServiceScope scope = application.Services.CreateScope();
+
+      using EventContext eventContext = scope.ServiceProvider.GetRequiredService<EventContext>();
+      await eventContext.Database.MigrateAsync();
+
+      using IdentityContext identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+      await identityContext.Database.MigrateAsync();
+
+      // TODO(fpion): migrate PortalContext
+    }
 
     application.Run();
   }
