@@ -5,9 +5,6 @@ using Microsoft.Extensions.Options;
 
 namespace Logitar.Portal.Application.Settings;
 
-/// <summary>
-/// TODO(fpion): this class is never called.
-/// </summary>
 internal class ConfigurePasswordSettings : IConfigureOptions<PasswordSettings>
 {
   private readonly IApplicationContext _applicationContext;
