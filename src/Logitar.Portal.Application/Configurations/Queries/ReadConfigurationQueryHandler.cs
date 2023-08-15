@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Configurations;
+﻿using AutoMapper;
+using Logitar.Portal.Domain.Configurations;
 using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Queries;
@@ -6,16 +7,22 @@ namespace Logitar.Portal.Application.Configurations.Queries;
 internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfigurationQuery, Configuration>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly IMapper _mapper;
 
-  public ReadConfigurationQueryHandler(IApplicationContext applicationContext)
+  public ReadConfigurationQueryHandler(IApplicationContext applicationContext, IMapper mapper)
   {
     _applicationContext = applicationContext;
+    _mapper = mapper;
   }
 
-  public async Task<Configuration> Handle(ReadConfigurationQuery query, CancellationToken cancellationToken)
+  public Task<Configuration> Handle(ReadConfigurationQuery _, CancellationToken cancellationToken)
   {
-    ConfigurationAggregate configuration = _applicationContext.Configuration;
+    ConfigurationAggregate aggregate = _applicationContext.Configuration;
 
-    throw new NotImplementedException(); // TODO(fpion): map aggregate to output model
+    Configuration configuration = _mapper.Map<Configuration>(aggregate);
+    // TODO(fpion): CreatedBy
+    // TODO(fpion): UpdatedBy
+
+    return Task.FromResult(configuration);
   }
 }

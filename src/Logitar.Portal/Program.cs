@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal;
@@ -27,7 +28,8 @@ public class Program
       using IdentityContext identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
       await identityContext.Database.MigrateAsync();
 
-      // TODO(fpion): migrate PortalContext
+      using PortalContext portalContext = scope.ServiceProvider.GetRequiredService<PortalContext>();
+      await portalContext.Database.MigrateAsync();
     }
 
     application.Run();

@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Domain;
+﻿using Logitar.Portal.Application.Actors;
+
+namespace Logitar.Portal.Application;
 
 public abstract record Aggregate
 {

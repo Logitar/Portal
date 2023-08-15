@@ -1,5 +1,8 @@
-﻿using Logitar.Portal.Application;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;
@@ -23,12 +26,14 @@ internal class Startup : StartupBase
 
     services.AddControllers();
 
+    services.AddApplicationInsightsTelemetry();
+    IHealthChecksBuilder healthChecks = services.AddHealthChecks();
+
     if (_enableOpenApi)
     {
       services.AddOpenApi();
     }
 
-    // TODO(fpion): add logging & monitoring
     // TODO(fpion): implement a SqlServer implementation
 
     services.AddMemoryCache();
@@ -45,6 +50,9 @@ internal class Startup : StartupBase
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:
         connectionString = _configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal") ?? string.Empty;
         services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        healthChecks.AddDbContextCheck<EventContext>();
+        healthChecks.AddDbContextCheck<IdentityContext>();
+        healthChecks.AddDbContextCheck<PortalContext>();
         break;
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
@@ -63,6 +71,7 @@ internal class Startup : StartupBase
     if (builder is WebApplication application)
     {
       application.MapControllers();
+      application.MapHealthChecks("/health");
     }
   }
 }

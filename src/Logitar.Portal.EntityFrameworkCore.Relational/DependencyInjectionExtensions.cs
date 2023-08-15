@@ -10,9 +10,12 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalWithEntityFrameworkCoreRelational(this IServiceCollection services)
   {
+    Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
+
     return services
       .AddLogitarIdentityWithEntityFrameworkCoreRelational()
       .AddLogitarPortalApplication()
+      .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
       .AddRepositories();
   }
 

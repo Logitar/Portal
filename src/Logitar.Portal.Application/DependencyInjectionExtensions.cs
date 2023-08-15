@@ -15,9 +15,15 @@ public static class DependencyInjectionExtensions
     services.AddOptions<PasswordSettings>();
 
     return services
+      .AddAutoMapper(assembly)
+      .AddApplicationServices()
       .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
-      .AddTransient<IConfigurationService, ConfigurationService>()
       .AddTransient<IConfigureOptions<PasswordSettings>, ConfigurePasswordSettings>()
       .AddTransient<IRequestPipeline, RequestPipeline>();
+  }
+
+  private static IServiceCollection AddApplicationServices(this IServiceCollection services)
+  {
+    return services.AddTransient<IConfigurationService, ConfigurationService>();
   }
 }

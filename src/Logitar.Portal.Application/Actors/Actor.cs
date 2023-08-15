@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
 
-namespace Logitar.Portal.Domain;
+namespace Logitar.Portal.Application.Actors;
 
 public record Actor
 {
