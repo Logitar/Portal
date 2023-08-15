@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Extensions;
 
@@ -17,6 +18,8 @@ internal class HttpApplicationContext : IApplicationContext
 
   protected HttpContext Context => _httpContextAccessor.HttpContext
     ?? throw new InvalidOperationException($"The {_httpContextAccessor.HttpContext} is required.");
+
+  public ActorId ActorId { get; } = new(); // TODO(fpion): Authentication
 
   public ConfigurationAggregate Configuration
   {

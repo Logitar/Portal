@@ -12,9 +12,8 @@ internal class ConfigurationInitializedValidator : AbstractValidator<Configurati
     RuleFor(x => x.DefaultLocale).NotNull()
       .Locale();
 
-    RuleFor(x => x.Secret).NotEmpty()
-      .MinimumLength(256 / 8)
-      .MaximumLength(512 / 8);
+    RuleFor(x => x.Secret).NotNull()
+      .SetValidator(new SecretValidator());
 
     RuleFor(x => x.UniqueNameSettings).NotNull()
       .SetValidator(new ReadOnlyUniqueNameSettingsValidator());

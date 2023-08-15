@@ -32,6 +32,17 @@ public class ConfigurationController : ControllerBase
     return Ok(await _configurationService.ReadAsync(cancellationToken));
   }
 
-  // TODO(fpion): ReplaceAsync
-  // TODO(fpion): UpdateAsync
+  [Authorize] // TODO(fpion): PortalIdentity
+  [HttpPut]
+  public async Task<ActionResult<Configuration>> ReplaceAsync([FromBody] ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.ReplaceAsync(payload, version, cancellationToken));
+  }
+
+  [Authorize] // TODO(fpion): PortalIdentity
+  [HttpPatch]
+  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.UpdateAsync(payload, cancellationToken));
+  }
 }

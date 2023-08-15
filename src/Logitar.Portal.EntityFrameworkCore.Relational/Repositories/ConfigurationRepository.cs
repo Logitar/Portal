@@ -12,7 +12,9 @@ internal class ConfigurationRepository : EventSourcing.EntityFrameworkCore.Relat
   }
 
   public async Task<ConfigurationAggregate?> LoadAsync(CancellationToken cancellationToken)
-    => (await base.LoadAsync<ConfigurationAggregate>(cancellationToken)).SingleOrDefault();
+    => await LoadAsync(version: null, cancellationToken);
+  public async Task<ConfigurationAggregate?> LoadAsync(long? version, CancellationToken cancellationToken)
+    => await base.LoadAsync<ConfigurationAggregate>(ConfigurationAggregate.AggregateId, version, cancellationToken);
 
   public async Task SaveAsync(ConfigurationAggregate configuration, CancellationToken cancellationToken)
     => await base.SaveAsync(configuration, cancellationToken);
