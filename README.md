@@ -18,3 +18,7 @@ are already configured in the `appsettings.Development.json` file.
 ### PostgreSQL
 
 `docker run --name Logitar.Portal_postgres -e POSTGRES_PASSWORD=P@s$W0rD -p 7829:5432 -d postgres`
+
+### SQL Server
+
+`docker run --name Logitar.Portal_sqlserver -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=P@s$W0rD" -p 8394:1433 -d mcr.microsoft.com/mssql/server:2022-latest`

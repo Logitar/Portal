@@ -11,6 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="secrets.example.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="secrets.example.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
@@ -24,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logitar.Portal.EntityFrameworkCore.PostgreSQL\Logitar.Portal.EntityFrameworkCore.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

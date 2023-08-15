@@ -3,6 +3,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
+using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;
@@ -34,8 +35,6 @@ internal class Startup : StartupBase
       services.AddOpenApi();
     }
 
-    // TODO(fpion): implement a SqlServer implementation
-
     services.AddMemoryCache();
     services.AddSingleton<ICacheService, CacheService>();
 
@@ -50,13 +49,22 @@ internal class Startup : StartupBase
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:
         connectionString = _configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal") ?? string.Empty;
         services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
-        healthChecks.AddDbContextCheck<EventContext>();
-        healthChecks.AddDbContextCheck<IdentityContext>();
-        healthChecks.AddDbContextCheck<PortalContext>();
+        AddDbContextChecks(healthChecks);
+        break;
+      case DatabaseProvider.EntityFrameworkCoreSqlServer:
+        connectionString = _configuration.GetValue<string>("SQLCONNSTR_Portal") ?? string.Empty;
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
+        AddDbContextChecks(healthChecks);
         break;
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
     }
+  }
+  private static void AddDbContextChecks(IHealthChecksBuilder builder)
+  {
+    builder.AddDbContextCheck<EventContext>();
+    builder.AddDbContextCheck<IdentityContext>();
+    builder.AddDbContextCheck<PortalContext>();
   }
 
   public override void Configure(IApplicationBuilder builder)
