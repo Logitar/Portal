@@ -14,6 +14,7 @@ public static class DependencyInjectionExtensions
         b => b.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.PostgreSQL")
       ))
       .AddLogitarIdentityWithEntityFrameworkCorePostgreSQL(connectionString)
-      .AddLogitarPortalWithEntityFrameworkCoreRelational();
+      .AddLogitarPortalWithEntityFrameworkCoreRelational()
+      .AddSingleton<IPortalSqlHelper, PortalSqlHelper>();
   }
 }

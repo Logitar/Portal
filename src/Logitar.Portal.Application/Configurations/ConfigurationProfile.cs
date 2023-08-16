@@ -10,7 +10,7 @@ internal class ConfigurationProfile : Profile
 {
   public ConfigurationProfile()
   {
-    CreateMap<ConfigurationAggregate, Configuration>()
+    CreateMap<ConfigurationAggregate, Configuration>() // TODO(fpion): resolve actors
       .ForMember(x => x.Id, x => x.MapFrom(y => y.Id.Value))
       .ForMember(x => x.CreatedBy, x => x.Ignore())
       .ForMember(x => x.UpdatedBy, x => x.Ignore());

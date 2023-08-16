@@ -95,9 +95,10 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     HashSet<string> claimMappingKeys = payload.ClaimMappings.Select(x => x.Key).ToHashSet();
     foreach (string claimMappingKey in realm.ClaimMappings.Keys)
     {
-      if (!claimMappingKeys.Contains(claimMappingKey))
+      if (!claimMappingKeys.Contains(claimMappingKey)
+        && (reference == null || reference.ClaimMappings.ContainsKey(claimMappingKey)))
       {
-        realm.RemoveClaimMapping(claimMappingKey); // TODO(fpion): delta
+        realm.RemoveClaimMapping(claimMappingKey);
       }
     }
     foreach (ClaimMapping claimMapping in payload.ClaimMappings)
@@ -108,9 +109,10 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     HashSet<string> customAttributeKeys = payload.CustomAttributes.Select(x => x.Key).ToHashSet();
     foreach (string customAttributeKey in realm.CustomAttributes.Keys)
     {
-      if (!customAttributeKeys.Contains(customAttributeKey))
+      if (!customAttributeKeys.Contains(customAttributeKey)
+        && (reference == null || reference.CustomAttributes.ContainsKey(customAttributeKey)))
       {
-        realm.RemoveCustomAttribute(customAttributeKey); // TODO(fpion): delta
+        realm.RemoveCustomAttribute(customAttributeKey);
       }
     }
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)

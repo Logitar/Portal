@@ -21,8 +21,6 @@ internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfiguration
     ConfigurationAggregate aggregate = _applicationContext.Configuration;
 
     Configuration configuration = _mapper.Map<Configuration>(aggregate);
-    // TODO(fpion): CreatedBy
-    // TODO(fpion): UpdatedBy
 
     return Task.FromResult(configuration);
   }

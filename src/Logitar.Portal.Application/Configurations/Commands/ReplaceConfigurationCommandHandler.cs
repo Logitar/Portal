@@ -69,8 +69,6 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
     }
 
     Configuration result = _mapper.Map<Configuration>(configuration);
-    // TODO(fpion): CreatedBy
-    // TODO(fpion): UpdatedBy
 
     return result;
   }
