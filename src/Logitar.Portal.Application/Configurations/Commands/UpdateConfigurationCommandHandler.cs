@@ -21,7 +21,7 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
   public async Task<Configuration> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
   {
     ConfigurationAggregate configuration = await _configurationRepository.LoadAsync(cancellationToken)
-      ?? throw new NotImplementedException(); // TODO(fpion): implement
+      ?? throw new InvalidOperationException("The configuration could not be found.");
 
     UpdateConfigurationPayload payload = command.Payload;
 

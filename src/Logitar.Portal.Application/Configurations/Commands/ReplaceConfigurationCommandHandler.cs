@@ -22,7 +22,7 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
   public async Task<Configuration> Handle(ReplaceConfigurationCommand command, CancellationToken cancellationToken)
   {
     ConfigurationAggregate configuration = await _configurationRepository.LoadAsync(cancellationToken)
-      ?? throw new NotImplementedException(); // TODO(fpion): implement
+      ?? throw new InvalidOperationException("The configuration could not be found.");
 
     ConfigurationAggregate? reference = null;
     if (command.Version.HasValue)
@@ -69,7 +69,7 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
 
     Configuration result = _mapper.Map<Configuration>(configuration);
     // TODO(fpion): CreatedBy
-    // TODO(fpion): ReplacedBy
+    // TODO(fpion): UpdatedBy
 
     return result;
   }

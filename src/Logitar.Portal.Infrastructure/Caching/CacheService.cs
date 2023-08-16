@@ -1,8 +1,8 @@
-﻿using Logitar.Portal.Application;
+﻿using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.Configurations;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Logitar.Portal;
+namespace Logitar.Portal.Infrastructure.Caching;
 
 internal class CacheService : ICacheService
 {

@@ -1,7 +1,6 @@
-﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.Identity.EntityFrameworkCore.Relational;
-using Logitar.Portal.EntityFrameworkCore.Relational;
-using Microsoft.EntityFrameworkCore;
+﻿using Logitar.Portal.Application.Caching.Commands;
+using Logitar.Portal.Infrastructure;
+using MediatR;
 
 namespace Logitar.Portal;
 
@@ -18,19 +17,13 @@ public class Program
 
     startup.Configure(application);
 
+    using IServiceScope scope = application.Services.CreateScope();
+    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
     if (application.Configuration.GetValue<bool>("EnableMigrations"))
     {
-      using IServiceScope scope = application.Services.CreateScope();
-
-      using EventContext eventContext = scope.ServiceProvider.GetRequiredService<EventContext>();
-      await eventContext.Database.MigrateAsync();
-
-      using IdentityContext identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
-      await identityContext.Database.MigrateAsync();
-
-      using PortalContext portalContext = scope.ServiceProvider.GetRequiredService<PortalContext>();
-      await portalContext.Database.MigrateAsync();
+      await mediator.Publish(new InitializeDatabaseCommand());
     }
+    await mediator.Send(new InitializeCacheCommand());
 
     application.Run();
   }

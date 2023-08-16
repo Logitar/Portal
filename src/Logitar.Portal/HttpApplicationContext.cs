@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Extensions;
 
