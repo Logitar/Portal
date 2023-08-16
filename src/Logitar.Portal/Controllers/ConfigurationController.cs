@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.Configurations;
+﻿using Logitar.Portal.Contracts.Configurations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

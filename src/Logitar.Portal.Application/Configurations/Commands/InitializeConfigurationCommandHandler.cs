@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
 using MediatR;
 

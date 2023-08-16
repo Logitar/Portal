@@ -1,6 +1,6 @@
 ﻿using Logitar.Identity.Domain.Users;
 using Logitar.Identity.Domain.Users.Events;
-using Logitar.Portal.Application.Actors;
+using Logitar.Portal.Contracts.Actors;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 

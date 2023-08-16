@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Domain.Configurations;
+﻿namespace Logitar.Portal.Contracts.Configurations;
 
 public record LoggingSettings : ILoggingSettings
 {

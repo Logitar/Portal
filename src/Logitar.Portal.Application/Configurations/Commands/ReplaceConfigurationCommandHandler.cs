@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using MediatR;

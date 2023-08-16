@@ -1,10 +1,8 @@
-﻿using Logitar.EventSourcing;
-
-namespace Logitar.Portal.Application.Actors;
+﻿namespace Logitar.Portal.Contracts.Actors;
 
 public record Actor
 {
-  public string Id { get; set; } = ActorId.DefaultValue;
+  public string Id { get; set; } = "SYSTEM";
   public ActorType Type { get; set; } = ActorType.System;
   public bool IsDeleted { get; set; } = false;
 

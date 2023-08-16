@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Logitar.Identity.Domain.Settings;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 

@@ -1,7 +1,4 @@
-﻿using Logitar.Identity.Domain.Settings;
-using Logitar.Portal.Domain.Configurations;
-
-namespace Logitar.Portal.Application.Configurations;
+﻿namespace Logitar.Portal.Contracts.Configurations;
 
 public record UpdateConfigurationPayload
 {

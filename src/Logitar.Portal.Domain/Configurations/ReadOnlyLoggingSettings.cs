@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Domain.Configurations;
+﻿using Logitar.Portal.Contracts.Configurations;
+
+namespace Logitar.Portal.Domain.Configurations;
 
 public record ReadOnlyLoggingSettings : ILoggingSettings
 {

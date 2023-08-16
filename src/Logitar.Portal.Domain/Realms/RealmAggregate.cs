@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Roles.Validators;
 using Logitar.Identity.Domain.Validators;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain.Realms.Events;
 using Logitar.Portal.Domain.Realms.Validators;
 using Logitar.Portal.Domain.Validators;

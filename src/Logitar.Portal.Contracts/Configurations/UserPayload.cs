@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Application.Configurations;
+﻿namespace Logitar.Portal.Contracts.Configurations;
 
 public record UserPayload
 {
