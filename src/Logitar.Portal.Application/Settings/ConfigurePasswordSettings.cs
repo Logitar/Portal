@@ -1,6 +1,7 @@
 ﻿using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Realms;
 using Microsoft.Extensions.Options;
 
 namespace Logitar.Portal.Application.Settings;
@@ -16,10 +17,10 @@ internal class ConfigurePasswordSettings : IConfigureOptions<PasswordSettings>
 
   public void Configure(PasswordSettings settings)
   {
-    // TODO(fpion): Realm
+    RealmAggregate? realm = _applicationContext.Realm;
     ConfigurationAggregate configuration = _applicationContext.Configuration;
 
-    ReadOnlyPasswordSettings passwordSettings = configuration.PasswordSettings;
+    ReadOnlyPasswordSettings passwordSettings = realm?.PasswordSettings ?? configuration.PasswordSettings;
 
     settings.RequiredLength = passwordSettings.RequiredLength;
     settings.RequiredUniqueChars = passwordSettings.RequiredUniqueChars;

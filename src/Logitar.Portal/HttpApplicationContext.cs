@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;
@@ -27,5 +28,11 @@ internal class HttpApplicationContext : IApplicationContext
     get => Context.GetConfiguration() ?? _cacheService.Configuration
       ?? throw new InvalidOperationException("The configuration could not be resolved.");
     set => Context.SetConfiguration(value);
+  }
+
+  public RealmAggregate? Realm
+  {
+    get => Context.GetRealm();
+    set => Context.SetRealm(value);
   }
 }
