@@ -9,6 +9,8 @@ public class UniqueSlugAlreadyUsedException : Exception
   public UniqueSlugAlreadyUsedException(string uniqueSlug, string propertyName)
     : base(BuildMessage(uniqueSlug, propertyName))
   {
+    UniqueSlug = uniqueSlug;
+    PropertyName = propertyName;
   }
 
   public string UniqueSlug

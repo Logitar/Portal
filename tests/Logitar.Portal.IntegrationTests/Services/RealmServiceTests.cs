@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
@@ -89,6 +90,20 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
     Assert.Equal(payload.CustomAttributes, realm.CustomAttributes);
   }
 
+  [Fact(DisplayName = "CreateAsync: it should throw UniqueSlugAlreadyUsedException when unique slug is already used.")]
+  public async Task CreateAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_unique_slug_is_already_used()
+  {
+    CreateRealmPayload payload = new()
+    {
+      UniqueSlug = _realm.UniqueSlug.ToUpper()
+    };
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(
+      async () => await _realmService.CreateAsync(payload)
+    );
+    Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
+  }
+
   [Fact(DisplayName = "DeleteAsync: it should delete the realm.")]
   public async Task DeleteAsync_it_should_delete_the_realm()
   {
@@ -100,12 +115,37 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
     Assert.Empty(PortalContext.Realms.Where(x => x.AggregateId == _realm.Id.Value));
   }
 
+  [Fact(DisplayName = "DeleteAsync: it should return return null when realm is not found.")]
+  public async Task DeleteAsync_it_should_return_return_null_when_realm_is_not_found()
+  {
+    Assert.Null(await _realmService.DeleteAsync(Guid.Empty.ToString()));
+  }
+
   [Fact(DisplayName = "ReadAsync: it should read the realm.")]
   public async Task ReadAsync_it_should_read_the_realm()
   {
-    Realm? realm = await _realmService.ReadAsync(_realm.Id.Value);
+    Realm? realm = await _realmService.ReadAsync(_realm.Id.Value, _realm.UniqueSlug);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.Value, realm.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return null when realm is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_realm_is_not_found()
+  {
+    Assert.Null(await _realmService.ReadAsync(Guid.Empty.ToString(), $"{_realm.UniqueSlug}-2"));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when multiple realms are found.")]
+  public async Task ReadAsync_it_should_throw_TooManyResultsException_when_multiple_realms_are_found()
+  {
+    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    await _realmRepository.SaveAsync(realm);
+
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(
+      async () => await _realmService.ReadAsync(_realm.Id.Value, realm.UniqueSlug)
+    );
+    Assert.Equal(1, exception.Expected);
+    Assert.Equal(2, exception.Actual);
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should replace the realm.")]
@@ -174,6 +214,50 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
     Assert.Contains(realm.CustomAttributes, x => x.Key == "WebhookEndpoint" && x.Value == "https://skillcraft.francispion.ca/webhooks/portal");
   }
 
+  [Fact(DisplayName = "ReplaceAsync: it should return return null when realm is not found.")]
+  public async Task ReplaceAsync_it_should_return_return_null_when_realm_is_not_found()
+  {
+    ReplaceRealmPayload payload = new();
+    Assert.Null(await _realmService.ReplaceAsync(Guid.Empty.ToString(), payload));
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should throw UniqueSlugAlreadyUsedException when unique slug is already used.")]
+  public async Task ReplaceAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_unique_slug_is_already_used()
+  {
+    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    await _realmRepository.SaveAsync(realm);
+
+    ReplaceRealmPayload payload = new()
+    {
+      UniqueSlug = _realm.UniqueSlug
+    };
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(
+      async () => await _realmService.ReplaceAsync(realm.Id.Value, payload)
+    );
+    Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return no result when none are matching.")]
+  public async Task SearchAsync_it_should_return_no_result_when_none_are_matching()
+  {
+    SearchRealmsPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Terms = new SearchTerm[]
+        {
+          new("%legend%")
+        }
+      }
+    };
+
+    SearchResults<Realm> results = await _realmService.SearchAsync(payload);
+    Assert.NotNull(results);
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return the correct realms.")]
   public async Task SearchAsync_it_should_return_the_correct_realms()
   {
@@ -215,10 +299,35 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
     };
 
     SearchResults<Realm> results = await _realmService.SearchAsync(payload);
+    Assert.NotNull(results);
     Assert.Equal(4, results.Total);
     Assert.Equal(2, results.Results.Count());
     Assert.Equal(_realm.Id.Value, results.Results.ElementAt(0).Id);
     Assert.Equal(starCraft.Id.Value, results.Results.ElementAt(1).Id);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should return return null when realm is not found.")]
+  public async Task UpdateAsync_it_should_return_return_null_when_realm_is_not_found()
+  {
+    UpdateRealmPayload payload = new();
+    Assert.Null(await _realmService.UpdateAsync(Guid.Empty.ToString(), payload));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw UniqueSlugAlreadyUsedException when unique slug is already used.")]
+  public async Task UpdateAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_unique_slug_is_already_used()
+  {
+    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    await _realmRepository.SaveAsync(realm);
+
+    UpdateRealmPayload payload = new()
+    {
+      UniqueSlug = _realm.UniqueSlug
+    };
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(
+      async () => await _realmService.UpdateAsync(realm.Id.Value, payload)
+    );
+    Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
   }
 
   [Fact(DisplayName = "UpdateAsync: it should update the realm.")]

@@ -3,6 +3,7 @@ using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain;
@@ -73,6 +74,15 @@ public class ConfigurationServiceTests : IntegrationTestBase, IAsyncLifetime
     Assert.Equal(new ReadOnlyUniqueNameSettings(), configuration.UniqueNameSettings);
     Assert.Equal(new ReadOnlyPasswordSettings(), configuration.PasswordSettings);
     Assert.Equal(new ReadOnlyLoggingSettings(), configuration.LoggingSettings);
+  }
+
+  [Fact(DisplayName = "InitializeAsync: it should throw ConfigurationAlreadyInitializedException when configuration has already been initialized.")]
+  public async Task InitializeAsync_it_should_throw_ConfigurationAlreadyInitializedException_when_configuration_has_already_been_initialized()
+  {
+    await InitializeConfigurationAsync();
+
+    InitializeConfigurationPayload payload = new();
+    await Assert.ThrowsAsync<ConfigurationAlreadyInitializedException>(async () => await _configurationService.InitializeAsync(payload));
   }
 
   [Fact(DisplayName = "ReadAsync: it should read the configuration.")]

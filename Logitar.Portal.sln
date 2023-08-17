@@ -32,11 +32,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Contracts", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E206444A-B0DE-425D-95E7-D5D206EBF172}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.IntegrationTests", "tests\Logitar.Portal.IntegrationTests\Logitar.Portal.IntegrationTests.csproj", "{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.IntegrationTests", "tests\Logitar.Portal.IntegrationTests\Logitar.Portal.IntegrationTests.csproj", "{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Application.UnitTests", "tests\Logitar.Portal.Application.UnitTests\Logitar.Portal.Application.UnitTests.csproj", "{B8A45CEA-A303-4503-A951-788C6DAA4764}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,10 +78,6 @@ Global
 		{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8A45CEA-A303-4503-A951-788C6DAA4764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8A45CEA-A303-4503-A951-788C6DAA4764}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8A45CEA-A303-4503-A951-788C6DAA4764}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8A45CEA-A303-4503-A951-788C6DAA4764}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -94,7 +88,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5A720848-E57E-4B0E-A3EF-5A57D3C06F5E} = {E206444A-B0DE-425D-95E7-D5D206EBF172}
-		{B8A45CEA-A303-4503-A951-788C6DAA4764} = {E206444A-B0DE-425D-95E7-D5D206EBF172}
 		{8952C8FA-C8CF-40AB-BB3A-CEC3FEE5AE70} = {E206444A-B0DE-425D-95E7-D5D206EBF172}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
