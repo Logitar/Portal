@@ -11,7 +11,7 @@ internal class UniqueSlugValidator : AbstractValidator<string>
       .MaximumLength(byte.MaxValue)
       .Slug();
 
-    if (propertyName == null)
+    if (propertyName != null)
     {
       options = options.WithName(propertyName);
     }

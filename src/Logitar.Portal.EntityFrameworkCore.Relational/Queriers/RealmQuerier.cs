@@ -79,6 +79,8 @@ internal class RealmQuerier : IRealmQuerier
             break;
         }
       }
+
+      query = ordered ?? query;
     }
 
     query = query.ApplyPaging(payload);

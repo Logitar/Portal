@@ -47,4 +47,6 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
 
   public async Task SaveAsync(RealmAggregate realm, CancellationToken cancellationToken)
     => await base.SaveAsync(realm, cancellationToken);
+  public async Task SaveAsync(IEnumerable<RealmAggregate> realms, CancellationToken cancellationToken)
+    => await base.SaveAsync(realms, cancellationToken);
 }

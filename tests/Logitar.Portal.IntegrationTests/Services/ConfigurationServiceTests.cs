@@ -1,107 +1,50 @@
 ﻿using Bogus;
-using Logitar.Data;
 using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Users;
-using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
-using Logitar.Portal.EntityFrameworkCore.Relational;
-using Logitar.Portal.EntityFrameworkCore.SqlServer;
-using Logitar.Portal.Infrastructure;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Logitar.Portal.Services;
 
 [Trait("Category", "Integration")]
-public class ConfigurationServiceTests : IAsyncLifetime
+public class ConfigurationServiceTests : IntegrationTestBase, IAsyncLifetime
 {
-  private readonly Actor _actor = new();
-  private readonly Faker _faker = new();
-
   private readonly ICacheService _cacheService;
   private readonly IConfigurationRepository _configurationRepository;
   private readonly IConfigurationService _configurationService;
-  private readonly IMediator _mediator;
-  private readonly PortalContext _portalContext;
-  private readonly ISqlHelper _sqlHelper;
   private readonly IUserRepository _userRepository;
   private readonly IOptions<UserSettings> _userSettings;
 
   public ConfigurationServiceTests()
   {
-    IConfiguration configuration = new ConfigurationBuilder()
-      .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-      .Build();
+    InitializeConfiguration = false;
 
-    ServiceCollection services = new();
-    services.AddMemoryCache();
-    services.AddSingleton(configuration);
-    services.AddSingleton<IApplicationContext, TestApplicationContext>();
-
-    DatabaseProvider databaseProvider = configuration.GetValue<DatabaseProvider>("DatabaseProvider");
-    switch (databaseProvider)
-    {
-      case DatabaseProvider.EntityFrameworkCoreSqlServer:
-        string connectionString = (configuration.GetValue<string>("SQLCONNSTR_Portal") ?? string.Empty)
-          .Replace("{database}", GetType().Name);
-        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
-        break;
-      default:
-        throw new DatabaseProviderNotSupportedException(databaseProvider);
-    }
-
-    IServiceProvider serviceProvider = services.BuildServiceProvider();
-
-    _cacheService = serviceProvider.GetRequiredService<ICacheService>();
-    _configurationRepository = serviceProvider.GetRequiredService<IConfigurationRepository>();
-    _configurationService = serviceProvider.GetRequiredService<IConfigurationService>();
-    _mediator = serviceProvider.GetRequiredService<IMediator>();
-    _portalContext = serviceProvider.GetRequiredService<PortalContext>();
-    _sqlHelper = serviceProvider.GetRequiredService<ISqlHelper>();
-    _userRepository = serviceProvider.GetRequiredService<IUserRepository>();
-    _userSettings = serviceProvider.GetRequiredService<IOptions<UserSettings>>();
+    _cacheService = ServiceProvider.GetRequiredService<ICacheService>();
+    _configurationRepository = ServiceProvider.GetRequiredService<IConfigurationRepository>();
+    _configurationService = ServiceProvider.GetRequiredService<IConfigurationService>();
+    _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
+    _userSettings = ServiceProvider.GetRequiredService<IOptions<UserSettings>>();
   }
-
-  public async Task InitializeAsync()
-  {
-    await _mediator.Publish(new InitializeDatabaseCommand());
-
-    IEnumerable<TableId> tables = new[]
-    {
-      PortalDb.Realms.Table,
-      PortalDb.Actors.Table,
-      Db.Users.Table,
-      Db.Events.Table
-    };
-    foreach (TableId table in tables)
-    {
-      ICommand command = _sqlHelper.DeleteFrom(table).Build();
-      await _portalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
-    }
-  }
-  public Task DisposeAsync() => Task.CompletedTask;
 
   [Fact(DisplayName = "InitializeAsync: it should initialize the configuration.")]
   public async Task InitializeAsync_it_should_initialize_the_configuration()
   {
     InitializeConfigurationPayload payload = new()
     {
-      Locale = $" {_faker.Locale} ",
+      Locale = $" {Faker.Locale} ",
       User = new UserPayload
       {
-        UniqueName = $" {_faker.Person.UserName} ",
+        UniqueName = $" {Faker.Person.UserName} ",
         Password = "Pizza7",
-        EmailAddress = $" {_faker.Person.Email} ",
-        FirstName = $" {_faker.Person.FirstName} ",
-        LastName = $" {_faker.Person.LastName} "
+        EmailAddress = $" {Faker.Person.Email} ",
+        FirstName = $" {Faker.Person.FirstName} ",
+        LastName = $" {Faker.Person.LastName} "
       }
     };
 
@@ -139,7 +82,7 @@ public class ConfigurationServiceTests : IAsyncLifetime
 
     Configuration configuration = await _configurationService.ReadAsync();
     Assert.NotNull(configuration);
-    Assert.Equal(_faker.Locale, configuration.DefaultLocale);
+    Assert.Equal(Faker.Locale, configuration.DefaultLocale);
     Assert.Equal(32, configuration.Secret.Length);
     Assert.Equal(new Contracts.UniqueNameSettings(), configuration.UniqueNameSettings);
     Assert.Equal(new Contracts.PasswordSettings(), configuration.PasswordSettings);
@@ -179,7 +122,7 @@ public class ConfigurationServiceTests : IAsyncLifetime
     };
     Configuration configuration = await _configurationService.ReplaceAsync(payload, aggregate.Version);
     Assert.NotNull(configuration);
-    Assert.Equal(_actor, configuration.UpdatedBy);
+    Assert.Equal(new Actor()/*Actor*/, configuration.UpdatedBy); // TODO(fpion): resolve actor
     Assert.True(configuration.Version > aggregate.Version);
     Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale);
     Assert.NotEqual(aggregate.Secret, configuration.Secret);
@@ -202,29 +145,12 @@ public class ConfigurationServiceTests : IAsyncLifetime
     };
     Configuration configuration = await _configurationService.UpdateAsync(payload);
     Assert.NotNull(configuration);
-    Assert.Equal(_actor, configuration.UpdatedBy);
+    Assert.Equal(new Actor()/*Actor*/, configuration.UpdatedBy); // TODO(fpion): resolve actor
     Assert.True(configuration.Version > aggregate.Version);
     Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale);
     Assert.Equal(aggregate.Secret, configuration.Secret);
     Assert.Equal(aggregate.UniqueNameSettings, configuration.UniqueNameSettings.ToReadOnlyUniqueNameSettings());
     Assert.Equal(aggregate.PasswordSettings, configuration.PasswordSettings.ToReadOnlyPasswordSettings());
     Assert.Equal(aggregate.LoggingSettings, configuration.LoggingSettings.ToReadOnlyLoggingSettings());
-  }
-
-  private async Task InitializeConfigurationAsync(CancellationToken cancellationToken = default)
-  {
-    InitializeConfigurationPayload payload = new()
-    {
-      Locale = _faker.Locale,
-      User = new UserPayload
-      {
-        UniqueName = _faker.Person.UserName,
-        Password = "P@s$W0rD",
-        EmailAddress = _faker.Person.Email,
-        FirstName = _faker.Person.FirstName,
-        LastName = _faker.Person.LastName
-      }
-    };
-    await _configurationService.InitializeAsync(payload, cancellationToken);
   }
 }
