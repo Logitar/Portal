@@ -2,7 +2,6 @@
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Realms.Events;
-using System.Text.Json;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 

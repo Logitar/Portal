@@ -6,7 +6,6 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
 
 namespace Logitar.Portal.Services;
 

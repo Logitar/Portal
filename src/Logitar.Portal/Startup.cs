@@ -7,7 +7,6 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
-using System.Text.Json.Serialization;
 
 namespace Logitar.Portal;
 

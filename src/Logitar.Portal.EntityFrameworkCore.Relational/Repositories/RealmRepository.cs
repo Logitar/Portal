@@ -20,6 +20,35 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
 
   protected string AggregateType { get; } = typeof(RealmAggregate).GetName();
 
+  public async Task<RealmAggregate?> FindAsync(string idOrUniqueSlug, CancellationToken cancellationToken)
+  {
+    string uniqueSlugNormalized = idOrUniqueSlug.ToUpper();
+
+    IQuery query = _sql.QueryFrom(Db.Events.Table)
+      .Join(PortalDb.Realms.AggregateId, Db.Events.AggregateId,
+        new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .WhereOr(
+        new OperatorCondition(PortalDb.Realms.AggregateId, Operators.IsEqualTo(idOrUniqueSlug)),
+        new OperatorCondition(PortalDb.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlugNormalized))
+      )
+      .SelectAll(Db.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    IEnumerable<RealmAggregate> realms = base.Load<RealmAggregate>(events.Select(EventSerializer.Deserialize));
+    if (realms.Count() > 1)
+    {
+      return realms.Single(realm => realm.Id.Value == idOrUniqueSlug);
+    }
+
+    return realms.SingleOrDefault();
+  }
+
   public async Task<RealmAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
     => await LoadAsync(id, version: null, cancellationToken);
   public async Task<RealmAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
