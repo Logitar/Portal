@@ -14,24 +14,31 @@ internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, Realm?>
 
   public async Task<Realm?> Handle(ReadRealmQuery query, CancellationToken cancellationToken)
   {
-    List<Realm> realms = new(capacity: 2);
+    Dictionary<string, Realm> realms = new(capacity: 2);
 
     if (query.Id != null)
     {
-      realms.AddIfNotNull(await _realmQuerier.ReadAsync(query.Id, cancellationToken));
+      Realm? realm = await _realmQuerier.ReadAsync(query.Id, cancellationToken);
+      if (realm != null)
+      {
+        realms[realm.Id] = realm;
+      }
     }
 
     if (query.UniqueSlug != null)
     {
-      realms.AddIfNotNull(await _realmQuerier.ReadByUniqueSlugAsync(query.UniqueSlug, cancellationToken));
+      Realm? realm = await _realmQuerier.ReadByUniqueSlugAsync(query.UniqueSlug, cancellationToken);
+      if (realm != null)
+      {
+        realms[realm.Id] = realm;
+      }
     }
 
-    realms = realms.Distinct().ToList();
     if (realms.Count > 1)
     {
       throw new TooManyResultsException<Realm>(expected: 1, actual: realms.Count);
     }
 
-    return realms.SingleOrDefault();
+    return realms.Values.SingleOrDefault();
   }
 }
