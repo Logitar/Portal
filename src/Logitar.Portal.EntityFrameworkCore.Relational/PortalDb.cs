@@ -5,6 +5,11 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
 internal static class PortalDb
 {
+  public static class Actors
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Actors));
+  }
+
   public static class Realms
   {
     public static readonly TableId Table = new(nameof(PortalContext.Realms));

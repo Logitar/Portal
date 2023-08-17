@@ -16,12 +16,14 @@ public static class DependencyInjectionExtensions
     Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
     services.AddOptions<PasswordSettings>();
+    services.AddOptions<UserSettings>();
 
     return services
       .AddAutoMapper(assembly)
       .AddApplicationServices()
       .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
       .AddTransient<IConfigureOptions<PasswordSettings>, ConfigurePasswordSettings>()
+      .AddTransient<IConfigureOptions<UserSettings>, ConfigureUserSettings>()
       .AddTransient<IRequestPipeline, RequestPipeline>();
   }
 
