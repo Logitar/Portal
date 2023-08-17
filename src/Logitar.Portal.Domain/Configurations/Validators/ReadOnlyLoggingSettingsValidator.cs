@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Contracts.Configurations;
 
 namespace Logitar.Portal.Domain.Configurations.Validators;
 

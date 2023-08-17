@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
 using MediatR;
 
@@ -58,8 +59,6 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
     }
 
     Configuration result = _mapper.Map<Configuration>(configuration);
-    // TODO(fpion): CreatedBy
-    // TODO(fpion): UpdatedBy
 
     return result;
   }

@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Application.Configurations.Queries;
+using Logitar.Portal.Contracts.Configurations;
 
 namespace Logitar.Portal.Application.Configurations;
 

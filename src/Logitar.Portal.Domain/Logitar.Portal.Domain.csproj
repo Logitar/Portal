@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="System.Globalization" />
   </ItemGroup>
 

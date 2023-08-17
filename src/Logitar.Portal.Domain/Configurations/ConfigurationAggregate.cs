@@ -126,7 +126,7 @@ public class ConfigurationAggregate : AggregateRoot
     }
   }
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId actorId)
   {
     foreach (DomainEvent change in Changes)
     {
