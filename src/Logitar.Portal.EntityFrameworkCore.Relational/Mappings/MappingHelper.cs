@@ -5,9 +5,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Mappings;
 internal static class MappingHelper
 {
   public static IEnumerable<CustomAttribute> GetCustomAttributes(Dictionary<string, string> customAttributes)
-  {
-    return customAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));
-  }
+    => customAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));
 
   public static DateTime ToUtcDateTime(DateTime value) => DateTime.SpecifyKind(value, DateTimeKind.Utc);
   public static DateTime? ToUtcDateTime(DateTime? value)
