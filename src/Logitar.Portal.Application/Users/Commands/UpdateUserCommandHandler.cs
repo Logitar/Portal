@@ -39,19 +39,19 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       return null;
     }
 
-    RealmAggregate? realm = null;
-    if (user.TenantId != null)
-    {
-      AggregateId realmId = new(user.TenantId);
-      realm = await _realmRepository.LoadAsync(realmId, cancellationToken)
-        ?? throw new InvalidOperationException($"The realm 'Id={realmId}' could not be found.");
-    }
-    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
-
     UpdateUserPayload payload = command.Payload;
 
     if (payload.UniqueName != null)
     {
+      RealmAggregate? realm = null;
+      if (user.TenantId != null)
+      {
+        AggregateId realmId = new(user.TenantId);
+        realm = await _realmRepository.LoadAsync(realmId, cancellationToken)
+          ?? throw new InvalidOperationException($"The realm 'Id={realmId}' could not be found.");
+      }
+
+      IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
       user.SetUniqueName(uniqueNameSettings, payload.UniqueName);
     }
     if (payload.Password != null)

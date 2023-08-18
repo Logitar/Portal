@@ -48,4 +48,20 @@ public class UserController : ControllerBase
 
     return user == null ? NotFound() : Ok(user);
   }
+
+  [HttpPut("{id}")]
+  public async Task<ActionResult<User>> ReplaceAsync(string id, [FromBody] ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.ReplaceAsync(id, payload, version, cancellationToken);
+
+    return user == null ? NotFound() : Ok(user);
+  }
+
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<User>> UpdateAsync(string id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.UpdateAsync(id, payload, cancellationToken);
+
+    return user == null ? NotFound() : Ok(user);
+  }
 }
