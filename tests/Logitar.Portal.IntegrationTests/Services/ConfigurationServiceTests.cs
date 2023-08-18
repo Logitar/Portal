@@ -22,7 +22,7 @@ public class ConfigurationServiceTests : IntegrationTestBase, IAsyncLifetime
   private readonly IUserRepository _userRepository;
   private readonly IOptions<UserSettings> _userSettings;
 
-  public ConfigurationServiceTests()
+  public ConfigurationServiceTests() : base()
   {
     InitializeConfiguration = false;
 

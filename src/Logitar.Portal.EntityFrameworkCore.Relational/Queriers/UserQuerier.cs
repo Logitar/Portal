@@ -29,19 +29,42 @@ internal class UserQuerier : IUserQuerier
   public async Task<User?> ReadAsync(string id, CancellationToken cancellationToken)
   {
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
+    if (user == null)
+    {
+      return null;
+    }
 
-    return _mapper.Map<User?>(user);
+    RealmEntity? realm = null;
+    if (user.TenantId != null)
+    {
+      realm = await _realms.AsNoTracking()
+        .SingleOrDefaultAsync(x => x.AggregateId == user.TenantId, cancellationToken);
+    }
+
+    // TODO(fpion): Actors
+
+    User result = _mapper.Map<User>(user);
+    if (realm != null)
+    {
+      result.Realm = _mapper.Map<Realm>(realm);
+    }
+
+    return result;
   }
 
   public async Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string uniqueName, CancellationToken cancellationToken)
   {
     RealmEntity? realm = null;
-    if (realmIdOrUniqueSlug != null)
+    if (!string.IsNullOrWhiteSpace(realmIdOrUniqueSlug))
     {
-      string uniqueSlugNormalized = realmIdOrUniqueSlug.ToUpper();
+      string aggregateId = realmIdOrUniqueSlug.Trim();
+      string uniqueSlugNormalized = aggregateId.ToUpper();
+
       realm = await _realms.AsNoTracking()
-        .SingleOrDefaultAsync(x => x.AggregateId == realmIdOrUniqueSlug || x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
+        .SingleOrDefaultAsync(x => x.AggregateId == aggregateId
+          || x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
       if (realm == null)
       {
         return null;
@@ -52,11 +75,16 @@ internal class UserQuerier : IUserQuerier
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
-      .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+    if (user == null)
+    {
+      return null;
+    }
 
-    User? result = _mapper.Map<User?>(user);
-    if (result != null && realm != null)
+    // TODO(fpion): Actors
+
+    User result = _mapper.Map<User>(user);
+    if (realm != null)
     {
       result.Realm = _mapper.Map<Realm>(realm);
     }

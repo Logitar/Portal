@@ -6,6 +6,7 @@ namespace Logitar.Portal.Contracts.Users;
 public record User : Aggregate
 {
   public string UniqueName { get; set; } = string.Empty;
+
   public bool HasPassword { get; set; }
   public Actor? PasswordChangedBy { get; private set; }
   public DateTime? PasswordChangedOn { get; private set; }

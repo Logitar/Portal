@@ -13,7 +13,7 @@ internal class RealmProfile : Profile
     CreateMap<RealmEntity, Realm>()
       .IncludeBase<AggregateEntity, Aggregate>()
       .ForMember(x => x.ClaimMappings, x => x.MapFrom(GetClaimMappings))
-      .ForMember(x => x.CustomAttributes, x => x.MapFrom(GetCustomAttributes));
+      .ForMember(x => x.CustomAttributes, x => x.MapFrom(GetCustomAttributes)); // TODO(fpion): refactor
   }
 
   private static IEnumerable<ClaimMapping> GetClaimMappings(RealmEntity realm, Realm _)

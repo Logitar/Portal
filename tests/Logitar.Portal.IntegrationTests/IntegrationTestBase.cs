@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Contracts.Actors;
@@ -42,6 +43,8 @@ public abstract class IntegrationTestBase
 
     ServiceProvider = services.BuildServiceProvider();
 
+    EventContext = ServiceProvider.GetRequiredService<EventContext>();
+    IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
     Publisher = ServiceProvider.GetRequiredService<IPublisher>();
     SqlHelper = ServiceProvider.GetRequiredService<ISqlHelper>();
@@ -58,10 +61,13 @@ public abstract class IntegrationTestBase
   }
 
   protected Actor Actor { get; }
+  protected ActorId ActorId => new(Actor.Id);
   protected Faker Faker { get; } = new();
 
   protected IServiceProvider ServiceProvider { get; }
 
+  protected EventContext EventContext { get; }
+  protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
   protected IPublisher Publisher { get; }
   protected ISqlHelper SqlHelper { get; }
