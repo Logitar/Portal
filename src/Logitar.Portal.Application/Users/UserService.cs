@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Application.Users.Queries;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Users;
@@ -31,6 +32,11 @@ internal class UserService : IUserService
   public async Task<User?> ReplaceAsync(string id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
+  }
+
+  public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SearchUsersQuery(payload), cancellationToken);
   }
 
   public async Task<User?> UpdateAsync(string id, UpdateUserPayload payload, CancellationToken cancellationToken)

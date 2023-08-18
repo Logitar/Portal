@@ -1,4 +1,8 @@
-﻿using Logitar.Identity.Domain;
+﻿using Bogus;
+using Logitar.EventSourcing;
+using Logitar.Identity.Domain;
+using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
@@ -13,6 +17,8 @@ namespace Logitar.Portal.Services;
 [Trait(Traits.Category, Categories.Integration)]
 public class UserServiceTests : IntegrationTestBase, IAsyncLifetime
 {
+  private readonly IApplicationContext _applicationContext;
+  private readonly IPasswordService _passwordService;
   private readonly IRealmRepository _realmRepository;
   private readonly IUserManager _userManager;
   private readonly IUserRepository _userRepository;
@@ -23,6 +29,8 @@ public class UserServiceTests : IntegrationTestBase, IAsyncLifetime
 
   public UserServiceTests() : base()
   {
+    _applicationContext = ServiceProvider.GetRequiredService<IApplicationContext>();
+    _passwordService = ServiceProvider.GetRequiredService<IPasswordService>();
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
     _userManager = ServiceProvider.GetRequiredService<IUserManager>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
@@ -370,6 +378,113 @@ public class UserServiceTests : IntegrationTestBase, IAsyncLifetime
     Assert.Equal(_realm.Id.Value, exception.TenantId);
     Assert.Equal(payload.UniqueName.Trim(), exception.UniqueName);
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return no result when none are matching.")]
+  public async Task SearchAsync_it_should_return_no_result_when_none_are_matching()
+  {
+    SearchUsersPayload payload = new()
+    {
+      HasPassword = false
+    };
+
+    SearchResults<User> results = await _userService.SearchAsync(payload);
+    Assert.NotNull(results);
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct realms.")]
+  public async Task SearchAsync_it_should_return_the_correct_realms()
+  {
+    UserAggregate disabled = CreateUser(isDisabled: true, lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(disabled);
+
+    UserAggregate hasPassword = CreateUser(lastName: Faker.Person.LastName, realm: _realm);
+    hasPassword.SetPassword(_passwordService.Create("P@s$W0rD"));
+    await _userManager.SaveAsync(hasPassword);
+
+    UserAggregate notConfirmed = CreateUser(isConfirmed: false, lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(notConfirmed);
+
+    UserAggregate portalUser = CreateUser(lastName: Faker.Person.LastName);
+    await _userManager.SaveAsync(portalUser);
+
+    UserAggregate user = CreateUser(realm: _realm);
+    await _userManager.SaveAsync(user);
+
+    UserAggregate user1 = CreateUser(lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(user1);
+
+    UserAggregate user2 = CreateUser(lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(user2);
+
+    UserAggregate user3 = CreateUser(lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(user3);
+
+    UserAggregate user4 = CreateUser(lastName: Faker.Person.LastName, realm: _realm);
+    await _userManager.SaveAsync(user4);
+
+    UserAggregate[] users = new[] { user1, user2, user3, user4 }
+      .OrderBy(x => x.FullName)
+      .Skip(1)
+      .Take(2)
+      .ToArray();
+
+    SearchUsersPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Terms = new SearchTerm[]
+        {
+          new(Faker.Person.LastName)
+        }
+      },
+      Realm = _realm.UniqueSlug,
+      HasPassword = false,
+      IsConfirmed = true,
+      IsDisabled = false,
+      Sort = new UserSortOption[]
+      {
+        new(UserSort.FullName)
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<User> results = await _userService.SearchAsync(payload);
+    Assert.NotNull(results);
+    Assert.Equal(4, results.Total);
+
+    Assert.Equal(users.Length, results.Results.Count());
+    for (int i = 0; i < users.Length; i++)
+    {
+      Assert.Equal(users[i].Id.Value, results.Results.ElementAt(i).Id);
+    }
+  }
+  private UserAggregate CreateUser(ActorId? actorId = null, bool isConfirmed = true,
+    bool isDisabled = false, Faker? faker = null, string? lastName = null, RealmAggregate? realm = null)
+  {
+    faker ??= new();
+    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
+
+    UserAggregate user = new(uniqueNameSettings, faker.Person.UserName, realm?.Id.Value, actorId ?? ActorId)
+    {
+      Email = new EmailAddress(faker.Person.Email, isConfirmed),
+      FirstName = faker.Person.FirstName,
+      LastName = lastName ?? faker.Person.LastName,
+      Birthdate = faker.Person.DateOfBirth,
+      Gender = new Gender(faker.Person.Gender.ToString()),
+      Locale = CultureInfo.GetCultureInfo(faker.Locale),
+      Picture = new Uri(faker.Person.Avatar),
+      Website = realm?.Url
+    };
+    if (isDisabled)
+    {
+      user.Disable(actorId ?? ActorId);
+    }
+
+    return user;
   }
 
   [Fact(DisplayName = "UpdateAsync: it should return return null when user is not found.")]

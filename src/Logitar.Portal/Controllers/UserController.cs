@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,6 +56,12 @@ public class UserController : ControllerBase
     User? user = await _userService.ReplaceAsync(id, payload, version, cancellationToken);
 
     return user == null ? NotFound() : Ok(user);
+  }
+
+  [HttpPost("search")]
+  public async Task<ActionResult<SearchResults<User>>> SearchAsync([FromBody] SearchUsersPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _userService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPatch("{id}")]

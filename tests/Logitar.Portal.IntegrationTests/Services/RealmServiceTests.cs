@@ -290,7 +290,7 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
       },
       Sort = new RealmSortOption[]
       {
-        new RealmSortOption(RealmSort.DisplayName)
+        new(RealmSort.DisplayName)
       },
       Skip = 1,
       Limit = 2
