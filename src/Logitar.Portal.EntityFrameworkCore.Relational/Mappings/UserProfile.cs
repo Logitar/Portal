@@ -12,15 +12,15 @@ internal class UserProfile : Profile
     CreateMap<UserEntity, User>() // TODO(fpion): resolve actors
       .IncludeBase<AggregateEntity, Aggregate>()
       .ForMember(x => x.PasswordChangedBy, x => x.Ignore())
-      .ForMember(x => x.PasswordChangedOn, x => x.MapFrom(y => y.PasswordChangedOn.AsUtc()))
+      .ForMember(x => x.PasswordChangedOn, x => x.MapFrom(y => MappingHelper.ToUtcDateTime(y.PasswordChangedOn)))
       .ForMember(x => x.DisabledBy, x => x.Ignore())
-      .ForMember(x => x.DisabledOn, x => x.MapFrom(y => y.DisabledOn.AsUtc()))
-      .ForMember(x => x.AuthenticatedOn, x => x.MapFrom(y => y.AuthenticatedOn.AsUtc()))
+      .ForMember(x => x.DisabledOn, x => x.MapFrom(y => MappingHelper.ToUtcDateTime(y.DisabledOn)))
+      .ForMember(x => x.AuthenticatedOn, x => x.MapFrom(y => MappingHelper.ToUtcDateTime(y.AuthenticatedOn)))
       .ForMember(x => x.Address, x => x.MapFrom(GetAddress))
       .ForMember(x => x.Email, x => x.MapFrom(GetEmail))
       .ForMember(x => x.Phone, x => x.MapFrom(GetPhone))
-      .ForMember(x => x.Birthdate, x => x.MapFrom(y => y.Birthdate.AsUtc()))
-      .ForMember(x => x.CustomAttributes, x => x.MapFrom(GetCustomAttributes)); // TODO(fpion): refactor
+      .ForMember(x => x.Birthdate, x => x.MapFrom(y => MappingHelper.ToUtcDateTime(y.Birthdate)))
+      .ForMember(x => x.CustomAttributes, x => x.MapFrom(y => MappingHelper.GetCustomAttributes(y.CustomAttributes)));
   }
 
   private static Address? GetAddress(UserEntity user, User _)
@@ -40,7 +40,7 @@ internal class UserProfile : Profile
       Country = user.AddressCountry,
       Formatted = user.AddressFormatted,
       VerifiedBy = null, // TODO(fpion): resolve actor
-      VerifiedOn = user.AddressVerifiedOn.AsUtc(),
+      VerifiedOn = MappingHelper.ToUtcDateTime(user.AddressVerifiedOn),
       IsVerified = user.IsAddressVerified
     };
   }
@@ -55,7 +55,7 @@ internal class UserProfile : Profile
     {
       Address = user.EmailAddress,
       VerifiedBy = null, // TODO(fpion): resolve actor
-      VerifiedOn = user.EmailVerifiedOn.AsUtc(),
+      VerifiedOn = MappingHelper.ToUtcDateTime(user.EmailVerifiedOn),
       IsVerified = user.IsEmailVerified
     };
   }
@@ -73,11 +73,8 @@ internal class UserProfile : Profile
       Extension = user.PhoneExtension,
       E164Formatted = user.PhoneE164Formatted,
       VerifiedBy = null, // TODO(fpion): resolve actor
-      VerifiedOn = user.PhoneVerifiedOn.AsUtc(),
+      VerifiedOn = MappingHelper.ToUtcDateTime(user.PhoneVerifiedOn),
       IsVerified = user.IsPhoneVerified
     };
   }
-
-  private static IEnumerable<CustomAttribute> GetCustomAttributes(UserEntity user, User _)
-    => user.CustomAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));
 }
