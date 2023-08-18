@@ -26,5 +26,7 @@ public record CreateUserPayload
   public string? Profile { get; set; }
   public string? Website { get; set; }
 
+  // TODO(fpion): Roles
+
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 }

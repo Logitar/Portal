@@ -27,4 +27,9 @@ internal class UserService : IUserService
   {
     return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName), cancellationToken);
   }
+
+  public async Task<User?> UpdateAsync(string id, UpdateUserPayload payload, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new UpdateUserCommand(id, payload), cancellationToken);
+  }
 }

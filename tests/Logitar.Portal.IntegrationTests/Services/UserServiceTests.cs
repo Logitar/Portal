@@ -42,6 +42,9 @@ public class UserServiceTests : IntegrationTestBase, IAsyncLifetime
     {
       Email = new EmailAddress(Faker.Person.Email)
     };
+    _user.SetCustomAttribute("EmployeeId", "661-240446-8");
+    _user.SetCustomAttribute("HourlyRate", "26.50");
+    _user.SetCustomAttribute("IsTraining", bool.TrueString);
   }
 
   [Fact(DisplayName = "CreateAsync: it should create the user.")]
@@ -221,6 +224,119 @@ public class UserServiceTests : IntegrationTestBase, IAsyncLifetime
     );
     Assert.Equal(1, exception.Expected);
     Assert.Equal(2, exception.Actual);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should return return null when user is not found.")]
+  public async Task UpdateAsync_it_should_return_return_null_when_user_is_not_found()
+  {
+    UpdateUserPayload payload = new();
+    Assert.Null(await _userService.UpdateAsync(Guid.Empty.ToString(), payload));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw EmailAddressAlreadyUsedException when email address is already used.")]
+  public Task UpdateAsync_it_should_throw_EmailAddressAlreadyUsedException_when_email_address_is_already_used()
+  {
+    return Task.CompletedTask; // TODO(fpion): IOptions<UserSettings> are Scoped/Singleton instead of Transient!
+
+    //Assert.NotNull(_user.Email);
+
+    //UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _user.TenantId, ActorId);
+    //await _userManager.SaveAsync(user);
+
+    //UpdateUserPayload payload = new()
+    //{
+    //  Email = new Contracts.MayBe<EmailPayload>(new EmailPayload
+    //  {
+    //    Address = _user.Email.Address
+    //  })
+    //};
+    //var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(
+    //  async () => await _userService.UpdateAsync(user.Id.Value, payload)
+    //);
+    //Assert.Equal(_realm.Id.Value, exception.TenantId);
+    //Assert.Equal(payload.Email.Value?.Address.Trim(), exception.EmailAddress);
+    //Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw UniqueNameAlreadyUsedException when unique name is already used.")]
+  public async Task UpdateAsync_it_should_throw_UniqueNameAlreadyUsedException_when_unique_name_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _user.TenantId, ActorId);
+    await _userManager.SaveAsync(user);
+
+    UpdateUserPayload payload = new()
+    {
+      UniqueName = _user.UniqueName
+    };
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(
+      async () => await _userService.UpdateAsync(user.Id.Value, payload)
+    );
+    Assert.Equal(_realm.Id.Value, exception.TenantId);
+    Assert.Equal(payload.UniqueName.Trim(), exception.UniqueName);
+    Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should update the realm.")]
+  public async Task UpdateAsync_it_should_update_the_realm()
+  {
+    UpdateUserPayload payload = new()
+    {
+      UniqueName = $" {_user.UniqueName}2 ",
+      Password = null, // TODO(fpion): change password
+      IsDisabled = true,
+      Email = new Contracts.MayBe<EmailPayload>(),
+      Phone = new Contracts.MayBe<PhonePayload>(new PhonePayload
+      {
+        CountryCode = "  CA  ",
+        Number = "  +15148454636  ",
+        Extension = "  12345  ",
+        IsVerified = true
+      }),
+      FirstName = new Contracts.MayBe<string>(Faker.Person.FirstName),
+      LastName = new Contracts.MayBe<string>(Faker.Person.LastName),
+      Birthdate = new Contracts.MayBe<DateTime>(Faker.Person.DateOfBirth),
+      Gender = new Contracts.MayBe<string>(Faker.Person.Gender.ToString()),
+      Locale = new Contracts.MayBe<string>(Faker.Locale),
+      TimeZone = new Contracts.MayBe<string>("America/Montreal"),
+      Picture = new Contracts.MayBe<string>(Faker.Person.Avatar),
+      Profile = new Contracts.MayBe<string>("    "),
+      Website = new Contracts.MayBe<string>(_realm.Url?.ToString()),
+      CustomAttributes = new CustomAttributeModification[]
+      {
+        new("  Department  ", "  Mortgages  "),
+        new("  HourlyRate  ", "37.50"),
+        new("  IsTraining  ", value: null)
+      }
+    };
+
+    User? user = await _userService.UpdateAsync(_user.Id.Value, payload);
+    Assert.NotNull(user);
+    Assert.Equal(new Actor()/*Actor*/, user.UpdatedBy); // TODO(fpion): resolve actor
+    Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
+    Assert.Null(user.DisabledBy); // TODO(fpion): resolve actor
+    Assert.NotNull(user.DisabledOn);
+    Assert.True(user.IsDisabled);
+    Assert.Null(user.Email);
+    Assert.NotNull(user.Phone);
+    Assert.Equal(payload.Phone.Value?.CountryCode?.Trim(), user.Phone.CountryCode);
+    Assert.Equal(payload.Phone.Value?.Number.Trim(), user.Phone.Number);
+    Assert.Equal(payload.Phone.Value?.Extension?.Trim(), user.Phone.Extension);
+    Assert.True(user.Phone.IsVerified);
+    Assert.True(user.IsConfirmed);
+    Assert.Equal(payload.FirstName.Value, user.FirstName);
+    Assert.Equal(payload.LastName.Value, user.LastName);
+    Assert.Equal(payload.Birthdate.Value.ToUniversalTime(), user.Birthdate);
+    Assert.Equal(payload.Gender.Value?.ToLower(), user.Gender);
+    Assert.Equal(payload.Locale.Value, user.Locale);
+    Assert.Equal(payload.TimeZone.Value, user.TimeZone);
+    Assert.Equal(payload.Picture.Value, user.Picture);
+    Assert.Null(user.Profile);
+    Assert.Equal(payload.Website.Value, user.Website);
+
+    Assert.Equal(3, user.CustomAttributes.Count());
+    Assert.Contains(user.CustomAttributes, x => x.Key == "Department" && x.Value == "Mortgages");
+    Assert.Contains(user.CustomAttributes, x => x.Key == "EmployeeId" && x.Value == "661-240446-8");
+    Assert.Contains(user.CustomAttributes, x => x.Key == "HourlyRate" && x.Value == "37.50");
   }
 
   public override async Task InitializeAsync()
