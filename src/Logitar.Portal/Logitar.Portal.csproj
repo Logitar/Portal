@@ -39,4 +39,8 @@
     <InternalsVisibleTo Include="Logitar.Portal.IntegrationTests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
+
 </Project>

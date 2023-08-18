@@ -31,6 +31,8 @@ internal class RealmQuerier : IRealmQuerier
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
+    // TODO(fpion): Actors
+
     return _mapper.Map<Realm?>(realm);
   }
 
@@ -40,6 +42,8 @@ internal class RealmQuerier : IRealmQuerier
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
+
+    // TODO(fpion): Actors
 
     return _mapper.Map<Realm?>(realm);
   }
@@ -86,6 +90,8 @@ internal class RealmQuerier : IRealmQuerier
     query = query.ApplyPaging(payload);
 
     RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
+
+    // TODO(fpion): Actors
 
     return new SearchResults<Realm>(_mapper.Map<IEnumerable<Realm>>(realms), total);
   }

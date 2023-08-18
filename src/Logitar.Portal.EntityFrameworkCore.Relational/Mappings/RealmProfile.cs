@@ -13,12 +13,9 @@ internal class RealmProfile : Profile
     CreateMap<RealmEntity, Realm>()
       .IncludeBase<AggregateEntity, Aggregate>()
       .ForMember(x => x.ClaimMappings, x => x.MapFrom(GetClaimMappings))
-      .ForMember(x => x.CustomAttributes, x => x.MapFrom(GetCustomAttributes));
+      .ForMember(x => x.CustomAttributes, x => x.MapFrom(y => MappingHelper.GetCustomAttributes(y.CustomAttributes)));
   }
 
   private static IEnumerable<ClaimMapping> GetClaimMappings(RealmEntity realm, Realm _)
     => realm.ClaimMappings.Select(claimMapping => new ClaimMapping(claimMapping.Key, claimMapping.Value.Name, claimMapping.Value.Type));
-
-  private static IEnumerable<CustomAttribute> GetCustomAttributes(RealmEntity realm, Realm _)
-    => realm.CustomAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));
 }

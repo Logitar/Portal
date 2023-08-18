@@ -1,12 +1,10 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.Application;
+﻿using Logitar.Portal.Application;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
 
 namespace Logitar.Portal.Services;
 
@@ -18,12 +16,12 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
 
   private readonly RealmAggregate _realm;
 
-  public RealmServiceTests()
+  public RealmServiceTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
     _realmService = ServiceProvider.GetRequiredService<IRealmService>();
 
-    _realm = new("skillcraft", new ActorId(Actor.Id))
+    _realm = new("skillcraft", ActorId)
     {
       DisplayName = "SkillCraft",
       Description = "The realm for the SkillCraft RPG web application.",
@@ -138,7 +136,7 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
   [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when multiple realms are found.")]
   public async Task ReadAsync_it_should_throw_TooManyResultsException_when_multiple_realms_are_found()
   {
-    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    RealmAggregate realm = new("pokegame", ActorId);
     await _realmRepository.SaveAsync(realm);
 
     var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(
@@ -224,7 +222,7 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
   [Fact(DisplayName = "ReplaceAsync: it should throw UniqueSlugAlreadyUsedException when unique slug is already used.")]
   public async Task ReplaceAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_unique_slug_is_already_used()
   {
-    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    RealmAggregate realm = new("pokegame", ActorId);
     await _realmRepository.SaveAsync(realm);
 
     ReplaceRealmPayload payload = new()
@@ -292,7 +290,7 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
       },
       Sort = new RealmSortOption[]
       {
-        new RealmSortOption(RealmSort.DisplayName)
+        new(RealmSort.DisplayName)
       },
       Skip = 1,
       Limit = 2
@@ -316,7 +314,7 @@ public class RealmServiceTests : IntegrationTestBase, IAsyncLifetime
   [Fact(DisplayName = "UpdateAsync: it should throw UniqueSlugAlreadyUsedException when unique slug is already used.")]
   public async Task UpdateAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_unique_slug_is_already_used()
   {
-    RealmAggregate realm = new("pokegame", new ActorId(Actor.Id));
+    RealmAggregate realm = new("pokegame", ActorId);
     await _realmRepository.SaveAsync(realm);
 
     UpdateRealmPayload payload = new()
