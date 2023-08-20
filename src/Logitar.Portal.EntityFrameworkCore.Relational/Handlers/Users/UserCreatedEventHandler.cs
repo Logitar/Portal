@@ -14,13 +14,13 @@ internal class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
     _context = context;
   }
 
-  public async Task Handle(UserCreatedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(UserCreatedEvent created, CancellationToken cancellationToken)
   {
     ActorEntity? actor = await _context.Actors.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.Id == created.AggregateId.Value, cancellationToken);
     if (actor == null)
     {
-      actor = new(@event);
+      actor = new(created);
 
       _context.Actors.Add(actor);
       await _context.SaveChangesAsync(cancellationToken);

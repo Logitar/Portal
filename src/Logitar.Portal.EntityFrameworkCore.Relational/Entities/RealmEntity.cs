@@ -20,7 +20,7 @@ internal record RealmEntity : AggregateEntity
     PasswordSettings = created.PasswordSettings;
   }
 
-  private RealmEntity()
+  private RealmEntity() : base()
   {
   }
 
@@ -56,9 +56,9 @@ internal record RealmEntity : AggregateEntity
   }
 
   public Dictionary<string, ReadOnlyClaimMapping> ClaimMappings { get; private set; } = new();
-  public string ClaimMappingsSerialized
+  public string? ClaimMappingsSerialized
   {
-    get => JsonSerializer.Serialize(ClaimMappings);
+    get => ClaimMappings.Any() ? JsonSerializer.Serialize(ClaimMappings) : null;
     private set
     {
       if (value == null)

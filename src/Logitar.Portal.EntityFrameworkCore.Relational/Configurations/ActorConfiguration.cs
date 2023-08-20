@@ -10,10 +10,14 @@ internal class ActorConfiguration : IEntityTypeConfiguration<ActorEntity>
 {
   public void Configure(EntityTypeBuilder<ActorEntity> builder)
   {
-    builder.ToTable(nameof(PortalContext.Actors));
+    builder.ToTable(PortalDb.Actors.Table.Table!, PortalDb.Actors.Table.Schema);
     builder.HasKey(x => x.ActorId);
 
     builder.HasIndex(x => x.Id).IsUnique();
+    builder.HasIndex(x => x.Type);
+    builder.HasIndex(x => x.IsDeleted);
+    builder.HasIndex(x => x.DisplayName);
+    builder.HasIndex(x => x.EmailAddress);
 
     builder.Property(x => x.Id).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Type).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<ActorType>());

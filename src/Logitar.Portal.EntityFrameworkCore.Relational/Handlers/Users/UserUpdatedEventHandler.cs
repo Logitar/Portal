@@ -22,13 +22,13 @@ internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
     _userRepository = userRepository;
   }
 
-  public async Task Handle(UserUpdatedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(UserUpdatedEvent updated, CancellationToken cancellationToken)
   {
-    UserAggregate? user = await _userRepository.LoadAsync(@event.AggregateId, @event.Version, includeDeleted: true, cancellationToken);
+    UserAggregate? user = await _userRepository.LoadAsync(updated.AggregateId, updated.Version, includeDeleted: true, cancellationToken);
     if (user != null)
     {
       ActorEntity? actor = await _context.Actors
-        .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.Value, cancellationToken);
+        .SingleOrDefaultAsync(x => x.Id == updated.AggregateId.Value, cancellationToken);
       if (actor == null)
       {
         actor = new(user);

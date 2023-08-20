@@ -10,7 +10,7 @@ public static class DependencyInjectionExtensions
   public static IServiceCollection AddLogitarPortalWithEntityFrameworkCoreSqlServer(this IServiceCollection services, string connectionString)
   {
     return services
-      .AddDbContext<PortalContext>(options => options.UseSqlServer(connectionString,
+      .AddDbContext<PortalContext>(builder => builder.UseSqlServer(connectionString,
         b => b.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.SqlServer")
       ))
       .AddLogitarIdentityWithEntityFrameworkCoreSqlServer(connectionString)

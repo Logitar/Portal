@@ -14,10 +14,10 @@ internal class RealmDeletedEventHandler : INotificationHandler<RealmDeletedEvent
     _context = context;
   }
 
-  public async Task Handle(RealmDeletedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(RealmDeletedEvent deleted, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.AggregateId == deleted.AggregateId.Value, cancellationToken);
     if (realm != null)
     {
       _context.Realms.Remove(realm);

@@ -22,13 +22,13 @@ internal class UserDeletedEventHandler : INotificationHandler<UserDeletedEvent>
     _userRepository = userRepository;
   }
 
-  public async Task Handle(UserDeletedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(UserDeletedEvent deleted, CancellationToken cancellationToken)
   {
     ActorEntity? actor = await _context.Actors
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.Id == deleted.AggregateId.Value, cancellationToken);
     if (actor == null)
     {
-      UserAggregate? user = await _userRepository.LoadAsync(@event.AggregateId, @event.Version, includeDeleted: true, cancellationToken);
+      UserAggregate? user = await _userRepository.LoadAsync(deleted.AggregateId, deleted.Version, includeDeleted: true, cancellationToken);
       if (user != null)
       {
         actor = new(user);
@@ -38,7 +38,7 @@ internal class UserDeletedEventHandler : INotificationHandler<UserDeletedEvent>
     }
     else
     {
-      actor.Delete(@event);
+      actor.Delete(deleted);
 
       _cacheService.RemoveActor(new ActorId(actor.Id));
     }

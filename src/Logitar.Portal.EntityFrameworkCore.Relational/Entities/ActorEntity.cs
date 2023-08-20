@@ -28,7 +28,7 @@ internal record ActorEntity
   {
   }
 
-  public int ActorId { get; private set; }
+  public long ActorId { get; private set; }
 
   public string Id { get; private set; } = string.Empty;
   public ActorType Type { get; private set; }

@@ -20,7 +20,7 @@ internal class InitializeDatabaseCommandHandler : INotificationHandler<Initializ
     _portalContext = portalContext;
   }
 
-  public async Task Handle(InitializeDatabaseCommand notification, CancellationToken cancellationToken)
+  public async Task Handle(InitializeDatabaseCommand _, CancellationToken cancellationToken)
   {
     await _eventContext.Database.MigrateAsync(cancellationToken);
     await _identityContext.Database.MigrateAsync(cancellationToken);

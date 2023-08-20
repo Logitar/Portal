@@ -47,6 +47,11 @@ internal class ActorService : IActorService
       }
     }
 
+    foreach (KeyValuePair<ActorId, Actor> actor in actors)
+    {
+      _cacheService.SetActor(actor.Key, actor.Value);
+    }
+
     return actors;
   }
 }

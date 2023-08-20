@@ -14,13 +14,13 @@ internal class RealmCreatedEventHandler : INotificationHandler<RealmCreatedEvent
     _context = context;
   }
 
-  public async Task Handle(RealmCreatedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(RealmCreatedEvent created, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.AggregateId == created.AggregateId.Value, cancellationToken);
     if (realm == null)
     {
-      realm = new(@event);
+      realm = new(created);
 
       _context.Realms.Add(realm);
       await _context.SaveChangesAsync(cancellationToken);

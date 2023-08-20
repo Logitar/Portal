@@ -14,14 +14,14 @@ internal class RealmConfiguration : AggregateConfiguration<RealmEntity>, IEntity
     builder.ToTable(PortalDb.Realms.Table.Table!, PortalDb.Realms.Table.Schema);
     builder.HasKey(x => x.RealmId);
 
-    builder.HasIndex(x => x.UniqueSlug);
-    builder.HasIndex(x => x.UniqueSlugNormalized).IsUnique();
-    builder.HasIndex(x => x.DisplayName);
-
     builder.Ignore(x => x.UniqueNameSettings);
     builder.Ignore(x => x.PasswordSettings);
     builder.Ignore(x => x.ClaimMappings);
     builder.Ignore(x => x.CustomAttributes);
+
+    builder.HasIndex(x => x.UniqueSlug);
+    builder.HasIndex(x => x.UniqueSlugNormalized).IsUnique();
+    builder.HasIndex(x => x.DisplayName);
 
     builder.Property(x => x.UniqueSlug).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.UniqueSlugNormalized).HasMaxLength(byte.MaxValue);
