@@ -91,6 +91,8 @@ internal record RealmEntity : AggregateEntity
 
   public void Update(RealmUpdatedEvent updated)
   {
+    base.Update(updated);
+
     if (updated.UniqueSlug != null)
     {
       UniqueSlug = updated.UniqueSlug;
