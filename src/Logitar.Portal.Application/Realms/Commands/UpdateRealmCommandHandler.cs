@@ -33,12 +33,6 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.UniqueSlug != null)
     {
-      RealmAggregate? other = await _realmRepository.LoadAsync(payload.UniqueSlug, cancellationToken);
-      if (other?.Equals(realm) == false)
-      {
-        throw new UniqueSlugAlreadyUsedException(payload.UniqueSlug, nameof(payload.UniqueSlug));
-      }
-
       realm.UniqueSlug = payload.UniqueSlug;
     }
     if (payload.DisplayName != null)
@@ -52,7 +46,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.DefaultLocale != null)
     {
-      realm.DefaultLocale = payload.DefaultLocale.Value?.GetCultureInfo(nameof(payload.DefaultLocale));
+      realm.DefaultLocale = payload.DefaultLocale.Value?.GetLocale(nameof(payload.DefaultLocale));
     }
     if (payload.Secret != null)
     {
@@ -74,11 +68,11 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.UniqueNameSettings != null)
     {
-      realm.UniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
+      realm.UniqueNameSettings = payload.UniqueNameSettings.ToUniqueNameSettings();
     }
     if (payload.PasswordSettings != null)
     {
-      realm.PasswordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
+      realm.PasswordSettings = payload.PasswordSettings.ToPasswordSettings();
     }
 
     foreach (ClaimMappingModification claimMapping in payload.ClaimMappings)

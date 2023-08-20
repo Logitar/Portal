@@ -15,6 +15,6 @@ public static class DependencyInjectionExtensions
       ))
       .AddLogitarIdentityWithEntityFrameworkCoreSqlServer(connectionString)
       .AddLogitarPortalWithEntityFrameworkCoreRelational()
-      .AddSingleton<IPortalSqlHelper, PortalSqlHelper>();
+      .AddSingleton<IQueryHelper, QueryHelper>();
   }
 }

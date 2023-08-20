@@ -1,5 +1,7 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Users;
 using Logitar.Identity.Domain.Users.Events;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,28 +10,39 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Handlers.Users;
 
 internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
 {
+  private readonly ICacheService _cacheService;
   private readonly PortalContext _context;
   private readonly IUserRepository _userRepository;
 
-  public UserUpdatedEventHandler(PortalContext context, IUserRepository userRepository)
+  public UserUpdatedEventHandler(ICacheService cacheService, PortalContext context,
+    IUserRepository userRepository)
   {
+    _cacheService = cacheService;
     _context = context;
     _userRepository = userRepository;
   }
 
-  public async Task Handle(UserUpdatedEvent notification, CancellationToken cancellationToken)
+  public async Task Handle(UserUpdatedEvent updated, CancellationToken cancellationToken)
   {
-    ActorEntity? actor = await _context.Actors
-      .SingleOrDefaultAsync(x => x.Id == notification.AggregateId.Value, cancellationToken);
-    if (actor != null)
+    UserAggregate? user = await _userRepository.LoadAsync(updated.AggregateId, updated.Version, includeDeleted: true, cancellationToken);
+    if (user != null)
     {
-      UserAggregate? user = await _userRepository.LoadAsync(notification.AggregateId, notification.Version, cancellationToken);
-      if (user != null)
+      ActorEntity? actor = await _context.Actors
+        .SingleOrDefaultAsync(x => x.Id == updated.AggregateId.Value, cancellationToken);
+      if (actor == null)
+      {
+        actor = new(user);
+
+        _context.Actors.Add(actor);
+      }
+      else
       {
         actor.Update(user);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _cacheService.RemoveActor(new ActorId(actor.Id));
       }
+
+      await _context.SaveChangesAsync(cancellationToken);
     }
   }
 }

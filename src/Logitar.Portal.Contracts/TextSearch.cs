@@ -2,6 +2,15 @@
 
 public record TextSearch
 {
-  public IEnumerable<SearchTerm> Terms { get; set; } = Enumerable.Empty<SearchTerm>();
-  public QueryOperator Operator { get; set; } = QueryOperator.And;
+  public TextSearch() : this(Enumerable.Empty<SearchTerm>())
+  {
+  }
+  public TextSearch(IEnumerable<SearchTerm> terms, ConditionOperator @operator = ConditionOperator.And)
+  {
+    Terms = terms;
+    Operator = @operator;
+  }
+
+  public IEnumerable<SearchTerm> Terms { get; set; }
+  public ConditionOperator Operator { get; set; }
 }

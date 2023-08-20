@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-public record DeleteRealmCommand(string Id) : IRequest<Realm?>;
+internal record DeleteRealmCommand(string Id) : IRequest<Realm?>;

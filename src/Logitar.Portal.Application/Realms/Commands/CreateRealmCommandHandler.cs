@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -29,32 +30,16 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
       throw new UniqueSlugAlreadyUsedException(payload.UniqueSlug, nameof(payload.UniqueSlug));
     }
 
-    CultureInfo? defaultLocale = payload.DefaultLocale?.GetCultureInfo(nameof(payload.DefaultLocale));
-    Uri? url = payload.Url?.GetUrl(nameof(payload.Url));
-
-    realm = new(payload.UniqueSlug, _applicationContext.ActorId)
+    ReadOnlyUniqueNameSettings? uniqueNameSettings = payload.UniqueNameSettings?.ToUniqueNameSettings();
+    ReadOnlyPasswordSettings? passwordSettings = payload.PasswordSettings?.ToPasswordSettings();
+    realm = new(payload.UniqueSlug, payload.Secret, payload.RequireUniqueEmail,
+      payload.RequireConfirmedAccount, uniqueNameSettings, passwordSettings, _applicationContext.ActorId)
     {
       DisplayName = payload.DisplayName,
       Description = payload.Description,
-      DefaultLocale = defaultLocale,
-      Url = url,
-      RequireUniqueEmail = payload.RequireUniqueEmail,
-      RequireConfirmedAccount = payload.RequireConfirmedAccount
+      DefaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale)),
+      Url = payload.Url?.GetUrl(nameof(payload.Url))
     };
-
-    if (payload.Secret != null)
-    {
-      realm.Secret = payload.Secret;
-    }
-
-    if (payload.UniqueNameSettings != null)
-    {
-      realm.UniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
-    }
-    if (payload.PasswordSettings != null)
-    {
-      realm.PasswordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
-    }
 
     foreach (ClaimMapping claimMapping in payload.ClaimMappings)
     {

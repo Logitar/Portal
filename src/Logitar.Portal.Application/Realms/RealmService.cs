@@ -29,11 +29,6 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new ReadRealmQuery(id, uniqueSlug), cancellationToken);
   }
 
-  public async Task<Realm?> ReplaceAsync(string id, ReplaceRealmPayload payload, long? version, CancellationToken cancellationToken)
-  {
-    return await _pipeline.ExecuteAsync(new ReplaceRealmCommand(id, payload, version), cancellationToken);
-  }
-
   public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new SearchRealmsQuery(payload), cancellationToken);

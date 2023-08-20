@@ -11,6 +11,6 @@ public record CustomAttributeModification
     Value = value;
   }
 
-  public string Key { get; set; } = string.Empty;
+  public string Key { get; set; }
   public string? Value { get; set; }
 }

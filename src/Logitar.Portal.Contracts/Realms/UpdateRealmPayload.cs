@@ -3,12 +3,12 @@
 public record UpdateRealmPayload
 {
   public string? UniqueSlug { get; set; }
-  public MayBe<string>? DisplayName { get; set; }
-  public MayBe<string>? Description { get; set; }
+  public Modification<string>? DisplayName { get; set; }
+  public Modification<string>? Description { get; set; }
 
-  public MayBe<string>? DefaultLocale { get; set; }
+  public Modification<string>? DefaultLocale { get; set; }
   public string? Secret { get; set; }
-  public MayBe<string>? Url { get; set; }
+  public Modification<string>? Url { get; set; }
 
   public bool? RequireUniqueEmail { get; set; }
   public bool? RequireConfirmedAccount { get; set; }

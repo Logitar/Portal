@@ -1,8 +1,7 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
-using Logitar.Portal.Application.Users;
-using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 using Logitar.Portal.Infrastructure;
@@ -17,25 +16,20 @@ public static class DependencyInjectionExtensions
     Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
 
     return services
-      .AddAutoMapper(assembly)
-      .AddLogitarIdentityWithEntityFrameworkCoreRelational()
       .AddLogitarPortalInfrastructure()
       .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
       .AddQueriers()
-      .AddRepositories();
+      .AddRepositories()
+      .AddScoped<IActorService, ActorService>();
   }
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)
   {
-    return services
-      .AddScoped<IRealmQuerier, RealmQuerier>()
-      .AddScoped<IUserQuerier, UserQuerier>();
+    return services.AddScoped<IRealmQuerier, RealmQuerier>();
   }
 
   private static IServiceCollection AddRepositories(this IServiceCollection services)
   {
-    return services
-      .AddScoped<IConfigurationRepository, ConfigurationRepository>()
-      .AddScoped<IRealmRepository, RealmRepository>();
+    return services.AddScoped<IRealmRepository, RealmRepository>();
   }
 }

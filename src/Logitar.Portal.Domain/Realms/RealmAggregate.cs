@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Roles.Validators;
 using Logitar.Identity.Domain.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain.Realms.Events;
@@ -12,6 +11,8 @@ namespace Logitar.Portal.Domain.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
+  private const int SecretLength = 256 / 8;
+
   private readonly Dictionary<string, ReadOnlyClaimMapping> _claimMappings = new();
   private readonly Dictionary<string, string> _customAttributes = new();
 
@@ -19,7 +20,7 @@ public class RealmAggregate : AggregateRoot
   private string? _displayName = null;
   private string? _description = null;
 
-  private CultureInfo? _defaultLocale = null;
+  private Locale? _defaultLocale = null;
   private string _secret = string.Empty;
   private Uri? _url = null;
 
@@ -33,17 +34,32 @@ public class RealmAggregate : AggregateRoot
   {
   }
 
-  public RealmAggregate(string uniqueSlug, ActorId actorId = default) : base()
+  public RealmAggregate(string uniqueSlug, string? secret = null, bool requireUniqueEmail = false,
+    bool requireConfirmedAccount = false, ReadOnlyUniqueNameSettings? uniqueNameSettings = null,
+    ReadOnlyPasswordSettings? passwordSettings = null, ActorId actorId = default) : base()
   {
-    RealmCreatedEvent created = new()
+    new UniqueSlugValidator(nameof(UniqueSlug)).ValidateAndThrow(uniqueSlug);
+
+    if (secret == null)
+    {
+      secret = RandomStringGenerator.GetString(SecretLength);
+    }
+    else
+    {
+      secret = secret.Trim();
+      new SecretValidator(nameof(Secret)).ValidateAndThrow(secret);
+    }
+
+    ApplyChange(new RealmCreatedEvent
     {
       ActorId = actorId,
-      UniqueSlug = uniqueSlug,
-      Secret = RandomStringGenerator.GetString()
-    };
-    new RealmCreatedValidator().ValidateAndThrow(created);
-
-    ApplyChange(created);
+      UniqueSlug = uniqueSlug.Trim(),
+      Secret = secret,
+      RequireUniqueEmail = requireUniqueEmail,
+      RequireConfirmedAccount = requireConfirmedAccount,
+      UniqueNameSettings = uniqueNameSettings ?? new(),
+      PasswordSettings = passwordSettings ?? new()
+    });
   }
   protected virtual void Apply(RealmCreatedEvent created)
   {
@@ -63,13 +79,14 @@ public class RealmAggregate : AggregateRoot
     get => _uniqueSlug;
     set
     {
+      value = value.Trim();
       new UniqueSlugValidator(nameof(UniqueSlug)).ValidateAndThrow(value);
 
       if (value != _uniqueSlug)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.UniqueSlug = value;
-        Apply(updated);
+        _uniqueSlug = value;
       }
     }
   }
@@ -87,8 +104,8 @@ public class RealmAggregate : AggregateRoot
       if (value != _displayName)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
-        updated.DisplayName = new MayBe<string>(value);
-        Apply(updated);
+        updated.DisplayName = new Modification<string>(value);
+        _displayName = value;
       }
     }
   }
@@ -98,31 +115,25 @@ public class RealmAggregate : AggregateRoot
     set
     {
       value = value?.CleanTrim();
-
-      if (value != _displayName)
+      if (value != _description)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
-        updated.Description = new MayBe<string>(value);
-        Apply(updated);
+        updated.Description = new Modification<string>(value);
+        _description = value;
       }
     }
   }
 
-  public CultureInfo? DefaultLocale
+  public Locale? DefaultLocale
   {
     get => _defaultLocale;
     set
     {
-      if (value != null)
-      {
-        new LocaleValidator(nameof(DefaultLocale)).ValidateAndThrow(value);
-      }
-
       if (value != _defaultLocale)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
-        updated.DefaultLocale = new MayBe<CultureInfo>(value);
-        Apply(updated);
+        updated.DefaultLocale = new Modification<Locale>(value);
+        _defaultLocale = value;
       }
     }
   }
@@ -131,14 +142,21 @@ public class RealmAggregate : AggregateRoot
     get => _secret;
     set
     {
-      value = string.IsNullOrWhiteSpace(value) ? RandomStringGenerator.GetString() : value.Trim();
-      new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
+      if (string.IsNullOrWhiteSpace(value))
+      {
+        value = RandomStringGenerator.GetString(SecretLength);
+      }
+      else
+      {
+        value = value.Trim();
+        new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
+      }
 
       if (value != _secret)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.Secret = value;
-        Apply(updated);
+        _secret = value;
       }
     }
   }
@@ -150,8 +168,8 @@ public class RealmAggregate : AggregateRoot
       if (value != _url)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
-        updated.Url = new MayBe<Uri>(value);
-        Apply(updated);
+        updated.Url = new Modification<Uri>(value);
+        _url = value;
       }
     }
   }
@@ -165,7 +183,7 @@ public class RealmAggregate : AggregateRoot
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.RequireUniqueEmail = value;
-        Apply(updated);
+        _requireUniqueEmail = value;
       }
     }
   }
@@ -178,7 +196,7 @@ public class RealmAggregate : AggregateRoot
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.RequireConfirmedAccount = value;
-        Apply(updated);
+        _requireConfirmedAccount = value;
       }
     }
   }
@@ -188,13 +206,11 @@ public class RealmAggregate : AggregateRoot
     get => _uniqueNameSettings;
     set
     {
-      new ReadOnlyUniqueNameSettingsValidator().ValidateAndThrow(value);
-
       if (value != _uniqueNameSettings)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.UniqueNameSettings = value;
-        Apply(updated);
+        _uniqueNameSettings = value;
       }
     }
   }
@@ -203,13 +219,11 @@ public class RealmAggregate : AggregateRoot
     get => _passwordSettings;
     set
     {
-      new ReadOnlyPasswordSettingsValidator().ValidateAndThrow(value);
-
       if (value != _passwordSettings)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
         updated.PasswordSettings = value;
-        Apply(updated);
+        _passwordSettings = value;
       }
     }
   }
@@ -227,7 +241,7 @@ public class RealmAggregate : AggregateRoot
     {
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.ClaimMappings[key] = null;
-      Apply(updated);
+      _claimMappings.Remove(key);
     }
   }
 
@@ -238,7 +252,7 @@ public class RealmAggregate : AggregateRoot
     {
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.CustomAttributes[key] = null;
-      Apply(updated);
+      _customAttributes.Remove(key);
     }
   }
 
@@ -247,12 +261,11 @@ public class RealmAggregate : AggregateRoot
     key = key.Trim();
     new ClaimMappingKeyValidator("Key").ValidateAndThrow(key);
 
-    if (!_claimMappings.TryGetValue(key, out ReadOnlyClaimMapping? existingClaimMapping)
-      || claimMapping != existingClaimMapping)
+    if (!_claimMappings.TryGetValue(key, out ReadOnlyClaimMapping? existingValue) || claimMapping != existingValue)
     {
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.ClaimMappings[key] = claimMapping;
-      Apply(updated);
+      _claimMappings[key] = claimMapping;
     }
   }
 
@@ -266,7 +279,7 @@ public class RealmAggregate : AggregateRoot
     {
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.CustomAttributes[key] = value;
-      Apply(updated);
+      _customAttributes[key] = value;
     }
   }
 
@@ -285,6 +298,7 @@ public class RealmAggregate : AggregateRoot
       }
     }
   }
+
   protected virtual void Apply(RealmUpdatedEvent updated)
   {
     if (updated.UniqueSlug != null)
@@ -356,9 +370,9 @@ public class RealmAggregate : AggregateRoot
     }
   }
 
-  protected T GetLatestEvent<T>() where T : DomainEvent, new()
+  protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()
   {
-    T? change = Changes.LastOrDefault(change => change is T) as T;
+    T? change = Changes.Last(change => change is T) as T;
     if (change == null)
     {
       change = new();

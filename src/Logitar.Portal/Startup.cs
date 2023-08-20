@@ -27,7 +27,7 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllers(options => options.Filters.Add<PortalExceptionFilterAttribute>())
+    services.AddControllers(options => options.Filters.Add<ExceptionHandlingAttribute>())
       .AddJsonOptions(options =>
       {
         options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
@@ -48,7 +48,7 @@ internal class Startup : StartupBase
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-      ?? DatabaseProvider.EntityFrameworkCorePostgreSQL;
+      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     string connectionString;
     switch (databaseProvider)
     {
