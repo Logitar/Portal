@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - dev
-      - feature/realms
-      - v3
+      - v3 # TODO(fpion): remove
   workflow_dispatch:
 
 jobs:
