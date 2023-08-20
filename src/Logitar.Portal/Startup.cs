@@ -1,4 +1,12 @@
-﻿using Logitar.Portal.Extensions;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Infrastructure;
+using Logitar.Portal.Application;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.EntityFrameworkCore.Relational;
+using Logitar.Portal.EntityFrameworkCore.SqlServer;
+using Logitar.Portal.Extensions;
+using Logitar.Portal.Filters;
 
 namespace Logitar.Portal;
 
@@ -19,10 +27,10 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllers(/*options => options.Filters.Add<PortalExceptionFilterAttribute>()*/)
+    services.AddControllers(options => options.Filters.Add<ExceptionHandlingAttribute>())
       .AddJsonOptions(options =>
       {
-        //options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
+        options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
       });
 
@@ -37,21 +45,21 @@ internal class Startup : StartupBase
     services.AddMemoryCache();
 
     services.AddHttpContextAccessor();
-    //services.AddSingleton<IApplicationContext, HttpApplicationContext>();
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-      ?? DatabaseProvider.EntityFrameworkCorePostgreSQL;
+      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     string connectionString;
     switch (databaseProvider)
     {
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:
         connectionString = _configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal") ?? string.Empty;
-        //services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
         AddDbContextChecks(healthChecks);
         break;
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
         connectionString = _configuration.GetValue<string>("SQLCONNSTR_Portal") ?? string.Empty;
-        //services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
         AddDbContextChecks(healthChecks);
         break;
       default:
@@ -60,9 +68,9 @@ internal class Startup : StartupBase
   }
   private static void AddDbContextChecks(IHealthChecksBuilder builder)
   {
-    //builder.AddDbContextCheck<EventContext>();
-    //builder.AddDbContextCheck<IdentityContext>();
-    //builder.AddDbContextCheck<PortalContext>();
+    builder.AddDbContextCheck<EventContext>();
+    builder.AddDbContextCheck<IdentityContext>();
+    builder.AddDbContextCheck<PortalContext>();
   }
 
   public override void Configure(IApplicationBuilder builder)

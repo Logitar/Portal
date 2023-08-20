@@ -1,4 +1,7 @@
-﻿namespace Logitar.Portal;
+﻿using Logitar.Portal.Infrastructure;
+using MediatR;
+
+namespace Logitar.Portal;
 
 public class Program
 {
@@ -13,15 +16,13 @@ public class Program
 
     startup.Configure(application);
 
-    // TODO(fpion): initialize caching
-    // TODO(fpion): initialize database
-    //using IServiceScope scope = application.Services.CreateScope();
-    //IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-    //if (application.Configuration.GetValue<bool>("EnableMigrations"))
-    //{
-    //  await mediator.Publish(new InitializeDatabaseCommand());
-    //}
-    //await mediator.Send(new InitializeCacheCommand());
+    using IServiceScope scope = application.Services.CreateScope();
+    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+    if (application.Configuration.GetValue<bool>("EnableMigrations"))
+    {
+      await mediator.Publish(new InitializeDatabaseCommand());
+    }
+    //await mediator.Publish(new InitializeCacheCommand()); // TODO(fpion): initialize cache
 
     application.Run();
   }
