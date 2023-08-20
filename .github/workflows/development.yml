@@ -1,0 +1,17 @@
+name: Build Development Portal
+
+on:
+  push:
+    branches:
+      - dev
+      - feature/realms
+      - v3
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Logitar.Portal/Dockerfile
