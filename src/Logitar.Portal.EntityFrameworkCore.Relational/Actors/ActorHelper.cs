@@ -18,6 +18,54 @@ internal static class ActorHelper
     return ids;
   }
 
+  public static IEnumerable<ActorId> GetIds(params SessionEntity[] sessions)
+  {
+    HashSet<ActorId> ids = new(capacity: sessions.Length * 10);
+
+    foreach (SessionEntity session in sessions)
+    {
+      ids.Add(new ActorId(session.CreatedBy));
+      ids.Add(new ActorId(session.UpdatedBy));
+
+      if (session.SignedOutBy != null)
+      {
+        ids.Add(new ActorId(session.SignedOutBy));
+      }
+
+      if (session.User != null)
+      {
+        ids.Add(new ActorId(session.User.CreatedBy));
+        ids.Add(new ActorId(session.User.UpdatedBy));
+
+        if (session.User.PasswordChangedBy != null)
+        {
+          ids.Add(new ActorId(session.User.PasswordChangedBy));
+        }
+        if (session.User.DisabledBy != null)
+        {
+          ids.Add(new ActorId(session.User.DisabledBy));
+        }
+
+        if (session.User.AddressVerifiedBy != null)
+        {
+          ids.Add(new ActorId(session.User.AddressVerifiedBy));
+        }
+
+        if (session.User.EmailVerifiedBy != null)
+        {
+          ids.Add(new ActorId(session.User.EmailVerifiedBy));
+        }
+
+        if (session.User.PhoneVerifiedBy != null)
+        {
+          ids.Add(new ActorId(session.User.PhoneVerifiedBy));
+        }
+      }
+    }
+
+    return ids;
+  }
+
   public static IEnumerable<ActorId> GetIds(params UserEntity[] users)
   {
     HashSet<ActorId> ids = new(capacity: users.Length * 7);

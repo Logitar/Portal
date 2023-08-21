@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain.Realms.Events;
@@ -232,6 +233,14 @@ public class RealmAggregate : AggregateRoot
   public IReadOnlyDictionary<string, ReadOnlyClaimMapping> ClaimMappings => _claimMappings.AsReadOnly();
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
+
+  public IUserSettings UserSettings => new UserSettings
+  {
+    RequireUniqueEmail = RequireUniqueEmail,
+    RequireConfirmedAccount = RequireConfirmedAccount,
+    UniqueNameSettings = UniqueNameSettings,
+    PasswordSettings = PasswordSettings
+  };
 
   public void Delete(ActorId actorId = default) => ApplyChange(new RealmDeletedEvent(actorId));
 

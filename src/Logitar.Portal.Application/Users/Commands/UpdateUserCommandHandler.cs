@@ -4,8 +4,8 @@ using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Realms;
 using MediatR;
-using Microsoft.Extensions.Options;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
@@ -13,21 +13,21 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IPasswordService _passwordService;
+  private readonly IRealmRepository _realmRepository;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
-  private readonly IOptions<UserSettings> _userSettings;
 
   public UpdateUserCommandHandler(IApplicationContext applicationContext,
-    IPasswordService passwordService, IUserManager userManager, IUserQuerier userQuerier,
-    IUserRepository userRepository, IOptions<UserSettings> userSettings)
+    IPasswordService passwordService, IRealmRepository realmRepository, IUserManager userManager,
+    IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
     _passwordService = passwordService;
+    _realmRepository = realmRepository;
     _userManager = userManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
-    _userSettings = userSettings;
   }
 
   public async Task<User?> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
@@ -39,12 +39,19 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       return null;
     }
 
+    RealmAggregate? realm = null;
+    if (user.TenantId != null)
+    {
+      realm = await _realmRepository.FindAsync(user.TenantId, cancellationToken)
+        ?? throw new InvalidOperationException($"The realm '{user.TenantId}' could not be found from user '{user}'.");
+    }
+    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings!; // TODO(fpion): use configuration
+
     UpdateUserPayload payload = command.Payload;
 
     if (payload.UniqueName != null)
     {
-      UserSettings userSettings = _userSettings.Value;
-      user.SetUniqueName(userSettings.UniqueNameSettings, payload.UniqueName);
+      user.SetUniqueName(uniqueNameSettings, payload.UniqueName);
     }
     if (payload.Password != null)
     {
