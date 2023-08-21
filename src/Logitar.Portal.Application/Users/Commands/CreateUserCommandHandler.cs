@@ -37,7 +37,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
         ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
     }
-    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings!; // TODO(fpion): use configuration
+    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
     string? tenantId = realm?.Id.Value;
 
     UserAggregate user = new(uniqueNameSettings, payload.UniqueName, tenantId, _applicationContext.ActorId);

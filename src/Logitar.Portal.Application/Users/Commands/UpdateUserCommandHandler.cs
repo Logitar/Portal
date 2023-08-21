@@ -45,7 +45,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       realm = await _realmRepository.FindAsync(user.TenantId, cancellationToken)
         ?? throw new InvalidOperationException($"The realm '{user.TenantId}' could not be found from user '{user}'.");
     }
-    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings!; // TODO(fpion): use configuration
+    IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
 
     UpdateUserPayload payload = command.Payload;
 

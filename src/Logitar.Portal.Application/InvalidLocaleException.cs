@@ -6,7 +6,7 @@ public class InvalidLocaleException : Exception
 {
   private const string ErrorMessage = "The specified locale is not valid.";
 
-  public InvalidLocaleException(string code, string propertyName, Exception innerException)
+  public InvalidLocaleException(string code, string propertyName, Exception? innerException = null)
     : base(BuildMessage(code, propertyName), innerException)
   {
     Code = code;

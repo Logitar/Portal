@@ -4,7 +4,7 @@ using Logitar.Portal.Domain.Realms.Validators;
 
 namespace Logitar.Portal.Domain;
 
-public record class ReadOnlyUniqueNameSettings : IUniqueNameSettings
+public record ReadOnlyUniqueNameSettings : IUniqueNameSettings
 {
   public ReadOnlyUniqueNameSettings(string? allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+")
   {

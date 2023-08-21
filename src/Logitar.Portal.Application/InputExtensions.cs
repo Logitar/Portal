@@ -2,8 +2,10 @@
 using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Configurations;
 
 namespace Logitar.Portal.Application;
 
@@ -96,6 +98,8 @@ internal static class InputExtensions
   public static PhoneNumber ToPhoneNumber(this PhonePayload phone, bool isVerified)
     => new(phone.Number, phone.CountryCode, phone.Extension, isVerified);
 
+  public static ReadOnlyLoggingSettings ToLoggingSettings(this LoggingSettings loggingSettings)
+    => new(loggingSettings.Extent, loggingSettings.OnlyErrors);
   public static ReadOnlyPasswordSettings ToPasswordSettings(this PasswordSettings passwordSettings)
     => new(passwordSettings.RequiredLength, passwordSettings.RequiredUniqueChars,
       passwordSettings.RequireNonAlphanumeric, passwordSettings.RequireLowercase,

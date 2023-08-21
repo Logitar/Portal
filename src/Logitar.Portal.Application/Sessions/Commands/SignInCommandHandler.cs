@@ -44,7 +44,7 @@ internal class SignInCommandHandler : IRequestHandler<SignInCommand, Session>
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
         ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
     }
-    IUserSettings userSettings = realm?.UserSettings!; // TODO(fpion): use configuration
+    IUserSettings userSettings = realm?.UserSettings ?? _applicationContext.Configuration.UserSettings;
     string? tenantId = realm?.Id.Value;
 
     UserAggregate user = await _userRepository.LoadAsync(tenantId, payload.UniqueName, cancellationToken)

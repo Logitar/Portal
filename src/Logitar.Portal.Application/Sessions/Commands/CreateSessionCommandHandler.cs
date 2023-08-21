@@ -48,7 +48,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
       realm = await _realmRepository.FindAsync(user.TenantId, cancellationToken)
         ?? throw new InvalidOperationException($"The realm '{user.TenantId}' could not be found from user '{user}'.");
     }
-    IUserSettings userSettings = realm?.UserSettings!; // TODO(fpion): use configuration
+    IUserSettings userSettings = realm?.UserSettings ?? _applicationContext.Configuration.UserSettings;
 
     byte[]? secretBytes = null;
     Password? secret = payload.IsPersistent ? _passwordService.Generate(Constants.SecretLength, out secretBytes) : null;
