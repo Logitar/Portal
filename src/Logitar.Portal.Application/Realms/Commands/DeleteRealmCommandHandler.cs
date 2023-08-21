@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
@@ -7,16 +8,21 @@ namespace Logitar.Portal.Application.Realms.Commands;
 
 internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, Realm?>
 {
+  private readonly IAggregateRepository _aggregateRepository;
   private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
+  private readonly IUserRepository _userRepository;
 
-  public DeleteRealmCommandHandler(IApplicationContext applicationContext,
-    IRealmQuerier realmQuerier, IRealmRepository realmRepository)
+  public DeleteRealmCommandHandler(IAggregateRepository aggregateRepository,
+    IApplicationContext applicationContext, IRealmQuerier realmQuerier,
+    IRealmRepository realmRepository, IUserRepository userRepository)
   {
+    _aggregateRepository = aggregateRepository;
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
+    _userRepository = userRepository;
   }
 
   public async Task<Realm?> Handle(DeleteRealmCommand command, CancellationToken cancellationToken)
@@ -31,8 +37,20 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
 
     realm.Delete(_applicationContext.ActorId);
 
+    await DeleteUsersAsync(realm, cancellationToken);
+
     await _realmRepository.SaveAsync(realm, cancellationToken);
 
     return result;
+  }
+
+  private async Task DeleteUsersAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId: realm.Id.Value, cancellationToken);
+    foreach (UserAggregate user in users)
+    {
+      user.Delete(_applicationContext.ActorId);
+    }
+    await _aggregateRepository.SaveAsync(users, cancellationToken);
   }
 }
