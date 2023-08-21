@@ -1,5 +1,7 @@
 ﻿using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application;
@@ -19,6 +21,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddApplicationServices(this IServiceCollection services)
   {
     return services
-      .AddTransient<IRealmService, RealmService>();
+      .AddTransient<IRealmService, RealmService>()
+      .AddTransient<IUserService, UserService>();
   }
 }

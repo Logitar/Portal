@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
@@ -25,7 +26,9 @@ public static class DependencyInjectionExtensions
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)
   {
-    return services.AddScoped<IRealmQuerier, RealmQuerier>();
+    return services
+      .AddScoped<IRealmQuerier, RealmQuerier>()
+      .AddScoped<IUserQuerier, UserQuerier>();
   }
 
   private static IServiceCollection AddRepositories(this IServiceCollection services)

@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Domain.Realms.Validators;
 
 namespace Logitar.Portal.Domain;
 
-public record class ReadOnlyUniqueNameSettings
+public record class ReadOnlyUniqueNameSettings : IUniqueNameSettings
 {
   public ReadOnlyUniqueNameSettings(string? allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+")
   {
