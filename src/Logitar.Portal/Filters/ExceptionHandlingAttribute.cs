@@ -11,10 +11,11 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(InvalidAggregateIdException)] = HandleInvalidAggregateIdException,
+    [typeof(InvalidGenderException)] = HandleInvalidGenderException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
+    [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
     [typeof(NotImplementedException)] = HandleNotImplementedException,
-    [typeof(TooManyResultsException)] = HandleTooManyResultsException,
     [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
     [typeof(ValidationException)] = HandleValidationException
   };
@@ -24,6 +25,16 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     if (_handlers.TryGetValue(context.Exception.GetType(), out Func<ExceptionContext, IActionResult>? handler))
     {
       context.Result = handler(context);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is AggregateNotFoundException aggregateNotFound)
+    {
+      context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is TooManyResultsException)
+    {
+      context.Result = new BadRequestObjectResult(new { ErrorCode = "TooManyResults" });
       context.ExceptionHandled = true;
     }
     else
@@ -37,9 +48,19 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     return new BadRequestObjectResult(((InvalidAggregateIdException)context.Exception).Failure);
   }
 
+  private static IActionResult HandleInvalidGenderException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((InvalidGenderException)context.Exception).Failure);
+  }
+
   private static IActionResult HandleInvalidLocaleException(ExceptionContext context)
   {
     return new BadRequestObjectResult(((InvalidLocaleException)context.Exception).Failure);
+  }
+
+  private static IActionResult HandleInvalidTimeZoneEntryException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((InvalidTimeZoneEntryException)context.Exception).Failure);
   }
 
   private static IActionResult HandleInvalidUrlException(ExceptionContext context)
@@ -53,11 +74,6 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     {
       StatusCode = StatusCodes.Status501NotImplemented
     };
-  }
-
-  private static IActionResult HandleTooManyResultsException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(new { ErrorCode = "TooManyResults" });
   }
 
   private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)

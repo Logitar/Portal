@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
-using Logitar.Identity.Infrastructure;
 using Logitar.Portal.Application;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -28,11 +27,7 @@ internal class Startup : StartupBase
     base.ConfigureServices(services);
 
     services.AddControllers(options => options.Filters.Add<ExceptionHandlingAttribute>())
-      .AddJsonOptions(options =>
-      {
-        options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-      });
+      .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     if (_enableOpenApi)
     {

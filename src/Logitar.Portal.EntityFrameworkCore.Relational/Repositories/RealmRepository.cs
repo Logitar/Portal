@@ -21,6 +21,30 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     _sqlHelper = sqlHelper;
   }
 
+  public async Task<RealmAggregate?> FindAsync(string realm, CancellationToken cancellationToken)
+  {
+    string aggregateId = realm.Trim();
+    string uniqueSlugNormalized = aggregateId.ToUpper();
+
+    IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
+      .Join(PortalDb.Realms.AggregateId, Db.Events.AggregateId,
+        new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .WhereOr(
+        new OperatorCondition(PortalDb.Realms.AggregateId, Operators.IsEqualTo(aggregateId)),
+        new OperatorCondition(PortalDb.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlugNormalized))
+      )
+      .SelectAll(Db.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<RealmAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+  }
+
   public async Task<RealmAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
     => await base.LoadAsync<RealmAggregate>(id, cancellationToken);
   public async Task<RealmAggregate?> LoadAsync(string uniqueSlug, CancellationToken cancellationToken)
