@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain;
+using Logitar.Identity.Domain.Sessions;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Realms;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +13,17 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
 {
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
+    [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidAggregateIdException)] = HandleInvalidAggregateIdException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
     [typeof(NotImplementedException)] = HandleNotImplementedException,
+    [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
+    [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
+    [typeof(UserIsNotConfirmedException)] = HandleUserIsNotConfirmedException,
     [typeof(ValidationException)] = HandleValidationException
   };
 
@@ -43,10 +49,20 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
       context.Result = new BadRequestObjectResult(new { ErrorCode = "TooManyResults" });
       context.ExceptionHandled = true;
     }
+    else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(uniqueNameAlreadyUsed.Failure);
+      context.ExceptionHandled = true;
+    }
     else
     {
       base.OnException(context);
     }
+  }
+
+  private static IActionResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)
+  {
+    return new ConflictObjectResult(((EmailAddressAlreadyUsedException)context.Exception).Failure);
   }
 
   private static IActionResult HandleInvalidAggregateIdException(ExceptionContext context)
@@ -82,9 +98,24 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     };
   }
 
+  private static IActionResult HandleSessionIsNotActiveException(ExceptionContext _)
+  {
+    return new BadRequestObjectResult(new { ErrorCode = "SessionIsNotActive" });
+  }
+
   private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)
   {
     return new ConflictObjectResult(((UniqueSlugAlreadyUsedException)context.Exception).Failure);
+  }
+
+  private static IActionResult HandleUserIsDisabledException(ExceptionContext _)
+  {
+    return new BadRequestObjectResult(new { ErrorCode = "UserIsDisabled" });
+  }
+
+  private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext _)
+  {
+    return new BadRequestObjectResult(new { ErrorCode = "UserIsNotConfirmed" });
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)
