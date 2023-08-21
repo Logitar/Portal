@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Domain;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Realms;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,11 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     else if (context.Exception is AggregateNotFoundException aggregateNotFound)
     {
       context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is InvalidCredentialsException)
+    {
+      context.Result = new BadRequestObjectResult(new { ErrorCode = "InvalidCredentials" });
       context.ExceptionHandled = true;
     }
     else if (context.Exception is TooManyResultsException)

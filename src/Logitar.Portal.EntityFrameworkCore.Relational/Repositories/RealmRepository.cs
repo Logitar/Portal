@@ -42,7 +42,11 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<RealmAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+    IEnumerable<RealmAggregate> realms = Load<RealmAggregate>(events.Select(EventSerializer.Deserialize));
+
+    return realms.Count() > 1
+      ? realms.FirstOrDefault(realm => realm.Id.Value == aggregateId)
+      : realms.SingleOrDefault();
   }
 
   public async Task<RealmAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
