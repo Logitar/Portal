@@ -90,14 +90,7 @@ internal class RealmQuerier : IRealmQuerier
       }
     }
 
-    if (payload.Skip > 1)
-    {
-      query = query.Skip(payload.Skip);
-    }
-    if (payload.Limit > 1)
-    {
-      query = query.Take(payload.Limit);
-    }
+    query = query.ApplyPaging(payload);
 
     RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
     IEnumerable<Realm> results = await MapAsync(realms, cancellationToken);

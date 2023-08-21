@@ -3,6 +3,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -35,6 +36,27 @@ internal class Mapper
       ClaimMappings = source.ClaimMappings.Select(claimMapping => new ClaimMapping(claimMapping.Key, claimMapping.Value.Name, claimMapping.Value.Type)),
       CustomAttributes = ToCustomAttributes(source.CustomAttributes)
     };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Session Map(SessionEntity source, Realm? realm)
+  {
+    Session destination = new()
+    {
+      IsPersistent = source.IsPersistent,
+      IsActive = source.IsActive,
+      SignedOutBy = source.SignedOutBy == null ? null : GetActor(source.SignedOutBy),
+      SignedOutOn = source.SignedOutOn.HasValue ? ToUniversalTime(source.SignedOutOn.Value) : null,
+      CustomAttributes = ToCustomAttributes(source.CustomAttributes)
+    };
+
+    if (source.User != null)
+    {
+      destination.User = Map(source.User, realm);
+    }
 
     MapAggregate(source, destination);
 

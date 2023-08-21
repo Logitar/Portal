@@ -45,7 +45,7 @@ internal class UserQuerier : IUserQuerier
     {
       realm = await _realms.AsNoTracking()
         .SingleOrDefaultAsync(x => x.AggregateId == user.TenantId, cancellationToken)
-        ?? throw new InvalidOperationException($"The realm 'Id={user.TenantId}' could not be found.");
+        ?? throw new InvalidOperationException($"The realm 'Id={user.TenantId}' could not be found from user 'Id={user.AggregateId}'.");
     }
 
     return await MapAsync(user, realm, cancellationToken);
@@ -195,14 +195,7 @@ internal class UserQuerier : IUserQuerier
       }
     }
 
-    if (payload.Skip > 1)
-    {
-      query = query.Skip(payload.Skip);
-    }
-    if (payload.Limit > 1)
-    {
-      query = query.Take(payload.Limit);
-    }
+    query = query.ApplyPaging(payload);
 
     UserEntity[] users = await query.ToArrayAsync(cancellationToken);
     IEnumerable<User> results = await MapAsync(users, realm, cancellationToken);

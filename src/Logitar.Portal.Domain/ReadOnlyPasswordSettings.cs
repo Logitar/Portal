@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Domain.Realms.Validators;
 
 namespace Logitar.Portal.Domain;
 
-public record class ReadOnlyPasswordSettings
+public record class ReadOnlyPasswordSettings : IPasswordSettings
 {
   public ReadOnlyPasswordSettings(int requiredLength = 6, int requiredUniqueChars = 1,
     bool requireNonAlphanumeric = false, bool requireLowercase = true,
@@ -25,4 +27,6 @@ public record class ReadOnlyPasswordSettings
   public bool RequireLowercase { get; }
   public bool RequireUppercase { get; }
   public bool RequireDigit { get; }
+
+  public string Strategy { get; } = Pbkdf2.Prefix;
 }

@@ -34,6 +34,11 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new SearchUsersQuery(payload), cancellationToken);
   }
 
+  public async Task<User?> SignOutAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SignOutUserCommand(id), cancellationToken);
+  }
+
   public async Task<User?> UpdateAsync(string id, UpdateUserPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new UpdateUserCommand(id, payload), cancellationToken);
