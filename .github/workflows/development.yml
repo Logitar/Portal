@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      - v3 # TODO(fpion): remove
   workflow_dispatch:
 
 jobs:
