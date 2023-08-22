@@ -75,10 +75,7 @@ internal class Startup : StartupBase
     }
 
     builder.UseHttpsRedirection();
-    builder.UseSession();
     builder.UseMiddleware<RefreshSession>();
-    builder.UseAuthentication();
-    //builder.UseAuthorization();
 
     if (builder is WebApplication application)
     {
