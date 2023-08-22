@@ -130,7 +130,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.LastName, user.LastName);
     Assert.NotNull(user.FullName);
     Assert.Null(user.Nickname);
-    Assert.Equal(payload.Birthdate?.ToUniversalTime(), user.Birthdate);
+    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
     Assert.Equal(payload.Locale, user.Locale);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
@@ -169,6 +169,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     await CheckUserPasswordAsync(user.Id, payload.Password);
   }
+  private static long ToUnixTimeMilliseconds(DateTime? value)
+    => value.HasValue ? new DateTimeOffset(value.Value).ToUnixTimeMilliseconds() : 0;
 
   [Fact(DisplayName = "CreateAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
   public async Task CreateAsync_it_should_throw_AggregateNotFoundException_when_the_realm_could_not_be_found()

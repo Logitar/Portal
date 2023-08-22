@@ -43,7 +43,7 @@ internal class Startup : StartupBase
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+      ?? DatabaseProvider.EntityFrameworkCorePostgreSQL;
     string connectionString;
     switch (databaseProvider)
     {

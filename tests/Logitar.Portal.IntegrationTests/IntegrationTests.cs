@@ -12,6 +12,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure;
@@ -45,6 +46,11 @@ public abstract class IntegrationTests
     DatabaseProvider databaseProvider = configuration.GetValue<DatabaseProvider>("DatabaseProvider");
     switch (databaseProvider)
     {
+      case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+        connectionString = (configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal") ?? string.Empty)
+          .Replace("{database}", GetType().Name);
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        break;
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
         connectionString = (configuration.GetValue<string>("SQLCONNSTR_Portal") ?? string.Empty)
           .Replace("{database}", GetType().Name);
