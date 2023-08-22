@@ -31,7 +31,7 @@ public class ConfigurationAggregate : AggregateRoot
     ReadOnlyPasswordSettings? passwordSettings = null,
     ReadOnlyLoggingSettings? loggingSettings = null, ActorId actorId = default) : base(UniqueId)
   {
-    if (secret == null)
+    if (string.IsNullOrWhiteSpace(secret))
     {
       secret = RandomStringGenerator.GetString(SecretLength);
     }
