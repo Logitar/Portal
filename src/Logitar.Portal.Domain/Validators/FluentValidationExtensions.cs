@@ -15,6 +15,6 @@ internal static class FluentValidationExtensions
 
   public static IRuleBuilderOptions<T, TProperty> WithPropertyName<T, TProperty>(this IRuleBuilderOptions<T, TProperty> options, string? propertyName)
   {
-    return propertyName == null ? options : options.WithPropertyName(propertyName);
+    return propertyName == null ? options : options.WithName(propertyName);
   }
 }
