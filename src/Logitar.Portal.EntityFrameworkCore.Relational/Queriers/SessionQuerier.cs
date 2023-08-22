@@ -67,6 +67,8 @@ internal class SessionQuerier : ISessionQuerier
       .Join(Db.Users.UserId, Db.Sessions.UserId)
       .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Sessions.Table);
+
+    _queryHelper.ApplyTextSearch(builder, payload.Id, Db.Sessions.AggregateId);
     _queryHelper.ApplyTextSearch(builder, payload.Search);
 
     if (payload.UserId != null)

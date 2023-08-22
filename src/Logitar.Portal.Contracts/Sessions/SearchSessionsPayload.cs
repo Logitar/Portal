@@ -5,6 +5,8 @@ public record SearchSessionsPayload : SearchPayload
   public string? Realm { get; set; }
   public string? UserId { get; set; }
 
+  public TextSearch Id { get; set; } = new();
+
   public bool? IsActive { get; set; }
   public bool? IsPersistent { get; set; }
 

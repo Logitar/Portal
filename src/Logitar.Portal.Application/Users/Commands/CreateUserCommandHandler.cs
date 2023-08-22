@@ -47,7 +47,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     }
     if (payload.IsDisabled)
     {
-      user.Disable();
+      user.Disable(_applicationContext.ActorId);
     }
 
     if (payload.Address != null)

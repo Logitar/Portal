@@ -62,18 +62,18 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       }
       else
       {
-        user.ChangePassword(payload.Password.CurrentPassword, newPassword);
+        user.ChangePassword(payload.Password.CurrentPassword, newPassword, _applicationContext.ActorId);
       }
     }
     if (payload.IsDisabled.HasValue)
     {
       if (payload.IsDisabled.Value)
       {
-        user.Disable();
+        user.Disable(_applicationContext.ActorId);
       }
       else
       {
-        user.Enable();
+        user.Enable(_applicationContext.ActorId);
       }
     }
 

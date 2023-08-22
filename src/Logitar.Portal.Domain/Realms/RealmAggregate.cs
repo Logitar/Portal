@@ -40,9 +40,10 @@ public class RealmAggregate : AggregateRoot
     bool requireConfirmedAccount = false, ReadOnlyUniqueNameSettings? uniqueNameSettings = null,
     ReadOnlyPasswordSettings? passwordSettings = null, ActorId actorId = default) : base()
   {
+    uniqueSlug = uniqueSlug.Trim();
     new UniqueSlugValidator(nameof(UniqueSlug)).ValidateAndThrow(uniqueSlug);
 
-    if (secret == null)
+    if (string.IsNullOrWhiteSpace(secret))
     {
       secret = RandomStringGenerator.GetString(SecretLength);
     }
@@ -55,7 +56,7 @@ public class RealmAggregate : AggregateRoot
     ApplyChange(new RealmCreatedEvent
     {
       ActorId = actorId,
-      UniqueSlug = uniqueSlug.Trim(),
+      UniqueSlug = uniqueSlug,
       Secret = secret,
       RequireUniqueEmail = requireUniqueEmail,
       RequireConfirmedAccount = requireConfirmedAccount,
