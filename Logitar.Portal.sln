@@ -24,11 +24,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Domain", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.EntityFrameworkCore.Relational", "src\Logitar.Portal.EntityFrameworkCore.Relational\Logitar.Portal.EntityFrameworkCore.Relational.csproj", "{CFE0E9F9-F410-4614-AA20-FAA5DE552EF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.EntityFrameworkCore.SqlServer", "src\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj", "{5EFC6568-BD35-48AD-BFB1-DB2EFB08F9B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.EntityFrameworkCore.SqlServer", "src\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj", "{5EFC6568-BD35-48AD-BFB1-DB2EFB08F9B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.EntityFrameworkCore.PostgreSQL", "src\Logitar.Portal.EntityFrameworkCore.PostgreSQL\Logitar.Portal.EntityFrameworkCore.PostgreSQL.csproj", "{E9532917-005D-41B0-B1E7-E2D7CE8E3EBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.EntityFrameworkCore.PostgreSQL", "src\Logitar.Portal.EntityFrameworkCore.PostgreSQL\Logitar.Portal.EntityFrameworkCore.PostgreSQL.csproj", "{E9532917-005D-41B0-B1E7-E2D7CE8E3EBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{426ADCE3-606C-491E-92B9-FFFD300B012D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{426ADCE3-606C-491E-92B9-FFFD300B012D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A0876EE-6DB7-4BCE-ACA3-D80E72178CD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.IntegrationTests", "tests\Logitar.Portal.IntegrationTests\Logitar.Portal.IntegrationTests.csproj", "{8140EE83-AB94-47D9-BD8B-C9329CBF4621}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,9 +72,16 @@ Global
 		{426ADCE3-606C-491E-92B9-FFFD300B012D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{426ADCE3-606C-491E-92B9-FFFD300B012D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{426ADCE3-606C-491E-92B9-FFFD300B012D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8140EE83-AB94-47D9-BD8B-C9329CBF4621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8140EE83-AB94-47D9-BD8B-C9329CBF4621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8140EE83-AB94-47D9-BD8B-C9329CBF4621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8140EE83-AB94-47D9-BD8B-C9329CBF4621}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8140EE83-AB94-47D9-BD8B-C9329CBF4621} = {8A0876EE-6DB7-4BCE-ACA3-D80E72178CD9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55C506C2-F420-403F-B2E6-A47E2DF4C4B6}
