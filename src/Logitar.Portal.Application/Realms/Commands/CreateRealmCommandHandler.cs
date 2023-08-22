@@ -30,8 +30,8 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
       throw new UniqueSlugAlreadyUsedException(payload.UniqueSlug, nameof(payload.UniqueSlug));
     }
 
-    ReadOnlyUniqueNameSettings? uniqueNameSettings = payload.UniqueNameSettings?.ToUniqueNameSettings();
-    ReadOnlyPasswordSettings? passwordSettings = payload.PasswordSettings?.ToPasswordSettings();
+    ReadOnlyUniqueNameSettings? uniqueNameSettings = payload.UniqueNameSettings?.ToReadOnlyUniqueNameSettings();
+    ReadOnlyPasswordSettings? passwordSettings = payload.PasswordSettings?.ToReadOnlyPasswordSettings();
     realm = new(payload.UniqueSlug, payload.Secret, payload.RequireUniqueEmail,
       payload.RequireConfirmedAccount, uniqueNameSettings, passwordSettings, _applicationContext.ActorId)
     {

@@ -84,12 +84,12 @@ internal class SessionQuerier : ISessionQuerier
       builder = builder.Where(Db.Sessions.IsPersistent, Operators.IsEqualTo(payload.IsPersistent.Value));
     }
 
-    IQueryable<SessionEntity> query = _sessions.FromQuery(builder.Build()).AsNoTracking();
+    IQueryable<SessionEntity> query = _sessions.FromQuery(builder.Build()).AsNoTracking()
+      .Include(x => x.User);
 
     long total = await query.LongCountAsync(cancellationToken);
 
-    int sortCount = payload.Sort.Count();
-    if (sortCount > 0)
+    if (payload.Sort.Any())
     {
       IOrderedQueryable<SessionEntity>? ordered = null;
 

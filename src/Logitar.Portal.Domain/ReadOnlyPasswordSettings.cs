@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Settings;
-using Logitar.Portal.Domain.Realms.Validators;
+using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain;
 

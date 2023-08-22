@@ -4,7 +4,7 @@ namespace Logitar.Portal.Application;
 
 public class InvalidTimeZoneEntryException : Exception
 {
-  private const string ErrorMessage = "The specified time zone entry is not valid.";
+  private const string ErrorMessage = "The specified time zone is not valid.";
 
   public InvalidTimeZoneEntryException(string id, string propertyName, Exception innerException)
     : base(BuildMessage(id, propertyName), innerException)

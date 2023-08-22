@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Logitar.Portal.Domain.Realms.Validators;
+namespace Logitar.Portal.Domain.Validators;
 
 internal class ReadOnlyUniqueNameSettingsValidator : AbstractValidator<ReadOnlyUniqueNameSettings>
 {

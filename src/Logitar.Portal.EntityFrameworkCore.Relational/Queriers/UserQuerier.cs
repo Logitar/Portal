@@ -108,12 +108,12 @@ internal class UserQuerier : IUserQuerier
       builder = builder.Where(Db.Users.IsDisabled, Operators.IsEqualTo(payload.IsDisabled.Value));
     }
 
-    IQueryable<UserEntity> query = _users.FromQuery(builder.Build()).AsNoTracking();
+    IQueryable<UserEntity> query = _users.FromQuery(builder.Build()).AsNoTracking()
+      .Include(x => x.Roles);
 
     long total = await query.LongCountAsync(cancellationToken);
 
-    int sortCount = payload.Sort.Count();
-    if (sortCount > 0)
+    if (payload.Sort.Any())
     {
       IOrderedQueryable<UserEntity>? ordered = null;
 
@@ -173,8 +173,8 @@ internal class UserQuerier : IUserQuerier
             break;
           case UserSort.PhoneNumber:
             ordered = (ordered == null)
-              ? (sort.IsDescending ? query.OrderByDescending(x => x.PhoneNumber) : query.OrderBy(x => x.PhoneNumber))
-              : (sort.IsDescending ? ordered.ThenByDescending(x => x.PhoneNumber) : ordered.ThenBy(x => x.PhoneNumber));
+              ? (sort.IsDescending ? query.OrderByDescending(x => x.PhoneE164Formatted) : query.OrderBy(x => x.PhoneE164Formatted))
+              : (sort.IsDescending ? ordered.ThenByDescending(x => x.PhoneE164Formatted) : ordered.ThenBy(x => x.PhoneE164Formatted));
             break;
           case UserSort.UniqueName:
             ordered = (ordered == null)

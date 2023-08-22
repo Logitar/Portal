@@ -2,7 +2,8 @@
 
 public class ConfigurationAlreadyInitializedException : Exception
 {
-  public ConfigurationAlreadyInitializedException() : base("The configuration has already been initialized.")
+  public ConfigurationAlreadyInitializedException()
+    : base("The configuration has already been initialized.")
   {
   }
 }

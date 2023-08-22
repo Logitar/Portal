@@ -4,7 +4,7 @@ namespace Logitar.Portal.Application;
 
 public class InvalidGenderException : Exception
 {
-  private const string ErrorMessage = "The specified locale is not valid.";
+  private const string ErrorMessage = "The specified gender is not valid.";
 
   public InvalidGenderException(string value, string propertyName, Exception innerException)
     : base(BuildMessage(value, propertyName), innerException)

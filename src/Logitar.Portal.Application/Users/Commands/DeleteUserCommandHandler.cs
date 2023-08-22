@@ -7,15 +7,13 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public DeleteUserCommandHandler(IApplicationContext applicationContext, IUserManager userManager,
+  public DeleteUserCommandHandler(IUserManager userManager,
     IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _userManager = userManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -30,8 +28,6 @@ internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Use
       return null;
     }
     User result = await _userQuerier.ReadAsync(user, cancellationToken);
-
-    user.Delete(_applicationContext.ActorId);
 
     await _userManager.DeleteAsync(user, cancellationToken);
 

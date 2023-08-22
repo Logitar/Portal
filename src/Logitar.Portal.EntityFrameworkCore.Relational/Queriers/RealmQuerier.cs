@@ -57,8 +57,7 @@ internal class RealmQuerier : IRealmQuerier
 
     long total = await query.LongCountAsync(cancellationToken);
 
-    int sortCount = payload.Sort.Count();
-    if (sortCount > 0)
+    if (payload.Sort.Any())
     {
       IOrderedQueryable<RealmEntity>? ordered = null;
 

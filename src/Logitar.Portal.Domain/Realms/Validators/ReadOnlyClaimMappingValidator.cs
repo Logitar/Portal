@@ -9,6 +9,7 @@ internal class ReadOnlyClaimMappingValidator : AbstractValidator<ReadOnlyClaimMa
     RuleFor(x => x.Name).NotEmpty()
       .MaximumLength(byte.MaxValue);
 
-    When(x => x.Type != null, () => RuleFor(x => x.Type).NotEmpty());
+    When(x => x.Type != null, () => RuleFor(x => x.Type).NotEmpty()
+      .MaximumLength(byte.MaxValue));
   }
 }

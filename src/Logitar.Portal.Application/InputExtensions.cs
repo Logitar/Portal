@@ -98,12 +98,12 @@ internal static class InputExtensions
   public static PhoneNumber ToPhoneNumber(this PhonePayload phone, bool isVerified)
     => new(phone.Number, phone.CountryCode, phone.Extension, isVerified);
 
-  public static ReadOnlyLoggingSettings ToLoggingSettings(this LoggingSettings loggingSettings)
+  public static ReadOnlyLoggingSettings ToReadOnlyLoggingSettings(this LoggingSettings loggingSettings)
     => new(loggingSettings.Extent, loggingSettings.OnlyErrors);
-  public static ReadOnlyPasswordSettings ToPasswordSettings(this PasswordSettings passwordSettings)
+  public static ReadOnlyPasswordSettings ToReadOnlyPasswordSettings(this PasswordSettings passwordSettings)
     => new(passwordSettings.RequiredLength, passwordSettings.RequiredUniqueChars,
       passwordSettings.RequireNonAlphanumeric, passwordSettings.RequireLowercase,
       passwordSettings.RequireUppercase, passwordSettings.RequireDigit);
-  public static ReadOnlyUniqueNameSettings ToUniqueNameSettings(this UniqueNameSettings uniqueNameSettings)
+  public static ReadOnlyUniqueNameSettings ToReadOnlyUniqueNameSettings(this UniqueNameSettings uniqueNameSettings)
     => new(uniqueNameSettings.AllowedCharacters);
 }

@@ -21,9 +21,9 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<RealmAggregate?> FindAsync(string realm, CancellationToken cancellationToken)
+  public async Task<RealmAggregate?> FindAsync(string idOrUniqueSlug, CancellationToken cancellationToken)
   {
-    string aggregateId = realm.Trim();
+    string aggregateId = idOrUniqueSlug.Trim();
     string uniqueSlugNormalized = aggregateId.ToUpper();
 
     IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)

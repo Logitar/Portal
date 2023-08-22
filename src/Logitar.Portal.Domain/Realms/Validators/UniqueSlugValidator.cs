@@ -3,7 +3,7 @@ using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain.Realms.Validators;
 
-public class UniqueSlugValidator : AbstractValidator<string>
+internal class UniqueSlugValidator : AbstractValidator<string>
 {
   public UniqueSlugValidator(string? propertyName = null)
   {

@@ -23,7 +23,7 @@ internal class ConfigurationService : IConfigurationService
     return await _pipeline.ExecuteAsync(new ReadConfigurationQuery(), cancellationToken);
   }
 
-  public async Task<Configuration?> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new UpdateConfigurationCommand(payload), cancellationToken);
   }

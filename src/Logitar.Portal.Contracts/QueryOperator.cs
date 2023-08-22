@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Contracts;
 
-public enum ConditionOperator
+public enum QueryOperator
 {
   And = 0,
   Or = 1

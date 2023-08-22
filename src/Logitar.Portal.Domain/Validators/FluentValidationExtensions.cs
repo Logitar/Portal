@@ -2,12 +2,12 @@
 
 namespace Logitar.Portal.Domain.Validators;
 
-public static class FluentValidationExtensions
+internal static class FluentValidationExtensions
 {
   public static IRuleBuilderOptions<T, string> Slug<T>(this IRuleBuilder<T, string> ruleBuilder)
   {
     return ruleBuilder.Must(BeAValidSlug)
-      .WithErrorCode("")
+      .WithErrorCode("SlugValidator")
       .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words separated by hyphens (-).");
   }
   private static bool BeAValidSlug(string slug)

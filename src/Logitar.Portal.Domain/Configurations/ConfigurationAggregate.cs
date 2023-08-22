@@ -53,13 +53,13 @@ public class ConfigurationAggregate : AggregateRoot
   }
   protected virtual void Apply(ConfigurationInitializedEvent initialized)
   {
-    DefaultLocale = initialized.DefaultLocale;
-    Secret = initialized.Secret;
+    _defaultLocale = initialized.DefaultLocale;
+    _secret = initialized.Secret;
 
-    UniqueNameSettings = initialized.UniqueNameSettings;
-    PasswordSettings = initialized.PasswordSettings;
+    _uniqueNameSettings = initialized.UniqueNameSettings;
+    _passwordSettings = initialized.PasswordSettings;
 
-    LoggingSettings = initialized.LoggingSettings;
+    _loggingSettings = initialized.LoggingSettings;
   }
 
   public Locale DefaultLocale
@@ -164,9 +164,35 @@ public class ConfigurationAggregate : AggregateRoot
     }
   }
 
+  protected virtual void Apply(ConfigurationUpdatedEvent updated)
+  {
+    if (updated.DefaultLocale != null)
+    {
+      _defaultLocale = updated.DefaultLocale;
+    }
+    if (updated.Secret != null)
+    {
+      _secret = updated.Secret;
+    }
+
+    if (updated.UniqueNameSettings != null)
+    {
+      _uniqueNameSettings = updated.UniqueNameSettings;
+    }
+    if (updated.PasswordSettings != null)
+    {
+      _passwordSettings = updated.PasswordSettings;
+    }
+
+    if (updated.LoggingSettings != null)
+    {
+      _loggingSettings = updated.LoggingSettings;
+    }
+  }
+
   protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()
   {
-    T? change = Changes.Last(change => change is T) as T;
+    T? change = Changes.LastOrDefault(change => change is T) as T;
     if (change == null)
     {
       change = new();

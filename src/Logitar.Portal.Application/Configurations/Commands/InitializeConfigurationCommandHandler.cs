@@ -30,7 +30,8 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
 
   public async Task<InitializeConfigurationResult> Handle(InitializeConfigurationCommand command, CancellationToken cancellationToken)
   {
-    if (await _configurationRepository.LoadAsync(cancellationToken) != null)
+    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
+    if (configuration != null)
     {
       throw new ConfigurationAlreadyInitializedException();
     }
@@ -41,7 +42,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     AggregateId userId = AggregateId.NewId();
     ActorId actorId = new(userId.Value);
 
-    ConfigurationAggregate configuration = new(locale, actorId: actorId);
+    configuration = new(locale, actorId: actorId);
 
     UserAggregate user = new(configuration.UniqueNameSettings, payload.User.UniqueName, tenantId: null, actorId, userId);
     user.SetPassword(_passwordService.Create(payload.User.Password));
@@ -49,6 +50,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     user.FirstName = payload.User.FirstName;
     user.LastName = payload.User.LastName;
     user.Locale = locale;
+    user.Update(actorId);
 
     await _configurationRepository.SaveAsync(configuration, cancellationToken);
     await _userManager.SaveAsync(user, cancellationToken);

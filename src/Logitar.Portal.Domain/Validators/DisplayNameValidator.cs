@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Domain.Validators;
 
-public class DisplayNameValidator : AbstractValidator<string>
+internal class DisplayNameValidator : AbstractValidator<string>
 {
   public DisplayNameValidator(string? propertyName = null)
   {

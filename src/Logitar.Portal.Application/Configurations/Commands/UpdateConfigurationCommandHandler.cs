@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, Configuration?>
+internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, Configuration>
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IConfigurationQuerier _configurationQuerier;
@@ -19,13 +19,10 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
     _configurationRepository = configurationRepository;
   }
 
-  public async Task<Configuration?> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
+  public async Task<Configuration> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
-    if (configuration == null)
-    {
-      return null;
-    }
+    ConfigurationAggregate configuration = await _configurationRepository.LoadAsync(cancellationToken)
+      ?? throw new InvalidOperationException("The configuration could not be found.");
 
     UpdateConfigurationPayload payload = command.Payload;
     Locale? defaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale));
@@ -41,16 +38,16 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
 
     if (payload.UniqueNameSettings != null)
     {
-      configuration.UniqueNameSettings = payload.UniqueNameSettings.ToUniqueNameSettings();
+      configuration.UniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
     }
     if (payload.PasswordSettings != null)
     {
-      configuration.PasswordSettings = payload.PasswordSettings.ToPasswordSettings();
+      configuration.PasswordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
     }
 
     if (payload.LoggingSettings != null)
     {
-      configuration.LoggingSettings = payload.LoggingSettings.ToLoggingSettings();
+      configuration.LoggingSettings = payload.LoggingSettings.ToReadOnlyLoggingSettings();
     }
 
     if (configuration.HasChanges)

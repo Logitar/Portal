@@ -33,6 +33,12 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.UniqueSlug != null)
     {
+      RealmAggregate? other = await _realmRepository.LoadAsync(payload.UniqueSlug, cancellationToken);
+      if (other?.Equals(realm) == false)
+      {
+        throw new UniqueSlugAlreadyUsedException(payload.UniqueSlug, nameof(payload.UniqueSlug));
+      }
+
       realm.UniqueSlug = payload.UniqueSlug;
     }
     if (payload.DisplayName != null)
@@ -68,11 +74,11 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.UniqueNameSettings != null)
     {
-      realm.UniqueNameSettings = payload.UniqueNameSettings.ToUniqueNameSettings();
+      realm.UniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
     }
     if (payload.PasswordSettings != null)
     {
-      realm.PasswordSettings = payload.PasswordSettings.ToPasswordSettings();
+      realm.PasswordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
     }
 
     foreach (ClaimMappingModification claimMapping in payload.ClaimMappings)

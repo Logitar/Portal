@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Logitar.Portal.Domain.Realms.Validators;
+namespace Logitar.Portal.Domain.Validators;
 
 internal class ReadOnlyPasswordSettingsValidator : AbstractValidator<ReadOnlyPasswordSettings>
 {
@@ -10,5 +10,7 @@ internal class ReadOnlyPasswordSettingsValidator : AbstractValidator<ReadOnlyPas
 
     RuleFor(x => x.RequiredUniqueChars).GreaterThan(0)
       .LessThanOrEqualTo(x => x.RequiredLength);
+
+    RuleFor(x => x.Strategy).NotEmpty();
   }
 }

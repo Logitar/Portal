@@ -2,8 +2,6 @@
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
 using Microsoft.Extensions.Primitives;
-using System.Text;
-using System.Text.Json;
 
 namespace Logitar.Portal.Extensions;
 

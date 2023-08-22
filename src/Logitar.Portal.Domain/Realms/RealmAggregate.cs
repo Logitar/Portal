@@ -382,7 +382,7 @@ public class RealmAggregate : AggregateRoot
 
   protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()
   {
-    T? change = Changes.Last(change => change is T) as T;
+    T? change = Changes.LastOrDefault(change => change is T) as T;
     if (change == null)
     {
       change = new();

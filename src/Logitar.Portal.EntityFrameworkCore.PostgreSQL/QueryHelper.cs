@@ -42,10 +42,10 @@ internal class QueryHelper : IQueryHelper
         {
           switch (search.Operator)
           {
-            case ConditionOperator.And:
+            case QueryOperator.And:
               query.WhereAnd(conditions.ToArray());
               break;
-            case ConditionOperator.Or:
+            case QueryOperator.Or:
               query.WhereOr(conditions.ToArray());
               break;
           }
