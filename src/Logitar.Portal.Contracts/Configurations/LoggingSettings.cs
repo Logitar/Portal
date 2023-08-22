@@ -2,6 +2,6 @@
 
 public record LoggingSettings : ILoggingSettings
 {
-  public LoggingExtent Extent { get; set; } = LoggingExtent.ActivityOnly;
-  public bool OnlyErrors { get; set; } = false;
+  public LoggingExtent Extent { get; set; }
+  public bool OnlyErrors { get; set; }
 }

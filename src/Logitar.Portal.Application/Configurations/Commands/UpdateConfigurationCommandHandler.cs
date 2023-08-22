@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Logitar.Identity.Domain;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
 using MediatR;
@@ -8,15 +8,15 @@ namespace Logitar.Portal.Application.Configurations.Commands;
 internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, Configuration>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly IConfigurationQuerier _configurationQuerier;
   private readonly IConfigurationRepository _configurationRepository;
-  private readonly IMapper _mapper;
 
   public UpdateConfigurationCommandHandler(IApplicationContext applicationContext,
-    IConfigurationRepository configurationRepository, IMapper mapper)
+    IConfigurationQuerier configurationQuerier, IConfigurationRepository configurationRepository)
   {
     _applicationContext = applicationContext;
+    _configurationQuerier = configurationQuerier;
     _configurationRepository = configurationRepository;
-    _mapper = mapper;
   }
 
   public async Task<Configuration> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
@@ -25,11 +25,10 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
       ?? throw new InvalidOperationException("The configuration could not be found.");
 
     UpdateConfigurationPayload payload = command.Payload;
+    Locale? defaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale));
 
-    if (payload.DefaultLocale != null)
+    if (defaultLocale != null)
     {
-      CultureInfo defaultLocale = payload.DefaultLocale.GetCultureInfo(nameof(payload.DefaultLocale))
-        ?? CultureInfo.InvariantCulture;
       configuration.DefaultLocale = defaultLocale;
     }
     if (payload.Secret != null)
@@ -58,8 +57,6 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
       await _configurationRepository.SaveAsync(configuration, cancellationToken);
     }
 
-    Configuration result = _mapper.Map<Configuration>(configuration);
-
-    return result;
+    return await _configurationQuerier.ReadAsync(configuration, cancellationToken);
   }
 }

@@ -23,7 +23,7 @@ public class Program
     {
       await mediator.Publish(new InitializeDatabaseCommand());
     }
-    await mediator.Send(new InitializeCacheCommand());
+    await mediator.Publish(new InitializeCacheCommand());
 
     application.Run();
   }

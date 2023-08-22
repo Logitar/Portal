@@ -2,4 +2,4 @@
 
 namespace Logitar.Portal.Application.Caching.Commands;
 
-public record InitializeCacheCommand : IRequest<Unit>;
+public record InitializeCacheCommand : INotification;

@@ -41,7 +41,7 @@ public class AggregateNotFoundException : Exception
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
-    message.Append("Type: ").AppendLine(type.GetName());
+    message.Append("TypeName: ").AppendLine(type.GetName());
     message.Append("Id: ").AppendLine(id);
     message.Append("PropertyName: ").AppendLine(propertyName);
 

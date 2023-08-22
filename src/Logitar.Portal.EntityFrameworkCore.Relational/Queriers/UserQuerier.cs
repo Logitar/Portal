@@ -1,12 +1,15 @@
-﻿using AutoMapper;
-using Logitar.Data;
+﻿using Logitar.Data;
+using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,62 +17,46 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 
 internal class UserQuerier : IUserQuerier
 {
-  private readonly IMapper _mapper;
+  private readonly IActorService _actorService;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<RealmEntity> _realms;
-  private readonly IPortalSqlHelper _sql;
   private readonly DbSet<UserEntity> _users;
 
-  public UserQuerier(IdentityContext identityContext, IMapper mapper, PortalContext portalContext,
-    IPortalSqlHelper sql)
+  public UserQuerier(IActorService actorService, IdentityContext identityContext,
+    IQueryHelper queryHelper, PortalContext portalContext)
   {
-    _mapper = mapper;
+    _actorService = actorService;
+    _queryHelper = queryHelper;
     _realms = portalContext.Realms;
     _users = identityContext.Users;
-    _sql = sql;
   }
 
   public async Task<User> ReadAsync(UserAggregate user, CancellationToken cancellationToken)
     => await ReadAsync(user.Id.Value, cancellationToken)
-      ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id}' could not be found.");
+      ?? throw new InvalidOperationException($"The user entity 'Id={user.Id}' could not be found.");
   public async Task<User?> ReadAsync(string id, CancellationToken cancellationToken)
   {
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
-    if (user == null)
-    {
-      return null;
-    }
 
     RealmEntity? realm = null;
-    if (user.TenantId != null)
+    if (user?.TenantId != null)
     {
       realm = await _realms.AsNoTracking()
-        .SingleOrDefaultAsync(x => x.AggregateId == user.TenantId, cancellationToken);
+        .SingleOrDefaultAsync(x => x.AggregateId == user.TenantId, cancellationToken)
+        ?? throw new InvalidOperationException($"The realm 'Id={user.TenantId}' could not be found from user 'Id={user.AggregateId}'.");
     }
 
-    // TODO(fpion): Actors
-
-    User result = _mapper.Map<User>(user);
-    if (realm != null)
-    {
-      result.Realm = _mapper.Map<Realm>(realm);
-    }
-
-    return result;
+    return await MapAsync(user, realm, cancellationToken);
   }
 
   public async Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string uniqueName, CancellationToken cancellationToken)
   {
     RealmEntity? realm = null;
-    if (!string.IsNullOrWhiteSpace(realmIdOrUniqueSlug))
+    if (realmIdOrUniqueSlug != null)
     {
-      string aggregateId = realmIdOrUniqueSlug.Trim();
-      string uniqueSlugNormalized = aggregateId.ToUpper();
-
-      realm = await _realms.AsNoTracking()
-        .SingleOrDefaultAsync(x => x.AggregateId == aggregateId
-          || x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
+      realm = await FindRealmAsync(realmIdOrUniqueSlug, cancellationToken);
       if (realm == null)
       {
         return null;
@@ -80,45 +67,31 @@ internal class UserQuerier : IUserQuerier
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
-    if (user == null)
-    {
-      return null;
-    }
 
-    // TODO(fpion): Actors
-
-    User result = _mapper.Map<User>(user);
-    if (realm != null)
-    {
-      result.Realm = _mapper.Map<Realm>(realm);
-    }
-
-    return result;
+    return await MapAsync(user, realm, cancellationToken);
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
   {
     RealmEntity? realm = null;
-    if (!string.IsNullOrWhiteSpace(payload.Realm))
+    if (payload.Realm != null)
     {
-      string aggregateId = payload.Realm.Trim();
-      string uniqueSlugNormalized = aggregateId.ToUpper();
-
-      realm = await _realms.AsNoTracking()
-        .SingleOrDefaultAsync(x => x.AggregateId == aggregateId
-          || x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
+      realm = await FindRealmAsync(payload.Realm, cancellationToken);
       if (realm == null)
       {
         return new SearchResults<User>();
       }
     }
+    string? tenantId = realm?.AggregateId;
 
-    IQueryBuilder builder = _sql.QueryFrom(Db.Users.Table)
-      .Where(Db.Users.TenantId, realm == null ? Operators.IsNull() : Operators.IsEqualTo(realm.AggregateId))
+    IQueryBuilder builder = _queryHelper.From(Db.Users.Table)
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Users.Table);
-    _sql.ApplyTextSearch(builder, payload.Id, Db.Users.AggregateId);
-    _sql.ApplyTextSearch(builder, payload.Search, Db.Users.UniqueName, Db.Users.AddressFormatted,
+
+    _queryHelper.ApplyTextSearch(builder, payload.Id, Db.Users.AggregateId);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, Db.Users.UniqueName, Db.Users.AddressFormatted,
       Db.Users.EmailAddress, Db.Users.PhoneE164Formatted, Db.Users.FirstName, Db.Users.MiddleName,
       Db.Users.LastName, Db.Users.Nickname, Db.Users.Gender, Db.Users.Locale, Db.Users.TimeZone);
 
@@ -135,7 +108,8 @@ internal class UserQuerier : IUserQuerier
       builder = builder.Where(Db.Users.IsDisabled, Operators.IsEqualTo(payload.IsDisabled.Value));
     }
 
-    IQueryable<UserEntity> query = _users.FromQuery(builder.Build()).AsNoTracking();
+    IQueryable<UserEntity> query = _users.FromQuery(builder.Build()).AsNoTracking()
+      .Include(x => x.Roles);
 
     long total = await query.LongCountAsync(cancellationToken);
 
@@ -167,20 +141,25 @@ internal class UserQuerier : IUserQuerier
               ? (sort.IsDescending ? query.OrderByDescending(x => x.EmailAddress) : query.OrderBy(x => x.EmailAddress))
               : (sort.IsDescending ? ordered.ThenByDescending(x => x.EmailAddress) : ordered.ThenBy(x => x.EmailAddress));
             break;
+          case UserSort.FirstName:
+            ordered = (ordered == null)
+              ? (sort.IsDescending ? query.OrderByDescending(x => x.FirstName) : query.OrderBy(x => x.FirstName))
+              : (sort.IsDescending ? ordered.ThenByDescending(x => x.FirstName) : ordered.ThenBy(x => x.FirstName));
+            break;
           case UserSort.FullName:
             ordered = (ordered == null)
               ? (sort.IsDescending ? query.OrderByDescending(x => x.FullName) : query.OrderBy(x => x.FullName))
               : (sort.IsDescending ? ordered.ThenByDescending(x => x.FullName) : ordered.ThenBy(x => x.FullName));
             break;
-          case UserSort.LastFirstMiddleName:
+          case UserSort.LastName:
             ordered = (ordered == null)
-              ? (sort.IsDescending
-                ? query.OrderByDescending(x => x.LastName).ThenByDescending(x => x.FirstName).ThenByDescending(x => x.MiddleName)
-                : query.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.MiddleName)
-              ) : (sort.IsDescending
-                ? ordered.ThenByDescending(x => x.LastName).ThenByDescending(x => x.FirstName).ThenByDescending(x => x.FirstName)
-                : ordered.ThenBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.MiddleName)
-              );
+              ? (sort.IsDescending ? query.OrderByDescending(x => x.LastName) : query.OrderBy(x => x.LastName))
+              : (sort.IsDescending ? ordered.ThenByDescending(x => x.LastName) : ordered.ThenBy(x => x.LastName));
+            break;
+          case UserSort.MiddleName:
+            ordered = (ordered == null)
+              ? (sort.IsDescending ? query.OrderByDescending(x => x.MiddleName) : query.OrderBy(x => x.MiddleName))
+              : (sort.IsDescending ? ordered.ThenByDescending(x => x.MiddleName) : ordered.ThenBy(x => x.MiddleName));
             break;
           case UserSort.Nickname:
             ordered = (ordered == null)
@@ -210,25 +189,51 @@ internal class UserQuerier : IUserQuerier
         }
       }
 
-      query = ordered ?? query;
+      if (ordered != null)
+      {
+        query = ordered;
+      }
     }
 
     query = query.ApplyPaging(payload);
 
     UserEntity[] users = await query.ToArrayAsync(cancellationToken);
-
-    User[] results = _mapper.Map<IEnumerable<User>>(users).ToArray();
-    if (realm != null)
-    {
-      Realm realmResult = _mapper.Map<Realm>(realm);
-      foreach (User result in results)
-      {
-        result.Realm = realmResult;
-      }
-    }
-
-    // TODO(fpion): Actors
+    IEnumerable<User> results = await MapAsync(users, realm, cancellationToken);
 
     return new SearchResults<User>(results, total);
+  }
+
+  private async Task<RealmEntity?> FindRealmAsync(string realm, CancellationToken cancellationToken)
+  {
+    string aggregateId = realm.Trim();
+    string uniqueSlugNormalized = aggregateId.ToUpper();
+
+    RealmEntity[] realms = await _realms.AsNoTracking()
+      .Where(x => x.AggregateId == aggregateId || x.UniqueSlugNormalized == uniqueSlugNormalized)
+      .ToArrayAsync(cancellationToken);
+
+    return realms.Length > 1
+      ? realms.FirstOrDefault(realm => realm.AggregateId == aggregateId)
+      : realms.SingleOrDefault();
+  }
+
+  private async Task<User?> MapAsync(UserEntity? user, RealmEntity? realm, CancellationToken cancellationToken)
+  {
+    if (user == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(new[] { user }, realm, cancellationToken)).Single();
+  }
+  private async Task<IEnumerable<User>> MapAsync(IEnumerable<UserEntity> users, RealmEntity? realm, CancellationToken cancellationToken)
+  {
+    IEnumerable<ActorId> actorIds = ActorHelper.GetIds(users.ToArray());
+    Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    Mapper mapper = new(actors);
+
+    Realm? mappedRealm = realm == null ? null : mapper.Map(realm);
+
+    return users.Select(user => mapper.Map(user, mappedRealm));
   }
 }

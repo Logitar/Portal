@@ -52,7 +52,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.DefaultLocale != null)
     {
-      realm.DefaultLocale = payload.DefaultLocale.Value?.GetCultureInfo(nameof(payload.DefaultLocale));
+      realm.DefaultLocale = payload.DefaultLocale.Value?.GetLocale(nameof(payload.DefaultLocale));
     }
     if (payload.Secret != null)
     {

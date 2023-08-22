@@ -3,7 +3,6 @@ name: Deploy Staging Portal to Azure
 on:
   push:
     branches:
-      - dev
       - "hotfix_**"
       - "release_**"
   workflow_dispatch:

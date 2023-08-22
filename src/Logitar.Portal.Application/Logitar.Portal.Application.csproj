@@ -8,8 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="FluentValidation" Version="11.7.1" />
     <PackageReference Include="MediatR" Version="12.1.1" />
   </ItemGroup>
 
@@ -18,14 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.Globalization" />
     <Using Include="System.Reflection" />
     <Using Include="System.Text" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="Logitar.Portal.Application.UnitTests" />
-    <InternalsVisibleTo Include="Logitar.Portal.IntegrationTests" />
   </ItemGroup>
 
 </Project>

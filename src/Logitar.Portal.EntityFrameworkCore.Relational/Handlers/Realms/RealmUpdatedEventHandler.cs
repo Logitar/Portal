@@ -14,13 +14,13 @@ internal class RealmUpdatedEventHandler : INotificationHandler<RealmUpdatedEvent
     _context = context;
   }
 
-  public async Task Handle(RealmUpdatedEvent notification, CancellationToken cancellationToken)
+  public async Task Handle(RealmUpdatedEvent updated, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == notification.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.AggregateId == updated.AggregateId.Value, cancellationToken);
     if (realm != null)
     {
-      realm.Update(notification);
+      realm.Update(updated);
 
       await _context.SaveChangesAsync(cancellationToken);
     }

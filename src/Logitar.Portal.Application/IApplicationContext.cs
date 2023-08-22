@@ -1,12 +1,12 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Domain.Configurations;
-using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application;
 
 public interface IApplicationContext
 {
+  Actor Actor { get; }
   ActorId ActorId { get; }
-  ConfigurationAggregate Configuration { get; set; }
-  RealmAggregate? Realm { get; set; }
+  ConfigurationAggregate Configuration { get; }
 }

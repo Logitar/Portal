@@ -1,33 +1,55 @@
-﻿using Logitar.Portal.Domain.Configurations;
-using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Constants;
+using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Sessions;
+using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Extensions;
 
 internal static class HttpContextExtensions
 {
-  private const string ConfigurationKey = "Configuration";
-  private const string RealmKey = "Realm";
+  private const string SessionIdKey = "SessionId";
 
-  public static ConfigurationAggregate? GetConfiguration(this HttpContext context)
-    => context.GetItem<ConfigurationAggregate>(ConfigurationKey);
-  public static RealmAggregate? GetRealm(this HttpContext context)
-    => context.GetItem<RealmAggregate>(RealmKey);
-  private static T? GetItem<T>(this HttpContext context, object key)
-    => context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
-
-  public static void SetConfiguration(this HttpContext context, ConfigurationAggregate? configuration)
-    => context.SetItem(ConfigurationKey, configuration);
-  public static void SetRealm(this HttpContext context, RealmAggregate? realm)
-    => context.SetItem(RealmKey, realm);
-  private static void SetItem<T>(this HttpContext context, object key, T? value)
+  public static IEnumerable<CustomAttribute> GetSessionCustomAttributes(this HttpContext context)
   {
-    if (value == null)
+    List<CustomAttribute> customAttributes = new(capacity: 2)
     {
-      context.Items.Remove(key);
-    }
-    else
+      new("AdditionalInformation", JsonSerializer.Serialize(context.Request.Headers))
+    };
+
+    string? ipAddress = null;
+    if (context.Request.Headers.TryGetValue("X-Forwarded-For", out StringValues xForwardedFor))
     {
-      context.Items[key] = value;
+      ipAddress = xForwardedFor.Single()?.Split(':').First();
     }
+    ipAddress ??= context.Connection.RemoteIpAddress?.ToString();
+    if (ipAddress != null)
+    {
+      customAttributes.Add(new("IpAddress", ipAddress));
+    }
+
+    return customAttributes;
+  }
+
+  public static string? GetSessionId(this HttpContext context)
+  {
+    byte[]? bytes = context.Session.Get(SessionIdKey);
+
+    return bytes == null ? null : Encoding.UTF8.GetString(bytes);
+  }
+  public static bool IsSignedIn(this HttpContext context) => context.GetSessionId() != null;
+  public static void SignIn(this HttpContext context, Session session)
+  {
+    context.Session.Set(SessionIdKey, Encoding.UTF8.GetBytes(session.Id));
+
+    if (session.RefreshToken != null)
+    {
+      context.Response.Cookies.Append(Cookies.RefreshToken, session.RefreshToken, Cookies.RefreshTokenOptions);
+    }
+  }
+  public static void SignOut(this HttpContext context)
+  {
+    context.Session.Clear();
+
+    context.Response.Cookies.Delete(Cookies.RefreshToken);
   }
 }

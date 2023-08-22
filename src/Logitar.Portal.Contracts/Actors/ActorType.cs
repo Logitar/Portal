@@ -3,6 +3,6 @@
 public enum ActorType
 {
   System = 0,
-  ApiKey = 1,
-  User = 2
+  User = 1,
+  ApiKey = 2
 }

@@ -6,17 +6,17 @@ public class InvalidLocaleException : Exception
 {
   private const string ErrorMessage = "The specified locale is not valid.";
 
-  public InvalidLocaleException(string cultureName, string propertyName, Exception innerException)
-    : base(BuildMessage(cultureName, propertyName), innerException)
+  public InvalidLocaleException(string code, string propertyName, Exception? innerException = null)
+    : base(BuildMessage(code, propertyName), innerException)
   {
-    CultureName = cultureName;
+    Code = code;
     PropertyName = propertyName;
   }
 
-  public string CultureName
+  public string Code
   {
-    get => (string)Data[nameof(CultureName)]!;
-    private set => Data[nameof(CultureName)] = value;
+    get => (string)Data[nameof(Code)]!;
+    private set => Data[nameof(Code)] = value;
   }
   public string PropertyName
   {
@@ -24,17 +24,17 @@ public class InvalidLocaleException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public ValidationFailure Failure => new(PropertyName, ErrorMessage, CultureName)
+  public ValidationFailure Failure => new(PropertyName, ErrorMessage, Code)
   {
     ErrorCode = "InvalidLocale"
   };
 
-  private static string BuildMessage(string cultureName, string propertyName)
+  private static string BuildMessage(string code, string propertyName)
   {
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
-    message.Append("CultureName: ").AppendLine(cultureName);
+    message.Append("Code: ").AppendLine(code);
     message.Append("PropertyName: ").AppendLine(propertyName);
 
     return message.ToString();

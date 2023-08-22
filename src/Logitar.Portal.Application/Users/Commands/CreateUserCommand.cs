@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-public record CreateUserCommand(CreateUserPayload Payload) : IRequest<User>;
+internal record CreateUserCommand(CreateUserPayload Payload) : IRequest<User>;

@@ -10,7 +10,7 @@ internal class ActorConfiguration : IEntityTypeConfiguration<ActorEntity>
 {
   public void Configure(EntityTypeBuilder<ActorEntity> builder)
   {
-    builder.ToTable(nameof(PortalContext.Actors));
+    builder.ToTable(PortalDb.Actors.Table.Table!, PortalDb.Actors.Table.Schema);
     builder.HasKey(x => x.ActorId);
 
     builder.HasIndex(x => x.Id).IsUnique();
@@ -18,9 +18,8 @@ internal class ActorConfiguration : IEntityTypeConfiguration<ActorEntity>
     builder.HasIndex(x => x.IsDeleted);
     builder.HasIndex(x => x.DisplayName);
 
-    builder.Property(x => x.Id).HasMaxLength(byte.MaxValue).IsRequired();
-    builder.Property(x => x.Type).HasMaxLength(byte.MaxValue)
-      .HasConversion(new EnumToStringConverter<ActorType>());
+    builder.Property(x => x.Id).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.Type).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<ActorType>());
     builder.Property(x => x.DisplayName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.EmailAddress).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PictureUrl).HasMaxLength(2048);

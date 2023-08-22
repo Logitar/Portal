@@ -11,5 +11,10 @@ internal static class FluentValidationExtensions
       .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words separated by hyphens (-).");
   }
   private static bool BeAValidSlug(string slug)
-    => slug.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(c => char.IsLetterOrDigit(c)));
+    => slug.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
+
+  public static IRuleBuilderOptions<T, TProperty> WithPropertyName<T, TProperty>(this IRuleBuilderOptions<T, TProperty> options, string? propertyName)
+  {
+    return propertyName == null ? options : options.WithPropertyName(propertyName);
+  }
 }

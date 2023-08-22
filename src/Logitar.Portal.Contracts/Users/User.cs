@@ -8,14 +8,14 @@ public record User : Aggregate
   public string UniqueName { get; set; } = string.Empty;
 
   public bool HasPassword { get; set; }
-  public Actor? PasswordChangedBy { get; private set; }
-  public DateTime? PasswordChangedOn { get; private set; }
+  public Actor? PasswordChangedBy { get; set; }
+  public DateTime? PasswordChangedOn { get; set; }
 
-  public Actor? DisabledBy { get; private set; }
-  public DateTime? DisabledOn { get; private set; }
+  public Actor? DisabledBy { get; set; }
+  public DateTime? DisabledOn { get; set; }
   public bool IsDisabled { get; set; }
 
-  public DateTime? AuthenticatedOn { get; private set; }
+  public DateTime? AuthenticatedOn { get; set; }
 
   public Address? Address { get; set; }
   public Email? Email { get; set; }
@@ -38,9 +38,9 @@ public record User : Aggregate
   public string? Profile { get; set; }
   public string? Website { get; set; }
 
-  public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
-
   // TODO(fpion): Roles
+
+  public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public Realm? Realm { get; set; }
 }

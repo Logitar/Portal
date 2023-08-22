@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
@@ -12,16 +13,19 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
   private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
+  private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
   public DeleteRealmCommandHandler(IAggregateRepository aggregateRepository,
     IApplicationContext applicationContext, IRealmQuerier realmQuerier,
-    IRealmRepository realmRepository, IUserRepository userRepository)
+    IRealmRepository realmRepository, ISessionRepository sessionRepository,
+    IUserRepository userRepository)
   {
     _aggregateRepository = aggregateRepository;
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
+    _sessionRepository = sessionRepository;
     _userRepository = userRepository;
   }
 
@@ -35,25 +39,32 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     }
     Realm result = await _realmQuerier.ReadAsync(realm, cancellationToken);
 
-    // TODO(fpion): Delete Messages
-    // TODO(fpion): Delete Templates
-    // TODO(fpion): Delete Senders
-    // TODO(fpion): Delete Dictionaries
-    // TODO(fpion): Delete Sessions
-    // TODO(fpion): Delete API Keys
-    // TODO(fpion): Delete Roles
+    realm.Delete(_applicationContext.ActorId);
 
-    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm.Id.Value, cancellationToken);
+    await DeleteSessionsAsync(realm, cancellationToken);
+    await DeleteUsersAsync(realm, cancellationToken);
+
+    await _realmRepository.SaveAsync(realm, cancellationToken);
+
+    return result;
+  }
+
+  private async Task DeleteSessionsAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadAsync(tenantId: realm.Id.Value, cancellationToken);
+    foreach (SessionAggregate session in sessions)
+    {
+      session.Delete(_applicationContext.ActorId);
+    }
+    await _aggregateRepository.SaveAsync(sessions, cancellationToken);
+  }
+  private async Task DeleteUsersAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId: realm.Id.Value, cancellationToken);
     foreach (UserAggregate user in users)
     {
       user.Delete(_applicationContext.ActorId);
     }
     await _aggregateRepository.SaveAsync(users, cancellationToken);
-
-    realm.Delete(_applicationContext.ActorId);
-
-    await _realmRepository.SaveAsync(realm, cancellationToken);
-
-    return result;
   }
 }

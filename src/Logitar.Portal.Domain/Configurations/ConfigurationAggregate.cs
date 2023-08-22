@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Validators;
+using Logitar.Identity.Domain;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Domain.Configurations.Events;
-using Logitar.Portal.Domain.Configurations.Validators;
 using Logitar.Portal.Domain.Validators;
 using Logitar.Security.Cryptography;
 
@@ -10,9 +10,11 @@ namespace Logitar.Portal.Domain.Configurations;
 
 public class ConfigurationAggregate : AggregateRoot
 {
-  public static readonly AggregateId AggregateId = new("CONFIGURATION");
+  private const int SecretLength = 256 / 8;
 
-  private CultureInfo _defaultLocale = CultureInfo.InvariantCulture;
+  public static readonly AggregateId UniqueId = new("CONFIGURATION");
+
+  private Locale _defaultLocale = new("en");
   private string _secret = string.Empty;
 
   private ReadOnlyUniqueNameSettings _uniqueNameSettings = new();
@@ -24,41 +26,52 @@ public class ConfigurationAggregate : AggregateRoot
   {
   }
 
-  public ConfigurationAggregate(CultureInfo defaultLocale, ActorId actorId) : base(AggregateId)
+  public ConfigurationAggregate(Locale defaultLocale, string? secret = null,
+    ReadOnlyUniqueNameSettings? uniqueNameSettings = null,
+    ReadOnlyPasswordSettings? passwordSettings = null,
+    ReadOnlyLoggingSettings? loggingSettings = null, ActorId actorId = default) : base(UniqueId)
   {
-    ConfigurationInitializedEvent initialized = new()
+    if (secret == null)
+    {
+      secret = RandomStringGenerator.GetString(SecretLength);
+    }
+    else
+    {
+      secret = secret.Trim();
+      new SecretValidator(nameof(Secret)).ValidateAndThrow(secret);
+    }
+
+    ApplyChange(new ConfigurationInitializedEvent
     {
       ActorId = actorId,
       DefaultLocale = defaultLocale,
-      Secret = RandomStringGenerator.GetString()
-    };
-    new ConfigurationInitializedValidator().ValidateAndThrow(initialized);
-
-    ApplyChange(initialized);
+      Secret = secret ?? RandomStringGenerator.GetString(),
+      UniqueNameSettings = uniqueNameSettings ?? new(),
+      PasswordSettings = passwordSettings ?? new(),
+      LoggingSettings = loggingSettings ?? new()
+    });
   }
   protected virtual void Apply(ConfigurationInitializedEvent initialized)
   {
     _defaultLocale = initialized.DefaultLocale;
     _secret = initialized.Secret;
 
-    UniqueNameSettings = initialized.UniqueNameSettings;
-    PasswordSettings = initialized.PasswordSettings;
+    _uniqueNameSettings = initialized.UniqueNameSettings;
+    _passwordSettings = initialized.PasswordSettings;
 
-    LoggingSettings = initialized.LoggingSettings;
+    _loggingSettings = initialized.LoggingSettings;
   }
 
-  public CultureInfo DefaultLocale
+  public Locale DefaultLocale
   {
     get => _defaultLocale;
     set
     {
-      new LocaleValidator(nameof(DefaultLocale)).ValidateAndThrow(value);
-
       if (value != _defaultLocale)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
         updated.DefaultLocale = value;
-        Apply(updated);
+        _defaultLocale = value;
       }
     }
   }
@@ -67,14 +80,21 @@ public class ConfigurationAggregate : AggregateRoot
     get => _secret;
     set
     {
-      value = string.IsNullOrWhiteSpace(value) ? RandomStringGenerator.GetString() : value.Trim();
-      new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
+      if (string.IsNullOrWhiteSpace(value))
+      {
+        value = RandomStringGenerator.GetString(SecretLength);
+      }
+      else
+      {
+        value = value.Trim();
+        new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
+      }
 
       if (value != _secret)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
         updated.Secret = value;
-        Apply(updated);
+        _secret = value;
       }
     }
   }
@@ -84,13 +104,11 @@ public class ConfigurationAggregate : AggregateRoot
     get => _uniqueNameSettings;
     set
     {
-      new ReadOnlyUniqueNameSettingsValidator().ValidateAndThrow(value);
-
       if (value != _uniqueNameSettings)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
         updated.UniqueNameSettings = value;
-        Apply(updated);
+        _uniqueNameSettings = value;
       }
     }
   }
@@ -99,13 +117,11 @@ public class ConfigurationAggregate : AggregateRoot
     get => _passwordSettings;
     set
     {
-      new ReadOnlyPasswordSettingsValidator().ValidateAndThrow(value);
-
       if (value != _passwordSettings)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
         updated.PasswordSettings = value;
-        Apply(updated);
+        _passwordSettings = value;
       }
     }
   }
@@ -115,18 +131,24 @@ public class ConfigurationAggregate : AggregateRoot
     get => _loggingSettings;
     set
     {
-      new ReadOnlyLoggingSettingsValidator().ValidateAndThrow(value);
-
       if (value != _loggingSettings)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
         updated.LoggingSettings = value;
-        Apply(updated);
+        _loggingSettings = value;
       }
     }
   }
 
-  public void Update(ActorId actorId)
+  public IUserSettings UserSettings => new UserSettings
+  {
+    RequireUniqueEmail = false,
+    RequireConfirmedAccount = false,
+    UniqueNameSettings = UniqueNameSettings,
+    PasswordSettings = PasswordSettings
+  };
+
+  public void Update(ActorId actorId = default)
   {
     foreach (DomainEvent change in Changes)
     {
@@ -141,6 +163,7 @@ public class ConfigurationAggregate : AggregateRoot
       }
     }
   }
+
   protected virtual void Apply(ConfigurationUpdatedEvent updated)
   {
     if (updated.DefaultLocale != null)
@@ -167,7 +190,7 @@ public class ConfigurationAggregate : AggregateRoot
     }
   }
 
-  protected T GetLatestEvent<T>() where T : DomainEvent, new()
+  protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()
   {
     T? change = Changes.LastOrDefault(change => change is T) as T;
     if (change == null)

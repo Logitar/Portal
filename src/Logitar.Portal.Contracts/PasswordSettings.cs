@@ -2,10 +2,10 @@
 
 public record PasswordSettings
 {
-  public int RequiredLength { get; set; } = 6;
-  public int RequiredUniqueChars { get; set; } = 1;
-  public bool RequireNonAlphanumeric { get; set; } = false;
-  public bool RequireLowercase { get; set; } = true;
-  public bool RequireUppercase { get; set; } = true;
-  public bool RequireDigit { get; set; } = true;
+  public int RequiredLength { get; set; }
+  public int RequiredUniqueChars { get; set; }
+  public bool RequireNonAlphanumeric { get; set; }
+  public bool RequireLowercase { get; set; }
+  public bool RequireUppercase { get; set; }
+  public bool RequireDigit { get; set; }
 }

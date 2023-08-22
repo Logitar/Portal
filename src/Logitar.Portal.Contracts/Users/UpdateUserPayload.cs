@@ -6,23 +6,23 @@ public record UpdateUserPayload
   public ChangePasswordPayload? Password { get; set; }
   public bool? IsDisabled { get; set; }
 
-  public MayBe<AddressPayload>? Address { get; set; }
-  public MayBe<EmailPayload>? Email { get; set; }
-  public MayBe<PhonePayload>? Phone { get; set; }
+  public Modification<AddressPayload>? Address { get; set; }
+  public Modification<EmailPayload>? Email { get; set; }
+  public Modification<PhonePayload>? Phone { get; set; }
 
-  public MayBe<string>? FirstName { get; set; }
-  public MayBe<string>? MiddleName { get; set; }
-  public MayBe<string>? LastName { get; set; }
-  public MayBe<string>? Nickname { get; set; }
+  public Modification<string>? FirstName { get; set; }
+  public Modification<string>? MiddleName { get; set; }
+  public Modification<string>? LastName { get; set; }
+  public Modification<string>? Nickname { get; set; }
 
-  public MayBe<DateTime>? Birthdate { get; set; }
-  public MayBe<string>? Gender { get; set; }
-  public MayBe<string>? Locale { get; set; }
-  public MayBe<string>? TimeZone { get; set; }
+  public Modification<DateTime>? Birthdate { get; set; }
+  public Modification<string>? Gender { get; set; }
+  public Modification<string>? Locale { get; set; }
+  public Modification<string>? TimeZone { get; set; }
 
-  public MayBe<string>? Picture { get; set; }
-  public MayBe<string>? Profile { get; set; }
-  public MayBe<string>? Website { get; set; }
+  public Modification<string>? Picture { get; set; }
+  public Modification<string>? Profile { get; set; }
+  public Modification<string>? Website { get; set; }
 
   // TODO(fpion): Roles
 

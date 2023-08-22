@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-public record DeleteUserCommand(string Id) : IRequest<User?>;
+internal record DeleteUserCommand(string Id) : IRequest<User?>;

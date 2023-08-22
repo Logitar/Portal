@@ -1,16 +1,32 @@
-﻿using Logitar.Identity.Domain.Passwords;
+﻿using FluentValidation;
+using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Settings;
+using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain;
 
 public record ReadOnlyPasswordSettings : IPasswordSettings
 {
-  public int RequiredLength { get; init; } = 6;
-  public int RequiredUniqueChars { get; init; } = 1;
-  public bool RequireNonAlphanumeric { get; init; } = false;
-  public bool RequireLowercase { get; init; } = true;
-  public bool RequireUppercase { get; init; } = true;
-  public bool RequireDigit { get; init; } = true;
+  public ReadOnlyPasswordSettings(int requiredLength = 6, int requiredUniqueChars = 1,
+    bool requireNonAlphanumeric = false, bool requireLowercase = true,
+    bool requireUppercase = true, bool requireDigit = true)
+  {
+    RequiredLength = requiredLength;
+    RequiredUniqueChars = requiredUniqueChars;
+    RequireNonAlphanumeric = requireNonAlphanumeric;
+    RequireLowercase = requireLowercase;
+    RequireUppercase = requireUppercase;
+    RequireDigit = requireDigit;
 
-  public string Strategy { get; init; } = Pbkdf2.Prefix;
+    new ReadOnlyPasswordSettingsValidator().ValidateAndThrow(this);
+  }
+
+  public int RequiredLength { get; }
+  public int RequiredUniqueChars { get; }
+  public bool RequireNonAlphanumeric { get; }
+  public bool RequireLowercase { get; }
+  public bool RequireUppercase { get; }
+  public bool RequireDigit { get; }
+
+  public string Strategy { get; } = Pbkdf2.Prefix;
 }

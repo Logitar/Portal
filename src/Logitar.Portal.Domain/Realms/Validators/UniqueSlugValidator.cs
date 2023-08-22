@@ -9,11 +9,7 @@ internal class UniqueSlugValidator : AbstractValidator<string>
   {
     IRuleBuilderOptions<string, string> options = RuleFor(x => x).NotEmpty()
       .MaximumLength(byte.MaxValue)
-      .Slug();
-
-    if (propertyName != null)
-    {
-      options = options.WithName(propertyName);
-    }
+      .Slug()
+      .WithPropertyName(propertyName);
   }
 }

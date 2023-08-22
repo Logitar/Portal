@@ -29,14 +29,14 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName), cancellationToken);
   }
 
-  public async Task<User?> ReplaceAsync(string id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
-  {
-    return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
-  }
-
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new SearchUsersQuery(payload), cancellationToken);
+  }
+
+  public async Task<User?> SignOutAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new SignOutUserCommand(id), cancellationToken);
   }
 
   public async Task<User?> UpdateAsync(string id, UpdateUserPayload payload, CancellationToken cancellationToken)

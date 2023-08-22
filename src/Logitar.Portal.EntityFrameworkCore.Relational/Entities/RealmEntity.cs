@@ -15,6 +15,9 @@ internal record RealmEntity : AggregateEntity
 
     RequireUniqueEmail = created.RequireUniqueEmail;
     RequireConfirmedAccount = created.RequireConfirmedAccount;
+
+    UniqueNameSettings = created.UniqueNameSettings;
+    PasswordSettings = created.PasswordSettings;
   }
 
   private RealmEntity() : base()
@@ -105,7 +108,7 @@ internal record RealmEntity : AggregateEntity
 
     if (updated.DefaultLocale != null)
     {
-      DefaultLocale = updated.DefaultLocale.Value?.Name;
+      DefaultLocale = updated.DefaultLocale.Value?.Code;
     }
     if (updated.Secret != null)
     {
@@ -142,7 +145,7 @@ internal record RealmEntity : AggregateEntity
       }
       else
       {
-        ClaimMappings[claimMapping.Key] = claimMapping.Value; ;
+        ClaimMappings[claimMapping.Key] = claimMapping.Value;
       }
     }
 

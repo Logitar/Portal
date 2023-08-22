@@ -17,8 +17,8 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
   private readonly IUserQuerier _userQuerier;
 
   public CreateUserCommandHandler(IApplicationContext applicationContext,
-    IPasswordService passwordService, IRealmRepository realmRepository, IUserManager userManager,
-    IUserQuerier userQuerier)
+    IPasswordService passwordService, IRealmRepository realmRepository,
+    IUserManager userManager, IUserQuerier userQuerier)
   {
     _applicationContext = applicationContext;
     _passwordService = passwordService;
@@ -36,11 +36,11 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     {
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
         ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
-      _applicationContext.Realm = realm;
     }
     IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
+    string? tenantId = realm?.Id.Value;
 
-    UserAggregate user = new(uniqueNameSettings, payload.UniqueName, realm?.Id.Value, _applicationContext.ActorId);
+    UserAggregate user = new(uniqueNameSettings, payload.UniqueName, tenantId, _applicationContext.ActorId);
     if (payload.Password != null)
     {
       user.SetPassword(_passwordService.Create(payload.Password));
@@ -70,7 +70,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
     user.Birthdate = payload.Birthdate;
     user.Gender = payload.Gender?.GetGender(nameof(payload.Gender));
-    user.Locale = payload.Locale?.GetCultureInfo(nameof(payload.Locale));
+    user.Locale = payload.Locale?.GetLocale(nameof(payload.Locale));
     user.TimeZone = payload.TimeZone?.GetTimeZone(nameof(payload.TimeZone));
 
     user.Picture = payload.Picture?.GetUrl(nameof(payload.Picture));

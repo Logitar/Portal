@@ -1,12 +1,12 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
-using Logitar.Identity.Infrastructure;
 using Logitar.Portal.Application;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
+using Logitar.Portal.Middlewares;
 
 namespace Logitar.Portal;
 
@@ -27,12 +27,8 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllers(options => options.Filters.Add<PortalExceptionFilterAttribute>())
-      .AddJsonOptions(options =>
-      {
-        options.JsonSerializerOptions.Converters.Add(new CultureInfoConverter());
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-      });
+    services.AddControllers(options => options.Filters.Add<ExceptionHandlingAttribute>())
+      .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     if (_enableOpenApi)
     {
@@ -42,13 +38,12 @@ internal class Startup : StartupBase
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
 
-    services.AddMemoryCache();
-
     services.AddHttpContextAccessor();
+    services.AddMemoryCache();
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-      ?? DatabaseProvider.EntityFrameworkCorePostgreSQL;
+      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     string connectionString;
     switch (databaseProvider)
     {
@@ -81,6 +76,7 @@ internal class Startup : StartupBase
     }
 
     builder.UseHttpsRedirection();
+    builder.UseMiddleware<RefreshSession>();
 
     if (builder is WebApplication application)
     {

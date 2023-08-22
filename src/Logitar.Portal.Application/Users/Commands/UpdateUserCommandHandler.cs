@@ -32,8 +32,8 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
   public async Task<User?> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
   {
-    AggregateId userId = command.Id.GetAggregateId(nameof(command.Id));
-    UserAggregate? user = await _userRepository.LoadAsync(userId, cancellationToken);
+    AggregateId id = command.Id.GetAggregateId(nameof(command.Id));
+    UserAggregate? user = await _userRepository.LoadAsync(id, cancellationToken);
     if (user == null)
     {
       return null;
@@ -46,9 +46,8 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       RealmAggregate? realm = null;
       if (user.TenantId != null)
       {
-        AggregateId realmId = new(user.TenantId);
-        realm = await _realmRepository.LoadAsync(realmId, cancellationToken)
-          ?? throw new InvalidOperationException($"The realm 'Id={realmId}' could not be found.");
+        realm = await _realmRepository.FindAsync(user.TenantId, cancellationToken)
+          ?? throw new InvalidOperationException($"The realm '{user.TenantId}' could not be found from user '{user}'.");
       }
 
       IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
@@ -56,13 +55,14 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
     if (payload.Password != null)
     {
-      if (payload.Password.Current == null)
+      Password newPassword = _passwordService.Create(payload.Password.NewPassword);
+      if (payload.Password.CurrentPassword == null)
       {
-        user.SetPassword(_passwordService.Create(payload.Password.Password));
+        user.SetPassword(newPassword);
       }
       else
       {
-        throw new NotImplementedException(); // TODO(fpion): change password
+        user.ChangePassword(payload.Password.CurrentPassword, newPassword);
       }
     }
     if (payload.IsDisabled.HasValue)
@@ -120,7 +120,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
     if (payload.Locale != null)
     {
-      user.Locale = payload.Locale.Value?.GetCultureInfo(nameof(payload.Locale));
+      user.Locale = payload.Locale.Value?.GetLocale(nameof(payload.Locale));
     }
     if (payload.TimeZone != null)
     {

@@ -1,10 +1,13 @@
-﻿using AutoMapper;
-using Logitar.Data;
+﻿using Logitar.Data;
+using Logitar.EventSourcing;
 using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,47 +15,43 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 
 internal class RealmQuerier : IRealmQuerier
 {
-  private readonly IMapper _mapper;
+  private readonly IActorService _actorService;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<RealmEntity> _realms;
-  private readonly IPortalSqlHelper _sql;
 
-  public RealmQuerier(PortalContext context, IMapper mapper, IPortalSqlHelper sql)
+  public RealmQuerier(IActorService actorService, PortalContext context, IQueryHelper queryHelper)
   {
-    _mapper = mapper;
+    _actorService = actorService;
     _realms = context.Realms;
-    _sql = sql;
+    _queryHelper = queryHelper;
   }
 
   public async Task<Realm> ReadAsync(RealmAggregate realm, CancellationToken cancellationToken)
     => await ReadAsync(realm.Id.Value, cancellationToken)
-      ?? throw new InvalidOperationException($"The realm entity 'AggregateId={realm.Id}' could not be found.");
+      ?? throw new InvalidOperationException($"The realm entity 'Id={realm.Id}' could not be found.");
   public async Task<Realm?> ReadAsync(string id, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == id, cancellationToken);
 
-    // TODO(fpion): Actors
-
-    return _mapper.Map<Realm?>(realm);
+    return await MapAsync(realm, cancellationToken);
   }
 
   public async Task<Realm?> ReadByUniqueSlugAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
-    string uniqueSlugNormalized = uniqueSlug.ToUpper();
+    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
 
-    // TODO(fpion): Actors
-
-    return _mapper.Map<Realm?>(realm);
+    return await MapAsync(realm, cancellationToken);
   }
 
   public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sql.QueryFrom(PortalDb.Realms.Table).SelectAll(PortalDb.Realms.Table);
-    _sql.ApplyTextSearch(builder, payload.Id, PortalDb.Realms.AggregateId);
-    _sql.ApplyTextSearch(builder, payload.Search, PortalDb.Realms.UniqueSlug, PortalDb.Realms.DisplayName);
+    IQueryBuilder builder = _queryHelper.From(PortalDb.Realms.Table).SelectAll(PortalDb.Realms.Table);
+    _queryHelper.ApplyTextSearch(builder, payload.Id, PortalDb.Realms.AggregateId);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Realms.UniqueSlug, PortalDb.Realms.DisplayName);
 
     IQueryable<RealmEntity> query = _realms.FromQuery(builder.Build()).AsNoTracking();
 
@@ -84,15 +83,35 @@ internal class RealmQuerier : IRealmQuerier
         }
       }
 
-      query = ordered ?? query;
+      if (ordered != null)
+      {
+        query = ordered;
+      }
     }
 
     query = query.ApplyPaging(payload);
 
     RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
+    IEnumerable<Realm> results = await MapAsync(realms, cancellationToken);
 
-    // TODO(fpion): Actors
+    return new SearchResults<Realm>(results, total);
+  }
 
-    return new SearchResults<Realm>(_mapper.Map<IEnumerable<Realm>>(realms), total);
+  private async Task<Realm?> MapAsync(RealmEntity? realm, CancellationToken cancellationToken)
+  {
+    if (realm == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(new[] { realm }, cancellationToken)).Single();
+  }
+  private async Task<IEnumerable<Realm>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken)
+  {
+    IEnumerable<ActorId> actorIds = ActorHelper.GetIds(realms.ToArray());
+    Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    Mapper mapper = new(actors);
+
+    return realms.Select(mapper.Map);
   }
 }

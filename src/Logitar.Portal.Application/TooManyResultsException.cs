@@ -1,18 +1,13 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.Application;
 
 public class TooManyResultsException : Exception
 {
-  public TooManyResultsException(Type type, int expected, int actual)
-    : base(BuildMessage(type, expected, actual))
-  {
-    if (!type.IsSubclassOf(typeof(Aggregate)))
-    {
-      throw new ArgumentException($"The type must be a subclass of the '{nameof(Aggregate)}' type.", nameof(type));
-    }
+  private const string ErrorMessage = "There are too many results.";
 
+  public TooManyResultsException(Type type, int expected, int actual)
+  {
     TypeName = type.GetName();
     Expected = expected;
     Actual = actual;
@@ -38,8 +33,8 @@ public class TooManyResultsException : Exception
   {
     StringBuilder message = new();
 
-    message.AppendLine("There are too many results.");
-    message.Append("Type: ").AppendLine(type.GetName());
+    message.AppendLine(ErrorMessage);
+    message.Append("TypeName: ").AppendLine(type.GetName());
     message.Append("Expected: ").Append(expected).AppendLine();
     message.Append("Actual: ").Append(actual).AppendLine();
 
@@ -47,7 +42,7 @@ public class TooManyResultsException : Exception
   }
 }
 
-public class TooManyResultsException<T> : TooManyResultsException where T : Aggregate
+public class TooManyResultsException<T> : TooManyResultsException
 {
   public TooManyResultsException(int expected, int actual) : base(typeof(T), expected, actual)
   {
