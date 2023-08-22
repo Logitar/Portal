@@ -38,6 +38,7 @@ internal class Startup : StartupBase
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
 
+    services.AddHttpContextAccessor();
     services.AddMemoryCache();
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
