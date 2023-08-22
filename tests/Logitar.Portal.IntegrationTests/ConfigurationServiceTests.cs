@@ -34,7 +34,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
       User = new UserPayload
       {
         UniqueName = Faker.Person.UserName,
-        Password = "P@s$W0rD", // TODO(fpion): Pizza7
+        Password = PasswordString,
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
@@ -107,7 +107,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
       User = new UserPayload
       {
         UniqueName = Faker.Person.UserName,
-        Password = "P@s$W0rD", // TODO(fpion): Pizza7
+        Password = PasswordString,
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
@@ -128,7 +128,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
       User = new UserPayload
       {
         UniqueName = Faker.Person.UserName,
-        Password = "P@s$W0rD", // TODO(fpion): Pizza7
+        Password = PasswordString,
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName

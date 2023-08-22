@@ -51,13 +51,12 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
 
+    session.Update(_applicationContext.ActorId);
+
     await _sessionManager.SaveAsync(session, cancellationToken);
 
     Session result = await _sessionQuerier.ReadAsync(session, cancellationToken);
-    if (secretBytes != null)
-    {
-      result.RefreshToken = new RefreshToken(session, secretBytes).Encode();
-    }
+    result.RefreshToken = new RefreshToken(session, secretBytes).Encode();
 
     return result;
   }

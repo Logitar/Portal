@@ -1,6 +1,7 @@
 # Logitar.Portal.EntityFrameworkCore.SqlServer
 
-TODO
+Provides an implementation of a relational data store to be used with the Portal identity provider
+system, Entity Framework Core and Microsoft SQL Server.
 
 ## Migrations
 

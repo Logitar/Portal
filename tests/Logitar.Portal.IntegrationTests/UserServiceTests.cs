@@ -52,7 +52,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     };
     _user.SetCustomAttribute("EmployeeId", "185-713947-2");
     _user.SetCustomAttribute("HourlyRate", "25.00");
-    _user.SetPassword(_passwordService.Create("P@s$W0rD")); // TODO(fpion): Pizza7
+    _user.SetPassword(_passwordService.Create(PasswordString));
     _user.Update(ActorId);
   }
 
@@ -70,7 +70,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     {
       Realm = _realm.UniqueSlug,
       UniqueName = $"{_user.UniqueName}2",
-      Password = "P@s$W0rD", // TODO(fpion): Pizza7
+      Password = PasswordString,
       IsDisabled = true,
       Address = new AddressPayload
       {
@@ -278,7 +278,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(user.Picture, actor.PictureUrl);
   }
 
-  [Fact(DisplayName = "ReadAsync: it should return the deleted user.")]
+  [Fact(DisplayName = "ReadAsync: it should return null when the user is not found.")]
   public async Task ReadAsync_it_should_return_null_when_the_user_is_not_found()
   {
     Assert.Null(await _userService.ReadAsync(Guid.Empty.ToString(), _realm.Id.Value, $"{_user.UniqueName}2"));
@@ -319,10 +319,10 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Realm = Guid.Empty.ToString()
     };
 
-    SearchResults<User> users = await _userService.SearchAsync(payload);
+    SearchResults<User> results = await _userService.SearchAsync(payload);
 
-    Assert.Empty(users.Results);
-    Assert.Equal(0, users.Total);
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
   }
 
   [Fact(DisplayName = "SearchAsync: it should return the correct results by ID.")]
@@ -349,13 +349,13 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       }
     };
 
-    SearchResults<User> users = await _userService.SearchAsync(payload);
+    SearchResults<User> results = await _userService.SearchAsync(payload);
 
-    Assert.Equal(2, users.Results.Count());
-    Assert.Equal(2, users.Total);
+    Assert.Equal(2, results.Results.Count());
+    Assert.Equal(2, results.Total);
 
-    Assert.Contains(users.Results, user => user.Id == user1.Id.Value);
-    Assert.Contains(users.Results, user => user.Id == user2.Id.Value);
+    Assert.Contains(results.Results, user => user.Id == user1.Id.Value);
+    Assert.Contains(results.Results, user => user.Id == user2.Id.Value);
   }
 
   [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
@@ -364,7 +364,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     UserAggregate disabled = CreateUser("disabled", isDisabled: true, lastName: Faker.Person.LastName);
     UserAggregate notConfirmed = CreateUser("not_confirmed", isConfirmed: false, lastName: Faker.Person.LastName);
     UserAggregate other = CreateUser(uniqueName: Guid.NewGuid().ToString());
-    UserAggregate withPassword = CreateUser("test", "P@s$W0rD"); // TODO(fpion): Pizza7
+    UserAggregate withPassword = CreateUser("test", PasswordString);
 
     UserAggregate user1 = CreateUser("user1", firstName: Faker.Name.FirstName(), middleName: "Carlos", lastName: Faker.Person.LastName);
     UserAggregate user2 = CreateUser("user2", firstName: Faker.Name.FirstName(), middleName: "Robert", lastName: Faker.Person.LastName);
@@ -527,7 +527,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       UniqueName = $" {_user.UniqueName}2 ",
       Password = new ChangePasswordPayload
       {
-        CurrentPassword = "P@s$W0rD", // TODO(fpion): Pizza7
+        CurrentPassword = PasswordString,
         NewPassword = "Test123!"
       },
       IsDisabled = true,

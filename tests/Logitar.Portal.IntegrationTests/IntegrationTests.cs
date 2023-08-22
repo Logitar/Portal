@@ -24,7 +24,11 @@ namespace Logitar.Portal;
 
 public abstract class IntegrationTests
 {
+  protected const string PasswordString = "P@s$W0rD"; // TODO(fpion): Pizza7
+
   private readonly TestApplicationContext _applicationContext = new();
+  private readonly IConfigurationService _configurationService;
+  private readonly IPasswordService _passwordService;
 
   protected IntegrationTests()
   {
@@ -51,6 +55,10 @@ public abstract class IntegrationTests
     }
 
     ServiceProvider = services.BuildServiceProvider();
+
+    _configurationService = ServiceProvider.GetRequiredService<IConfigurationService>();
+    _passwordService = ServiceProvider.GetRequiredService<IPasswordService>();
+
     AggregateRepository = ServiceProvider.GetRequiredService<IAggregateRepository>();
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
     SqlHelper = ServiceProvider.GetRequiredService<ISqlHelper>();
@@ -108,15 +116,14 @@ public abstract class IntegrationTests
       User = new UserPayload
       {
         UniqueName = Faker.Person.UserName,
-        Password = "P@s$W0rD", // TODO(fpion): Pizza7
+        Password = PasswordString,
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       }
     };
 
-    IConfigurationService configurationService = ServiceProvider.GetRequiredService<IConfigurationService>();
-    InitializeConfigurationResult result = await configurationService.InitializeAsync(payload);
+    InitializeConfigurationResult result = await _configurationService.InitializeAsync(payload);
     User user = result.User;
 
     _applicationContext.Actor = new()
@@ -150,10 +157,9 @@ public abstract class IntegrationTests
     UserEntity? user = await IdentityContext.Users.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == userId);
     Assert.NotNull(user);
-    Assert.NotNull(user.Password);
 
-    IPasswordService passwordService = ServiceProvider.GetRequiredService<IPasswordService>();
-    Password password = passwordService.Decode(user.Password);
+    Assert.NotNull(user.Password);
+    Password password = _passwordService.Decode(user.Password);
     Assert.True(password.IsMatch(passwordString));
   }
 }

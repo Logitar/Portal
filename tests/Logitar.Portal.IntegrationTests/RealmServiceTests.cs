@@ -159,7 +159,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(deleted.OccurredOn);
   }
 
-  [Fact(DisplayName = "ReadAsync: it should return the deleted realm.")]
+  [Fact(DisplayName = "ReadAsync: it should return null when the realm is not found.")]
   public async Task ReadAsync_it_should_return_null_when_the_realm_is_not_found()
   {
     Assert.Null(await _realmService.ReadAsync(Guid.Empty.ToString(), $"{_realm.UniqueSlug}2"));
@@ -208,18 +208,18 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       }
     };
 
-    SearchResults<Realm> realms = await _realmService.SearchAsync(payload);
+    SearchResults<Realm> results = await _realmService.SearchAsync(payload);
 
-    Assert.Empty(realms.Results);
-    Assert.Equal(0, realms.Total);
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
   }
 
   [Fact(DisplayName = "SearchAsync: it should return the correct results by ID.")]
   public async Task SearchAsync_it_should_return_the_correct_results_by_ID()
   {
-    RealmAggregate otherRealm = new("other");
-    RealmAggregate testRealm = new("test");
-    await AggregateRepository.SaveAsync(new[] { otherRealm, testRealm });
+    RealmAggregate realm1 = new("realm1");
+    RealmAggregate realm2 = new("realm2");
+    await AggregateRepository.SaveAsync(new[] { realm1, realm2 });
 
     SearchRealmsPayload payload = new()
     {
@@ -229,19 +229,19 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
         Terms = new SearchTerm[]
         {
           new(_realm.Id.Value),
-          new(testRealm.Id.Value),
+          new(realm1.Id.Value),
           new(Guid.Empty.ToString())
         }
       }
     };
 
-    SearchResults<Realm> realms = await _realmService.SearchAsync(payload);
+    SearchResults<Realm> results = await _realmService.SearchAsync(payload);
 
-    Assert.Equal(2, realms.Results.Count());
-    Assert.Equal(2, realms.Total);
+    Assert.Equal(2, results.Results.Count());
+    Assert.Equal(2, results.Total);
 
-    Assert.Contains(realms.Results, realm => realm.Id == _realm.Id.Value);
-    Assert.Contains(realms.Results, realm => realm.Id == testRealm.Id.Value);
+    Assert.Contains(results.Results, realm => realm.Id == _realm.Id.Value);
+    Assert.Contains(results.Results, realm => realm.Id == realm1.Id.Value);
   }
 
   [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
