@@ -37,6 +37,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       DefaultLocale = new Locale(Faker.Locale),
       Url = new Uri("https://www.desjardins.com/")
     };
+    _realm.Update(ActorId);
 
     _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value, ActorId)
     {
@@ -52,6 +53,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _user.SetCustomAttribute("EmployeeId", "185-713947-2");
     _user.SetCustomAttribute("HourlyRate", "25.00");
     _user.SetPassword(_passwordService.Create("P@s$W0rD")); // TODO(fpion): Pizza7
+    _user.Update(ActorId);
   }
 
   public override async Task InitializeAsync()
@@ -62,7 +64,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a new user.")]
-  public async Task CreateAsync_it_should_create_an_user()
+  public async Task CreateAsync_it_should_create_a_new_user()
   {
     CreateUserPayload payload = new()
     {
@@ -323,6 +325,39 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(0, users.Total);
   }
 
+  [Fact(DisplayName = "SearchAsync: it should return the correct results by ID.")]
+  public async Task SearchAsync_it_should_return_the_correct_results_by_ID()
+  {
+    UserAggregate user1 = new(_realm.UniqueNameSettings, "user1", _realm.Id.Value, ActorId);
+    UserAggregate user2 = new(_realm.UniqueNameSettings, "user2", _realm.Id.Value, ActorId);
+    await AggregateRepository.SaveAsync(new[] { user1, user2 });
+
+    Assert.NotNull(User);
+    SearchUsersPayload payload = new()
+    {
+      Realm = _realm.Id.Value,
+      Id = new TextSearch
+      {
+        Operator = QueryOperator.Or,
+        Terms = new SearchTerm[]
+        {
+          new(User.Id.Value),
+          new(user1.Id.Value),
+          new(user2.Id.Value),
+          new(Guid.Empty.ToString())
+        }
+      }
+    };
+
+    SearchResults<User> users = await _userService.SearchAsync(payload);
+
+    Assert.Equal(2, users.Results.Count());
+    Assert.Equal(2, users.Total);
+
+    Assert.Contains(users.Results, user => user.Id == user1.Id.Value);
+    Assert.Contains(users.Results, user => user.Id == user2.Id.Value);
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
   public async Task SearchAsync_it_should_return_the_correct_results()
   {
@@ -535,6 +570,13 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate" && customAttribute.Value == "37.50");
 
     await CheckUserPasswordAsync(user.Id, payload.Password.NewPassword);
+
+    ActorEntity actor = await PortalContext.Actors.AsNoTracking().SingleAsync(a => a.Id == user.Id);
+    Assert.Equal(ActorType.User, actor.Type);
+    Assert.False(actor.IsDeleted);
+    Assert.Equal(user.FullName, actor.DisplayName);
+    Assert.Equal(user.Email.Address, actor.EmailAddress);
+    Assert.Equal(user.Picture, actor.PictureUrl);
   }
 
   private UserAggregate CreateUser(string uniqueName, string? password = null, bool isConfirmed = true,
