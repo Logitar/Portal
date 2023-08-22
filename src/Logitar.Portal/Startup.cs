@@ -6,6 +6,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
+using Logitar.Portal.Middlewares;
 
 namespace Logitar.Portal;
 
@@ -37,9 +38,8 @@ internal class Startup : StartupBase
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
 
-    services.AddMemoryCache();
-
     services.AddHttpContextAccessor();
+    services.AddMemoryCache();
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
@@ -76,6 +76,7 @@ internal class Startup : StartupBase
     }
 
     builder.UseHttpsRedirection();
+    builder.UseMiddleware<RefreshSession>();
 
     if (builder is WebApplication application)
     {

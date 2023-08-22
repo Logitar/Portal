@@ -5,7 +5,7 @@ using Logitar.Portal.Domain.Realms.Validators;
 
 namespace Logitar.Portal.Domain;
 
-public record class ReadOnlyPasswordSettings : IPasswordSettings
+public record ReadOnlyPasswordSettings : IPasswordSettings
 {
   public ReadOnlyPasswordSettings(int requiredLength = 6, int requiredUniqueChars = 1,
     bool requireNonAlphanumeric = false, bool requireLowercase = true,

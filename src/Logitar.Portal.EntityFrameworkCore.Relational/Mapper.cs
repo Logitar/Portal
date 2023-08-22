@@ -2,10 +2,12 @@
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -17,6 +19,26 @@ internal class Mapper
   public Mapper(IReadOnlyDictionary<ActorId, Actor> actors)
   {
     _actors = actors;
+  }
+
+  public Configuration Map(ConfigurationAggregate source)
+  {
+    Configuration destination = new()
+    {
+      DefaultLocale = source.DefaultLocale.Code,
+      Secret = source.Secret,
+      UniqueNameSettings = ToUniqueNameSettings(source.UniqueNameSettings),
+      PasswordSettings = ToPasswordSettings(source.PasswordSettings),
+      LoggingSettings = new LoggingSettings
+      {
+        Extent = source.LoggingSettings.Extent,
+        OnlyErrors = source.LoggingSettings.OnlyErrors
+      }
+    };
+
+    MapAggregate(source, destination);
+
+    return destination;
   }
 
   public Realm Map(RealmEntity source)
@@ -139,6 +161,15 @@ internal class Mapper
     return destination;
   }
 
+  private void MapAggregate(AggregateRoot source, Aggregate destination)
+  {
+    destination.Id = source.Id.Value;
+    destination.CreatedBy = GetActor(source.CreatedBy);
+    destination.CreatedOn = ToUniversalTime(source.CreatedOn);
+    destination.UpdatedBy = GetActor(source.UpdatedBy);
+    destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
+    destination.Version = source.Version;
+  }
   private void MapAggregate(AggregateEntity source, Aggregate destination)
   {
     destination.Id = source.AggregateId;
@@ -148,7 +179,8 @@ internal class Mapper
     destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
     destination.Version = source.Version;
   }
-  private Actor GetActor(string id) => _actors.TryGetValue(new ActorId(id), out Actor? actor) ? actor : new();
+  private Actor GetActor(string id) => GetActor(new ActorId(id));
+  private Actor GetActor(ActorId id) => _actors.TryGetValue(id, out Actor? actor) ? actor : new();
 
   private static IEnumerable<CustomAttribute> ToCustomAttributes(Dictionary<string, string> customAttributes)
     => customAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));

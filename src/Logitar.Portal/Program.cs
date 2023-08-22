@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Infrastructure;
+﻿using Logitar.Portal.Application.Caching.Commands;
+using Logitar.Portal.Infrastructure;
 using MediatR;
 
 namespace Logitar.Portal;
@@ -22,7 +23,7 @@ public class Program
     {
       await mediator.Publish(new InitializeDatabaseCommand());
     }
-    //await mediator.Publish(new InitializeCacheCommand()); // TODO(fpion): initialize cache
+    await mediator.Publish(new InitializeCacheCommand());
 
     application.Run();
   }

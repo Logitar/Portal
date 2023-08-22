@@ -3,6 +3,7 @@ using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Realms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,6 +14,7 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
 {
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
+    [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidAggregateIdException)] = HandleInvalidAggregateIdException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
@@ -58,6 +60,11 @@ internal class ExceptionHandlingAttribute : ExceptionFilterAttribute
     {
       base.OnException(context);
     }
+  }
+
+  private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
+  {
+    return new ConflictObjectResult(new { ErrorCode = "ConfigurationAlreadyInitialized" });
   }
 
   private static IActionResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)
