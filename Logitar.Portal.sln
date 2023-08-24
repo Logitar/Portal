@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Domain", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{77B307A3-92A4-4B8B-B0F5-C1B49FFC0041}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{47671062-4959-41F6-AECD-53574A60006B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.EntityFrameworkCore.Relational", "src\Logitar.Portal.EntityFrameworkCore.Relational\Logitar.Portal.EntityFrameworkCore.Relational.csproj", "{7E777F93-56BC-4EDE-89CD-EC6453CFA29A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,14 @@ Global
 		{77B307A3-92A4-4B8B-B0F5-C1B49FFC0041}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77B307A3-92A4-4B8B-B0F5-C1B49FFC0041}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77B307A3-92A4-4B8B-B0F5-C1B49FFC0041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47671062-4959-41F6-AECD-53574A60006B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47671062-4959-41F6-AECD-53574A60006B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47671062-4959-41F6-AECD-53574A60006B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47671062-4959-41F6-AECD-53574A60006B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E777F93-56BC-4EDE-89CD-EC6453CFA29A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E777F93-56BC-4EDE-89CD-EC6453CFA29A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E777F93-56BC-4EDE-89CD-EC6453CFA29A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E777F93-56BC-4EDE-89CD-EC6453CFA29A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

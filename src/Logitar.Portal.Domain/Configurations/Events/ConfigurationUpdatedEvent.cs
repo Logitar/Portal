@@ -1,9 +1,10 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Domain.Settings;
+using MediatR;
 
 namespace Logitar.Portal.Domain.Configurations.Events;
 
-public record ConfigurationUpdatedEvent : DomainEvent
+public record ConfigurationUpdatedEvent : DomainEvent, INotification
 {
   public Locale? DefaultLocale { get; set; }
   public string? Secret { get; set; }

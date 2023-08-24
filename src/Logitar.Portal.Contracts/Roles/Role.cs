@@ -10,5 +10,5 @@ public record Role : Aggregate
 
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
-  public Realm Realm { get; set; } = new();
+  public Realm? Realm { get; set; }
 }

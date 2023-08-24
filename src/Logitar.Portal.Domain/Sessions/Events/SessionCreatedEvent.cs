@@ -1,9 +1,10 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Domain.Passwords;
+using MediatR;
 
 namespace Logitar.Portal.Domain.Sessions.Events;
 
-public record SessionCreatedEvent : DomainEvent
+public record SessionCreatedEvent : DomainEvent, INotification
 {
   public SessionCreatedEvent(ActorId actorId)
   {

@@ -1,0 +1,16 @@
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.EventSourcing.Infrastructure;
+using Logitar.Portal.Domain.Sessions;
+
+namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
+
+internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, ISessionRepository
+{
+  public SessionRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer)
+    : base(eventBus, eventContext, eventSerializer)
+  {
+  }
+
+  public async Task SaveAsync(SessionAggregate session, CancellationToken cancellationToken)
+    => await base.SaveAsync(session, cancellationToken);
+}

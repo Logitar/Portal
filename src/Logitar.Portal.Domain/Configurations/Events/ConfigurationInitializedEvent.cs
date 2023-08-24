@@ -1,9 +1,10 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Domain.Settings;
+using MediatR;
 
 namespace Logitar.Portal.Domain.Configurations.Events;
 
-public record ConfigurationInitializedEvent : DomainEvent
+public record ConfigurationInitializedEvent : DomainEvent, INotification
 {
   public ConfigurationInitializedEvent(ActorId actorId)
   {
