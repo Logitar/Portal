@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Contracts.Configurations;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Logitar.Portal.Application;
 

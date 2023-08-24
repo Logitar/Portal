@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Settings;
 public record ReadOnlyPasswordSettings : IPasswordSettings
 {
   public ReadOnlyPasswordSettings(int requiredLength = 8, int requiredUniqueChars = 8, bool requireNonAlphanumeric = true,
-    bool requireLowercase = true, bool requireUppercase = true, bool requireDigit = true)
+    bool requireLowercase = true, bool requireUppercase = true, bool requireDigit = true, string strategy = "PBKDF2")
   {
     RequiredLength = requiredLength;
     RequiredUniqueChars = requiredUniqueChars;
@@ -15,6 +15,8 @@ public record ReadOnlyPasswordSettings : IPasswordSettings
     RequireLowercase = requireLowercase;
     RequireUppercase = requireUppercase;
     RequireDigit = requireDigit;
+
+    Strategy = strategy;
 
     new ReadOnlyPasswordSettingsValidator().ValidateAndThrow(this);
   }
@@ -25,4 +27,6 @@ public record ReadOnlyPasswordSettings : IPasswordSettings
   public bool RequireLowercase { get; }
   public bool RequireUppercase { get; }
   public bool RequireDigit { get; }
+
+  public string Strategy { get; }
 }

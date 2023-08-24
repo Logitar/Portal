@@ -10,5 +10,7 @@ internal class ReadOnlyPasswordSettingsValidator : AbstractValidator<ReadOnlyPas
 
     RuleFor(x => x.RequiredUniqueChars).GreaterThan(0)
       .LessThanOrEqualTo(x => x.RequiredLength);
+
+    RuleFor(x => x.Strategy).NotEmpty();
   }
 }

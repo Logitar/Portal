@@ -1,7 +1,10 @@
-﻿namespace Logitar.Portal.Domain.Passwords;
+﻿using Logitar.Portal.Contracts.Settings;
+
+namespace Logitar.Portal.Domain.Passwords;
 
 public interface IPasswordService
 {
-  Password Create(string password);
-  Password Generate(int length, out byte[] password);
+  Password Create(IPasswordSettings passwordSettings, string password);
+  Password Decode(string encoded);
+  Password Generate(IPasswordSettings passwordSettings, int length, out byte[] password);
 }

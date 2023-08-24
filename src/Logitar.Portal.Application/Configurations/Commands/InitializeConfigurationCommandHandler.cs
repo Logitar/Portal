@@ -54,12 +54,12 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       FirstName = payload.User.FirstName,
       LastName = payload.User.LastName
     };
-    user.SetPassword(_passwordService.Create(payload.User.Password));
+    user.SetPassword(_passwordService.Create(configuration.PasswordSettings, payload.User.Password));
     user.Update(actorId);
 
     byte[]? secretBytes = null;
     Password? secret = payload.Session.IsPersistent
-      ? _passwordService.Generate(SessionAggregate.SecretLength, out secretBytes)
+      ? _passwordService.Generate(configuration.PasswordSettings, SessionAggregate.SecretLength, out secretBytes)
       : null;
     SessionAggregate session = user.SignIn(configuration.UserSettings, secret);
     foreach (CustomAttribute customAttribute in payload.Session.CustomAttributes)

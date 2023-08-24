@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Logitar.Portal.Domain;
+﻿namespace Logitar.Portal.Domain;
 
 public record Locale
 {

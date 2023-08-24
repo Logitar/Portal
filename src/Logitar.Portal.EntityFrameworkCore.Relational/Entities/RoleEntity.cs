@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
+﻿namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 internal record RoleEntity : AggregateEntity
 {

@@ -8,4 +8,6 @@ public record PasswordSettings : IPasswordSettings
   public bool RequireLowercase { get; set; }
   public bool RequireUppercase { get; set; }
   public bool RequireDigit { get; set; }
+
+  public string Strategy { get; set; } = string.Empty;
 }

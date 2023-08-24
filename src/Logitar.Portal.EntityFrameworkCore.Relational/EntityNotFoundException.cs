@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
-using System.Text;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 

@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Domain.Sessions.Events;
-using System.Text.Json;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
