@@ -18,7 +18,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 {
                     ActorId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", maxLength: 255, nullable: false),
                     Type = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),

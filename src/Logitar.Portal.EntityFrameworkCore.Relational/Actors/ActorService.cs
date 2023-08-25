@@ -22,13 +22,13 @@ internal class ActorService : IActorService
   {
     Dictionary<ActorId, Actor> actors = new(ids.Count());
 
-    List<string> missingActors = new(capacity: actors.Count);
+    List<Guid> missingActors = new(capacity: actors.Count);
     foreach (ActorId id in ids)
     {
       Actor? actor = _cacheService.GetActor(id);
       if (actor == null)
       {
-        missingActors.Add(id.Value);
+        missingActors.Add(id.ToGuid());
       }
       else
       {

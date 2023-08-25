@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Actors;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Domain.Users.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -7,14 +8,14 @@ internal record ActorEntity
 {
   public ActorEntity(UserCreatedEvent created)
   {
-    Id = created.AggregateId.Value;
+    Id = created.AggregateId.ToGuid();
     Type = ActorType.User;
 
     DisplayName = created.UniqueName;
   }
   public ActorEntity(UserEntity user)
   {
-    Id = user.AggregateId;
+    Id = new AggregateId(user.AggregateId).ToGuid();
     Type = ActorType.User;
 
     DisplayName = user.FullName ?? user.UniqueName;
@@ -28,7 +29,7 @@ internal record ActorEntity
 
   public long ActorId { get; private set; }
 
-  public string Id { get; private set; } = string.Empty;
+  public Guid Id { get; private set; }
   public ActorType Type { get; private set; }
   public bool IsDeleted { get; private set; }
 

@@ -2,7 +2,7 @@
 
 public record Actor
 {
-  public string Id { get; set; } = "SYSTEM";
+  public Guid Id { get; set; }
   public ActorType Type { get; set; }
   public bool IsDeleted { get; set; }
 

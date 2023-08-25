@@ -132,6 +132,11 @@ public class ConfigurationAggregate : AggregateRoot
       if (change is ConfigurationUpdatedEvent updated && updated.ActorId == default)
       {
         updated.ActorId = actorId;
+
+        if (updated.Version == Version)
+        {
+          UpdatedBy = actorId;
+        }
       }
     }
   }

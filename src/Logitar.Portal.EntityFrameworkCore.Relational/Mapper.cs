@@ -23,8 +23,13 @@ internal class Mapper
 
   public Configuration ToConfiguration(ConfigurationAggregate source)
   {
-    Configuration destination = new()
+    return new Configuration
     {
+      CreatedBy = FindActor(source.CreatedBy),
+      CreatedOn = ToUniversalTime(source.CreatedOn),
+      UpdatedBy = FindActor(source.UpdatedBy),
+      UpdatedOn = ToUniversalTime(source.UpdatedOn),
+      Version = source.Version,
       DefaultLocale = source.DefaultLocale.Code,
       Secret = source.Secret,
       UniqueNameSettings = new UniqueNameSettings
@@ -47,10 +52,6 @@ internal class Mapper
         OnlyErrors = source.LoggingSettings.OnlyErrors
       }
     };
-
-    MapAggregate(source, destination);
-
-    return destination;
   }
 
   public Realm ToRealm(RealmEntity source)
@@ -199,15 +200,6 @@ internal class Mapper
     return destination;
   }
 
-  private void MapAggregate(AggregateRoot source, Aggregate destination)
-  {
-    destination.Id = source.Id.ToGuid();
-    destination.CreatedBy = FindActor(source.CreatedBy);
-    destination.CreatedOn = ToUniversalTime(source.CreatedOn);
-    destination.UpdatedBy = FindActor(source.UpdatedBy);
-    destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
-    destination.Version = source.Version;
-  }
   private void MapAggregate(AggregateEntity source, Aggregate destination)
   {
     destination.Id = new AggregateId(source.AggregateId).ToGuid();
@@ -217,7 +209,7 @@ internal class Mapper
     destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
     destination.Version = source.Version;
   }
-  private Actor FindActor(string id) => _actors.TryGetValue(new ActorId(id), out Actor? actor) ? actor : new();
+  private Actor FindActor(string id) => FindActor(new ActorId(id));
   private Actor FindActor(ActorId id) => _actors.TryGetValue(id, out Actor? actor) ? actor : new();
 
   private static IEnumerable<CustomAttribute> ToCustomAttributes(Dictionary<string, string> customAttributes)

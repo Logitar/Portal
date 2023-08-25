@@ -158,6 +158,11 @@ public class UserAggregate : AggregateRoot
       if (change is UserUpdatedEvent updated && updated.ActorId == default)
       {
         updated.ActorId = actorId;
+
+        if (updated.Version == Version)
+        {
+          UpdatedBy = actorId;
+        }
       }
     }
   }

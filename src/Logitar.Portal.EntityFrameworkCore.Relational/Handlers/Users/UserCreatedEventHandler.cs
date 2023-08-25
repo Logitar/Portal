@@ -26,7 +26,7 @@ internal class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
     }
 
     ActorEntity? actor = await _context.Actors.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.ToGuid(), cancellationToken);
     if (actor == null)
     {
       actor = new(@event);

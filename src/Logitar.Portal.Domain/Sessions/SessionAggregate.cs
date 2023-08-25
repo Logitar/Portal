@@ -76,6 +76,11 @@ public class SessionAggregate : AggregateRoot
       if (change is SessionUpdatedEvent updated && updated.ActorId == default)
       {
         updated.ActorId = actorId;
+
+        if (updated.Version == Version)
+        {
+          UpdatedBy = actorId;
+        }
       }
     }
   }
