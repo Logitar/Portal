@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
@@ -26,6 +27,7 @@ public abstract class IntegrationTests
   protected const string PasswordString = "Test123!";
 
   private readonly TestApplicationContext _applicationContext = new();
+  private readonly ILoggingService _loggingService;
 
   protected IntegrationTests()
   {
@@ -53,6 +55,9 @@ public abstract class IntegrationTests
     AggregateRepository = ServiceProvider.GetRequiredService<IAggregateRepository>();
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
+
+    _loggingService = ServiceProvider.GetRequiredService<ILoggingService>();
+    _loggingService.Start();
   }
 
   protected Faker Faker { get; } = new();

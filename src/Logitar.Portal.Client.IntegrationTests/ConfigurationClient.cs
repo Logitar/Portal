@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
-using System.Net.Http.Json;
 
 namespace Logitar.Portal.Client;
 

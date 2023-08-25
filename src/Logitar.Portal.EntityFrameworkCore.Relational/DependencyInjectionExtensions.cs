@@ -1,12 +1,14 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
+using Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 using Logitar.Portal.Infrastructure;
@@ -26,7 +28,8 @@ public static class DependencyInjectionExtensions
       .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
       .AddQueriers()
       .AddRepositories()
-      .AddScoped<IActorService, ActorService>();
+      .AddScoped<IActorService, ActorService>()
+      .AddScoped<ILoggingService, LoggingService>();
   }
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)

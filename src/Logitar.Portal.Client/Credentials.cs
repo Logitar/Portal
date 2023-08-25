@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Logitar.Portal.Client;
+﻿namespace Logitar.Portal.Client;
 
 public record Credentials
 {

@@ -4,6 +4,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.GraphQL;
 using Logitar.Portal.Web;
 using Logitar.Portal.Web.Extensions;
+using Logitar.Portal.Web.Middlewares;
 
 namespace Logitar.Portal;
 
@@ -76,6 +77,7 @@ internal class Startup : StartupBase
     builder.UseHttpsRedirection();
     builder.UseStaticFiles();
     builder.UseSession();
+    builder.UseMiddleware<Logging>();
     builder.UseAuthentication();
     builder.UseAuthorization();
 

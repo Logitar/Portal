@@ -5,5 +5,5 @@ namespace Logitar.Portal.Web;
 
 internal class HttpApplicationContext : IApplicationContext
 {
-  public ActorId ActorId { get; } = new();
+  public ActorId ActorId { get; } = new(Guid.Empty);
 }

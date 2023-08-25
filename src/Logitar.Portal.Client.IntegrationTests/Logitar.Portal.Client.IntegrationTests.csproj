@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -28,6 +28,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logitar.Portal.Client\Logitar.Portal.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Net.Http.Json" />
   </ItemGroup>
 
 </Project>
