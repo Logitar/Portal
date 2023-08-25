@@ -17,6 +17,7 @@ public static class DependencyInjectionExtensions
   public static IServiceCollection AddLogitarPortalGraphQL(this IServiceCollection services, GraphQLSettings settings)
   {
     return services.AddGraphQL(builder => builder
+      .AddAuthorizationRule()
       .AddSchema<PortalSchema>()
       .AddSystemTextJson()
       .AddErrorInfoProvider(new ErrorInfoProvider(options =>
