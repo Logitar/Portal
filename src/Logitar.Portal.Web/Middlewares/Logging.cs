@@ -33,7 +33,7 @@ public class Logging
     }
     finally
     {
-      loggingService.SetActors(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
+      loggingService.SetActors(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSessionId());
 
       HttpResponse response = context.Response;
       await loggingService.EndAsync(response.StatusCode);

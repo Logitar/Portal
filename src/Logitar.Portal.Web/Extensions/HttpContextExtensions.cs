@@ -9,7 +9,6 @@ namespace Logitar.Portal.Web.Extensions;
 internal static class HttpContextExtensions
 {
   private const string SessionIdKey = "SessionId";
-  private const string SessionKey = "Session";
   private const string UserKey = "User";
 
   public static string GetAdditionalInformation(this HttpContext context)
@@ -44,14 +43,12 @@ internal static class HttpContextExtensions
     return customAttributes;
   }
 
-  public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key)
   {
     return context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
   }
 
-  public static void SetSession(this HttpContext context, Session? session) => context.SetItem(SessionKey, session);
   public static void SetUser(this HttpContext context, User? user) => context.SetItem(UserKey, user);
   private static void SetItem<T>(this HttpContext context, object key, T? value)
   {
@@ -80,6 +77,8 @@ internal static class HttpContextExtensions
     {
       context.Response.Cookies.Append(Cookies.RefreshToken, session.RefreshToken, Cookies.RefreshTokenOptions);
     }
+
+    context.SetUser(session.User);
   }
   public static void SignOut(this HttpContext context)
   {
