@@ -5,6 +5,8 @@ namespace Logitar.Portal.Contracts.Sessions;
 
 public record Session : Aggregate
 {
+  public Guid Id { get; set; }
+
   public bool IsPersistent { get; set; }
   public string? RefreshToken { get; set; }
 

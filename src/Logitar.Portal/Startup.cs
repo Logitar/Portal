@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
+using Logitar.Portal.GraphQL;
 using Logitar.Portal.Web;
 using Logitar.Portal.Web.Extensions;
 
@@ -22,6 +23,7 @@ internal class Startup : StartupBase
     base.ConfigureServices(services);
 
     services.AddLogitarPortalWeb();
+    services.AddLogitarPortalGraphQL(_configuration);
 
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
@@ -54,15 +56,35 @@ internal class Startup : StartupBase
       builder.UseOpenApi();
     }
 
+    if (_configuration.GetValue<bool>("UseGraphQLAltair"))
+    {
+      builder.UseGraphQLAltair();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
+    {
+      builder.UseGraphQLGraphiQL();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
+    {
+      builder.UseGraphQLPlayground();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
+    {
+      builder.UseGraphQLVoyager();
+    }
+
     builder.UseHttpsRedirection();
     builder.UseStaticFiles();
     builder.UseSession();
     builder.UseAuthentication();
     builder.UseAuthorization();
 
+    builder.UseGraphQL<PortalSchema>();
+
     if (builder is WebApplication application)
     {
       application.MapControllers();
+      application.MapHealthChecks("/health");
     }
   }
 }

@@ -4,8 +4,6 @@ namespace Logitar.Portal.Contracts;
 
 public abstract record Aggregate
 {
-  public Guid Id { get; set; }
-
   public Actor CreatedBy { get; set; } = new();
   public DateTime CreatedOn { get; set; }
 

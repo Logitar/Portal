@@ -23,13 +23,8 @@ internal class Mapper
 
   public Configuration ToConfiguration(ConfigurationAggregate source)
   {
-    return new Configuration
+    Configuration destination = new()
     {
-      CreatedBy = FindActor(source.CreatedBy),
-      CreatedOn = ToUniversalTime(source.CreatedOn),
-      UpdatedBy = FindActor(source.UpdatedBy),
-      UpdatedOn = ToUniversalTime(source.UpdatedOn),
-      Version = source.Version,
       DefaultLocale = source.DefaultLocale.Code,
       Secret = source.Secret,
       UniqueNameSettings = new UniqueNameSettings
@@ -52,12 +47,17 @@ internal class Mapper
         OnlyErrors = source.LoggingSettings.OnlyErrors
       }
     };
+
+    MapAggregate(source, destination);
+
+    return destination;
   }
 
   public Realm ToRealm(RealmEntity source)
   {
     Realm destination = new()
     {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
       UniqueSlug = source.UniqueSlug,
       DisplayName = source.DisplayName,
       Description = source.Description,
@@ -93,6 +93,7 @@ internal class Mapper
   {
     Role destination = new()
     {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
       UniqueName = source.UniqueName,
       DisplayName = source.DisplayName,
       Description = source.Description,
@@ -109,6 +110,7 @@ internal class Mapper
   {
     Session destination = new()
     {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
       SignedOutBy = source.SignedOutBy == null ? null : FindActor(source.SignedOutBy),
@@ -129,6 +131,7 @@ internal class Mapper
   {
     User destination = new()
     {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
       UniqueName = source.UniqueName,
       HasPassword = source.HasPassword,
       PasswordChangedBy = source.PasswordChangedBy == null ? null : FindActor(source.PasswordChangedBy),
@@ -200,9 +203,16 @@ internal class Mapper
     return destination;
   }
 
+  private void MapAggregate(AggregateRoot source, Aggregate destination)
+  {
+    destination.CreatedBy = FindActor(source.CreatedBy);
+    destination.CreatedOn = ToUniversalTime(source.CreatedOn);
+    destination.UpdatedBy = FindActor(source.UpdatedBy);
+    destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
+    destination.Version = source.Version;
+  }
   private void MapAggregate(AggregateEntity source, Aggregate destination)
   {
-    destination.Id = new AggregateId(source.AggregateId).ToGuid();
     destination.CreatedBy = FindActor(source.CreatedBy);
     destination.CreatedOn = ToUniversalTime(source.CreatedOn);
     destination.UpdatedBy = FindActor(source.UpdatedBy);

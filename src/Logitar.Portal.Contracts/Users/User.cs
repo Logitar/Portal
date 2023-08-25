@@ -6,6 +6,8 @@ namespace Logitar.Portal.Contracts.Users;
 
 public record User : Aggregate
 {
+  public Guid Id { get; set; }
+
   public string UniqueName { get; set; } = string.Empty;
 
   public bool HasPassword { get; set; }
