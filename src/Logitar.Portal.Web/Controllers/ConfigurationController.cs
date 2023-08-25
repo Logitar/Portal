@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Configuration;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +19,20 @@ public class ConfigurationController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult> InitializeAsync([FromBody] Models.Configuration.InitializeConfigurationPayload payload, CancellationToken cancellationToken)
   {
-    InitializeConfigurationResult result = await _configurationService.InitializeAsync(payload, cancellationToken);
+    Contracts.Configurations.InitializeConfigurationPayload initializePayload = new()
+    {
+      Locale = payload.Locale,
+      User = payload.User,
+      Session = new SessionPayload
+      {
+        CustomAttributes = HttpContext.GetSessionCustomAttributes()
+      }
+    };
+    Session session = await _configurationService.InitializeAsync(initializePayload, cancellationToken);
 
-    HttpContext.SignIn(result.Session);
+    HttpContext.SignIn(session);
 
     return NoContent();
   }

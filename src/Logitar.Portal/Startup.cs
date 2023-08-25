@@ -57,9 +57,6 @@ internal class Startup : StartupBase
     builder.UseHttpsRedirection();
     builder.UseStaticFiles();
     builder.UseSession();
-    //builder.UseMiddleware<Logging>(); // TODO(fpion): middlewares
-    //builder.UseMiddleware<RefreshSession>(); // TODO(fpion): middlewares
-    //builder.UseMiddleware<RedirectUnauthorized>(); // TODO(fpion): middlewares
     builder.UseAuthentication();
     builder.UseAuthorization();
 

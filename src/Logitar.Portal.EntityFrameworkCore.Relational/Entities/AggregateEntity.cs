@@ -29,7 +29,7 @@ internal abstract record AggregateEntity
 
   public void Update(DomainEvent change)
   {
-    UpdatedBy = change.AggregateId.Value;
+    UpdatedBy = change.ActorId.Value;
     UpdatedOn = change.OccurredOn.ToUniversalTime();
 
     Version = change.Version;

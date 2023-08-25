@@ -20,6 +20,8 @@ public class UserAggregate : AggregateRoot
   private string? _firstName = null;
   private string? _lastName = null;
 
+  private Locale? _locale = null;
+
   public UserAggregate(AggregateId id) : base(id)
   {
   }
@@ -106,6 +108,20 @@ public class UserAggregate : AggregateRoot
     }
   }
   public string? FullName { get; private set; }
+
+  public Locale? Locale
+  {
+    get => _locale;
+    set
+    {
+      if (value != _locale)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Locale = new Modification<Locale>(value);
+        _locale = value;
+      }
+    }
+  }
 
   public void SetPassword(Password password)
   {

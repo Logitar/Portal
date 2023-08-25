@@ -10,6 +10,8 @@ internal record SessionEntity : AggregateEntity
     User = user;
 
     Secret = created.Secret?.Encode();
+
+    IsActive = true;
   }
 
   private SessionEntity() : base()

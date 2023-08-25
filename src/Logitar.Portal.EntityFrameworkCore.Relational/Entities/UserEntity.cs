@@ -154,5 +154,10 @@ internal record UserEntity : AggregateEntity
     {
       FullName = updated.FullName.Value;
     }
+
+    if (updated.Locale != null)
+    {
+      Locale = updated.Locale.Value?.Code;
+    }
   }
 }

@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Infrastructure.Converters;
-using System.Text.Json.Serialization;
+using Logitar.Portal.Web.Filters;
 
 namespace Logitar.Portal.Web;
 
@@ -9,11 +9,7 @@ public static class DependencyInjectionExtensions
   public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services)
   {
     services
-     .AddControllers(options =>
-     {
-       //options.Filters.Add<ExceptionHandlingFilter>(); // TODO(fpion): filters
-       //options.Filters.Add<LoggingFilter>(); // TODO(fpion): filters
-     })
+     .AddControllers(options => options.Filters.Add<ExceptionHandlingFilter>())
      .AddJsonOptions(options =>
      {
        options.JsonSerializerOptions.Converters.Add(new LocaleConverter());
