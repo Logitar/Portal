@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Infrastructure.Converters;
 
-internal class LocaleConverter : JsonConverter<Locale?>
+public class LocaleConverter : JsonConverter<Locale?>
 {
   public override Locale? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
   {

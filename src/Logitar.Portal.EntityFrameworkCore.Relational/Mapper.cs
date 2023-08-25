@@ -38,13 +38,49 @@ internal class Mapper
         RequireNonAlphanumeric = source.PasswordSettings.RequireNonAlphanumeric,
         RequireLowercase = source.PasswordSettings.RequireLowercase,
         RequireUppercase = source.PasswordSettings.RequireUppercase,
-        RequireDigit = source.PasswordSettings.RequireDigit
+        RequireDigit = source.PasswordSettings.RequireDigit,
+        Strategy = source.PasswordSettings.Strategy
       },
       LoggingSettings = new LoggingSettings
       {
         Extent = source.LoggingSettings.Extent,
         OnlyErrors = source.LoggingSettings.OnlyErrors
       }
+    };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Realm ToRealm(RealmEntity source)
+  {
+    Realm destination = new()
+    {
+      UniqueSlug = source.UniqueSlug,
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      DefaultLocale = source.DefaultLocale,
+      Secret = source.Secret,
+      Url = source.Url,
+      RequireUniqueEmail = source.RequireUniqueEmail,
+      RequireConfirmedAccount = source.RequireConfirmedAccount,
+      UniqueNameSettings = new UniqueNameSettings
+      {
+        AllowedCharacters = source.AllowedUniqueNameCharacters
+      },
+      PasswordSettings = new PasswordSettings
+      {
+        RequiredLength = source.RequiredPasswordLength,
+        RequiredUniqueChars = source.RequiredPasswordUniqueChars,
+        RequireNonAlphanumeric = source.PasswordsRequireNonAlphanumeric,
+        RequireLowercase = source.PasswordsRequireLowercase,
+        RequireUppercase = source.PasswordsRequireUppercase,
+        RequireDigit = source.PasswordsRequireDigit,
+        Strategy = source.PasswordStrategy
+      },
+      ClaimMappings = source.ClaimMappings.Select(claimMapping => new ClaimMapping(claimMapping.Key, claimMapping.Value.Name, claimMapping.Value.Type)),
+      CustomAttributes = ToCustomAttributes(source.CustomAttributes)
     };
 
     MapAggregate(source, destination);

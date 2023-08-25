@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.Application\Logitar.Portal.Application.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

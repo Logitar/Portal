@@ -114,7 +114,7 @@ internal record UserEntity : AggregateEntity
   {
     Update(signedIn);
 
-    AuthenticatedOn = signedIn.OccurredOn;
+    AuthenticatedOn = signedIn.OccurredOn.ToUniversalTime();
   }
 
   public void Update(UserUpdatedEvent updated)

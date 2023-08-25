@@ -26,13 +26,11 @@ internal class SessionQuerier : ISessionQuerier
 
   public async Task<Session> ReadAsync(SessionAggregate session, CancellationToken cancellationToken)
   {
-    return await ReadAsync(session.Id, cancellationToken)
+    return await ReadAsync(session.Id.Value, cancellationToken)
       ?? throw new EntityNotFoundException<SessionEntity>(session.Id);
   }
-  public async Task<Session?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
+  private async Task<Session?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
   {
-    string aggregateId = id.Value.Trim();
-
     SessionEntity? session = await _sessions.AsNoTracking()
       .Include(x => x.User).ThenInclude(x => x!.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
@@ -41,8 +39,13 @@ internal class SessionQuerier : ISessionQuerier
       return null;
     }
 
-    Realm? realm = session.User?.TenantId == null ? null
-      : await _realmQuerier.ReadAsync(new AggregateId(session.User.TenantId), cancellationToken);
+    Realm? realm = null;
+    if (session.User?.TenantId != null)
+    {
+      AggregateId realmId = new(session.User.TenantId);
+      realm = await _realmQuerier.ReadAsync(realmId, cancellationToken)
+        ?? throw new EntityNotFoundException<RealmEntity>(realmId);
+    }
 
     IEnumerable<ActorId> actorIds = new[] { session.CreatedBy, session.UpdatedBy, session.SignedOutBy }
       .Where(id => id != null)
@@ -50,6 +53,6 @@ internal class SessionQuerier : ISessionQuerier
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return mapper.ToSession(session, realm: null);
+    return mapper.ToSession(session, realm);
   }
 }

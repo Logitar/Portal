@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Sessions;
@@ -32,6 +33,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddScoped<IConfigurationQuerier, ConfigurationQuerier>()
+      .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>();
   }
 

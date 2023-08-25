@@ -6,6 +6,7 @@ internal class ReadOnlyUniqueNameSettingsValidator : AbstractValidator<ReadOnlyU
 {
   public ReadOnlyUniqueNameSettingsValidator()
   {
-    When(x => x.AllowedCharacters != null, () => RuleFor(x => x.AllowedCharacters).NotEmpty());
+    When(x => x.AllowedCharacters != null, () => RuleFor(x => x.AllowedCharacters).NotEmpty()
+      .MaximumLength(byte.MaxValue));
   }
 }
