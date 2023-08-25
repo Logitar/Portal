@@ -14,6 +14,7 @@ public static class DependencyInjectionExtensions
         builder => builder.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.PostgreSQL")
       ))
       .AddLogitarEventSourcingWithEntityFrameworkCorePostgreSQL(connectionString)
-      .AddLogitarPortalWithEntityFrameworkCoreRelational();
+      .AddLogitarPortalWithEntityFrameworkCoreRelational()
+      .AddSingleton<ISqlHelper, PostgresHelper>();
   }
 }

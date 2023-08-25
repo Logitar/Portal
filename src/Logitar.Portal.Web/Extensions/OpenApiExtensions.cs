@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Logitar.Portal.Web.Constants;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Logitar.Portal.Web.Extensions;
 
@@ -12,7 +14,7 @@ public static class OpenApiExtensions
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(config =>
     {
-      //config.AddSecurity();
+      config.AddSecurity();
       config.SwaggerDoc(name: $"v{Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact
@@ -44,33 +46,33 @@ public static class OpenApiExtensions
     ));
   }
 
-  //private static void AddSecurity(this SwaggerGenOptions options)
-  //{
-  //  options.AddSecurityDefinition(Schemes.Basic, new OpenApiSecurityScheme
-  //  {
-  //    Description = "Enter your credentials in the inputs below:",
-  //    In = ParameterLocation.Header,
-  //    Name = Headers.Authorization,
-  //    Scheme = Schemes.Basic,
-  //    Type = SecuritySchemeType.Http
-  //  });
-  //  options.AddSecurityRequirement(new OpenApiSecurityRequirement
-  //  {
-  //    {
-  //      new OpenApiSecurityScheme
-  //      {
-  //        In = ParameterLocation.Header,
-  //        Name = Headers.Authorization,
-  //        Reference = new OpenApiReference
-  //        {
-  //          Id = Schemes.Basic,
-  //          Type = ReferenceType.SecurityScheme
-  //        },
-  //        Scheme = Schemes.Basic,
-  //        Type = SecuritySchemeType.Http
-  //      },
-  //      new List<string>()
-  //    }
-  //  });
-  //}
+  private static void AddSecurity(this SwaggerGenOptions options)
+  {
+    options.AddSecurityDefinition(Schemes.Basic, new OpenApiSecurityScheme
+    {
+      Description = "Enter your credentials in the inputs below:",
+      In = ParameterLocation.Header,
+      Name = Headers.Authorization,
+      Scheme = Schemes.Basic,
+      Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Name = Headers.Authorization,
+          Reference = new OpenApiReference
+          {
+            Id = Schemes.Basic,
+            Type = ReferenceType.SecurityScheme
+          },
+          Scheme = Schemes.Basic,
+          Type = SecuritySchemeType.Http
+        },
+        new List<string>()
+      }
+    });
+  }
 }

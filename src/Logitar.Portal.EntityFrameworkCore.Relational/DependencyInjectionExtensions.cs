@@ -4,6 +4,7 @@ using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
@@ -37,7 +38,8 @@ public static class DependencyInjectionExtensions
     return services
       .AddScoped<IConfigurationQuerier, ConfigurationQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
-      .AddScoped<ISessionQuerier, SessionQuerier>();
+      .AddScoped<ISessionQuerier, SessionQuerier>()
+      .AddScoped<IUserQuerier, UserQuerier>();
   }
 
   private static IServiceCollection AddRepositories(this IServiceCollection services)

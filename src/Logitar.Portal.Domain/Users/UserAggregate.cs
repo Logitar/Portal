@@ -44,6 +44,12 @@ public class UserAggregate : AggregateRoot
       UniqueName = uniqueName
     });
   }
+  protected virtual void Apply(UserCreatedEvent created)
+  {
+    TenantId = created.TenantId;
+
+    UniqueName = created.UniqueName;
+  }
 
   public string? TenantId { get; private set; }
 
@@ -132,6 +138,15 @@ public class UserAggregate : AggregateRoot
 
   public SessionAggregate SignIn(IUserSettings userSettings, Password? secret = null, ActorId? actorId = null)
   {
+    return SignIn(userSettings, password: null, secret, actorId);
+  }
+  public SessionAggregate SignIn(IUserSettings userSettings, string? password, Password? secret = null, ActorId? actorId = null)
+  {
+    if (password != null && _password?.IsMatch(password) != true)
+    {
+      throw new IncorrectUserPasswordException(this, password);
+    }
+
     if (IsDisabled)
     {
       throw new UserIsDisabledException(this);

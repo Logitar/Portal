@@ -29,6 +29,10 @@ internal class SessionQuerier : ISessionQuerier
     return await ReadAsync(session.Id.Value, cancellationToken)
       ?? throw new EntityNotFoundException<SessionEntity>(session.Id);
   }
+  public async Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+  }
   private async Task<Session?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
   {
     SessionEntity? session = await _sessions.AsNoTracking()
