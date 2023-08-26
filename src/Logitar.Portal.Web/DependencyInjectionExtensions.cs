@@ -24,6 +24,14 @@ public static class DependencyInjectionExtensions
        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
      });
 
+    services.AddCors(options => options.AddDefaultPolicy(cors =>
+    {
+      cors.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173");
+      cors.WithMethods("GET", "PATCH", "POST");
+      cors.WithHeaders("Content-Type");
+      cors.AllowCredentials();
+    })); // TODO(fpion): refactor
+
     services.AddAuthentication()
       .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });

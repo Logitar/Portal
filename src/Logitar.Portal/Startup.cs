@@ -75,6 +75,7 @@ internal class Startup : StartupBase
     }
 
     builder.UseHttpsRedirection();
+    builder.UseCors();
     builder.UseStaticFiles();
     builder.UseSession();
     builder.UseMiddleware<Logging>();

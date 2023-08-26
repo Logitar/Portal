@@ -1,9 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Configuration;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
@@ -46,7 +44,7 @@ public class ConfigurationController : ControllerBase
     return Ok(new IsConfigurationInitializedResult(configuration));
   }
 
-  [Authorize(Policy = Policies.PortalActor)]
+  //[Authorize(Policy = Policies.PortalActor)] // TODO(fpion): restrict
   [HttpGet]
   public async Task<ActionResult<Configuration>> ReadAsync(CancellationToken cancellationToken)
   {
@@ -56,14 +54,14 @@ public class ConfigurationController : ControllerBase
     return Ok(configuration);
   }
 
-  [Authorize(Policy = Policies.PortalActor)]
+  //[Authorize(Policy = Policies.PortalActor)] // TODO(fpion): restrict
   [HttpPut]
   public async Task<ActionResult<Configuration>> ReplaceAsync([FromBody] ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
   {
     return Ok(await _configurationService.ReplaceAsync(payload, version, cancellationToken));
   }
 
-  [Authorize(Policy = Policies.PortalActor)]
+  //[Authorize(Policy = Policies.PortalActor)] // TODO(fpion): restrict
   [HttpPatch]
   public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
