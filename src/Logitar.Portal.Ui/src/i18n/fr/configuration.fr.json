@@ -1,0 +1,31 @@
+{
+  "defaultLocale": "Langue par défaut",
+  "initialization": {
+    "initialize": "Initialiser",
+    "title": "Initialisation",
+    "user": {
+      "help": "Remplissez le formulaire ci-dessous pour créer un premier compte administrateur.",
+      "label": "Utilisateur"
+    }
+  },
+  "jwt": {
+    "secret": {
+      "warning": "Changer le secret invalidera tous les jetons actifs du Portail. Appuyez sur le bouton ci-dessous afin d’annuler le changement."
+    }
+  },
+  "logging": {
+    "extent": {
+      "label": "Étendue",
+      "onlyErrors": "Journaliser seulement les requêtes en erreur",
+      "options": {
+        "ActivityOnly": "Journaliser seulement les requêtes avec activités",
+        "Full": "Journaliser toutes les requêtes",
+        "None": "Ne journaliser aucune requête"
+      },
+      "placeholder": "Sélectionnez une étendue de journalisation"
+    },
+    "title": "Journalisation"
+  },
+  "title": "Configuration",
+  "updated": "La configuration a été enregistrée."
+}

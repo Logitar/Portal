@@ -1,0 +1,31 @@
+{
+  "jwt": {
+    "secret": {
+      "label": "Secret",
+      "placeholder": "Collez un secret JWT ou laissez vide afin de générer de manière sécuritaire un nouveau secret"
+    },
+    "title": "JSON Web Tokens"
+  },
+  "password": {
+    "requireDigit": "Exiger un chiffre",
+    "requireLowercase": "Exiger une minuscule",
+    "requireNonAlphanumeric": "Exiger un caractère spécial",
+    "requireUppercase": "Exiger une majuscule",
+    "requiredLength": {
+      "label": "Nombre de caractères minimal",
+      "placeholder": "Entrez le nom de caractères minimal dans un mot de passe"
+    },
+    "requiredUniqueChars": {
+      "label": "Nombre de caractères uniques",
+      "placeholder": "Entrez le nombre de caractères uniques minimal dans un mot de passe"
+    },
+    "title": "Mot de passe"
+  },
+  "uniqueName": {
+    "allowedCharacters": {
+      "label": "Caractères permis",
+      "placeholder": "Entrez tous les caractères permis dans les noms d’utilisateurs (ex. : abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._{'@'}{'+'})"
+    },
+    "title": "Nom d’utilisateur"
+  }
+}
