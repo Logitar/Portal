@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logitar.Portal.Client\Logitar.Portal.Client.csproj" />
+    <ProjectReference Include="..\..\src\Logitar.Portal.Client\Logitar.Portal.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
