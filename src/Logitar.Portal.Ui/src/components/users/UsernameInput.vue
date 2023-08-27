@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { UsernameSettings } from "@/types/realms";
+import type { UniqueNameSettings } from "@/types/settings";
 import type { ValidationRules } from "@/types/validation";
 
 const props = withDefaults(
@@ -11,7 +11,7 @@ const props = withDefaults(
     modelValue?: string;
     placeholder?: string;
     required?: boolean;
-    settings?: UsernameSettings;
+    settings?: UniqueNameSettings;
     validate?: boolean;
   }>(),
   {

@@ -135,6 +135,9 @@ watchEffect(() => {
             </li>
           </template>
           <template v-if="account.authenticated">
+            <li class="nav-item">
+              <RouterLink :to="{ name: 'Configuration' }" class="nav-link"><font-awesome-icon icon="fas fa-cog" /> {{ t("configuration.title") }}</RouterLink>
+            </li>
             <li class="nav-item d-block d-lg-none">
               <RouterLink class="nav-link" :to="{ name: 'Profile' }">
                 <app-avatar :display-name="user.displayName" :email-address="user.emailAddress" :size="24" :url="user.picture" />

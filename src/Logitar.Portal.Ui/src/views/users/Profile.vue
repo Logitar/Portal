@@ -38,7 +38,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <h1>{{ t("users.profile.title") }}</h1>
     <template v-if="user">
       <ProfileHeader :user="user" />
@@ -54,5 +54,5 @@ onMounted(async () => {
         </app-tab>
       </app-tabs>
     </template>
-  </div>
+  </main>
 </template>

@@ -3,14 +3,16 @@ using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
 using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Filters;
+using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Logitar.Portal.Web;
 
 public static class DependencyInjectionExtensions
 {
-  public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services)
+  public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services, IConfiguration configuration)
   {
     services
      .AddControllers(options =>
@@ -24,13 +26,8 @@ public static class DependencyInjectionExtensions
        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
      });
 
-    services.AddCors(options => options.AddDefaultPolicy(cors =>
-    {
-      cors.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173");
-      cors.WithMethods("GET", "PATCH", "POST");
-      cors.WithHeaders("Content-Type");
-      cors.AllowCredentials();
-    })); // TODO(fpion): refactor
+    CorsSettings corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    services.AddCors(corsSettings);
 
     services.AddAuthentication()
       .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { })
@@ -46,7 +43,7 @@ public static class DependencyInjectionExtensions
 
     services.AddSession(options =>
     {
-      options.Cookie.SameSite = SameSiteMode.Strict;
+      options.Cookie.SameSite = SameSiteMode.None; // TODO(fpion): Strict
       options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 

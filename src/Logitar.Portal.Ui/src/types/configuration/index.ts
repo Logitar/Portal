@@ -1,5 +1,5 @@
 import type { Aggregate } from "@/types/aggregate";
-import type { PasswordSettings, UniqueNameSettings } from "../settings";
+import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type Configuration = Aggregate & {
   defaultLocale: string;

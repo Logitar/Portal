@@ -6,7 +6,7 @@ import { assign } from "@/helpers/objectUtils";
 const { t } = useI18n();
 
 const props = defineProps<{
-  modelValue?: UniqueNameSettings;
+  modelValue: UniqueNameSettings;
 }>();
 
 const emit = defineEmits<{

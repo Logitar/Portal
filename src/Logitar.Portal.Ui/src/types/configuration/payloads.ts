@@ -1,5 +1,5 @@
 import type { LoggingSettings } from ".";
-import type { PasswordSettings, UniqueNameSettings } from "@types/settings";
+import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type InitializeConfigurationPayload = {
   locale: string;

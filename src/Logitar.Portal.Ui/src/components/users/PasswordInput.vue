@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import FormInput from "@/components/shared/FormInput.vue";
 import type { ConfirmedParams } from "@/types/validation";
-import type { PasswordSettings } from "@/types/realms";
+import type { PasswordSettings } from "@/types/settings";
 import type { ValidationRules } from "@/types/validation";
 
 const { t } = useI18n();
@@ -31,6 +31,7 @@ const props = withDefaults(
       requireLowercase: true,
       requireUppercase: true,
       requireDigit: true,
+      strategy: "PBKDF2",
     }),
     validate: false,
   }

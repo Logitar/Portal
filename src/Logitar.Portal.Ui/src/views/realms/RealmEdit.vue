@@ -4,9 +4,9 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import ClaimMappingList from "@/components/realms/ClaimMappingList.vue";
-import JwtSecretField from "@/components/realms/JwtSecretField.vue";
-import PasswordSettingsEdit from "@/components/realms/PasswordSettingsEdit.vue";
-import UsernameSettingsEdit from "@/components/realms/UsernameSettingsEdit.vue";
+import JwtSecretField from "@/components/settings/JwtSecretField.vue";
+import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
+import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ClaimMapping, Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttribute";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
@@ -29,7 +29,7 @@ const defaults = {
   description: "",
   requireConfirmedAccount: true,
   requireUniqueEmail: true,
-  usernameSettings: { allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" },
+  uniqueNameSettings: { allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" },
   passwordSettings: {
     requiredLength: 8,
     requiredUniqueChars: 8,
@@ -57,7 +57,7 @@ const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
 const uniqueName = ref<string>(defaults.uniqueName);
 const url = ref<string>(defaults.url);
-const usernameSettings = ref<UniqueNameSettings>(defaults.usernameSettings);
+const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
 
 const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;
@@ -69,7 +69,7 @@ const hasChanges = computed<boolean>(() => {
     description.value !== (model.description ?? "") ||
     requireConfirmedAccount.value !== model.requireConfirmedAccount ||
     requireUniqueEmail.value !== model.requireUniqueEmail ||
-    JSON.stringify(usernameSettings.value) !== JSON.stringify(model.usernameSettings) ||
+    JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings) ||
     JSON.stringify(passwordSettings.value) !== JSON.stringify(model.passwordSettings) ||
     secret.value !== model.secret ||
     JSON.stringify(claimMappings.value) !== JSON.stringify(model.claimMappings) ||
@@ -91,7 +91,7 @@ function setModel(model: Realm): void {
   secret.value = model.secret;
   uniqueName.value = model.uniqueName;
   url.value = model.url ?? "";
-  usernameSettings.value = model.usernameSettings;
+  uniqueNameSettings.value = model.uniqueNameSettings;
 }
 
 const { handleSubmit, isSubmitting } = useForm();
@@ -106,7 +106,7 @@ const onSubmit = handleSubmit(async () => {
         url: url.value,
         requireConfirmedAccount: requireConfirmedAccount.value,
         requireUniqueEmail: requireConfirmedAccount.value,
-        usernameSettings: usernameSettings.value,
+        uniqueNameSettings: uniqueNameSettings.value,
         passwordSettings: passwordSettings.value,
         claimMappings: claimMappings.value,
         customAttributes: customAttributes.value,
@@ -123,7 +123,7 @@ const onSubmit = handleSubmit(async () => {
         url: url.value,
         requireConfirmedAccount: requireConfirmedAccount.value,
         requireUniqueEmail: requireConfirmedAccount.value,
-        usernameSettings: usernameSettings.value,
+        uniqueNameSettings: uniqueNameSettings.value,
         passwordSettings: passwordSettings.value,
         claimMappings: claimMappings.value,
         customAttributes: customAttributes.value,
@@ -153,7 +153,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <h1 v-show="hasLoaded">{{ title }}</h1>
     <status-detail v-if="realm" :aggregate="realm" />
     <form v-show="hasLoaded" @submit.prevent="onSubmit">
@@ -205,7 +205,7 @@ onMounted(async () => {
               </span>
             </template>
           </form-checkbox>
-          <UsernameSettingsEdit v-model="usernameSettings" />
+          <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
           <PasswordSettingsEdit v-model="passwordSettings" />
           <h5>{{ t("realms.jwt.title") }}</h5>
           <JwtSecretField :old-value="realm?.secret" validate v-model="secret" />
@@ -218,5 +218,5 @@ onMounted(async () => {
         </app-tab>
       </app-tabs>
     </form>
-  </div>
+  </main>
 </template>

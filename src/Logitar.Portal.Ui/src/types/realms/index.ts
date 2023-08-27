@@ -1,6 +1,6 @@
 import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute } from "@/types/customAttribute";
-import type { PasswordSettings, UniqueNameSettings } from "../settings";
+import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type ClaimMapping = {
   key: string;

@@ -7,7 +7,7 @@ import { assign } from "@/helpers/objectUtils";
 const { t } = useI18n();
 
 const props = defineProps<{
-  modelValue?: LoggingSettings;
+  modelValue: LoggingSettings;
 }>();
 
 const emit = defineEmits<{

@@ -45,7 +45,7 @@ const onSubmit = handleSubmit(async () => {
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <h1>{{ t("users.signIn.title") }}</h1>
     <app-alert dismissible variant="warning" v-model="invalidCredentials">
       <strong>{{ t("users.signIn.failed") }}</strong> {{ t("users.signIn.invalidCredentials") }}
@@ -56,5 +56,5 @@ const onSubmit = handleSubmit(async () => {
       <form-checkbox class="mb-3" id="remember" label="users.signIn.remember" v-model="remember" />
       <icon-submit class="me-2" :disabled="isSubmitting" icon="fas fa-arrow-right-to-bracket" :loading="isSubmitting" text="users.signIn.submit" />
     </form>
-  </div>
+  </main>
 </template>

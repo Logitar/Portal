@@ -18,7 +18,6 @@ const router = createRouter({
       // this generates a separate chunk (ConfigurationView.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import("./views/ConfigurationView.vue"),
-      meta: { isPublic: true }, // TODO(fpion): remove
     },
     // Users
     {

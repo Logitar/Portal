@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import LoggingSettingsEdit from "@/components/configuration/LoggingSettingsEdit.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
@@ -75,46 +76,12 @@ const onSubmit = handleSubmit(async () => {
     });
     setModel(updatedConfiguration);
     toasts.success("configuration.updated");
-    // if (realm.value) {
-    //   const updatedRealm = await updateRealm(realm.value.id, {
-    //     displayName: displayName.value,
-    //     description: description.value,
-    //     defaultLocale: defaultLocale.value,
-    //     secret: secret.value,
-    //     url: url.value,
-    //     requireConfirmedAccount: requireConfirmedAccount.value,
-    //     requireUniqueEmail: requireConfirmedAccount.value,
-    //     usernameSettings: usernameSettings.value,
-    //     passwordSettings: passwordSettings.value,
-    //     claimMappings: claimMappings.value,
-    //     customAttributes: customAttributes.value,
-    //   });
-    //   setModel(updatedRealm);
-    //   toasts.success("realms.updated");
-    // } else {
-    //   const createdRealm = await createRealm({
-    //     uniqueName: uniqueName.value,
-    //     displayName: displayName.value,
-    //     description: description.value,
-    //     defaultLocale: defaultLocale.value,
-    //     secret: secret.value,
-    //     url: url.value,
-    //     requireConfirmedAccount: requireConfirmedAccount.value,
-    //     requireUniqueEmail: requireConfirmedAccount.value,
-    //     usernameSettings: usernameSettings.value,
-    //     passwordSettings: passwordSettings.value,
-    //     claimMappings: claimMappings.value,
-    //     customAttributes: customAttributes.value,
-    //   });
-    //   setModel(createdRealm);
-    //   toasts.success("realms.created");
-    //   router.replace({ name: "RealmEdit", params: { id: createdRealm.id } });
-    // }
   } catch (e: unknown) {
     handleError(e);
   }
 });
 
+const route = useRoute();
 onMounted(async () => {
   try {
     const configuration = await readConfiguration();
@@ -122,11 +89,14 @@ onMounted(async () => {
   } catch (e) {
     handleError(e);
   }
+  if (route.query.status === "initialized") {
+    toasts.success("configuration.initialized");
+  }
 });
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <h1>{{ t("configuration.title") }}</h1>
     <status-detail v-if="configuration" :aggregate="configuration" />
     <form v-if="configuration" @submit.prevent="onSubmit">
@@ -140,5 +110,5 @@ onMounted(async () => {
       <h5>{{ t("settings.jwt.title") }}</h5>
       <JwtSecretField :old-value="configuration.secret" validate warning="configuration.jwt.secret.warning" v-model="secret" />
     </form>
-  </div>
+  </main>
 </template>

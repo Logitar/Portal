@@ -9,6 +9,7 @@ internal class Program
   public static async Task Main(string[] args)
   {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    builder.WebHost.UseStaticWebAssets();
 
     Startup startup = new(builder.Configuration);
     startup.ConfigureServices(builder.Services);

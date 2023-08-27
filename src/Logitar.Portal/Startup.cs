@@ -23,7 +23,7 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddLogitarPortalWeb();
+    services.AddLogitarPortalWeb(_configuration);
     services.AddLogitarPortalGraphQL(_configuration);
 
     services.AddApplicationInsightsTelemetry();

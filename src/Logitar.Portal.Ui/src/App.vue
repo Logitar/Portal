@@ -9,11 +9,6 @@ import type { ApiError } from "./types/api";
 import type { ToastOptions, ToastUtils } from "./types/components";
 import { handleErrorKey, registerTooltipsKey, toastKey, toastsKey } from "./inject/App";
 
-// TODO(fpion): favicon
-// TODO(fpion): ensure user is signed-in after configuration initialization
-// TODO(fpion): build and expose the application from the backend
-// TODO(fpion): deploy application to staging
-
 const route = useRoute();
 const router = useRouter();
 

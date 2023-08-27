@@ -17,4 +17,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  build: {
+    outDir: "../Logitar.Portal.Web/wwwroot/dist",
+    emptyOutDir: true,
+  },
+  server: {
+    port: 7745,
+  },
 });

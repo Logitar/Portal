@@ -7,6 +7,10 @@
     <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <StaticWebAssetBasePath Condition="$(StaticWebAssetBasePath) == ''">/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
