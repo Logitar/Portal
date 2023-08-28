@@ -13,18 +13,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
       - uses: azure/docker-login@v1
         with:
           login-server: francispion.azurecr.io
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          cd ./src/Logitar.Portal.UI
+          cd ./src/Logitar.Portal.Ui
           npm ci
-          npm run build:staging
+          npm run build
           cd ../..
           docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Logitar.Portal/Dockerfile
           docker push francispion.azurecr.io/portal:${{ github.sha }}
