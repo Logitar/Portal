@@ -3,6 +3,7 @@ using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,8 +28,8 @@ internal class RealmQuerier : IRealmQuerier
     {
       return null;
     }
-    IEnumerable<ActorId> actorIds = new[] { realm.CreatedBy, realm.UpdatedBy }
-      .Select(id => new ActorId(id));
+
+    IEnumerable<ActorId> actorIds = realm.GetActorIds();
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 

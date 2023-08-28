@@ -115,7 +115,8 @@ public abstract class IntegrationTests
         }
       }
     };
-    Session session = await configurationService.InitializeAsync(payload);
+    InitializeConfigurationResult result = await configurationService.InitializeAsync(payload);
+    Session session = result.Session;
 
     Configuration = await AggregateRepository.LoadAsync<ConfigurationAggregate>(ConfigurationAggregate.UniqueId);
     Assert.NotNull(Configuration);

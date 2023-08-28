@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Users;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,10 +47,8 @@ internal class UserQuerier : IUserQuerier
       realm = await _realmQuerier.ReadAsync(realmId, cancellationToken)
       ?? throw new EntityNotFoundException<RealmEntity>(realmId);
     }
-    IEnumerable<ActorId> actorIds = new[] { user.CreatedBy, user.UpdatedBy, user.PasswordChangedBy,
-        user.DisabledBy, user.AddressVerifiedBy, user.EmailVerifiedBy, user.PhoneVerifiedBy }
-      .Where(id => id != null)
-      .Select(id => new ActorId(id!));
+
+    IEnumerable<ActorId> actorIds = user.GetActorIds();
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 

@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,9 +52,7 @@ internal class SessionQuerier : ISessionQuerier
         ?? throw new EntityNotFoundException<RealmEntity>(realmId);
     }
 
-    IEnumerable<ActorId> actorIds = new[] { session.CreatedBy, session.UpdatedBy, session.SignedOutBy }
-      .Where(id => id != null)
-      .Select(id => new ActorId(id!));
+    IEnumerable<ActorId> actorIds = session.GetActorIds();
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 

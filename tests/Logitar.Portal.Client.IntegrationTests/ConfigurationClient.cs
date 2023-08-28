@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.Client;
 
@@ -13,7 +12,7 @@ internal class ConfigurationClient : IConfigurationService
     _client.BaseAddress = new Uri(settings.BaseUrl);
   }
 
-  public async Task<Session> InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<InitializeConfigurationResult> InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken)
   {
     Uri requestUri = new("/api/configuration", UriKind.Relative);
     using HttpRequestMessage request = new(HttpMethod.Post, requestUri)
@@ -24,7 +23,7 @@ internal class ConfigurationClient : IConfigurationService
     using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
     response.EnsureSuccessStatusCode();
 
-    return new Session();
+    return new InitializeConfigurationResult();
   }
 
   public Task<Configuration?> ReadAsync(CancellationToken cancellationToken)

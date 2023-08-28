@@ -57,7 +57,8 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
       }
     };
 
-    Session session = await _configurationService.InitializeAsync(payload);
+    InitializeConfigurationResult result = await _configurationService.InitializeAsync(payload);
+    Session session = result.Session;
     User user = session.User;
 
     Actor actor = new()
