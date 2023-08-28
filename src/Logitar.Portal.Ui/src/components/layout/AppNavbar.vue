@@ -8,7 +8,7 @@ import type { AuthenticatedUser } from "@/types/users";
 import type { Hyperlink } from "@/types/components";
 import type { Locale } from "@/types/i18n";
 import { orderBy } from "@/helpers/arrayUtils";
-import { urlCombine } from "@/helpers/stringUtils";
+import { combineURL } from "@/helpers/stringUtils";
 import { useAccountStore } from "@/stores/account";
 import { useI18nStore } from "@/stores/i18n";
 
@@ -33,14 +33,14 @@ const otherLocales = computed<Locale[]>(() => {
     "nativeName"
   );
 });
-const swaggerUrl = computed<string | undefined>(() => (environmentName.value === "development" ? urlCombine(apiBaseUrl, "/swagger") : undefined));
+const swaggerUrl = computed<string | undefined>(() => (environmentName.value === "development" ? combineURL(apiBaseUrl, "/swagger") : undefined));
 const graphQLLinks = computed<Hyperlink[]>(() =>
   environmentName.value === "development"
     ? [
-        { text: "Altair", url: urlCombine(apiBaseUrl, "/ui/altair") },
-        { text: "GraphiQL", url: urlCombine(apiBaseUrl, "/ui/graphiql") },
-        { text: "Playground", url: urlCombine(apiBaseUrl, "/ui/playground") },
-        { text: "Voyager", url: urlCombine(apiBaseUrl, "/ui/voyager") },
+        { text: "Altair", url: combineURL(apiBaseUrl, "/ui/altair") },
+        { text: "GraphiQL", url: combineURL(apiBaseUrl, "/ui/graphiql") },
+        { text: "Playground", url: combineURL(apiBaseUrl, "/ui/playground") },
+        { text: "Voyager", url: combineURL(apiBaseUrl, "/ui/voyager") },
       ]
     : []
 );

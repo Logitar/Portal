@@ -86,11 +86,11 @@ onMounted(async () => {
   try {
     const configuration = await readConfiguration();
     setModel(configuration);
+    if (route.query.status === "initialized") {
+      toasts.success("configuration.initialized");
+    }
   } catch (e) {
     handleError(e);
-  }
-  if (route.query.status === "initialized") {
-    toasts.success("configuration.initialized");
   }
 });
 </script>

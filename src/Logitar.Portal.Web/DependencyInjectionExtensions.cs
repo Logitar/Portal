@@ -15,7 +15,7 @@ public static class DependencyInjectionExtensions
   public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services, IConfiguration configuration)
   {
     services
-     .AddControllers(options =>
+     .AddControllersWithViews(options =>
      {
        options.Filters.Add<ExceptionHandlingFilter>();
        options.Filters.Add<LoggingFilter>();
