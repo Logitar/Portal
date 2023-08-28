@@ -1,0 +1,149 @@
+{
+  "address": {
+    "additional": {
+      "label": "Informations additionnelles",
+      "placeholder": "Entrez des informations additionnelles, si nécessaire (ex. : C.P. Boîte #4321)"
+    },
+    "country": {
+      "label": "Pays",
+      "placeholder": "Sélectionnez un pays"
+    },
+    "locality": {
+      "label": "Ville",
+      "placeholder": "Entrez votre ville"
+    },
+    "postalCode": {
+      "label": "Code postal",
+      "placeholder": "Entrez votre code postal"
+    },
+    "region": {
+      "label": "Région",
+      "placeholder": "Sélectionnez votre région"
+    },
+    "street": {
+      "label": "Numéro et nom de rue",
+      "placeholder": "Entrez votre numéro et nom de rue"
+    },
+    "title": "Adresse postale",
+    "verified": "Vérifiée"
+  },
+  "birthdate": "Date de naissance",
+  "createdOn": "Création",
+  "email": {
+    "address": {
+      "label": "Adresse courriel",
+      "placeholder": "Entrez votre adresse courriel"
+    },
+    "verified": "Vérifiée"
+  },
+  "gender": {
+    "label": "Genre",
+    "options": {
+      "Female": "Femme",
+      "Male": "Homme",
+      "Other": "Autre"
+    },
+    "placeholder": "Sélectionnez votre genre"
+  },
+  "locale": {
+    "placeholder": "Sélectionnez votre langue de communication préférée"
+  },
+  "name": {
+    "first": {
+      "label": "Prénom",
+      "placeholder": "Entrez votre prénom"
+    },
+    "full": "Nom",
+    "last": {
+      "label": "Nom de famille",
+      "placeholder": "Entrez votre nom de famille"
+    },
+    "middle": {
+      "label": "Nom intermédiaire",
+      "placeholder": "Entrez votre nom intermédiaire"
+    },
+    "nick": {
+      "label": "Surnom",
+      "placeholder": "Entrez votre surnom"
+    },
+    "user": {
+      "label": "Nom d’utilisateur",
+      "placeholder": "Entrez votre nom d’utilisateur"
+    }
+  },
+  "password": {
+    "changeFailed": "Modification du mot de passe échouée !",
+    "changed": "Votre mot de passe a été modifié.",
+    "changedOn": "Dernière modification le {date}",
+    "confirm": {
+      "label": "Confirmation du mot de passe",
+      "placeholder": "Entrez à nouveau le même mot de passe"
+    },
+    "current": {
+      "label": "Mot de passe actuel",
+      "placeholder": "Entrez votre mot de passe actuel"
+    },
+    "invalidCredentials": "Veuillez vérifier que vous avez entré le bon mot de passe actuel.",
+    "label": "Mot de passe",
+    "new": {
+      "label": "Nouveau mot de passe",
+      "placeholder": "Entrez un nouveau mot de passe"
+    },
+    "placeholder": "Entrez votre mot de passe",
+    "submit": "Modifier"
+  },
+  "phone": {
+    "countryCode": {
+      "label": "Code de pays",
+      "placeholder": "Sélectionnez un pays"
+    },
+    "e164": "Téléphone (E164)",
+    "extension": {
+      "label": "Extension téléphonique",
+      "placeholder": "Entrez votre extension téléphonique"
+    },
+    "invalid": "Le téléphone n’est pas valide.",
+    "number": {
+      "example": "Exemple :",
+      "label": "Numéro de téléphone",
+      "placeholder": "Entrez votre numéro de téléphone"
+    },
+    "verified": "Vérifié"
+  },
+  "picture": {
+    "label": "Photo",
+    "placeholder": "Collez le lien (URL) vers votre photo"
+  },
+  "profile": {
+    "label": "Profil",
+    "placeholder": "Collez le lien (URL) vers votre profil",
+    "title": "Profil",
+    "updated": "Votre profil a été modifié."
+  },
+  "signIn": {
+    "failed": "Connexion échouée !",
+    "invalidCredentials": "Veuillez vérifier que vous avez entré votre adresse courriel ou nom d’utilisateur et mot de passe.",
+    "remember": "Rester connecté",
+    "submit": "Se connecter",
+    "title": "Connexion"
+  },
+  "signOut": {
+    "title": "Déconnexion"
+  },
+  "signedInOn": "Dernière connexion",
+  "tabs": {
+    "authentication": "Informations d’authentification",
+    "contact": "Informations de contact",
+    "personal": "Informations personnelles"
+  },
+  "timeZone": {
+    "label": "Fuseau horaire",
+    "placeholder": "Sélectionnez votre fuseau horaire"
+  },
+  "updatedOn": "Dernière modification",
+  "usernameOrEmailPlaceholder": "Entrez votre adresse courriel ou nom d’utilisateur",
+  "website": {
+    "label": "Site Web",
+    "placeholder": "Collez le lien (URL) vers votre site Web"
+  }
+}

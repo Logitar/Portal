@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- Reimplemented configuration management.
 
 ## [2.1.0] - 2023-05-01
 
@@ -72,7 +74,7 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Utar94/Portal/compare/v2.1.0...HEAD
-[2.1.0]: https://github.com/Utar94/Portal/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/Utar94/Portal/compare/v1.1.5...v2.0.0
-[1.1.5]: https://github.com/Utar94/Portal/releases/tag/v1.1.5
+[unreleased]: https://github.com/Logitar/Portal/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/Logitar/Portal/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/Logitar/Portal/compare/v1.1.5...v2.0.0
+[1.1.5]: https://github.com/Logitar/Portal/releases/tag/v1.1.5
