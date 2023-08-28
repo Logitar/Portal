@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Application.Configurations.Queries;
 using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.Application.Configurations;
 
@@ -14,7 +13,7 @@ internal class ConfigurationService : IConfigurationService
     _pipeline = pipeline;
   }
 
-  public async Task<Session> InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<InitializeConfigurationResult> InitializeAsync(InitializeConfigurationPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new InitializeConfigurationCommand(payload), cancellationToken);
   }

@@ -1,10 +1,10 @@
 import type { Configuration, IsConfigurationInitializedResult } from "@/types/configuration";
 import type { InitializeConfigurationPayload, UpdateConfigurationPayload } from "@/types/configuration/payloads";
-import type { UserProfile } from "@/types/users";
+import type { InitializeConfigurationResult } from "@/types/configuration";
 import { get, patch, post } from ".";
 
-export async function initializeConfiguration(payload: InitializeConfigurationPayload): Promise<UserProfile> {
-  return (await post<InitializeConfigurationPayload, UserProfile>("/api/configuration", payload)).data;
+export async function initializeConfiguration(payload: InitializeConfigurationPayload): Promise<InitializeConfigurationResult> {
+  return (await post<InitializeConfigurationPayload, InitializeConfigurationResult>("/api/configuration", payload)).data;
 }
 
 export async function isConfigurationInitialized(): Promise<IsConfigurationInitializedResult> {

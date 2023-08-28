@@ -2,7 +2,6 @@
 import { computed, inject, onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import LoggingSettingsEdit from "@/components/configuration/LoggingSettingsEdit.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
@@ -12,8 +11,10 @@ import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration, updateConfiguration } from "@/api/configuration";
+import { useConfigurationStore } from "@/stores/configuration";
 
 const { t } = useI18n();
+const configurationStore = useConfigurationStore();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
 
@@ -81,14 +82,15 @@ const onSubmit = handleSubmit(async () => {
   }
 });
 
-const route = useRoute();
 onMounted(async () => {
+  if (configurationStore.toast) {
+    toasts.success(configurationStore.toast);
+    configurationStore.toast = undefined;
+  }
   try {
-    const configuration = await readConfiguration();
+    const configuration = configurationStore.configuration ?? (await readConfiguration());
+    configurationStore.configuration = undefined;
     setModel(configuration);
-    if (route.query.status === "initialized") {
-      toasts.success("configuration.initialized");
-    }
   } catch (e) {
     handleError(e);
   }

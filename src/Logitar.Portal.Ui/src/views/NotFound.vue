@@ -13,7 +13,7 @@ const { t } = useI18n();
         <hr class="my-4" />
         <p>{{ t("notFound.help") }}</p>
         <p class="lead">
-          <RouterLink :to="{ name: 'Home' }" class="btn btn-primary btn-lg" role="button">
+          <RouterLink :to="{ name: 'Dashboard' }" class="btn btn-primary btn-lg" role="button">
             <font-awesome-icon icon="fas fa-home" /> {{ t("notFound.link") }}
           </RouterLink>
         </p>

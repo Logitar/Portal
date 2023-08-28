@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
@@ -21,7 +20,7 @@ public class ConfigurationController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult<User>> InitializeAsync([FromBody] Models.Configuration.InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<Models.Configuration.InitializeConfigurationResult>> InitializeAsync([FromBody] Models.Configuration.InitializeConfigurationPayload payload, CancellationToken cancellationToken)
   {
     Contracts.Configurations.InitializeConfigurationPayload initializePayload = new()
     {
@@ -32,14 +31,14 @@ public class ConfigurationController : ControllerBase
         CustomAttributes = HttpContext.GetSessionCustomAttributes()
       }
     };
-    Session session = await _configurationService.InitializeAsync(initializePayload, cancellationToken);
+    Contracts.Configurations.InitializeConfigurationResult result = await _configurationService.InitializeAsync(initializePayload, cancellationToken);
 
-    HttpContext.SignIn(session);
+    HttpContext.SignIn(result.Session);
 
-    User user = session.User;
+    User user = result.Session.User;
     Uri uri = new($"{Request.Scheme}://{Request.Host}/api/users/{user.Id}");
 
-    return Created(uri, user);
+    return Created(uri, new Models.Configuration.InitializeConfigurationResult(result));
   }
 
   [HttpGet("initialized")]

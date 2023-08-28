@@ -11,7 +11,7 @@ defineProps<{
 <template>
   <footer class="bg-dark">
     <div class="fluid">
-      <RouterLink :to="{ name: 'Home' }" class="text-light">
+      <RouterLink :to="{ name: 'Dashboard' }" class="text-light">
         <img src="@/assets/img/logo.png" :alt="`${t('brand')} Logo`" height="32" /> {{ t("copyright", { version }) }}
       </RouterLink>
     </div>

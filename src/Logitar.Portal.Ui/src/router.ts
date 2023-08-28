@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "./views/HomeView.vue";
+import { isConfigurationInitialized } from "./api/configuration";
 import { useAccountStore } from "@/stores/account";
 import { useConfigurationStore } from "@/stores/configuration";
 
@@ -7,24 +7,24 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.MODE === "development" ? import.meta.env.BASE_URL : "/app"),
   routes: [
     {
-      name: "Home",
+      name: "Dashboard",
       path: "/",
-      component: HomeView,
-      meta: { isPublic: true },
+      // route level code-splitting
+      // this generates a separate chunk (Dashboard.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import("./views/Dashboard.vue"),
     },
     // Configuration
-    {
-      name: "Setup",
-      path: "/setup",
-      // route level code-splitting
-      // this generates a separate chunk (InitializeConfiguration.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import("./views/configuration/InitializeConfiguration.vue"),
-    },
     {
       name: "ConfigurationEdit",
       path: "/configuration",
       component: () => import("./views/configuration/ConfigurationEdit.vue"),
+    },
+    {
+      name: "Setup",
+      path: "/setup",
+      component: () => import("./views/configuration/ConfigurationInit.vue"),
+      meta: { isPublic: true },
     },
     // Users
     {
@@ -69,7 +69,18 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
+  const configuration = useConfigurationStore();
+  if (typeof configuration.isInitialized === "undefined") {
+    const result = await isConfigurationInitialized();
+    configuration.isInitialized = result.isInitialized;
+  }
+  if (configuration.isInitialized === false && to.name !== "Setup") {
+    return { name: "Setup" };
+  } else if (configuration.isInitialized === true && to.name === "Setup") {
+    return { name: "Dashboard" };
+  }
+
   const account = useAccountStore();
   if (!to.meta.isPublic && !account.authenticated) {
     return { name: "SignIn", query: { redirect: to.fullPath } };

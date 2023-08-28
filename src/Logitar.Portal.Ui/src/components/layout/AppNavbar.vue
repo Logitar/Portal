@@ -10,14 +10,15 @@ import type { Locale } from "@/types/i18n";
 import { orderBy } from "@/helpers/arrayUtils";
 import { combineURL } from "@/helpers/stringUtils";
 import { useAccountStore } from "@/stores/account";
+import { useConfigurationStore } from "@/stores/configuration";
 import { useI18nStore } from "@/stores/i18n";
 
-const { availableLocales, locale, t } = useI18n();
-const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
-
 const account = useAccountStore();
+const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
+const configuration = useConfigurationStore();
 const i18n = useI18nStore();
 const router = useRouter();
+const { availableLocales, locale, t } = useI18n();
 
 const props = defineProps<{
   environment: string;
@@ -73,7 +74,7 @@ watchEffect(() => {
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
     <div class="container-fluid">
-      <RouterLink :to="{ name: 'Home' }" class="navbar-brand">
+      <RouterLink :to="{ name: 'Dashboard' }" class="navbar-brand">
         <img src="@/assets/img/logo.png" :alt="`${t('brand')} Logo`" height="32" />
         {{ t("brand") }}
         <span v-if="environmentName !== 'production'" class="badge text-bg-warning">{{ environmentName }}</span>
@@ -136,7 +137,9 @@ watchEffect(() => {
           </template>
           <template v-if="account.authenticated">
             <li class="nav-item">
-              <RouterLink :to="{ name: 'Configuration' }" class="nav-link"><font-awesome-icon icon="fas fa-cog" /> {{ t("configuration.title") }}</RouterLink>
+              <RouterLink :to="{ name: 'ConfigurationEdit' }" class="nav-link"
+                ><font-awesome-icon icon="fas fa-cog" /> {{ t("configuration.title") }}</RouterLink
+              >
             </li>
             <li class="nav-item d-block d-lg-none">
               <RouterLink class="nav-link" :to="{ name: 'Profile' }">
@@ -165,7 +168,7 @@ watchEffect(() => {
               </ul>
             </li>
           </template>
-          <template v-else>
+          <template v-else-if="configuration.isInitialized">
             <li class="nav-item">
               <RouterLink :to="{ name: 'SignIn' }" class="nav-link">
                 <font-awesome-icon icon="fas fa-arrow-right-to-bracket" /> {{ t("users.signIn.title") }}

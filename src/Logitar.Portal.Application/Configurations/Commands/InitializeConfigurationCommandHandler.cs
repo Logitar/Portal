@@ -12,17 +12,19 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal class InitializeConfigurationCommandHandler : IRequestHandler<InitializeConfigurationCommand, Session>
+internal class InitializeConfigurationCommandHandler : IRequestHandler<InitializeConfigurationCommand, InitializeConfigurationResult>
 {
+  private readonly IConfigurationQuerier _configurationQuerier;
   private readonly IConfigurationRepository _configurationRepository;
   private readonly IPasswordService _passwordService;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
-  public InitializeConfigurationCommandHandler(IConfigurationRepository configurationRepository, IPasswordService passwordService,
-    ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserRepository userRepository)
+  public InitializeConfigurationCommandHandler(IConfigurationQuerier configurationQuerier, IConfigurationRepository configurationRepository,
+    IPasswordService passwordService, ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserRepository userRepository)
   {
+    _configurationQuerier = configurationQuerier;
     _configurationRepository = configurationRepository;
     _passwordService = passwordService;
     _sessionQuerier = sessionQuerier;
@@ -30,7 +32,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     _userRepository = userRepository;
   }
 
-  public async Task<Session> Handle(InitializeConfigurationCommand command, CancellationToken cancellationToken)
+  public async Task<InitializeConfigurationResult> Handle(InitializeConfigurationCommand command, CancellationToken cancellationToken)
   {
     ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
     if (configuration != null)
@@ -77,6 +79,10 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       sessionResult.RefreshToken = new RefreshToken(session, secretBytes).Encode();
     }
 
-    return sessionResult;
+    return new InitializeConfigurationResult
+    {
+      Configuration = await _configurationQuerier.ReadAsync(configuration, cancellationToken),
+      Session = sessionResult
+    };
   }
 }
