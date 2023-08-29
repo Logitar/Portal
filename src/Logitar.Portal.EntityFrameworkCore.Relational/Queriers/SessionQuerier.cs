@@ -70,14 +70,9 @@ internal class SessionQuerier : ISessionQuerier
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Sessions.Table)
       .Join(Db.Users.UserId, Db.Sessions.UserId)
+      .ApplyIdInFilter(Db.Sessions.AggregateId, payload.IdIn)
       .SelectAll(Db.Sessions.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search);
-
-    if (payload.IdIn.Any())
-    {
-      IEnumerable<string> aggregateIds = payload.IdIn.Distinct().Select(id => new AggregateId(id).Value);
-      builder = builder.Where(Db.Sessions.AggregateId, Operators.IsIn(aggregateIds.ToArray()));
-    }
 
     if (realm != null)
     {

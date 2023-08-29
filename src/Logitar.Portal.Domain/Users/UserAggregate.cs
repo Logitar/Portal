@@ -111,7 +111,7 @@ public class UserAggregate : AggregateRoot
       }
     }
   }
-  public bool IsConfirmed => Email?.IsVerified == true || Phone?.IsVerified == true;
+  public bool IsConfirmed => Address?.IsVerified == true || Email?.IsVerified == true || Phone?.IsVerified == true;
 
   public string? FirstName
   {

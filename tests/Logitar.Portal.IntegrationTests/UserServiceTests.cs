@@ -285,6 +285,26 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(2, exception.Actual);
   }
 
+  [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
+  public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
+  {
+    SearchUsersPayload payload = new()
+    {
+      IdIn = new[] { Guid.Empty }
+    };
+
+    SearchResults<User> results = await _userService.SearchAsync(payload);
+
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
+  public async Task SearchAsync_it_should_return_the_correct_results()
+  {
+    Assert.Fail("TODO(fpion): implement");
+  }
+
   [Fact(DisplayName = "SignOutAsync: it should sign-out the user.")]
   public async Task SignOutAsync_it_should_sign_out_the_user()
   {

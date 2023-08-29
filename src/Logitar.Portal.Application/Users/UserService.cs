@@ -34,9 +34,9 @@ internal class UserService : IUserService
     throw new NotImplementedException();
   }
 
-  public Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new SearchUsersQuery(payload), cancellationToken);
   }
 
   public async Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken)

@@ -276,7 +276,11 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
           new("test")
         }
       },
-      IdIn = new[] { session1.Id.ToGuid(), session2.Id.ToGuid(), session3.Id.ToGuid(), session4.Id.ToGuid() },
+      IdIn = new[]
+      {
+        otherUser.Id.ToGuid(), persistent.Id.ToGuid(), session1.Id.ToGuid(), session2.Id.ToGuid(),
+        session3.Id.ToGuid(), session4.Id.ToGuid(), signedOut.Id.ToGuid()
+      },
       Realm = _realm.UniqueSlug,
       UserId = _user.Id.ToGuid(),
       IsActive = true,
