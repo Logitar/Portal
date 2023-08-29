@@ -22,6 +22,16 @@ internal static class Db
     public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
   }
 
+  public static class Sessions
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Sessions));
+
+    public static readonly ColumnId AggregateId = new(nameof(SessionEntity.AggregateId), Table);
+    public static readonly ColumnId IsActive = new(nameof(SessionEntity.IsActive), Table);
+    public static readonly ColumnId IsPersistent = new(nameof(SessionEntity.IsPersistent), Table);
+    public static readonly ColumnId UserId = new(nameof(SessionEntity.UserId), Table);
+  }
+
   public static class Users
   {
     public static readonly TableId Table = new(nameof(PortalContext.Users));
@@ -29,5 +39,6 @@ internal static class Db
     public static readonly ColumnId AggregateId = new(nameof(UserEntity.AggregateId), Table);
     public static readonly ColumnId TenantId = new(nameof(UserEntity.TenantId), Table);
     public static readonly ColumnId UniqueNameNormalized = new(nameof(UserEntity.UniqueNameNormalized), Table);
+    public static readonly ColumnId UserId = new(nameof(UserEntity.UserId), Table);
   }
 }

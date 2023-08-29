@@ -5,5 +5,6 @@ namespace Logitar.Portal.Application.Realms;
 
 public interface IRealmQuerier
 {
-  Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken);
+  Task<Realm?> FindAsync(string idOrUniqueSlug, CancellationToken cancellationToken = default);
+  Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken = default);
 }

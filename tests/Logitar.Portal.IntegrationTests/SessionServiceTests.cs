@@ -46,11 +46,11 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
       Birthdate = Faker.Person.DateOfBirth,
       Gender = new Gender(Faker.Person.Gender.ToString()),
       Locale = new Locale(Faker.Locale),
-      //TimeZone = new TimeZoneEntry("America/Montreal"), // TODO(fpion): implement
-      //Picture = new Uri(Faker.Person.Avatar), // TODO(fpion): implement
-      //Website = _realm.Url // TODO(fpion): implement
+      TimeZone = new TimeZoneEntry("America/Montreal"),
+      Picture = new Uri(Faker.Person.Avatar),
+      Website = _realm.Url
     };
-    //_user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}"); // TODO(fpion): implement
+    _user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}");
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
     _user.Update(ActorId);
 
@@ -129,6 +129,20 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<AggregateNotFoundException<UserAggregate>>(async () => await _sessionService.CreateAsync(payload));
     Assert.Equal(payload.UserId.ToString(), exception.Id);
     Assert.Equal(nameof(payload.UserId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should read the session by ID.")]
+  public async Task ReadAsync_it_should_read_the_session_by_Id()
+  {
+    Session? session = await _sessionService.ReadAsync(_session.Id.ToGuid());
+    Assert.NotNull(session);
+    Assert.Equal(_session.Id.ToGuid(), session.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return null when the session is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_the_session_is_not_found()
+  {
+    Assert.Null(await _sessionService.ReadAsync(Guid.Empty));
   }
 
   [Fact(DisplayName = "RenewAsync: it should renew a Portal session.")]

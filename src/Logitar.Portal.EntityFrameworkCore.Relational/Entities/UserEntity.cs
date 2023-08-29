@@ -137,6 +137,12 @@ internal record UserEntity : AggregateEntity
 
   public void Update(UserUpdatedEvent updated)
   {
+    base.Update(updated);
+
+    if (updated.UniqueName != null)
+    {
+      UniqueName = updated.UniqueName;
+    }
     if (updated.Password != null)
     {
       Password = updated.Password.Encode();
@@ -193,5 +199,36 @@ internal record UserEntity : AggregateEntity
     {
       Locale = updated.Locale.Value?.Code;
     }
+    if (updated.TimeZone != null)
+    {
+      TimeZone = updated.TimeZone.Value?.Id;
+    }
+
+    if (updated.Picture != null)
+    {
+      Picture = updated.Picture.Value?.ToString();
+    }
+    if (updated.Profile != null)
+    {
+      Profile = updated.Profile.Value?.ToString();
+    }
+    if (updated.Website != null)
+    {
+      Website = updated.Website.Value?.ToString();
+    }
+
+    foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
+    {
+      if (customAttribute.Value == null)
+      {
+        CustomAttributes.Remove(customAttribute.Key);
+      }
+      else
+      {
+        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+      }
+    }
+
+    // TODO(fpion): Roles
   }
 }

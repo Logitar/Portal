@@ -20,7 +20,9 @@ public static class DependencyInjectionExtensions
       .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(new JsonConverter[]
       {
+        new GenderConverter(),
         new LocaleConverter(),
+        new TimeZoneEntryConverter(),
         serviceProvider.GetRequiredService<PasswordConverter>()
       }))
       .AddSingleton<IPasswordService, PasswordService>()

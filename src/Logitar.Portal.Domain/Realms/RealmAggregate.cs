@@ -238,9 +238,16 @@ public class RealmAggregate : AggregateRoot
 
   public void Delete(ActorId actorId = default) => ApplyChange(new RealmDeletedEvent(actorId));
 
-  // TODO(fpion): RemoveClaimMapping
-
-  // TODO(fpion): RemoveCustomAttribute
+  public void RemoveClaimMapping(string key)
+  {
+    key = key.Trim();
+    if (_claimMappings.ContainsKey(key))
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.ClaimMappings[key] = null;
+      _claimMappings.Remove(key);
+    }
+  }
 
   public void RemoveCustomAttribute(string key)
   {
@@ -250,6 +257,19 @@ public class RealmAggregate : AggregateRoot
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.CustomAttributes[key] = null;
       _customAttributes.Remove(key);
+    }
+  }
+
+  public void SetClaimMapping(string key, ReadOnlyClaimMapping claimMapping)
+  {
+    key = key.Trim();
+    new CustomAttributeKeyValidator("Key").ValidateAndThrow(key);
+
+    if (!_claimMappings.TryGetValue(key, out ReadOnlyClaimMapping? existingClaimMapping) || claimMapping != existingClaimMapping)
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.ClaimMappings[key] = claimMapping;
+      _claimMappings[key] = claimMapping;
     }
   }
 

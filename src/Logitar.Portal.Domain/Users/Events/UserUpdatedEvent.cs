@@ -7,6 +7,7 @@ namespace Logitar.Portal.Domain.Users.Events;
 
 public record UserUpdatedEvent : DomainEvent, INotification
 {
+  public string? UniqueName { get; set; }
   public Password? Password { get; set; }
 
   public Modification<EmailAddress>? Email { get; set; }
@@ -20,4 +21,13 @@ public record UserUpdatedEvent : DomainEvent, INotification
   public Modification<DateTime?>? Birthdate { get; set; }
   public Modification<Gender>? Gender { get; set; }
   public Modification<Locale>? Locale { get; set; }
+  public Modification<TimeZoneEntry>? TimeZone { get; set; }
+
+  public Modification<Uri>? Picture { get; set; }
+  public Modification<Uri>? Profile { get; set; }
+  public Modification<Uri>? Website { get; set; }
+
+  public Dictionary<string, string?> CustomAttributes { get; init; } = new();
+
+  // TODO(fpion): Roles
 }

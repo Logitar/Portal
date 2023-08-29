@@ -13,6 +13,9 @@ namespace Logitar.Portal.Domain.Users;
 
 public class UserAggregate : AggregateRoot
 {
+  private readonly Dictionary<string, string> _customAttributes = new();
+  // TODO(fpion): _roles
+
   private Password? _password = null;
 
   private EmailAddress? _email = null;
@@ -25,6 +28,11 @@ public class UserAggregate : AggregateRoot
   private DateTime? _birthdate = null;
   private Gender? _gender = null;
   private Locale? _locale = null;
+  private TimeZoneEntry? _timeZone = null;
+
+  private Uri? _picture = null;
+  private Uri? _profile = null;
+  private Uri? _website = null;
 
   public UserAggregate(AggregateId id) : base(id)
   {
@@ -202,6 +210,63 @@ public class UserAggregate : AggregateRoot
       }
     }
   }
+  public TimeZoneEntry? TimeZone
+  {
+    get => _timeZone;
+    set
+    {
+      if (value != _timeZone)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.TimeZone = new Modification<TimeZoneEntry>(value);
+        _timeZone = value;
+      }
+    }
+  }
+
+  public Uri? Picture
+  {
+    get => _picture;
+    set
+    {
+      if (value != _picture)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Picture = new Modification<Uri>(value);
+        _picture = value;
+      }
+    }
+  }
+  public Uri? Profile
+  {
+    get => _profile;
+    set
+    {
+      if (value != _profile)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Profile = new Modification<Uri>(value);
+        _profile = value;
+      }
+    }
+  }
+  public Uri? Website
+  {
+    get => _website;
+    set
+    {
+      if (value != _website)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Website = new Modification<Uri>(value);
+        _website = value;
+      }
+    }
+  }
+
+  public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
+
+  // TODO(fpion): Roles
 
   public void Disable(ActorId actorId = default)
   {
@@ -221,11 +286,49 @@ public class UserAggregate : AggregateRoot
   }
   protected virtual void Apply(UserEnabledEvent _) => IsDisabled = false;
 
+  public void RemoveCustomAttribute(string key)
+  {
+    key = key.Trim();
+    if (_customAttributes.ContainsKey(key))
+    {
+      UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+      updated.CustomAttributes[key] = null;
+      _customAttributes.Remove(key);
+    }
+  }
+
+  public void SetCustomAttribute(string key, string value)
+  {
+    key = key.Trim();
+    value = value.Trim();
+    new CustomAttributeValidator().ValidateAndThrow(key, value);
+
+    if (!_customAttributes.TryGetValue(key, out string? existingValue) || value != existingValue)
+    {
+      UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+      updated.CustomAttributes[key] = value;
+      _customAttributes[key] = value;
+    }
+  }
+
   public void SetPassword(Password password)
   {
     UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
     updated.Password = password;
     _password = password;
+  }
+
+  public void SetUniqueName(IUniqueNameSettings uniqueNameSettings, string uniqueName)
+  {
+    uniqueName = uniqueName.Trim();
+    new UniqueNameValidator(uniqueNameSettings, nameof(UniqueName)).ValidateAndThrow(uniqueName);
+
+    if (uniqueName != UniqueName)
+    {
+      UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+      updated.UniqueName = uniqueName;
+      UniqueName = uniqueName;
+    }
   }
 
   public SessionAggregate SignIn(IUserSettings userSettings, Password? secret = null, ActorId? actorId = null)
@@ -276,6 +379,10 @@ public class UserAggregate : AggregateRoot
 
   protected virtual void Apply(UserUpdatedEvent updated)
   {
+    if (updated.UniqueName != null)
+    {
+      UniqueName = updated.UniqueName;
+    }
     if (updated.Password != null)
     {
       _password = updated.Password;
@@ -319,6 +426,37 @@ public class UserAggregate : AggregateRoot
     {
       _locale = updated.Locale.Value;
     }
+    if (updated.TimeZone != null)
+    {
+      _timeZone = updated.TimeZone.Value;
+    }
+
+    if (updated.Picture != null)
+    {
+      _picture = updated.Picture.Value;
+    }
+    if (updated.Profile != null)
+    {
+      _profile = updated.Profile.Value;
+    }
+    if (updated.Website != null)
+    {
+      _website = updated.Website.Value;
+    }
+
+    foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
+    {
+      if (customAttribute.Value == null)
+      {
+        _customAttributes.Remove(customAttribute.Key);
+      }
+      else
+      {
+        _customAttributes[customAttribute.Key] = customAttribute.Value;
+      }
+    }
+
+    // TODO(fpion): Roles
   }
 
   protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()
