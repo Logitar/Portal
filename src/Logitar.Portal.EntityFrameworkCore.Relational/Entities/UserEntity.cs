@@ -110,6 +110,24 @@ internal record UserEntity : AggregateEntity
   public List<RoleEntity> Roles { get; } = new();
   public List<SessionEntity> Sessions { get; } = new();
 
+  public void Disable(UserDisabledEvent disabled)
+  {
+    Update(disabled);
+
+    DisabledBy = disabled.ActorId.Value;
+    DisabledOn = disabled.OccurredOn;
+    IsDisabled = true;
+  }
+
+  public void Enable(UserEnabledEvent enabled)
+  {
+    Update(enabled);
+
+    DisabledBy = null;
+    DisabledOn = null;
+    IsDisabled = false;
+  }
+
   public void SignIn(UserSignedInEvent signedIn)
   {
     Update(signedIn);

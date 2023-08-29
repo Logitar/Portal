@@ -26,6 +26,17 @@ internal static class FluentValidationExtensions
     return !string.IsNullOrEmpty(identifier) && !char.IsDigit(identifier.First()) && identifier.All(c => char.IsLetterOrDigit(c) || c == '_');
   }
 
+  public static IRuleBuilderOptions<T, string> Slug<T>(this IRuleBuilder<T, string> ruleBuilder)
+  {
+    return ruleBuilder.Must(BeAValidSlug)
+      .WithErrorCode(BuildErrorCode(nameof(Slug)))
+      .WithMessage("'{PropertyName}' must be composed of non-empty alphanumeric words separated by hyphens (-).");
+  }
+  private static bool BeAValidSlug(string slug)
+  {
+    return slug.Split('-').All(word => !string.IsNullOrEmpty(word) && word.All(char.IsLetterOrDigit));
+  }
+
   public static IRuleBuilderOptions<T, TProperty> WithPropertyName<T, TProperty>(this IRuleBuilderOptions<T, TProperty> options, string? propertyName)
   {
     return propertyName == null ? options : options.WithName(propertyName);

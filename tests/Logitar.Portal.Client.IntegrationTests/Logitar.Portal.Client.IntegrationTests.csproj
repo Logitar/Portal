@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -28,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Logitar.Portal.Client\Logitar.Portal.Client.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

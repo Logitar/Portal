@@ -22,6 +22,9 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
     _sqlHelper = sqlHelper;
   }
 
+  public async Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
+    => await base.LoadAsync<UserAggregate>(new AggregateId(id), cancellationToken);
+
   public async Task<UserAggregate?> LoadAsync(string? tenantId, string uniqueName, CancellationToken cancellationToken)
   {
     tenantId = tenantId?.CleanTrim();

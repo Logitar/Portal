@@ -40,6 +40,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Client", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Client.IntegrationTests", "tests\Logitar.Portal.Client.IntegrationTests\Logitar.Portal.Client.IntegrationTests.csproj", "{53FFA964-A1A1-4DA1-B2ED-3F004C08D1FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Domain.UnitTests", "tests\Logitar.Portal.Domain.UnitTests\Logitar.Portal.Domain.UnitTests.csproj", "{0896C155-EBAF-4274-8A2B-45CA1E2E8393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{D703064F-9DE7-47AF-B756-C5D9AD0671CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +98,14 @@ Global
 		{53FFA964-A1A1-4DA1-B2ED-3F004C08D1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53FFA964-A1A1-4DA1-B2ED-3F004C08D1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53FFA964-A1A1-4DA1-B2ED-3F004C08D1FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0896C155-EBAF-4274-8A2B-45CA1E2E8393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0896C155-EBAF-4274-8A2B-45CA1E2E8393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0896C155-EBAF-4274-8A2B-45CA1E2E8393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0896C155-EBAF-4274-8A2B-45CA1E2E8393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D703064F-9DE7-47AF-B756-C5D9AD0671CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D703064F-9DE7-47AF-B756-C5D9AD0671CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D703064F-9DE7-47AF-B756-C5D9AD0671CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D703064F-9DE7-47AF-B756-C5D9AD0671CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +113,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E190D5F9-E245-4EA4-845A-F6E9006F0208} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
 		{53FFA964-A1A1-4DA1-B2ED-3F004C08D1FA} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
+		{0896C155-EBAF-4274-8A2B-45CA1E2E8393} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
+		{D703064F-9DE7-47AF-B756-C5D9AD0671CB} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55C506C2-F420-403F-B2E6-A47E2DF4C4B6}

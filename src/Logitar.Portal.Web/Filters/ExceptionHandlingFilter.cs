@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -23,6 +24,20 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     if (_handlers.TryGetValue(context.Exception.GetType(), out Func<ExceptionContext, IActionResult>? handler))
     {
       context.Result = handler(context);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is AggregateNotFoundException aggregateNotFound)
+    {
+      context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is InvalidCredentialsException)
+    {
+      context.Result = new BadRequestObjectResult(new
+      {
+        ErrorCode = "InvalidCredentials",
+        ErrorMessage = "The specified credentials are not valid."
+      });
       context.ExceptionHandled = true;
     }
     else

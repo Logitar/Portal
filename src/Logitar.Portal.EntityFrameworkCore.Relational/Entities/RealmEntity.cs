@@ -1,9 +1,24 @@
-﻿using Logitar.Portal.Domain.Realms;
+﻿using Logitar.Portal.Contracts.Settings;
+using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Realms.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 internal record RealmEntity : AggregateEntity
 {
+  public RealmEntity(RealmCreatedEvent created) : base(created)
+  {
+    UniqueSlug = created.UniqueSlug;
+
+    Secret = created.Secret;
+
+    RequireUniqueEmail = created.RequireUniqueEmail;
+    RequireConfirmedAccount = created.RequireConfirmedAccount;
+
+    SetUniqueNameSettings(created.UniqueNameSettings);
+    SetPasswordSettings(created.PasswordSettings);
+  }
+
   private RealmEntity() : base()
   {
   }
@@ -68,5 +83,93 @@ internal record RealmEntity : AggregateEntity
         CustomAttributes = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? new();
       }
     }
+  }
+
+  public void Update(RealmUpdatedEvent updated)
+  {
+    base.Update(updated);
+
+    if (updated.UniqueSlug != null)
+    {
+      UniqueSlug = updated.UniqueSlug;
+    }
+    if (updated.DisplayName != null)
+    {
+      DisplayName = updated.DisplayName.Value;
+    }
+    if (updated.Description != null)
+    {
+      Description = updated.Description.Value;
+    }
+
+    if (updated.DefaultLocale != null)
+    {
+      DefaultLocale = updated.DefaultLocale.Value?.Code;
+    }
+    if (updated.Secret != null)
+    {
+      Secret = updated.Secret;
+    }
+    if (updated.Url != null)
+    {
+      Url = updated.Url.Value?.ToString();
+    }
+
+    if (updated.RequireUniqueEmail.HasValue)
+    {
+      RequireUniqueEmail = updated.RequireUniqueEmail.Value;
+    }
+    if (updated.RequireConfirmedAccount.HasValue)
+    {
+      RequireConfirmedAccount = updated.RequireConfirmedAccount.Value;
+    }
+
+    if (updated.UniqueNameSettings != null)
+    {
+      SetUniqueNameSettings(updated.UniqueNameSettings);
+    }
+    if (updated.PasswordSettings != null)
+    {
+      SetPasswordSettings(updated.PasswordSettings);
+    }
+
+    foreach (KeyValuePair<string, ReadOnlyClaimMapping?> claimMapping in updated.ClaimMappings)
+    {
+      if (claimMapping.Value == null)
+      {
+        ClaimMappings.Remove(claimMapping.Key);
+      }
+      else
+      {
+        ClaimMappings[claimMapping.Key] = claimMapping.Value;
+      }
+    }
+
+    foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
+    {
+      if (customAttribute.Value == null)
+      {
+        CustomAttributes.Remove(customAttribute.Key);
+      }
+      else
+      {
+        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+      }
+    }
+  }
+
+  private void SetUniqueNameSettings(IUniqueNameSettings uniqueNameSettings)
+  {
+    AllowedUniqueNameCharacters = uniqueNameSettings.AllowedCharacters;
+  }
+  private void SetPasswordSettings(IPasswordSettings passwordSettings)
+  {
+    RequiredPasswordLength = passwordSettings.RequiredLength;
+    RequiredPasswordUniqueChars = passwordSettings.RequiredUniqueChars;
+    PasswordsRequireNonAlphanumeric = passwordSettings.RequireNonAlphanumeric;
+    PasswordsRequireLowercase = passwordSettings.RequireLowercase;
+    PasswordsRequireUppercase = passwordSettings.RequireUppercase;
+    PasswordsRequireDigit = passwordSettings.RequireDigit;
+    PasswordStrategy = passwordSettings.Strategy;
   }
 }

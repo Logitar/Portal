@@ -4,11 +4,11 @@ namespace Logitar.Portal.Domain.Settings;
 
 public record ReadOnlyUserSettings : IUserSettings
 {
-  public ReadOnlyUserSettings(bool requireUniqueEmail = false, bool requireConfirmedAccout = false,
+  public ReadOnlyUserSettings(bool requireUniqueEmail = false, bool requireConfirmedAccount = false,
     IUniqueNameSettings? uniqueNameSettings = null, IPasswordSettings? passwordSettings = null)
   {
     RequireUniqueEmail = requireUniqueEmail;
-    RequireConfirmedAccount = requireConfirmedAccout;
+    RequireConfirmedAccount = requireConfirmedAccount;
 
     UniqueNameSettings = uniqueNameSettings ?? new ReadOnlyUniqueNameSettings();
     PasswordSettings = passwordSettings ?? new ReadOnlyPasswordSettings();

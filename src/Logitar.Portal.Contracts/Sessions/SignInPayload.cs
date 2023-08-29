@@ -2,7 +2,7 @@
 
 public record SignInPayload
 {
-  public string Realm { get; set; } = string.Empty;
+  public string? Realm { get; set; }
 
   public string UniqueName { get; set; } = string.Empty;
   public string Password { get; set; } = string.Empty;

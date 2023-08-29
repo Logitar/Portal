@@ -129,6 +129,24 @@ public class UserAggregate : AggregateRoot
     }
   }
 
+  public void Disable(ActorId actorId = default)
+  {
+    if (!IsDisabled)
+    {
+      ApplyChange(new UserDisabledEvent(actorId));
+    }
+  }
+  protected virtual void Apply(UserDisabledEvent _) => IsDisabled = true;
+
+  public void Enable(ActorId actorId = default)
+  {
+    if (IsDisabled)
+    {
+      ApplyChange(new UserEnabledEvent(actorId));
+    }
+  }
+  protected virtual void Apply(UserEnabledEvent _) => IsDisabled = false;
+
   public void SetPassword(Password password)
   {
     UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
