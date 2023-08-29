@@ -296,6 +296,8 @@ public class UserAggregate : AggregateRoot
 
   // TODO(fpion): Roles
 
+  public void Delete(ActorId actorId = default) => ApplyChange(new UserDeletedEvent(actorId));
+
   public void Disable(ActorId actorId = default)
   {
     if (!IsDisabled)

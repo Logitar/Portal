@@ -18,9 +18,9 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new CreateUserCommand(payload), cancellationToken);
   }
 
-  public Task<User?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<User?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new DeleteUserCommand(id), cancellationToken);
   }
 
   public Task<User?> ReadAsync(Guid? id, string? realm, string? uniqueName, CancellationToken cancellationToken)

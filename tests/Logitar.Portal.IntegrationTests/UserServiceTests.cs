@@ -5,7 +5,9 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal;
@@ -216,6 +218,28 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(_realm.Id.Value, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should delete the user.")]
+  public async Task DeleteAsync_it_should_delete_the_user()
+  {
+    SessionAggregate session = new(_user, actorId: ActorId);
+    session.SignOut(ActorId);
+    await AggregateRepository.SaveAsync(session);
+
+    User? user = await _userService.DeleteAsync(_user.Id.ToGuid());
+
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+
+    Assert.Null(await PortalContext.Sessions.SingleOrDefaultAsync(x => x.AggregateId == session.Id.Value));
+    Assert.Null(await PortalContext.Users.SingleOrDefaultAsync(x => x.AggregateId == _user.Id.Value));
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should return null when the user is not found.")]
+  public async Task DeleteAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.DeleteAsync(Guid.Empty));
   }
 
   private static void AssertEqual(AddressPayload? payload, Address? address)

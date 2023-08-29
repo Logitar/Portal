@@ -44,6 +44,8 @@ public class SessionAggregate : AggregateRoot
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
+  public void Delete(ActorId actorId = default) => ApplyChange(new SessionDeletedEvent(actorId));
+
   public void RemoveCustomAttribute(string key)
   {
     key = key.Trim();
