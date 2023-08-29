@@ -164,6 +164,10 @@ internal record UserEntity : AggregateEntity
     {
       FirstName = updated.FirstName.Value;
     }
+    if (updated.MiddleName != null)
+    {
+      MiddleName = updated.MiddleName.Value;
+    }
     if (updated.LastName != null)
     {
       LastName = updated.LastName.Value;
@@ -171,6 +175,10 @@ internal record UserEntity : AggregateEntity
     if (updated.FullName != null)
     {
       FullName = updated.FullName.Value;
+    }
+    if (updated.Nickname != null)
+    {
+      Nickname = updated.Nickname.Value;
     }
 
     if (updated.Locale != null)

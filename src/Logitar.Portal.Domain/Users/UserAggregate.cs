@@ -18,7 +18,9 @@ public class UserAggregate : AggregateRoot
   private EmailAddress? _email = null;
 
   private string? _firstName = null;
+  private string? _middleName = null;
   private string? _lastName = null;
+  private string? _nickname = null;
 
   private Locale? _locale = null;
 
@@ -88,8 +90,28 @@ public class UserAggregate : AggregateRoot
       {
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
         updated.FirstName = new Modification<string>(value);
-        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(value, LastName));
+        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(value, MiddleName, LastName));
         _firstName = value;
+      }
+    }
+  }
+  public string? MiddleName
+  {
+    get => _middleName;
+    set
+    {
+      value = value?.CleanTrim();
+      if (value != null)
+      {
+        new PersonNameValidator(nameof(MiddleName)).ValidateAndThrow(value);
+      }
+
+      if (value != _middleName)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.MiddleName = new Modification<string>(value);
+        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(FirstName, value, LastName));
+        _middleName = value;
       }
     }
   }
@@ -108,12 +130,31 @@ public class UserAggregate : AggregateRoot
       {
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
         updated.LastName = new Modification<string>(value);
-        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(FirstName, value));
+        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(FirstName, MiddleName, value));
         _lastName = value;
       }
     }
   }
   public string? FullName { get; private set; }
+  public string? Nickname
+  {
+    get => _nickname;
+    set
+    {
+      value = value?.CleanTrim();
+      if (value != null)
+      {
+        new PersonNameValidator(nameof(Nickname)).ValidateAndThrow(value);
+      }
+
+      if (value != _nickname)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Nickname = new Modification<string>(value);
+        _nickname = value;
+      }
+    }
+  }
 
   public Locale? Locale
   {
@@ -216,6 +257,10 @@ public class UserAggregate : AggregateRoot
     {
       _firstName = updated.FirstName.Value;
     }
+    if (updated.MiddleName != null)
+    {
+      _middleName = updated.MiddleName.Value;
+    }
     if (updated.LastName != null)
     {
       _lastName = updated.LastName.Value;
@@ -223,6 +268,15 @@ public class UserAggregate : AggregateRoot
     if (updated.FullName != null)
     {
       FullName = updated.FullName.Value;
+    }
+    if (updated.Nickname != null)
+    {
+      Nickname = updated.Nickname.Value;
+    }
+
+    if (updated.Locale != null)
+    {
+      _locale = updated.Locale.Value;
     }
   }
 

@@ -12,8 +12,10 @@ public record UserUpdatedEvent : DomainEvent, INotification
   public Modification<EmailAddress>? Email { get; set; }
 
   public Modification<string>? FirstName { get; set; }
+  public Modification<string>? MiddleName { get; set; }
   public Modification<string>? LastName { get; set; }
   public Modification<string>? FullName { get; set; }
+  public Modification<string>? Nickname { get; set; }
 
   public Modification<Locale>? Locale { get; set; }
 }

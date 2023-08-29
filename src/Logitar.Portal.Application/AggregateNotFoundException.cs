@@ -7,9 +7,14 @@ public class AggregateNotFoundException : Exception
 {
   private const string ErrorMessage = "The specified aggregate could not be found.";
 
-  public AggregateNotFoundException(Type type, Guid id, string propertyName)
+  public AggregateNotFoundException(Type type, string id, string propertyName)
     : base(BuildMessage(type, id, propertyName))
   {
+    if (!type.IsSubclassOf(typeof(AggregateRoot)))
+    {
+      throw new ArgumentException($"The type must be a subclass of the '{nameof(AggregateRoot)}' type.", nameof(type));
+    }
+
     TypeName = type.GetName();
     Id = id;
     PropertyName = propertyName;
@@ -20,9 +25,9 @@ public class AggregateNotFoundException : Exception
     get => (string)Data[nameof(TypeName)]!;
     private set => Data[nameof(TypeName)] = value;
   }
-  public Guid Id
+  public string Id
   {
-    get => (Guid)Data[nameof(Id)]!;
+    get => (string)Data[nameof(Id)]!;
     private set => Data[nameof(Id)] = value;
   }
   public string PropertyName
@@ -36,13 +41,13 @@ public class AggregateNotFoundException : Exception
     ErrorCode = "AggregateNotFound"
   };
 
-  private static string BuildMessage(Type type, Guid id, string propertyName)
+  private static string BuildMessage(Type type, string id, string propertyName)
   {
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
     message.Append("TypeName: ").AppendLine(type.GetName());
-    message.Append("Id: ").Append(id).AppendLine();
+    message.Append("Id: ").AppendLine(id);
     message.Append("PropertyName: ").AppendLine(propertyName);
 
     return message.ToString();
@@ -51,10 +56,13 @@ public class AggregateNotFoundException : Exception
 
 public class AggregateNotFoundException<T> : AggregateNotFoundException where T : AggregateRoot
 {
-  public AggregateNotFoundException(AggregateId id, string propertyName) : this(id.ToGuid(), propertyName)
+  public AggregateNotFoundException(AggregateId id, string propertyName) : this(id.Value, propertyName)
   {
   }
-  public AggregateNotFoundException(Guid id, string propertyName) : base(typeof(T), id, propertyName)
+  public AggregateNotFoundException(Guid id, string propertyName) : this(id.ToString(), propertyName)
+  {
+  }
+  public AggregateNotFoundException(string id, string propertyName) : base(typeof(T), id, propertyName)
   {
   }
 }

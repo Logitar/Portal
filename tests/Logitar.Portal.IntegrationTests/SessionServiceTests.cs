@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain;
@@ -38,13 +39,15 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
       Email = new EmailAddress(Faker.Person.Email, isVerified: true),
       FirstName = Faker.Person.FirstName,
       LastName = Faker.Person.LastName,
-      //Birthdate = Faker.Person.DateOfBirth,
-      //Gender = new Gender(Faker.Person.Gender.ToString()),
+      //Birthdate = Faker.Person.DateOfBirth, // TODO(fpion): implement
+      //Gender = new Gender(Faker.Person.Gender.ToString()), // TODO(fpion): implement
       Locale = new Locale(Faker.Locale),
-      //TimeZone = new TimeZoneEntry("America/Montreal"),
-      //Picture = new Uri(Faker.Person.Avatar),
-      //Website = _realm.Url
+      //TimeZone = new TimeZoneEntry("America/Montreal"), // TODO(fpion): implement
+      //Picture = new Uri(Faker.Person.Avatar), // TODO(fpion): implement
+      //Website = _realm.Url // TODO(fpion): implement
     };
+    //_user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}"); // TODO(fpion): implement
+    _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
     _user.Update(ActorId);
   }
 
@@ -70,14 +73,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     Assert.NotNull(session.RefreshToken);
     Assert.Equal(User.Id.ToGuid(), session.User.Id);
 
-    RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
-    SessionEntity? entity = await PortalContext.Sessions.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == refreshToken.Id.Value);
-    Assert.NotNull(entity);
-
-    Assert.NotNull(entity.Secret);
-    Password secret = PasswordService.Decode(entity.Secret);
-    Assert.True(secret.IsMatch(Convert.ToBase64String(refreshToken.Secret)));
+    await AssertSessionSecretAsync(session.RefreshToken);
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a session.")]
@@ -121,7 +117,99 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
       UserId = Guid.Empty
     };
     var exception = await Assert.ThrowsAsync<AggregateNotFoundException<UserAggregate>>(async () => await _sessionService.CreateAsync(payload));
-    Assert.Equal(payload.UserId, exception.Id);
+    Assert.Equal(payload.UserId.ToString(), exception.Id);
     Assert.Equal(nameof(payload.UserId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SignInAsync: it should create a persistent session.")]
+  public async Task SignInAsync_it_should_create_a_persistent_session()
+  {
+    Assert.NotNull(User);
+    SignInPayload payload = new()
+    {
+      UniqueName = User.UniqueName,
+      Password = PasswordString,
+      IsPersistent = true
+    };
+
+    Session session = await _sessionService.SignInAsync(payload);
+    Assert.True(session.IsPersistent);
+    Assert.NotNull(session.RefreshToken);
+    Assert.Equal(User.Id.ToGuid(), session.User.Id);
+
+    await AssertSessionSecretAsync(session.RefreshToken);
+  }
+
+  [Fact(DisplayName = "SignInAsync: it should create a session.")]
+  public async Task SignInAsync_it_should_create_a_session()
+  {
+    SignInPayload payload = new()
+    {
+      Realm = $" {_realm.UniqueSlug.ToLower()} ",
+      UniqueName = $" {_user.UniqueName.ToLower()} ",
+      Password = PasswordString,
+      IsPersistent = false,
+      CustomAttributes = new CustomAttribute[]
+  {
+        new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"),
+        new("IpAddress", Faker.Internet.Ip())
+  }
+    };
+
+    Session session = await _sessionService.SignInAsync(payload);
+
+    Assert.NotEqual(Guid.Empty, session.Id);
+    Assert.Equal(Actor, session.CreatedBy);
+    AssertIsNear(session.CreatedOn);
+    Assert.Equal(Actor, session.UpdatedBy);
+    AssertIsNear(session.UpdatedOn);
+    Assert.True(session.Version >= 1);
+
+    Assert.False(session.IsPersistent);
+    Assert.Null(session.RefreshToken);
+    Assert.True(session.IsActive);
+    Assert.Null(session.SignedOutBy);
+    Assert.Null(session.SignedOutOn);
+    Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
+
+    Assert.Equal(_user.Id.ToGuid(), session.User.Id);
+  }
+
+  [Fact(DisplayName = "SignInAsync: it should throw AggregateNotFoundException when the realm is not found.")]
+  public async Task SignInAsync_it_should_throw_AggregateNotFoundException_when_the_realm_is_not_found()
+  {
+    SignInPayload payload = new()
+    {
+      Realm = $"{_realm.UniqueSlug}-2"
+    };
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _sessionService.SignInAsync(payload));
+    Assert.Equal(payload.Realm, exception.Id);
+    Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SignInAsync: it should throw UserNotFoundException when the user is not found.")]
+  public async Task SignInAsync_it_should_throw_UserNotFoundException_when_the_user_is_not_found()
+  {
+    SignInPayload payload = new()
+    {
+      Realm = _realm.Id.ToGuid().ToString(),
+      UniqueName = $"{_user.UniqueName}2",
+      Password = PasswordString
+    };
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await _sessionService.SignInAsync(payload));
+    Assert.Equal(_realm.ToString(), exception.Realm);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
+  }
+
+  private async Task AssertSessionSecretAsync(string value)
+  {
+    RefreshToken refreshToken = RefreshToken.Decode(value);
+    SessionEntity? entity = await PortalContext.Sessions.AsNoTracking()
+      .SingleOrDefaultAsync(x => x.AggregateId == refreshToken.Id.Value);
+    Assert.NotNull(entity);
+
+    Assert.NotNull(entity.Secret);
+    Password secret = PasswordService.Decode(entity.Secret);
+    Assert.True(secret.IsMatch(Convert.ToBase64String(refreshToken.Secret)));
   }
 }

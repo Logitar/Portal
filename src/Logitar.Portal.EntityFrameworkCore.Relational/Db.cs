@@ -14,6 +14,14 @@ internal static class Db
     public static readonly ColumnId AggregateType = new(nameof(EventEntity.AggregateType), Table);
   }
 
+  public static class Realms
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Realms));
+
+    public static readonly ColumnId AggregateId = new(nameof(RealmEntity.AggregateId), Table);
+    public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
+  }
+
   public static class Users
   {
     public static readonly TableId Table = new(nameof(PortalContext.Users));
