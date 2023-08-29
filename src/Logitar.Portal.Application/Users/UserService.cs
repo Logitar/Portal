@@ -38,9 +38,9 @@ internal class UserService : IUserService
     throw new NotImplementedException();
   }
 
-  public Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new SignOutUserCommand(id), cancellationToken);
   }
 
   public Task<User?> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken)

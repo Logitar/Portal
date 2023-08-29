@@ -7,6 +7,7 @@ using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -240,6 +241,41 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   public async Task DeleteAsync_it_should_return_null_when_the_user_is_not_found()
   {
     Assert.Null(await _userService.DeleteAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "SignOutAsync: it should sign-out the user.")]
+  public async Task SignOutAsync_it_should_sign_out_the_user()
+  {
+    SessionAggregate session1 = new(_user, actorId: ActorId);
+    SessionAggregate session2 = new(_user, actorId: ActorId);
+    SessionAggregate signedOut = new(_user, actorId: ActorId);
+    signedOut.SignOut(ActorId);
+    await AggregateRepository.SaveAsync(new[] { session1, session2, signedOut });
+
+    User? user = await _userService.SignOutAsync(_user.Id.ToGuid());
+
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+
+    SessionEntity[] entities = await PortalContext.Sessions.AsNoTracking()
+      .Include(x => x.User)
+      .Where(x => x.User!.AggregateId == _user.Id.Value)
+      .ToArrayAsync();
+
+    Assert.Equal(3, entities.Length);
+    Assert.Contains(entities, session => session.AggregateId == session1.Id.Value && session.IsActive == false
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+    Assert.Contains(entities, session => session.AggregateId == session2.Id.Value && session.IsActive == false
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+    Assert.Contains(entities, session => session.AggregateId == signedOut.Id.Value && session.IsActive == false
+      && session.SignedOutBy == signedOut.UpdatedBy.Value
+      && ToUnixTimeMilliseconds(session.SignedOutOn) == ToUnixTimeMilliseconds(signedOut.UpdatedOn));
+  }
+
+  [Fact(DisplayName = "SignOutAsync: it should return null when the user is not found.")]
+  public async Task SignOutAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.SignOutAsync(Guid.Empty));
   }
 
   private static void AssertEqual(AddressPayload? payload, Address? address)

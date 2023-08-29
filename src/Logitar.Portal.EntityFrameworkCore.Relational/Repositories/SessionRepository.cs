@@ -25,19 +25,25 @@ internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.
   public async Task<SessionAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
     => await base.LoadAsync<SessionAggregate>(id, cancellationToken);
   public async Task<IEnumerable<SessionAggregate>> LoadAsync(UserAggregate user, CancellationToken cancellationToken)
+    => await LoadAsync(user, isActive: null, cancellationToken);
+  public async Task<IEnumerable<SessionAggregate>> LoadAsync(UserAggregate user, bool? isActive, CancellationToken cancellationToken)
   {
     string aggregateId = user.Id.Value;
 
-    IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
+    IQueryBuilder query = _sqlHelper.QueryFrom(Db.Events.Table)
       .Join(Db.Sessions.AggregateId, Db.Events.AggregateId,
         new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
       .Join(Db.Users.UserId, Db.Sessions.UserId)
       .Where(Db.Users.AggregateId, Operators.IsEqualTo(aggregateId))
-      .SelectAll(Db.Events.Table)
-      .Build();
+      .SelectAll(Db.Events.Table);
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
+    if (isActive.HasValue)
+    {
+      query = query.Where(Db.Sessions.IsActive, Operators.IsEqualTo(isActive.Value));
+    }
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query.Build())
       .AsNoTracking()
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
