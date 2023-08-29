@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,6 +15,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   {
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
+    [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
     [typeof(UserIsNotConfirmedException)] = HandleUserIsNotConfirmedException,
     [typeof(ValidationException)] = HandleValidationException
@@ -31,13 +33,9 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
       context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is InvalidCredentialsException)
+    else if (context.Exception is InvalidCredentialsException invalidCredentials)
     {
-      context.Result = new BadRequestObjectResult(new
-      {
-        ErrorCode = "InvalidCredentials",
-        ErrorMessage = "The specified credentials are not valid."
-      });
+      context.Result = new BadRequestObjectResult(new ErrorInfo(invalidCredentials, "The specified credentials are not valid."));
       context.ExceptionHandled = true;
     }
     else
@@ -46,9 +44,9 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     }
   }
 
-  private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext _)
+  private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
   {
-    return new JsonResult(new { ErrorCode = "ConfigurationAlreadyInitialized" })
+    return new JsonResult(new ErrorInfo(context.Exception, "The configuration has already been initialized."))
     {
       StatusCode = StatusCodes.Status403Forbidden
     };
@@ -59,14 +57,19 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     return new BadRequestObjectResult(((InvalidLocaleException)context.Exception).Failure);
   }
 
-  private static IActionResult HandleUserIsDisabledException(ExceptionContext _)
+  public static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new { ErrorCode = "UserIsDisabled" });
+    return new BadRequestObjectResult(new ErrorInfo(context.Exception, "The session is not active."));
   }
 
-  private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext _)
+  private static IActionResult HandleUserIsDisabledException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new { ErrorCode = "UserIsDisabled" });
+    return new BadRequestObjectResult(new ErrorInfo(context.Exception, "The user is disabled."));
+  }
+
+  private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(new ErrorInfo(context.Exception, "The user is not confirmed."));
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)

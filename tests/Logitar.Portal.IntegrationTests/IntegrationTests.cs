@@ -15,6 +15,7 @@ using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Infrastructure.Passwords.Strategies;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +52,7 @@ public abstract class IntegrationTests
         break;
     }
 
+    services.AddSingleton<IPbkdf2Settings>(_ => new Pbkdf2Settings { Iterations = 6 });
     ServiceProvider = services.BuildServiceProvider();
 
     AggregateRepository = ServiceProvider.GetRequiredService<IAggregateRepository>();

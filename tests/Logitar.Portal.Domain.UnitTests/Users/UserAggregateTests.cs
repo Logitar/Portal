@@ -3,10 +3,9 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Settings;
-using Logitar.Portal.Domain.Users;
 using Logitar.Security.Cryptography;
 
-namespace Logitar.Portal.Domain;
+namespace Logitar.Portal.Domain.Users;
 
 [Trait(Traits.Category, Categories.Unit)]
 public class UserAggregateTests
@@ -58,7 +57,7 @@ public class UserAggregateTests
     ActorId actorId = ActorId.NewId();
 
     ReadOnlyUserSettings userSettings = new();
-    string secretString = RandomStringGenerator.GetString(32);
+    string secretString = RandomStringGenerator.GetString(SessionAggregate.SecretLength);
     PasswordMock secret = new(secretString);
     SessionAggregate session = _user.SignIn(userSettings, secret, actorId);
 

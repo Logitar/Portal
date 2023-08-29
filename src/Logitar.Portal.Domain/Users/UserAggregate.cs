@@ -22,6 +22,7 @@ public class UserAggregate : AggregateRoot
   private string? _lastName = null;
   private string? _nickname = null;
 
+  private DateTime? _birthdate = null;
   private Locale? _locale = null;
 
   public UserAggregate(AggregateId id) : base(id)
@@ -156,6 +157,24 @@ public class UserAggregate : AggregateRoot
     }
   }
 
+  public DateTime? Birthdate
+  {
+    get => _birthdate;
+    set
+    {
+      if (value.HasValue)
+      {
+        new BirthdateValidator(nameof(Birthdate)).ValidateAndThrow(value.Value);
+      }
+
+      if (value != _birthdate)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Birthdate = new Modification<DateTime?>(value);
+        _birthdate = value;
+      }
+    }
+  }
   public Locale? Locale
   {
     get => _locale;
@@ -274,6 +293,10 @@ public class UserAggregate : AggregateRoot
       Nickname = updated.Nickname.Value;
     }
 
+    if (updated.Birthdate != null)
+    {
+      Birthdate = updated.Birthdate.Value;
+    }
     if (updated.Locale != null)
     {
       _locale = updated.Locale.Value;

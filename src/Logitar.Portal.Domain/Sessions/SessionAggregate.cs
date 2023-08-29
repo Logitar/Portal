@@ -55,6 +55,26 @@ public class SessionAggregate : AggregateRoot
     }
   }
 
+  public void Renew(string secret, Password? newSecret = null, ActorId? actorId = null)
+  {
+    if (!IsActive)
+    {
+      throw new SessionIsNotActiveException(this);
+    }
+    else if (_secret?.IsMatch(secret) != true)
+    {
+      throw new IncorrectSessionSecretException(this, secret);
+    }
+
+    actorId ??= new(UserId.Value);
+
+    ApplyChange(new SessionRenewedEvent(actorId.Value)
+    {
+      Secret = newSecret
+    });
+  }
+  protected virtual void Apply(SessionRenewedEvent renewed) => _secret = renewed.Secret;
+
   public void SetCustomAttribute(string key, string value)
   {
     key = key.Trim();

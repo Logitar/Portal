@@ -51,6 +51,8 @@ internal record SessionEntity : AggregateEntity
     }
   }
 
+  public void Renew(SessionRenewedEvent renewed) => Secret = renewed.Secret?.Encode();
+
   public void Update(SessionUpdatedEvent updated)
   {
     base.Update(updated);

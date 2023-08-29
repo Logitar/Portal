@@ -181,6 +181,10 @@ internal record UserEntity : AggregateEntity
       Nickname = updated.Nickname.Value;
     }
 
+    if (updated.Birthdate != null)
+    {
+      Birthdate = updated.Birthdate.Value?.ToUniversalTime();
+    }
     if (updated.Locale != null)
     {
       Locale = updated.Locale.Value?.Code;
