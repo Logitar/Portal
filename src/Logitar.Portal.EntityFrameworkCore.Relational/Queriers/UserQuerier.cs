@@ -30,6 +30,10 @@ internal class UserQuerier : IUserQuerier
     return await ReadAsync(user.Id.Value, cancellationToken)
       ?? throw new EntityNotFoundException<UserEntity>(user.Id);
   }
+  public async Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+  }
   private async Task<User?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
   {
     UserEntity? user = await _users.AsNoTracking()
@@ -45,13 +49,41 @@ internal class UserQuerier : IUserQuerier
     {
       AggregateId realmId = new(user.TenantId);
       realm = await _realmQuerier.ReadAsync(realmId, cancellationToken)
-      ?? throw new EntityNotFoundException<RealmEntity>(realmId);
+        ?? throw new EntityNotFoundException<RealmEntity>(realmId);
     }
 
-    IEnumerable<ActorId> actorIds = user.GetActorIds();
+    return (await MapAsync(realm, cancellationToken, user)).Single();
+  }
+
+  public async Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string uniqueName, CancellationToken cancellationToken)
+  {
+    Realm? realm = null;
+    if (!string.IsNullOrWhiteSpace(realmIdOrUniqueSlug))
+    {
+      realm = await _realmQuerier.FindAsync(realmIdOrUniqueSlug, cancellationToken)
+        ?? throw new EntityNotFoundException<RealmEntity>(realmIdOrUniqueSlug);
+    }
+
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string uniqueNameNormalized = uniqueName.Trim().ToUpper();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+    if (user == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(realm, cancellationToken, user)).Single();
+  }
+
+  private async Task<IEnumerable<User>> MapAsync(Realm? realm = null, CancellationToken cancellationToken = default, params UserEntity[] users)
+  {
+    IEnumerable<ActorId> actorIds = users.SelectMany(user => user.GetActorIds()).Distinct();
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return mapper.ToUser(user, realm);
+    return users.Select(user => mapper.ToUser(user, realm));
   }
 }

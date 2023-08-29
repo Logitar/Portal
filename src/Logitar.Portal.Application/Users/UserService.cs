@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application.Users.Commands;
+using Logitar.Portal.Application.Users.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 
@@ -23,9 +24,9 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new DeleteUserCommand(id), cancellationToken);
   }
 
-  public Task<User?> ReadAsync(Guid? id, string? realm, string? uniqueName, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Guid? id, string? realm, string? uniqueName, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName), cancellationToken);
   }
 
   public Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, CancellationToken cancellationToken)

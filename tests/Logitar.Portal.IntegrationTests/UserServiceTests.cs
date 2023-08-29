@@ -243,6 +243,48 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _userService.DeleteAsync(Guid.Empty));
   }
 
+  [Fact(DisplayName = "ReadAsync: it should return null when the user is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_user.UniqueName}2"));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the Portal user found by unique name.")]
+  public async Task ReadAsync_it_should_return_the_Portal_user_found_by_unique_name()
+  {
+    Assert.NotNull(User);
+    User? user = await _userService.ReadAsync(realm: null, uniqueName: $" {User.UniqueName} ");
+    Assert.NotNull(user);
+    Assert.Equal(User.Id.ToGuid(), user.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the realm user found by unique name.")]
+  public async Task ReadAsync_it_should_return_the_realm_user_found_by_unique_name()
+  {
+    User? user = await _userService.ReadAsync(realm: $" {_realm.Id.ToGuid()} ", uniqueName: $" {_user.UniqueName} ");
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the user found by ID.")]
+  public async Task ReadAsync_it_should_return_the_user_found_by_Id()
+  {
+    User? user = await _userService.ReadAsync(_user.Id.ToGuid());
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when many users have been found.")]
+  public async Task ReadAsync_it_should_throw_TooManyResultsException_when_many_users_have_been_found()
+  {
+    Assert.NotNull(User);
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(
+      async () => await _userService.ReadAsync(User.Id.ToGuid(), _realm.UniqueSlug, _user.UniqueName)
+    );
+    Assert.Equal(1, exception.Expected);
+    Assert.Equal(2, exception.Actual);
+  }
+
   [Fact(DisplayName = "SignOutAsync: it should sign-out the user.")]
   public async Task SignOutAsync_it_should_sign_out_the_user()
   {
