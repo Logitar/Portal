@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Contracts.Users;
 
-public record AddressPayload
+public record AddressPayload : IPostalAddress
 {
   public string Street { get; set; } = string.Empty;
   public string Locality { get; set; } = string.Empty;

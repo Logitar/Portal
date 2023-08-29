@@ -148,6 +148,28 @@ internal record UserEntity : AggregateEntity
       Password = updated.Password.Encode();
     }
 
+    if (updated.Address != null)
+    {
+      AddressStreet = updated.Address.Value?.Street;
+      AddressLocality = updated.Address.Value?.Locality;
+      AddressRegion = updated.Address.Value?.Region;
+      AddressPostalCode = updated.Address.Value?.PostalCode;
+      AddressCountry = updated.Address.Value?.Country;
+      AddressFormatted = updated.Address.Value?.Format();
+
+      if (!IsAddressVerified && updated.Address.Value?.IsVerified == true)
+      {
+        AddressVerifiedBy = updated.ActorId.Value;
+        AddressVerifiedOn = updated.OccurredOn.ToUniversalTime();
+        IsAddressVerified = true;
+      }
+      else if (IsAddressVerified && updated.Address.Value?.IsVerified != true)
+      {
+        AddressVerifiedBy = null;
+        AddressVerifiedOn = null;
+        IsAddressVerified = false;
+      }
+    }
     if (updated.Email != null)
     {
       EmailAddress = updated.Email.Value?.Address;
@@ -163,6 +185,26 @@ internal record UserEntity : AggregateEntity
         EmailVerifiedBy = null;
         EmailVerifiedOn = null;
         IsEmailVerified = false;
+      }
+    }
+    if (updated.Phone != null)
+    {
+      PhoneCountryCode = updated.Phone.Value?.CountryCode;
+      PhoneNumber = updated.Phone.Value?.Number;
+      PhoneExtension = updated.Phone.Value?.Extension;
+      PhoneE164Formatted = updated.Phone.Value?.FormatToE164();
+
+      if (!IsPhoneVerified && updated.Phone.Value?.IsVerified == true)
+      {
+        PhoneVerifiedBy = updated.ActorId.Value;
+        PhoneVerifiedOn = updated.OccurredOn.ToUniversalTime();
+        IsPhoneVerified = true;
+      }
+      else if (IsPhoneVerified && updated.Phone.Value?.IsVerified != true)
+      {
+        PhoneVerifiedBy = null;
+        PhoneVerifiedOn = null;
+        IsPhoneVerified = false;
       }
     }
 

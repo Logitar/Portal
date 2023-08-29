@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Domain.Validators;
 
@@ -46,6 +48,13 @@ internal static class FluentValidationExtensions
   private static bool BeInThePast(DateTime value, DateTime? moment = null)
   {
     return value <= (moment ?? DateTime.Now);
+  }
+
+  public static IRuleBuilderOptions<T, IPhoneNumber> PhoneNumber<T>(this IRuleBuilder<T, IPhoneNumber> ruleBuilder)
+  {
+    return ruleBuilder.Must(phoneNumber => phoneNumber.IsValid())
+      .WithErrorCode(BuildErrorCode(nameof(PhoneNumber)))
+      .WithMessage("'{PropertyName}' must be a valid phone number.");
   }
 
   public static IRuleBuilderOptions<T, string> Slug<T>(this IRuleBuilder<T, string> ruleBuilder)

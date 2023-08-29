@@ -3,7 +3,7 @@
 public record SearchPayload
 {
   public TextSearch Search { get; set; } = new();
-  //public TextSearch Id { get; set; } = new(); // TODO(fpion): implement
+  public IEnumerable<Guid> IdIn { get; set; } = Enumerable.Empty<Guid>();
 
   public IEnumerable<SortOption> Sort { get; set; } = Enumerable.Empty<SortOption>();
 

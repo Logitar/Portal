@@ -38,7 +38,7 @@ internal class RealmQuerier : IRealmQuerier
     {
       return null;
     }
-    RealmEntity realm = realms.Single(realm => realm.AggregateId == aggregateId);
+    RealmEntity realm = realms.Length == 1 ? realms.Single() : realms.First(realm => realm.AggregateId == aggregateId);
 
     return (await MapAsync(cancellationToken, realm)).Single();
   }

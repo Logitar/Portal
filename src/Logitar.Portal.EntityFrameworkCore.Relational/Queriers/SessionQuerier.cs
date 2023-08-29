@@ -72,7 +72,12 @@ internal class SessionQuerier : ISessionQuerier
       .Join(Db.Users.UserId, Db.Sessions.UserId)
       .SelectAll(Db.Sessions.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search);
-    //_sqlHelper.ApplyTextSearch(builder, payload.Id, Db.Sessions.AggregateId); // TODO(fpion): implement
+
+    if (payload.IdIn.Any())
+    {
+      IEnumerable<string> aggregateIds = payload.IdIn.Distinct().Select(id => new AggregateId(id).Value);
+      builder = builder.Where(Db.Sessions.AggregateId, Operators.IsIn(aggregateIds.ToArray()));
+    }
 
     if (realm != null)
     {

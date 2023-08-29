@@ -18,7 +18,9 @@ public class UserAggregate : AggregateRoot
 
   private Password? _password = null;
 
+  private PostalAddress? _address = null;
   private EmailAddress? _email = null;
+  private PhoneNumber? _phone = null;
 
   private string? _firstName = null;
   private string? _middleName = null;
@@ -70,6 +72,19 @@ public class UserAggregate : AggregateRoot
   public bool IsDisabled { get; private set; }
   public DateTime? AuthenticatedOn { get; private set; }
 
+  public PostalAddress? Address
+  {
+    get => _address;
+    set
+    {
+      if (value != _address)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Address = new Modification<PostalAddress>(value);
+        _address = value;
+      }
+    }
+  }
   public EmailAddress? Email
   {
     get => _email;
@@ -83,7 +98,20 @@ public class UserAggregate : AggregateRoot
       }
     }
   }
-  public bool IsConfirmed => Email?.IsVerified == true;
+  public PhoneNumber? Phone
+  {
+    get => _phone;
+    set
+    {
+      if (value != _phone)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Phone = new Modification<PhoneNumber>(value);
+        _phone = value;
+      }
+    }
+  }
+  public bool IsConfirmed => Email?.IsVerified == true || Phone?.IsVerified == true;
 
   public string? FirstName
   {
@@ -388,9 +416,17 @@ public class UserAggregate : AggregateRoot
       _password = updated.Password;
     }
 
+    if (updated.Address != null)
+    {
+      _address = updated.Address.Value;
+    }
     if (updated.Email != null)
     {
       _email = updated.Email.Value;
+    }
+    if (updated.Phone != null)
+    {
+      _phone = updated.Phone.Value;
     }
 
     if (updated.FirstName != null)

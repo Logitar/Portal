@@ -37,6 +37,7 @@ internal static class Db
     public static readonly TableId Table = new(nameof(PortalContext.Users));
 
     public static readonly ColumnId AggregateId = new(nameof(UserEntity.AggregateId), Table);
+    public static readonly ColumnId EmailAddressNormalized = new(nameof(UserEntity.EmailAddressNormalized), Table);
     public static readonly ColumnId TenantId = new(nameof(UserEntity.TenantId), Table);
     public static readonly ColumnId UniqueNameNormalized = new(nameof(UserEntity.UniqueNameNormalized), Table);
     public static readonly ColumnId UserId = new(nameof(UserEntity.UserId), Table);

@@ -10,7 +10,9 @@ public record UserUpdatedEvent : DomainEvent, INotification
   public string? UniqueName { get; set; }
   public Password? Password { get; set; }
 
+  public Modification<PostalAddress>? Address { get; set; }
   public Modification<EmailAddress>? Email { get; set; }
+  public Modification<PhoneNumber>? Phone { get; set; }
 
   public Modification<string>? FirstName { get; set; }
   public Modification<string>? MiddleName { get; set; }

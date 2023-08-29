@@ -26,7 +26,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   private readonly byte[] _secret;
   private readonly SessionAggregate _session;
 
-  public SessionServiceTests()
+  public SessionServiceTests() : base()
   {
     _sessionService = ServiceProvider.GetRequiredService<ISessionService>();
 
@@ -230,6 +230,79 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     };
     var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await _sessionService.RenewAsync(payload));
     Assert.Equal(refreshToken.Id.Value, exception.Id);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
+  public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
+  {
+    SearchSessionsPayload payload = new()
+    {
+      IdIn = new[] { Guid.Empty }
+    };
+
+    SearchResults<Session> results = await _sessionService.SearchAsync(payload);
+
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
+  public async Task SearchAsync_it_should_return_the_correct_results()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value, ActorId);
+
+    SessionAggregate idNotIn = CreateSession();
+    SessionAggregate otherUser = new(user, actorId: ActorId);
+    SessionAggregate persistent = CreateSession(isPersistent: true);
+    SessionAggregate session1 = CreateSession();
+    SessionAggregate session2 = CreateSession();
+    SessionAggregate session3 = CreateSession();
+    SessionAggregate session4 = CreateSession();
+
+    SessionAggregate signedOut = CreateSession();
+    signedOut.SignOut();
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { user, idNotIn, otherUser, persistent, session1, session2, session3, session4, signedOut });
+
+    SessionAggregate[] sessions = new[] { session1, session2, session3, session4 }
+      .OrderByDescending(x => x.UpdatedOn).Skip(1).Take(2).ToArray();
+
+    SearchSessionsPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Terms = new SearchTerm[]
+        {
+          new("test")
+        }
+      },
+      IdIn = new[] { session1.Id.ToGuid(), session2.Id.ToGuid(), session3.Id.ToGuid(), session4.Id.ToGuid() },
+      Realm = _realm.UniqueSlug,
+      UserId = _user.Id.ToGuid(),
+      IsActive = true,
+      IsPersistent = false,
+      Sort = new SessionSortOption[]
+      {
+        new()
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<Session> results = await _sessionService.SearchAsync(payload);
+
+    Assert.Equal(sessions.Length, results.Results.Count());
+    Assert.Equal(4, results.Total);
+
+    for (int i = 0; i < sessions.Length; i++)
+    {
+      Assert.Equal(sessions[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
+    }
+  }
+  private SessionAggregate CreateSession(bool isPersistent = false)
+  {
+    Password? secret = isPersistent ? PasswordService.Generate(_realm.PasswordSettings, SessionAggregate.SecretLength, out _) : null;
+    return new SessionAggregate(_user, secret, ActorId);
   }
 
   [Fact(DisplayName = "SignInAsync: it should create a persistent session.")]

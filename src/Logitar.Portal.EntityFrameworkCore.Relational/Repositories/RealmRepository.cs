@@ -52,7 +52,7 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     IEnumerable<RealmAggregate> realms = Load<RealmAggregate>(events.Select(EventSerializer.Deserialize));
     if (realms.Count() > 1)
     {
-      return realms.FirstOrDefault(realm => realm.Id.Value == idOrUniqueSlug);
+      return realms.First(realm => realm.Id.Value == idOrUniqueSlug);
     }
 
     return realms.SingleOrDefault();
