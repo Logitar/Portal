@@ -115,7 +115,7 @@ internal record UserEntity : AggregateEntity
     Update(disabled);
 
     DisabledBy = disabled.ActorId.Value;
-    DisabledOn = disabled.OccurredOn;
+    DisabledOn = disabled.OccurredOn.ToUniversalTime();
     IsDisabled = true;
   }
 
@@ -184,6 +184,10 @@ internal record UserEntity : AggregateEntity
     if (updated.Birthdate != null)
     {
       Birthdate = updated.Birthdate.Value?.ToUniversalTime();
+    }
+    if (updated.Gender != null)
+    {
+      Gender = updated.Gender.Value?.Value;
     }
     if (updated.Locale != null)
     {

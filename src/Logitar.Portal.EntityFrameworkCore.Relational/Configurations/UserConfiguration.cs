@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -65,7 +66,7 @@ internal class UserConfiguration : AggregateConfiguration<UserEntity>, IEntityTy
     builder.Property(x => x.LastName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.FullName).HasMaxLength(768); // NOTE(fpion): FirstName, MiddleName, LastName (3 * 255) + 2 space characters
     builder.Property(x => x.Nickname).HasMaxLength(byte.MaxValue);
-    builder.Property(x => x.Gender).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.Gender).HasMaxLength(Gender.MaximumLength);
     builder.Property(x => x.Locale).HasMaxLength(16);
     builder.Property(x => x.TimeZone).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Picture).HasMaxLength(Constants.UrlMaximumLength);

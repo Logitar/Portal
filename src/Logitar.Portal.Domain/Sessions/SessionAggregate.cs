@@ -89,6 +89,15 @@ public class SessionAggregate : AggregateRoot
     }
   }
 
+  public void SignOut(ActorId actorId = default)
+  {
+    if (IsActive)
+    {
+      ApplyChange(new SessionSignedOutEvent(actorId));
+    }
+  }
+  protected virtual void Apply(SessionSignedOutEvent _) => IsActive = false;
+
   public void Update(ActorId actorId)
   {
     foreach (DomainEvent change in Changes)

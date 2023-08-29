@@ -12,6 +12,8 @@ internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.
   {
   }
 
+  public async Task<SessionAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
+    => await base.LoadAsync<SessionAggregate>(new AggregateId(id), cancellationToken);
   public async Task<SessionAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
     => await base.LoadAsync<SessionAggregate>(id, cancellationToken);
 

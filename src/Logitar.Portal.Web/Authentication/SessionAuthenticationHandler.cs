@@ -21,7 +21,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     Guid? sessionId = Context.GetSessionId();
     if (sessionId.HasValue)
     {
-      Session? session = /*_cacheService.GetSession(sessionId.Value) ?*/ await _sessionQuerier.ReadAsync(sessionId.Value);
+      Session? session = /*_cacheService.GetSession(sessionId.Value) ?*/ await _sessionQuerier.ReadAsync(sessionId.Value); // TODO(fpion): implement
       AuthenticateResult? failure = null;
       if (session == null)
       {
@@ -43,7 +43,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
         return failure;
       }
 
-      //_cacheService.SetSession(session!);
+      //_cacheService.SetSession(session!); // TODO(fpion): implement
 
       Context.SetUser(session!.User);
 

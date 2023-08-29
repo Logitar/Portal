@@ -44,7 +44,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
       FirstName = Faker.Person.FirstName,
       LastName = Faker.Person.LastName,
       Birthdate = Faker.Person.DateOfBirth,
-      //Gender = new Gender(Faker.Person.Gender.ToString()), // TODO(fpion): implement
+      Gender = new Gender(Faker.Person.Gender.ToString()),
       Locale = new Locale(Faker.Locale),
       //TimeZone = new TimeZoneEntry("America/Montreal"), // TODO(fpion): implement
       //Picture = new Uri(Faker.Person.Avatar), // TODO(fpion): implement
@@ -296,6 +296,31 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await _sessionService.SignInAsync(payload));
     Assert.Equal(_realm.ToString(), exception.Realm);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
+  }
+
+  [Fact(DisplayName = "SignOutAsync: it should return null when the session is not found.")]
+  public async Task SignOutAsync_it_should_return_null_when_the_session_is_not_found()
+  {
+    Assert.Null(await _sessionService.SignOutAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "SignOutAsync: it should sign out the session.")]
+  public async Task SignOutAsync_it_should_sign_out_the_session()
+  {
+    Session? session = await _sessionService.SignOutAsync(_session.Id.ToGuid());
+    Assert.NotNull(session);
+    Assert.False(session.IsActive);
+    Assert.Equal(Actor, session.SignedOutBy);
+    Assert.True(session.SignedOutOn.HasValue);
+    AssertIsNear(session.SignedOutOn.Value);
+
+    Session? bis = await _sessionService.SignOutAsync(_session.Id.ToGuid());
+    Assert.NotNull(bis);
+    Assert.Equal(session.SignedOutBy, bis.SignedOutBy);
+    Assert.Equal(session.SignedOutOn, bis.SignedOutOn);
+    Assert.Equal(session.UpdatedBy, bis.UpdatedBy);
+    Assert.Equal(session.UpdatedOn, bis.UpdatedOn);
+    Assert.Equal(session.Version, bis.Version);
   }
 
   private async Task AssertRefreshTokenAsync(string value)

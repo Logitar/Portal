@@ -18,5 +18,6 @@ public record UserUpdatedEvent : DomainEvent, INotification
   public Modification<string>? Nickname { get; set; }
 
   public Modification<DateTime?>? Birthdate { get; set; }
+  public Modification<Gender>? Gender { get; set; }
   public Modification<Locale>? Locale { get; set; }
 }

@@ -23,6 +23,7 @@ public class UserAggregate : AggregateRoot
   private string? _nickname = null;
 
   private DateTime? _birthdate = null;
+  private Gender? _gender = null;
   private Locale? _locale = null;
 
   public UserAggregate(AggregateId id) : base(id)
@@ -175,6 +176,19 @@ public class UserAggregate : AggregateRoot
       }
     }
   }
+  public Gender? Gender
+  {
+    get => _gender;
+    set
+    {
+      if (value != _gender)
+      {
+        UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+        updated.Gender = new Modification<Gender>(value);
+        _gender = value;
+      }
+    }
+  }
   public Locale? Locale
   {
     get => _locale;
@@ -296,6 +310,10 @@ public class UserAggregate : AggregateRoot
     if (updated.Birthdate != null)
     {
       Birthdate = updated.Birthdate.Value;
+    }
+    if (updated.Gender != null)
+    {
+      _gender = updated.Gender.Value;
     }
     if (updated.Locale != null)
     {
