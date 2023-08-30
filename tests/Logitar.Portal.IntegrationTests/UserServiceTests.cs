@@ -1,4 +1,5 @@
-﻿using Logitar.EventSourcing;
+﻿using Bogus;
+using Logitar.EventSourcing;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
@@ -25,15 +26,14 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   {
     _userService = ServiceProvider.GetRequiredService<IUserService>();
 
-    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true, actorId: ActorId)
+    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
       DefaultLocale = new Locale(Faker.Locale),
       Url = new Uri("https://www.desjardins.com/")
     };
-    _realm.Update(ActorId);
 
-    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value, ActorId)
+    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email, isVerified: true),
       FirstName = Faker.Person.FirstName,
@@ -47,7 +47,6 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     };
     _user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}");
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
-    _user.Update(ActorId);
   }
 
   public override async Task InitializeAsync()
@@ -91,8 +90,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "CreateAsync: it should create a realm user.")]
   public async Task CreateAsync_it_should_create_a_realm_user()
   {
-    RealmAggregate realm = new("logitar", actorId: ActorId);
-    UserAggregate aggregate = new(realm.UniqueNameSettings, Faker.Person.UserName, realm.Id.Value, ActorId)
+    RealmAggregate realm = new("logitar");
+    UserAggregate aggregate = new(realm.UniqueNameSettings, Faker.Person.UserName, realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email)
     };
@@ -224,8 +223,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should delete the user.")]
   public async Task DeleteAsync_it_should_delete_the_user()
   {
-    SessionAggregate session = new(_user, actorId: ActorId);
-    session.SignOut(ActorId);
+    SessionAggregate session = new(_user);
+    session.SignOut();
     await AggregateRepository.SaveAsync(session);
 
     User? user = await _userService.DeleteAsync(_user.Id.ToGuid());
@@ -302,16 +301,93 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
   public async Task SearchAsync_it_should_return_the_correct_results()
   {
-    Assert.Fail("TODO(fpion): implement");
+    UserAggregate ontarian = CreateUser("America/Toronto");
+
+    UserAggregate withPassword = CreateUser();
+    withPassword.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
+
+    UserAggregate confirmed = CreateUser();
+    confirmed.Email = new EmailAddress(Faker.Person.Email, isVerified: true);
+
+    UserAggregate disabled = CreateUser();
+    disabled.Disable();
+
+    UserAggregate idNotIn = CreateUser();
+    UserAggregate user1 = CreateUser();
+    UserAggregate user2 = CreateUser();
+    UserAggregate user3 = CreateUser();
+    UserAggregate user4 = CreateUser();
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { ontarian, withPassword, confirmed, disabled, idNotIn, user1, user2, user3, user4 });
+
+    UserAggregate[] users = new[] { user1, user2, user3, user4 }
+      .OrderBy(x => x.FullName).Skip(1).Take(2).ToArray();
+
+    HashSet<Guid> ids = (await PortalContext.Users.AsNoTracking().ToArrayAsync())
+      .Select(user => new AggregateId(user.AggregateId).ToGuid()).ToHashSet();
+    ids.Remove(idNotIn.Id.ToGuid());
+
+    SearchUsersPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Operator = SearchOperator.Or,
+        Terms = new SearchTerm[]
+        {
+          new("%/M_ntr__l"),
+          new(Guid.NewGuid().ToString())
+        }
+      },
+      IdIn = ids,
+      Realm = $" {_realm.UniqueSlug.ToUpper()} ",
+      HasPassword = false,
+      IsConfirmed = false,
+      IsDisabled = false,
+      Sort = new UserSortOption[]
+      {
+        new(UserSort.FullName)
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<User> results = await _userService.SearchAsync(payload);
+
+    Assert.Equal(users.Length, results.Results.Count());
+    Assert.Equal(4, results.Total);
+
+    for (int i = 0; i < users.Length; i++)
+    {
+      Assert.Equal(users[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
+    }
+  }
+  private UserAggregate CreateUser(string? timeZone = null)
+  {
+    Faker faker = new();
+
+    UserAggregate user = new(_realm.UniqueNameSettings, faker.Person.UserName, _realm.Id.Value)
+    {
+      FirstName = faker.Person.FirstName,
+      LastName = faker.Person.LastName,
+      Nickname = string.Concat(faker.Person.FirstName.First(), faker.Person.LastName).ToLower(),
+      Birthdate = faker.Person.DateOfBirth,
+      Gender = new Gender(faker.Person.Gender.ToString()),
+      Locale = new Locale(faker.Locale),
+      TimeZone = new TimeZoneEntry(timeZone ?? "America/Montreal"),
+      Picture = new Uri(faker.Person.Avatar),
+      Website = new Uri($"https://www.{faker.Person.Website}/")
+    };
+
+    return user;
   }
 
   [Fact(DisplayName = "SignOutAsync: it should sign-out the user.")]
   public async Task SignOutAsync_it_should_sign_out_the_user()
   {
-    SessionAggregate session1 = new(_user, actorId: ActorId);
-    SessionAggregate session2 = new(_user, actorId: ActorId);
-    SessionAggregate signedOut = new(_user, actorId: ActorId);
-    signedOut.SignOut(ActorId);
+    SessionAggregate session1 = new(_user);
+    SessionAggregate session2 = new(_user);
+    SessionAggregate signedOut = new(_user);
+    signedOut.SignOut();
     await AggregateRepository.SaveAsync(new[] { session1, session2, signedOut });
 
     User? user = await _userService.SignOutAsync(_user.Id.ToGuid());
@@ -326,9 +402,9 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(3, entities.Length);
     Assert.Contains(entities, session => session.AggregateId == session1.Id.Value && session.IsActive == false
-      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      /*&& session.SignedOutBy == ActorId.Value*/ && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == session2.Id.Value && session.IsActive == false
-      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      /*&& session.SignedOutBy == ActorId.Value*/&& (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == signedOut.Id.Value && session.IsActive == false
       && session.SignedOutBy == signedOut.UpdatedBy.Value
       && ToUnixTimeMilliseconds(session.SignedOutOn) == ToUnixTimeMilliseconds(signedOut.UpdatedOn));

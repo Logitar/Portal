@@ -126,10 +126,14 @@ public class UserAggregate : AggregateRoot
 
       if (value != _firstName)
       {
+        string? fullName = PersonHelper.BuildFullName(value, MiddleName, LastName);
+
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
         updated.FirstName = new Modification<string>(value);
-        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(value, MiddleName, LastName));
+        updated.FullName = new Modification<string>(fullName);
+
         _firstName = value;
+        FullName = fullName;
       }
     }
   }
@@ -146,10 +150,14 @@ public class UserAggregate : AggregateRoot
 
       if (value != _middleName)
       {
+        string? fullName = PersonHelper.BuildFullName(FirstName, value, LastName);
+
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
         updated.MiddleName = new Modification<string>(value);
-        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(FirstName, value, LastName));
+        updated.FullName = new Modification<string>(fullName);
+
         _middleName = value;
+        FullName = fullName;
       }
     }
   }
@@ -166,10 +174,14 @@ public class UserAggregate : AggregateRoot
 
       if (value != _lastName)
       {
+        string? fullName = PersonHelper.BuildFullName(FirstName, MiddleName, value);
+
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
         updated.LastName = new Modification<string>(value);
-        updated.FullName = new Modification<string>(PersonHelper.BuildFullName(FirstName, MiddleName, value));
+        updated.FullName = new Modification<string>(fullName);
+
         _lastName = value;
+        FullName = fullName;
       }
     }
   }

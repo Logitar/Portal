@@ -30,15 +30,14 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   {
     _sessionService = ServiceProvider.GetRequiredService<ISessionService>();
 
-    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true, actorId: ActorId)
+    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
       DefaultLocale = new Locale(Faker.Locale),
       Url = new Uri("https://www.desjardins.com/")
     };
-    _realm.Update(ActorId);
 
-    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value, ActorId)
+    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email, isVerified: true),
       FirstName = Faker.Person.FirstName,
@@ -52,13 +51,11 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     };
     _user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}");
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
-    _user.Update(ActorId);
 
     Password secret = PasswordService.Generate(_realm.PasswordSettings, SessionAggregate.SecretLength, out _secret);
-    _session = new(_user, secret, ActorId);
+    _session = new(_user, secret);
     _session.SetCustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}");
     _session.SetCustomAttribute("IpAddress", Faker.Internet.Ip());
-    _session.Update(ActorId);
   }
 
   public override async Task InitializeAsync()
@@ -152,7 +149,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     Assert.NotNull(User);
 
     Password secret = PasswordService.Generate(Configuration.PasswordSettings, SessionAggregate.SecretLength, out byte[] secretBytes);
-    SessionAggregate aggregate = new(User, secret, ActorId);
+    SessionAggregate aggregate = new(User, secret);
     await AggregateRepository.SaveAsync(aggregate);
 
     RenewPayload payload = new()
@@ -249,10 +246,10 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
   public async Task SearchAsync_it_should_return_the_correct_results()
   {
-    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value, ActorId);
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value);
 
     SessionAggregate idNotIn = CreateSession();
-    SessionAggregate otherUser = new(user, actorId: ActorId);
+    SessionAggregate otherUser = new(user);
     SessionAggregate persistent = CreateSession(isPersistent: true);
     SessionAggregate session1 = CreateSession();
     SessionAggregate session2 = CreateSession();
@@ -267,6 +264,10 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     SessionAggregate[] sessions = new[] { session1, session2, session3, session4 }
       .OrderByDescending(x => x.UpdatedOn).Skip(1).Take(2).ToArray();
 
+    HashSet<Guid> ids = (await PortalContext.Sessions.AsNoTracking().ToArrayAsync())
+      .Select(session => new AggregateId(session.AggregateId).ToGuid()).ToHashSet();
+    ids.Remove(idNotIn.Id.ToGuid());
+
     SearchSessionsPayload payload = new()
     {
       Search = new TextSearch
@@ -276,11 +277,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
           new("test")
         }
       },
-      IdIn = new[]
-      {
-        otherUser.Id.ToGuid(), persistent.Id.ToGuid(), session1.Id.ToGuid(), session2.Id.ToGuid(),
-        session3.Id.ToGuid(), session4.Id.ToGuid(), signedOut.Id.ToGuid()
-      },
+      IdIn = ids,
       Realm = _realm.UniqueSlug,
       UserId = _user.Id.ToGuid(),
       IsActive = true,
@@ -306,7 +303,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   private SessionAggregate CreateSession(bool isPersistent = false)
   {
     Password? secret = isPersistent ? PasswordService.Generate(_realm.PasswordSettings, SessionAggregate.SecretLength, out _) : null;
-    return new SessionAggregate(_user, secret, ActorId);
+    return new SessionAggregate(_user, secret);
   }
 
   [Fact(DisplayName = "SignInAsync: it should create a persistent session.")]
