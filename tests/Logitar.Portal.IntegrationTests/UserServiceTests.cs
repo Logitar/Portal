@@ -389,6 +389,54 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _userService.ReplaceAsync(Guid.Empty, payload));
   }
 
+  [Fact(DisplayName = "ReplaceAsync: it should throw EmailAddressAlreadyUsedException when the email address is already used.")]
+  public async Task ReplaceAsync_it_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
+    {
+      Email = new EmailAddress(Faker.Internet.Email())
+    };
+    await AggregateRepository.SaveAsync(user);
+
+    ReplaceUserPayload payload = new()
+    {
+      UniqueName = _user.UniqueName,
+      Email = new EmailPayload
+      {
+        Address = user.Email.Address
+      }
+    };
+
+    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(
+      async () => await _userService.ReplaceAsync(_user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.Email.Address, exception.EmailAddress);
+    Assert.Equal(nameof(payload.Email), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should throw UniqueNameAlreadyUsedException when the email address is already used.")]
+  public async Task ReplaceAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_email_address_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
+    {
+      Email = new EmailAddress(Faker.Internet.Email())
+    };
+    await AggregateRepository.SaveAsync(user);
+
+    ReplaceUserPayload payload = new()
+    {
+      UniqueName = $" {user.UniqueName} "
+    };
+
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(
+      async () => await _userService.ReplaceAsync(_user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
+    Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
   public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
   {
@@ -579,6 +627,53 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       && customAttribute.Value == "50.00");
 
     await AssertUserPasswordAsync(user.Id, payload.Password.NewPassword);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw EmailAddressAlreadyUsedException when the email address is already used.")]
+  public async Task UpdateAsync_it_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
+    {
+      Email = new EmailAddress(Faker.Internet.Email())
+    };
+    await AggregateRepository.SaveAsync(user);
+
+    UpdateUserPayload payload = new()
+    {
+      Email = new Modification<EmailPayload>(new()
+      {
+        Address = user.Email.Address
+      })
+    };
+
+    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(
+      async () => await _userService.UpdateAsync(_user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.Email.Value?.Address, exception.EmailAddress);
+    Assert.Equal(nameof(payload.Email), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw UniqueNameAlreadyUsedException when the email address is already used.")]
+  public async Task UpdateAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_email_address_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
+    {
+      Email = new EmailAddress(Faker.Internet.Email())
+    };
+    await AggregateRepository.SaveAsync(user);
+
+    UpdateUserPayload payload = new()
+    {
+      UniqueName = $" {user.UniqueName} "
+    };
+
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(
+      async () => await _userService.UpdateAsync(_user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
+    Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
   }
 
   private static void AssertEqual(AddressPayload? payload, Address? address)
