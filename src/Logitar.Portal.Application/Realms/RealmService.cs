@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application.Realms.Commands;
+using Logitar.Portal.Application.Realms.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 
@@ -23,9 +24,9 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new DeleteRealmCommand(id), cancellationToken);
   }
 
-  public Task<Realm?> ReadAsync(Guid? id, string? uniqueSlug, CancellationToken cancellationToken)
+  public async Task<Realm?> ReadAsync(Guid? id, string? uniqueSlug, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new ReadRealmQuery(id, uniqueSlug), cancellationToken);
   }
 
   public Task<Realm?> ReplaceAsync(Guid id, ReplaceRealmPayload payload, CancellationToken cancellationToken)

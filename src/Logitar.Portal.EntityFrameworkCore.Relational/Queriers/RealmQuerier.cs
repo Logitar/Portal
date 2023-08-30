@@ -49,10 +49,28 @@ internal class RealmQuerier : IRealmQuerier
     return await ReadAsync(realm.Id, cancellationToken)
       ?? throw new EntityNotFoundException<RealmEntity>(realm.Id);
   }
+  public async Task<Realm?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return await ReadAsync(new AggregateId(id), cancellationToken);
+  }
   public async Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == id.Value, cancellationToken);
+    if (realm == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(cancellationToken, realm)).Single();
+  }
+
+  public async Task<Realm?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
+  {
+    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
+
+    RealmEntity? realm = await _realms.AsNoTracking()
+      .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
     if (realm == null)
     {
       return null;

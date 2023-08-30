@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
@@ -138,5 +139,41 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   public async Task DeleteAsync_it_should_return_null_when_the_realm_is_not_found()
   {
     Assert.Null(await _realmService.DeleteAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return null when the realm is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_the_realm_is_not_found()
+  {
+    Assert.Null(await _realmService.ReadAsync(Guid.Empty, $"{_realm.UniqueSlug}-2"));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the realm found by unique slug.")]
+  public async Task ReadAsync_it_should_return_the_realmfound_by_unique_slug()
+  {
+    Realm? realm = await _realmService.ReadAsync(uniqueSlug: $" {_realm.UniqueSlug} ");
+    Assert.NotNull(realm);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the realm found by ID.")]
+  public async Task ReadAsync_it_should_return_the_realm_found_by_Id()
+  {
+    Realm? realm = await _realmService.ReadAsync(_realm.Id.ToGuid());
+    Assert.NotNull(realm);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when many realms have been found.")]
+  public async Task ReadAsync_it_should_throw_TooManyResultsException_when_many_realms_have_been_found()
+  {
+    RealmAggregate realm = new($"{_realm.UniqueSlug}-2");
+    await AggregateRepository.SaveAsync(realm);
+
+    Assert.NotNull(User);
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(
+      async () => await _realmService.ReadAsync(_realm.Id.ToGuid(), realm.UniqueSlug)
+    );
+    Assert.Equal(1, exception.Expected);
+    Assert.Equal(2, exception.Actual);
   }
 }
