@@ -58,6 +58,26 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     return realms.SingleOrDefault();
   }
 
+  public async Task<RealmAggregate?> LoadAsync(string uniqueSlug, CancellationToken cancellationToken)
+  {
+    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
+
+    IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
+      .Join(Db.Realms.AggregateId, Db.Events.AggregateId,
+        new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .Where(Db.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlugNormalized))
+      .SelectAll(Db.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<RealmAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+  }
+
   public async Task<RealmAggregate?> LoadAsync(SessionAggregate session, CancellationToken cancellationToken)
   {
     UserAggregate user = await LoadAsync<UserAggregate>(session.UserId, cancellationToken)
@@ -78,4 +98,7 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     return await base.LoadAsync<RealmAggregate>(id, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(id, $"{nameof(user)}.{nameof(user.TenantId)}");
   }
+
+  public async Task SaveAsync(RealmAggregate realm, CancellationToken cancellationToken)
+    => await base.SaveAsync(realm, cancellationToken);
 }

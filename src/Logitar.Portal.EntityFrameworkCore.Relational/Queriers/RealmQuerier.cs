@@ -3,6 +3,7 @@ using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,11 @@ internal class RealmQuerier : IRealmQuerier
     return (await MapAsync(cancellationToken, realm)).Single();
   }
 
+  public async Task<Realm> ReadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    return await ReadAsync(realm.Id, cancellationToken)
+      ?? throw new EntityNotFoundException<RealmEntity>(realm.Id);
+  }
   public async Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _realms.AsNoTracking()
