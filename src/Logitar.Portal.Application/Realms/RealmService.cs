@@ -29,9 +29,9 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new ReadRealmQuery(id, uniqueSlug), cancellationToken);
   }
 
-  public Task<Realm?> ReplaceAsync(Guid id, ReplaceRealmPayload payload, CancellationToken cancellationToken)
+  public async Task<Realm?> ReplaceAsync(Guid id, ReplaceRealmPayload payload, long? version, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new ReplaceRealmCommand(id, payload, version), cancellationToken);
   }
 
   public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
@@ -39,8 +39,8 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new SearchRealmsQuery(payload), cancellationToken);
   }
 
-  public Task<Realm?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
+  public async Task<Realm?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new UpdateRealmCommand(id, payload), cancellationToken);
   }
 }

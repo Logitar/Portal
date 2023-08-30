@@ -344,7 +344,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
     Assert.Equal(Actor, user.UpdatedBy);
     AssertIsNear(user.UpdatedOn);
-    Assert.True(user.Version > 1);
+    Assert.True(user.Version > version);
 
     Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
     Assert.Equal(payload.IsDisabled, user.IsDisabled);
@@ -415,8 +415,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Email), exception.PropertyName);
   }
 
-  [Fact(DisplayName = "ReplaceAsync: it should throw UniqueNameAlreadyUsedException when the email address is already used.")]
-  public async Task ReplaceAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_email_address_is_already_used()
+  [Fact(DisplayName = "ReplaceAsync: it should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
+  public async Task ReplaceAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
     UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
     {
@@ -654,8 +654,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Email), exception.PropertyName);
   }
 
-  [Fact(DisplayName = "UpdateAsync: it should throw UniqueNameAlreadyUsedException when the email address is already used.")]
-  public async Task UpdateAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_email_address_is_already_used()
+  [Fact(DisplayName = "UpdateAsync: it should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
+  public async Task UpdateAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
     UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value)
     {
@@ -721,7 +721,4 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Assert.Equal(payload.IsVerified, phone.IsVerified);
     }
   }
-
-  private static long? ToUnixTimeMilliseconds(DateTime? value)
-    => value.HasValue ? new DateTimeOffset(value.Value).ToUnixTimeMilliseconds() : null;
 }

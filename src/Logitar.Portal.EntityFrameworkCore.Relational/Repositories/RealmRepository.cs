@@ -61,6 +61,9 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
   public async Task<RealmAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await base.LoadAsync<RealmAggregate>(new AggregateId(id), cancellationToken);
 
+  public async Task<RealmAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
+    => await base.LoadAsync<RealmAggregate>(id, version, cancellationToken);
+
   public async Task<RealmAggregate?> LoadAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
     string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();

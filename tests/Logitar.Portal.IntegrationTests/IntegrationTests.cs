@@ -164,4 +164,7 @@ public abstract class IntegrationTests
     Password password = PasswordService.Decode(user.Password);
     Assert.True(password.IsMatch(passwordString ?? PasswordString));
   }
+
+  protected static long? ToUnixTimeMilliseconds(DateTime? value)
+    => value.HasValue ? new DateTimeOffset(value.Value).ToUnixTimeMilliseconds() : null;
 }

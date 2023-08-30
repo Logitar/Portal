@@ -99,7 +99,8 @@ internal static class InputExtensions
   public static ReadOnlyLoggingSettings ToReadOnlyLoggingSettings(this ILoggingSettings input)
     => new(input.Extent, input.OnlyErrors);
   public static ReadOnlyPasswordSettings ToReadOnlyPasswordSettings(this IPasswordSettings input)
-    => new(input.RequiredLength, input.RequiredUniqueChars, input.RequireNonAlphanumeric, input.RequireLowercase, input.RequireUppercase, input.RequireDigit);
+    => new(input.RequiredLength, input.RequiredUniqueChars, input.RequireNonAlphanumeric,
+        input.RequireLowercase, input.RequireUppercase, input.RequireDigit, input.Strategy);
   public static ReadOnlyUniqueNameSettings ToReadOnlyUniqueNameSettings(this IUniqueNameSettings input)
     => new(input.AllowedCharacters);
 }

@@ -177,6 +177,120 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(2, exception.Actual);
   }
 
+  [Fact(DisplayName = "ReplaceAsync: it should replace the realm.")]
+  public async Task ReplaceAsync_it_should_replace_the_realm()
+  {
+    long version = _realm.Version;
+
+    _realm.RemoveClaimMapping("EmployeeId");
+    _realm.SetClaimMapping("EmployeeNo", new ReadOnlyClaimMapping("employee_no"));
+    _realm.RemoveCustomAttribute("PostalCode");
+    _realm.SetCustomAttribute("PostalAddress", "150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2");
+    await AggregateRepository.SaveAsync(_realm);
+
+    ReplaceRealmPayload payload = new()
+    {
+      UniqueSlug = $" {_realm.UniqueSlug}-2 ",
+      DisplayName = $"  {_realm.DisplayName?.ToUpper()}  ",
+      Description = "    ",
+      DefaultLocale = "  en-CA  ",
+      Secret = "  YRJH43_+dM}Z&a8K!P5c,NsSvtebn2rT  ",
+      Url = "  https://www.desjardins.com/index.html  ",
+      RequireUniqueEmail = true,
+      RequireConfirmedAccount = true,
+      UniqueNameSettings = new UniqueNameSettings
+      {
+        AllowedCharacters = _realm.UniqueNameSettings.AllowedCharacters
+      },
+      PasswordSettings = new PasswordSettings
+      {
+        RequiredLength = 7,
+        RequiredUniqueChars = 4,
+        RequireNonAlphanumeric = true,
+        RequireLowercase = true,
+        RequireUppercase = true,
+        RequireDigit = false,
+        Strategy = "BCRYPT"
+      },
+      ClaimMappings = new ClaimMapping[]
+      {
+        new("DepartmentCode", "dept_code", "string"),
+        new("HourlyRate", "rate", "float")
+      },
+      CustomAttributes = new CustomAttribute[]
+      {
+        new("LocationKind", "ShoppingMall"),
+        new("PhoneNumber", "+15148454636")
+      }
+    };
+
+    Realm? realm = await _realmService.ReplaceAsync(_realm.Id.ToGuid(), payload, version);
+    Assert.NotNull(realm);
+
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+    Assert.Equal(Guid.Empty, realm.CreatedBy.Id);
+    Assert.Equal(ToUnixTimeMilliseconds(_realm.CreatedOn), ToUnixTimeMilliseconds(realm.CreatedOn));
+    Assert.Equal(Actor, realm.UpdatedBy);
+    AssertIsNear(realm.UpdatedOn);
+    Assert.True(realm.Version > version);
+
+    Assert.Equal(payload.UniqueSlug.Trim(), realm.UniqueSlug);
+    Assert.Equal(payload.DisplayName.Trim(), realm.DisplayName);
+    Assert.Null(realm.Description);
+    Assert.Equal(payload.DefaultLocale.Trim(), realm.DefaultLocale);
+    Assert.Equal(payload.Secret.Trim(), realm.Secret);
+    Assert.Equal(payload.Url.Trim(), realm.Url);
+    Assert.Equal(payload.RequireUniqueEmail, realm.RequireUniqueEmail);
+    Assert.Equal(payload.RequireConfirmedAccount, realm.RequireConfirmedAccount);
+    Assert.Equal(payload.UniqueNameSettings, realm.UniqueNameSettings);
+    Assert.Equal(payload.PasswordSettings, realm.PasswordSettings);
+
+    Assert.Equal(3, realm.ClaimMappings.Count());
+    Assert.Contains(realm.ClaimMappings, claimMapping => claimMapping.Key == "DepartmentCode"
+      && claimMapping.Name == "dept_code" && claimMapping.Type == "string");
+    Assert.Contains(realm.ClaimMappings, claimMapping => claimMapping.Key == "EmployeeNo"
+      && claimMapping.Name == "employee_no" && claimMapping.Type == null);
+    Assert.Contains(realm.ClaimMappings, claimMapping => claimMapping.Key == "HourlyRate"
+      && claimMapping.Name == "rate" && claimMapping.Type == "float");
+
+    Assert.Equal(3, realm.CustomAttributes.Count());
+    Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "LocationKind"
+      && customAttribute.Value == "ShoppingMall");
+    Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PhoneNumber"
+      && customAttribute.Value == "+15148454636");
+    Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PostalAddress"
+      && customAttribute.Value == "150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2");
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should return null when the realm is not found.")]
+  public async Task ReplaceAsync_it_should_return_null_when_the_realm_is_not_found()
+  {
+    ReplaceRealmPayload payload = new();
+    Assert.Null(await _realmService.ReplaceAsync(Guid.Empty, payload));
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
+  public async Task ReplaceAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
+  {
+    RealmAggregate realm = new($"{_realm.UniqueSlug}-2");
+    await AggregateRepository.SaveAsync(realm);
+
+    ReplaceRealmPayload payload = new()
+    {
+      UniqueSlug = $" {realm.UniqueSlug} ",
+      PasswordSettings = new PasswordSettings
+      {
+        RequiredLength = 1,
+        RequiredUniqueChars = 1,
+        Strategy = "BCRYPT"
+      }
+    };
+
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await _realmService.ReplaceAsync(_realm.Id.ToGuid(), payload));
+    Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
   public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
   {
@@ -237,5 +351,86 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     {
       Assert.Equal(realms[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
     }
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should return null when the realm is not found.")]
+  public async Task UpdateAsync_it_should_return_null_when_the_realm_is_not_found()
+  {
+    UpdateRealmPayload payload = new();
+    Assert.Null(await _realmService.UpdateAsync(Guid.Empty, payload));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
+  public async Task UpdateAsync_it_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
+  {
+    RealmAggregate realm = new($"{_realm.UniqueSlug}-2");
+    await AggregateRepository.SaveAsync(realm);
+
+    UpdateRealmPayload payload = new()
+    {
+      UniqueSlug = $" {realm.UniqueSlug} "
+    };
+
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await _realmService.UpdateAsync(_realm.Id.ToGuid(), payload));
+    Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should update the realm.")]
+  public async Task UpdateAsync_it_should_update_the_realm()
+  {
+    UpdateRealmPayload payload = new()
+    {
+      Description = new Modification<string>("Indoor complex featuring shops with apparel, accessories & housewares, plus a food court & a grocer."),
+      Secret = "jVf5!.UNxR6ny?$K+S~T2Wh-8@_4d;v'",
+      RequireUniqueEmail = true,
+      PasswordSettings = new PasswordSettings
+      {
+        RequiredLength = 7,
+        RequiredUniqueChars = 4,
+        RequireNonAlphanumeric = true,
+        RequireLowercase = true,
+        RequireUppercase = true,
+        RequireDigit = false,
+        Strategy = "BCRYPT"
+      },
+      ClaimMappings = new ClaimMappingModification[]
+      {
+        new("EmployeeId", name: null),
+        new("EmployeeNo", "employee_no", "string")
+      },
+      CustomAttributes = new CustomAttributeModification[]
+      {
+        new("PostalCode", value: null),
+        new("  PostalAddress  ", "  150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2  ")
+      }
+    };
+
+    Realm? realm = await _realmService.UpdateAsync(_realm.Id.ToGuid(), payload);
+    Assert.NotNull(realm);
+
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+    Assert.Equal(Guid.Empty, realm.CreatedBy.Id);
+    Assert.Equal(ToUnixTimeMilliseconds(_realm.CreatedOn), ToUnixTimeMilliseconds(realm.CreatedOn));
+    Assert.Equal(Actor, realm.UpdatedBy);
+    AssertIsNear(realm.UpdatedOn);
+    Assert.True(realm.Version > 1);
+
+    Assert.Equal(payload.Description.Value, realm.Description);
+    Assert.Equal(payload.Secret, realm.Secret);
+    Assert.Equal(payload.RequireUniqueEmail, realm.RequireUniqueEmail);
+    Assert.Equal(payload.PasswordSettings, realm.PasswordSettings);
+
+    Assert.Equal(2, realm.ClaimMappings.Count());
+    Assert.Contains(realm.ClaimMappings, claimMapping => claimMapping.Key == "EmployeeNo"
+      && claimMapping.Name == "employee_no" && claimMapping.Type == "string");
+    Assert.Contains(realm.ClaimMappings, claimMapping => claimMapping.Key == "HourlyRate"
+      && claimMapping.Name == "rate" && claimMapping.Type == "double");
+
+    Assert.Equal(2, realm.CustomAttributes.Count());
+    Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PhoneNumber"
+      && customAttribute.Value == "+15148454636");
+    Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PostalAddress"
+      && customAttribute.Value == "150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2");
   }
 }
