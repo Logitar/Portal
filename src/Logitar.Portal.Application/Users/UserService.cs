@@ -29,9 +29,9 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName), cancellationToken);
   }
 
-  public Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, CancellationToken cancellationToken)
+  public async Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
@@ -44,8 +44,8 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new SignOutUserCommand(id), cancellationToken);
   }
 
-  public Task<User?> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken)
+  public async Task<User?> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new UpdateUserCommand(id, payload), cancellationToken);
   }
 }

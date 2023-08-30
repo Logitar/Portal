@@ -110,6 +110,15 @@ internal record UserEntity : AggregateEntity
   public List<RoleEntity> Roles { get; } = new();
   public List<SessionEntity> Sessions { get; } = new();
 
+  public void ChangePassword(UserChangedPasswordEvent changedPassword)
+  {
+    Update(changedPassword);
+
+    Password = changedPassword.NewPassword.Encode();
+    PasswordChangedBy = changedPassword.ActorId.Value;
+    PasswordChangedOn = changedPassword.OccurredOn.ToUniversalTime();
+  }
+
   public void Disable(UserDisabledEvent disabled)
   {
     Update(disabled);

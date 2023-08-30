@@ -36,6 +36,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email, isVerified: true),
+      Phone = new PhoneNumber("+15148454636", "CA", "123456"),
       FirstName = Faker.Person.FirstName,
       LastName = Faker.Person.LastName,
       Birthdate = Faker.Person.DateOfBirth,
@@ -46,6 +47,9 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Website = _realm.Url
     };
     _user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}");
+    _user.SetCustomAttribute("Department", "Mortgages");
+    _user.SetCustomAttribute("EmployeeId", "040-735323-2");
+    _user.SetCustomAttribute("HourlyRate", "25.00");
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
   }
 
@@ -284,6 +288,107 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(2, exception.Actual);
   }
 
+  [Fact(DisplayName = "ReplaceAsync: it should replace the user.")]
+  public async Task ReplaceAsync_it_should_replace_the_user()
+  {
+    long version = _user.Version;
+
+    _user.RemoveCustomAttribute("Department");
+    _user.SetCustomAttribute("DepartmentCode", "951");
+    _user.SetCustomAttribute("HourlyRate", "37.50");
+    await AggregateRepository.SaveAsync(_user);
+
+    Faker faker = new();
+    ReplaceUserPayload payload = new()
+    {
+      UniqueName = $" {_user.UniqueName}2 ",
+      Password = string.Concat(PasswordString, '*'),
+      IsDisabled = true,
+      Address = new AddressPayload
+      {
+        Street = "150 Saint-Catherine St W",
+        Locality = "Montreal",
+        Region = "QC",
+        PostalCode = "H2X 3Y2",
+        Country = "CA",
+        IsVerified = true
+      },
+      Email = new EmailPayload
+      {
+        Address = faker.Person.Email
+      },
+      FirstName = faker.Person.FirstName,
+      MiddleName = "    ",
+      LastName = faker.Person.LastName,
+      Nickname = string.Concat(faker.Person.FirstName.First(), faker.Person.LastName).ToLower(),
+      Birthdate = faker.Person.DateOfBirth,
+      Gender = faker.Person.Gender.ToString(),
+      Locale = faker.Locale,
+      TimeZone = "America/New_York   ",
+      Picture = faker.Person.Avatar,
+      Profile = "    ",
+      Website = $"  {_realm.Url}  ",
+      CustomAttributes = new CustomAttribute[]
+      {
+         new(" EmployeeId  ", "   040-735323-2 "),
+         new("HourlyRate", "50.00")
+      }
+    };
+
+    User? user = await _userService.ReplaceAsync(_user.Id.ToGuid(), payload, version);
+
+    Assert.NotNull(user);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Equal(Guid.Empty, user.CreatedBy.Id);
+    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
+    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.NotNull(user.Address);
+    Assert.Equal(payload.Address.Street, user.Address.Street);
+    Assert.Equal(payload.Address.Locality, user.Address.Locality);
+    Assert.Equal(payload.Address.Region, user.Address.Region);
+    Assert.Equal(payload.Address.PostalCode, user.Address.PostalCode);
+    Assert.Equal(payload.Address.Country, user.Address.Country);
+    Assert.Equal(payload.Address.IsVerified, user.Address.IsVerified);
+    Assert.NotNull(user.Email);
+    Assert.Equal(payload.Email.Address, user.Email.Address);
+    Assert.Equal(payload.Email.IsVerified, user.Email.IsVerified);
+    Assert.Null(user.Phone);
+    Assert.Equal(payload.FirstName, user.FirstName);
+    Assert.Null(user.MiddleName);
+    Assert.Equal(payload.LastName, user.LastName);
+    Assert.Equal(payload.Nickname, user.Nickname);
+    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
+    Assert.Equal(payload.Gender.ToLower(), user.Gender);
+    Assert.Equal(payload.Locale, user.Locale);
+    Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
+    Assert.Equal(payload.Picture, user.Picture);
+    Assert.Null(user.Profile);
+    Assert.Equal(payload.Website.Trim(), user.Website);
+
+    Assert.Equal(3, user.CustomAttributes.Count());
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "DepartmentCode"
+      && customAttribute.Value == "951");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "EmployeeId"
+      && customAttribute.Value == "040-735323-2");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate"
+      && customAttribute.Value == "50.00");
+
+    await AssertUserPasswordAsync(user.Id, payload.Password);
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should return null when the user is not found.")]
+  public async Task ReplaceAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    ReplaceUserPayload payload = new();
+    Assert.Null(await _userService.ReplaceAsync(Guid.Empty, payload));
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
   public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
   {
@@ -412,6 +517,68 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   public async Task SignOutAsync_it_should_return_null_when_the_user_is_not_found()
   {
     Assert.Null(await _userService.SignOutAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should return null when the user is not found.")]
+  public async Task UpdateAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    UpdateUserPayload payload = new();
+    Assert.Null(await _userService.UpdateAsync(Guid.Empty, payload));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should replace the user.")]
+  public async Task UpdateAsync_it_should_replace_the_user()
+  {
+    _user.Disable();
+    _user.RemoveCustomAttribute("Department");
+    _user.SetCustomAttribute("DepartmentCode", "951");
+    _user.SetCustomAttribute("HourlyRate", "37.50");
+    await AggregateRepository.SaveAsync(_user);
+
+    UpdateUserPayload payload = new()
+    {
+      UniqueName = $"  {_user.UniqueName}2  ",
+      Password = new ChangePasswordPayload
+      {
+        CurrentPassword = PasswordString,
+        NewPassword = string.Concat(PasswordString, '*')
+      },
+      IsDisabled = false,
+      MiddleName = new Modification<string>($" {Faker.Name.FirstName()} "),
+      Nickname = new Modification<string>(string.Concat(_user.FirstName?.First(), _user.LastName).ToLower()),
+      CustomAttributes = new CustomAttributeModification[]
+      {
+        new("DepartmentName", "Mortgages"),
+        new("HourlyRate", "50.00"),
+        new("DepartmentCode", null)
+      }
+    };
+
+    User? user = await _userService.UpdateAsync(_user.Id.ToGuid(), payload);
+
+    Assert.NotNull(user);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Equal(Guid.Empty, user.CreatedBy.Id);
+    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
+    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.Equal(payload.MiddleName.Value?.Trim(), user.MiddleName);
+    Assert.Equal(payload.Nickname.Value?.Trim(), user.Nickname);
+
+    Assert.Equal(3, user.CustomAttributes.Count());
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "DepartmentName"
+      && customAttribute.Value == "Mortgages");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "EmployeeId"
+      && customAttribute.Value == "040-735323-2");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate"
+      && customAttribute.Value == "50.00");
+
+    await AssertUserPasswordAsync(user.Id, payload.Password.NewPassword);
   }
 
   private static void AssertEqual(AddressPayload? payload, Address? address)

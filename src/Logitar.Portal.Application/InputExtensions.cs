@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Settings;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Settings;
@@ -87,6 +88,13 @@ internal static class InputExtensions
       throw new InvalidUrlException(uriString, propertyName, innerException);
     }
   }
+
+  public static EmailAddress ToEmailAddress(this EmailPayload payload)
+    => new(payload.Address, payload.IsVerified);
+  public static PhoneNumber ToPhoneNumber(this PhonePayload payload)
+    => new(payload.Number, payload.CountryCode, payload.Extension, payload.IsVerified);
+  public static PostalAddress ToPostalAddress(this AddressPayload payload)
+    => new(payload.Street, payload.Locality, payload.Country, payload.Region, payload.PostalCode, payload.IsVerified);
 
   public static ReadOnlyLoggingSettings ToReadOnlyLoggingSettings(this ILoggingSettings input)
     => new(input.Extent, input.OnlyErrors);

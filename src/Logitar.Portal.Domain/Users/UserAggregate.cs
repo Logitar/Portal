@@ -308,6 +308,19 @@ public class UserAggregate : AggregateRoot
 
   // TODO(fpion): Roles
 
+  public void ChangePassword(string currentPassword, Password newPassword, ActorId? actorId = null)
+  {
+    if (_password?.IsMatch(currentPassword) != true)
+    {
+      throw new IncorrectUserPasswordException(this, currentPassword);
+    }
+
+    actorId ??= new(Id.Value);
+
+    ApplyChange(new UserChangedPasswordEvent(actorId.Value, newPassword));
+  }
+  protected virtual void Apply(UserChangedPasswordEvent changedPassword) => _password = changedPassword.NewPassword;
+
   public void Delete(ActorId actorId = default) => ApplyChange(new UserDeletedEvent(actorId));
 
   public void Disable(ActorId actorId = default)

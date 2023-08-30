@@ -29,6 +29,9 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
   public async Task<User> Handle(CreateUserCommand command, CancellationToken cancellationToken)
   {
     CreateUserPayload payload = command.Payload;
+    PostalAddress? address = payload.Address?.ToPostalAddress();
+    EmailAddress? email = payload.Email?.ToEmailAddress();
+    PhoneNumber? phone = payload.Phone?.ToPhoneNumber();
 
     RealmAggregate? realm = null;
     if (payload.Realm != null)
@@ -55,27 +58,26 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       user.Disable(_applicationContext.ActorId);
     }
 
-    if (payload.Address != null)
+    if (address != null)
     {
-      user.Address = new PostalAddress(payload.Address.Street, payload.Address.Locality,
-        payload.Address.Country, payload.Address.Region, payload.Address.PostalCode, payload.Address.IsVerified);
+      user.Address = address;
     }
-    if (payload.Email != null)
+    if (email != null)
     {
       if (realm?.RequireUniqueEmail == true)
       {
-        IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId, payload.Email, cancellationToken);
+        IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId, email, cancellationToken);
         if (users.Any(u => !u.Equals(user)))
         {
-          throw new EmailAddressAlreadyUsedException(tenantId, payload.Email, nameof(payload.Email));
+          throw new EmailAddressAlreadyUsedException(tenantId, email, nameof(payload.Email));
         }
       }
 
-      user.Email = new EmailAddress(payload.Email.Address, payload.Email.IsVerified);
+      user.Email = email;
     }
-    if (payload.Phone != null)
+    if (phone != null)
     {
-      user.Phone = new PhoneNumber(payload.Phone.Number, payload.Phone.CountryCode, payload.Phone.Extension, payload.Phone.IsVerified);
+      user.Phone = phone;
     }
 
     user.FirstName = payload.FirstName;
