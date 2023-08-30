@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 
@@ -11,4 +12,5 @@ public interface IRealmQuerier
   Task<Realm?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken = default);
   Task<Realm?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken = default);
+  Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken = default);
 }

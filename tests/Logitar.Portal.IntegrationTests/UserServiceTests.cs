@@ -365,7 +365,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   {
     Faker faker = new();
 
-    UserAggregate user = new(_realm.UniqueNameSettings, faker.Person.UserName, _realm.Id.Value)
+    return new UserAggregate(_realm.UniqueNameSettings, faker.Person.UserName, _realm.Id.Value)
     {
       FirstName = faker.Person.FirstName,
       LastName = faker.Person.LastName,
@@ -377,8 +377,6 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Picture = new Uri(faker.Person.Avatar),
       Website = new Uri($"https://www.{faker.Person.Website}/")
     };
-
-    return user;
   }
 
   [Fact(DisplayName = "SignOutAsync: it should sign-out the user.")]

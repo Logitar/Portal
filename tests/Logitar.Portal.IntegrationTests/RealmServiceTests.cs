@@ -176,4 +176,66 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(1, exception.Expected);
     Assert.Equal(2, exception.Actual);
   }
+
+  [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
+  public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
+  {
+    SearchRealmsPayload payload = new()
+    {
+      IdIn = new[] { Guid.Empty }
+    };
+
+    SearchResults<Realm> results = await _realmService.SearchAsync(payload);
+
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
+  public async Task SearchAsync_it_should_return_the_correct_results()
+  {
+    RealmAggregate idNotIn = new("desjardins-123");
+    RealmAggregate realm1 = new("legacy-desjcoop");
+    RealmAggregate realm2 = new("desjardins-514");
+    RealmAggregate realm3 = new("desjzrdins-450");
+    RealmAggregate realm4 = new("désjardîns-987");
+    await AggregateRepository.SaveAsync(new[] { idNotIn, realm1, realm2, realm3, realm4 });
+
+    RealmAggregate[] realms = new[] { realm1, realm2, realm3, realm4 }
+      .OrderBy(x => x.DisplayName).Skip(1).Take(2).ToArray();
+
+    HashSet<Guid> ids = (await PortalContext.Realms.AsNoTracking().ToArrayAsync())
+      .Select(realm => new AggregateId(realm.AggregateId).ToGuid()).ToHashSet();
+    ids.Remove(idNotIn.Id.ToGuid());
+
+    SearchRealmsPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Operator = SearchOperator.Or,
+        Terms = new SearchTerm[]
+        {
+          new("d_sj_rd_ns-%"),
+          new("%legacy%")
+        }
+      },
+      IdIn = ids,
+      Sort = new RealmSortOption[]
+      {
+        new RealmSortOption(RealmSort.DisplayName)
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<Realm> results = await _realmService.SearchAsync(payload);
+
+    Assert.Equal(realms.Length, results.Results.Count());
+    Assert.Equal(4, results.Total);
+
+    for (int i = 0; i < realms.Length; i++)
+    {
+      Assert.Equal(realms[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
+    }
+  }
 }

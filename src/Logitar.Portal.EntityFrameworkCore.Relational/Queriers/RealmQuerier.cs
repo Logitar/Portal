@@ -1,6 +1,8 @@
-﻿using Logitar.EventSourcing;
+﻿using Logitar.Data;
+using Logitar.EventSourcing;
 using Logitar.Portal.Application.Actors;
 using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
@@ -14,11 +16,13 @@ internal class RealmQuerier : IRealmQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<RealmEntity> _realms;
+  private readonly ISqlHelper _sqlHelper;
 
-  public RealmQuerier(IActorService actorService, PortalContext context)
+  public RealmQuerier(IActorService actorService, PortalContext context, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
     _realms = context.Realms;
+    _sqlHelper = sqlHelper;
   }
 
   public async Task<Realm?> FindAsync(string idOrUniqueSlug, CancellationToken cancellationToken)
@@ -77,6 +81,48 @@ internal class RealmQuerier : IRealmQuerier
     }
 
     return (await MapAsync(cancellationToken, realm)).Single();
+  }
+
+  public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
+  {
+    IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Realms.Table)
+      .ApplyIdInFilter(Db.Realms.AggregateId, payload.IdIn)
+      .SelectAll(Db.Realms.Table);
+    _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Realms.UniqueSlug, Db.Realms.DisplayName);
+
+    IQueryable<RealmEntity> query = _realms.FromQuery(builder.Build()).AsNoTracking();
+    long total = await query.LongCountAsync(cancellationToken);
+
+    IOrderedQueryable<RealmEntity>? ordered = null;
+    foreach (RealmSortOption sort in payload.Sort)
+    {
+      switch (sort.Field)
+      {
+        case RealmSort.DisplayName:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.DisplayName) : ordered.ThenBy(x => x.DisplayName));
+          break;
+        case RealmSort.UniqueSlug:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.UniqueSlug) : query.OrderBy(x => x.UniqueSlug))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.UniqueSlug) : ordered.ThenBy(x => x.UniqueSlug));
+          break;
+        case RealmSort.UpdatedOn:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.UpdatedOn) : query.OrderBy(x => x.UpdatedOn))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.UpdatedOn) : ordered.ThenBy(x => x.UpdatedOn));
+          break;
+      }
+    }
+    query = ordered ?? query;
+
+    query = query.ApplyPaging(payload);
+
+    RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
+    IEnumerable<Realm> results = await MapAsync(cancellationToken, realms);
+
+    return new SearchResults<Realm>(results, total);
   }
 
   private async Task<IEnumerable<Realm>> MapAsync(CancellationToken cancellationToken = default, params RealmEntity[] realms)

@@ -34,9 +34,9 @@ internal class RealmService : IRealmService
     throw new NotImplementedException();
   }
 
-  public Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new SearchRealmsQuery(payload), cancellationToken);
   }
 
   public Task<Realm?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)

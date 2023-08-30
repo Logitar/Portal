@@ -19,6 +19,8 @@ internal static class Db
     public static readonly TableId Table = new(nameof(PortalContext.Realms));
 
     public static readonly ColumnId AggregateId = new(nameof(RealmEntity.AggregateId), Table);
+    public static readonly ColumnId DisplayName = new(nameof(RealmEntity.DisplayName), Table);
+    public static readonly ColumnId UniqueSlug = new(nameof(RealmEntity.UniqueSlug), Table);
     public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
   }
 

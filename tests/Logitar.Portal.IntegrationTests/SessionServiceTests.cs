@@ -248,15 +248,18 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   {
     UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value);
 
-    SessionAggregate idNotIn = CreateSession();
+    SessionAggregate idNotIn = new(_user);
     SessionAggregate otherUser = new(user);
-    SessionAggregate persistent = CreateSession(isPersistent: true);
-    SessionAggregate session1 = CreateSession();
-    SessionAggregate session2 = CreateSession();
-    SessionAggregate session3 = CreateSession();
-    SessionAggregate session4 = CreateSession();
 
-    SessionAggregate signedOut = CreateSession();
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, SessionAggregate.SecretLength, out _);
+    SessionAggregate persistent = new(_user, secret);
+
+    SessionAggregate session1 = new(_user);
+    SessionAggregate session2 = new(_user);
+    SessionAggregate session3 = new(_user);
+    SessionAggregate session4 = new(_user);
+
+    SessionAggregate signedOut = new(_user);
     signedOut.SignOut();
 
     await AggregateRepository.SaveAsync(new AggregateRoot[] { user, idNotIn, otherUser, persistent, session1, session2, session3, session4, signedOut });
@@ -299,11 +302,6 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     {
       Assert.Equal(sessions[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
     }
-  }
-  private SessionAggregate CreateSession(bool isPersistent = false)
-  {
-    Password? secret = isPersistent ? PasswordService.Generate(_realm.PasswordSettings, SessionAggregate.SecretLength, out _) : null;
-    return new SessionAggregate(_user, secret);
   }
 
   [Fact(DisplayName = "SignInAsync: it should create a persistent session.")]
