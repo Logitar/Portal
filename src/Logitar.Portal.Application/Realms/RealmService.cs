@@ -18,9 +18,9 @@ internal class RealmService : IRealmService
     return await _pipeline.ExecuteAsync(new CreateRealmCommand(payload), cancellationToken);
   }
 
-  public Task<Realm?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Realm?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    return await _pipeline.ExecuteAsync(new DeleteRealmCommand(id), cancellationToken);
   }
 
   public Task<Realm?> ReadAsync(Guid? id, string? uniqueSlug, CancellationToken cancellationToken)

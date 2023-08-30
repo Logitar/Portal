@@ -4,6 +4,7 @@ using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +49,26 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
     return base.Load<UserAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
   }
 
+  public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    string tenantId = realm.Id.Value;
+
+    IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
+      .Join(Db.Users.AggregateId, Db.Events.AggregateId,
+        new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .Where(Db.Users.TenantId, Operators.IsEqualTo(tenantId))
+      .SelectAll(Db.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return base.Load<UserAggregate>(events.Select(EventSerializer.Deserialize));
+  }
+
   public async Task<IEnumerable<UserAggregate>> LoadAsync(string? tenantId, IEmailAddress email, CancellationToken cancellationToken)
   {
     tenantId = tenantId?.CleanTrim();
@@ -75,5 +96,14 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
     await base.SaveAsync(user, cancellationToken);
 
     _cacheService.RemoveUser(user);
+  }
+  public async Task SaveAsync(IEnumerable<UserAggregate> users, CancellationToken cancellationToken)
+  {
+    await base.SaveAsync(users, cancellationToken);
+
+    foreach (UserAggregate user in users)
+    {
+      _cacheService.RemoveUser(user);
+    }
   }
 }

@@ -16,11 +16,27 @@ internal class DeleteSessionsCommandHandler : INotificationHandler<DeleteSession
 
   public async Task Handle(DeleteSessionsCommand command, CancellationToken cancellationToken)
   {
-    IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadAsync(command.User, cancellationToken);
+    IEnumerable<SessionAggregate> sessions = await LoadAsync(command, cancellationToken);
     foreach (SessionAggregate session in sessions)
     {
       session.Delete(_applicationContext.ActorId);
     }
+
     await _sessionRepository.SaveAsync(sessions, cancellationToken);
+  }
+
+  private async Task<IEnumerable<SessionAggregate>> LoadAsync(DeleteSessionsCommand command, CancellationToken cancellationToken)
+  {
+    if (command.Realm != null)
+    {
+      return await _sessionRepository.LoadAsync(command.Realm, cancellationToken);
+    }
+
+    if (command.User != null)
+    {
+      return await _sessionRepository.LoadAsync(command.User, cancellationToken);
+    }
+
+    return Enumerable.Empty<SessionAggregate>();
   }
 }

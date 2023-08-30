@@ -1,10 +1,14 @@
-﻿using Logitar.Portal.Application.Realms;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Settings;
+using Logitar.Portal.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal;
@@ -108,5 +112,31 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await _realmService.CreateAsync(payload));
     Assert.Equal(payload.UniqueSlug, exception.UniqueSlug);
     Assert.Equal(nameof(payload.UniqueSlug), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should delete the realm.")]
+  public async Task DeleteAsync_it_should_delete_the_realm()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
+    {
+      Email = new EmailAddress(Faker.Person.Email, isVerified: true)
+    };
+    SessionAggregate session = user.SignIn(_realm.UserSettings);
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { user, session });
+
+    Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
+
+    Assert.NotNull(realm);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+
+    Assert.Null(await PortalContext.Sessions.SingleOrDefaultAsync(x => x.AggregateId == session.Id.Value));
+    Assert.Null(await PortalContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value));
+    Assert.Null(await PortalContext.Realms.SingleOrDefaultAsync(x => x.AggregateId == _realm.Id.Value));
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should return null when the realm is not found.")]
+  public async Task DeleteAsync_it_should_return_null_when_the_realm_is_not_found()
+  {
+    Assert.Null(await _realmService.DeleteAsync(Guid.Empty));
   }
 }
