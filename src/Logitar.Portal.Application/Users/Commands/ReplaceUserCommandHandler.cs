@@ -1,9 +1,12 @@
-﻿using Logitar.Portal.Contracts;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Users;
 using MediatR;
 
@@ -14,15 +17,17 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
   private readonly IApplicationContext _applicationContext;
   private readonly IPasswordService _passwordService;
   private readonly IRealmRepository _realmRepository;
+  private readonly IRoleRepository _roleRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
   public ReplaceUserCommandHandler(IApplicationContext applicationContext, IPasswordService passwordService,
-    IRealmRepository realmRepository, IUserQuerier userQuerier, IUserRepository userRepository)
+    IRealmRepository realmRepository, IRoleRepository roleRepository, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
     _passwordService = passwordService;
     _realmRepository = realmRepository;
+    _roleRepository = roleRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -40,7 +45,6 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       realm = await _realmRepository.LoadAsync(user, cancellationToken);
     }
-    string? tenantId = realm?.Id.Value;
 
     UserAggregate? reference = null;
     if (command.Version.HasValue)
@@ -49,15 +53,24 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     }
 
     ReplaceUserPayload payload = command.Payload;
-    PostalAddress? address = payload.Address?.ToPostalAddress();
-    EmailAddress? email = payload.Email?.ToEmailAddress();
-    PhoneNumber? phone = payload.Phone?.ToPhoneNumber();
-    Gender? gender = payload.Gender?.GetGender(nameof(payload.Gender));
-    Locale? locale = payload.Locale?.GetLocale(nameof(payload.Locale));
-    TimeZoneEntry? timeZone = payload.TimeZone?.GetTimeZone(nameof(payload.TimeZone));
-    Uri? picture = payload.Picture?.GetUrl(nameof(payload.Picture));
-    Uri? profile = payload.Profile?.GetUrl(nameof(payload.Profile));
-    Uri? website = payload.Website?.GetUrl(nameof(payload.Website));
+
+    await SetAuthenticationInformationAsync(user, reference, payload, realm, cancellationToken);
+    await SetContactInformationAsync(user, reference, payload, realm, cancellationToken);
+    SetPersonalInformation(user, reference, payload);
+    SetCustomAttributes(user, reference, payload);
+    await SetRolesAsync(user, reference, payload, realm, cancellationToken);
+
+    user.Update(_applicationContext.ActorId);
+
+    await _userRepository.SaveAsync(user, cancellationToken);
+
+    return await _userQuerier.ReadAsync(user, cancellationToken);
+  }
+
+  private async Task SetAuthenticationInformationAsync(UserAggregate user, UserAggregate? reference,
+    ReplaceUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  {
+    string? tenantId = realm?.Id.Value;
 
     if (reference == null || payload.UniqueName.Trim() != reference.UniqueName)
     {
@@ -84,6 +97,15 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Enable(_applicationContext.ActorId);
     }
+  }
+
+  private async Task SetContactInformationAsync(UserAggregate user, UserAggregate? reference,
+    ReplaceUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  {
+    string? tenantId = realm?.Id.Value;
+    PostalAddress? address = payload.Address?.ToPostalAddress();
+    EmailAddress? email = payload.Email?.ToEmailAddress();
+    PhoneNumber? phone = payload.Phone?.ToPhoneNumber();
 
     if (reference == null || address != reference.Address)
     {
@@ -106,6 +128,16 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Phone = phone;
     }
+  }
+
+  private static void SetPersonalInformation(UserAggregate user, UserAggregate? reference, ReplaceUserPayload payload)
+  {
+    Gender? gender = payload.Gender?.GetGender(nameof(payload.Gender));
+    Locale? locale = payload.Locale?.GetLocale(nameof(payload.Locale));
+    TimeZoneEntry? timeZone = payload.TimeZone?.GetTimeZone(nameof(payload.TimeZone));
+    Uri? picture = payload.Picture?.GetUrl(nameof(payload.Picture));
+    Uri? profile = payload.Profile?.GetUrl(nameof(payload.Profile));
+    Uri? website = payload.Website?.GetUrl(nameof(payload.Website));
 
     if (reference == null || payload.FirstName?.CleanTrim() != reference.FirstName)
     {
@@ -153,9 +185,10 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Website = website;
     }
+  }
 
-    // TODO(fpion): Roles
-
+  private static void SetCustomAttributes(UserAggregate user, UserAggregate? reference, ReplaceUserPayload payload)
+  {
     HashSet<string> customAttributeKeys = payload.CustomAttributes.Select(x => x.Key.Trim()).ToHashSet();
     foreach (string key in user.CustomAttributes.Keys)
     {
@@ -168,10 +201,68 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
-    user.Update(_applicationContext.ActorId);
+  }
 
-    await _userRepository.SaveAsync(user, cancellationToken);
+  private async Task SetRolesAsync(UserAggregate user, UserAggregate? reference,
+    ReplaceUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  {
+    IEnumerable<RoleAggregate> roles = await FindRolesAsync(payload, realm, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    HashSet<AggregateId> roleIds = roles.Select(r => r.Id).ToHashSet();
+    foreach (AggregateId roleId in user.Roles)
+    {
+      if (!roleIds.Contains(roleId) && (reference == null || reference.Roles.Contains(roleId)))
+      {
+        user.RemoveRole(roleId);
+      }
+    }
+
+    foreach (RoleAggregate role in roles)
+    {
+      user.AddRole(role);
+    }
+  }
+  private async Task<IEnumerable<RoleAggregate>> FindRolesAsync(ReplaceUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  {
+    int roleCount = payload.Roles.Count();
+    if (roleCount == 0)
+    {
+      return Enumerable.Empty<RoleAggregate>();
+    }
+
+    IEnumerable<RoleAggregate> roles = await _roleRepository.LoadAsync(realm, cancellationToken);
+    Dictionary<Guid, RoleAggregate> rolesById = new(capacity: roles.Count());
+    Dictionary<string, RoleAggregate> rolesByUniqueName = new(capacity: rolesById.Count);
+    foreach (RoleAggregate role in roles)
+    {
+      rolesById[role.Id.ToGuid()] = role;
+      rolesByUniqueName[role.UniqueName.ToUpper()] = role;
+    }
+
+    List<RoleAggregate> foundRoles = new(capacity: roleCount);
+    List<string> missingRoles = new(capacity: roleCount);
+
+    foreach (string idOrUniqueName in payload.Roles)
+    {
+      if (!string.IsNullOrWhiteSpace(idOrUniqueName))
+      {
+        if ((Guid.TryParse(idOrUniqueName.Trim(), out Guid id) && rolesById.TryGetValue(id, out RoleAggregate? role))
+          || rolesByUniqueName.TryGetValue(idOrUniqueName.Trim().ToUpper(), out role))
+        {
+          foundRoles.Add(role);
+        }
+        else
+        {
+          missingRoles.Add(idOrUniqueName);
+        }
+      }
+    }
+
+    if (missingRoles.Any())
+    {
+      throw new RolesNotFoundException(missingRoles, nameof(payload.Roles));
+    }
+
+    return foundRoles.AsReadOnly();
   }
 }

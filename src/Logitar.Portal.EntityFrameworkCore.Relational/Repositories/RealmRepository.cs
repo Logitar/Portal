@@ -4,6 +4,7 @@ using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Application;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -82,6 +83,19 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
       .ToArrayAsync(cancellationToken);
 
     return Load<RealmAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+  }
+
+  public async Task<RealmAggregate?> LoadAsync(RoleAggregate role, CancellationToken cancellationToken)
+  {
+    if (role.TenantId == null)
+    {
+      return null;
+    }
+
+    AggregateId id = new(role.TenantId);
+
+    return await base.LoadAsync<RealmAggregate>(id, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(id, $"{nameof(role)}.{nameof(role.TenantId)}");
   }
 
   public async Task<RealmAggregate?> LoadAsync(SessionAggregate session, CancellationToken cancellationToken)

@@ -24,7 +24,7 @@ public record ReplaceUserPayload
   public string? Profile { get; set; }
   public string? Website { get; set; }
 
-  // TODO(fpion): Roles
-
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
+
+  public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
 }

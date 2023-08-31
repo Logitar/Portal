@@ -1,7 +1,16 @@
-﻿namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
+﻿using Logitar.Portal.Domain.Roles.Events;
+
+namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 internal record RoleEntity : AggregateEntity
 {
+  public RoleEntity(RoleCreatedEvent created) : base(created)
+  {
+    TenantId = created.TenantId;
+
+    UniqueName = created.UniqueName;
+  }
+
   private RoleEntity() : base()
   {
   }
@@ -37,4 +46,34 @@ internal record RoleEntity : AggregateEntity
   }
 
   public List<UserEntity> Users { get; } = new();
+
+  public void Update(RoleUpdatedEvent updated)
+  {
+    base.Update(updated);
+
+    if (updated.UniqueName != null)
+    {
+      UniqueName = updated.UniqueName;
+    }
+    if (updated.DisplayName != null)
+    {
+      DisplayName = updated.DisplayName.Value;
+    }
+    if (updated.Description != null)
+    {
+      Description = updated.Description.Value;
+    }
+
+    foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
+    {
+      if (customAttribute.Value == null)
+      {
+        CustomAttributes.Remove(customAttribute.Key);
+      }
+      else
+      {
+        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+      }
+    }
+  }
 }

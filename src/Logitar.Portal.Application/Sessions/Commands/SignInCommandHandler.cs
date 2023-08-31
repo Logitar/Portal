@@ -55,6 +55,7 @@ internal class SignInCommandHandler : IRequestHandler<SignInCommand, Session>
     {
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
+
     session.Update(_applicationContext.ActorId);
 
     await _userRepository.SaveAsync(user, cancellationToken);

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions.Commands;
+﻿using Logitar.Portal.Application.Roles.Commands;
+using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
@@ -32,6 +33,7 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
 
     await _publisher.Publish(new DeleteSessionsCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteUsersCommand(realm), cancellationToken);
+    await _publisher.Publish(new DeleteRolesCommand(realm), cancellationToken);
 
     realm.Delete(_applicationContext.ActorId);
 

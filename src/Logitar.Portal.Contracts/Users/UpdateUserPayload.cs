@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.Roles;
+
+namespace Logitar.Portal.Contracts.Users;
 
 public record UpdateUserPayload
 {
@@ -24,7 +26,7 @@ public record UpdateUserPayload
   public Modification<string>? Profile { get; set; }
   public Modification<string>? Website { get; set; }
 
-  // TODO(fpion): Roles
-
   public IEnumerable<CustomAttributeModification> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttributeModification>();
+
+  public IEnumerable<RoleModification> Roles { get; set; } = Enumerable.Empty<RoleModification>();
 }

@@ -101,6 +101,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
         realm.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
       }
     }
+
     realm.Update(_applicationContext.ActorId);
 
     await _realmRepository.SaveAsync(realm, cancellationToken);

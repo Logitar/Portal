@@ -48,6 +48,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     {
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
+
     session.Update(_applicationContext.ActorId);
 
     await _userRepository.SaveAsync(user, cancellationToken);

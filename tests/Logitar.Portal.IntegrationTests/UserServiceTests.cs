@@ -1,11 +1,14 @@
 ﻿using Bogus;
 using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -20,6 +23,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   private readonly IUserService _userService;
 
   private readonly RealmAggregate _realm;
+  private readonly RoleAggregate _readUsers;
+  private readonly RoleAggregate _writeUsers;
   private readonly UserAggregate _user;
 
   public UserServiceTests() : base()
@@ -31,6 +36,15 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       DisplayName = "Desjardins",
       DefaultLocale = new Locale(Faker.Locale),
       Url = new Uri("https://www.desjardins.com/")
+    };
+
+    _readUsers = new(_realm.UniqueNameSettings, "read_users", _realm.Id.Value)
+    {
+      DisplayName = "Read Users"
+    };
+    _writeUsers = new(_realm.UniqueNameSettings, "write_users", _realm.Id.Value)
+    {
+      DisplayName = "Write Users"
     };
 
     _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
@@ -47,6 +61,8 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Website = _realm.Url
     };
     _user.Profile = new Uri($"{_realm.Url}profiles/{_user.Id.ToGuid()}");
+    _user.AddRole(_readUsers);
+    _user.AddRole(_writeUsers);
     _user.SetCustomAttribute("Department", "Mortgages");
     _user.SetCustomAttribute("EmployeeId", "040-735323-2");
     _user.SetCustomAttribute("HourlyRate", "25.00");
@@ -57,7 +73,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _user });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _user });
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a Portal user.")]
@@ -95,11 +111,13 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   public async Task CreateAsync_it_should_create_a_realm_user()
   {
     RealmAggregate realm = new("logitar");
+    RoleAggregate readUsers = new(realm.UniqueNameSettings, "read_users", realm.Id.Value);
+    RoleAggregate writeUsers = new(realm.UniqueNameSettings, "write_users", realm.Id.Value);
     UserAggregate aggregate = new(realm.UniqueNameSettings, Faker.Person.UserName, realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email)
     };
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { realm, aggregate });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { realm, readUsers, writeUsers, aggregate });
 
     CreateUserPayload payload = new()
     {
@@ -141,6 +159,11 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       {
         new("EmployeeId", "000-068152-0"),
         new("HourlyRate", "38.46")
+      },
+      Roles = new string[]
+      {
+        $"  {readUsers.Id.ToGuid().ToString().ToUpper()}  ",
+        $"  {writeUsers.UniqueName.ToUpper()}  "
       }
     };
 
@@ -170,6 +193,10 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.Profile);
     Assert.Equal(payload.Website.Trim(), user.Website);
     Assert.Equal(payload.CustomAttributes, user.CustomAttributes);
+
+    Assert.Equal(2, user.Roles.Count());
+    Assert.Contains(user.Roles, role => role.Id == readUsers.Id.ToGuid());
+    Assert.Contains(user.Roles, role => role.Id == writeUsers.Id.ToGuid());
 
     Assert.NotNull(user.Realm);
     Assert.Equal(realm.Id.ToGuid(), user.Realm.Id);
@@ -207,6 +234,20 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(_realm.Id.Value, exception.TenantId);
     Assert.Equal(payload.Email.Address, exception.EmailAddress);
     Assert.Equal(nameof(payload.Email), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "CreateAsync: it should throw RolesNotFoundException when some roles could not be found.")]
+  public async Task CreateAsync_it_should_throw_RolesNotFoundException_when_some_roles_could_not_be_found()
+  {
+    CreateUserPayload payload = new()
+    {
+      UniqueName = Faker.Internet.UserName(),
+      Roles = new string[] { "read_users", "write_users" }
+    };
+
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await _userService.CreateAsync(payload));
+    Assert.Equal(payload.Roles, exception.MissingRoles);
+    Assert.Equal(nameof(payload.Roles), exception.PropertyName);
   }
 
   [Fact(DisplayName = "CreateAsync: it should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
@@ -293,10 +334,14 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   {
     long version = _user.Version;
 
+    RoleAggregate readRoles = new(_realm.UniqueNameSettings, "read_roles", _realm.Id.Value);
+    RoleAggregate writeRoles = new(_realm.UniqueNameSettings, "write_roles", _realm.Id.Value);
+    _user.AddRole(readRoles);
+    _user.RemoveRole(_writeUsers);
     _user.RemoveCustomAttribute("Department");
     _user.SetCustomAttribute("DepartmentCode", "951");
     _user.SetCustomAttribute("HourlyRate", "37.50");
-    await AggregateRepository.SaveAsync(_user);
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { readRoles, writeRoles, _user });
 
     Faker faker = new();
     ReplaceUserPayload payload = new()
@@ -332,6 +377,11 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       {
          new(" EmployeeId  ", "   040-735323-2 "),
          new("HourlyRate", "50.00")
+      },
+      Roles = new string[]
+      {
+        _readUsers.UniqueName,
+        writeRoles.UniqueName
       }
     };
 
@@ -379,6 +429,11 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate"
       && customAttribute.Value == "50.00");
 
+    Assert.Equal(3, user.Roles.Count());
+    Assert.Contains(user.Roles, role => role.Id == _readUsers.Id.ToGuid());
+    Assert.Contains(user.Roles, role => role.Id == readRoles.Id.ToGuid());
+    Assert.Contains(user.Roles, role => role.Id == writeRoles.Id.ToGuid());
+
     await AssertUserPasswordAsync(user.Id, payload.Password);
   }
 
@@ -413,6 +468,23 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(user.TenantId, exception.TenantId);
     Assert.Equal(payload.Email.Address, exception.EmailAddress);
     Assert.Equal(nameof(payload.Email), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ReplaceAsync: it should throw RolesNotFoundException when some roles could not be found.")]
+  public async Task ReplaceAsync_it_should_throw_RolesNotFoundException_when_some_roles_could_not_be_found()
+  {
+    RoleAggregate readRoles = new(_realm.UniqueNameSettings, "read_roles", _realm.Id.Value);
+    await AggregateRepository.SaveAsync(readRoles);
+
+    ReplaceUserPayload payload = new()
+    {
+      UniqueName = _user.UniqueName,
+      Roles = new string[] { readRoles.UniqueName, "write_roles", "read_realms" }
+    };
+
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await _userService.ReplaceAsync(_user.Id.ToGuid(), payload));
+    Assert.Equal(new[] { "write_roles", "read_realms" }, exception.MissingRoles);
+    Assert.Equal(nameof(payload.Roles), exception.PropertyName);
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
@@ -574,61 +646,6 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _userService.UpdateAsync(Guid.Empty, payload));
   }
 
-  [Fact(DisplayName = "UpdateAsync: it should replace the user.")]
-  public async Task UpdateAsync_it_should_replace_the_user()
-  {
-    _user.Disable();
-    _user.RemoveCustomAttribute("Department");
-    _user.SetCustomAttribute("DepartmentCode", "951");
-    _user.SetCustomAttribute("HourlyRate", "37.50");
-    await AggregateRepository.SaveAsync(_user);
-
-    UpdateUserPayload payload = new()
-    {
-      UniqueName = $"  {_user.UniqueName}2  ",
-      Password = new ChangePasswordPayload
-      {
-        CurrentPassword = PasswordString,
-        NewPassword = string.Concat(PasswordString, '*')
-      },
-      IsDisabled = false,
-      MiddleName = new Modification<string>($" {Faker.Name.FirstName()} "),
-      Nickname = new Modification<string>(string.Concat(_user.FirstName?.First(), _user.LastName).ToLower()),
-      CustomAttributes = new CustomAttributeModification[]
-      {
-        new("DepartmentName", "Mortgages"),
-        new("HourlyRate", "50.00"),
-        new("DepartmentCode", null)
-      }
-    };
-
-    User? user = await _userService.UpdateAsync(_user.Id.ToGuid(), payload);
-
-    Assert.NotNull(user);
-
-    Assert.Equal(_user.Id.ToGuid(), user.Id);
-    Assert.Equal(Guid.Empty, user.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
-    Assert.Equal(Actor, user.UpdatedBy);
-    AssertIsNear(user.UpdatedOn);
-    Assert.True(user.Version > 1);
-
-    Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
-    Assert.Equal(payload.IsDisabled, user.IsDisabled);
-    Assert.Equal(payload.MiddleName.Value?.Trim(), user.MiddleName);
-    Assert.Equal(payload.Nickname.Value?.Trim(), user.Nickname);
-
-    Assert.Equal(3, user.CustomAttributes.Count());
-    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "DepartmentName"
-      && customAttribute.Value == "Mortgages");
-    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "EmployeeId"
-      && customAttribute.Value == "040-735323-2");
-    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate"
-      && customAttribute.Value == "50.00");
-
-    await AssertUserPasswordAsync(user.Id, payload.Password.NewPassword);
-  }
-
   [Fact(DisplayName = "UpdateAsync: it should throw EmailAddressAlreadyUsedException when the email address is already used.")]
   public async Task UpdateAsync_it_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
   {
@@ -654,6 +671,26 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Email), exception.PropertyName);
   }
 
+  [Fact(DisplayName = "UpdateAsync: it should throw RolesNotFoundException when some roles could not be found.")]
+  public async Task UpdateAsync_it_should_throw_RolesNotFoundException_when_some_roles_could_not_be_found()
+  {
+    UpdateUserPayload payload = new()
+    {
+      Roles = new RoleModification[]
+      {
+        new(_readUsers.UniqueName, CollectionAction.Add),
+        new(_writeUsers.UniqueName, CollectionAction.Remove),
+        new("read_roles", CollectionAction.Add)
+      }
+    };
+
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(
+      async () => await _userService.UpdateAsync(_user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(new[] { "read_roles" }, exception.MissingRoles);
+    Assert.Equal(nameof(payload.Roles), exception.PropertyName);
+  }
+
   [Fact(DisplayName = "UpdateAsync: it should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task UpdateAsync_it_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
@@ -674,6 +711,74 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(user.TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should update the user.")]
+  public async Task UpdateAsync_it_should_update_the_user()
+  {
+    RoleAggregate readRoles = new(_realm.UniqueNameSettings, "read_roles", _realm.Id.Value);
+    await AggregateRepository.SaveAsync(readRoles);
+
+    _user.Disable();
+    _user.RemoveCustomAttribute("Department");
+    _user.SetCustomAttribute("DepartmentCode", "951");
+    _user.SetCustomAttribute("HourlyRate", "37.50");
+    await AggregateRepository.SaveAsync(_user);
+
+    UpdateUserPayload payload = new()
+    {
+      UniqueName = $"  {_user.UniqueName}2  ",
+      Password = new ChangePasswordPayload
+      {
+        CurrentPassword = PasswordString,
+        NewPassword = string.Concat(PasswordString, '*')
+      },
+      IsDisabled = false,
+      MiddleName = new Modification<string>($" {Faker.Name.FirstName()} "),
+      Nickname = new Modification<string>(string.Concat(_user.FirstName?.First(), _user.LastName).ToLower()),
+      CustomAttributes = new CustomAttributeModification[]
+      {
+        new("DepartmentName", "Mortgages"),
+        new("HourlyRate", "50.00"),
+        new("DepartmentCode", null)
+      },
+      Roles = new RoleModification[]
+      {
+        new(readRoles.UniqueName, CollectionAction.Add),
+        new(_readUsers.UniqueName, CollectionAction.Add),
+        new(_writeUsers.UniqueName, CollectionAction.Remove)
+      }
+    };
+
+    User? user = await _userService.UpdateAsync(_user.Id.ToGuid(), payload);
+
+    Assert.NotNull(user);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Equal(Guid.Empty, user.CreatedBy.Id);
+    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
+    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.Equal(payload.MiddleName.Value?.Trim(), user.MiddleName);
+    Assert.Equal(payload.Nickname.Value?.Trim(), user.Nickname);
+
+    Assert.Equal(2, user.Roles.Count());
+    Assert.Contains(user.Roles, role => role.Id == _readUsers.Id.ToGuid());
+    Assert.Contains(user.Roles, role => role.Id == readRoles.Id.ToGuid());
+
+    Assert.Equal(3, user.CustomAttributes.Count());
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "DepartmentName"
+      && customAttribute.Value == "Mortgages");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "EmployeeId"
+      && customAttribute.Value == "040-735323-2");
+    Assert.Contains(user.CustomAttributes, customAttribute => customAttribute.Key == "HourlyRate"
+      && customAttribute.Value == "50.00");
+
+    await AssertUserPasswordAsync(user.Id, payload.Password.NewPassword);
   }
 
   private static void AssertEqual(AddressPayload? payload, Address? address)

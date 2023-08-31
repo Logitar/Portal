@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Realms;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Sessions;
@@ -21,6 +22,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
+    [typeof(RolesNotFoundException)] = HandleRolesNotFoundException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
     [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
@@ -92,6 +94,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static IActionResult HandleInvalidUrlException(ExceptionContext context)
   {
     return new BadRequestObjectResult(((InvalidUrlException)context.Exception).Failure);
+  }
+
+  private static IActionResult HandleRolesNotFoundException(ExceptionContext context)
+  {
+    return new NotFoundObjectResult(((RolesNotFoundException)context.Exception).Failure);
   }
 
   private static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)

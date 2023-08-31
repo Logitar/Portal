@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Domain.Users.Events;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Domain.Users.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
@@ -144,9 +145,9 @@ internal record UserEntity : AggregateEntity
     AuthenticatedOn = signedIn.OccurredOn.ToUniversalTime();
   }
 
-  public void Update(UserUpdatedEvent updated)
+  public void Update(UserUpdatedEvent updated, IEnumerable<RoleEntity> roles)
   {
-    base.Update(updated);
+    Update(updated);
 
     if (updated.UniqueName != null)
     {
@@ -280,6 +281,21 @@ internal record UserEntity : AggregateEntity
       }
     }
 
-    // TODO(fpion): Roles
+    Dictionary<string, RoleEntity> roleById = roles.ToDictionary(x => x.AggregateId, x => x);
+    foreach (KeyValuePair<string, CollectionAction> roleAction in updated.Roles)
+    {
+      if (roleById.TryGetValue(roleAction.Key, out RoleEntity? role))
+      {
+        switch (roleAction.Value)
+        {
+          case CollectionAction.Add:
+            Roles.Add(role);
+            break;
+          case CollectionAction.Remove:
+            Roles.Remove(role);
+            break;
+        }
+      }
+    }
   }
 }
