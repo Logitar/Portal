@@ -41,9 +41,9 @@ public record User : Aggregate
   public string? Profile { get; set; }
   public string? Website { get; set; }
 
-  public IEnumerable<Role> Roles { get; set; } = Enumerable.Empty<Role>();
-
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
+
+  public IEnumerable<Role> Roles { get; set; } = Enumerable.Empty<Role>();
 
   public Realm? Realm { get; set; }
 }

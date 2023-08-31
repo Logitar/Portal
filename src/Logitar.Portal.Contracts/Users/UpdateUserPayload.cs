@@ -26,7 +26,7 @@ public record UpdateUserPayload
   public Modification<string>? Profile { get; set; }
   public Modification<string>? Website { get; set; }
 
-  public IEnumerable<RoleModification> Roles { get; set; } = Enumerable.Empty<RoleModification>();
-
   public IEnumerable<CustomAttributeModification> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttributeModification>();
+
+  public IEnumerable<RoleModification> Roles { get; set; } = Enumerable.Empty<RoleModification>();
 }

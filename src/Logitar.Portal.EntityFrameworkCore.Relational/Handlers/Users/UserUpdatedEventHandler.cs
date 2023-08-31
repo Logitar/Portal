@@ -22,7 +22,7 @@ internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
       ?? throw new EntityNotFoundException<UserEntity>(@event.AggregateId);
 
     HashSet<string> roleIds = @event.Roles.Keys.ToHashSet();
-    RoleEntity[] roles = await _context.Roles.AsNoTracking()
+    RoleEntity[] roles = await _context.Roles
       .Where(x => roleIds.Contains(x.AggregateId))
       .ToArrayAsync(cancellationToken);
 

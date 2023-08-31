@@ -23,8 +23,7 @@ internal class RoleCreatedEventHandler : INotificationHandler<RoleCreatedEvent>
       role = new(@event);
 
       _context.Roles.Add(role);
+      await _context.SaveChangesAsync(cancellationToken);
     }
-
-    await _context.SaveChangesAsync(cancellationToken);
   }
 }
