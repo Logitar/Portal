@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Settings;
 using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Web.Extensions;
@@ -75,7 +76,15 @@ internal static class HttpContextExtensions
 
     if (session.RefreshToken != null)
     {
-      context.Response.Cookies.Append(Cookies.RefreshToken, session.RefreshToken, Cookies.RefreshTokenOptions);
+      CookiesSettings cookiesSettings = context.RequestServices.GetRequiredService<CookiesSettings>();
+      CookieOptions options = new()
+      {
+        HttpOnly = cookiesSettings.RefreshToken.HttpOnly,
+        MaxAge = cookiesSettings.RefreshToken.MaxAge,
+        SameSite = cookiesSettings.RefreshToken.SameSite,
+        Secure = cookiesSettings.RefreshToken.Secure
+      };
+      context.Response.Cookies.Append(Cookies.RefreshToken, session.RefreshToken, options);
     }
 
     context.SetUser(session.User);

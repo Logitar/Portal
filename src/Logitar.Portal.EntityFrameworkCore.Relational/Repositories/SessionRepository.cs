@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
@@ -13,11 +14,13 @@ internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.
 {
   private static readonly string AggregateType = typeof(SessionAggregate).GetName();
 
+  private readonly ICacheService _cacheService;
   private readonly ISqlHelper _sqlHelper;
 
-  public SessionRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
+  public SessionRepository(ICacheService cacheService, IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
     : base(eventBus, eventContext, eventSerializer)
   {
+    _cacheService = cacheService;
     _sqlHelper = sqlHelper;
   }
 
@@ -73,7 +76,18 @@ internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.
   }
 
   public async Task SaveAsync(SessionAggregate session, CancellationToken cancellationToken)
-    => await base.SaveAsync(session, cancellationToken);
+  {
+    await base.SaveAsync(session, cancellationToken);
+
+    _cacheService.RemoveSession(session);
+  }
   public async Task SaveAsync(IEnumerable<SessionAggregate> sessions, CancellationToken cancellationToken)
-    => await base.SaveAsync(sessions, cancellationToken);
+  {
+    await base.SaveAsync(sessions, cancellationToken);
+
+    foreach (SessionAggregate session in sessions)
+    {
+      _cacheService.RemoveSession(session);
+    }
+  }
 }

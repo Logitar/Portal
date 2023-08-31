@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions;
+﻿using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
@@ -8,11 +9,14 @@ namespace Logitar.Portal.Web.Authentication;
 
 internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthenticationOptions>
 {
+  private readonly ICacheService _cacheService;
   private readonly ISessionQuerier _sessionQuerier;
 
-  public SessionAuthenticationHandler(ISessionQuerier sessionQuerier, IOptionsMonitor<SessionAuthenticationOptions> options,
-    ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+  public SessionAuthenticationHandler(ICacheService cacheService, ISessionQuerier sessionQuerier,
+    IOptionsMonitor<SessionAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+      : base(options, logger, encoder, clock)
   {
+    _cacheService = cacheService;
     _sessionQuerier = sessionQuerier;
   }
 
@@ -21,7 +25,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     Guid? sessionId = Context.GetSessionId();
     if (sessionId.HasValue)
     {
-      Session? session = /*_cacheService.GetSession(sessionId.Value) ?*/ await _sessionQuerier.ReadAsync(sessionId.Value); // TODO(fpion): implement
+      Session? session = _cacheService.GetSession(sessionId.Value) ?? await _sessionQuerier.ReadAsync(sessionId.Value);
       AuthenticateResult? failure = null;
       if (session == null)
       {
@@ -43,7 +47,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
         return failure;
       }
 
-      //_cacheService.SetSession(session!); // TODO(fpion): implement
+      _cacheService.SetSession(session!);
 
       Context.SetUser(session!.User);
 
