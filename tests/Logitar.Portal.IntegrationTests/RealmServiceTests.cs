@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Users;
@@ -118,12 +119,14 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should delete the realm.")]
   public async Task DeleteAsync_it_should_delete_the_realm()
   {
+    RoleAggregate role = new(_realm.UniqueNameSettings, "admin", _realm.Id.Value);
     UserAggregate user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
     {
       Email = new EmailAddress(Faker.Person.Email, isVerified: true)
     };
+    user.AddRole(role);
     SessionAggregate session = user.SignIn(_realm.UserSettings);
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { user, session });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { role, user, session });
 
     Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
 

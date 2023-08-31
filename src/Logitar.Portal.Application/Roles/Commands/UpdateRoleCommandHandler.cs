@@ -3,7 +3,6 @@ using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
-using Logitar.Portal.Domain.Users;
 using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Commands;
@@ -45,7 +44,7 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
       RoleAggregate? other = await _roleRepository.LoadAsync(tenantId, payload.UniqueName, cancellationToken);
       if (other?.Equals(role) == false)
       {
-        throw new UniqueNameAlreadyUsedException<UserAggregate>(tenantId, payload.UniqueName, nameof(payload.UniqueName));
+        throw new UniqueNameAlreadyUsedException<RoleAggregate>(tenantId, payload.UniqueName, nameof(payload.UniqueName));
       }
 
       IUniqueNameSettings uniqueNameSettings = realm?.UniqueNameSettings ?? _applicationContext.Configuration.UniqueNameSettings;
