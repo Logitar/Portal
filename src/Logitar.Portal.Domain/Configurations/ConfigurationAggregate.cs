@@ -123,7 +123,7 @@ public class ConfigurationAggregate : AggregateRoot
   }
 
   public IUserSettings UserSettings => new ReadOnlyUserSettings(requireUniqueEmail: false,
-    requireConfirmedAccout: false, UniqueNameSettings, PasswordSettings);
+    requireConfirmedAccount: false, UniqueNameSettings, PasswordSettings);
 
   public void Update(ActorId actorId)
   {

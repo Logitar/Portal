@@ -1,16 +1,20 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web;
 
 internal class HttpApplicationContext : IApplicationContext
 {
+  private readonly ICacheService _cacheService;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
-  public HttpApplicationContext(IHttpContextAccessor httpContextAccessor)
+  public HttpApplicationContext(ICacheService cacheService, IHttpContextAccessor httpContextAccessor)
   {
+    _cacheService = cacheService;
     _httpContextAccessor = httpContextAccessor;
   }
 
@@ -30,4 +34,7 @@ internal class HttpApplicationContext : IApplicationContext
       return new ActorId(Guid.Empty);
     }
   }
+
+  public ConfigurationAggregate Configuration => _cacheService.Configuration
+    ?? throw new InvalidOperationException("The configuration could not be found in the cache.");
 }

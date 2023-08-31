@@ -28,16 +28,16 @@ internal class ConfigurationClient : IConfigurationService
 
   public Task<Configuration?> ReadAsync(CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    throw new NotSupportedException();
   }
 
   public Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    throw new NotSupportedException();
   }
 
   public Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException();
+    throw new NotSupportedException();
   }
 }

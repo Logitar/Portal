@@ -44,6 +44,8 @@ public class SessionAggregate : AggregateRoot
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
+  public void Delete(ActorId actorId = default) => ApplyChange(new SessionDeletedEvent(actorId));
+
   public void RemoveCustomAttribute(string key)
   {
     key = key.Trim();
@@ -54,6 +56,26 @@ public class SessionAggregate : AggregateRoot
       _customAttributes.Remove(key);
     }
   }
+
+  public void Renew(string secret, Password? newSecret = null, ActorId? actorId = null)
+  {
+    if (!IsActive)
+    {
+      throw new SessionIsNotActiveException(this);
+    }
+    else if (_secret?.IsMatch(secret) != true)
+    {
+      throw new IncorrectSessionSecretException(this, secret);
+    }
+
+    actorId ??= new(UserId.Value);
+
+    ApplyChange(new SessionRenewedEvent(actorId.Value)
+    {
+      Secret = newSecret
+    });
+  }
+  protected virtual void Apply(SessionRenewedEvent renewed) => _secret = renewed.Secret;
 
   public void SetCustomAttribute(string key, string value)
   {
@@ -68,6 +90,15 @@ public class SessionAggregate : AggregateRoot
       _customAttributes[key] = value;
     }
   }
+
+  public void SignOut(ActorId actorId = default)
+  {
+    if (IsActive)
+    {
+      ApplyChange(new SessionSignedOutEvent(actorId));
+    }
+  }
+  protected virtual void Apply(SessionSignedOutEvent _) => IsActive = false;
 
   public void Update(ActorId actorId)
   {

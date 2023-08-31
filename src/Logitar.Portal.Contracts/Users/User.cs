@@ -24,6 +24,8 @@ public record User : Aggregate
   public Email? Email { get; set; }
   public Phone? Phone { get; set; }
 
+  public bool IsConfirmed { get; set; }
+
   public string? FirstName { get; set; }
   public string? MiddleName { get; set; }
   public string? LastName { get; set; }

@@ -26,14 +26,14 @@ internal class ActorService : IActorService
     foreach (ActorId id in ids)
     {
       Actor? actor = _cacheService.GetActor(id);
-      if (actor == null)
-      {
-        missingActors.Add(id.ToGuid());
-      }
-      else
+      if (actor != null)
       {
         actors[id] = actor;
         _cacheService.SetActor(id, actor);
+      }
+      else if (id != default)
+      {
+        missingActors.Add(id.ToGuid());
       }
     }
 

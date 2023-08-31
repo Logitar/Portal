@@ -7,7 +7,7 @@ public class EntityNotFoundException : Exception
 {
   private const string ErrorMessage = "The specified entity could not be found.";
 
-  public EntityNotFoundException(Type type, AggregateId aggregateId)
+  public EntityNotFoundException(Type type, string aggregateId)
     : base(BuildMessage(type, aggregateId))
   {
     if (!type.IsSubclassOf(typeof(AggregateEntity)))
@@ -16,7 +16,7 @@ public class EntityNotFoundException : Exception
     }
 
     TypeName = type.GetName();
-    AggregateId = aggregateId.Value;
+    AggregateId = aggregateId;
   }
 
   public string TypeName
@@ -30,13 +30,13 @@ public class EntityNotFoundException : Exception
     private set => Data[nameof(AggregateId)] = value;
   }
 
-  private static string BuildMessage(Type type, AggregateId aggregateId)
+  private static string BuildMessage(Type type, string aggregateId)
   {
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
     message.Append("TypeName: ").AppendLine(type.GetName());
-    message.Append("AggregateId: ").Append(aggregateId).AppendLine();
+    message.Append("AggregateId: ").AppendLine(aggregateId);
 
     return message.ToString();
   }
@@ -44,7 +44,10 @@ public class EntityNotFoundException : Exception
 
 internal class EntityNotFoundException<T> : EntityNotFoundException where T : AggregateEntity
 {
-  public EntityNotFoundException(AggregateId aggregateId) : base(typeof(T), aggregateId)
+  public EntityNotFoundException(AggregateId aggregateId) : this(aggregateId.Value)
+  {
+  }
+  public EntityNotFoundException(string aggregateId) : base(typeof(T), aggregateId)
   {
   }
 }

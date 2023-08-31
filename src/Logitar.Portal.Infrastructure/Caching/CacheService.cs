@@ -1,7 +1,9 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -29,6 +31,40 @@ internal class CacheService : ICacheService
   public void SetActor(ActorId id, Actor actor) => SetItem(GetActorKey(id), actor);
   private static string GetActorKey(ActorId id) => $"Actor:Id:{id}";
 
+  public Session? GetSession(Guid id) => GetItem<Session>(GetSessionKey(id));
+  public void RemoveSession(SessionAggregate session)
+  {
+    Guid sessionId = session.Id.ToGuid();
+    RemoveItem(GetSessionKey(sessionId));
+
+    string userSessionsKey = GetUserSessionsKey(session.UserId.ToGuid());
+    HashSet<Guid>? userSessions = GetItem<HashSet<Guid>>(userSessionsKey);
+    if (userSessions != null)
+    {
+      userSessions.Remove(sessionId);
+
+      if (userSessions.Any())
+      {
+        SetItem(userSessionsKey, userSessions);
+      }
+      else
+      {
+        RemoveItem(userSessionsKey);
+      }
+    }
+  }
+  public void SetSession(Session session)
+  {
+    SetItem(GetSessionKey(session.Id), session);
+
+    string userSessionsKey = GetUserSessionsKey(session.User.Id);
+    HashSet<Guid> userSessions = GetItem<HashSet<Guid>>(userSessionsKey) ?? new();
+    userSessions.Add(session.Id);
+    SetItem(userSessionsKey, userSessions);
+  }
+  private static string GetSessionKey(Guid id) => $"Session:Id:{id}";
+  private static string GetUserSessionsKey(Guid id) => $"User:Id:{id}:Sessions";
+
   public CachedUser? GetUser(string uniqueName)
   {
     string uniqueNameKey = GetUniqueNameKey(uniqueName);
@@ -45,6 +81,19 @@ internal class CacheService : ICacheService
 
     RemoveItem(uniqueNameKey);
     RemoveItem(userKey);
+
+    string userSessionsKey = GetUserSessionsKey(user.Id.ToGuid());
+    HashSet<Guid>? userSessions = GetItem<HashSet<Guid>>(userSessionsKey);
+    if (userSessions != null)
+    {
+      RemoveItem(userSessionsKey);
+
+      foreach (Guid sessionId in userSessions)
+      {
+        string sessionKey = GetSessionKey(sessionId);
+        RemoveItem(sessionKey);
+      }
+    }
   }
   public void SetUser(CachedUser user)
   {
@@ -59,5 +108,5 @@ internal class CacheService : ICacheService
 
   private T? GetItem<T>(object key) => _cache.TryGetValue(key, out T? value) ? value : default;
   private void RemoveItem(object key) => _cache.Remove(key);
-  private void SetItem<T>(object key, T value) => _cache.Set(key, value);
+  private void SetItem<T>(object key, T value) => _cache.Set(key, value, TimeSpan.FromMinutes(5));
 }

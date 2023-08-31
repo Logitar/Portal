@@ -15,6 +15,7 @@ using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Infrastructure.Passwords.Strategies;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -51,8 +52,12 @@ public abstract class IntegrationTests
         break;
     }
 
+    services.AddSingleton<IPbkdf2Settings>(_ => new Pbkdf2Settings { Iterations = 6 });
     ServiceProvider = services.BuildServiceProvider();
+
     AggregateRepository = ServiceProvider.GetRequiredService<IAggregateRepository>();
+    PasswordService = ServiceProvider.GetRequiredService<IPasswordService>();
+
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
 
@@ -65,6 +70,8 @@ public abstract class IntegrationTests
 
   protected IServiceProvider ServiceProvider { get; }
   protected IAggregateRepository AggregateRepository { get; }
+  protected IPasswordService PasswordService { get; }
+
   protected EventContext EventContext { get; }
   protected PortalContext PortalContext { get; }
 
@@ -82,6 +89,9 @@ public abstract class IntegrationTests
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Actors"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Sessions"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Users"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Roles"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Realms"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Logs"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Events"";");
 
     if (InitializeConfiguration)
@@ -120,6 +130,7 @@ public abstract class IntegrationTests
 
     Configuration = await AggregateRepository.LoadAsync<ConfigurationAggregate>(ConfigurationAggregate.UniqueId);
     Assert.NotNull(Configuration);
+    _applicationContext.Configuration = Configuration;
 
     User = await AggregateRepository.LoadAsync<UserAggregate>(new AggregateId(session.User.Id));
     Assert.NotNull(User);
@@ -144,15 +155,16 @@ public abstract class IntegrationTests
 
   protected async Task AssertUserPasswordAsync(Guid userId, string? passwordString = null)
   {
-    IPasswordService passwordService = ServiceProvider.GetRequiredService<IPasswordService>();
-
     AggregateId aggregateId = new(userId);
     UserEntity? user = await PortalContext.Users.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId.Value);
     Assert.NotNull(user);
 
     Assert.NotNull(user.Password);
-    Password password = passwordService.Decode(user.Password);
+    Password password = PasswordService.Decode(user.Password);
     Assert.True(password.IsMatch(passwordString ?? PasswordString));
   }
+
+  protected static long? ToUnixTimeMilliseconds(DateTime? value)
+    => value.HasValue ? new DateTimeOffset(value.Value).ToUnixTimeMilliseconds() : null;
 }

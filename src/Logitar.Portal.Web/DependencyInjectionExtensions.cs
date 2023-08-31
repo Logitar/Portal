@@ -27,6 +27,7 @@ public static class DependencyInjectionExtensions
      });
 
     CorsSettings corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
     services.AddAuthentication()
@@ -41,9 +42,11 @@ public static class DependencyInjectionExtensions
         .Build());
     });
 
+    CookiesSettings cookiesSettings = configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    services.AddSingleton(cookiesSettings);
     services.AddSession(options =>
     {
-      options.Cookie.SameSite = SameSiteMode.None; // TODO(fpion): Strict
+      options.Cookie.SameSite = cookiesSettings.Session.SameSite;
       options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 

@@ -110,6 +110,33 @@ internal record UserEntity : AggregateEntity
   public List<RoleEntity> Roles { get; } = new();
   public List<SessionEntity> Sessions { get; } = new();
 
+  public void ChangePassword(UserChangedPasswordEvent changedPassword)
+  {
+    Update(changedPassword);
+
+    Password = changedPassword.NewPassword.Encode();
+    PasswordChangedBy = changedPassword.ActorId.Value;
+    PasswordChangedOn = changedPassword.OccurredOn.ToUniversalTime();
+  }
+
+  public void Disable(UserDisabledEvent disabled)
+  {
+    Update(disabled);
+
+    DisabledBy = disabled.ActorId.Value;
+    DisabledOn = disabled.OccurredOn.ToUniversalTime();
+    IsDisabled = true;
+  }
+
+  public void Enable(UserEnabledEvent enabled)
+  {
+    Update(enabled);
+
+    DisabledBy = null;
+    DisabledOn = null;
+    IsDisabled = false;
+  }
+
   public void SignIn(UserSignedInEvent signedIn)
   {
     Update(signedIn);
@@ -119,11 +146,39 @@ internal record UserEntity : AggregateEntity
 
   public void Update(UserUpdatedEvent updated)
   {
+    base.Update(updated);
+
+    if (updated.UniqueName != null)
+    {
+      UniqueName = updated.UniqueName;
+    }
     if (updated.Password != null)
     {
       Password = updated.Password.Encode();
     }
 
+    if (updated.Address != null)
+    {
+      AddressStreet = updated.Address.Value?.Street;
+      AddressLocality = updated.Address.Value?.Locality;
+      AddressRegion = updated.Address.Value?.Region;
+      AddressPostalCode = updated.Address.Value?.PostalCode;
+      AddressCountry = updated.Address.Value?.Country;
+      AddressFormatted = updated.Address.Value?.Format();
+
+      if (!IsAddressVerified && updated.Address.Value?.IsVerified == true)
+      {
+        AddressVerifiedBy = updated.ActorId.Value;
+        AddressVerifiedOn = updated.OccurredOn.ToUniversalTime();
+        IsAddressVerified = true;
+      }
+      else if (IsAddressVerified && updated.Address.Value?.IsVerified != true)
+      {
+        AddressVerifiedBy = null;
+        AddressVerifiedOn = null;
+        IsAddressVerified = false;
+      }
+    }
     if (updated.Email != null)
     {
       EmailAddress = updated.Email.Value?.Address;
@@ -141,10 +196,34 @@ internal record UserEntity : AggregateEntity
         IsEmailVerified = false;
       }
     }
+    if (updated.Phone != null)
+    {
+      PhoneCountryCode = updated.Phone.Value?.CountryCode;
+      PhoneNumber = updated.Phone.Value?.Number;
+      PhoneExtension = updated.Phone.Value?.Extension;
+      PhoneE164Formatted = updated.Phone.Value?.FormatToE164();
+
+      if (!IsPhoneVerified && updated.Phone.Value?.IsVerified == true)
+      {
+        PhoneVerifiedBy = updated.ActorId.Value;
+        PhoneVerifiedOn = updated.OccurredOn.ToUniversalTime();
+        IsPhoneVerified = true;
+      }
+      else if (IsPhoneVerified && updated.Phone.Value?.IsVerified != true)
+      {
+        PhoneVerifiedBy = null;
+        PhoneVerifiedOn = null;
+        IsPhoneVerified = false;
+      }
+    }
 
     if (updated.FirstName != null)
     {
       FirstName = updated.FirstName.Value;
+    }
+    if (updated.MiddleName != null)
+    {
+      MiddleName = updated.MiddleName.Value;
     }
     if (updated.LastName != null)
     {
@@ -154,10 +233,53 @@ internal record UserEntity : AggregateEntity
     {
       FullName = updated.FullName.Value;
     }
+    if (updated.Nickname != null)
+    {
+      Nickname = updated.Nickname.Value;
+    }
 
+    if (updated.Birthdate != null)
+    {
+      Birthdate = updated.Birthdate.Value?.ToUniversalTime();
+    }
+    if (updated.Gender != null)
+    {
+      Gender = updated.Gender.Value?.Value;
+    }
     if (updated.Locale != null)
     {
       Locale = updated.Locale.Value?.Code;
     }
+    if (updated.TimeZone != null)
+    {
+      TimeZone = updated.TimeZone.Value?.Id;
+    }
+
+    if (updated.Picture != null)
+    {
+      Picture = updated.Picture.Value?.ToString();
+    }
+    if (updated.Profile != null)
+    {
+      Profile = updated.Profile.Value?.ToString();
+    }
+    if (updated.Website != null)
+    {
+      Website = updated.Website.Value?.ToString();
+    }
+
+    foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
+    {
+      if (customAttribute.Value == null)
+      {
+        CustomAttributes.Remove(customAttribute.Key);
+      }
+      else
+      {
+        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+      }
+    }
+
+    // TODO(fpion): Roles
   }
 }
