@@ -14,9 +14,9 @@ internal class UserService : IUserService
     _pipeline = pipeline;
   }
 
-  public Task<User> AuthenticateAsync(AuthenticateUserPayload payload, CancellationToken cancellationToken)
+  public async Task<User> AuthenticateAsync(AuthenticateUserPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new AuthenticateUserCommand(payload), cancellationToken);
   }
 
   public async Task<User> CreateAsync(CreateUserPayload payload, CancellationToken cancellationToken)

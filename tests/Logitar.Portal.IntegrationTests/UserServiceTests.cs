@@ -76,6 +76,77 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _user });
   }
 
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the Portal user.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_Portal_user()
+  {
+    Assert.NotNull(User);
+    AuthenticateUserPayload payload = new()
+    {
+      UniqueName = $"  {User.UniqueName.ToUpper()}  ",
+      Password = PasswordString
+    };
+
+    User user = await _userService.AuthenticateAsync(payload);
+
+    Assert.Equal(User.Id.ToGuid(), user.Id);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.NotNull(user.AuthenticatedOn);
+    AssertIsNear(user.AuthenticatedOn!.Value);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_realm_user()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug.ToUpper()}  ",
+      UniqueName = $"  {_user.UniqueName.ToUpper()}  ",
+      Password = PasswordString
+    };
+
+    User user = await _userService.AuthenticateAsync(payload);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.NotNull(user.AuthenticatedOn);
+    AssertIsNear(user.AuthenticatedOn!.Value);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
+  public async Task AuthenticateAsync_it_should_throw_AggregateNotFoundException_when_the_realm_could_not_be_found()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = $"{_realm.UniqueSlug}-2"
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _userService.AuthenticateAsync(payload));
+    Assert.Equal(payload.Realm, exception.Id);
+    Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw UserNotFoundException when the user could not be found.")]
+  public async Task AuthenticateAsync_it_should_throw_UserNotFoundException_when_the_user_could_not_be_found()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      UniqueName = $"{_user.UniqueName}2"
+    };
+
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.AuthenticateAsync(payload));
+    Assert.Equal(_realm.ToString(), exception.Realm);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
+  }
+
   [Fact(DisplayName = "CreateAsync: it should create a Portal user.")]
   public async Task CreateAsync_it_should_create_a_Portal_user()
   {
