@@ -108,5 +108,5 @@ internal class CacheService : ICacheService
 
   private T? GetItem<T>(object key) => _cache.TryGetValue(key, out T? value) ? value : default;
   private void RemoveItem(object key) => _cache.Remove(key);
-  private void SetItem<T>(object key, T value) => _cache.Set(key, value);
+  private void SetItem<T>(object key, T value) => _cache.Set(key, value, TimeSpan.FromMinutes(5));
 }
