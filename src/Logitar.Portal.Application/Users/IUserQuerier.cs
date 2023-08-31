@@ -9,5 +9,6 @@ public interface IUserQuerier
   Task<User> ReadAsync(UserAggregate user, CancellationToken cancellationToken = default);
   Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<User?> ReadAsync(string? realm, string uniqueName, CancellationToken cancellationToken = default);
+  Task<User?> ReadAsync(string? realm, string identifierKey, string identifierValue, CancellationToken cancellationToken = default);
   Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken = default);
 }

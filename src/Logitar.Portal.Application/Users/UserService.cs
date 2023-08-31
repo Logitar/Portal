@@ -14,6 +14,11 @@ internal class UserService : IUserService
     _pipeline = pipeline;
   }
 
+  public Task<User> AuthenticateAsync(AuthenticateUserPayload payload, CancellationToken cancellationToken)
+  {
+    throw new NotImplementedException(); // TODO(fpion): implement
+  }
+
   public async Task<User> CreateAsync(CreateUserPayload payload, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new CreateUserCommand(payload), cancellationToken);
@@ -24,14 +29,24 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new DeleteUserCommand(id), cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(Guid? id, string? realm, string? uniqueName, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Guid? id, string? realm, string? uniqueName, string? identifierKey, string? identifierValue, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName), cancellationToken);
+    return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName, identifierKey, identifierValue), cancellationToken);
+  }
+
+  public Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
+  {
+    throw new NotImplementedException(); // TODO(fpion): implement
   }
 
   public async Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
+  }
+
+  public Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)
+  {
+    throw new NotImplementedException(); // TODO(fpion): implement
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)

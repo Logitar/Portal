@@ -34,6 +34,15 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, User?>
       }
     }
 
+    if (query.IdentifierKey != null && query.IdentifierValue != null)
+    {
+      User? user = await _userQuerier.ReadAsync(query.Realm, query.IdentifierKey, query.IdentifierValue, cancellationToken);
+      if (user != null)
+      {
+        users[user.Id] = user;
+      }
+    }
+
     if (users.Count > 1)
     {
       throw new TooManyResultsException<User>(expected: 1, actual: users.Count);

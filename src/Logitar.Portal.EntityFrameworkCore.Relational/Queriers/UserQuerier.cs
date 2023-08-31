@@ -82,6 +82,11 @@ internal class UserQuerier : IUserQuerier
     return (await MapAsync(realm, cancellationToken, user)).Single();
   }
 
+  public Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string identifierKey, string identifierValue, CancellationToken cancellationToken)
+  {
+    throw new NotImplementedException(); // TODO(fpion): implement
+  }
+
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
   {
     Realm? realm = null;
