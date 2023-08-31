@@ -21,7 +21,12 @@ internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
       .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken)
       ?? throw new EntityNotFoundException<UserEntity>(@event.AggregateId);
 
-    user.Update(@event);
+    HashSet<string> roleIds = @event.Roles.Keys.ToHashSet();
+    RoleEntity[] roles = await _context.Roles.AsNoTracking()
+      .Where(x => roleIds.Contains(x.AggregateId))
+      .ToArrayAsync(cancellationToken);
+
+    user.Update(@event, roles);
 
     ActorEntity? actor = await _context.Actors
       .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.ToGuid(), cancellationToken);

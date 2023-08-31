@@ -31,5 +31,5 @@ public record UserUpdatedEvent : DomainEvent, INotification
 
   public Dictionary<string, string?> CustomAttributes { get; init; } = new();
 
-  // TODO(fpion): Roles
+  public Dictionary<string, CollectionAction> Roles { get; init; } = new();
 }

@@ -3,6 +3,7 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain.Passwords;
+using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Users.Events;
@@ -14,7 +15,7 @@ namespace Logitar.Portal.Domain.Users;
 public class UserAggregate : AggregateRoot
 {
   private readonly Dictionary<string, string> _customAttributes = new();
-  // TODO(fpion): _roles
+  private readonly HashSet<AggregateId> _roles = new();
 
   private Password? _password = null;
 
@@ -306,7 +307,18 @@ public class UserAggregate : AggregateRoot
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
-  // TODO(fpion): Roles
+  public IImmutableSet<AggregateId> Roles => ImmutableHashSet.Create(_roles.ToArray());
+
+  public void AddRole(RoleAggregate role)
+  {
+    AggregateId roleId = role.Id;
+    if (!_roles.Contains(roleId))
+    {
+      UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+      updated.Roles[roleId.Value] = CollectionAction.Add;
+      _roles.Add(roleId);
+    }
+  }
 
   public void ChangePassword(string currentPassword, Password newPassword, ActorId? actorId = null)
   {
@@ -349,6 +361,17 @@ public class UserAggregate : AggregateRoot
       UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
       updated.CustomAttributes[key] = null;
       _customAttributes.Remove(key);
+    }
+  }
+
+  public void RemoveRole(RoleAggregate role) => RemoveRole(role.Id);
+  public void RemoveRole(AggregateId roleId)
+  {
+    if (_roles.Contains(roleId))
+    {
+      UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
+      updated.Roles[roleId.Value] = CollectionAction.Remove;
+      _roles.Remove(roleId);
     }
   }
 
@@ -519,7 +542,20 @@ public class UserAggregate : AggregateRoot
       }
     }
 
-    // TODO(fpion): Roles
+    foreach (KeyValuePair<string, CollectionAction> role in updated.Roles)
+    {
+      AggregateId roleId = new(role.Key);
+
+      switch (role.Value)
+      {
+        case CollectionAction.Add:
+          _roles.Add(roleId);
+          break;
+        case CollectionAction.Remove:
+          _roles.Remove(roleId);
+          break;
+      }
+    }
   }
 
   protected virtual T GetLatestEvent<T>() where T : DomainEvent, new()

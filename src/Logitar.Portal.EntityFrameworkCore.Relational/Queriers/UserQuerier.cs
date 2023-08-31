@@ -41,7 +41,7 @@ internal class UserQuerier : IUserQuerier
   private async Task<User?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
   {
     UserEntity? user = await _users.AsNoTracking()
-    .Include(x => x.Roles)
+      .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (user == null)
     {

@@ -19,7 +19,7 @@ internal class InitializeDatabaseCommandHandler : INotificationHandler<Initializ
     _portalContext = portalContext;
   }
 
-  public async Task Handle(InitializeDatabaseCommand notification, CancellationToken cancellationToken)
+  public async Task Handle(InitializeDatabaseCommand _, CancellationToken cancellationToken)
   {
     if (_configuration.GetValue<bool>("EnableMigrations"))
     {

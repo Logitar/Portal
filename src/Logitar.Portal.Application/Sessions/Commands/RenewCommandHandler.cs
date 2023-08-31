@@ -52,6 +52,7 @@ internal class RenewCommandHandler : IRequestHandler<RenewCommand, Session>
     {
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
+
     session.Update(_applicationContext.ActorId);
 
     await _sessionRepository.SaveAsync(session, cancellationToken);

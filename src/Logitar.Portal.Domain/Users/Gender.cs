@@ -1,5 +1,4 @@
 ﻿using Logitar.Security.Claims;
-using System.Collections.Immutable;
 
 namespace Logitar.Portal.Domain.Users;
 

@@ -50,6 +50,7 @@ internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Rol
     {
       role.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
+
     role.Update(_applicationContext.ActorId);
 
     await _roleRepository.SaveAsync(role, cancellationToken);

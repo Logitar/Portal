@@ -24,6 +24,18 @@ internal static class Db
     public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
   }
 
+  public static class Roles
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Roles));
+
+    public static readonly ColumnId AggregateId = new(nameof(RoleEntity.AggregateId), Table);
+    public static readonly ColumnId DisplayName = new(nameof(RoleEntity.DisplayName), Table);
+    public static readonly ColumnId RoleId = new(nameof(RoleEntity.RoleId), Table);
+    public static readonly ColumnId TenantId = new(nameof(RoleEntity.TenantId), Table);
+    public static readonly ColumnId UniqueName = new(nameof(RoleEntity.UniqueName), Table);
+    public static readonly ColumnId UniqueNameNormalized = new(nameof(RoleEntity.UniqueNameNormalized), Table);
+  }
+
   public static class Sessions
   {
     public static readonly TableId Table = new(nameof(PortalContext.Sessions));
@@ -58,5 +70,13 @@ internal static class Db
     public static readonly ColumnId UniqueName = new(nameof(UserEntity.UniqueName), Table);
     public static readonly ColumnId UniqueNameNormalized = new(nameof(UserEntity.UniqueNameNormalized), Table);
     public static readonly ColumnId UserId = new(nameof(UserEntity.UserId), Table);
+  }
+
+  public static class UserRoles
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.UserRoles));
+
+    public static readonly ColumnId RoleId = new(nameof(UserRoleEntity.RoleId), Table);
+    public static readonly ColumnId UserId = new(nameof(UserRoleEntity.UserId), Table);
   }
 }
