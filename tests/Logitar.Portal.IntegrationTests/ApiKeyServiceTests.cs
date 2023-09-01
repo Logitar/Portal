@@ -4,6 +4,7 @@ using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Passwords;
@@ -323,6 +324,82 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await _apiKeyService.ReplaceAsync(_apiKey.Id.ToGuid(), payload));
     Assert.Equal(new[] { "read_roles", "read_realms" }, exception.MissingRoles);
     Assert.Equal(nameof(payload.Roles), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should return null when the API key is not found.")]
+  public async Task UpdateAsync_it_should_return_null_when_the_Api_key_is_not_found()
+  {
+    UpdateApiKeyPayload payload = new();
+    Assert.Null(await _apiKeyService.UpdateAsync(Guid.Empty, payload));
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should throw RolesNotFoundException when some roles could not be found.")]
+  public async Task UpdateAsync_it_should_throw_RolesNotFoundException_when_some_roles_could_not_be_found()
+  {
+    UpdateApiKeyPayload payload = new()
+    {
+      Roles = new RoleModification[]
+      {
+        new("read_roles", CollectionAction.Add),
+        new("read_realms", CollectionAction.Add)
+      }
+    };
+
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await _apiKeyService.UpdateAsync(_apiKey.Id.ToGuid(), payload));
+    Assert.Equal(new[] { "read_roles", "read_realms" }, exception.MissingRoles);
+    Assert.Equal(nameof(payload.Roles), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "UpdateAsync: it should update the API key.")]
+  public async Task UpdateAsync_it_should_update_the_Api_key()
+  {
+    RoleAggregate readRealms = new(_realm.UniqueNameSettings, "read_realms", _realm.Id.Value);
+    RoleAggregate readRoles = new(_realm.UniqueNameSettings, "read_roles", _realm.Id.Value);
+    _apiKey.AddRole(readRealms);
+    _apiKey.SetCustomAttribute("Key3", "Value3");
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { readRealms, readRoles, _apiKey });
+
+    UpdateApiKeyPayload payload = new()
+    {
+      Title = $"  {_apiKey.Title}2  ",
+      Description = new Modification<string>("    "),
+      ExpiresOn = _apiKey.ExpiresOn?.AddMonths(-6),
+      CustomAttributes = new CustomAttributeModification[]
+      {
+        new("Key1", value: null),
+        new("Key2", "value2"),
+        new("Key4", "Value4")
+      },
+      Roles = new RoleModification[]
+      {
+        new("read_roles", CollectionAction.Add),
+        new("write_users", CollectionAction.Remove)
+      }
+    };
+
+    ApiKey? apiKey = await _apiKeyService.UpdateAsync(_apiKey.Id.ToGuid(), payload);
+    Assert.NotNull(apiKey);
+
+    Assert.Equal(_apiKey.Id.ToGuid(), apiKey.Id);
+    Assert.Equal(Guid.Empty, apiKey.CreatedBy.Id);
+    AssertEqual(_apiKey.CreatedOn, apiKey.CreatedOn);
+    Assert.Equal(Actor, apiKey.UpdatedBy);
+    AssertIsNear(apiKey.UpdatedOn);
+    Assert.True(apiKey.Version > _apiKey.Version);
+
+    Assert.Equal(payload.Title.Trim(), apiKey.Title);
+    Assert.Equal(payload.Description.Value?.CleanTrim(), apiKey.Description);
+    AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
+
+    Assert.Equal(3, apiKey.CustomAttributes.Count());
+    Assert.Contains(apiKey.CustomAttributes, customAttribute => customAttribute.Key == "Key2" && customAttribute.Value == "value2");
+    Assert.Contains(apiKey.CustomAttributes, customAttribute => customAttribute.Key == "Key3" && customAttribute.Value == "Value3");
+    Assert.Contains(apiKey.CustomAttributes, customAttribute => customAttribute.Key == "Key4" && customAttribute.Value == "Value4");
+
+    Assert.Equal(3, apiKey.Roles.Count());
+    Assert.Contains(apiKey.Roles, role => role.UniqueName == _readUsers.UniqueName);
+    Assert.Contains(apiKey.Roles, role => role.UniqueName == readRealms.UniqueName);
+    Assert.Contains(apiKey.Roles, role => role.UniqueName == readRoles.UniqueName);
   }
 
   private async Task AssertApiKeySecretAsync(string value)

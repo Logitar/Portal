@@ -44,8 +44,8 @@ internal class ApiKeyService : IApiKeyService
     throw new NotImplementedException(); // TODO(fpion): implement
   }
 
-  public Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new UpdateApiKeyCommand(id, payload), cancellationToken);
   }
 }

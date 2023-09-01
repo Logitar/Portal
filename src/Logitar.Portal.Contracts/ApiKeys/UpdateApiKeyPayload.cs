@@ -4,9 +4,9 @@ namespace Logitar.Portal.Contracts.ApiKeys;
 
 public record UpdateApiKeyPayload
 {
-  public string Title { get; set; } = string.Empty;
+  public string? Title { get; set; }
   public Modification<string>? Description { get; set; }
-  public Modification<DateTime?>? ExpiresOn { get; set; }
+  public DateTime? ExpiresOn { get; set; }
 
   public IEnumerable<CustomAttributeModification> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttributeModification>();
 
