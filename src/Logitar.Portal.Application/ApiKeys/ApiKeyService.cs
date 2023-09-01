@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application.ApiKeys.Commands;
+using Logitar.Portal.Application.ApiKeys.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 
@@ -28,9 +29,9 @@ internal class ApiKeyService : IApiKeyService
     return await _pipeline.ExecuteAsync(new DeleteApiKeyCommand(id), cancellationToken);
   }
 
-  public Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new ReadApiKeyQuery(id), cancellationToken);
   }
 
   public Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)

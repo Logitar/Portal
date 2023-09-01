@@ -179,6 +179,20 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _apiKeyService.DeleteAsync(Guid.Empty));
   }
 
+  [Fact(DisplayName = "ReadAsync: it should return null when the API key is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_the_Api_key_is_not_found()
+  {
+    Assert.Null(await _apiKeyService.ReadAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the API key found by ID.")]
+  public async Task ReadAsync_it_should_return_the_Api_key_found_by_Id()
+  {
+    ApiKey? apiKey = await _apiKeyService.ReadAsync(_apiKey.Id.ToGuid());
+    Assert.NotNull(apiKey);
+    Assert.Equal(_apiKey.Id.ToGuid(), apiKey.Id);
+  }
+
   private async Task AssertApiKeySecretAsync(string value)
   {
     XApiKey xApiKey = XApiKey.Decode(value);
