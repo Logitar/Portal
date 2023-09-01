@@ -31,15 +31,17 @@ internal class RoleQuerier : IRoleQuerier
 
   public async Task<Role> ReadAsync(RoleAggregate role, CancellationToken cancellationToken)
   {
-    return await ReadAsync(role.Id.Value, cancellationToken)
+    return await ReadAsync(role.Id, cancellationToken)
       ?? throw new EntityNotFoundException<RoleEntity>(role.Id);
   }
   public async Task<Role?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+    return await ReadAsync(new AggregateId(id), cancellationToken);
   }
-  private async Task<Role?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
+  private async Task<Role?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
+    string aggregateId = id.Value;
+
     RoleEntity? role = await _roles.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (role == null)

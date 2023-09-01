@@ -71,6 +71,105 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Actors", (string)null);
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.ApiKeyEntity", b =>
+                {
+                    b.Property<int>("ApiKeyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ApiKeyId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("AuthenticatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CustomAttributesSerialized")
+                        .HasColumnType("text")
+                        .HasColumnName("CustomAttributes");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ExpiresOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Secret")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ApiKeyId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("AuthenticatedOn");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("ExpiresOn");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("Title");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("Version");
+
+                    b.ToTable("ApiKeys", (string)null);
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.ApiKeyRoleEntity", b =>
+                {
+                    b.Property<int>("ApiKeyId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ApiKeyId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("ApiKeyRoles", (string)null);
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.LogEntity", b =>
                 {
                     b.Property<long>("LogId")
@@ -765,6 +864,71 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserIdentifierEntity", b =>
+                {
+                    b.Property<int>("UserIdentifierId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserIdentifierId"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ValueNormalized")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserIdentifierId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "Key", "Value")
+                        .IsUnique();
+
+                    b.ToTable("UserIdentifiers", (string)null);
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserRoleEntity", b =>
                 {
                     b.Property<int>("UserId")
@@ -778,6 +942,21 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.ApiKeyRoleEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.ApiKeyEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ApiKeyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.LogEventEntity", b =>
@@ -797,6 +976,17 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserIdentifierEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserEntity", "User")
+                        .WithMany("Identifiers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -824,6 +1014,8 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserEntity", b =>
                 {
+                    b.Navigation("Identifiers");
+
                     b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618

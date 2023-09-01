@@ -15,6 +15,7 @@ namespace Logitar.Portal.Domain.Users;
 public class UserAggregate : AggregateRoot
 {
   private readonly Dictionary<string, string> _customAttributes = new();
+  private readonly Dictionary<string, string> _identifiers = new();
   private readonly HashSet<AggregateId> _roles = new();
 
   private Password? _password = null;
@@ -306,6 +307,7 @@ public class UserAggregate : AggregateRoot
   }
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
+  public IReadOnlyDictionary<string, string> Identifiers => _identifiers.AsReadOnly();
 
   public IImmutableSet<AggregateId> Roles => ImmutableHashSet.Create(_roles.ToArray());
 
@@ -364,6 +366,18 @@ public class UserAggregate : AggregateRoot
     }
   }
 
+  public void RemoveIdentifier(string key, ActorId actorId = default)
+  {
+    key = key.Trim();
+    if (_identifiers.ContainsKey(key))
+    {
+      ApplyChange(new UserIdentifierSetEvent(actorId)
+      {
+        Key = key
+      });
+    }
+  }
+
   public void RemoveRole(RoleAggregate role) => RemoveRole(role.Id);
   public void RemoveRole(AggregateId roleId)
   {
@@ -386,6 +400,33 @@ public class UserAggregate : AggregateRoot
       UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
       updated.CustomAttributes[key] = value;
       _customAttributes[key] = value;
+    }
+  }
+
+  public void SetIdentifier(string key, string value, ActorId actorId = default)
+  {
+    key = key.Trim();
+    value = value.Trim();
+    new IdentifierValidator().ValidateAndThrow(key, value);
+
+    if (!_identifiers.TryGetValue(key, out string? existingValue) || value != existingValue)
+    {
+      ApplyChange(new UserIdentifierSetEvent(actorId)
+      {
+        Key = key,
+        Value = value
+      });
+    }
+  }
+  protected virtual void Apply(UserIdentifierSetEvent identifier)
+  {
+    if (identifier.Value == null)
+    {
+      _identifiers.Remove(identifier.Key);
+    }
+    else
+    {
+      _identifiers[identifier.Key] = identifier.Value;
     }
   }
 

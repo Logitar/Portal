@@ -89,6 +89,7 @@ public abstract class IntegrationTests
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Actors"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Sessions"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Users"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""ApiKeys"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Roles"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Realms"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Logs"";");
@@ -165,6 +166,18 @@ public abstract class IntegrationTests
     Assert.True(password.IsMatch(passwordString ?? PasswordString));
   }
 
+  protected static void AssertEqual(DateTime? expected, DateTime? actual)
+  {
+    if (expected.HasValue)
+    {
+      Assert.True(actual.HasValue);
+      Assert.Equal(ToUnixTimeMilliseconds(expected.Value), ToUnixTimeMilliseconds(actual.Value));
+    }
+    else
+    {
+      Assert.Null(actual);
+    }
+  }
   protected static long? ToUnixTimeMilliseconds(DateTime? value)
     => value.HasValue ? new DateTimeOffset(value.Value).ToUnixTimeMilliseconds() : null;
 }

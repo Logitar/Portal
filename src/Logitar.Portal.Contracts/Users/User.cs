@@ -43,6 +43,7 @@ public record User : Aggregate
 
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
+  public IEnumerable<Identifier> Identifiers { get; set; } = Enumerable.Empty<Identifier>();
   public IEnumerable<Role> Roles { get; set; } = Enumerable.Empty<Role>();
 
   public Realm? Realm { get; set; }

@@ -42,7 +42,7 @@ public class EmailAddressAlreadyUsedException : Exception
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
-    message.Append("TenantId: ").AppendLine(tenantId);
+    message.Append("TenantId: ").AppendLine(tenantId ?? "<null>");
     message.Append("EmailAddress: ").AppendLine(email.Address);
     message.Append("PropertyName: ").AppendLine(propertyName);
 

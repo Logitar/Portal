@@ -66,6 +66,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _user.SetCustomAttribute("Department", "Mortgages");
     _user.SetCustomAttribute("EmployeeId", "040-735323-2");
     _user.SetCustomAttribute("HourlyRate", "25.00");
+    _user.SetIdentifier("HealthInsuranceNumber", BuildHealthInsuranceNumber(Faker));
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
   }
 
@@ -74,6 +75,80 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     await base.InitializeAsync();
 
     await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _user });
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the Portal user.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_Portal_user()
+  {
+    Assert.NotNull(User);
+    AuthenticateUserPayload payload = new()
+    {
+      UniqueName = $"  {User.UniqueName.ToUpper()}  ",
+      Password = PasswordString
+    };
+
+    User user = await _userService.AuthenticateAsync(payload);
+
+    Assert.Equal(User.Id.ToGuid(), user.Id);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(user.UpdatedOn, user.AuthenticatedOn);
+
+    Assert.Null(user.Realm);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_realm_user()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug.ToUpper()}  ",
+      UniqueName = $"  {_user.UniqueName.ToUpper()}  ",
+      Password = PasswordString
+    };
+
+    User user = await _userService.AuthenticateAsync(payload);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(user.UpdatedOn, user.AuthenticatedOn);
+
+    Assert.NotNull(user.Realm);
+    Assert.Equal(_realm.Id.ToGuid(), user.Realm.Id);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
+  public async Task AuthenticateAsync_it_should_throw_AggregateNotFoundException_when_the_realm_could_not_be_found()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = $"{_realm.UniqueSlug}-2"
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _userService.AuthenticateAsync(payload));
+    Assert.Equal(payload.Realm, exception.Id);
+    Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw UserNotFoundException when the user could not be found.")]
+  public async Task AuthenticateAsync_it_should_throw_UserNotFoundException_when_the_user_could_not_be_found()
+  {
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      UniqueName = $"{_user.UniqueName}2"
+    };
+
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.AuthenticateAsync(payload));
+    Assert.Equal(_realm.ToString(), exception.Realm);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a Portal user.")]
@@ -185,7 +260,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.MiddleName);
     Assert.Equal(payload.LastName, user.LastName);
     Assert.Equal(payload.Nickname, user.Nickname);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
+    AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
     Assert.Equal(payload.Locale, user.Locale);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
@@ -290,7 +365,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "ReadAsync: it should return null when the user is not found.")]
   public async Task ReadAsync_it_should_return_null_when_the_user_is_not_found()
   {
-    Assert.Null(await _userService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_user.UniqueName}2"));
+    Assert.Null(await _userService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_user.UniqueName}2", "HealthInsuranceNumber", identifierValue: null));
   }
 
   [Fact(DisplayName = "ReadAsync: it should return the Portal user found by unique name.")]
@@ -318,6 +393,15 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(_user.Id.ToGuid(), user.Id);
   }
 
+  [Fact(DisplayName = "ReadAsync: it should return the user found by identifier.")]
+  public async Task ReadAsync_it_should_return_the_user_found_by_identifier()
+  {
+    KeyValuePair<string, string> identifier = _user.Identifiers.Single();
+    User? user = await _userService.ReadAsync(identifierKey: identifier.Key, identifierValue: identifier.Value);
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+  }
+
   [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when many users have been found.")]
   public async Task ReadAsync_it_should_throw_TooManyResultsException_when_many_users_have_been_found()
   {
@@ -327,6 +411,32 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     );
     Assert.Equal(1, exception.Expected);
     Assert.Equal(2, exception.Actual);
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should remove an existing identifier.")]
+  public async Task RemoveIdentifierAsync_it_should_remove_an_existing_identifier()
+  {
+    User? user = await _userService.RemoveIdentifierAsync(_user.Id.ToGuid(), "  HealthInsuranceNumber  ");
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Empty(user.Identifiers);
+
+    Assert.Empty(await PortalContext.UserIdentifiers.ToArrayAsync());
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should return null when the user is not found.")]
+  public async Task RemoveIdentifierAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.RemoveIdentifierAsync(Guid.Empty, string.Empty));
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should return the user even when the identifier does not exist.")]
+  public async Task RemoveIdentifierAsync_it_should_return_the_user_even_when_the_identifier_does_not_exist()
+  {
+    User? user = await _userService.RemoveIdentifierAsync(_user.Id.ToGuid(), "test");
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.NotEmpty(user.Identifiers);
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should replace the user.")]
@@ -391,7 +501,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_user.Id.ToGuid(), user.Id);
     Assert.Equal(Guid.Empty, user.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    AssertEqual(_user.CreatedOn, user.CreatedOn);
     Assert.Equal(Actor, user.UpdatedBy);
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > version);
@@ -413,7 +523,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.MiddleName);
     Assert.Equal(payload.LastName, user.LastName);
     Assert.Equal(payload.Nickname, user.Nickname);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
+    AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
     Assert.Equal(payload.Locale, user.Locale);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
@@ -507,6 +617,95 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(user.TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should return null when the user is not found.")]
+  public async Task SaveIdentifierAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.SaveIdentifierAsync(Guid.Empty, new SaveIdentifierPayload()));
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should create a new identifier.")]
+  public async Task SaveIdentifierAsync_it_should_create_a_new_identifier()
+  {
+    SaveIdentifierPayload payload = new()
+    {
+      Key = "  EmployeeId  ",
+      Value = $"  {Guid.NewGuid()}  "
+    };
+
+    Assert.NotNull(User);
+    User.SetIdentifier(payload.Key, payload.Value);
+    await AggregateRepository.SaveAsync(User);
+
+    User? user = await _userService.SaveIdentifierAsync(_user.Id.ToGuid(), payload);
+    Assert.NotNull(user);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(2, user.Identifiers.Count());
+
+    Identifier identifier = user.Identifiers.Single(identifier => identifier.Key == payload.Key.Trim());
+    Assert.NotEqual(Guid.Empty, identifier.Id);
+    Assert.Equal(payload.Value.Trim(), identifier.Value);
+    Assert.Equal(user.UpdatedBy, identifier.CreatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.CreatedOn);
+    Assert.Equal(user.UpdatedBy, identifier.UpdatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.UpdatedOn);
+    Assert.Equal(1, identifier.Version);
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should throw IdentifierAlreadyUsedException when the identifier is already used.")]
+  public async Task SaveIdentifierAsync_it_should_throw_IdentifierAlreadyUsedException_when_the_identifier_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value);
+    await AggregateRepository.SaveAsync(user);
+
+    KeyValuePair<string, string> identifier = _user.Identifiers.Single();
+    SaveIdentifierPayload payload = new()
+    {
+      Key = identifier.Key,
+      Value = identifier.Value
+    };
+
+    var exception = await Assert.ThrowsAsync<IdentifierAlreadyUsedException<UserAggregate>>(
+      async () => await _userService.SaveIdentifierAsync(user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.Key, exception.Key);
+    Assert.Equal(payload.Value, exception.Value);
+    Assert.Equal("Key,Value", exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should update an existing identifier.")]
+  public async Task SaveIdentifierAsync_it_should_update_an_existing_identifier()
+  {
+    UserIdentifierEntity entity = await PortalContext.UserIdentifiers.AsNoTracking().SingleAsync();
+
+    SaveIdentifierPayload payload = new()
+    {
+      Key = "  HealthInsuranceNumber  ",
+      Value = $"  {BuildHealthInsuranceNumber()}  "
+    };
+
+    User? user = await _userService.SaveIdentifierAsync(_user.Id.ToGuid(), payload);
+    Assert.NotNull(user);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Identifier identifier = user.Identifiers.Single();
+    Assert.Equal(entity.Id, identifier.Id);
+    Assert.Equal(entity.Key, identifier.Key);
+    Assert.Equal(payload.Value.Trim(), identifier.Value);
+    Assert.Equal(Guid.Empty, identifier.CreatedBy.Id);
+    Assert.Equal(entity.CreatedOn, identifier.CreatedOn);
+    Assert.Equal(user.UpdatedBy, identifier.UpdatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.UpdatedOn);
+    Assert.Equal(2, identifier.Version);
   }
 
   [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
@@ -625,9 +824,9 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(3, entities.Length);
     Assert.Contains(entities, session => session.AggregateId == session1.Id.Value && session.IsActive == false
-      /*&& session.SignedOutBy == ActorId.Value*/ && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == session2.Id.Value && session.IsActive == false
-      /*&& session.SignedOutBy == ActorId.Value*/&& (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == signedOut.Id.Value && session.IsActive == false
       && session.SignedOutBy == signedOut.UpdatedBy.Value
       && ToUnixTimeMilliseconds(session.SignedOutOn) == ToUnixTimeMilliseconds(signedOut.UpdatedOn));
@@ -756,7 +955,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_user.Id.ToGuid(), user.Id);
     Assert.Equal(Guid.Empty, user.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    AssertEqual(_user.CreatedOn, user.CreatedOn);
     Assert.Equal(Actor, user.UpdatedBy);
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > 1);
@@ -825,5 +1024,21 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Assert.Equal(payload.Extension, phone.Extension);
       Assert.Equal(payload.IsVerified, phone.IsVerified);
     }
+  }
+
+  private static string BuildHealthInsuranceNumber(Faker? faker = null)
+  {
+    faker ??= new();
+
+    StringBuilder hin = new();
+
+    hin.Append(faker.Person.LastName[..3]);
+    hin.Append(faker.Person.FirstName.First());
+    hin.Append((faker.Person.DateOfBirth.Year % 100).ToString("00"));
+    hin.Append(faker.Person.DateOfBirth.Month.ToString("00"));
+    hin.Append(faker.Person.DateOfBirth.Day.ToString("00"));
+    hin.Append(faker.Random.Number(1, 99).ToString("00"));
+
+    return hin.ToString().ToUpper();
   }
 }

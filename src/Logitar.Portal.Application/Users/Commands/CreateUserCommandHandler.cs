@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.Roles;
+﻿using Logitar.Portal.Application.Roles.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Users;
@@ -13,19 +13,19 @@ namespace Logitar.Portal.Application.Users.Commands;
 internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly IMediator _mediator;
   private readonly IPasswordService _passwordService;
   private readonly IRealmRepository _realmRepository;
-  private readonly IRoleRepository _roleRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public CreateUserCommandHandler(IApplicationContext applicationContext, IPasswordService passwordService,
-    IRealmRepository realmRepository, IRoleRepository roleRepository, IUserQuerier userQuerier, IUserRepository userRepository)
+  public CreateUserCommandHandler(IApplicationContext applicationContext, IMediator mediator, IPasswordService passwordService,
+    IRealmRepository realmRepository, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
+    _mediator = mediator;
     _passwordService = passwordService;
     _realmRepository = realmRepository;
-    _roleRepository = roleRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -138,53 +138,10 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
   private async Task SetRolesAsync(UserAggregate user, CreateUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    IEnumerable<RoleAggregate> roles = await FindRolesAsync(payload, realm, cancellationToken);
+    IEnumerable<RoleAggregate> roles = await _mediator.Send(new FindRolesQuery(payload.Roles, nameof(payload.Roles), realm), cancellationToken);
     foreach (RoleAggregate role in roles)
     {
       user.AddRole(role);
     }
-  }
-  private async Task<IEnumerable<RoleAggregate>> FindRolesAsync(CreateUserPayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
-  {
-    int roleCount = payload.Roles.Count();
-    if (roleCount == 0)
-    {
-      return Enumerable.Empty<RoleAggregate>();
-    }
-
-    IEnumerable<RoleAggregate> roles = await _roleRepository.LoadAsync(realm, cancellationToken);
-    Dictionary<Guid, RoleAggregate> rolesById = new(capacity: roles.Count());
-    Dictionary<string, RoleAggregate> rolesByUniqueName = new(capacity: rolesById.Count);
-    foreach (RoleAggregate role in roles)
-    {
-      rolesById[role.Id.ToGuid()] = role;
-      rolesByUniqueName[role.UniqueName.ToUpper()] = role;
-    }
-
-    List<RoleAggregate> foundRoles = new(capacity: roleCount);
-    List<string> missingRoles = new(capacity: roleCount);
-
-    foreach (string idOrUniqueName in payload.Roles)
-    {
-      if (!string.IsNullOrWhiteSpace(idOrUniqueName))
-      {
-        if ((Guid.TryParse(idOrUniqueName.Trim(), out Guid id) && rolesById.TryGetValue(id, out RoleAggregate? role))
-          || rolesByUniqueName.TryGetValue(idOrUniqueName.Trim().ToUpper(), out role))
-        {
-          foundRoles.Add(role);
-        }
-        else
-        {
-          missingRoles.Add(idOrUniqueName);
-        }
-      }
-    }
-
-    if (missingRoles.Any())
-    {
-      throw new RolesNotFoundException(missingRoles, nameof(payload.Roles));
-    }
-
-    return foundRoles.AsReadOnly();
   }
 }

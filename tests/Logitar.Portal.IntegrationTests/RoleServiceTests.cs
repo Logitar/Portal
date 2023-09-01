@@ -2,6 +2,8 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Settings;
@@ -111,10 +113,17 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
   public async Task DeleteAsync_it_should_delete_the_role()
   {
     RoleAggregate other = new(_realm.UniqueNameSettings, "other_role", _realm.Id.Value);
+
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
+    ApiKeyAggregate apiKey = new("Default", secret, _realm.Id.Value);
+    apiKey.AddRole(other);
+    apiKey.AddRole(_role);
+
     UserAggregate user = new(_realm.UniqueNameSettings, Faker.Person.Website, _realm.Id.Value);
     user.AddRole(other);
     user.AddRole(_role);
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { other, user });
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { other, apiKey, user });
 
     Role? role = await _roleService.DeleteAsync(_role.Id.ToGuid());
 
@@ -123,11 +132,19 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Null(await PortalContext.Roles.SingleOrDefaultAsync(x => x.AggregateId == _role.Id.Value));
 
-    UserEntity? entity = await PortalContext.Users.AsNoTracking()
+    ApiKeyEntity? apiKeyEntity = await PortalContext.ApiKeys.AsNoTracking()
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.AggregateId == apiKey.Id.Value);
+    Assert.NotNull(apiKeyEntity);
+    Assert.Contains(apiKeyEntity.Roles, role => role.AggregateId == other.Id.Value);
+    Assert.DoesNotContain(apiKeyEntity.Roles, role => role.AggregateId == _role.Id.Value);
+
+    UserEntity? userEntity = await PortalContext.Users.AsNoTracking()
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value);
-    Assert.NotNull(entity);
-    Assert.DoesNotContain(entity.Roles, role => role.AggregateId == _role.Id.Value);
+    Assert.NotNull(userEntity);
+    Assert.Contains(userEntity.Roles, role => role.AggregateId == other.Id.Value);
+    Assert.DoesNotContain(userEntity.Roles, role => role.AggregateId == _role.Id.Value);
   }
 
   [Fact(DisplayName = "DeleteAsync: it should return null when the role is not found.")]
@@ -197,7 +214,7 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_role.Id.ToGuid(), role.Id);
     Assert.Equal(Guid.Empty, role.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_role.CreatedOn), ToUnixTimeMilliseconds(role.CreatedOn));
+    AssertEqual(_role.CreatedOn, role.CreatedOn);
     Assert.Equal(Actor, role.UpdatedBy);
     AssertIsNear(role.UpdatedOn);
     Assert.True(role.Version > 1);
@@ -366,7 +383,7 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_role.Id.ToGuid(), role.Id);
     Assert.Equal(Guid.Empty, role.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_role.CreatedOn), ToUnixTimeMilliseconds(role.CreatedOn));
+    AssertEqual(_role.CreatedOn, role.CreatedOn);
     Assert.Equal(Actor, role.UpdatedBy);
     AssertIsNear(role.UpdatedOn);
     Assert.True(role.Version > 1);

@@ -31,16 +31,19 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User> ReadAsync(UserAggregate user, CancellationToken cancellationToken)
   {
-    return await ReadAsync(user.Id.Value, cancellationToken)
+    return await ReadAsync(user.Id, cancellationToken)
       ?? throw new EntityNotFoundException<UserEntity>(user.Id);
   }
   public async Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+    return await ReadAsync(new AggregateId(id), cancellationToken);
   }
-  private async Task<User?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
+  private async Task<User?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
+    string aggregateId = id.Value;
+
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (user == null)
@@ -72,8 +75,33 @@ internal class UserQuerier : IUserQuerier
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+    if (user == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(realm, cancellationToken, user)).Single();
+  }
+
+  public async Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string identifierKey, string identifierValue, CancellationToken cancellationToken)
+  {
+    Realm? realm = null;
+    if (!string.IsNullOrWhiteSpace(realmIdOrUniqueSlug))
+    {
+      realm = await _realmQuerier.FindAsync(realmIdOrUniqueSlug, cancellationToken)
+        ?? throw new EntityNotFoundException<RealmEntity>(realmIdOrUniqueSlug);
+    }
+
+    string key = identifierKey.Trim();
+    string valueNormalized = identifierValue.Trim().ToUpper();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.Key == key && y.ValueNormalized == valueNormalized), cancellationToken);
     if (user == null)
     {
       return null;
@@ -119,6 +147,7 @@ internal class UserQuerier : IUserQuerier
 
     IQueryable<UserEntity> query = _users.FromQuery(builder.Build())
       .AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles);
     long total = await query.LongCountAsync(cancellationToken);
 

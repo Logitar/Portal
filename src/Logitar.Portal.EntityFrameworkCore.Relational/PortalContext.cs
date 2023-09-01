@@ -10,12 +10,15 @@ public class PortalContext : DbContext
   }
 
   internal DbSet<ActorEntity> Actors { get; private set; }
+  internal DbSet<ApiKeyEntity> ApiKeys { get; private set; }
+  internal DbSet<ApiKeyRoleEntity> ApiKeyRoles { get; private set; }
   internal DbSet<LogEntity> Logs { get; private set; }
   internal DbSet<LogEventEntity> LogEvents { get; private set; }
   internal DbSet<RealmEntity> Realms { get; private set; }
   internal DbSet<RoleEntity> Roles { get; private set; }
   internal DbSet<SessionEntity> Sessions { get; private set; }
   internal DbSet<UserEntity> Users { get; private set; }
+  internal DbSet<UserIdentifierEntity> UserIdentifiers { get; private set; }
   internal DbSet<UserRoleEntity> UserRoles { get; private set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)

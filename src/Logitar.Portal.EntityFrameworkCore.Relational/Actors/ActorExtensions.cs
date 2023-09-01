@@ -15,6 +15,27 @@ internal static class ActorExtensions
     return new[] { new ActorId(aggregate.CreatedBy), new ActorId(aggregate.UpdatedBy) }.Distinct();
   }
 
+  public static IEnumerable<ActorId> GetActorIds(this ApiKeyEntity apiKey)
+  {
+    List<ActorId> actorIds = new(capacity: 2 + (2 * apiKey.Roles.Count))
+    {
+      new ActorId(apiKey.CreatedBy),
+      new ActorId(apiKey.UpdatedBy)
+    };
+
+    foreach (RoleEntity role in apiKey.Roles)
+    {
+      actorIds.AddRange(role.GetActorIds());
+    }
+
+    return actorIds.Distinct();
+  }
+
+  public static IEnumerable<ActorId> GetActorIds(this IdentifierEntity identifier)
+  {
+    return new[] { new ActorId(identifier.CreatedBy), new ActorId(identifier.UpdatedBy) };
+  }
+
   public static IEnumerable<ActorId> GetActorIds(this SessionEntity session)
   {
     List<ActorId> actorIds = new(capacity: 10)
@@ -38,7 +59,8 @@ internal static class ActorExtensions
 
   public static IEnumerable<ActorId> GetActorIds(this UserEntity user)
   {
-    List<ActorId> actorIds = new(capacity: 7 + (2 * user.Roles.Count))
+    int capacity = 7 + (2 * user.Identifiers.Count) + (2 * user.Roles.Count);
+    List<ActorId> actorIds = new(capacity)
     {
       new ActorId(user.CreatedBy),
       new ActorId(user.UpdatedBy)
@@ -63,6 +85,11 @@ internal static class ActorExtensions
     if (user.PhoneVerifiedBy != null)
     {
       actorIds.Add(new ActorId(user.PhoneVerifiedBy));
+    }
+
+    foreach (UserIdentifierEntity identifier in user.Identifiers)
+    {
+      actorIds.AddRange(identifier.GetActorIds());
     }
 
     foreach (RoleEntity role in user.Roles)

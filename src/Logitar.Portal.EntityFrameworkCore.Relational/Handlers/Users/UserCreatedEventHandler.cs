@@ -23,17 +23,7 @@ internal class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
       user = new(@event);
 
       _context.Users.Add(user);
+      await _context.SaveChangesAsync(cancellationToken);
     }
-
-    ActorEntity? actor = await _context.Actors.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.ToGuid(), cancellationToken);
-    if (actor == null)
-    {
-      actor = new(@event);
-
-      _context.Actors.Add(actor);
-    }
-
-    await _context.SaveChangesAsync(cancellationToken);
   }
 }

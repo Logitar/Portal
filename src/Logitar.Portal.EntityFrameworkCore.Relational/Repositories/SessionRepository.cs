@@ -25,20 +25,20 @@ internal class SessionRepository : EventSourcing.EntityFrameworkCore.Relational.
   }
 
   public async Task<SessionAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<SessionAggregate>(new AggregateId(id), cancellationToken);
+    => await LoadAsync(new AggregateId(id), cancellationToken);
   public async Task<SessionAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
     => await base.LoadAsync<SessionAggregate>(id, cancellationToken);
 
-  public async Task<IEnumerable<SessionAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  public async Task<IEnumerable<SessionAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    string tenantId = realm.Id.Value;
+    string? tenantId = realm?.Id.Value;
 
     IQueryBuilder query = _sqlHelper.QueryFrom(Db.Events.Table)
       .Join(Db.Sessions.AggregateId, Db.Events.AggregateId,
         new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
       .Join(Db.Users.UserId, Db.Sessions.UserId)
-      .Where(Db.Users.TenantId, Operators.IsEqualTo(tenantId))
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Events.Table);
 
     EventEntity[] events = await EventContext.Events.FromQuery(query.Build())

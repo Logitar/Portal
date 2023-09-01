@@ -31,15 +31,17 @@ internal class SessionQuerier : ISessionQuerier
 
   public async Task<Session> ReadAsync(SessionAggregate session, CancellationToken cancellationToken)
   {
-    return await ReadAsync(session.Id.Value, cancellationToken)
+    return await ReadAsync(session.Id, cancellationToken)
       ?? throw new EntityNotFoundException<SessionEntity>(session.Id);
   }
   public async Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+    return await ReadAsync(new AggregateId(id), cancellationToken);
   }
-  private async Task<Session?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
+  private async Task<Session?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
+    string aggregateId = id.Value;
+
     SessionEntity? session = await _sessions.AsNoTracking()
       .Include(x => x.User).ThenInclude(x => x!.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);

@@ -21,8 +21,7 @@ internal class RoleRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
   }
 
   public async Task<RoleAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<RoleAggregate>(new AggregateId(id), cancellationToken);
-
+    => await LoadAsync(new AggregateId(id), version: null, cancellationToken);
   public async Task<RoleAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
     => await base.LoadAsync<RoleAggregate>(id, version, cancellationToken);
 
