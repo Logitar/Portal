@@ -1,10 +1,27 @@
-﻿using Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Security.Claims;
 
 namespace Logitar.Portal.Web.Extensions;
 
 internal static class ClaimExtensions
 {
+  public static ClaimsIdentity CreateClaimsIdentity(this ApiKey apiKey, string? authenticationType = null)
+  {
+    ClaimsIdentity identity = new(authenticationType);
+
+    identity.AddClaim(new(Rfc7519ClaimNames.Subject, apiKey.Id.ToString()));
+    identity.AddClaim(apiKey.UpdatedOn.CreateClaim(Rfc7519ClaimNames.UpdatedAt));
+    identity.AddClaim(new(Rfc7519ClaimNames.FullName, apiKey.Title));
+
+    if (apiKey.AuthenticatedOn.HasValue)
+    {
+      identity.AddClaim(apiKey.AuthenticatedOn.Value.CreateClaim(Rfc7519ClaimNames.AuthenticationTime));
+    }
+
+    return identity;
+  }
+
   public static ClaimsIdentity CreateClaimsIdentity(this User user, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);

@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Web.Extensions;
@@ -29,6 +30,12 @@ internal class HttpApplicationContext : IApplicationContext
       if (user != null)
       {
         return new ActorId(user.Id);
+      }
+
+      ApiKey? apiKey = Context.GetApiKey();
+      if (apiKey != null)
+      {
+        return new ActorId(apiKey.Id);
       }
 
       return new ActorId(Guid.Empty);
