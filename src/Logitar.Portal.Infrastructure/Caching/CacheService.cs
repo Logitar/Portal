@@ -94,6 +94,9 @@ internal class CacheService : ICacheService
         RemoveItem(sessionKey);
       }
     }
+
+    ActorId actorId = new(user.Id.Value);
+    RemoveActor(actorId);
   }
   public void SetUser(CachedUser user)
   {

@@ -28,19 +28,6 @@ internal class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEvent>
 
     user.Update(@event, roles);
 
-    ActorEntity? actor = await _context.Actors
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.ToGuid(), cancellationToken);
-    if (actor == null)
-    {
-      actor = new(user);
-
-      _context.Actors.Add(actor);
-    }
-    else if (@event.UniqueName != null || @event.Email != null || @event.FullName != null || @event.Picture != null)
-    {
-      actor.Update(user);
-    }
-
     await _context.SaveChangesAsync(cancellationToken);
   }
 }

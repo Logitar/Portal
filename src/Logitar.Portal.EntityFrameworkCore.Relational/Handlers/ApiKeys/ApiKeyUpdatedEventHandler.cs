@@ -28,19 +28,6 @@ internal class ApiKeyUpdatedEventHandler : INotificationHandler<ApiKeyUpdatedEve
 
     apiKey.Update(@event, roles);
 
-    ActorEntity? actor = await _context.Actors
-      .SingleOrDefaultAsync(x => x.Id == @event.AggregateId.ToGuid(), cancellationToken);
-    if (actor == null)
-    {
-      actor = new(apiKey);
-
-      _context.Actors.Add(actor);
-    }
-    else if (@event.Title != null)
-    {
-      actor.Update(@event);
-    }
-
     await _context.SaveChangesAsync(cancellationToken);
   }
 }

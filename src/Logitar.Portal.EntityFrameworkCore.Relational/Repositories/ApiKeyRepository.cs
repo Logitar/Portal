@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
@@ -13,11 +14,13 @@ internal class ApiKeyRepository : EventSourcing.EntityFrameworkCore.Relational.A
 {
   private static readonly string AggregateType = typeof(ApiKeyAggregate).GetName();
 
+  private readonly ICacheService _cacheService;
   private readonly ISqlHelper _sqlHelper;
 
-  public ApiKeyRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
+  public ApiKeyRepository(ICacheService cacheService, IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
     : base(eventBus, eventContext, eventSerializer)
   {
+    _cacheService = cacheService;
     _sqlHelper = sqlHelper;
   }
 
@@ -71,7 +74,20 @@ internal class ApiKeyRepository : EventSourcing.EntityFrameworkCore.Relational.A
   }
 
   public async Task SaveAsync(ApiKeyAggregate apiKey, CancellationToken cancellationToken)
-    => await base.SaveAsync(apiKey, cancellationToken);
+  {
+    await base.SaveAsync(apiKey, cancellationToken);
+
+    ActorId actorId = new(apiKey.Id.Value);
+    _cacheService.RemoveActor(actorId);
+  }
   public async Task SaveAsync(IEnumerable<ApiKeyAggregate> apiKeys, CancellationToken cancellationToken)
-    => await base.SaveAsync(apiKeys, cancellationToken);
+  {
+    await base.SaveAsync(apiKeys, cancellationToken);
+
+    foreach (ApiKeyAggregate apiKey in apiKeys)
+    {
+      ActorId actorId = new(apiKey.Id.Value);
+      _cacheService.RemoveActor(actorId);
+    }
+  }
 }
