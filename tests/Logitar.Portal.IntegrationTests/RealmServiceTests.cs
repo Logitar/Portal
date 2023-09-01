@@ -5,6 +5,8 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Sessions;
@@ -120,13 +122,17 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   public async Task DeleteAsync_it_should_delete_the_realm()
   {
     RoleAggregate role = new(_realm.UniqueNameSettings, "admin", _realm.Id.Value);
-    UserAggregate user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
-    {
-      Email = new EmailAddress(Faker.Person.Email, isVerified: true)
-    };
+
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
+    ApiKeyAggregate apiKey = new("Default", secret, _realm.Id.Value);
+    apiKey.AddRole(role);
+
+    UserAggregate user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value);
     user.AddRole(role);
-    SessionAggregate session = user.SignIn(_realm.UserSettings);
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { role, user, session });
+
+    SessionAggregate session = new(user);
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { role, apiKey, user, session });
 
     Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
 
@@ -135,6 +141,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Null(await PortalContext.Sessions.SingleOrDefaultAsync(x => x.AggregateId == session.Id.Value));
     Assert.Null(await PortalContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value));
+    Assert.Null(await PortalContext.ApiKeys.SingleOrDefaultAsync(x => x.AggregateId == apiKey.Id.Value));
     Assert.Null(await PortalContext.Realms.SingleOrDefaultAsync(x => x.AggregateId == _realm.Id.Value));
   }
 

@@ -6,6 +6,24 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
 internal static class Db
 {
+  public static class ApiKeys
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.ApiKeys));
+
+    public static readonly ColumnId AggregateId = new(nameof(ApiKeyEntity.AggregateId), Table);
+    public static readonly ColumnId ApiKeyId = new(nameof(ApiKeyEntity.ApiKeyId), Table);
+    public static readonly ColumnId TenantId = new(nameof(ApiKeyEntity.TenantId), Table);
+    public static readonly ColumnId Title = new(nameof(ApiKeyEntity.Title), Table);
+  }
+
+  public static class ApiKeyRoles
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.ApiKeyRoles));
+
+    public static readonly ColumnId ApiKeyId = new(nameof(ApiKeyRoleEntity.ApiKeyId), Table);
+    public static readonly ColumnId RoleId = new(nameof(ApiKeyRoleEntity.RoleId), Table);
+  }
+
   public static class Events
   {
     public static readonly TableId Table = new(nameof(EventContext.Events));

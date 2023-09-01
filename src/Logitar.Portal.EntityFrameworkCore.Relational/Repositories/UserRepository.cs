@@ -99,15 +99,15 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
     return base.Load<UserAggregate>(events.Select(EventSerializer.Deserialize));
   }
 
-  public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  public async Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    string tenantId = realm.Id.Value;
+    string? tenantId = realm?.Id.Value;
 
     IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
       .Join(Db.Users.AggregateId, Db.Events.AggregateId,
         new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
-      .Where(Db.Users.TenantId, Operators.IsEqualTo(tenantId))
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Events.Table)
       .Build();
 

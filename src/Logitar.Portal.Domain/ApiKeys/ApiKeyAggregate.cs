@@ -11,6 +11,8 @@ namespace Logitar.Portal.Domain.ApiKeys;
 
 public class ApiKeyAggregate : AggregateRoot
 {
+  public const int SecretLength = 32;
+
   private readonly Dictionary<string, string> _customAttributes = new();
   private readonly HashSet<AggregateId> _roles = new();
 
@@ -118,6 +120,8 @@ public class ApiKeyAggregate : AggregateRoot
       _roles.Add(roleId);
     }
   }
+
+  public void Delete(ActorId actorId = default) => ApplyChange(new ApiKeyDeletedEvent(actorId));
 
   public void RemoveCustomAttribute(string key)
   {

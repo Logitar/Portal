@@ -5,6 +5,7 @@ using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
@@ -22,6 +23,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
   private readonly RealmAggregate _realm;
   private readonly RoleAggregate _readUsers;
   private readonly RoleAggregate _writeUsers;
+  private readonly ApiKeyAggregate _apiKey;
 
   public ApiKeyServiceTests() : base()
   {
@@ -36,13 +38,24 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
 
     _readUsers = new(_realm.UniqueNameSettings, "read_users", _realm.Id.Value);
     _writeUsers = new(_realm.UniqueNameSettings, "write_users", _realm.Id.Value);
+
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
+    _apiKey = new("Default", secret, _realm.Id.Value)
+    {
+      Description = "This is the default API key.",
+      ExpiresOn = DateTime.Now.AddYears(1)
+    };
+    _apiKey.AddRole(_readUsers);
+    _apiKey.AddRole(_writeUsers);
+    _apiKey.SetCustomAttribute("Key1", "Value1");
+    _apiKey.SetCustomAttribute("Key2", "Value2");
   }
 
   public override async Task InitializeAsync()
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _apiKey });
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a new Portal API key.")]
@@ -147,6 +160,23 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _apiKeyService.CreateAsync(payload));
     Assert.Equal(payload.Realm, exception.Id);
     Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should delete the API key.")]
+  public async Task DeleteAsync_it_should_delete_the_Api_key()
+  {
+    ApiKey? apiKey = await _apiKeyService.DeleteAsync(_apiKey.Id.ToGuid());
+
+    Assert.NotNull(apiKey);
+    Assert.Equal(_apiKey.Id.ToGuid(), apiKey.Id);
+
+    Assert.Null(await PortalContext.ApiKeys.SingleOrDefaultAsync(x => x.AggregateId == _apiKey.Id.Value));
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should return null when the API key is not found.")]
+  public async Task DeleteAsync_it_should_return_null_when_the_Api_key_is_not_found()
+  {
+    Assert.Null(await _apiKeyService.DeleteAsync(Guid.Empty));
   }
 
   private async Task AssertApiKeySecretAsync(string value)

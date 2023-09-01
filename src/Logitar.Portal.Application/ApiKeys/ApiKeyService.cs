@@ -23,9 +23,9 @@ internal class ApiKeyService : IApiKeyService
     return await _pipeline.ExecuteAsync(new CreateApiKeyCommand(payload), cancellationToken);
   }
 
-  public Task<ApiKey?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ApiKey?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new DeleteApiKeyCommand(id), cancellationToken);
   }
 
   public Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken)

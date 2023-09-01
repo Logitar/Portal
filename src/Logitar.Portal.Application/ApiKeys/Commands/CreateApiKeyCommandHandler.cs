@@ -43,7 +43,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     string? tenantId = realm?.Id.Value;
     IPasswordSettings passwordSettings = realm?.PasswordSettings ?? _applicationContext.Configuration.PasswordSettings;
 
-    Password secret = _passwordService.Generate(passwordSettings, 32, out byte[] secretBytes);
+    Password secret = _passwordService.Generate(passwordSettings, ApiKeyAggregate.SecretLength, out byte[] secretBytes);
     ApiKeyAggregate apiKey = new(payload.Title, secret, tenantId, _applicationContext.ActorId)
     {
       Description = payload.Description,
