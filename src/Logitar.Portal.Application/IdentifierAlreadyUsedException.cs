@@ -19,6 +19,7 @@ public class IdentifierAlreadyUsedException : Exception
     TenantId = tenantId;
     Key = key;
     Value = value;
+    PropertyName = propertyName;
   }
 
   public string TypeName
@@ -28,8 +29,8 @@ public class IdentifierAlreadyUsedException : Exception
   }
   public string? TenantId
   {
-    get => (string?)Data[nameof(Key)];
-    private set => Data[nameof(Key)] = value;
+    get => (string?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
   public string Key
   {

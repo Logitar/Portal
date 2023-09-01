@@ -66,6 +66,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _user.SetCustomAttribute("Department", "Mortgages");
     _user.SetCustomAttribute("EmployeeId", "040-735323-2");
     _user.SetCustomAttribute("HourlyRate", "25.00");
+    _user.SetIdentifier("HealthInsuranceNumber", BuildHealthInsuranceNumber(Faker));
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
   }
 
@@ -580,6 +581,95 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
   }
 
+  [Fact(DisplayName = "SaveIdentifierAsync: it should return null when the user is not found.")]
+  public async Task SaveIdentifierAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.SaveIdentifierAsync(Guid.Empty, new SaveIdentifierPayload()));
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should create a new identifier.")]
+  public async Task SaveIdentifierAsync_it_should_create_a_new_identifier()
+  {
+    SaveIdentifierPayload payload = new()
+    {
+      Key = "  EmployeeId  ",
+      Value = $"  {Guid.NewGuid()}  "
+    };
+
+    Assert.NotNull(User);
+    User.SetIdentifier(payload.Key, payload.Value);
+    await AggregateRepository.SaveAsync(User);
+
+    User? user = await _userService.SaveIdentifierAsync(_user.Id.ToGuid(), payload);
+    Assert.NotNull(user);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(2, user.Identifiers.Count());
+
+    Identifier identifier = user.Identifiers.Single(identifier => identifier.Key == payload.Key.Trim());
+    Assert.NotEqual(Guid.Empty, identifier.Id);
+    Assert.Equal(payload.Value.Trim(), identifier.Value);
+    Assert.Equal(user.UpdatedBy, identifier.CreatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.CreatedOn);
+    Assert.Equal(user.UpdatedBy, identifier.UpdatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.UpdatedOn);
+    Assert.Equal(1, identifier.Version);
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should throw IdentifierAlreadyUsedException when the identifier is already used.")]
+  public async Task SaveIdentifierAsync_it_should_throw_IdentifierAlreadyUsedException_when_the_identifier_is_already_used()
+  {
+    UserAggregate user = new(_realm.UniqueNameSettings, $"{_user.UniqueName}2", _realm.Id.Value);
+    await AggregateRepository.SaveAsync(user);
+
+    KeyValuePair<string, string> identifier = _user.Identifiers.Single();
+    SaveIdentifierPayload payload = new()
+    {
+      Key = identifier.Key,
+      Value = identifier.Value
+    };
+
+    var exception = await Assert.ThrowsAsync<IdentifierAlreadyUsedException<UserAggregate>>(
+      async () => await _userService.SaveIdentifierAsync(user.Id.ToGuid(), payload)
+    );
+    Assert.Equal(user.TenantId, exception.TenantId);
+    Assert.Equal(payload.Key, exception.Key);
+    Assert.Equal(payload.Value, exception.Value);
+    Assert.Equal("Key,Value", exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SaveIdentifierAsync: it should update an existing identifier.")]
+  public async Task SaveIdentifierAsync_it_should_update_an_existing_identifier()
+  {
+    UserIdentifierEntity entity = await PortalContext.UserIdentifiers.AsNoTracking().SingleAsync();
+
+    SaveIdentifierPayload payload = new()
+    {
+      Key = "  HealthInsuranceNumber  ",
+      Value = $"  {BuildHealthInsuranceNumber()}  "
+    };
+
+    User? user = await _userService.SaveIdentifierAsync(_user.Id.ToGuid(), payload);
+    Assert.NotNull(user);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Identifier identifier = user.Identifiers.Single();
+    Assert.Equal(entity.Id, identifier.Id);
+    Assert.Equal(entity.Key, identifier.Key);
+    Assert.Equal(payload.Value.Trim(), identifier.Value);
+    Assert.Equal(Guid.Empty, identifier.CreatedBy.Id);
+    Assert.Equal(entity.CreatedOn, identifier.CreatedOn);
+    Assert.Equal(user.UpdatedBy, identifier.UpdatedBy);
+    Assert.Equal(user.UpdatedOn, identifier.UpdatedOn);
+    Assert.Equal(2, identifier.Version);
+  }
+
   [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
   public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
   {
@@ -896,5 +986,21 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Assert.Equal(payload.Extension, phone.Extension);
       Assert.Equal(payload.IsVerified, phone.IsVerified);
     }
+  }
+
+  private static string BuildHealthInsuranceNumber(Faker? faker = null)
+  {
+    faker ??= new();
+
+    StringBuilder hin = new();
+
+    hin.Append(faker.Person.LastName[..3]);
+    hin.Append(faker.Person.FirstName.First());
+    hin.Append((faker.Person.DateOfBirth.Year % 100).ToString("00"));
+    hin.Append(faker.Person.DateOfBirth.Month.ToString("00"));
+    hin.Append(faker.Person.DateOfBirth.Day.ToString("00"));
+    hin.Append(faker.Random.Number(1, 99).ToString("00"));
+
+    return hin.ToString().ToUpper();
   }
 }

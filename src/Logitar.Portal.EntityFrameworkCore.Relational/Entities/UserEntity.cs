@@ -141,6 +141,8 @@ internal record UserEntity : AggregateEntity
 
   public void SetIdentifier(UserIdentifierSetEvent @event)
   {
+    Update(@event);
+
     UserIdentifierEntity? identifier = Identifiers.SingleOrDefault(identifier => identifier.Key == @event.Key);
     if (identifier == null)
     {

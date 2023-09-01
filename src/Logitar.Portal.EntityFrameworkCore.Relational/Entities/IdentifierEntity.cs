@@ -15,7 +15,7 @@ internal abstract record IdentifierEntity
     Key = @event.Key;
 
     CreatedBy = @event.ActorId.Value;
-    CreatedOn = @event.OccurredOn;
+    CreatedOn = @event.OccurredOn.ToUniversalTime();
 
     Update(@event);
   }
@@ -44,7 +44,7 @@ internal abstract record IdentifierEntity
     Value = @event.Value;
 
     UpdatedBy = @event.ActorId.Value;
-    UpdatedOn = @event.OccurredOn;
+    UpdatedOn = @event.OccurredOn.ToUniversalTime();
 
     Version++;
   }

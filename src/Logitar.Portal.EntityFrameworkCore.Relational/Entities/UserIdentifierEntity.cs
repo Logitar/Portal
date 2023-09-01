@@ -19,5 +19,5 @@ internal record UserIdentifierEntity : IdentifierEntity
   public UserEntity? User { get; private set; }
   public int UserId { get; private set; }
 
-  public void Update(UserIdentifierSetEvent @event) => Update(@event);
+  public void Update(UserIdentifierSetEvent @event) => base.Update(@event);
 }

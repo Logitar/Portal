@@ -42,6 +42,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
       context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
       context.ExceptionHandled = true;
     }
+    else if (context.Exception is IdentifierAlreadyUsedException identifierAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(identifierAlreadyUsed.Failure);
+      context.ExceptionHandled = true;
+    }
     else if (context.Exception is InvalidCredentialsException invalidCredentials)
     {
       context.Result = new BadRequestObjectResult(new ErrorInfo(invalidCredentials, "The specified credentials are not valid."));
