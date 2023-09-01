@@ -318,6 +318,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     ReplaceApiKeyPayload payload = new()
     {
       Title = _apiKey.Title,
+      ExpiresOn = _apiKey.ExpiresOn,
       Roles = new string[] { "read_users", "read_roles", "read_realms" }
     };
 

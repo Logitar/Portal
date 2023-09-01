@@ -96,7 +96,11 @@ public class ApiKeyAggregate : AggregateRoot
       {
         new ExpirationValidator(nameof(ExpiresOn)).ValidateAndThrow(value.Value);
       }
-      // TODO(fpion): CannotPostponeExpirationException
+
+      if (_expiresOn.HasValue && value == null || _expiresOn < value)
+      {
+        throw new CannotPostponeExpirationException(this, value, nameof(ExpiresOn));
+      }
 
       if (value != _expiresOn)
       {

@@ -14,7 +14,7 @@ public class ApiKeyAggregateTests
   {
     _secret = RandomStringGenerator.GetString(ApiKeyAggregate.SecretLength);
     PasswordMock secret = new(_secret);
-    _apiKey = new("Default", secret); ;
+    _apiKey = new("Default", secret);
   }
 
   [Fact(DisplayName = "Authenticate: it should authenticate the API key.")]
@@ -81,5 +81,46 @@ public class ApiKeyAggregateTests
   {
     _apiKey.ExpiresOn = DateTime.Now.AddYears(1);
     Assert.False(_apiKey.IsExpired());
+  }
+
+  [Fact(DisplayName = "ExpiresOn: it should set the expiration date when current value is null.")]
+  public void ExpiresOn_it_should_set_the_expiration_date_when_current_value_is_null()
+  {
+    DateTime expiresOn = DateTime.Now.AddYears(1);
+    _apiKey.ExpiresOn = expiresOn;
+    Assert.Equal(expiresOn, _apiKey.ExpiresOn);
+  }
+
+  [Fact(DisplayName = "ExpiresOn: it should set the expiration date when new value is less than current value.")]
+  public void ExpiresOn_it_should_set_the_expiration_date_when_new_value_is_less_than_current_value()
+  {
+    _apiKey.ExpiresOn = DateTime.Now.AddYears(1);
+
+    DateTime expiresOn = DateTime.Now.AddMonths(6);
+    _apiKey.ExpiresOn = expiresOn;
+    Assert.Equal(expiresOn, _apiKey.ExpiresOn);
+  }
+
+  [Fact(DisplayName = "ExpiresOn: it should throw CannotPostponeExpirationException when new value is greater than current value.")]
+  public void ExpiresOn_it_should_throw_CannotPostponeExpirationException_when_new_value_is_greater_than_current_value()
+  {
+    _apiKey.ExpiresOn = DateTime.Now.AddMonths(1);
+
+    DateTime expiresOn = DateTime.Now.AddYears(1);
+    var exception = Assert.Throws<CannotPostponeExpirationException>(() => _apiKey.ExpiresOn = expiresOn);
+    Assert.Equal(_apiKey.ToString(), exception.ApiKey);
+    Assert.Equal(expiresOn, exception.ExpiresOn);
+    Assert.Equal(nameof(_apiKey.ExpiresOn), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ExpiresOn: it should throw CannotPostponeExpirationException when new value is null.")]
+  public void ExpiresOn_it_should_throw_CannotPostponeExpirationException_when_new_value_is_null()
+  {
+    _apiKey.ExpiresOn = DateTime.Now.AddMonths(1);
+
+    var exception = Assert.Throws<CannotPostponeExpirationException>(() => _apiKey.ExpiresOn = null);
+    Assert.Equal(_apiKey.ToString(), exception.ApiKey);
+    Assert.Null(exception.ExpiresOn);
+    Assert.Equal(nameof(_apiKey.ExpiresOn), exception.PropertyName);
   }
 }
