@@ -34,9 +34,9 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName, identifierKey, identifierValue), cancellationToken);
   }
 
-  public Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
+  public async Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new RemoveIdentifierCommand(id, key), cancellationToken);
   }
 
   public async Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)

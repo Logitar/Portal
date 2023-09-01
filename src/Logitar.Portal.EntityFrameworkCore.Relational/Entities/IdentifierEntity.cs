@@ -41,7 +41,7 @@ internal abstract record IdentifierEntity
 
   protected void Update(IdentifierSetEvent @event)
   {
-    Value = @event.Value;
+    Value = @event.Value ?? throw new ArgumentException($"The {nameof(@event.Value)} is required.", nameof(@event));
 
     UpdatedBy = @event.ActorId.Value;
     UpdatedOn = @event.OccurredOn.ToUniversalTime();

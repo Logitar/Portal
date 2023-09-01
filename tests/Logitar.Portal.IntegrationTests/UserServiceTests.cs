@@ -362,7 +362,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "ReadAsync: it should return null when the user is not found.")]
   public async Task ReadAsync_it_should_return_null_when_the_user_is_not_found()
   {
-    Assert.Null(await _userService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_user.UniqueName}2"));
+    Assert.Null(await _userService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_user.UniqueName}2", "HealthInsuranceNumber", identifierValue: null));
   }
 
   [Fact(DisplayName = "ReadAsync: it should return the Portal user found by unique name.")]
@@ -390,6 +390,15 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(_user.Id.ToGuid(), user.Id);
   }
 
+  [Fact(DisplayName = "ReadAsync: it should return the user found by identifier.")]
+  public async Task ReadAsync_it_should_return_the_user_found_by_identifier()
+  {
+    KeyValuePair<string, string> identifier = _user.Identifiers.Single();
+    User? user = await _userService.ReadAsync(identifierKey: identifier.Key, identifierValue: identifier.Value);
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+  }
+
   [Fact(DisplayName = "ReadAsync: it should throw TooManyResultsException when many users have been found.")]
   public async Task ReadAsync_it_should_throw_TooManyResultsException_when_many_users_have_been_found()
   {
@@ -399,6 +408,32 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     );
     Assert.Equal(1, exception.Expected);
     Assert.Equal(2, exception.Actual);
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should remove an existing identifier.")]
+  public async Task RemoveIdentifierAsync_it_should_remove_an_existing_identifier()
+  {
+    User? user = await _userService.RemoveIdentifierAsync(_user.Id.ToGuid(), "  HealthInsuranceNumber  ");
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Empty(user.Identifiers);
+
+    Assert.Empty(await PortalContext.UserIdentifiers.ToArrayAsync());
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should return null when the user is not found.")]
+  public async Task RemoveIdentifierAsync_it_should_return_null_when_the_user_is_not_found()
+  {
+    Assert.Null(await _userService.RemoveIdentifierAsync(Guid.Empty, string.Empty));
+  }
+
+  [Fact(DisplayName = "RemoveIdentifierAsync: it should return the user even when the identifier does not exist.")]
+  public async Task RemoveIdentifierAsync_it_should_return_the_user_even_when_the_identifier_does_not_exist()
+  {
+    User? user = await _userService.RemoveIdentifierAsync(_user.Id.ToGuid(), "test");
+    Assert.NotNull(user);
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.NotEmpty(user.Identifiers);
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should replace the user.")]

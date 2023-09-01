@@ -366,6 +366,18 @@ public class UserAggregate : AggregateRoot
     }
   }
 
+  public void RemoveIdentifier(string key, ActorId actorId = default)
+  {
+    key = key.Trim();
+    if (_identifiers.ContainsKey(key))
+    {
+      ApplyChange(new UserIdentifierSetEvent(actorId)
+      {
+        Key = key
+      });
+    }
+  }
+
   public void RemoveRole(RoleAggregate role) => RemoveRole(role.Id);
   public void RemoveRole(AggregateId roleId)
   {
@@ -406,7 +418,17 @@ public class UserAggregate : AggregateRoot
       });
     }
   }
-  protected virtual void Apply(UserIdentifierSetEvent identifier) => _identifiers[identifier.Key] = identifier.Value;
+  protected virtual void Apply(UserIdentifierSetEvent identifier)
+  {
+    if (identifier.Value == null)
+    {
+      _identifiers.Remove(identifier.Key);
+    }
+    else
+    {
+      _identifiers[identifier.Key] = identifier.Value;
+    }
+  }
 
   public void SetPassword(Password password)
   {
