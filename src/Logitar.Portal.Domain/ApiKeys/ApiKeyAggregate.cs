@@ -96,6 +96,7 @@ public class ApiKeyAggregate : AggregateRoot
       {
         new ExpirationValidator(nameof(ExpiresOn)).ValidateAndThrow(value.Value);
       }
+      // TODO(fpion): CannotPostponeExpirationException
 
       if (value != _expiresOn)
       {
@@ -121,7 +122,25 @@ public class ApiKeyAggregate : AggregateRoot
     }
   }
 
+  public void Authenticate(string secret, ActorId? actorId = null)
+  {
+    if (IsExpired())
+    {
+      throw new ApiKeyIsExpiredException(this);
+    }
+    else if (_secret?.IsMatch(secret) != true)
+    {
+      throw new IncorrectApiKeySecretException(this, secret);
+    }
+
+    actorId ??= new(Id.Value);
+
+    ApplyChange(new ApiKeyAuthenticatedEvent(actorId.Value));
+  }
+
   public void Delete(ActorId actorId = default) => ApplyChange(new ApiKeyDeletedEvent(actorId));
+
+  public bool IsExpired(DateTime? moment = null) => ExpiresOn.HasValue && ExpiresOn.Value <= (moment ?? DateTime.Now);
 
   public void RemoveCustomAttribute(string key)
   {

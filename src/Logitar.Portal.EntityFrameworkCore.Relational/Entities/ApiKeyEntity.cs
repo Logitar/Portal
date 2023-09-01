@@ -49,6 +49,13 @@ internal record ApiKeyEntity : AggregateEntity
 
   public List<RoleEntity> Roles { get; } = new();
 
+  public void Authenticate(ApiKeyAuthenticatedEvent authenticated)
+  {
+    Update(authenticated);
+
+    AuthenticatedOn = authenticated.OccurredOn.ToUniversalTime();
+  }
+
   public void Update(ApiKeyUpdatedEvent updated, IEnumerable<RoleEntity> roles)
   {
     Update(updated);

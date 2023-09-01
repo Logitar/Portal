@@ -26,7 +26,7 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
   }
 
   public async Task<UserAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<UserAggregate>(new AggregateId(id), cancellationToken);
+    => await LoadAsync(new AggregateId(id), version: null, cancellationToken);
   public async Task<UserAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
     => await base.LoadAsync<UserAggregate>(id, version, cancellationToken);
 

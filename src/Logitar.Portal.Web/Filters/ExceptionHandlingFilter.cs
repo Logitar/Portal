@@ -5,6 +5,7 @@ using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 {
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
+    [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
@@ -66,6 +68,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     {
       base.OnException(context);
     }
+  }
+
+  private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(new ErrorInfo(context.Exception, "The API key is expired."));
   }
 
   private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)

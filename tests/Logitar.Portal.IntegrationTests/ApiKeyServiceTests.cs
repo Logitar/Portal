@@ -9,6 +9,7 @@ using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
   private readonly RealmAggregate _realm;
   private readonly RoleAggregate _readUsers;
   private readonly RoleAggregate _writeUsers;
+  private readonly byte[] _secret;
   private readonly ApiKeyAggregate _apiKey;
 
   public ApiKeyServiceTests() : base()
@@ -39,7 +41,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     _readUsers = new(_realm.UniqueNameSettings, "read_users", _realm.Id.Value);
     _writeUsers = new(_realm.UniqueNameSettings, "write_users", _realm.Id.Value);
 
-    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _secret);
     _apiKey = new("Default", secret, _realm.Id.Value)
     {
       Description = "This is the default API key.",
@@ -56,6 +58,66 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     await base.InitializeAsync();
 
     await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _apiKey });
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the Portal API key.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_Portal_Api_key()
+  {
+    Password secret = PasswordService.Generate(new ReadOnlyPasswordSettings(), ApiKeyAggregate.SecretLength, out byte[] secretBytes);
+    ApiKeyAggregate aggregate = new("Default", secret);
+    await AggregateRepository.SaveAsync(aggregate);
+
+    XApiKey xApiKey = new(aggregate, secretBytes);
+
+    ApiKey apiKey = await _apiKeyService.AuthenticateAsync(xApiKey.Encode());
+
+    Assert.Equal(aggregate.Id.ToGuid(), apiKey.Id);
+
+    Assert.Equal(Actor, apiKey.UpdatedBy);
+    AssertIsNear(apiKey.UpdatedOn);
+    Assert.True(apiKey.Version > 1);
+
+    Assert.Equal(apiKey.UpdatedOn, apiKey.AuthenticatedOn);
+
+    Assert.Null(apiKey.Realm);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm API key.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_realm_Api_key()
+  {
+    XApiKey xApiKey = new(_apiKey, _secret);
+
+    ApiKey apiKey = await _apiKeyService.AuthenticateAsync(xApiKey.Encode());
+
+    Assert.Equal(_apiKey.Id.ToGuid(), apiKey.Id);
+
+    Assert.Equal(Actor, apiKey.UpdatedBy);
+    AssertIsNear(apiKey.UpdatedOn);
+    Assert.True(apiKey.Version > 1);
+
+    Assert.Equal(apiKey.UpdatedOn, apiKey.AuthenticatedOn);
+
+    Assert.NotNull(apiKey.Realm);
+    Assert.Equal(_realm.Id.ToGuid(), apiKey.Realm.Id);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw ApiKeyNotFoundException when the API key could not be found.")]
+  public async Task AuthenticateAsync_it_should_throw_ApiKeyNotFoundException_when_the_Api_key_could_not_be_found()
+  {
+    Password secret = PasswordService.Generate(new ReadOnlyPasswordSettings(), ApiKeyAggregate.SecretLength, out byte[] secretBytes);
+    ApiKeyAggregate apiKey = new("Default", secret);
+    XApiKey xApiKey = new(apiKey, secretBytes);
+
+    var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await _apiKeyService.AuthenticateAsync(xApiKey.Encode()));
+    Assert.Equal(xApiKey.Id.Value, exception.Id);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should throw InvalidXApiKeyException when the X-API-Key is not valid.")]
+  public async Task AuthenticateAsync_it_should_throw_InvalidXApiKeyException_when_the_X_Api_Key_is_not_valid()
+  {
+    string xApiKey = "PT:abc:123";
+    var exception = await Assert.ThrowsAsync<InvalidXApiKeyException>(async () => await _apiKeyService.AuthenticateAsync(xApiKey));
+    Assert.Equal(xApiKey, exception.XApiKey);
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a new Portal API key.")]

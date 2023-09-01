@@ -95,8 +95,9 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > 1);
 
-    Assert.NotNull(user.AuthenticatedOn);
-    AssertIsNear(user.AuthenticatedOn!.Value);
+    Assert.Equal(user.UpdatedOn, user.AuthenticatedOn);
+
+    Assert.Null(user.Realm);
   }
 
   [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user.")]
@@ -117,8 +118,10 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > 1);
 
-    Assert.NotNull(user.AuthenticatedOn);
-    AssertIsNear(user.AuthenticatedOn!.Value);
+    Assert.Equal(user.UpdatedOn, user.AuthenticatedOn);
+
+    Assert.NotNull(user.Realm);
+    Assert.Equal(_realm.Id.ToGuid(), user.Realm.Id);
   }
 
   [Fact(DisplayName = "AuthenticateAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
