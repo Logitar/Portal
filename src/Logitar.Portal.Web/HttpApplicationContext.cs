@@ -42,6 +42,8 @@ internal class HttpApplicationContext : IApplicationContext
     }
   }
 
+  public Uri? BaseUrl => new($"{Context.Request.Scheme}://{Context.Request.Host}");
+
   public ConfigurationAggregate Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration could not be found in the cache.");
 }

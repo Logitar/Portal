@@ -106,6 +106,9 @@ internal static class ClaimExtensions
       identity.AddClaim(user.AuthenticatedOn.Value.CreateClaim(Rfc7519ClaimNames.AuthenticationTime));
     }
 
+    // TODO(fpion): Roles
+    // TODO(fpion): other claims
+
     return identity;
   }
 

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Domain.Validators;
 
-internal class SecretValidator : AbstractValidator<string>
+public class SecretValidator : AbstractValidator<string>
 {
   public SecretValidator(string? propertyName = null)
   {
