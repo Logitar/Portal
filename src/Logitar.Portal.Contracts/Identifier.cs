@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 
-namespace Logitar.Portal.Contracts.Users;
+namespace Logitar.Portal.Contracts;
 
 public record Identifier
 {

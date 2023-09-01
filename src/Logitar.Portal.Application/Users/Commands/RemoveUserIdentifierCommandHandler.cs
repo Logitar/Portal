@@ -4,20 +4,20 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class RemoveIdentifierCommandHandler : IRequestHandler<RemoveIdentifierCommand, User?>
+internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserIdentifierCommand, User?>
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public RemoveIdentifierCommandHandler(IApplicationContext applicationContext, IUserQuerier userQuerier, IUserRepository userRepository)
+  public RemoveUserIdentifierCommandHandler(IApplicationContext applicationContext, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(RemoveIdentifierCommand command, CancellationToken cancellationToken)
+  public async Task<User?> Handle(RemoveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
     if (user == null)

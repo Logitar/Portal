@@ -18,6 +18,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
+    [typeof(CannotPostponeExpirationException)] = HandleCannotPostponeExpirationException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
@@ -73,6 +74,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
   {
     return new BadRequestObjectResult(new ErrorInfo(context.Exception, "The API key is expired."));
+  }
+
+  private static IActionResult HandleCannotPostponeExpirationException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((CannotPostponeExpirationException)context.Exception).Failure);
   }
 
   private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)

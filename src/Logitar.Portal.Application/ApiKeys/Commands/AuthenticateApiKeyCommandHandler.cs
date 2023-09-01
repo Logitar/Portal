@@ -32,7 +32,8 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
     ApiKeyAggregate apiKey = await _apiKeyRepository.LoadAsync(xApiKey.Id, cancellationToken)
       ?? throw new ApiKeyNotFoundException(xApiKey.Id);
 
-    apiKey.Authenticate(Convert.ToBase64String(xApiKey.Secret), _applicationContext.ActorId);
+    string secret = Convert.ToBase64String(xApiKey.Secret);
+    apiKey.Authenticate(secret, _applicationContext.ActorId);
 
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 

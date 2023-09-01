@@ -46,8 +46,9 @@ internal class RenewCommandHandler : IRequestHandler<RenewCommand, Session>
     RealmAggregate? realm = await _realmRepository.LoadAsync(session, cancellationToken);
     IPasswordSettings passwordSettings = realm?.PasswordSettings ?? _applicationContext.Configuration.PasswordSettings;
 
+    string secret = Convert.ToBase64String(refreshToken.Secret);
     Password newSecret = _passwordService.Generate(passwordSettings, SessionAggregate.SecretLength, out byte[] secretBytes);
-    session.Renew(Convert.ToBase64String(refreshToken.Secret), newSecret, _applicationContext.ActorId);
+    session.Renew(secret, newSecret, _applicationContext.ActorId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);

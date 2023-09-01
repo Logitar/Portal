@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record RemoveIdentifierCommand(Guid Id, string Key) : IRequest<User?>;
+internal record RemoveUserIdentifierCommand(Guid Id, string Key) : IRequest<User?>;

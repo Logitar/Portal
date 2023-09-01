@@ -36,7 +36,7 @@ internal class UserService : IUserService
 
   public async Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new RemoveIdentifierCommand(id, key), cancellationToken);
+    return await _pipeline.ExecuteAsync(new RemoveUserIdentifierCommand(id, key), cancellationToken);
   }
 
   public async Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
@@ -46,7 +46,7 @@ internal class UserService : IUserService
 
   public async Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)
   {
-    return await _pipeline.ExecuteAsync(new SaveIdentifierCommand(id, payload), cancellationToken);
+    return await _pipeline.ExecuteAsync(new SaveUserIdentifierCommand(id, payload), cancellationToken);
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)

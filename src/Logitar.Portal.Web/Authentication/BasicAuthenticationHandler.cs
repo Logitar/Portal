@@ -66,7 +66,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
 
           try
           {
-            _ = user.SignIn(configuration.UserSettings, password);
+            _ = user.SignIn(configuration.UserSettings, password); // TODO(fpion): use AuthenticateUserCommand?
           }
           catch (Exception exception)
           {
