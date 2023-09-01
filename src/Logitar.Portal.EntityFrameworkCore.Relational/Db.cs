@@ -12,6 +12,7 @@ internal static class Db
 
     public static readonly ColumnId AggregateId = new(nameof(ApiKeyEntity.AggregateId), Table);
     public static readonly ColumnId ApiKeyId = new(nameof(ApiKeyEntity.ApiKeyId), Table);
+    public static readonly ColumnId ExpiresOn = new(nameof(ApiKeyEntity.ExpiresOn), Table);
     public static readonly ColumnId TenantId = new(nameof(ApiKeyEntity.TenantId), Table);
     public static readonly ColumnId Title = new(nameof(ApiKeyEntity.Title), Table);
   }

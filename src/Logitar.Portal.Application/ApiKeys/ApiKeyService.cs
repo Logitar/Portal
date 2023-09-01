@@ -39,9 +39,9 @@ internal class ApiKeyService : IApiKeyService
     return await _pipeline.ExecuteAsync(new ReplaceApiKeyCommand(id, payload, version), cancellationToken);
   }
 
-  public Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new SearchApiKeysQuery(payload), cancellationToken);
   }
 
   public async Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)

@@ -326,6 +326,81 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Roles), exception.PropertyName);
   }
 
+  [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
+  public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
+  {
+    SearchApiKeysPayload payload = new()
+    {
+      IdIn = new[] { Guid.Empty }
+    };
+
+    SearchResults<ApiKey> results = await _apiKeyService.SearchAsync(payload);
+
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
+  public async Task SearchAsync_it_should_return_the_correct_results()
+  {
+    Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
+
+    ApiKeyAggregate notInRealm = new("Default", secret);
+    ApiKeyAggregate notMatching = new("Test", secret, _realm.Id.Value);
+    ApiKeyAggregate idNotIn = new("Difoolt", secret, _realm.Id.Value);
+    ApiKeyAggregate apiKey1 = new("Default", secret, _realm.Id.Value);
+    ApiKeyAggregate apiKey2 = new("Défaut", secret, _realm.Id.Value);
+    ApiKeyAggregate apiKey3 = new("Dyfoot", secret, _realm.Id.Value);
+    ApiKeyAggregate expired = new("Ddffftt", secret, _realm.Id.Value)
+    {
+      ExpiresOn = DateTime.Now.AddDays(1)
+    };
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { notInRealm, notMatching, idNotIn, apiKey1, apiKey2, apiKey3, expired });
+
+    ApiKeyAggregate[] apiKeys = new[] { _apiKey, apiKey1, apiKey2, apiKey3 }
+      .OrderBy(x => x.Title).Skip(1).Take(2).ToArray();
+
+    HashSet<Guid> ids = (await PortalContext.ApiKeys.AsNoTracking().ToArrayAsync())
+      .Select(user => new AggregateId(user.AggregateId).ToGuid()).ToHashSet();
+    ids.Remove(idNotIn.Id.ToGuid());
+
+    SearchApiKeysPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Operator = SearchOperator.Or,
+        Terms = new SearchTerm[]
+        {
+          new("d_f__%t"),
+          new(Guid.NewGuid().ToString())
+        }
+      },
+      IdIn = ids,
+      Realm = $" {_realm.UniqueSlug.ToUpper()} ",
+      Status = new ApiKeyStatus
+      {
+        IsExpired = false,
+        Moment = DateTime.Now.AddMonths(1)
+      },
+      Sort = new ApiKeySortOption[]
+      {
+        new(ApiKeySort.Title)
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<ApiKey> results = await _apiKeyService.SearchAsync(payload);
+
+    Assert.Equal(apiKeys.Length, results.Results.Count());
+    Assert.Equal(4, results.Total);
+
+    for (int i = 0; i < apiKeys.Length; i++)
+    {
+      Assert.Equal(apiKeys[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
+    }
+  }
+
   [Fact(DisplayName = "UpdateAsync: it should return null when the API key is not found.")]
   public async Task UpdateAsync_it_should_return_null_when_the_Api_key_is_not_found()
   {
