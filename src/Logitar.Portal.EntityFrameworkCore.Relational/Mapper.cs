@@ -53,6 +53,21 @@ internal class Mapper
     return destination;
   }
 
+  public Identifier ToIdentifier(IdentifierEntity source)
+  {
+    return new Identifier()
+    {
+      Id = source.Id,
+      Key = source.Key,
+      Value = source.Value,
+      CreatedBy = FindActor(source.CreatedBy),
+      CreatedOn = ToUniversalTime(source.CreatedOn),
+      UpdatedBy = FindActor(source.UpdatedBy),
+      UpdatedOn = ToUniversalTime(source.UpdatedOn),
+      Version = source.Version
+    };
+  }
+
   public Realm ToRealm(RealmEntity source)
   {
     Realm destination = new()
@@ -152,8 +167,9 @@ internal class Mapper
       Picture = source.Picture,
       Profile = source.Profile,
       Website = source.Website,
-      Roles = source.Roles.Select(role => ToRole(role, realm)),
       CustomAttributes = ToCustomAttributes(source.CustomAttributes),
+      Identifiers = source.Identifiers.Select(ToIdentifier),
+      Roles = source.Roles.Select(role => ToRole(role, realm)),
       Realm = realm
     };
 

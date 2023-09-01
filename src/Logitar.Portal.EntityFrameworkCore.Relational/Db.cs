@@ -72,6 +72,15 @@ internal static class Db
     public static readonly ColumnId UserId = new(nameof(UserEntity.UserId), Table);
   }
 
+  public static class UserIdentifiers
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.UserIdentifiers));
+
+    public static readonly ColumnId Key = new(nameof(UserIdentifierEntity.Key), Table);
+    public static readonly ColumnId UserId = new(nameof(UserIdentifierEntity.UserId), Table);
+    public static readonly ColumnId ValueNormalized = new(nameof(UserIdentifierEntity.ValueNormalized), Table);
+  }
+
   public static class UserRoles
   {
     public static readonly TableId Table = new(nameof(PortalContext.UserRoles));

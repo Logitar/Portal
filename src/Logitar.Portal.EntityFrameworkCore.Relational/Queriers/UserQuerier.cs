@@ -41,6 +41,7 @@ internal class UserQuerier : IUserQuerier
   private async Task<User?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
   {
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (user == null)
@@ -72,6 +73,7 @@ internal class UserQuerier : IUserQuerier
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
     if (user == null)
@@ -82,9 +84,28 @@ internal class UserQuerier : IUserQuerier
     return (await MapAsync(realm, cancellationToken, user)).Single();
   }
 
-  public Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string identifierKey, string identifierValue, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(string? realmIdOrUniqueSlug, string identifierKey, string identifierValue, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    Realm? realm = null;
+    if (!string.IsNullOrWhiteSpace(realmIdOrUniqueSlug))
+    {
+      realm = await _realmQuerier.FindAsync(realmIdOrUniqueSlug, cancellationToken)
+        ?? throw new EntityNotFoundException<RealmEntity>(realmIdOrUniqueSlug);
+    }
+
+    string key = identifierKey.Trim();
+    string valueNormalized = identifierValue.Trim().ToUpper();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.Key == key && y.ValueNormalized == valueNormalized), cancellationToken);
+    if (user == null)
+    {
+      return null;
+    }
+
+    return (await MapAsync(realm, cancellationToken, user)).Single();
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
@@ -124,6 +145,7 @@ internal class UserQuerier : IUserQuerier
 
     IQueryable<UserEntity> query = _users.FromQuery(builder.Build())
       .AsNoTracking()
+      .Include(x => x.Identifiers)
       .Include(x => x.Roles);
     long total = await query.LongCountAsync(cancellationToken);
 

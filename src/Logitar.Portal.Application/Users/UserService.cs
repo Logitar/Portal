@@ -44,9 +44,9 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
   }
 
-  public Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)
+  public async Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new SaveIdentifierCommand(id, payload), cancellationToken);
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)

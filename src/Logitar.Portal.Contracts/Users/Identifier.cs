@@ -6,6 +6,9 @@ public record Identifier
 {
   public Guid Id { get; set; }
 
+  public string Key { get; set; } = string.Empty;
+  public string Value { get; set; } = string.Empty;
+
   public Actor CreatedBy { get; set; } = new();
   public DateTime CreatedOn { get; set; }
 
@@ -13,7 +16,4 @@ public record Identifier
   public DateTime UpdatedOn { get; set; }
 
   public long Version { get; set; }
-
-  public string Key { get; set; } = string.Empty;
-  public string Value { get; set; } = string.Empty;
 }

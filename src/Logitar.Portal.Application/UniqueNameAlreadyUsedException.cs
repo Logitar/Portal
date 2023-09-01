@@ -8,7 +8,7 @@ public class UniqueNameAlreadyUsedException : Exception
   private const string ErrorMessage = "The specified unique name is already used.";
 
   public UniqueNameAlreadyUsedException(Type type, string? tenantId, string uniqueName, string propertyName)
-    : base(BuildMessage(tenantId, uniqueName, propertyName))
+    : base(BuildMessage(type, tenantId, uniqueName, propertyName))
   {
     if (!type.IsSubclassOf(typeof(AggregateRoot)))
     {
@@ -48,12 +48,13 @@ public class UniqueNameAlreadyUsedException : Exception
     CustomState = new { TenantId }
   };
 
-  private static string BuildMessage(string? tenantId, string uniqueName, string propertyName)
+  private static string BuildMessage(Type type, string? tenantId, string uniqueName, string propertyName)
   {
     StringBuilder message = new();
 
     message.AppendLine(ErrorMessage);
-    message.Append("TenantId: ").AppendLine(tenantId);
+    message.Append("TypeName: ").AppendLine(type.GetName());
+    message.Append("TenantId: ").AppendLine(tenantId ?? "<null>");
     message.Append("UniqueName: ").AppendLine(uniqueName);
     message.Append("PropertyName: ").AppendLine(propertyName);
 

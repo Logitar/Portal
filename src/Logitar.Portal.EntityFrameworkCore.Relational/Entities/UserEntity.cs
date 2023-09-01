@@ -108,6 +108,7 @@ internal record UserEntity : AggregateEntity
     }
   }
 
+  public List<UserIdentifierEntity> Identifiers { get; } = new();
   public List<RoleEntity> Roles { get; } = new();
   public List<SessionEntity> Sessions { get; } = new();
 
@@ -136,6 +137,20 @@ internal record UserEntity : AggregateEntity
     DisabledBy = null;
     DisabledOn = null;
     IsDisabled = false;
+  }
+
+  public void SetIdentifier(UserIdentifierSetEvent @event)
+  {
+    UserIdentifierEntity? identifier = Identifiers.SingleOrDefault(identifier => identifier.Key == @event.Key);
+    if (identifier == null)
+    {
+      identifier = new(@event, this);
+      Identifiers.Add(identifier);
+    }
+    else
+    {
+      identifier.Update(@event);
+    }
   }
 
   public void SignIn(UserSignedInEvent signedIn)
