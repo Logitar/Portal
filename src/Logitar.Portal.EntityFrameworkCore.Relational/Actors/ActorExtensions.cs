@@ -15,6 +15,22 @@ internal static class ActorExtensions
     return new[] { new ActorId(aggregate.CreatedBy), new ActorId(aggregate.UpdatedBy) }.Distinct();
   }
 
+  public static IEnumerable<ActorId> GetActorIds(this ApiKeyEntity apiKey)
+  {
+    List<ActorId> actorIds = new(capacity: 2 + (2 * apiKey.Roles.Count))
+    {
+      new ActorId(apiKey.CreatedBy),
+      new ActorId(apiKey.UpdatedBy)
+    };
+
+    foreach (RoleEntity role in apiKey.Roles)
+    {
+      actorIds.AddRange(role.GetActorIds());
+    }
+
+    return actorIds.Distinct();
+  }
+
   public static IEnumerable<ActorId> GetActorIds(this IdentifierEntity identifier)
   {
     return new[] { new ActorId(identifier.CreatedBy), new ActorId(identifier.UpdatedBy) };

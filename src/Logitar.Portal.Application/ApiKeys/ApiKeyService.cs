@@ -1,18 +1,26 @@
-﻿using Logitar.Portal.Contracts;
+﻿using Logitar.Portal.Application.ApiKeys.Commands;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 
 namespace Logitar.Portal.Application.ApiKeys;
 
 internal class ApiKeyService : IApiKeyService
 {
+  private readonly IRequestPipeline _pipeline;
+
+  public ApiKeyService(IRequestPipeline pipeline)
+  {
+    _pipeline = pipeline;
+  }
+
   public Task<ApiKey> AuthenticateAsync(string xApiKey, CancellationToken cancellationToken)
   {
     throw new NotImplementedException(); // TODO(fpion): implement
   }
 
-  public Task<ApiKey> CreateAsync(CreateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ApiKey> CreateAsync(CreateApiKeyPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    return await _pipeline.ExecuteAsync(new CreateApiKeyCommand(payload), cancellationToken);
   }
 
   public Task<ApiKey?> DeleteAsync(Guid id, CancellationToken cancellationToken)

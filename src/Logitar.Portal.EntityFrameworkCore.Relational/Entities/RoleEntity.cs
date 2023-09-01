@@ -45,6 +45,7 @@ internal record RoleEntity : AggregateEntity
     }
   }
 
+  public List<ApiKeyEntity> ApiKeys { get; } = new();
   public List<UserEntity> Users { get; } = new();
 
   public void Update(RoleUpdatedEvent updated)

@@ -1,11 +1,13 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Actors;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
@@ -39,6 +41,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddQueriers(this IServiceCollection services)
   {
     return services
+      .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
       .AddScoped<IConfigurationQuerier, ConfigurationQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<IRoleQuerier, RoleQuerier>()
@@ -49,6 +52,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddRepositories(this IServiceCollection services)
   {
     return services
+      .AddScoped<IApiKeyRepository, ApiKeyRepository>()
       .AddScoped<IConfigurationRepository, ConfigurationRepository>()
       .AddScoped<IRealmRepository, RealmRepository>()
       .AddScoped<IRoleRepository, RoleRepository>()

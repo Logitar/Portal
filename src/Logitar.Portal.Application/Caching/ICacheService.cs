@@ -12,7 +12,7 @@ public interface ICacheService
   ConfigurationAggregate? Configuration { get; set; }
 
   Actor? GetActor(ActorId id);
-  void RemoveActor(ActorId id);
+  void RemoveActor(ActorId id); // TODO(fpion): this is never called!
   void SetActor(ActorId id, Actor actor);
 
   Session? GetSession(Guid id);

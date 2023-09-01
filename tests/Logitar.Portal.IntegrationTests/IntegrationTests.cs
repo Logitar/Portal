@@ -89,6 +89,7 @@ public abstract class IntegrationTests
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Actors"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Sessions"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Users"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""ApiKeys"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Roles"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Realms"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Logs"";");

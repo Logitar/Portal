@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
@@ -19,6 +20,25 @@ internal class Mapper
   public Mapper(Dictionary<ActorId, Actor> actors)
   {
     _actors = actors;
+  }
+
+  public ApiKey ToApiKey(ApiKeyEntity source, Realm? realm)
+  {
+    ApiKey destination = new()
+    {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
+      Title = source.Title,
+      Description = source.Description,
+      ExpiresOn = source.ExpiresOn,
+      AuthenticatedOn = source.AuthenticatedOn,
+      CustomAttributes = ToCustomAttributes(source.CustomAttributes),
+      Roles = source.Roles.Select(role => ToRole(role, realm)),
+      Realm = realm
+    };
+
+    MapAggregate(source, destination);
+
+    return destination;
   }
 
   public Configuration ToConfiguration(ConfigurationAggregate source)

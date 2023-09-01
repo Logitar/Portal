@@ -31,15 +31,17 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User> ReadAsync(UserAggregate user, CancellationToken cancellationToken)
   {
-    return await ReadAsync(user.Id.Value, cancellationToken)
+    return await ReadAsync(user.Id, cancellationToken)
       ?? throw new EntityNotFoundException<UserEntity>(user.Id);
   }
   public async Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return await ReadAsync(new AggregateId(id).Value, cancellationToken);
+    return await ReadAsync(new AggregateId(id), cancellationToken);
   }
-  private async Task<User?> ReadAsync(string aggregateId, CancellationToken cancellationToken)
+  private async Task<User?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
+    string aggregateId = id.Value;
+
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)

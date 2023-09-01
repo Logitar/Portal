@@ -59,8 +59,10 @@ internal class RealmQuerier : IRealmQuerier
   }
   public async Task<Realm?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
   {
+    string aggregateId = id.Value;
+
     RealmEntity? realm = await _realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == id.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (realm == null)
     {
       return null;
