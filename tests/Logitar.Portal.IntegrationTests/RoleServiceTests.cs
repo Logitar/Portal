@@ -214,7 +214,7 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_role.Id.ToGuid(), role.Id);
     Assert.Equal(Guid.Empty, role.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_role.CreatedOn), ToUnixTimeMilliseconds(role.CreatedOn));
+    AssertEqual(_role.CreatedOn, role.CreatedOn);
     Assert.Equal(Actor, role.UpdatedBy);
     AssertIsNear(role.UpdatedOn);
     Assert.True(role.Version > 1);
@@ -383,7 +383,7 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_role.Id.ToGuid(), role.Id);
     Assert.Equal(Guid.Empty, role.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_role.CreatedOn), ToUnixTimeMilliseconds(role.CreatedOn));
+    AssertEqual(_role.CreatedOn, role.CreatedOn);
     Assert.Equal(Actor, role.UpdatedBy);
     AssertIsNear(role.UpdatedOn);
     Assert.True(role.Version > 1);

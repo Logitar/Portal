@@ -260,7 +260,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.MiddleName);
     Assert.Equal(payload.LastName, user.LastName);
     Assert.Equal(payload.Nickname, user.Nickname);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
+    AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
     Assert.Equal(payload.Locale, user.Locale);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
@@ -501,7 +501,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_user.Id.ToGuid(), user.Id);
     Assert.Equal(Guid.Empty, user.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    AssertEqual(_user.CreatedOn, user.CreatedOn);
     Assert.Equal(Actor, user.UpdatedBy);
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > version);
@@ -523,7 +523,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.MiddleName);
     Assert.Equal(payload.LastName, user.LastName);
     Assert.Equal(payload.Nickname, user.Nickname);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.Birthdate), ToUnixTimeMilliseconds(user.Birthdate));
+    AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
     Assert.Equal(payload.Locale, user.Locale);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
@@ -824,9 +824,9 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(3, entities.Length);
     Assert.Contains(entities, session => session.AggregateId == session1.Id.Value && session.IsActive == false
-      /*&& session.SignedOutBy == ActorId.Value*/ && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == session2.Id.Value && session.IsActive == false
-      /*&& session.SignedOutBy == ActorId.Value*/&& (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
+      && session.SignedOutBy == ActorId.Value && (DateTime.Now - session.SignedOutOn) < TimeSpan.FromMinutes(1));
     Assert.Contains(entities, session => session.AggregateId == signedOut.Id.Value && session.IsActive == false
       && session.SignedOutBy == signedOut.UpdatedBy.Value
       && ToUnixTimeMilliseconds(session.SignedOutOn) == ToUnixTimeMilliseconds(signedOut.UpdatedOn));
@@ -955,7 +955,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_user.Id.ToGuid(), user.Id);
     Assert.Equal(Guid.Empty, user.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_user.CreatedOn), ToUnixTimeMilliseconds(user.CreatedOn));
+    AssertEqual(_user.CreatedOn, user.CreatedOn);
     Assert.Equal(Actor, user.UpdatedBy);
     AssertIsNear(user.UpdatedOn);
     Assert.True(user.Version > 1);

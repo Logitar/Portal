@@ -239,7 +239,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
     Assert.Equal(Guid.Empty, realm.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_realm.CreatedOn), ToUnixTimeMilliseconds(realm.CreatedOn));
+    AssertEqual(_realm.CreatedOn, realm.CreatedOn);
     Assert.Equal(Actor, realm.UpdatedBy);
     AssertIsNear(realm.UpdatedOn);
     Assert.True(realm.Version > version);
@@ -421,7 +421,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
     Assert.Equal(Guid.Empty, realm.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_realm.CreatedOn), ToUnixTimeMilliseconds(realm.CreatedOn));
+    AssertEqual(_realm.CreatedOn, realm.CreatedOn);
     Assert.Equal(Actor, realm.UpdatedBy);
     AssertIsNear(realm.UpdatedOn);
     Assert.True(realm.Version > 1);

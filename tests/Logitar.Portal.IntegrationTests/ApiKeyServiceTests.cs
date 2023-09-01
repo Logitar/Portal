@@ -147,7 +147,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(payload.Title.Trim(), apiKey.Title);
     Assert.Equal(payload.Description?.CleanTrim(), apiKey.Description);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.ExpiresOn), ToUnixTimeMilliseconds(apiKey.ExpiresOn));
+    AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
 
     Assert.Equal(2, apiKey.CustomAttributes.Count());
     Assert.Contains(apiKey.CustomAttributes, customAttribute => customAttribute.Key == "Key1" && customAttribute.Value == "Value1");
@@ -284,14 +284,14 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
 
     Assert.Equal(_apiKey.Id.ToGuid(), apiKey.Id);
     Assert.Equal(Guid.Empty, apiKey.CreatedBy.Id);
-    Assert.Equal(ToUnixTimeMilliseconds(_apiKey.CreatedOn), ToUnixTimeMilliseconds(apiKey.CreatedOn));
+    AssertEqual(_apiKey.CreatedOn, apiKey.CreatedOn);
     Assert.Equal(Actor, apiKey.UpdatedBy);
     AssertIsNear(apiKey.UpdatedOn);
     Assert.True(apiKey.Version > version);
 
     Assert.Equal(payload.Title.Trim(), apiKey.Title);
     Assert.Equal(payload.Description?.CleanTrim(), apiKey.Description);
-    Assert.Equal(ToUnixTimeMilliseconds(payload.ExpiresOn), ToUnixTimeMilliseconds(apiKey.ExpiresOn));
+    AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
 
     Assert.Equal(3, apiKey.CustomAttributes.Count());
     Assert.Contains(apiKey.CustomAttributes, customAttribute => customAttribute.Key == "Key2" && customAttribute.Value == "value2");
