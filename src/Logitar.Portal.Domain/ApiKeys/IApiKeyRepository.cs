@@ -8,6 +8,7 @@ public interface IApiKeyRepository
 {
   Task<ApiKeyAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<ApiKeyAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken = default);
+  Task<ApiKeyAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken = default);
   Task<IEnumerable<ApiKeyAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken = default);
   Task<IEnumerable<ApiKeyAggregate>> LoadAsync(RoleAggregate role, CancellationToken cancellationToken = default);
   Task SaveAsync(ApiKeyAggregate apiKey, CancellationToken cancellationToken = default);

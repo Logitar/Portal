@@ -24,7 +24,9 @@ internal class ApiKeyRepository : EventSourcing.EntityFrameworkCore.Relational.A
   public async Task<ApiKeyAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await LoadAsync(new AggregateId(id), cancellationToken);
   public async Task<ApiKeyAggregate?> LoadAsync(AggregateId id, CancellationToken cancellationToken)
-    => await base.LoadAsync<ApiKeyAggregate>(id, cancellationToken);
+    => await LoadAsync(id, version: null, cancellationToken);
+  public async Task<ApiKeyAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
+    => await base.LoadAsync<ApiKeyAggregate>(id, version, cancellationToken);
 
   public async Task<IEnumerable<ApiKeyAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
