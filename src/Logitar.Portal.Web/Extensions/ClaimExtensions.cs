@@ -11,12 +11,12 @@ internal static class ClaimExtensions
     ClaimsIdentity identity = new(authenticationType);
 
     identity.AddClaim(new(Rfc7519ClaimNames.Subject, apiKey.Id.ToString()));
-    identity.AddClaim(apiKey.UpdatedOn.CreateClaim(Rfc7519ClaimNames.UpdatedAt));
+    identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.UpdatedAt, apiKey.UpdatedOn));
     identity.AddClaim(new(Rfc7519ClaimNames.FullName, apiKey.Title));
 
     if (apiKey.AuthenticatedOn.HasValue)
     {
-      identity.AddClaim(apiKey.AuthenticatedOn.Value.CreateClaim(Rfc7519ClaimNames.AuthenticationTime));
+      identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.AuthenticationTime, apiKey.AuthenticatedOn.Value));
     }
 
     return identity;
@@ -28,7 +28,7 @@ internal static class ClaimExtensions
 
     identity.AddClaim(new(Rfc7519ClaimNames.Subject, user.Id.ToString()));
     identity.AddClaim(new(Rfc7519ClaimNames.Username, user.UniqueName));
-    identity.AddClaim(user.UpdatedOn.CreateClaim(Rfc7519ClaimNames.UpdatedAt));
+    identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.UpdatedAt, user.UpdatedOn));
 
     if (user.Address != null)
     {
@@ -103,7 +103,7 @@ internal static class ClaimExtensions
 
     if (user.AuthenticatedOn.HasValue)
     {
-      identity.AddClaim(user.AuthenticatedOn.Value.CreateClaim(Rfc7519ClaimNames.AuthenticationTime));
+      identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.AuthenticationTime, user.AuthenticatedOn.Value));
     }
 
     // TODO(fpion): Roles
@@ -125,10 +125,5 @@ internal static class ClaimExtensions
     };
 
     return new Claim(name, postalAddress.Serialize());
-  }
-
-  private static Claim CreateClaim(this DateTime value, string name)
-  {
-    return new(name, new DateTimeOffset(value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64);
   }
 }

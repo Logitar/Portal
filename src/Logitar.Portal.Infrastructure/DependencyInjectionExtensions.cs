@@ -1,11 +1,13 @@
 ﻿using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Infrastructure.Passwords;
 using Logitar.Portal.Infrastructure.Passwords.Strategies;
+using Logitar.Portal.Infrastructure.Tokens;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Infrastructure;
@@ -26,6 +28,7 @@ public static class DependencyInjectionExtensions
         serviceProvider.GetRequiredService<PasswordConverter>()
       }))
       .AddSingleton<IPasswordService, PasswordService>()
+      .AddSingleton<ITokenManager, JsonWebTokenManager>()
       .AddSingleton<PasswordConverter>()
       .AddScoped<IEventBus, EventBus>();
   }

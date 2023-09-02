@@ -6,7 +6,6 @@ using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Domain.Validators;
 using Logitar.Security.Claims;
 using MediatR;
-using System.Security.Claims;
 
 namespace Logitar.Portal.Application.Tokens.Commands;
 
@@ -68,8 +67,8 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     secret ??= realm?.Secret ?? configuration.Secret;
     DateTime? expires = payload.Lifetime > 0 ? DateTime.UtcNow.AddSeconds(payload.Lifetime) : null;
     string? algorithm = payload.Algorithm?.CleanTrim();
-    string? audience = GetAudience(payload.Audience, realm);
-    string? issuer = GetIssuer(payload.Issuer, realm);
+    string? audience = TokenHelper.GetAudience(payload.Audience, realm, _applicationContext.BaseUrl);
+    string? issuer = TokenHelper.GetIssuer(payload.Issuer, realm, _applicationContext.BaseUrl);
 
     string token = _tokenManager.Create(identity, secret, expires, algorithm, audience, issuer);
 
@@ -77,13 +76,4 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
   }
 
   private static string FormatClaimName(string name) => new string(name.Where(c => char.IsLetter(c) || c == '_').ToArray()).ToLower();
-
-  private string? GetAudience(string? format, RealmAggregate? realm) => Format(format, realm)
-    ?? realm?.Url?.ToString() ?? realm?.UniqueSlug ?? _applicationContext.BaseUrl?.ToString();
-  private string? GetIssuer(string? format, RealmAggregate? realm) => Format(format, realm)
-    ?? (realm == null ? _applicationContext.BaseUrl?.ToString() : $"{_applicationContext.BaseUrl?.ToString().TrimEnd('/')}/realms/{realm.UniqueSlug}");
-  private static string? Format(string? format, RealmAggregate? realm) => format?
-    .Replace("{UniqueSlug}", realm?.UniqueSlug)
-    .Replace("{Url}", realm?.Url?.ToString())
-    .CleanTrim();
 }

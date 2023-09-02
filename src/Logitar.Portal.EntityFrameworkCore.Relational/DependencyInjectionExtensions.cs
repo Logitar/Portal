@@ -6,6 +6,7 @@ using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Configurations;
@@ -17,6 +18,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
+using Logitar.Portal.EntityFrameworkCore.Relational.Tokens;
 using Logitar.Portal.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,7 +37,8 @@ public static class DependencyInjectionExtensions
       .AddQueriers()
       .AddRepositories()
       .AddScoped<IActorService, ActorService>()
-      .AddScoped<ILoggingService, LoggingService>();
+      .AddScoped<ILoggingService, LoggingService>()
+      .AddScoped<ITokenBlacklist, TokenBlacklist>();
   }
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)
