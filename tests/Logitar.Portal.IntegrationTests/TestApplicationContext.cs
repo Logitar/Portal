@@ -8,6 +8,8 @@ internal class TestApplicationContext : IApplicationContext
 {
   public ActorId ActorId { get; set; } = new(Guid.Empty);
 
+  public Uri? BaseUrl { get; set; }
+
   private ConfigurationAggregate? _configuration = null;
   public ConfigurationAggregate Configuration
   {

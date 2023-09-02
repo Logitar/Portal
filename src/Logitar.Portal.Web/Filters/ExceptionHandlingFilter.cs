@@ -10,6 +10,7 @@ using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Logitar.Portal.Web.Filters;
 
@@ -53,6 +54,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     else if (context.Exception is InvalidCredentialsException invalidCredentials)
     {
       context.Result = new BadRequestObjectResult(new ErrorInfo(invalidCredentials, "The specified credentials are not valid."));
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is SecurityTokenException securityToken)
+    {
+      context.Result = new BadRequestObjectResult(new ErrorInfo(securityToken));
       context.ExceptionHandled = true;
     }
     else if (context.Exception is TooManyResultsException tooManyResults)

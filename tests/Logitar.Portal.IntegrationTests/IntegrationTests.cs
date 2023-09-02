@@ -93,6 +93,7 @@ public abstract class IntegrationTests
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Roles"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Realms"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Logs"";");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""TokenBlacklist"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Events"";");
 
     if (InitializeConfiguration)
@@ -147,11 +148,14 @@ public abstract class IntegrationTests
       EmailAddress = User.Email?.Address
     };
     _applicationContext.ActorId = ActorId;
+
+    _applicationContext.BaseUrl = new Uri($"https://portal.{Faker.Internet.DomainName()}/");
   }
 
   protected static void AssertIsNear(DateTime value, int seconds = 60)
   {
-    Assert.True((DateTime.Now - value) < TimeSpan.FromSeconds(seconds));
+    TimeSpan difference = (DateTime.UtcNow - value.ToUniversalTime()).Duration();
+    Assert.True(difference < TimeSpan.FromSeconds(seconds));
   }
 
   protected async Task AssertUserPasswordAsync(Guid userId, string? passwordString = null)

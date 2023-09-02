@@ -11,6 +11,7 @@
     <PackageReference Include="Logitar.EventSourcing.Infrastructure" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="7.0.10" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,7 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="System.IdentityModel.Tokens.Jwt" />
+    <Using Include="System.Security.Claims" />
     <Using Include="System.Security.Cryptography" />
+    <Using Include="System.Text" />
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Serialization" />
   </ItemGroup>

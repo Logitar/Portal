@@ -18,8 +18,6 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
   {
     if (_httpContextAccessor.HttpContext != null)
     {
-      // TODO(fpion): add a claim for the realm and use it
-
       User? user = _httpContextAccessor.HttpContext.GetUser();
       if (user != null)
       {

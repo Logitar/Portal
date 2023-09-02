@@ -242,9 +242,9 @@ internal class Mapper
   private void MapAggregate(AggregateRoot source, Aggregate destination)
   {
     destination.CreatedBy = FindActor(source.CreatedBy);
-    destination.CreatedOn = ToUniversalTime(source.CreatedOn);
+    destination.CreatedOn = source.CreatedOn.ToUniversalTime();
     destination.UpdatedBy = FindActor(source.UpdatedBy);
-    destination.UpdatedOn = ToUniversalTime(source.UpdatedOn);
+    destination.UpdatedOn = source.UpdatedOn.ToUniversalTime();
     destination.Version = source.Version;
   }
   private void MapAggregate(AggregateEntity source, Aggregate destination)

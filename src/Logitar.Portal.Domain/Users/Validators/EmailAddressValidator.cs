@@ -8,6 +8,6 @@ internal class EmailAddressValidator : AbstractValidator<EmailAddress>
   {
     RuleFor(x => x.Address).NotEmpty()
       .MaximumLength(byte.MaxValue)
-      .NotEmpty();
+      .EmailAddress();
   }
 }
