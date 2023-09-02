@@ -1,4 +1,6 @@
 ﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Security.Claims;
 
@@ -22,6 +24,14 @@ internal static class ClaimExtensions
     return identity;
   }
 
+  public static ClaimsIdentity CreateClaimsIdentity(this Session session, string? authenticationType = null)
+  {
+    ClaimsIdentity identity = session.User.CreateClaimsIdentity(authenticationType);
+
+    identity.AddClaim(new(Rfc7519ClaimNames.SessionId, session.Id.ToString()));
+
+    return identity;
+  }
   public static ClaimsIdentity CreateClaimsIdentity(this User user, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
@@ -29,6 +39,11 @@ internal static class ClaimExtensions
     identity.AddClaim(new(Rfc7519ClaimNames.Subject, user.Id.ToString()));
     identity.AddClaim(new(Rfc7519ClaimNames.Username, user.UniqueName));
     identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.UpdatedAt, user.UpdatedOn));
+
+    if (user.AuthenticatedOn.HasValue)
+    {
+      identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.AuthenticationTime, user.AuthenticatedOn.Value));
+    }
 
     if (user.Address != null)
     {
@@ -78,7 +93,6 @@ internal static class ClaimExtensions
     {
       identity.AddClaim(new(Rfc7519ClaimNames.Gender, user.Gender.ToLower()));
     }
-
     if (user.Locale != null)
     {
       identity.AddClaim(new(Rfc7519ClaimNames.Locale, user.Locale));
@@ -101,13 +115,10 @@ internal static class ClaimExtensions
       identity.AddClaim(new(Rfc7519ClaimNames.Website, user.Website));
     }
 
-    if (user.AuthenticatedOn.HasValue)
+    foreach (Role role in user.Roles)
     {
-      identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.AuthenticationTime, user.AuthenticatedOn.Value));
+      identity.AddClaim(new(Rfc7519ClaimNames.Roles, role.UniqueName));
     }
-
-    // TODO(fpion): Roles
-    // TODO(fpion): other claims
 
     return identity;
   }
