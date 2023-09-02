@@ -11,7 +11,7 @@ internal class JsonWebTokenManager : ITokenManager
 
   public JsonWebTokenManager()
   {
-    //_tokenHandler.InboundClaimTypeMap.Clear(); // TODO(fpion): implement
+    _tokenHandler.InboundClaimTypeMap.Clear();
   }
 
   public string Create(ClaimsIdentity subject, string secret, DateTime? expires, string? algorithm, string? audience, string? issuer)
