@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { AddressLineType } from "@/types/users/contact";
 
 const props = withDefaults(
   defineProps<{
@@ -10,7 +9,7 @@ const props = withDefaults(
     modelValue?: string;
     placeholder?: string;
     required?: boolean;
-    type: AddressLineType;
+    type: string;
     validate?: boolean;
   }>(),
   {

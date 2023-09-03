@@ -1,4 +1,18 @@
-import type { Address, Email, Phone } from "./contact";
+import type { Actor } from "@/types/actor";
+import type { Aggregate } from "@/types/aggregate";
+import type { CustomAttribute } from "@/types/customAttributes";
+import type { Identifier } from "@/types/identifier";
+import type { Realm } from "@/types/realms";
+import type { Role } from "@/types/roles";
+
+export type Address = Contact & {
+  street: string;
+  locality: string;
+  region?: string;
+  postalCode?: string;
+  country: string;
+  formatted: string;
+};
 
 export type AuthenticatedUser = {
   displayName?: string;
@@ -6,32 +20,64 @@ export type AuthenticatedUser = {
   picture?: string;
 };
 
+export type Contact = {
+  verifiedBy?: Actor;
+  verifiedOn?: string;
+  isVerified: boolean;
+};
+
+export type CountrySettings = {
+  code: string;
+  postalCode?: string;
+  regions: string[];
+};
+
+export type Email = Contact & {
+  address: string;
+};
+
 export type PersonNameType = "first" | "last" | "middle" | "nick";
+
+export type Phone = Contact & {
+  countryCode?: string;
+  number: string;
+  extension?: string;
+  e164Formatted: string;
+};
 
 export type ProfileUpdatedEvent = {
   toast?: boolean;
-  user: UserProfile;
+  user: User;
 };
 
-export type UserProfile = {
-  username: string;
+export type User = Aggregate & {
+  id: string;
+  uniqueName: string;
+  hasPassword: boolean;
+  passwordChangedBy?: Actor;
   passwordChangedOn?: string;
-  signedInOn?: string;
+  disabledBy?: Actor;
+  disabledOn?: Date;
+  isDisabled: boolean;
+  authenticatedOn?: string;
   address?: Address;
-  email: Email;
+  email?: Email;
   phone?: Phone;
-  firstName: string;
+  isConfirmed: boolean;
+  firstName?: string;
   middleName?: string;
-  lastName: string;
+  lastName?: string;
+  fullName?: string;
   nickname?: string;
-  fullName: string;
   birthdate?: string;
   gender?: string;
-  locale: string;
+  locale?: string;
   timeZone?: string;
   picture?: string;
   profile?: string;
   website?: string;
-  createdOn: string;
-  updatedOn: string;
+  customAttributes: CustomAttribute[];
+  identifiers: Identifier[];
+  roles: Role[];
+  realm?: Realm;
 };

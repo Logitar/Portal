@@ -2,7 +2,7 @@
 import { computed, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import countries from "@/resources/countries.json";
-import type { CountrySettings } from "@/types/users/contact";
+import type { CountrySettings } from "@/types/users";
 import type { SelectOption } from "@/types/components";
 import { orderBy } from "@/helpers/arrayUtils";
 

@@ -1,5 +1,5 @@
 import type { ClaimMapping } from ".";
-import type { CustomAttribute } from "@/types/customAttribute";
+import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type CreateRealmPayload = {

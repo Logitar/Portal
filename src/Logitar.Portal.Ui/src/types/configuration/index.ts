@@ -1,6 +1,6 @@
 import type { Aggregate } from "@/types/aggregate";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
-import type { UserProfile } from "../users";
+import type { User } from "@/types/users";
 
 export type Configuration = Aggregate & {
   defaultLocale: string;
@@ -12,7 +12,7 @@ export type Configuration = Aggregate & {
 
 export type InitializeConfigurationResult = {
   configuration: Configuration;
-  user: UserProfile;
+  user: User;
 };
 
 export type IsConfigurationInitializedResult = {

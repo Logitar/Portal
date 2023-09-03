@@ -27,6 +27,7 @@
     "title": "Postal Address",
     "verified": "Verified"
   },
+  "authenticatedOn": "Last signed-in on",
   "birthdate": "Date of birth",
   "createdOn": "Created on",
   "email": {
@@ -130,7 +131,6 @@
   "signOut": {
     "title": "Sign Out"
   },
-  "signedInOn": "Last signed-in on",
   "tabs": {
     "authentication": "Authentication Information",
     "contact": "Contact Information",

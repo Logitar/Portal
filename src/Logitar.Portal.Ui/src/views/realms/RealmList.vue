@@ -155,7 +155,7 @@ watch(
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <RouterLink :to="{ name: 'RealmEdit', params: { id: realm.id } }">{{ realm.uniqueName }}</RouterLink>
+              <RouterLink :to="{ name: 'RealmEdit', params: { id: realm.id } }">{{ realm.uniqueSlug }}</RouterLink>
             </td>
             <td>{{ realm.displayName ?? "—" }}</td>
             <td><status-block :actor="realm.updatedBy" :date="realm.updatedOn" /></td>
@@ -170,7 +170,7 @@ watch(
               />
               <delete-modal
                 confirm="realms.delete.confirm"
-                :display-name="realm.displayName ? `${realm.displayName} (${realm.uniqueName})` : realm.uniqueName"
+                :display-name="realm.displayName ? `${realm.displayName} (${realm.uniqueSlug})` : realm.uniqueSlug"
                 :id="`deleteModal_${realm.id}`"
                 :loading="isLoading"
                 title="realms.delete.title"

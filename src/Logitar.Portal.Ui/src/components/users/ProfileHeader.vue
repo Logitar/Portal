@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import type { UserProfile } from "@/types/users";
+import type { User } from "@/types/users";
 
 const { d, t } = useI18n();
 
 const props = defineProps<{
-  user: UserProfile;
+  user: User;
 }>();
 
 const addressLines = computed<string[]>(() => props.user.address?.formatted.split("\n") ?? []);
@@ -19,7 +19,7 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
         <th scope="row">{{ t("users.name.full") }}</th>
         <td>{{ user.fullName }}</td>
       </tr>
-      <tr>
+      <tr v-if="user.email">
         <th scope="row">{{ t("users.email.address.label") }}</th>
         <td>
           {{ user.email.address }}
@@ -51,9 +51,9 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
         <th scope="row">{{ t("users.updatedOn") }}</th>
         <td>{{ d(user.updatedOn, "medium") }}</td>
       </tr>
-      <tr v-if="user.signedInOn">
-        <th scope="row">{{ t("users.signedInOn") }}</th>
-        <td>{{ d(user.signedInOn, "medium") }}</td>
+      <tr v-if="user.authenticatedOn">
+        <th scope="row">{{ t("users.authenticatedOn") }}</th>
+        <td>{{ d(user.authenticatedOn, "medium") }}</td>
       </tr>
     </tbody>
   </table>

@@ -5,7 +5,7 @@ import AuthenticationInformation from "@/components/users/AuthenticationInformat
 import ContactInformation from "@/components/users/ContactInformation.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";
 import ProfileHeader from "@/components/users/ProfileHeader.vue";
-import type { ProfileUpdatedEvent, UserProfile } from "@/types/users";
+import type { ProfileUpdatedEvent, User } from "@/types/users";
 import type { ToastUtils } from "@/types/components";
 import { getProfile } from "@/api/account";
 import { handleErrorKey, toastsKey } from "@/inject/App";
@@ -17,7 +17,7 @@ const toasts = inject(toastsKey) as ToastUtils;
 
 const account = useAccountStore();
 
-const user = ref<UserProfile>();
+const user = ref<User>();
 
 function onProfileUpdated(event: ProfileUpdatedEvent): void {
   user.value = event.user;

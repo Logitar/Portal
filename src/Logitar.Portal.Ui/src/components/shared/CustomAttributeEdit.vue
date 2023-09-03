@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomAttribute } from "@/types/customAttribute";
+import type { CustomAttribute } from "@/types/customAttributes";
 import { assign } from "@/helpers/objectUtils";
 
 const props = defineProps<{

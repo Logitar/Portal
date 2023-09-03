@@ -8,14 +8,14 @@ import PictureInput from "@/components/users/PictureInput.vue";
 import ProfileInput from "@/components/users/ProfileInput.vue";
 import TimeZoneSelect from "@/components/users/TimeZoneSelect.vue";
 import WebsiteInput from "@/components/users/WebsiteInput.vue";
-import type { ProfileUpdatedEvent, UserProfile } from "@/types/users";
+import type { ProfileUpdatedEvent, User } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
-import { savePersonalInformation } from "@/api/account";
+import { saveProfile } from "@/api/account";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
 const props = defineProps<{
-  user: UserProfile;
+  user: User;
 }>();
 
 const birthdate = ref<Date>();
@@ -31,7 +31,7 @@ const timeZone = ref<string>("");
 const website = ref<string>("");
 
 const hasChanges = computed<boolean>(() => {
-  const user: UserProfile | undefined = props.user;
+  const user: User | undefined = props.user;
   if (!user) {
     return false;
   }
@@ -53,10 +53,10 @@ const hasChanges = computed<boolean>(() => {
 watchEffect(() => {
   const user = props.user;
   birthdate.value = user.birthdate ? new Date(user.birthdate) : undefined;
-  firstName.value = user.firstName;
+  firstName.value = user.firstName ?? "";
   gender.value = user.gender ?? "";
-  lastName.value = user.lastName;
-  locale.value = user.locale;
+  lastName.value = user.lastName ?? "";
+  locale.value = user.locale ?? "";
   middleName.value = user.middleName ?? "";
   nickname.value = user.nickname ?? "";
   picture.value = user.picture ?? "";
@@ -71,18 +71,21 @@ const emit = defineEmits<{
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
-    const user = await savePersonalInformation({
-      firstName: firstName.value,
-      middleName: middleName.value,
-      lastName: lastName.value,
-      nickname: nickname.value,
-      birthdate: birthdate.value,
-      gender: gender.value,
-      locale: locale.value,
-      timeZone: timeZone.value,
-      picture: picture.value,
-      profile: profile.value,
-      website: website.value,
+    const reference = props.user;
+    const user = await saveProfile({
+      firstName: firstName.value !== reference.firstName ? { value: firstName.value } : undefined,
+      middleName: middleName.value !== reference.middleName ? { value: middleName.value } : undefined,
+      lastName: lastName.value !== reference.lastName ? { value: lastName.value } : undefined,
+      nickname: nickname.value !== reference.nickname ? { value: nickname.value } : undefined,
+      birthdate: birthdate.value !== reference.birthdate ? { value: birthdate.value } : undefined,
+      gender: gender.value !== reference.gender ? { value: gender.value } : undefined,
+      locale: locale.value !== reference.locale ? { value: locale.value } : undefined,
+      timeZone: timeZone.value !== reference.timeZone ? { value: timeZone.value } : undefined,
+      picture: picture.value !== reference.picture ? { value: picture.value } : undefined,
+      profile: profile.value !== reference.profile ? { value: profile.value } : undefined,
+      website: website.value !== reference.website ? { value: website.value } : undefined,
+      customAttributes: [],
+      roles: [],
     });
     emit("profile-updated", { user });
   } catch (e: unknown) {

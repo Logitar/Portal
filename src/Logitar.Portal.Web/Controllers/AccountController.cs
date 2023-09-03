@@ -63,7 +63,7 @@ public class AccountController : ControllerBase
   }
 
   [Authorize(Policy = Policies.PortalActor)]
-  [HttpPatch("sign/out")]
+  [HttpPost("sign/out")]
   public async Task<ActionResult> SignOutAsync(CancellationToken cancellationToken)
   {
     Guid? sessionId = HttpContext.GetSessionId();

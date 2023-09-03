@@ -27,6 +27,7 @@
     "title": "Adresse postale",
     "verified": "Vérifiée"
   },
+  "authenticatedOn": "Dernière connexion",
   "birthdate": "Date de naissance",
   "createdOn": "Création",
   "email": {
@@ -130,7 +131,6 @@
   "signOut": {
     "title": "Déconnexion"
   },
-  "signedInOn": "Dernière connexion",
   "tabs": {
     "authentication": "Informations d’authentification",
     "contact": "Informations de contact",

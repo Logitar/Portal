@@ -7,16 +7,16 @@ import UsernameInput from "./UsernameInput.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { ProfileUpdatedEvent } from "@/types/users";
 import type { ToastUtils } from "@/types/components";
-import type { UserProfile } from "@/types/users";
-import { changePassword } from "@/api/account";
+import type { User } from "@/types/users";
 import { handleErrorKey, toastsKey } from "@/inject/App";
+import { saveProfile } from "@/api/account";
 
 const { d, t } = useI18n();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
 
 defineProps<{
-  user: UserProfile;
+  user: User;
 }>();
 
 const confirm = ref<string>("");
@@ -40,7 +40,14 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async (_, { resetForm }) => {
   invalidCredentials.value = false;
   try {
-    const user = await changePassword({ current: current.value, password: password.value });
+    const user = await saveProfile({
+      password: {
+        currentPassword: current.value,
+        newPassword: password.value,
+      },
+      customAttributes: [],
+      roles: [],
+    });
     resetForm();
     emit("profile-updated", { toast: false, user });
     toasts.success("users.password.changed");
@@ -60,7 +67,7 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
 <template>
   <div>
     <form @submit.prevent="onSubmit">
-      <UsernameInput disabled :model-value="user.username" />
+      <UsernameInput disabled :model-value="user.uniqueName" />
       <template v-if="user.passwordChangedOn">
         <h5>{{ t("users.password.label") }}</h5>
         <app-alert dismissible variant="warning" v-model="invalidCredentials">

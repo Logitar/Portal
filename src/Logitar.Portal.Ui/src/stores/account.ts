@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import type { UserProfile } from "@/types/users";
+import type { User } from "@/types/users";
 
 export const useAccountStore = defineStore(
   "account",
   () => {
-    const authenticated = ref<UserProfile>();
+    const authenticated = ref<User>();
 
-    function signIn(user: UserProfile): void {
+    function signIn(user: User): void {
       authenticated.value = user;
     }
     function signOut(): void {

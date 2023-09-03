@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CountrySettings } from "@/types/users/contact";
+import type { CountrySettings } from "@/types/users";
 import type { ValidationRules } from "@/types/validation";
 import { computed } from "vue";
 

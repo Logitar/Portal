@@ -1,5 +1,5 @@
 import type { Aggregate } from "@/types/aggregate";
-import type { CustomAttribute } from "@/types/customAttribute";
+import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type ClaimMapping = {
@@ -10,14 +10,14 @@ export type ClaimMapping = {
 
 export type Realm = Aggregate & {
   id: string;
-  uniqueName: string;
+  uniqueSlug: string;
   displayName?: string;
   description?: string;
   defaultLocale?: string;
   secret: string;
   url?: string;
-  requireConfirmedAccount: boolean;
   requireUniqueEmail: boolean;
+  requireConfirmedAccount: boolean;
   uniqueNameSettings: UniqueNameSettings;
   passwordSettings: PasswordSettings;
   claimMappings: ClaimMapping[];

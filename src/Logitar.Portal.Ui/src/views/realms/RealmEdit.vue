@@ -8,7 +8,7 @@ import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ClaimMapping, Realm } from "@/types/realms";
-import type { CustomAttribute } from "@/types/customAttribute";
+import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
 import { createRealm, getRealm, updateRealm } from "@/api/realms";
@@ -22,7 +22,7 @@ const registerTooltips = inject(registerTooltipsKey) as () => void;
 const toasts = inject(toastsKey) as ToastUtils;
 
 const defaults = {
-  uniqueName: "",
+  uniqueSlug: "",
   displayName: "",
   defaultLocale: "",
   url: "",
@@ -55,7 +55,7 @@ const realm = ref<Realm>();
 const requireConfirmedAccount = ref<boolean>(defaults.requireConfirmedAccount);
 const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
-const uniqueName = ref<string>(defaults.uniqueName);
+const uniqueName = ref<string>(defaults.uniqueSlug);
 const url = ref<string>(defaults.url);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
 
@@ -63,7 +63,7 @@ const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;
   return (
     displayName.value !== (model.displayName ?? "") ||
-    uniqueName.value !== model.uniqueName ||
+    uniqueName.value !== model.uniqueSlug ||
     defaultLocale.value !== (model.defaultLocale ?? "") ||
     url.value !== (model.url ?? "") ||
     description.value !== (model.description ?? "") ||
@@ -76,7 +76,7 @@ const hasChanges = computed<boolean>(() => {
     JSON.stringify(customAttributes.value) !== JSON.stringify(model.customAttributes)
   );
 });
-const title = computed<string>(() => realm.value?.displayName ?? realm.value?.uniqueName ?? t("realms.title.new"));
+const title = computed<string>(() => realm.value?.displayName ?? realm.value?.uniqueSlug ?? t("realms.title.new"));
 
 function setModel(model: Realm): void {
   realm.value = model;
@@ -89,7 +89,7 @@ function setModel(model: Realm): void {
   requireConfirmedAccount.value = model.requireConfirmedAccount;
   requireUniqueEmail.value = model.requireUniqueEmail;
   secret.value = model.secret;
-  uniqueName.value = model.uniqueName;
+  uniqueName.value = model.uniqueSlug;
   url.value = model.url ?? "";
   uniqueNameSettings.value = model.uniqueNameSettings;
 }
