@@ -152,6 +152,11 @@ public abstract class IntegrationTests
     _applicationContext.BaseUrl = new Uri($"https://portal.{Faker.Internet.DomainName()}/");
   }
 
+  protected static void AssertIsNear(DateTime? value, int seconds = 60)
+  {
+    Assert.True(value.HasValue);
+    AssertIsNear(value.Value, seconds);
+  }
   protected static void AssertIsNear(DateTime value, int seconds = 60)
   {
     TimeSpan difference = (DateTime.UtcNow - value.ToUniversalTime()).Duration();

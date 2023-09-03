@@ -85,7 +85,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       }
       else
       {
-        user.ChangePassword(payload.Password.CurrentPassword, newPassword);
+        user.ChangePassword(payload.Password.CurrentPassword, newPassword, _applicationContext.ActorId);
       }
     }
 
