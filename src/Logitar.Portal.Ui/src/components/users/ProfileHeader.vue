@@ -15,7 +15,7 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
 <template>
   <table class="table table-striped">
     <tbody>
-      <tr>
+      <tr v-if="user.fullName">
         <th scope="row">{{ t("users.name.full") }}</th>
         <td>{{ user.fullName }}</td>
       </tr>

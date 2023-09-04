@@ -4,15 +4,15 @@ import type { Realm } from "@/types/realms";
 import { _delete, get, graphQL, post, put } from ".";
 
 export async function createRealm(payload: CreateRealmPayload): Promise<Realm> {
-  return (await post<CreateRealmPayload, Realm>("/realms", payload)).data;
+  return (await post<CreateRealmPayload, Realm>("/api/realms", payload)).data;
 }
 
 export async function deleteRealm(id: string): Promise<Realm> {
-  return (await _delete<Realm>(`/realms/${id}`)).data;
+  return (await _delete<Realm>(`/api/realms/${id}`)).data;
 }
 
-export async function getRealm(id: string): Promise<Realm> {
-  return (await get<Realm>(`/realms/${id}`)).data;
+export async function readRealm(uniqueSlug: string): Promise<Realm> {
+  return (await get<Realm>(`/api/realms/unique-slug:${uniqueSlug}`)).data;
 }
 
 const searchRealmsQuery = `
@@ -20,7 +20,7 @@ query($parameters: RealmSearchParameters!) {
   realms(parameters: $parameters) {
     results {
       id
-      uniqueName
+      uniqueSlug
       displayName
       updatedBy {
         id
@@ -47,5 +47,5 @@ export async function searchRealms(parameters: SearchParameters): Promise<Search
 }
 
 export async function updateRealm(id: string, payload: UpdateRealmPayload): Promise<Realm> {
-  return (await put<UpdateRealmPayload, Realm>(`/realms/${id}`, payload)).data;
+  return (await put<UpdateRealmPayload, Realm>(`/api/realms/${id}`, payload)).data;
 }

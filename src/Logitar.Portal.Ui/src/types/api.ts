@@ -9,7 +9,8 @@ export type ApiResult<T> = {
 };
 
 export type ErrorDetail = {
-  code?: string;
+  errorCode: string;
+  errorMessage: string;
 };
 
 export type GraphQLRequest<T> = {

@@ -1,9 +1,5 @@
 {
   "address": {
-    "additional": {
-      "label": "Informations additionnelles",
-      "placeholder": "Entrez des informations additionnelles, si nécessaire (ex. : C.P. Boîte #4321)"
-    },
     "country": {
       "label": "Pays",
       "placeholder": "Sélectionnez un pays"
@@ -40,9 +36,9 @@
   "gender": {
     "label": "Genre",
     "options": {
-      "Female": "Femme",
-      "Male": "Homme",
-      "Other": "Autre"
+      "female": "Femme",
+      "male": "Homme",
+      "other": "Autre"
     },
     "placeholder": "Sélectionnez votre genre"
   },

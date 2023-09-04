@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import claimValueTypes from "@/resources/claimValueTypes.json";
+import claimTypes from "@/resources/claimTypes.json";
 import type { ClaimMapping } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import { assign } from "@/helpers/objectUtils";
@@ -11,9 +11,9 @@ const props = defineProps<{
   id: string;
 }>();
 
-const claimValueTypeOptions = computed<SelectOption[]>(() =>
+const claimTypeOptions = computed<SelectOption[]>(() =>
   orderBy(
-    claimValueTypes.map(({ id, name }) => ({ value: id, text: name })),
+    claimTypes.map(({ id, name }) => ({ value: id, text: name })),
     "text"
   )
 );
@@ -52,23 +52,23 @@ function onUpdate(changes: object): void {
     </div>
     <form-input
       class="col"
+      :id="`${id}_name`"
+      label="realms.claimMappings.name.label"
+      :model-value="claimMapping.name"
+      no-label
+      placeholder="realms.claimMappings.name.placeholder"
+      required
+      @update:model-value="onUpdate({ name: $event })"
+    />
+    <form-select
+      class="col"
       :id="`${id}_type`"
       label="realms.claimMappings.type.label"
       :model-value="claimMapping.type"
       no-label
+      :options="claimTypeOptions"
       placeholder="realms.claimMappings.type.placeholder"
-      required
-      @update:model-value="onUpdate({ type: $event })"
-    />
-    <form-select
-      class="col"
-      :id="`${id}_valueType`"
-      label="realms.claimMappings.valueType.label"
-      :model-value="claimMapping.valueType"
-      no-label
-      :options="claimValueTypeOptions"
-      placeholder="realms.claimMappings.valueType.placeholder"
-      @update:model-value="onUpdate({ valueType: $event || null })"
+      @update:model-value="onUpdate({ type: $event || null })"
     />
   </div>
 </template>

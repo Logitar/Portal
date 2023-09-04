@@ -146,7 +146,7 @@ watch(
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ t("realms.sort.options.UniqueName") }}</th>
+            <th scope="col">{{ t("realms.sort.options.UniqueSlug") }}</th>
             <th scope="col">{{ t("realms.sort.options.DisplayName") }}</th>
             <th scope="col">{{ t("realms.sort.options.UpdatedOn") }}</th>
             <th scope="col"></th>
@@ -155,7 +155,7 @@ watch(
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <RouterLink :to="{ name: 'RealmEdit', params: { id: realm.id } }">{{ realm.uniqueSlug }}</RouterLink>
+              <RouterLink :to="{ name: 'RealmEdit', params: { uniqueSlug: realm.uniqueSlug } }">{{ realm.uniqueSlug }}</RouterLink>
             </td>
             <td>{{ realm.displayName ?? "—" }}</td>
             <td><status-block :actor="realm.updatedBy" :date="realm.updatedOn" /></td>

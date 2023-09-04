@@ -3,6 +3,7 @@ import { computed, inject, ref, watchEffect } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import AddressLocalityInput from "./AddressLocalityInput.vue";
+import AddressStreetTextarea from "./AddressStreetTextarea.vue";
 import CountrySelect from "./CountrySelect.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import PhoneExtensionInput from "@/components/users/PhoneExtensionInput.vue";
@@ -15,8 +16,6 @@ import type { ProfileUpdatedEvent, User } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { saveProfile } from "@/api/account";
 
-// TODO(fpion): complete
-
 const { t } = useI18n();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -24,26 +23,32 @@ const props = defineProps<{
   user: User;
 }>();
 
-const address = ref<AddressPayload>({ street: "", locality: "", country: "", isVerified: false });
+const address = ref<AddressPayload>({ street: "", locality: "", region: "", postalCode: "", country: "", isVerified: false });
 const email = ref<EmailPayload>({ address: "", isVerified: false });
-const phone = ref<PhonePayload>({ number: "", isVerified: false });
+const phone = ref<PhonePayload>({ countryCode: "", number: "", extension: "", isVerified: false });
 const phoneNumberRef = ref<InstanceType<typeof PhoneNumberInput> | null>(null);
 const selectedCountry = ref<CountrySettings>();
 
-const hasChanges = computed<boolean>(() => {
+const hasAddressChanged = computed<boolean>(() => {
   const user = props.user;
   return (
     address.value.street !== (user.address?.street ?? "") ||
     address.value.locality !== (user.address?.locality ?? "") ||
-    address.value.postalCode !== user.address?.postalCode ||
+    address.value.postalCode !== (user.address?.postalCode ?? "") ||
     address.value.country !== (user.address?.country ?? "") ||
-    address.value.region !== user.address?.region ||
-    email.value.address !== user.email?.address ||
-    phone.value.countryCode !== user.phone?.countryCode ||
-    phone.value.number !== (user.phone?.number ?? "") ||
-    phone.value.extension !== user.phone?.extension
+    address.value.region !== (user.address?.region ?? "")
   );
 });
+const hasEmailChanged = computed<boolean>(() => email.value.address !== (props.user.email?.address ?? ""));
+const hasPhoneChanged = computed<boolean>(() => {
+  const user = props.user;
+  return (
+    (phone.value.countryCode ?? "CA") !== (user.phone?.countryCode ?? "CA") ||
+    (phone.value.number ?? "") !== (user.phone?.number ?? "") ||
+    phone.value.extension !== (user.phone?.extension ?? "")
+  );
+});
+const hasChanges = computed<boolean>(() => hasAddressChanged.value || hasEmailChanged.value || hasPhoneChanged.value);
 
 const isAddressRequired = computed<boolean>(() => {
   return (
@@ -60,8 +65,8 @@ watchEffect(() => {
   address.value = {
     street: user.address?.street ?? "",
     locality: user.address?.locality ?? "",
-    region: user.address?.region,
-    postalCode: user.address?.postalCode,
+    region: user.address?.region ?? "",
+    postalCode: user.address?.postalCode ?? "",
     country: user.address?.country ?? "",
     isVerified: user.address?.isVerified ?? false,
   };
@@ -70,9 +75,9 @@ watchEffect(() => {
     isVerified: user.email?.isVerified ?? false,
   };
   phone.value = {
-    countryCode: user.phone?.countryCode,
+    countryCode: user.phone?.countryCode ?? "CA",
     number: user.phone?.number ?? "",
-    extension: user.phone?.extension,
+    extension: user.phone?.extension ?? "",
     isVerified: user.phone?.isVerified ?? false,
   };
 });
@@ -84,11 +89,9 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     const user = await saveProfile({
-      // address: address.value.street ? address.value : undefined,
-      // email: email.value,
-      // phone: phone.value.number ? phone.value : undefined,
-      customAttributes: [],
-      roles: [],
+      address: hasAddressChanged.value ? { value: address.value.street ? address.value : undefined } : undefined,
+      email: hasEmailChanged.value ? { value: email.value.address ? email.value : undefined } : undefined,
+      phone: hasPhoneChanged.value ? { value: phone.value.number ? phone.value : undefined } : undefined,
     });
     emit("profile-updated", { user });
   } catch (e: unknown) {
@@ -111,7 +114,7 @@ function clearAddress(): void {
       <div class="mb-3">
         <icon-submit :disabled="!hasChanges || isSubmitting" icon="fas fa-floppy-disk" :loading="isSubmitting" text="actions.save" />
       </div>
-      <EmailAddressInput :disabled="user.email?.isVerified" required validate :verified="user.email?.isVerified" v-model="email.address" />
+      <EmailAddressInput :disabled="user.email?.isVerified" validate :verified="user.email?.isVerified" v-model="email.address" />
       <div class="row">
         <PhoneNumberInput
           class="col-lg-6"
@@ -131,9 +134,7 @@ function clearAddress(): void {
           <app-badge>{{ t("users.address.verified") }}</app-badge>
         </template>
       </h5>
-      <div class="row">
-        <!-- <AddressLineInput class="col-lg-6" :disabled="user.address?.isVerified" :required="isAddressRequired" type="street" validate v-model="address.street" /> -->
-      </div>
+      <AddressStreetTextarea :disabled="user.address?.isVerified" :required="isAddressRequired" validate v-model="address.street" />
       <div class="row">
         <AddressLocalityInput class="col-lg-6" :disabled="user.address?.isVerified" :required="isAddressRequired" validate v-model="address.locality" />
         <PostalCodeInput class="col-lg-6" :country="selectedCountry" :disabled="user.address?.isVerified" validate v-model="address.postalCode" />

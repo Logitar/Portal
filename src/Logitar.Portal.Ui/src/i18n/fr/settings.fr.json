@@ -21,6 +21,7 @@
     },
     "title": "Mot de passe"
   },
+  "title": "Paramètres",
   "uniqueName": {
     "allowedCharacters": {
       "label": "Caractères permis",

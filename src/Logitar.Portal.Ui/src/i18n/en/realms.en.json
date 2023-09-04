@@ -1,14 +1,14 @@
 {
   "claimMappings": {
     "empty": "There are no claim mapping.",
-    "title": "Claim Mappings",
-    "type": {
+    "name": {
       "label": "Name",
       "placeholder": "Enter the name of the claim"
     },
-    "valueType": {
+    "title": "Claim Mappings",
+    "type": {
       "label": "Type",
-      "placeholder": "Select a claim value type"
+      "placeholder": "Select a claim type"
     }
   },
   "created": "The realm has been created.",
@@ -35,7 +35,7 @@
   "sort": {
     "options": {
       "DisplayName": "Display name",
-      "UniqueName": "Unique name",
+      "UniqueSlug": "Unique slug",
       "UpdatedOn": "Updated on"
     }
   },
@@ -43,8 +43,8 @@
     "list": "Realms",
     "new": "New realm"
   },
-  "uniqueName": {
-    "label": "Unique Name (slug)",
+  "uniqueSlug": {
+    "label": "Unique Slug",
     "placeholder": "Enter an unique slug"
   },
   "updated": "The realm has been updated.",

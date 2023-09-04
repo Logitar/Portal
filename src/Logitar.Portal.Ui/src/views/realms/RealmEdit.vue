@@ -11,7 +11,7 @@ import type { ClaimMapping, Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
-import { createRealm, getRealm, updateRealm } from "@/api/realms";
+import { createRealm, readRealm, updateRealm } from "@/api/realms";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 
 const { t } = useI18n();
@@ -55,7 +55,7 @@ const realm = ref<Realm>();
 const requireConfirmedAccount = ref<boolean>(defaults.requireConfirmedAccount);
 const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
-const uniqueName = ref<string>(defaults.uniqueSlug);
+const uniqueSlug = ref<string>(defaults.uniqueSlug);
 const url = ref<string>(defaults.url);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
 
@@ -63,7 +63,7 @@ const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;
   return (
     displayName.value !== (model.displayName ?? "") ||
-    uniqueName.value !== model.uniqueSlug ||
+    uniqueSlug.value !== model.uniqueSlug ||
     defaultLocale.value !== (model.defaultLocale ?? "") ||
     url.value !== (model.url ?? "") ||
     description.value !== (model.description ?? "") ||
@@ -89,7 +89,7 @@ function setModel(model: Realm): void {
   requireConfirmedAccount.value = model.requireConfirmedAccount;
   requireUniqueEmail.value = model.requireUniqueEmail;
   secret.value = model.secret;
-  uniqueName.value = model.uniqueSlug;
+  uniqueSlug.value = model.uniqueSlug;
   url.value = model.url ?? "";
   uniqueNameSettings.value = model.uniqueNameSettings;
 }
@@ -99,23 +99,24 @@ const onSubmit = handleSubmit(async () => {
   try {
     if (realm.value) {
       const updatedRealm = await updateRealm(realm.value.id, {
-        displayName: displayName.value,
-        description: description.value,
-        defaultLocale: defaultLocale.value,
-        secret: secret.value,
-        url: url.value,
-        requireConfirmedAccount: requireConfirmedAccount.value,
-        requireUniqueEmail: requireConfirmedAccount.value,
-        uniqueNameSettings: uniqueNameSettings.value,
-        passwordSettings: passwordSettings.value,
-        claimMappings: claimMappings.value,
-        customAttributes: customAttributes.value,
+        uniqueSlug: uniqueSlug.value !== realm.value.uniqueSlug ? uniqueSlug.value : undefined,
+        displayName: displayName.value !== (realm.value.displayName ?? "") ? { value: displayName.value } : undefined,
+        description: description.value !== (realm.value.description ?? "") ? { value: description.value } : undefined,
+        defaultLocale: defaultLocale.value !== (realm.value.defaultLocale ?? "") ? { value: defaultLocale.value } : undefined,
+        secret: secret.value !== realm.value.secret ? secret.value : undefined,
+        url: url.value !== (realm.value.url ?? "") ? { value: url.value } : undefined,
+        requireUniqueEmail: requireUniqueEmail.value !== realm.value.requireUniqueEmail ? requireUniqueEmail.value : undefined,
+        requireConfirmedAccount: requireConfirmedAccount.value !== realm.value.requireConfirmedAccount ? requireConfirmedAccount.value : undefined,
+        uniqueNameSettings: JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(realm.value.uniqueNameSettings) ? uniqueNameSettings.value : undefined,
+        passwordSettings: JSON.stringify(passwordSettings.value) !== JSON.stringify(realm.value.passwordSettings) ? passwordSettings.value : undefined,
+        // claimMappings: claimMappings.value, // TODO(fpion): implement
+        // customAttributes: customAttributes.value, // TODO(fpion): implement
       });
       setModel(updatedRealm);
       toasts.success("realms.updated");
     } else {
       const createdRealm = await createRealm({
-        uniqueName: uniqueName.value,
+        uniqueSlug: uniqueSlug.value,
         displayName: displayName.value,
         description: description.value,
         defaultLocale: defaultLocale.value,
@@ -130,7 +131,7 @@ const onSubmit = handleSubmit(async () => {
       });
       setModel(createdRealm);
       toasts.success("realms.created");
-      router.replace({ name: "RealmEdit", params: { id: createdRealm.id } });
+      router.replace({ name: "RealmEdit", params: { uniqueSlug: createdRealm.uniqueSlug } });
     }
   } catch (e: unknown) {
     handleError(e);
@@ -138,10 +139,10 @@ const onSubmit = handleSubmit(async () => {
 });
 
 onMounted(async () => {
-  const id = route.params.id?.toString();
-  if (id) {
+  const uniqueSlug = route.params.uniqueSlug?.toString();
+  if (uniqueSlug) {
     try {
-      const realm = await getRealm(id);
+      const realm = await readRealm(uniqueSlug);
       setModel(realm);
     } catch (e: unknown) {
       handleError(e);
@@ -176,12 +177,12 @@ onMounted(async () => {
               :base-value="displayName"
               class="col-lg-6"
               :disabled="Boolean(realm)"
-              id="uniqueName"
-              label="realms.uniqueName.label"
-              placeholder="realms.uniqueName.placeholder"
+              id="uniqueSlug"
+              label="realms.uniqueSlug.label"
+              placeholder="realms.uniqueSlug.placeholder"
               :required="!realm"
               :validate="!realm"
-              v-model="uniqueName"
+              v-model="uniqueSlug"
             />
           </div>
           <div class="row">
@@ -190,7 +191,7 @@ onMounted(async () => {
           </div>
           <description-textarea v-model="description" />
         </app-tab>
-        <app-tab title="settings">
+        <app-tab title="settings.title">
           <form-checkbox class="mb-3" id="requireConfirmedAccount" v-model="requireConfirmedAccount">
             <template #label>
               <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireConfirmedAccount.info')">
@@ -207,8 +208,8 @@ onMounted(async () => {
           </form-checkbox>
           <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
           <PasswordSettingsEdit v-model="passwordSettings" />
-          <h5>{{ t("realms.jwt.title") }}</h5>
-          <JwtSecretField :old-value="realm?.secret" validate v-model="secret" />
+          <h5>{{ t("settings.jwt.title") }}</h5>
+          <JwtSecretField :old-value="realm?.secret" validate v-model="secret" warning="realms.jwt.secret.warning" />
         </app-tab>
         <app-tab title="realms.claimMappings.title">
           <ClaimMappingList v-model="claimMappings" />

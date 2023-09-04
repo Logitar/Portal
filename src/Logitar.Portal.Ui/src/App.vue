@@ -70,8 +70,8 @@ provide(toastsKey, toasts);
 </script>
 
 <template>
-  <AppNavbar environment="Development" />
+  <AppNavbar />
   <RouterView />
-  <AppFooter version="3.0.0" />
+  <AppFooter />
   <ToastContainer ref="containerRef" />
 </template>

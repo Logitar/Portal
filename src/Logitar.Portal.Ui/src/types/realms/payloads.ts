@@ -1,16 +1,23 @@
 import type { ClaimMapping } from ".";
-import type { CustomAttribute } from "@/types/customAttributes";
+import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
+import type { Modification } from "@/types/modifications";
+
+export type ClaimMappingModification = {
+  key: string;
+  name?: string;
+  type?: string;
+};
 
 export type CreateRealmPayload = {
-  uniqueName: string;
+  uniqueSlug: string;
   displayName?: string;
   description?: string;
   defaultLocale?: string;
   secret?: string;
   url?: string;
-  requireConfirmedAccount: boolean;
   requireUniqueEmail: boolean;
+  requireConfirmedAccount: boolean;
   uniqueNameSettings?: UniqueNameSettings;
   passwordSettings?: PasswordSettings;
   claimMappings?: ClaimMapping[];
@@ -18,15 +25,16 @@ export type CreateRealmPayload = {
 };
 
 export type UpdateRealmPayload = {
-  displayName?: string;
-  description?: string;
-  defaultLocale?: string;
+  uniqueSlug?: string;
+  displayName?: Modification<string>;
+  description?: Modification<string>;
+  defaultLocale?: Modification<string>;
   secret?: string;
-  url?: string;
-  requireConfirmedAccount: boolean;
-  requireUniqueEmail: boolean;
+  url?: Modification<string>;
+  requireUniqueEmail?: boolean;
+  requireConfirmedAccount?: boolean;
   uniqueNameSettings?: UniqueNameSettings;
   passwordSettings?: PasswordSettings;
-  claimMappings?: ClaimMapping[];
-  customAttributes?: CustomAttribute[];
+  claimMappings?: ClaimMappingModification[];
+  customAttributes?: CustomAttributeModification[];
 };

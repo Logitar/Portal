@@ -21,9 +21,9 @@ export type AuthenticatedUser = {
 };
 
 export type Contact = {
+  isVerified: boolean;
   verifiedBy?: Actor;
   verifiedOn?: string;
-  isVerified: boolean;
 };
 
 export type CountrySettings = {

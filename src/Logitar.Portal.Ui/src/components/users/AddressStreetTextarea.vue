@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disabled?: boolean;
     id?: string;
@@ -9,19 +7,18 @@ const props = withDefaults(
     modelValue?: string;
     placeholder?: string;
     required?: boolean;
-    type: string;
+    rows?: number;
     validate?: boolean;
   }>(),
   {
     disabled: false,
+    id: "street",
+    label: "users.address.street.label",
+    placeholder: "users.address.street.placeholder",
     required: false,
     validate: false,
   }
 );
-
-const inputId = computed<string>(() => props.id ?? `${props.type}Line`);
-const inputLabel = computed<string>(() => props.label ?? `users.address.${props.type}.label`);
-const inputPlaceholder = computed<string>(() => props.placeholder ?? `users.address.${props.type}.placeholder`);
 
 defineEmits<{
   (e: "update:model-value", value: string): void;
@@ -29,14 +26,16 @@ defineEmits<{
 </script>
 
 <template>
-  <form-input
+  <form-textarea
     :disabled="disabled"
-    :id="inputId"
-    :label="inputLabel"
+    :id="id"
+    :label="label"
     :max-length="validate ? 255 : undefined"
     :model-value="modelValue"
-    :placeholder="inputPlaceholder"
+    :placeholder="placeholder"
     :required="required"
+    :rows="rows"
     @update:model-value="$emit('update:model-value', $event)"
-  />
+  >
+  </form-textarea>
 </template>

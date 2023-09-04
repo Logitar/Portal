@@ -86,7 +86,7 @@ defineEmits<{
       <slot name="prepend"></slot>
       <maz-phone-number-input
         :class="classes"
-        :defaultCountryCode="countryCode"
+        :defaultCountryCode="countryCode || 'CA'"
         :disabled="disabled"
         :error="state === 'error'"
         :id="id"
