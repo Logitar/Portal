@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Web.Constants;
+﻿using Logitar.Portal.Contracts.Constants;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

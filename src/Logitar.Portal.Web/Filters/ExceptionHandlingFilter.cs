@@ -4,6 +4,7 @@ using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Sessions;
@@ -58,12 +59,12 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     }
     else if (context.Exception is SecurityTokenException securityToken)
     {
-      context.Result = new BadRequestObjectResult(new ErrorDetail(securityToken));
+      context.Result = new BadRequestObjectResult(ErrorDetail.From(securityToken));
       context.ExceptionHandled = true;
     }
     else if (context.Exception is TooManyResultsException tooManyResults)
     {
-      context.Result = new BadRequestObjectResult(new ErrorDetail(tooManyResults, "There are too many results."));
+      context.Result = new BadRequestObjectResult(ErrorDetail.From(tooManyResults, "There are too many results."));
       context.ExceptionHandled = true;
     }
     else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
@@ -79,7 +80,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new ErrorDetail(context.Exception, "The API key is expired."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The API key is expired."));
   }
 
   private static IActionResult HandleCannotPostponeExpirationException(ExceptionContext context)
@@ -89,7 +90,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
   {
-    return new JsonResult(new ErrorDetail(context.Exception, "The configuration has already been initialized."))
+    return new JsonResult(ErrorDetail.From(context.Exception, "The configuration has already been initialized."))
     {
       StatusCode = StatusCodes.Status403Forbidden
     };
@@ -127,7 +128,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new ErrorDetail(context.Exception, "The session is not active."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The session is not active."));
   }
 
   private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)
@@ -137,12 +138,12 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleUserIsDisabledException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new ErrorDetail(context.Exception, "The user is disabled."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The user is disabled."));
   }
 
   private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(new ErrorDetail(context.Exception, "The user is not confirmed."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The user is not confirmed."));
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)

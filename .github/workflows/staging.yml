@@ -21,7 +21,7 @@ jobs:
       - run: |
           cd ./src/Logitar.Portal.Ui
           npm ci
-          npm run build
+          npm run build:staging
           cd ../..
           docker build . -t francispion.azurecr.io/portal:${{ github.sha }} -f src/Logitar.Portal/Dockerfile
           docker push francispion.azurecr.io/portal:${{ github.sha }}

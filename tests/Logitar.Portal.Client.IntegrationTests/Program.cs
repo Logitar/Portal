@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Realms;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,20 +39,28 @@ internal class Program
     Console.WriteLine();
 
     CancellationToken cancellationToken = default;
-    TestContext context = new(count: 1);
+    TestContext context = new(count: 1 + 7 + 1);
     context.Start();
 
-    await InitializeConfigurationAsync(context, serviceProvider, cancellationToken);
-    if (context.HasFailed)
+    if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
     {
       context.End();
       return;
     }
 
+    RealmClientTests realmTests = new(context, _faker, serviceProvider.GetRequiredService<IRealmService>()); // 7 tests
+    if (!await realmTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    await realmTests.DeleteAsync(cancellationToken); // 1 test
+
     context.End();
   }
 
-  private static async Task InitializeConfigurationAsync(TestContext context, IServiceProvider serviceProvider, CancellationToken cancellationToken)
+  private static async Task<bool> InitializeConfigurationAsync(TestContext context, IServiceProvider serviceProvider, CancellationToken cancellationToken)
   {
     string name = nameof(InitializeConfigurationAsync);
 
@@ -85,5 +94,7 @@ internal class Program
     {
       context.Fail(name, exception);
     }
+
+    return !context.HasFailed;
   }
 }

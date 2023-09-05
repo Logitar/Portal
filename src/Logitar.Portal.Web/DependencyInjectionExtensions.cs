@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
@@ -33,11 +34,11 @@ public static class DependencyInjectionExtensions
     services.AddAuthentication()
       .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, options => { })
       .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { })
-      .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
+      .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(WebSchemes.Session, options => { });
 
     services.AddAuthorization(options =>
     {
-      options.AddPolicy(Policies.PortalActor, new AuthorizationPolicyBuilder(Schemes.All)
+      options.AddPolicy(Policies.PortalActor, new AuthorizationPolicyBuilder(WebSchemes.All)
         .RequireAuthenticatedUser()
         .AddRequirements(new PortalActorAuthorizationRequirement())
         .Build());
