@@ -24,7 +24,7 @@ const props = withDefaults(
   }
 );
 
-const isCustom = ref<boolean>(false);
+const isCustom = ref<boolean>(slugify(props.baseValue) !== props.modelValue);
 
 const emit = defineEmits<{
   (e: "update:model-value", value: string): void;
@@ -34,9 +34,6 @@ function onCustomUpdate(value: boolean): void {
   if (!value) {
     emit("update:model-value", slugify(props.baseValue));
   }
-}
-function onModelValueUpdate(value: string): void {
-  emit("update:model-value", value);
 }
 
 watch(
@@ -61,7 +58,7 @@ watch(
     :placeholder="placeholder"
     :required="required"
     :rules="{ slug: true }"
-    @update:model-value="onModelValueUpdate"
+    @update:model-value="$emit('update:model-value', $event)"
   >
     <template #after>
       <form-checkbox v-if="!disabled" :id="`${id}_custom`" label="custom" :model-value="isCustom" @update:model-value="onCustomUpdate" />

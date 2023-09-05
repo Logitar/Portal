@@ -6,7 +6,6 @@ import { useRouter } from "vue-router";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonNameInput from "@/components/users/PersonNameInput.vue";
-import UsernameInput from "@/components/users/UsernameInput.vue";
 import { handleErrorKey } from "@/inject/App";
 import { initializeConfiguration } from "@/api/configuration";
 import { useAccountStore } from "@/stores/account";
@@ -62,7 +61,7 @@ const onSubmit = handleSubmit(async () => {
     <form @submit.prevent="onSubmit">
       <div class="row">
         <EmailAddressInput class="col-lg-6" :model-value="emailAddress" required validate @update:model-value="onEmailAddressInput" />
-        <UsernameInput class="col-lg-6" required validate v-model="username" />
+        <unique-name-input class="col-lg-6" label="users.name.user.label" placeholder="users.name.user.placeholder" required validate v-model="username" />
       </div>
       <div class="row">
         <PersonNameInput class="col-lg-6" required type="first" validate v-model="firstName" />

@@ -21,8 +21,8 @@ export type CreateRealmPayload = {
   requireConfirmedAccount: boolean;
   uniqueNameSettings?: UniqueNameSettings;
   passwordSettings?: PasswordSettings;
-  claimMappings?: ClaimMapping[];
-  customAttributes?: CustomAttribute[];
+  claimMappings: ClaimMapping[];
+  customAttributes: CustomAttribute[];
 };
 
 export type RealmSort = "DisplayName" | "UniqueSlug" | "UpdatedOn";
@@ -32,7 +32,7 @@ export type RealmSortOption = SortOption & {
 };
 
 export type SearchRealmsPayload = SearchPayload & {
-  sort: RealmSortOption[];
+  sort?: RealmSortOption[];
 };
 
 export type UpdateRealmPayload = {

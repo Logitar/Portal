@@ -1,11 +1,11 @@
 export type SearchOperator = "And" | "Or";
 
 export type SearchPayload = {
-  search: TextSearch;
+  search?: TextSearch;
   idIn?: string[];
-  sort: SortOption[];
-  skip: number;
-  limit: number;
+  sort?: SortOption[];
+  skip?: number;
+  limit?: number;
 };
 
 export type SearchResults<T> = {

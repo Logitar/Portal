@@ -16,9 +16,9 @@ const props = withDefaults(
   }>(),
   {
     disabled: false,
-    id: "username",
-    label: "users.name.user.label",
-    placeholder: "users.name.user.placeholder",
+    id: "uniqueName",
+    label: "uniqueName.label",
+    placeholder: "uniqueName.placeholder",
     required: false,
     settings: () => ({ allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" }),
     validate: false,

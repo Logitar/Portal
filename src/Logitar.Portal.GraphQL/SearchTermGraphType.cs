@@ -3,9 +3,9 @@ using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.GraphQL;
 
-internal class SearchTermInputGraphType : InputObjectGraphType<SearchTerm>
+internal class SearchTermGraphType : InputObjectGraphType<SearchTerm>
 {
-  public SearchTermInputGraphType()
+  public SearchTermGraphType()
   {
     Name = nameof(SearchTerm);
     Description = "Represents a search term.";

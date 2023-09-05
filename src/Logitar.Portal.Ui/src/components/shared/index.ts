@@ -25,6 +25,7 @@ import SlugInput from "./SlugInput.vue";
 import SortSelect from "./SortSelect.vue";
 import StatusBlock from "./StatusBlock.vue";
 import StatusDetail from "./StatusDetail.vue";
+import UniqueNameInput from "./UniqueNameInput.vue";
 import UrlInput from "./UrlInput.vue";
 
 export default function (app: App) {
@@ -53,5 +54,6 @@ export default function (app: App) {
   app.component("sort-select", SortSelect);
   app.component("status-block", StatusBlock);
   app.component("status-detail", StatusDetail);
+  app.component("unique-name-input", UniqueNameInput);
   app.component("url-input", UrlInput);
 }

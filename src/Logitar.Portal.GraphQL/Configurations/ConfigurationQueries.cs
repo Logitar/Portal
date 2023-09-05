@@ -12,6 +12,8 @@ internal static class ConfigurationQueries
     root.Field<ConfigurationGraphType>("configuration")
       .AuthorizeWithPolicy(Policies.PortalActor)
       .Description("Retrieves the configuration of the system.")
-      .ResolveAsync(async context => await context.GetRequiredService<IConfigurationService, object?>().ReadAsync(context.CancellationToken));
+      .ResolveAsync(async context => await context.GetQueryService<IConfigurationService, object?>().ReadAsync(
+        context.CancellationToken
+      ));
   }
 }

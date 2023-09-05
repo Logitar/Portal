@@ -4,7 +4,6 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import PasswordInput from "@/components/users/PasswordInput.vue";
-import UsernameInput from "@/components/users/UsernameInput.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import { handleErrorKey } from "@/inject/App";
 import { signIn } from "@/api/account";
@@ -51,7 +50,7 @@ const onSubmit = handleSubmit(async () => {
       <strong>{{ t("users.signIn.failed") }}</strong> {{ t("users.signIn.invalidCredentials") }}
     </app-alert>
     <form @submit.prevent="onSubmit">
-      <UsernameInput placeholder="users.usernameOrEmailPlaceholder" required v-model="username" />
+      <unique-name-input label="users.name.user.label" placeholder="users.usernameOrEmailPlaceholder" required v-model="username" />
       <PasswordInput ref="passwordRef" required v-model="password" />
       <form-checkbox class="mb-3" id="remember" label="users.signIn.remember" v-model="remember" />
       <icon-submit class="me-2" :disabled="isSubmitting" icon="fas fa-arrow-right-to-bracket" :loading="isSubmitting" text="users.signIn.submit" />

@@ -3,14 +3,14 @@ using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.GraphQL;
 
-internal class TextSearchInputGraphType : InputObjectGraphType<TextSearch>
+internal class TextSearchGraphType : InputObjectGraphType<TextSearch>
 {
-  public TextSearchInputGraphType()
+  public TextSearchGraphType()
   {
     Name = nameof(TextSearch);
     Description = "Represents textual search parameters.";
 
-    Field(x => x.Terms, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<SearchTermInputGraphType>>>))
+    Field(x => x.Terms, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<SearchTermGraphType>>>))
       .Description("The terms of the textual search.");
     Field(x => x.Operator, type: typeof(NonNullGraphType<SearchOperatorGraphType>))
       .Description("The operator of the textual search.");

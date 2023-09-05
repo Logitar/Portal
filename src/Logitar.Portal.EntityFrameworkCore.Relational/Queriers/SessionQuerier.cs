@@ -64,23 +64,21 @@ internal class SessionQuerier : ISessionQuerier
   public async Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken)
   {
     Realm? realm = null;
-    if (payload.Realm != null)
+    string? tenantId = null;
+    if (!string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmQuerier.FindAsync(payload.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<RealmEntity>(payload.Realm);
+      tenantId = new AggregateId(realm.Id).Value;
     }
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Sessions.Table)
       .Join(Db.Users.UserId, Db.Sessions.UserId)
       .ApplyIdInFilter(Db.Sessions.AggregateId, payload.IdIn)
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Sessions.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search);
 
-    if (realm != null)
-    {
-      string tenantId = new AggregateId(realm.Id).Value;
-      builder = builder.Where(Db.Users.TenantId, Operators.IsEqualTo(tenantId));
-    }
     if (payload.UserId.HasValue)
     {
       string aggregateId = new AggregateId(payload.UserId.Value).Value;

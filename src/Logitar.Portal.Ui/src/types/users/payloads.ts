@@ -35,7 +35,7 @@ export type CreateUserPayload = {
   picture?: string;
   profile?: string;
   website?: string;
-  customAttributes?: CustomAttribute[];
+  customAttributes: CustomAttribute[];
   roles?: string[];
 };
 

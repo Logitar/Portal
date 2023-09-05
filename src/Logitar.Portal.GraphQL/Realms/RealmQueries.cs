@@ -17,9 +17,9 @@ internal static class RealmQueries
         new QueryArgument<IdGraphType>() { Name = "id", Description = "The unique identifier of the realm." },
         new QueryArgument<StringGraphType>() { Name = "uniqueSlug", Description = "The unique slug of the realm." }
       )
-      .ResolveAsync(async context => await context.GetRequiredService<IRealmService, object?>().ReadAsync(
-        context.GetArgument<Guid>("id"),
-        context.GetArgument<string>("uniqueSlug"),
+      .ResolveAsync(async context => await context.GetQueryService<IRealmService, object?>().ReadAsync(
+        context.GetArgument<Guid?>("id"),
+        context.GetArgument<string?>("uniqueSlug"),
         context.CancellationToken
       ));
 
@@ -27,9 +27,9 @@ internal static class RealmQueries
       .AuthorizeWithPolicy(Policies.PortalActor)
       .Description("Searches a list of realms.")
       .Arguments(
-        new QueryArgument<NonNullGraphType<SearchRealmsPayloadInputGraphType>>() { Name = "payload", Description = "The parameters to apply to the search." }
+        new QueryArgument<NonNullGraphType<SearchRealmsPayloadGraphType>>() { Name = "payload", Description = "The parameters to apply to the search." }
       )
-      .ResolveAsync(async context => await context.GetRequiredService<IRealmService, object?>().SearchAsync(
+      .ResolveAsync(async context => await context.GetQueryService<IRealmService, object?>().SearchAsync(
         context.GetArgument<SearchRealmsPayload>("payload"),
         context.CancellationToken
       ));

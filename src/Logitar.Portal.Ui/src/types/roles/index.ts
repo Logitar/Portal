@@ -8,7 +8,7 @@ export type Role = Aggregate & {
   uniqueName: string;
   displayName?: string;
   description?: string;
-  customAttribute: CustomAttribute[];
+  customAttributes: CustomAttribute[];
   realm?: Realm;
 };
 

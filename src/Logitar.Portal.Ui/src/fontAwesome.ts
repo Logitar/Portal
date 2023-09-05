@@ -26,6 +26,7 @@ import {
   faTimes,
   faTrash,
   faUser,
+  faUserGroup,
   faVial,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -53,6 +54,7 @@ library.add(
   faTimes,
   faTrash,
   faUser,
+  faUserGroup,
   faVial
 );
 

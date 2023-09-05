@@ -3,7 +3,6 @@ import { computed, inject, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import PasswordInput from "./PasswordInput.vue";
-import UsernameInput from "./UsernameInput.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { ProfileUpdatedEvent } from "@/types/users";
 import type { ToastUtils } from "@/types/components";
@@ -65,7 +64,7 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
 <template>
   <div>
     <form @submit.prevent="onSubmit">
-      <UsernameInput disabled :model-value="user.uniqueName" />
+      <unique-name-input disabled label="users.name.user.label" :model-value="user.uniqueName" />
       <template v-if="user.hasPassword">
         <h5>{{ t("users.password.label") }}</h5>
         <app-alert dismissible variant="warning" v-model="invalidCredentials">

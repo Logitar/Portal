@@ -113,24 +113,21 @@ internal class UserQuerier : IUserQuerier
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
   {
     Realm? realm = null;
-    if (payload.Realm != null)
+    string? tenantId = null;
+    if (!string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmQuerier.FindAsync(payload.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<RealmEntity>(payload.Realm);
+      tenantId = new AggregateId(realm.Id).Value;
     }
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Users.Table)
       .ApplyIdInFilter(Db.Users.AggregateId, payload.IdIn)
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Users.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Users.UniqueName, Db.Users.AddressFormatted,
       Db.Users.EmailAddress, Db.Users.PhoneE164Formatted, Db.Users.FirstName, Db.Users.MiddleName,
       Db.Users.LastName, Db.Users.FullName, Db.Users.Nickname, Db.Users.Gender, Db.Users.Locale, Db.Users.TimeZone);
-
-    if (realm != null)
-    {
-      string tenantId = new AggregateId(realm.Id).Value;
-      builder = builder.Where(Db.Users.TenantId, Operators.IsEqualTo(tenantId));
-    }
 
     if (payload.HasPassword.HasValue)
     {
