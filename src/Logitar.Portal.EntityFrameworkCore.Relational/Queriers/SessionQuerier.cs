@@ -75,7 +75,7 @@ internal class SessionQuerier : ISessionQuerier
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Sessions.Table)
       .Join(Db.Users.UserId, Db.Sessions.UserId)
       .ApplyIdInFilter(Db.Sessions.AggregateId, payload.IdIn)
-      .Where(Db.Roles.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Sessions.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search);
 

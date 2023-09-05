@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Roles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,7 +40,7 @@ internal class Program
     Console.WriteLine();
 
     CancellationToken cancellationToken = default;
-    TestContext context = new(count: 1 + 7 + 1);
+    TestContext context = new(count: 1 + 7 + 8 + 1);
     context.Start();
 
     if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
@@ -50,6 +51,13 @@ internal class Program
 
     RealmClientTests realmTests = new(context, _faker, serviceProvider.GetRequiredService<IRealmService>()); // 7 tests
     if (!await realmTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    RoleClientTests roleTests = new(context, _faker, serviceProvider.GetRequiredService<IRoleService>()); // 8 tests
+    if (!await roleTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;

@@ -123,7 +123,7 @@ internal class UserQuerier : IUserQuerier
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Users.Table)
       .ApplyIdInFilter(Db.Users.AggregateId, payload.IdIn)
-      .Where(Db.Roles.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
+      .Where(Db.Users.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Users.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Users.UniqueName, Db.Users.AddressFormatted,
       Db.Users.EmailAddress, Db.Users.PhoneE164Formatted, Db.Users.FirstName, Db.Users.MiddleName,

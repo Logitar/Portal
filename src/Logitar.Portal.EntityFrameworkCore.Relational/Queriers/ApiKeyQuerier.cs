@@ -74,7 +74,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.ApiKeys.Table)
       .ApplyIdInFilter(Db.ApiKeys.AggregateId, payload.IdIn)
-      .Where(Db.Roles.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
+      .Where(Db.ApiKeys.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.ApiKeys.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.ApiKeys.Title);
 
