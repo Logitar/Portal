@@ -32,6 +32,10 @@
     "info": "By enabling this setting, email address uniqueness will be enforced upon user creation & update.",
     "label": "Require unique email address"
   },
+  "select": {
+    "label": "Realm",
+    "placeholder": "Portal (no realm)"
+  },
   "sort": {
     "options": {
       "DisplayName": "Display name",
@@ -44,6 +48,10 @@
     "new": "New realm"
   },
   "uniqueSlug": {
+    "alreadyUsed": {
+      "help": "Please enter a different unique slug.",
+      "lead": "The unique slug is already used."
+    },
     "label": "Unique Slug",
     "placeholder": "Enter an unique slug"
   },

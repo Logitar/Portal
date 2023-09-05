@@ -89,5 +89,13 @@
       "signedOut": "Vous avez été déconnecté, veuillez vous reconnecter à votre compte.",
       "title": "Attention !"
     }
+  },
+  "uniqueName": {
+    "alreadyUsed": {
+      "help": "Veuillez entrer un nom unique différent.",
+      "lead": "Le nom unique est déjà utilisé."
+    },
+    "label": "Nom unique",
+    "placeholder": "Entrez un nom unique"
   }
 }

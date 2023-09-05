@@ -64,22 +64,19 @@ internal class ApiKeyQuerier : IApiKeyQuerier
   public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
   {
     Realm? realm = null;
-    if (payload.Realm != null)
+    string? tenantId = null;
+    if (!string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmQuerier.FindAsync(payload.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<RealmEntity>(payload.Realm);
+      tenantId = new AggregateId(realm.Id).Value;
     }
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.ApiKeys.Table)
       .ApplyIdInFilter(Db.ApiKeys.AggregateId, payload.IdIn)
+      .Where(Db.Roles.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.ApiKeys.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.ApiKeys.Title);
-
-    if (realm != null)
-    {
-      string tenantId = new AggregateId(realm.Id).Value;
-      builder = builder.Where(Db.ApiKeys.TenantId, Operators.IsEqualTo(tenantId));
-    }
 
     if (payload.Status != null)
     {

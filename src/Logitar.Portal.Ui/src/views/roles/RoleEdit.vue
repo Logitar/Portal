@@ -3,12 +3,18 @@ import { computed, inject, onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import RealmSelect from "@/components/realms/RealmSelect.vue";
+import type { ApiError, ErrorDetail } from "@/types/api";
+import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
+import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { ToastUtils } from "@/types/components";
+import type { UniqueNameSettings } from "@/types/settings";
 import { createRole, readRole, updateRole } from "@/api/roles";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
+import { readConfiguration } from "@/api/configuration";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -24,12 +30,16 @@ const defaults = {
   customAttributes: [],
 };
 
+const configuration = ref<Configuration>();
 const customAttributes = ref<CustomAttribute[]>(defaults.customAttributes);
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const hasLoaded = ref<boolean>(false);
+const realm = ref<Realm>();
+const realmId = ref<string>();
 const role = ref<Role>();
 const uniqueName = ref<string>(defaults.uniqueName);
+const uniqueNameAlreadyUsed = ref<boolean>(false);
 
 const hasChanges = computed<boolean>(() => {
   const model = role.value ?? defaults;
@@ -41,17 +51,21 @@ const hasChanges = computed<boolean>(() => {
   );
 });
 const title = computed<string>(() => role.value?.displayName ?? role.value?.uniqueName ?? t("roles.title.new"));
+const uniqueNameSettings = computed<UniqueNameSettings>(() => realm.value?.uniqueNameSettings ?? configuration.value?.uniqueNameSettings ?? {});
 
 function setModel(model: Role): void {
   role.value = model;
   customAttributes.value = model.customAttributes.map((item) => ({ ...item }));
   description.value = model.description ?? "";
   displayName.value = model.displayName ?? "";
+  realm.value = model.realm;
+  realmId.value = model.realm?.id;
   uniqueName.value = model.uniqueName;
 }
 
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  uniqueNameAlreadyUsed.value = false;
   try {
     if (role.value) {
       const customAttributeModifications = getCustomAttributeModifications(role.value.customAttributes, customAttributes.value);
@@ -65,6 +79,7 @@ const onSubmit = handleSubmit(async () => {
       toasts.success("roles.updated");
     } else {
       const createdRole = await createRole({
+        realm: realmId.value,
         uniqueName: uniqueName.value,
         displayName: displayName.value,
         description: description.value,
@@ -75,18 +90,41 @@ const onSubmit = handleSubmit(async () => {
       router.replace({ name: "RoleEdit", params: { id: createdRole.id } });
     }
   } catch (e: unknown) {
-    handleError(e);
+    const { data, status } = e as ApiError;
+    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueNameAlreadyUsed") {
+      uniqueNameAlreadyUsed.value = true;
+    } else {
+      handleError(e);
+    }
   }
 });
 
+function onRealmSelected(selected?: Realm) {
+  realm.value = selected;
+  realmId.value = selected?.id;
+}
+
 onMounted(async () => {
+  try {
+    configuration.value = await readConfiguration();
+  } catch (e: unknown) {
+    handleError(e);
+  }
+  if (route.query.realm?.toString()) {
+    realmId.value = route.query.realm?.toString();
+  }
   const id = route.params.id?.toString();
   if (id) {
     try {
       const role = await readRole(id);
       setModel(role);
     } catch (e: unknown) {
-      handleError(e);
+      const { status } = e as ApiError;
+      if (status === 404) {
+        router.push({ path: "/not-found" });
+      } else {
+        handleError(e);
+      }
     }
   }
   registerTooltips();
@@ -96,42 +134,38 @@ onMounted(async () => {
 
 <template>
   <main class="container">
-    <h1 v-show="hasLoaded">{{ title }}</h1>
-    <status-detail v-if="role" :aggregate="role" />
-    <form v-show="hasLoaded" @submit.prevent="onSubmit">
-      <div class="mb-3">
-        <icon-submit
-          class="me-1"
-          :disabled="isSubmitting || !hasChanges"
-          :icon="role ? 'save' : 'plus'"
-          :loading="isSubmitting"
-          :text="role ? 'actions.save' : 'actions.create'"
-          :variant="role ? undefined : 'success'"
-        />
-        <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
-      </div>
-      <app-tabs>
-        <app-tab active title="general">
-          <div class="row">
-            <display-name-input class="col-lg-6" validate v-model="displayName" />
-            <slug-input
-              :base-value="displayName"
-              class="col-lg-6"
-              :disabled="Boolean(role)"
-              id="uniqueName"
-              label="roles.uniqueName.label"
-              placeholder="roles.uniqueName.placeholder"
-              :required="!role"
-              :validate="!role"
-              v-model="uniqueName"
-            />
-          </div>
-          <description-textarea v-model="description" />
-        </app-tab>
-        <app-tab title="customAttributes.title">
-          <custom-attribute-list v-model="customAttributes" />
-        </app-tab>
-      </app-tabs>
-    </form>
+    <template v-if="hasLoaded">
+      <h1>{{ title }}</h1>
+      <app-alert dismissible variant="warning" v-model="uniqueNameAlreadyUsed">
+        <strong>{{ t("uniqueName.alreadyUsed.lead") }}</strong> {{ t("uniqueName.alreadyUsed.help") }}
+      </app-alert>
+      <status-detail v-if="role" :aggregate="role" />
+      <form @submit.prevent="onSubmit">
+        <div class="mb-3">
+          <icon-submit
+            class="me-1"
+            :disabled="isSubmitting || !hasChanges"
+            :icon="role ? 'save' : 'plus'"
+            :loading="isSubmitting"
+            :text="role ? 'actions.save' : 'actions.create'"
+            :variant="role ? undefined : 'success'"
+          />
+          <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
+        </div>
+        <app-tabs>
+          <app-tab active title="general">
+            <RealmSelect :disabled="Boolean(role)" :model-value="realmId" @realm-selected="onRealmSelected" />
+            <div class="row">
+              <unique-name-input class="col-lg-6" required :settings="uniqueNameSettings" validate v-model="uniqueName" />
+              <display-name-input class="col-lg-6" validate v-model="displayName" />
+            </div>
+            <description-textarea v-model="description" />
+          </app-tab>
+          <app-tab title="customAttributes.title">
+            <custom-attribute-list v-model="customAttributes" />
+          </app-tab>
+        </app-tabs>
+      </form>
+    </template>
   </main>
 </template>

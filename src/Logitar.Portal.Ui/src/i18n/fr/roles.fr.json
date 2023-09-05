@@ -17,9 +17,5 @@
     "list": "Rôles",
     "new": "Nouveau rôle"
   },
-  "uniqueName": {
-    "label": "Nom unique",
-    "placeholder": "Entrez un nom unique"
-  },
   "updated": "Le rôle a été enregistré."
 }

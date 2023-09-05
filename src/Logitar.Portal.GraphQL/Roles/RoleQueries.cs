@@ -18,7 +18,7 @@ internal static class RoleQueries
         new QueryArgument<StringGraphType>() { Name = "realm", Description = "The unique identifier or unique name of the role." },
         new QueryArgument<StringGraphType>() { Name = "uniqueName", Description = "The unique name of the role." }
       )
-      .ResolveAsync(async context => await context.GetRequiredService<IRoleService, object?>().ReadAsync(
+      .ResolveAsync(async context => await context.GetQueryService<IRoleService, object?>().ReadAsync(
         context.GetArgument<Guid?>("id"),
         context.GetArgument<string?>("realm"),
         context.GetArgument<string?>("uniqueName"),
@@ -31,7 +31,7 @@ internal static class RoleQueries
       .Arguments(
         new QueryArgument<NonNullGraphType<SearchRolesPayloadGraphType>>() { Name = "payload", Description = "The parameters to apply to the search." }
       )
-      .ResolveAsync(async context => await context.GetRequiredService<IRoleService, object?>().SearchAsync(
+      .ResolveAsync(async context => await context.GetQueryService<IRoleService, object?>().SearchAsync(
         context.GetArgument<SearchRolesPayload>("payload"),
         context.CancellationToken
       ));

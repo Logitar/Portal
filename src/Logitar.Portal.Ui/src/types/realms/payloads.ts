@@ -32,7 +32,7 @@ export type RealmSortOption = SortOption & {
 };
 
 export type SearchRealmsPayload = SearchPayload & {
-  sort: RealmSortOption[];
+  sort?: RealmSortOption[];
 };
 
 export type UpdateRealmPayload = {

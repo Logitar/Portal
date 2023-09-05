@@ -7,6 +7,7 @@ import ClaimMappingList from "@/components/realms/ClaimMappingList.vue";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
+import type { ApiError, ErrorDetail } from "@/types/api";
 import type { ClaimMapping, Realm } from "@/types/realms";
 import type { ClaimMappingModification } from "@/types/realms/payloads";
 import type { CustomAttribute } from "@/types/customAttributes";
@@ -60,6 +61,7 @@ const secret = ref<string>(defaults.secret);
 const uniqueSlug = ref<string>(defaults.uniqueSlug);
 const url = ref<string>(defaults.url);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
+const uniqueSlugAlreadyUsed = ref<boolean>(false);
 
 const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;
@@ -119,6 +121,7 @@ function getClaimMappingModifications(source: ClaimMapping[], destination: Claim
 }
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  uniqueSlugAlreadyUsed.value = false;
   try {
     if (realm.value) {
       const claimMappingModifications = getClaimMappingModifications(realm.value.claimMappings, claimMappings.value);
@@ -139,6 +142,7 @@ const onSubmit = handleSubmit(async () => {
       });
       setModel(updatedRealm);
       toasts.success("realms.updated");
+      router.replace({ name: "RealmEdit", params: { uniqueSlug: updatedRealm.uniqueSlug } });
     } else {
       const createdRealm = await createRealm({
         uniqueSlug: uniqueSlug.value,
@@ -159,7 +163,12 @@ const onSubmit = handleSubmit(async () => {
       router.replace({ name: "RealmEdit", params: { uniqueSlug: createdRealm.uniqueSlug } });
     }
   } catch (e: unknown) {
-    handleError(e);
+    const { data, status } = e as ApiError;
+    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueSlugAlreadyUsed") {
+      uniqueSlugAlreadyUsed.value = true;
+    } else {
+      handleError(e);
+    }
   }
 });
 
@@ -170,7 +179,12 @@ onMounted(async () => {
       const realm = await readRealm(uniqueSlug);
       setModel(realm);
     } catch (e: unknown) {
-      handleError(e);
+      const { status } = e as ApiError;
+      if (status === 404) {
+        router.push({ path: "/not-found" });
+      } else {
+        handleError(e);
+      }
     }
   }
   registerTooltips();
@@ -180,69 +194,73 @@ onMounted(async () => {
 
 <template>
   <main class="container">
-    <h1 v-show="hasLoaded">{{ title }}</h1>
-    <status-detail v-if="realm" :aggregate="realm" />
-    <form v-show="hasLoaded" @submit.prevent="onSubmit">
-      <div class="mb-3">
-        <icon-submit
-          class="me-1"
-          :disabled="isSubmitting || !hasChanges"
-          :icon="realm ? 'save' : 'plus'"
-          :loading="isSubmitting"
-          :text="realm ? 'actions.save' : 'actions.create'"
-          :variant="realm ? undefined : 'success'"
-        />
-        <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
-      </div>
-      <app-tabs>
-        <app-tab active title="general">
-          <div class="row">
-            <display-name-input class="col-lg-6" validate v-model="displayName" />
-            <slug-input
-              :base-value="displayName"
-              class="col-lg-6"
-              :disabled="Boolean(realm)"
-              id="uniqueSlug"
-              label="realms.uniqueSlug.label"
-              placeholder="realms.uniqueSlug.placeholder"
-              :required="!realm"
-              :validate="!realm"
-              v-model="uniqueSlug"
-            />
-          </div>
-          <div class="row">
-            <locale-select class="col-lg-6" id="defaultLocale" label="realms.defaultLocale" v-model="defaultLocale" />
-            <url-input class="col-lg-6" id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
-          </div>
-          <description-textarea v-model="description" />
-        </app-tab>
-        <app-tab title="settings.title">
-          <form-checkbox class="mb-3" id="requireConfirmedAccount" v-model="requireConfirmedAccount">
-            <template #label>
-              <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireConfirmedAccount.info')">
-                {{ t("realms.requireConfirmedAccount.label") }} <font-awesome-icon icon="fas fa-circle-info" />
-              </span>
-            </template>
-          </form-checkbox>
-          <form-checkbox class="mb-3" id="requireUniqueEmail" v-model="requireUniqueEmail">
-            <template #label>
-              <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireUniqueEmail.info')">
-                {{ t("realms.requireUniqueEmail.label") }} <font-awesome-icon icon="fas fa-circle-info" />
-              </span>
-            </template>
-          </form-checkbox>
-          <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
-          <PasswordSettingsEdit v-model="passwordSettings" />
-          <h5>{{ t("settings.jwt.title") }}</h5>
-          <JwtSecretField :old-value="realm?.secret" validate v-model="secret" warning="realms.jwt.secret.warning" />
-        </app-tab>
-        <app-tab title="realms.claimMappings.title">
-          <ClaimMappingList v-model="claimMappings" />
-        </app-tab>
-        <app-tab title="customAttributes.title">
-          <custom-attribute-list v-model="customAttributes" />
-        </app-tab>
-      </app-tabs>
-    </form>
+    <template v-if="hasLoaded">
+      <h1>{{ title }}</h1>
+      <app-alert dismissible variant="warning" v-model="uniqueSlugAlreadyUsed">
+        <strong>{{ t("realms.uniqueSlug.alreadyUsed.lead") }}</strong> {{ t("realms.uniqueSlug.alreadyUsed.help") }}
+      </app-alert>
+      <status-detail v-if="realm" :aggregate="realm" />
+      <form @submit.prevent="onSubmit">
+        <div class="mb-3">
+          <icon-submit
+            class="me-1"
+            :disabled="isSubmitting || !hasChanges"
+            :icon="realm ? 'save' : 'plus'"
+            :loading="isSubmitting"
+            :text="realm ? 'actions.save' : 'actions.create'"
+            :variant="realm ? undefined : 'success'"
+          />
+          <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
+        </div>
+        <app-tabs>
+          <app-tab active title="general">
+            <div class="row">
+              <display-name-input class="col-lg-6" validate v-model="displayName" />
+              <slug-input
+                :base-value="displayName"
+                class="col-lg-6"
+                id="uniqueSlug"
+                label="realms.uniqueSlug.label"
+                placeholder="realms.uniqueSlug.placeholder"
+                required
+                validate
+                v-model="uniqueSlug"
+              />
+            </div>
+            <div class="row">
+              <locale-select class="col-lg-6" id="defaultLocale" label="realms.defaultLocale" v-model="defaultLocale" />
+              <url-input class="col-lg-6" id="url" label="realms.url.label" placeholder="realms.url.placeholder" validate v-model="url" />
+            </div>
+            <description-textarea v-model="description" />
+          </app-tab>
+          <app-tab title="settings.title">
+            <form-checkbox class="mb-3" id="requireConfirmedAccount" v-model="requireConfirmedAccount">
+              <template #label>
+                <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireConfirmedAccount.info')">
+                  {{ t("realms.requireConfirmedAccount.label") }} <font-awesome-icon icon="fas fa-circle-info" />
+                </span>
+              </template>
+            </form-checkbox>
+            <form-checkbox class="mb-3" id="requireUniqueEmail" v-model="requireUniqueEmail">
+              <template #label>
+                <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireUniqueEmail.info')">
+                  {{ t("realms.requireUniqueEmail.label") }} <font-awesome-icon icon="fas fa-circle-info" />
+                </span>
+              </template>
+            </form-checkbox>
+            <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
+            <PasswordSettingsEdit v-model="passwordSettings" />
+            <h5>{{ t("settings.jwt.title") }}</h5>
+            <JwtSecretField :old-value="realm?.secret" validate v-model="secret" warning="realms.jwt.secret.warning" />
+          </app-tab>
+          <app-tab title="realms.claimMappings.title">
+            <ClaimMappingList v-model="claimMappings" />
+          </app-tab>
+          <app-tab title="customAttributes.title">
+            <custom-attribute-list v-model="customAttributes" />
+          </app-tab>
+        </app-tabs>
+      </form>
+    </template>
   </main>
 </template>

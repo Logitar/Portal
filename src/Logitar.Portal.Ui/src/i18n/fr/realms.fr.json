@@ -32,6 +32,10 @@
     "info": "En activant ce paramètre, l’unicité des adresses courriel sera forcée lors de la création et de la modification d’un utilisateur.",
     "label": "Exiger une adresse courriel unique"
   },
+  "select": {
+    "label": "Royaume",
+    "placeholder": "Portal (aucun royaume)"
+  },
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",
@@ -44,6 +48,10 @@
     "new": "Nouveau royaume"
   },
   "uniqueSlug": {
+    "alreadyUsed": {
+      "help": "Veuillez entrer un alias unique différent.",
+      "lead": "L’alias unique est déjà utilisé."
+    },
     "label": "Alias unique",
     "placeholder": "Entrez un alias (slug) unique"
   },

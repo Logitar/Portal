@@ -85,22 +85,19 @@ internal class RoleQuerier : IRoleQuerier
   public async Task<SearchResults<Role>> SearchAsync(SearchRolesPayload payload, CancellationToken cancellationToken)
   {
     Realm? realm = null;
-    if (payload.Realm != null)
+    string? tenantId = null;
+    if (!string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmQuerier.FindAsync(payload.Realm, cancellationToken)
         ?? throw new EntityNotFoundException<RealmEntity>(payload.Realm);
+      tenantId = new AggregateId(realm.Id).Value;
     }
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Roles.Table)
       .ApplyIdInFilter(Db.Roles.AggregateId, payload.IdIn)
+      .Where(Db.Roles.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Roles.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Roles.UniqueName, Db.Roles.DisplayName);
-
-    if (realm != null)
-    {
-      string tenantId = new AggregateId(realm.Id).Value;
-      builder = builder.Where(Db.Roles.TenantId, Operators.IsEqualTo(tenantId));
-    }
 
     IQueryable<RoleEntity> query = _roles.FromQuery(builder.Build())
       .AsNoTracking();
