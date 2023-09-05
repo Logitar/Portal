@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using Logitar.Portal.GraphQL.Configurations;
 using Logitar.Portal.GraphQL.Realms;
+using Logitar.Portal.GraphQL.Roles;
 
 namespace Logitar.Portal.GraphQL;
 
@@ -12,5 +13,6 @@ internal class RootQuery : ObjectGraphType
 
     ConfigurationQueries.Register(this);
     RealmQueries.Register(this);
+    RoleQueries.Register(this);
   }
 }
