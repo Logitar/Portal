@@ -10,7 +10,7 @@ internal abstract class SearchPayloadInputGraphType<T> : InputObjectGraphType<T>
     Name = typeof(T).Name;
     Description = "Represents the parameters of a search.";
 
-    Field(x => x.Search, type: typeof(NonNullGraphType<TextSearchInputGraphType>))
+    Field(x => x.Search, type: typeof(NonNullGraphType<TextSearchGraphType>))
       .DefaultValue(new TextSearch())
       .Description("The global textual search parameters to apply.");
     Field(x => x.IdIn, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IdGraphType>>>))
