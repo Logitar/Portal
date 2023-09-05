@@ -59,6 +59,12 @@ const router = createRouter({
       path: "/create-realm",
       component: () => import("./views/realms/RealmEdit.vue"),
     },
+    // Roles
+    {
+      name: "RoleList",
+      path: "/roles",
+      component: () => import("./views/roles/RoleList.vue"),
+    },
     // NotFound
     {
       name: "NotFound",
