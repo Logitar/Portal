@@ -8,10 +8,12 @@ import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ClaimMapping, Realm } from "@/types/realms";
+import type { ClaimMappingModification } from "@/types/realms/payloads";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
 import { createRealm, readRealm, updateRealm } from "@/api/realms";
+import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 
 const { t } = useI18n();
@@ -94,10 +96,33 @@ function setModel(model: Realm): void {
   uniqueNameSettings.value = model.uniqueNameSettings;
 }
 
+function getClaimMappingModifications(source: ClaimMapping[], destination: ClaimMapping[]): ClaimMappingModification[] {
+  const modifications: ClaimMappingModification[] = [];
+
+  const destinationKeys = new Set(destination.map(({ key }) => key));
+  for (const claimMapping of source) {
+    const key = claimMapping.key;
+    if (!destinationKeys.has(key)) {
+      modifications.push({ key });
+    }
+  }
+
+  const sourceMap = new Map(source.map(({ key, name, type }) => [key, JSON.stringify({ name, type })]));
+  for (const claimMapping of destination) {
+    const value = JSON.stringify({ name: claimMapping.name, type: claimMapping.type });
+    if (sourceMap.get(claimMapping.key) !== value) {
+      modifications.push(claimMapping);
+    }
+  }
+
+  return modifications;
+}
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     if (realm.value) {
+      const claimMappingModifications = getClaimMappingModifications(realm.value.claimMappings, claimMappings.value);
+      const customAttributeModifications = getCustomAttributeModifications(realm.value.customAttributes, customAttributes.value);
       const updatedRealm = await updateRealm(realm.value.id, {
         uniqueSlug: uniqueSlug.value !== realm.value.uniqueSlug ? uniqueSlug.value : undefined,
         displayName: displayName.value !== (realm.value.displayName ?? "") ? { value: displayName.value } : undefined,
@@ -109,8 +134,8 @@ const onSubmit = handleSubmit(async () => {
         requireConfirmedAccount: requireConfirmedAccount.value !== realm.value.requireConfirmedAccount ? requireConfirmedAccount.value : undefined,
         uniqueNameSettings: JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(realm.value.uniqueNameSettings) ? uniqueNameSettings.value : undefined,
         passwordSettings: JSON.stringify(passwordSettings.value) !== JSON.stringify(realm.value.passwordSettings) ? passwordSettings.value : undefined,
-        // claimMappings: claimMappings.value, // TODO(fpion): implement
-        // customAttributes: customAttributes.value, // TODO(fpion): implement
+        claimMappings: claimMappingModifications.length ? claimMappingModifications : undefined,
+        customAttributes: customAttributeModifications.length ? customAttributeModifications : undefined,
       });
       setModel(updatedRealm);
       toasts.success("realms.updated");

@@ -2,6 +2,7 @@ import type { ClaimMapping } from ".";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Modification } from "@/types/modifications";
+import type { SearchPayload, SortOption } from "@/types/search";
 
 export type ClaimMappingModification = {
   key: string;
@@ -22,6 +23,16 @@ export type CreateRealmPayload = {
   passwordSettings?: PasswordSettings;
   claimMappings?: ClaimMapping[];
   customAttributes?: CustomAttribute[];
+};
+
+export type RealmSort = "DisplayName" | "UniqueSlug" | "UpdatedOn";
+
+export type RealmSortOption = SortOption & {
+  field: RealmSort;
+};
+
+export type SearchRealmsPayload = SearchPayload & {
+  sort: RealmSortOption[];
 };
 
 export type UpdateRealmPayload = {

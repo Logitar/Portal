@@ -12,7 +12,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (Dashboard.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import("./views/Dashboard.vue"),
+      component: () => import("./views/DashboardView.vue"),
     },
     // Configuration
     {
@@ -30,7 +30,7 @@ const router = createRouter({
     {
       name: "Profile",
       path: "/user/profile",
-      component: () => import("./views/users/Profile.vue"),
+      component: () => import("./views/users/ProfileView.vue"),
     },
     {
       name: "SignIn",

@@ -1,7 +1,7 @@
-import type { SearchParameters, SearchResults } from "@/types/api";
-import type { CreateRealmPayload, UpdateRealmPayload } from "@/types/realms/payloads";
+import type { CreateRealmPayload, SearchRealmsPayload, UpdateRealmPayload } from "@/types/realms/payloads";
 import type { Realm } from "@/types/realms";
-import { _delete, get, graphQL, post, put } from ".";
+import type { SearchResults } from "@/types/search";
+import { _delete, get, graphQL, patch, post } from ".";
 
 export async function createRealm(payload: CreateRealmPayload): Promise<Realm> {
   return (await post<CreateRealmPayload, Realm>("/api/realms", payload)).data;
@@ -16,8 +16,8 @@ export async function readRealm(uniqueSlug: string): Promise<Realm> {
 }
 
 const searchRealmsQuery = `
-query($parameters: RealmSearchParameters!) {
-  realms(parameters: $parameters) {
+query($payload: SearchRealmsPayload!) {
+  realms(payload: $payload) {
     results {
       id
       uniqueSlug
@@ -28,7 +28,7 @@ query($parameters: RealmSearchParameters!) {
         isDeleted
         displayName
         emailAddress
-        picture
+        pictureUrl
       }
       updatedOn
     }
@@ -37,15 +37,15 @@ query($parameters: RealmSearchParameters!) {
 }
 `;
 type SearchRealmsRequest = {
-  parameters: SearchParameters;
+  payload: SearchRealmsPayload;
 };
 type SearchRealmsResponse = {
   realms: SearchResults<Realm>;
 };
-export async function searchRealms(parameters: SearchParameters): Promise<SearchResults<Realm>> {
-  return (await graphQL<SearchRealmsRequest, SearchRealmsResponse>(searchRealmsQuery, { parameters })).data.realms;
+export async function searchRealms(payload: SearchRealmsPayload): Promise<SearchResults<Realm>> {
+  return (await graphQL<SearchRealmsRequest, SearchRealmsResponse>(searchRealmsQuery, { payload })).data.realms;
 }
 
 export async function updateRealm(id: string, payload: UpdateRealmPayload): Promise<Realm> {
-  return (await put<UpdateRealmPayload, Realm>(`/api/realms/${id}`, payload)).data;
+  return (await patch<UpdateRealmPayload, Realm>(`/api/realms/${id}`, payload)).data;
 }
