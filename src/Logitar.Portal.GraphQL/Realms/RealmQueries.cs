@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Logitar.Cms.Schema.Extensions;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.GraphQL.Realms;
@@ -10,7 +11,7 @@ internal static class RealmQueries
   public static void Register(RootQuery root)
   {
     root.Field<RealmGraphType>("realm")
-      //.AuthorizeWithPolicy("PortalActor") // TODO(fpion): Policies.PortalActor
+      .AuthorizeWithPolicy(Policies.PortalActor)
       .Description("Retrieves a single realm.")
       .Arguments(
         new QueryArgument<IdGraphType>() { Name = "id", Description = "The unique identifier of the realm." },
@@ -23,7 +24,7 @@ internal static class RealmQueries
       ));
 
     root.Field<NonNullGraphType<RealmSearchResultsGraphType>>("realms")
-      //.AuthorizeWithPolicy("PortalActor") // TODO(fpion): Policies.PortalActor
+      .AuthorizeWithPolicy(Policies.PortalActor)
       .Description("Searches a list of realms.")
       .Arguments(
         new QueryArgument<NonNullGraphType<SearchRealmsPayloadInputGraphType>>() { Name = "payload", Description = "The parameters to apply to the search." }

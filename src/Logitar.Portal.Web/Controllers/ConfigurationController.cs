@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Configuration;
 using Microsoft.AspNetCore.Authorization;

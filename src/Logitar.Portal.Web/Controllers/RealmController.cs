@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Web.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

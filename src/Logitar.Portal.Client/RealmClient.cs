@@ -13,7 +13,8 @@ internal class RealmClient : ClientBase, IRealmService
 
   public async Task<Realm> CreateAsync(CreateRealmPayload payload, CancellationToken cancellationToken)
   {
-    return await PostAsync<Realm>(Path, payload, cancellationToken);
+    return await PostAsync<Realm>(Path, payload, cancellationToken)
+      ?? throw new InvalidOperationException("The result should not be null.");
   }
 
   public async Task<Realm?> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -67,7 +68,8 @@ internal class RealmClient : ClientBase, IRealmService
 
   public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
-    return await PostAsync<SearchResults<Realm>>($"{Path}/search", payload, cancellationToken);
+    return await PostAsync<SearchResults<Realm>>($"{Path}/search", payload, cancellationToken)
+      ?? throw new InvalidOperationException("The results should not be null.");
   }
 
   public async Task<Realm?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
