@@ -85,10 +85,7 @@ internal class Startup : StartupBase
     builder.UseAuthentication();
     builder.UseAuthorization();
 
-    builder.UseGraphQL<PortalSchema>("/graphql", options =>
-    {
-      options.AuthenticationSchemes.AddRange(Schemes.All);
-    });
+    builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(Schemes.All));
 
     if (builder is WebApplication application)
     {
