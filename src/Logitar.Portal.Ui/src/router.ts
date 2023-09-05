@@ -65,6 +65,16 @@ const router = createRouter({
       path: "/roles",
       component: () => import("./views/roles/RoleList.vue"),
     },
+    {
+      name: "RoleEdit",
+      path: "/roles/:id",
+      component: () => import("./views/roles/RoleEdit.vue"),
+    },
+    {
+      name: "CreateRole",
+      path: "/create-role",
+      component: () => import("./views/roles/RoleEdit.vue"),
+    },
     // NotFound
     {
       name: "NotFound",

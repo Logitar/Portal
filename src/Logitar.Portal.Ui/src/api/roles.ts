@@ -1,10 +1,18 @@
+import type { CreateRolePayload, SearchRolesPayload, UpdateRolePayload } from "@/types/roles/payloads";
 import type { Role } from "@/types/roles";
 import type { SearchResults } from "@/types/search";
-import type { SearchRolesPayload } from "@/types/roles/payloads";
-import { _delete, graphQL } from ".";
+import { _delete, get, graphQL, patch, post } from ".";
+
+export async function createRole(payload: CreateRolePayload): Promise<Role> {
+  return (await post<CreateRolePayload, Role>("/api/roles", payload)).data;
+}
 
 export async function deleteRole(id: string): Promise<Role> {
   return (await _delete<Role>(`/api/roles/${id}`)).data;
+}
+
+export async function readRole(id: string): Promise<Role> {
+  return (await get<Role>(`/api/roles/${id}`)).data;
 }
 
 const searchRolesQuery = `
@@ -36,4 +44,8 @@ type SearchRolesResponse = {
 };
 export async function searchRoles(payload: SearchRolesPayload): Promise<SearchResults<Role>> {
   return (await graphQL<SearchRolesRequest, SearchRolesResponse>(searchRolesQuery, { payload })).data.roles;
+}
+
+export async function updateRole(id: string, payload: UpdateRolePayload): Promise<Role> {
+  return (await patch<UpdateRolePayload, Role>(`/api/roles/${id}`, payload)).data;
 }
