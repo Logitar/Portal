@@ -37,6 +37,7 @@ internal class RoleClientTests
       name = $"{Sut}.{nameof(_roleService.ReplaceAsync)}";
       ReplaceRolePayload replace = new()
       {
+        UniqueName = role.UniqueName,
         DisplayName = "Administrator"
       };
       role = await _roleService.ReplaceAsync(role.Id, replace, role.Version, cancellationToken)
@@ -69,6 +70,7 @@ internal class RoleClientTests
       name = $"{Sut}.{nameof(_roleService.SearchAsync)}";
       SearchRolesPayload search = new()
       {
+        Realm = _context.Realm.UniqueSlug,
         IdIn = new Guid[] { role.Id }
       };
       SearchResults<Role> results = await _roleService.SearchAsync(search, cancellationToken);
