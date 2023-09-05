@@ -13,6 +13,9 @@ internal class CacheService : ICacheService
 {
   private const string ConfigurationKey = "Configuration";
 
+  private static readonly TimeSpan _actorExpiration = TimeSpan.FromHours(1);
+  private static readonly TimeSpan _authenticationExpiration = TimeSpan.FromMinutes(5);
+
   private readonly IMemoryCache _cache;
 
   public CacheService(IMemoryCache cache)
@@ -28,7 +31,7 @@ internal class CacheService : ICacheService
 
   public Actor? GetActor(ActorId id) => GetItem<Actor>(GetActorKey(id));
   public void RemoveActor(ActorId id) => RemoveItem(GetActorKey(id));
-  public void SetActor(ActorId id, Actor actor) => SetItem(GetActorKey(id), actor);
+  public void SetActor(ActorId id, Actor actor) => SetItem(GetActorKey(id), actor, _actorExpiration);
   private static string GetActorKey(ActorId id) => $"Actor:Id:{id}";
 
   public Session? GetSession(Guid id) => GetItem<Session>(GetSessionKey(id));
@@ -45,7 +48,7 @@ internal class CacheService : ICacheService
 
       if (userSessions.Any())
       {
-        SetItem(userSessionsKey, userSessions);
+        SetItem(userSessionsKey, userSessions, _authenticationExpiration);
       }
       else
       {
@@ -55,12 +58,12 @@ internal class CacheService : ICacheService
   }
   public void SetSession(Session session)
   {
-    SetItem(GetSessionKey(session.Id), session);
+    SetItem(GetSessionKey(session.Id), session, _authenticationExpiration);
 
     string userSessionsKey = GetUserSessionsKey(session.User.Id);
     HashSet<Guid> userSessions = GetItem<HashSet<Guid>>(userSessionsKey) ?? new();
     userSessions.Add(session.Id);
-    SetItem(userSessionsKey, userSessions);
+    SetItem(userSessionsKey, userSessions, _authenticationExpiration);
   }
   private static string GetSessionKey(Guid id) => $"Session:Id:{id}";
   private static string GetUserSessionsKey(Guid id) => $"User:Id:{id}:Sessions";
@@ -101,15 +104,16 @@ internal class CacheService : ICacheService
   public void SetUser(CachedUser user)
   {
     string userKey = GetUserKey(user.Aggregate);
-    SetItem(userKey, user);
+    SetItem(userKey, user, _authenticationExpiration);
 
     string uniqueNameKey = GetUniqueNameKey(user.Aggregate.UniqueName);
-    SetItem(uniqueNameKey, userKey);
+    SetItem(uniqueNameKey, userKey, _authenticationExpiration);
   }
   private static string GetUniqueNameKey(string uniqueName) => $"User:UniqueName:{uniqueName.Trim().ToUpper()}";
   private static string GetUserKey(UserAggregate user) => $"User:Id:{user.Id}";
 
   private T? GetItem<T>(object key) => _cache.TryGetValue(key, out T? value) ? value : default;
   private void RemoveItem(object key) => _cache.Remove(key);
-  private void SetItem<T>(object key, T value) => _cache.Set(key, value, TimeSpan.FromMinutes(5));
+  private void SetItem<T>(object key, T value) => _cache.Set(key, value);
+  private void SetItem<T>(object key, T value, TimeSpan expiration) => _cache.Set(key, value, expiration);
 }

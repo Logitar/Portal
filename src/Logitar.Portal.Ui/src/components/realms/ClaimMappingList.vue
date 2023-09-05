@@ -22,7 +22,7 @@ const emit = defineEmits<{
 
 function add(): void {
   const value = [...props.modelValue];
-  value.push({ key: "", type: "" });
+  value.push({ key: "", name: "" });
   emit("update:model-value", value);
 }
 function remove(index: number): void {
@@ -45,8 +45,8 @@ function update(index: number, mapping: ClaimMapping): void {
     <template v-if="modelValue.length">
       <div class="row">
         <h5 class="col">{{ t("customAttributes.key.label") }}</h5>
+        <h5 class="col">{{ t("realms.claimMappings.name.label") }}</h5>
         <h5 class="col">{{ t("realms.claimMappings.type.label") }}</h5>
-        <h5 class="col">{{ t("realms.claimMappings.valueType.label") }}</h5>
       </div>
       <ClaimMappingEdit
         v-for="(claimMapping, index) in modelValue"

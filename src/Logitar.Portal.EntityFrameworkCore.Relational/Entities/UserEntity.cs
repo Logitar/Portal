@@ -180,6 +180,8 @@ internal record UserEntity : AggregateEntity
     if (updated.Password != null)
     {
       Password = updated.Password.Encode();
+      PasswordChangedBy = updated.ActorId.Value;
+      PasswordChangedOn = updated.OccurredOn.ToUniversalTime();
     }
 
     if (updated.Address != null)

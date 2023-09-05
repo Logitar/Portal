@@ -1,8 +1,8 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
 using Microsoft.Extensions.Primitives;
 

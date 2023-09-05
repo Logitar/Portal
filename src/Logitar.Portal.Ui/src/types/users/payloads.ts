@@ -1,4 +1,4 @@
-import type { CustomAttributeModification } from "@/types/customAttributes";
+import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { Modification } from "@/types/modifications";
 import type { RoleModification } from "@/types/roles";
 
@@ -14,6 +14,29 @@ export type AddressPayload = {
 export type ChangePasswordPayload = {
   currentPassword?: string;
   newPassword: string;
+};
+
+export type CreateUserPayload = {
+  realm?: string;
+  uniqueName: string;
+  password?: string;
+  isDisabled: boolean;
+  address?: AddressPayload;
+  email?: EmailPayload;
+  phone?: PhonePayload;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  nickname?: string;
+  birthdate?: Date;
+  gender?: string;
+  locale?: string;
+  timeZone?: string;
+  picture?: string;
+  profile?: string;
+  website?: string;
+  customAttributes?: CustomAttribute[];
+  roles?: string[];
 };
 
 export type EmailPayload = {
@@ -52,6 +75,6 @@ export type UpdateUserPayload = {
   picture?: Modification<string>;
   profile?: Modification<string>;
   website?: Modification<string>;
-  customAttributes: CustomAttributeModification[];
-  roles: RoleModification[];
+  customAttributes?: CustomAttributeModification[];
+  roles?: RoleModification[];
 };

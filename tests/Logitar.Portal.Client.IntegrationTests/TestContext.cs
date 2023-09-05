@@ -55,5 +55,8 @@ internal class TestContext
 
     Console.WriteLine();
     Console.WriteLine("Test run {0}. | Success rate: {1}%", success == 100 ? "succeeded" : "failed", success);
+    Console.WriteLine();
+    Console.Write("Press a key to close the console.");
+    Console.ReadKey(intercept: true);
   }
 }

@@ -14,7 +14,7 @@ internal class ConfigurationGraphType : AggregateGraphType<Configuration>
     Field(x => x.DefaultLocale)
       .Description("The code (ISO 639-1) of the default locale (language) of the system.");
     Field(x => x.Secret)
-      .Description("The secret to use to sign security tokens.");
+      .Description("The secret to use to sign Portal security tokens.");
 
     Field(x => x.UniqueNameSettings, type: typeof(NonNullGraphType<UniqueNameSettingsGraphType>))
       .Description("The settings of the unique names of Portal users.");

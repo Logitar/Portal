@@ -1,8 +1,8 @@
 ﻿using Logitar.Portal.Application;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
-using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Filters;
 using Logitar.Portal.Web.Settings;

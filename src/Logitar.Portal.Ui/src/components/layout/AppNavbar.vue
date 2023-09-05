@@ -16,17 +16,13 @@ import { useI18nStore } from "@/stores/i18n";
 const account = useAccountStore();
 const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
 const configuration = useConfigurationStore();
+const environment = import.meta.env.MODE.toLowerCase();
 const i18n = useI18nStore();
 const router = useRouter();
 const { availableLocales, locale, t } = useI18n();
 
-const props = defineProps<{
-  environment: string;
-}>();
-
 const search = ref<string>("");
 
-const environmentName = computed<string>(() => props.environment.toLowerCase());
 const otherLocales = computed<Locale[]>(() => {
   const otherLocales = new Set<string>(availableLocales.filter((item) => item !== locale.value));
   return orderBy(
@@ -34,9 +30,9 @@ const otherLocales = computed<Locale[]>(() => {
     "nativeName"
   );
 });
-const swaggerUrl = computed<string | undefined>(() => (environmentName.value === "development" ? combineURL(apiBaseUrl, "/swagger") : undefined));
+const swaggerUrl = computed<string | undefined>(() => (environment === "development" ? combineURL(apiBaseUrl, "/swagger") : undefined));
 const graphQLLinks = computed<Hyperlink[]>(() =>
-  environmentName.value === "development"
+  environment === "development"
     ? [
         { text: "Altair", url: combineURL(apiBaseUrl, "/ui/altair") },
         { text: "GraphiQL", url: combineURL(apiBaseUrl, "/ui/graphiql") },
@@ -77,7 +73,7 @@ watchEffect(() => {
       <RouterLink :to="{ name: 'Dashboard' }" class="navbar-brand">
         <img src="@/assets/img/logo.png" :alt="`${t('brand')} Logo`" height="32" />
         {{ t("brand") }}
-        <span v-if="environmentName !== 'production'" class="badge text-bg-warning">{{ environmentName }}</span>
+        <span v-if="environment !== 'production'" class="badge text-bg-warning">{{ environment }}</span>
       </RouterLink>
       <button
         class="navbar-toggler"

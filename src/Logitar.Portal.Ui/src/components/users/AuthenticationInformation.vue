@@ -45,8 +45,6 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
         currentPassword: current.value,
         newPassword: password.value,
       },
-      customAttributes: [],
-      roles: [],
     });
     resetForm();
     emit("profile-updated", { toast: false, user });
@@ -55,7 +53,7 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
     reset();
     currentRef.value?.focus();
     const { data, status } = e as ApiError;
-    if (status === 400 && (data as ErrorDetail)?.code === "InvalidCredentials") {
+    if (status === 400 && (data as ErrorDetail)?.errorCode === "InvalidCredentials") {
       invalidCredentials.value = true;
     } else {
       handleError(e);
@@ -68,12 +66,12 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
   <div>
     <form @submit.prevent="onSubmit">
       <UsernameInput disabled :model-value="user.uniqueName" />
-      <template v-if="user.passwordChangedOn">
+      <template v-if="user.hasPassword">
         <h5>{{ t("users.password.label") }}</h5>
         <app-alert dismissible variant="warning" v-model="invalidCredentials">
           <strong>{{ t("users.password.changeFailed") }}</strong> {{ t("users.password.invalidCredentials") }}
         </app-alert>
-        <p>{{ t("users.password.changedOn", { date: d(user.passwordChangedOn, "medium") }) }}</p>
+        <p v-if="user.passwordChangedOn">{{ t("users.password.changedOn", { date: d(user.passwordChangedOn, "medium") }) }}</p>
         <PasswordInput
           id="current"
           label="users.password.current.label"

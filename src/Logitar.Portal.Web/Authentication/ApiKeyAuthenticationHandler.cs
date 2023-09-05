@@ -1,5 +1,5 @@
 ﻿using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;

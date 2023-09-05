@@ -43,6 +43,7 @@ internal class SignInCommandHandler : IRequestHandler<SignInCommand, Session>
 
     UserAggregate user = await _userRepository.LoadAsync(realm?.Id.Value, payload.UniqueName, cancellationToken)
       ?? throw new UserNotFoundException(realm, payload.UniqueName);
+    // TODO(fpion): sign-in by email address if it is unique in the realm
 
     IUserSettings userSettings = realm?.UserSettings ?? _applicationContext.Configuration.UserSettings;
 

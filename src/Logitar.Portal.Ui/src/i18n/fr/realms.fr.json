@@ -1,14 +1,14 @@
 {
   "claimMappings": {
     "empty": "Il n’y a aucune association de revendication.",
-    "title": "Associations de revendications",
-    "type": {
+    "name": {
       "label": "Nom",
       "placeholder": "Entrez le nom de la revendication"
     },
-    "valueType": {
+    "title": "Associations de revendications",
+    "type": {
       "label": "Type",
-      "placeholder": "Sélectionnez un type de valeur de revendication"
+      "placeholder": "Sélectionnez un type de revendication"
     }
   },
   "created": "Le royaume a été créé.",
@@ -35,7 +35,7 @@
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",
-      "UniqueName": "Nom unique",
+      "UniqueSlug": "Alias unique",
       "UpdatedOn": "Dernière modification"
     }
   },
@@ -43,8 +43,8 @@
     "list": "Royaumes",
     "new": "Nouveau royaume"
   },
-  "uniqueName": {
-    "label": "Nom unique (alias/slug)",
+  "uniqueSlug": {
+    "label": "Alias unique",
     "placeholder": "Entrez un alias (slug) unique"
   },
   "updated": "Le royaume a été enregistré.",

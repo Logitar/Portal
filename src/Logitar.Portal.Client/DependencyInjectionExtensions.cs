@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Realms;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 namespace Logitar.Portal.Client;
@@ -19,6 +20,7 @@ public static class DependencyInjectionExtensions
 
     return services
       .AddHttpClient()
-      .AddTransient<IConfigurationService, ConfigurationClient>();
+      .AddTransient<IConfigurationService, ConfigurationClient>()
+      .AddTransient<IRealmService, RealmClient>();
   }
 }

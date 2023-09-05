@@ -3,12 +3,13 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import type { Realm } from "@/types/realms";
-import type { SearchParameters } from "@/types/api";
+import type { RealmSort, SearchRealmsPayload } from "@/types/realms/payloads";
 import type { SelectOption, ToastUtils } from "@/types/components";
+import { deleteRealm, searchRealms } from "@/api/realms";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
-import { deleteRealm, searchRealms } from "@/api/realms";
+
 const { rt, t, tm } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -34,15 +35,15 @@ const sortOptions = computed<SelectOption[]>(() =>
 );
 
 async function refresh(): Promise<void> {
-  const parameters: SearchParameters = {
+  const parameters: SearchRealmsPayload = {
     search: {
       terms: search.value
         .split(" ")
         .filter((term) => Boolean(term))
         .map((term) => ({ value: `%${term}%` })),
-      operator: "AND",
+      operator: "And",
     },
-    sort: sort.value ? [{ field: sort.value, isDescending: isDescending.value }] : [],
+    sort: sort.value ? [{ field: sort.value as RealmSort, isDescending: isDescending.value }] : [],
     skip: (page.value - 1) * count.value,
     limit: count.value,
   };
@@ -146,7 +147,7 @@ watch(
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ t("realms.sort.options.UniqueName") }}</th>
+            <th scope="col">{{ t("realms.sort.options.UniqueSlug") }}</th>
             <th scope="col">{{ t("realms.sort.options.DisplayName") }}</th>
             <th scope="col">{{ t("realms.sort.options.UpdatedOn") }}</th>
             <th scope="col"></th>
@@ -155,7 +156,7 @@ watch(
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <RouterLink :to="{ name: 'RealmEdit', params: { id: realm.id } }">{{ realm.uniqueSlug }}</RouterLink>
+              <RouterLink :to="{ name: 'RealmEdit', params: { uniqueSlug: realm.uniqueSlug } }">{{ realm.uniqueSlug }}</RouterLink>
             </td>
             <td>{{ realm.displayName ?? "—" }}</td>
             <td><status-block :actor="realm.updatedBy" :date="realm.updatedOn" /></td>

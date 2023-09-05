@@ -252,7 +252,12 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.True(user.Version >= 1);
 
     Assert.Equal(payload.UniqueName, user.UniqueName);
-    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.True(user.HasPassword);
+    Assert.Equal(Actor, user.PasswordChangedBy);
+    AssertIsNear(user.PasswordChangedOn);
+    Assert.Equal(Actor, user.DisabledBy);
+    AssertIsNear(user.DisabledOn);
+    Assert.True(user.IsDisabled);
     AssertEqual(payload.Address, user.Address);
     AssertEqual(payload.Email, user.Email);
     AssertEqual(payload.Phone, user.Phone);
@@ -507,7 +512,12 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.True(user.Version > version);
 
     Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
-    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.True(user.HasPassword);
+    Assert.Equal(Actor, user.PasswordChangedBy);
+    AssertIsNear(user.PasswordChangedOn);
+    Assert.Equal(Actor, user.DisabledBy);
+    AssertIsNear(user.DisabledOn);
+    Assert.True(user.IsDisabled);
     Assert.NotNull(user.Address);
     Assert.Equal(payload.Address.Street, user.Address.Street);
     Assert.Equal(payload.Address.Locality, user.Address.Locality);
@@ -961,7 +971,12 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.True(user.Version > 1);
 
     Assert.Equal(payload.UniqueName.Trim(), user.UniqueName);
-    Assert.Equal(payload.IsDisabled, user.IsDisabled);
+    Assert.True(user.HasPassword);
+    Assert.Equal(Actor, user.PasswordChangedBy);
+    AssertIsNear(user.PasswordChangedOn);
+    Assert.Null(user.DisabledBy);
+    Assert.Null(user.DisabledOn);
+    Assert.False(user.IsDisabled);
     Assert.Equal(payload.MiddleName.Value?.Trim(), user.MiddleName);
     Assert.Equal(payload.Nickname.Value?.Trim(), user.Nickname);
 

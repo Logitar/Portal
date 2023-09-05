@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.GraphQL;
@@ -84,7 +85,7 @@ internal class Startup : StartupBase
     builder.UseAuthentication();
     builder.UseAuthorization();
 
-    builder.UseGraphQL<PortalSchema>();
+    builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(Schemes.All));
 
     if (builder is WebApplication application)
     {

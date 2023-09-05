@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web.Middlewares;
@@ -16,7 +17,7 @@ public class RenewSession
   {
     if (!context.GetSessionId().HasValue)
     {
-      if (context.Request.Cookies.TryGetValue(Constants.Cookies.RefreshToken, out string? refreshToken) && refreshToken != null)
+      if (context.Request.Cookies.TryGetValue(Cookies.RefreshToken, out string? refreshToken) && refreshToken != null)
       {
         try
         {
@@ -30,7 +31,7 @@ public class RenewSession
         }
         catch (Exception)
         {
-          context.Response.Cookies.Delete(Constants.Cookies.RefreshToken);
+          context.Response.Cookies.Delete(Cookies.RefreshToken);
         }
       }
     }

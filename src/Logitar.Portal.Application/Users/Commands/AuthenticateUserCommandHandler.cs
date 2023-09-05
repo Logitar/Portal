@@ -36,6 +36,7 @@ internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUser
 
     UserAggregate user = await _userRepository.LoadAsync(tenantId, payload.UniqueName, cancellationToken)
       ?? throw new UserNotFoundException(realm, payload.UniqueName);
+    // TODO(fpion): sign-in by email address if it is unique in the realm
     _ = user.SignIn(userSettings, payload.Password, actorId: _applicationContext.ActorId);
 
     await _userRepository.SaveAsync(user, cancellationToken);

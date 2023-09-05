@@ -1,9 +1,5 @@
 {
   "address": {
-    "additional": {
-      "label": "Additional Information",
-      "placeholder": "Enter additional information, if necessary (e.g. P.O. Box #4321)"
-    },
     "country": {
       "label": "Country",
       "placeholder": "Select your country"
@@ -40,9 +36,9 @@
   "gender": {
     "label": "Gender",
     "options": {
-      "Female": "Female",
-      "Male": "Male",
-      "Other": "Other"
+      "female": "Female",
+      "male": "Male",
+      "other": "Other"
     },
     "placeholder": "Select your gender"
   },

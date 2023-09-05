@@ -143,7 +143,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should replace the configuration.")]
-  public async Task UpdateAsync_it_should_replace_the_configuration()
+  public async Task ReplaceAsync_it_should_replace_the_configuration()
   {
     await InitializeConfigurationAsync();
 

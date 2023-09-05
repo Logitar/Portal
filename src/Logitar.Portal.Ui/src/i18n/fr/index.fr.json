@@ -63,7 +63,6 @@
     "label": "Recherche",
     "placeholder": "Entrez quelque chose à chercher"
   },
-  "settings": "Paramètres",
   "slug": {
     "label": "Alias (slug)",
     "placeholder": "Entrez un alias (slug)"

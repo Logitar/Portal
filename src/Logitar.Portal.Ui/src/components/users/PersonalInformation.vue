@@ -36,8 +36,8 @@ const hasChanges = computed<boolean>(() => {
     return false;
   }
   return (
-    firstName.value !== user.firstName ||
-    lastName.value !== user.lastName ||
+    firstName.value !== (user.firstName ?? "") ||
+    lastName.value !== (user.lastName ?? "") ||
     middleName.value !== (user.middleName ?? "") ||
     nickname.value !== (user.nickname ?? "") ||
     birthdate.value?.getTime() !== (user.birthdate ? new Date(user.birthdate) : undefined)?.getTime() ||
@@ -84,8 +84,6 @@ const onSubmit = handleSubmit(async () => {
       picture: picture.value !== reference.picture ? { value: picture.value } : undefined,
       profile: profile.value !== reference.profile ? { value: profile.value } : undefined,
       website: website.value !== reference.website ? { value: website.value } : undefined,
-      customAttributes: [],
-      roles: [],
     });
     emit("profile-updated", { user });
   } catch (e: unknown) {
@@ -101,8 +99,8 @@ const onSubmit = handleSubmit(async () => {
         <icon-submit :disabled="!hasChanges || isSubmitting" icon="fas fa-floppy-disk" :loading="isSubmitting" text="actions.save" />
       </div>
       <div class="row">
-        <PersonNameInput class="col-lg-6" required type="first" validate v-model="firstName" />
-        <PersonNameInput class="col-lg-6" required type="last" validate v-model="lastName" />
+        <PersonNameInput class="col-lg-6" type="first" validate v-model="firstName" />
+        <PersonNameInput class="col-lg-6" type="last" validate v-model="lastName" />
       </div>
       <div class="row">
         <PersonNameInput class="col-lg-6" type="middle" validate v-model="middleName" />
@@ -113,7 +111,7 @@ const onSubmit = handleSubmit(async () => {
         <GenderSelect class="col-lg-6" v-model="gender" />
       </div>
       <div class="row">
-        <locale-select class="col-lg-6" placeholder="users.locale.placeholder" required v-model="locale" />
+        <locale-select class="col-lg-6" placeholder="users.locale.placeholder" v-model="locale" />
         <TimeZoneSelect class="col-lg-6" v-model="timeZone" />
       </div>
       <PictureInput v-model="picture" />

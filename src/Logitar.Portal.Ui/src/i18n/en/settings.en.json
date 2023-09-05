@@ -21,6 +21,7 @@
     },
     "title": "Password"
   },
+  "title": "Settings",
   "uniqueName": {
     "allowedCharacters": {
       "label": "Allowed Characters",
