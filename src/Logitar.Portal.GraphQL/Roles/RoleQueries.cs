@@ -15,7 +15,7 @@ internal static class RoleQueries
       .Description("Retrieves a single role.")
       .Arguments(
         new QueryArgument<IdGraphType>() { Name = "id", Description = "The unique identifier of the role." },
-        new QueryArgument<StringGraphType>() { Name = "realm", Description = "The unique identifier or unique name of the role." },
+        new QueryArgument<StringGraphType>() { Name = "realm", Description = "The unique identifier or unique name of the realm in which the role resides." },
         new QueryArgument<StringGraphType>() { Name = "uniqueName", Description = "The unique name of the role." }
       )
       .ResolveAsync(async context => await context.GetQueryService<IRoleService, object?>().ReadAsync(
