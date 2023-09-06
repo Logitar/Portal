@@ -1,6 +1,10 @@
-﻿using Logitar.Portal.Contracts.Configurations;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Tokens;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 namespace Logitar.Portal.Client;
@@ -21,8 +25,12 @@ public static class DependencyInjectionExtensions
 
     return services
       .AddHttpClient()
+      .AddTransient<IApiKeyService, ApiKeyClient>()
       .AddTransient<IConfigurationService, ConfigurationClient>()
       .AddTransient<IRealmService, RealmClient>()
-      .AddTransient<IRoleService, RoleClient>();
+      .AddTransient<IRoleService, RoleClient>()
+      .AddTransient<ISessionService, SessionClient>()
+      .AddTransient<ITokenService, TokenClient>()
+      .AddTransient<IUserService, UserClient>();
   }
 }
