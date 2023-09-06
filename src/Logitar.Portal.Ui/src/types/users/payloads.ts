@@ -21,7 +21,7 @@ export type CreateUserPayload = {
   realm?: string;
   uniqueName: string;
   password?: string;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   address?: AddressPayload;
   email?: EmailPayload;
   phone?: PhonePayload;
@@ -36,8 +36,8 @@ export type CreateUserPayload = {
   picture?: string;
   profile?: string;
   website?: string;
-  customAttributes: CustomAttribute[];
-  roles: string[];
+  customAttributes?: CustomAttribute[];
+  roles?: string[];
 };
 
 export type EmailPayload = {

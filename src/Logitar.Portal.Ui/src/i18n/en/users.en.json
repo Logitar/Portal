@@ -35,6 +35,7 @@
   },
   "disable": "Disable",
   "disabled": "The user has been disabled.",
+  "disabledFormat": "Disabled on {date} by",
   "email": {
     "address": {
       "label": "Email Address",
@@ -56,6 +57,14 @@
   },
   "identifiers": {
     "title": "Identifiers"
+  },
+  "isConfirmed": {
+    "label": "Is confirmed",
+    "placeholder": "Select an option"
+  },
+  "isDisabled": {
+    "label": "Is disabled",
+    "placeholder": "Select an option"
   },
   "locale": {
     "placeholder": "Select your preferred communication language"
@@ -79,13 +88,17 @@
       "placeholder": "Enter your nickname"
     },
     "user": {
+      "alreadyUsed": {
+        "help": "Please enter a different username.",
+        "lead": "The username is already used."
+      },
       "label": "Username",
       "placeholder": "Enter your username"
     }
   },
   "password": {
     "changeFailed": "Password change failed!",
-    "changed": "Your password has been changed.",
+    "changed": "The user's password has been changed.",
     "changedOn": "Last changed on {date}",
     "confirm": {
       "label": "Password Confirmation",
@@ -102,7 +115,8 @@
       "placeholder": "Enter a new password"
     },
     "placeholder": "Enter your password",
-    "submit": "Change password"
+    "submit": "Change password",
+    "warning": "Avoid changing an user's password without its consent."
   },
   "phone": {
     "countryCode": {
@@ -128,6 +142,7 @@
   },
   "profile": {
     "label": "Profile URL",
+    "passwordChanged": "Your password has been changed.",
     "placeholder": "Paste the URL to your profile",
     "title": "Profile",
     "updated": "Your profile has been updated."

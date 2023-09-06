@@ -109,10 +109,7 @@ async function toggleDisabled(user: User): Promise<void> {
       const updatedUser = await updateUser(user.id, {
         isDisabled: !user.isDisabled,
       });
-      // const index = users.value.findIndex(({ id }) => id === updatedUser.id);
-      // if (index >= 0) {
-      //   users.value = users.value.splice(index, 1, updatedUser);
-      // }
+      await refresh();
       toasts.success(`users.${updatedUser.isDisabled ? "disabled" : "enabled"}`);
     } catch (e: unknown) {
       handleError(e);
@@ -172,8 +169,22 @@ watch(
       </div>
       <div class="row">
         <RealmSelect class="col-lg-4" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
-        <!-- TODO(fpion): isConfirmed -->
-        <!-- TODO(fpion): isDisabled -->
+        <yes-no-select
+          class="col-lg-4"
+          id="isConfirmed"
+          label="users.isConfirmed.label"
+          placeholder="users.isConfirmed.placeholder"
+          :model-value="isConfirmed"
+          @update:model-value="setQuery('isConfirmed', $event)"
+        />
+        <yes-no-select
+          class="col-lg-4"
+          id="isDisabled"
+          label="users.isDisabled.label"
+          placeholder="users.isDisabled.placeholder"
+          :model-value="isDisabled"
+          @update:model-value="setQuery('isDisabled', $event)"
+        />
       </div>
       <div class="row">
         <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
@@ -236,7 +247,7 @@ watch(
                 @click="toggleDisabled(user)"
               />
               <icon-button
-                class="me-1"
+                class="ms-1"
                 :disabled="isLoading || account.authenticated?.id === user.id"
                 icon="trash"
                 text="actions.delete"

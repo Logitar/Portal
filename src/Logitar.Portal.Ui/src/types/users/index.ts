@@ -45,11 +45,6 @@ export type Phone = Contact & {
   e164Formatted: string;
 };
 
-export type ProfileUpdatedEvent = {
-  toast?: boolean;
-  user: User;
-};
-
 export type User = Aggregate & {
   id: string;
   uniqueName: string;
@@ -57,7 +52,7 @@ export type User = Aggregate & {
   passwordChangedBy?: Actor;
   passwordChangedOn?: string;
   disabledBy?: Actor;
-  disabledOn?: Date;
+  disabledOn?: string;
   isDisabled: boolean;
   authenticatedOn?: string;
   address?: Address;
@@ -80,4 +75,9 @@ export type User = Aggregate & {
   identifiers: Identifier[];
   roles: Role[];
   realm?: Realm;
+};
+
+export type UserUpdatedEvent = {
+  toast?: string;
+  user: User;
 };

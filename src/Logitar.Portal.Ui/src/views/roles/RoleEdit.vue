@@ -15,6 +15,7 @@ import { createRole, readRole, updateRole } from "@/api/roles";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
+import { readRealm } from "@/api/realms";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -51,7 +52,11 @@ const hasChanges = computed<boolean>(() => {
   );
 });
 const title = computed<string>(() => role.value?.displayName ?? role.value?.uniqueName ?? t("roles.title.new"));
-const uniqueNameSettings = computed<UniqueNameSettings>(() => realm.value?.uniqueNameSettings ?? configuration.value?.uniqueNameSettings ?? {});
+const uniqueNameSettings = computed<UniqueNameSettings>(
+  () =>
+    realm.value?.uniqueNameSettings ??
+    configuration.value?.uniqueNameSettings ?? { allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" }
+);
 
 function setModel(model: Role): void {
   role.value = model;
@@ -107,24 +112,22 @@ function onRealmSelected(selected?: Realm) {
 onMounted(async () => {
   try {
     configuration.value = await readConfiguration();
-  } catch (e: unknown) {
-    handleError(e);
-  }
-  if (route.query.realm?.toString()) {
-    realmId.value = route.query.realm?.toString();
-  }
-  const id = route.params.id?.toString();
-  if (id) {
-    try {
+    const id = route.params.id?.toString();
+    const realmIdQuery = route.query.realm?.toString();
+    if (id) {
       const role = await readRole(id);
       setModel(role);
-    } catch (e: unknown) {
-      const { status } = e as ApiError;
-      if (status === 404) {
-        router.push({ path: "/not-found" });
-      } else {
-        handleError(e);
-      }
+    } else if (realmIdQuery) {
+      const foundRealm = await readRealm(realmIdQuery);
+      realm.value = foundRealm;
+      realmId.value = foundRealm.id;
+    }
+  } catch (e: unknown) {
+    const { status } = e as ApiError;
+    if (status === 404) {
+      router.push({ path: "/not-found" });
+    } else {
+      handleError(e);
     }
   }
   registerTooltips();

@@ -538,12 +538,12 @@ public class UserAggregate : AggregateRoot
     }
     if (updated.Nickname != null)
     {
-      Nickname = updated.Nickname.Value;
+      _nickname = updated.Nickname.Value;
     }
 
     if (updated.Birthdate != null)
     {
-      Birthdate = updated.Birthdate.Value;
+      _birthdate = updated.Birthdate.Value;
     }
     if (updated.Gender != null)
     {

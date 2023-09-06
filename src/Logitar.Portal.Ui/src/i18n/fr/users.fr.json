@@ -35,6 +35,7 @@
   },
   "disable": "Désactiver",
   "disabled": "L’utilisateur a été désactivé.",
+  "disabledFormat": "Désactivé le {date} par",
   "email": {
     "address": {
       "label": "Adresse courriel",
@@ -56,6 +57,14 @@
   },
   "identifiers": {
     "title": "Identifiants"
+  },
+  "isConfirmed": {
+    "label": "Confirmé",
+    "placeholder": "Sélectionnez une option"
+  },
+  "isDisabled": {
+    "label": "Désactivé",
+    "placeholder": "Sélectionnez une option"
   },
   "locale": {
     "placeholder": "Sélectionnez votre langue de communication préférée"
@@ -79,13 +88,17 @@
       "placeholder": "Entrez votre surnom"
     },
     "user": {
+      "alreadyUsed": {
+        "help": "Veuillez entrer un nom d’utilisateur différent.",
+        "lead": "Le nom d’utilisateur est déjà utilisé."
+      },
       "label": "Nom d’utilisateur",
       "placeholder": "Entrez votre nom d’utilisateur"
     }
   },
   "password": {
     "changeFailed": "Modification du mot de passe échouée !",
-    "changed": "Votre mot de passe a été modifié.",
+    "changed": "Le mot de passe de l’utilisateur a été modifié.",
     "changedOn": "Dernière modification le {date}",
     "confirm": {
       "label": "Confirmation du mot de passe",
@@ -102,7 +115,8 @@
       "placeholder": "Entrez un nouveau mot de passe"
     },
     "placeholder": "Entrez votre mot de passe",
-    "submit": "Modifier"
+    "submit": "Modifier",
+    "warning": "Évitez de changer le mot de passe d’un utilisateur sans leur consentement."
   },
   "phone": {
     "countryCode": {
@@ -128,6 +142,7 @@
   },
   "profile": {
     "label": "Profil",
+    "passwordChanged": "Votre mot de passe a été modifié.",
     "placeholder": "Collez le lien (URL) vers votre profil",
     "title": "Profil",
     "updated": "Votre profil a été modifié."

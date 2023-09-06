@@ -29,6 +29,7 @@ import {
   faSearch,
   faTimes,
   faTrash,
+  faTriangleExclamation,
   faUser,
   faUserGroup,
   faVial,
@@ -61,6 +62,7 @@ library.add(
   faSearch,
   faTimes,
   faTrash,
+  faTriangleExclamation,
   faUser,
   faUserGroup,
   faVial

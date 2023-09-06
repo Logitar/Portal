@@ -42,8 +42,7 @@ const rules = computed<ValidationRules>(() => {
   if (props.validate) {
     if (props.confirm) {
       rules.confirmed = [props.confirm.value, t(props.confirm.label).toLowerCase()];
-    }
-    if (props.settings) {
+    } else if (props.settings) {
       const { requiredLength, requiredUniqueChars, requireNonAlphanumeric, requireLowercase, requireUppercase, requireDigit } = props.settings;
       if (requiredLength) {
         rules.min_length = requiredLength;
