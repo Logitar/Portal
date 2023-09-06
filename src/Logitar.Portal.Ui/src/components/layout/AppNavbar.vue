@@ -108,6 +108,9 @@ watchEffect(() => {
             <li class="nav-item">
               <RouterLink :to="{ name: 'RoleList' }" class="nav-link"> <font-awesome-icon icon="fas fa-user-group" /> {{ t("roles.title.list") }} </RouterLink>
             </li>
+            <li class="nav-item">
+              <RouterLink :to="{ name: 'UserList' }" class="nav-link"> <font-awesome-icon icon="fas fa-user" /> {{ t("users.title.list") }} </RouterLink>
+            </li>
           </template>
         </ul>
 

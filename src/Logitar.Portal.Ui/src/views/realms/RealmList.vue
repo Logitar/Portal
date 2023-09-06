@@ -72,7 +72,7 @@ async function onDelete(realm: Realm, hideModal: () => void): Promise<void> {
       await deleteRealm(realm.id);
       hideModal();
       toasts.success("realms.delete.success");
-    } catch (e) {
+    } catch (e: unknown) {
       handleError(e);
       return;
     } finally {

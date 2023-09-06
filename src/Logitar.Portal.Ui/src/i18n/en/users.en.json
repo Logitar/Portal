@@ -24,8 +24,17 @@
     "verified": "Verified"
   },
   "authenticatedOn": "Last signed-in on",
+  "authenticatedOnFormat": "Last signed-in on {date}",
   "birthdate": "Date of birth",
+  "created": "The user has been created.",
   "createdOn": "Created on",
+  "delete": {
+    "confirm": "Do you really want to delete the following user?",
+    "success": "The user has been deleted.",
+    "title": "Delete user"
+  },
+  "disable": "Disable",
+  "disabled": "The user has been disabled.",
   "email": {
     "address": {
       "label": "Email Address",
@@ -33,6 +42,9 @@
     },
     "verified": "Verified"
   },
+  "empty": "There are no results.",
+  "enable": "Enable",
+  "enabled": "The user has been enabled.",
   "gender": {
     "label": "Gender",
     "options": {
@@ -41,6 +53,9 @@
       "other": "Other"
     },
     "placeholder": "Select your gender"
+  },
+  "identifiers": {
+    "title": "Identifiers"
   },
   "locale": {
     "placeholder": "Select your preferred communication language"
@@ -127,6 +142,20 @@
   "signOut": {
     "title": "Sign Out"
   },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Last signed-in on",
+      "EmailAddress": "Email address",
+      "FullName": "Full name",
+      "PhoneNumber": "Phone number",
+      "UniqueName": "Unique name",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Users",
+    "new": "New user"
+  },
   "tabs": {
     "authentication": "Authentication Information",
     "contact": "Contact Information",
@@ -136,6 +165,7 @@
     "label": "Time Zone",
     "placeholder": "Select your time zone"
   },
+  "updated": "The user has been updated.",
   "updatedOn": "Last updated on",
   "usernameOrEmailPlaceholder": "Enter your email address or username",
   "website": {

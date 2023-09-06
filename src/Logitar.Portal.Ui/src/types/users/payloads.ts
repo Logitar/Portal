@@ -1,6 +1,7 @@
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { Modification } from "@/types/modifications";
 import type { RoleModification } from "@/types/roles";
+import type { SearchPayload, SortOption } from "@/types/search";
 
 export type AddressPayload = {
   street: string;
@@ -36,7 +37,7 @@ export type CreateUserPayload = {
   profile?: string;
   website?: string;
   customAttributes: CustomAttribute[];
-  roles?: string[];
+  roles: string[];
 };
 
 export type EmailPayload = {
@@ -49,6 +50,14 @@ export type PhonePayload = {
   number: string;
   extension?: string;
   isVerified: boolean;
+};
+
+export type SearchUsersPayload = SearchPayload & {
+  realm?: string;
+  hasPassword?: boolean;
+  isConfirmed?: boolean;
+  isDisabled?: boolean;
+  sort: UserSortOption[];
 };
 
 export type SignInPayload = {
@@ -77,4 +86,23 @@ export type UpdateUserPayload = {
   website?: Modification<string>;
   customAttributes?: CustomAttributeModification[];
   roles?: RoleModification[];
+};
+
+export type UserSort =
+  | "AuthenticatedOn"
+  | "Birthdate"
+  | "DisabledOn"
+  | "EmailAddress"
+  | "FirstName"
+  | "FullName"
+  | "LastName"
+  | "MiddleName"
+  | "Nickname"
+  | "PasswordChangedOn"
+  | "PhoneNumber"
+  | "UniqueName"
+  | "UpdatedOn";
+
+export type UserSortOption = SortOption & {
+  field: UserSort;
 };

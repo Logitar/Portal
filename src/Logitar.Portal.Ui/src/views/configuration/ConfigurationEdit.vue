@@ -91,7 +91,7 @@ onMounted(async () => {
     const configuration = configurationStore.configuration ?? (await readConfiguration());
     configurationStore.configuration = undefined;
     setModel(configuration);
-  } catch (e) {
+  } catch (e: unknown) {
     handleError(e);
   }
 });
