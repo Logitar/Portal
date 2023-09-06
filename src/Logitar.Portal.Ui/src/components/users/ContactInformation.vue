@@ -121,19 +121,19 @@ function clearAddress(): void {
     <div class="mb-3">
       <icon-submit :disabled="!hasChanges || isSubmitting" icon="fas fa-floppy-disk" :loading="isSubmitting" text="actions.save" />
     </div>
-    <EmailAddressInput :disabled="user.email?.isVerified" validate :verified="user.email?.isVerified" v-model="email.address" />
+    <EmailAddressInput :disabled="isProfile && user.email?.isVerified" validate :verified="user.email?.isVerified" v-model="email.address" />
     <div class="row">
       <PhoneNumberInput
         class="col-lg-6"
         :country-code="phone.countryCode"
-        :disabled="user.phone?.isVerified"
+        :disabled="isProfile && user.phone?.isVerified"
         ref="phoneNumberRef"
         :required="Boolean(phone.extension)"
         :verified="user.phone?.isVerified"
         v-model="phone.number"
         @country-code="phone.countryCode = $event"
       />
-      <PhoneExtensionInput class="col-lg-6" :disabled="user.phone?.isVerified" validate v-model="phone.extension" />
+      <PhoneExtensionInput class="col-lg-6" :disabled="isProfile && user.phone?.isVerified" validate v-model="phone.extension" />
     </div>
     <h5>
       {{ t("users.address.title") }}
@@ -141,20 +141,26 @@ function clearAddress(): void {
         <app-badge>{{ t("users.address.verified") }}</app-badge>
       </template>
     </h5>
-    <AddressStreetTextarea :disabled="user.address?.isVerified" :required="isAddressRequired" validate v-model="address.street" />
+    <AddressStreetTextarea :disabled="isProfile && user.address?.isVerified" :required="isAddressRequired" validate v-model="address.street" />
     <div class="row">
-      <AddressLocalityInput class="col-lg-6" :disabled="user.address?.isVerified" :required="isAddressRequired" validate v-model="address.locality" />
-      <PostalCodeInput class="col-lg-6" :country="selectedCountry" :disabled="user.address?.isVerified" validate v-model="address.postalCode" />
+      <AddressLocalityInput
+        class="col-lg-6"
+        :disabled="isProfile && user.address?.isVerified"
+        :required="isAddressRequired"
+        validate
+        v-model="address.locality"
+      />
+      <PostalCodeInput class="col-lg-6" :country="selectedCountry" :disabled="isProfile && user.address?.isVerified" validate v-model="address.postalCode" />
     </div>
     <div class="row">
       <CountrySelect
         class="col-lg-6"
-        :disabled="user.address?.isVerified"
+        :disabled="isProfile && user.address?.isVerified"
         :required="isAddressRequired"
         v-model="address.country"
         @country-selected="selectedCountry = $event"
       />
-      <RegionSelect class="col-lg-6" :country="selectedCountry" :disabled="user.address?.isVerified" v-model="address.region" />
+      <RegionSelect class="col-lg-6" :country="selectedCountry" :disabled="isProfile && user.address?.isVerified" v-model="address.region" />
     </div>
     <icon-button
       v-if="user.address?.isVerified !== true"
