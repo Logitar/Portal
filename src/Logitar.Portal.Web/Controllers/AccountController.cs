@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
+using Logitar.Portal.Web.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,7 +44,7 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<User>> SignInAsync([FromBody] Models.Account.SignInPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<User>> SignInAsync([FromBody] PortalSignInPayload payload, CancellationToken cancellationToken)
   {
     SignInPayload signInPayload = new()
     {

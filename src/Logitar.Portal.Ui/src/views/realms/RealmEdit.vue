@@ -13,7 +13,7 @@ import type { ClaimMappingModification } from "@/types/realms/payloads";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
-import { createRealm, readRealm, updateRealm } from "@/api/realms";
+import { createRealm, readRealmByUniqueSlug, updateRealm } from "@/api/realms";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 
@@ -176,7 +176,7 @@ onMounted(async () => {
   const uniqueSlug = route.params.uniqueSlug?.toString();
   if (uniqueSlug) {
     try {
-      const realm = await readRealm(uniqueSlug);
+      const realm = await readRealmByUniqueSlug(uniqueSlug);
       setModel(realm);
     } catch (e: unknown) {
       const { status } = e as ApiError;

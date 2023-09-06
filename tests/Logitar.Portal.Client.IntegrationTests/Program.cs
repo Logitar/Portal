@@ -1,7 +1,11 @@
 ﻿using Bogus;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Tokens;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,7 +44,7 @@ internal class Program
     Console.WriteLine();
 
     CancellationToken cancellationToken = default;
-    TestContext context = new(count: 1 + 7 + 8 + 1);
+    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 1);
     context.Start();
 
     if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
@@ -63,8 +67,41 @@ internal class Program
       return;
     }
 
-    await realmTests.DeleteAsync(cancellationToken); // 1 test
+    UserClientTests userTests = new(context, _faker, serviceProvider.GetRequiredService<IUserService>()); // 12 tests
+    if (!await userTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
 
+    SessionClientTests sessionTests = new(context, _faker, serviceProvider.GetRequiredService<ISessionService>()); // 7 tests
+    if (!await sessionTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    if (!await userTests.SignOutAsync(cancellationToken)) // 1 test
+    {
+      context.End();
+      return;
+    }
+
+    ApiKeyClientTests apiKeyTests = new(context, _faker, serviceProvider.GetRequiredService<IApiKeyService>()); // 8 tests
+    if (!await apiKeyTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    TokenClientTests tokenTests = new(context, _faker, serviceProvider.GetRequiredService<ITokenService>()); // 2 tests
+    if (!await tokenTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    await realmTests.DeleteAsync(cancellationToken); // 1 test
     context.End();
   }
 

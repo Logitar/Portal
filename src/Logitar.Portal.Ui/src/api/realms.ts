@@ -11,7 +11,11 @@ export async function deleteRealm(id: string): Promise<Realm> {
   return (await _delete<Realm>(`/api/realms/${id}`)).data;
 }
 
-export async function readRealm(uniqueSlug: string): Promise<Realm> {
+export async function readRealm(id: string): Promise<Realm> {
+  return (await get<Realm>(`/api/realms/${id}`)).data;
+}
+
+export async function readRealmByUniqueSlug(uniqueSlug: string): Promise<Realm> {
   return (await get<Realm>(`/api/realms/unique-slug:${uniqueSlug}`)).data;
 }
 
@@ -22,6 +26,18 @@ query($payload: SearchRealmsPayload!) {
       id
       uniqueSlug
       displayName
+      uniqueNameSettings {
+        allowedCharacters
+      }
+      passwordSettings {
+        requiredLength
+        requiredUniqueChars
+        requireNonAlphanumeric
+        requireLowercase
+        requireUppercase
+        requireDigit
+        strategy
+      }
       updatedBy {
         id
         type

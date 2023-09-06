@@ -68,6 +68,7 @@ function onModelValueUpdate(id: string): void {
     :id="id"
     :label="label"
     :model-value="modelValue"
+    :no-state="!required"
     :options="options"
     :placeholder="placeholder"
     :required="required"

@@ -24,8 +24,18 @@
     "verified": "Vérifiée"
   },
   "authenticatedOn": "Dernière connexion",
+  "authenticatedOnFormat": "Dernière connexion le {date}",
   "birthdate": "Date de naissance",
+  "created": "L’utilisateur a été créé.",
   "createdOn": "Création",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer l’utilisateur suivant ?",
+    "success": "L’utilisateur a été supprimé.",
+    "title": "Supprimer l’utilisateur"
+  },
+  "disable": "Désactiver",
+  "disabled": "L’utilisateur a été désactivé.",
+  "disabledFormat": "Désactivé le {date} par",
   "email": {
     "address": {
       "label": "Adresse courriel",
@@ -33,6 +43,9 @@
     },
     "verified": "Vérifiée"
   },
+  "empty": "Il n’y a aucun résultat.",
+  "enable": "Activer",
+  "enabled": "L’utilisateur a été activé.",
   "gender": {
     "label": "Genre",
     "options": {
@@ -41,6 +54,17 @@
       "other": "Autre"
     },
     "placeholder": "Sélectionnez votre genre"
+  },
+  "identifiers": {
+    "title": "Identifiants"
+  },
+  "isConfirmed": {
+    "label": "Confirmé",
+    "placeholder": "Sélectionnez une option"
+  },
+  "isDisabled": {
+    "label": "Désactivé",
+    "placeholder": "Sélectionnez une option"
   },
   "locale": {
     "placeholder": "Sélectionnez votre langue de communication préférée"
@@ -64,13 +88,17 @@
       "placeholder": "Entrez votre surnom"
     },
     "user": {
+      "alreadyUsed": {
+        "help": "Veuillez entrer un nom d’utilisateur différent.",
+        "lead": "Le nom d’utilisateur est déjà utilisé."
+      },
       "label": "Nom d’utilisateur",
       "placeholder": "Entrez votre nom d’utilisateur"
     }
   },
   "password": {
     "changeFailed": "Modification du mot de passe échouée !",
-    "changed": "Votre mot de passe a été modifié.",
+    "changed": "Le mot de passe de l’utilisateur a été modifié.",
     "changedOn": "Dernière modification le {date}",
     "confirm": {
       "label": "Confirmation du mot de passe",
@@ -87,7 +115,8 @@
       "placeholder": "Entrez un nouveau mot de passe"
     },
     "placeholder": "Entrez votre mot de passe",
-    "submit": "Modifier"
+    "submit": "Modifier",
+    "warning": "Évitez de changer le mot de passe d’un utilisateur sans leur consentement."
   },
   "phone": {
     "countryCode": {
@@ -113,6 +142,7 @@
   },
   "profile": {
     "label": "Profil",
+    "passwordChanged": "Votre mot de passe a été modifié.",
     "placeholder": "Collez le lien (URL) vers votre profil",
     "title": "Profil",
     "updated": "Votre profil a été modifié."
@@ -127,6 +157,16 @@
   "signOut": {
     "title": "Déconnexion"
   },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Dernière authentification",
+      "EmailAddress": "Adresse courriel",
+      "FullName": "Nom complet",
+      "PhoneNumber": "Téléphone",
+      "UniqueName": "Nom unique",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
   "tabs": {
     "authentication": "Informations d’authentification",
     "contact": "Informations de contact",
@@ -136,6 +176,11 @@
     "label": "Fuseau horaire",
     "placeholder": "Sélectionnez votre fuseau horaire"
   },
+  "title": {
+    "list": "Utilisateurs",
+    "new": "Nouvel utilisateur"
+  },
+  "updated": "L’utilisateur a été enregistré.",
   "updatedOn": "Dernière modification",
   "usernameOrEmailPlaceholder": "Entrez votre adresse courriel ou nom d’utilisateur",
   "website": {

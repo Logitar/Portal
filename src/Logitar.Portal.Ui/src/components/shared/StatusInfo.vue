@@ -11,6 +11,10 @@ const props = defineProps<{
   format: string;
 }>();
 
+const displayName = computed<string>(() => {
+  const { displayName, type } = props.actor;
+  return type === "System" ? t("system") : displayName;
+});
 const href = computed<string | undefined>(() => {
   const { id, isDeleted, type } = props.actor;
   if (!isDeleted) {
@@ -41,12 +45,12 @@ const variant = computed<string | undefined>(() => (props.actor.type === "ApiKey
   <span>
     {{ t(format, { date: d(date, "medium") }) }}
     <template v-if="actor.type === 'System' || actor.isDeleted">
-      <app-avatar :display-name="actor.displayName" :email-address="actor.emailAddress" :icon="icon" :size="24" :url="actor.picture" :variant="variant" />
-      {{ actor.displayName }}
+      <app-avatar :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :size="24" :url="actor.picture" :variant="variant" />
+      {{ displayName }}
     </template>
     <a v-else :href="href" target="_blank">
-      <app-avatar :display-name="actor.displayName" :email-address="actor.emailAddress" :icon="icon" :size="24" :url="actor.picture" :variant="variant" />
-      {{ actor.displayName }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
+      <app-avatar :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :size="24" :url="actor.picture" :variant="variant" />
+      {{ displayName }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
     </a>
   </span>
 </template>

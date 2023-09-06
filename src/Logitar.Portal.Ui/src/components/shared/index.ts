@@ -27,6 +27,7 @@ import StatusBlock from "./StatusBlock.vue";
 import StatusDetail from "./StatusDetail.vue";
 import UniqueNameInput from "./UniqueNameInput.vue";
 import UrlInput from "./UrlInput.vue";
+import YesNoSelect from "./YesNoSelect.vue";
 
 export default function (app: App) {
   app.component("app-alert", AppAlert);
@@ -56,4 +57,5 @@ export default function (app: App) {
   app.component("status-detail", StatusDetail);
   app.component("unique-name-input", UniqueNameInput);
   app.component("url-input", UrlInput);
+  app.component("yes-no-select", YesNoSelect);
 }

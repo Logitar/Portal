@@ -24,8 +24,18 @@
     "verified": "Verified"
   },
   "authenticatedOn": "Last signed-in on",
+  "authenticatedOnFormat": "Last signed-in on {date}",
   "birthdate": "Date of birth",
+  "created": "The user has been created.",
   "createdOn": "Created on",
+  "delete": {
+    "confirm": "Do you really want to delete the following user?",
+    "success": "The user has been deleted.",
+    "title": "Delete user"
+  },
+  "disable": "Disable",
+  "disabled": "The user has been disabled.",
+  "disabledFormat": "Disabled on {date} by",
   "email": {
     "address": {
       "label": "Email Address",
@@ -33,6 +43,9 @@
     },
     "verified": "Verified"
   },
+  "empty": "There are no results.",
+  "enable": "Enable",
+  "enabled": "The user has been enabled.",
   "gender": {
     "label": "Gender",
     "options": {
@@ -41,6 +54,17 @@
       "other": "Other"
     },
     "placeholder": "Select your gender"
+  },
+  "identifiers": {
+    "title": "Identifiers"
+  },
+  "isConfirmed": {
+    "label": "Is confirmed",
+    "placeholder": "Select an option"
+  },
+  "isDisabled": {
+    "label": "Is disabled",
+    "placeholder": "Select an option"
   },
   "locale": {
     "placeholder": "Select your preferred communication language"
@@ -64,13 +88,17 @@
       "placeholder": "Enter your nickname"
     },
     "user": {
+      "alreadyUsed": {
+        "help": "Please enter a different username.",
+        "lead": "The username is already used."
+      },
       "label": "Username",
       "placeholder": "Enter your username"
     }
   },
   "password": {
     "changeFailed": "Password change failed!",
-    "changed": "Your password has been changed.",
+    "changed": "The user's password has been changed.",
     "changedOn": "Last changed on {date}",
     "confirm": {
       "label": "Password Confirmation",
@@ -87,7 +115,8 @@
       "placeholder": "Enter a new password"
     },
     "placeholder": "Enter your password",
-    "submit": "Change password"
+    "submit": "Change password",
+    "warning": "Avoid changing an user's password without its consent."
   },
   "phone": {
     "countryCode": {
@@ -113,6 +142,7 @@
   },
   "profile": {
     "label": "Profile URL",
+    "passwordChanged": "Your password has been changed.",
     "placeholder": "Paste the URL to your profile",
     "title": "Profile",
     "updated": "Your profile has been updated."
@@ -127,6 +157,20 @@
   "signOut": {
     "title": "Sign Out"
   },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Last signed-in on",
+      "EmailAddress": "Email address",
+      "FullName": "Full name",
+      "PhoneNumber": "Phone number",
+      "UniqueName": "Unique name",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Users",
+    "new": "New user"
+  },
   "tabs": {
     "authentication": "Authentication Information",
     "contact": "Contact Information",
@@ -136,6 +180,7 @@
     "label": "Time Zone",
     "placeholder": "Select your time zone"
   },
+  "updated": "The user has been updated.",
   "updatedOn": "Last updated on",
   "usernameOrEmailPlaceholder": "Enter your email address or username",
   "website": {

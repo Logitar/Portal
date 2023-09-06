@@ -144,6 +144,14 @@ public class RoleAggregate : AggregateRoot
     {
       UniqueName = updated.UniqueName;
     }
+    if (updated.DisplayName != null)
+    {
+      _displayName = updated.DisplayName.Value;
+    }
+    if (updated.Description != null)
+    {
+      _description = updated.Description.Value;
+    }
 
     foreach (KeyValuePair<string, string?> customAttribute in updated.CustomAttributes)
     {

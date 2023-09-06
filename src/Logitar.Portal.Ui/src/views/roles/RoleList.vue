@@ -75,7 +75,7 @@ async function onDelete(role: Role, hideModal: () => void): Promise<void> {
       await deleteRole(role.id);
       hideModal();
       toasts.success("roles.delete.success");
-    } catch (e) {
+    } catch (e: unknown) {
       handleError(e);
       return;
     } finally {
@@ -106,6 +106,7 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
+                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -140,18 +141,18 @@ watch(
         variant="success"
       />
     </div>
+    <RealmSelect :model-value="realm" @update:model-value="setQuery('realm', $event)" />
     <div class="row">
-      <RealmSelect class="col-lg-3" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
-      <search-input class="col-lg-3" :model-value="search" @update:model-value="setQuery('search', $event)" />
+      <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select
-        class="col-lg-3"
+        class="col-lg-4"
         :descending="isDescending"
         :model-value="sort"
         :options="sortOptions"
         @descending="setQuery('isDescending', $event)"
         @update:model-value="setQuery('sort', $event)"
       />
-      <count-select class="col-lg-3" :model-value="count" @update:model-value="setQuery('count', $event)" />
+      <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
     </div>
     <template v-if="roles.length">
       <table class="table table-striped">

@@ -1,4 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Client;
 
@@ -6,8 +8,6 @@ internal class TestContext
 {
   private int _index = 1;
   private int _success = 0;
-
-  private Realm? _realm = null;
 
   private readonly int _count;
 
@@ -17,10 +17,26 @@ internal class TestContext
   }
 
   public bool HasFailed { get; private set; }
+
+  private Realm? _realm = null;
   public Realm Realm
   {
     get => _realm ?? throw new InvalidOperationException("The realm has not been assigned yet.");
     set => _realm = value;
+  }
+
+  private Role? _role = null;
+  public Role Role
+  {
+    get => _role ?? throw new InvalidOperationException("The role has not been assigned yet.");
+    set => _role = value;
+  }
+
+  private User? _user = null;
+  public User User
+  {
+    get => _user ?? throw new InvalidOperationException("The user has not been assigned yet.");
+    set => _user = value;
   }
 
   private int Percentage => _index * 100 / _count;

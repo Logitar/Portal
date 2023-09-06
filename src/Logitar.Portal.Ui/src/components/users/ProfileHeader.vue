@@ -53,7 +53,11 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
       </tr>
       <tr v-if="user.authenticatedOn">
         <th scope="row">{{ t("users.authenticatedOn") }}</th>
-        <td>{{ d(user.authenticatedOn, "medium") }}</td>
+        <td>
+          {{ d(user.authenticatedOn, "medium") }}
+          <br />
+          TODO(fpion): View sessions
+        </td>
       </tr>
     </tbody>
   </table>

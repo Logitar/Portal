@@ -47,6 +47,7 @@
     "label": "Locale",
     "placeholder": "Select a locale"
   },
+  "no": "No",
   "notFound": {
     "help": "The requested page could not be found.",
     "lead": "Page Not Found",
@@ -97,5 +98,6 @@
     },
     "label": "Unique Name",
     "placeholder": "Enter an unique name"
-  }
+  },
+  "yes": "Yes"
 }

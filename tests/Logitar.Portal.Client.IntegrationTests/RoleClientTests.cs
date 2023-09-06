@@ -31,7 +31,7 @@ internal class RoleClientTests
         Realm = _context.Realm.UniqueSlug,
         UniqueName = "admin"
       };
-      Role? role = await _roleService.CreateAsync(create, cancellationToken);
+      Role role = await _roleService.CreateAsync(create, cancellationToken);
       _context.Succeed(name);
 
       name = $"{Sut}.{nameof(_roleService.ReplaceAsync)}";
@@ -70,7 +70,7 @@ internal class RoleClientTests
       name = $"{Sut}.{nameof(_roleService.SearchAsync)}";
       SearchRolesPayload search = new()
       {
-        Realm = _context.Realm.UniqueSlug,
+        Realm = $"  {_context.Realm.UniqueSlug}  ",
         IdIn = new Guid[] { role.Id }
       };
       SearchResults<Role> results = await _roleService.SearchAsync(search, cancellationToken);
@@ -88,10 +88,12 @@ internal class RoleClientTests
       role = await _roleService.ReadAsync(role.Id, cancellationToken: cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");
       _context.Succeed(name);
-      name = $"{Sut}.{nameof(_roleService.ReadAsync)}:UniqueSlug";
+      name = $"{Sut}.{nameof(_roleService.ReadAsync)}:UniqueName";
       role = await _roleService.ReadAsync(realm: _context.Realm.Id.ToString(), uniqueName: role.UniqueName, cancellationToken: cancellationToken)
         ?? throw new InvalidOperationException("The result should not be null.");
       _context.Succeed(name);
+
+      _context.Role = role;
     }
     catch (Exception exception)
     {

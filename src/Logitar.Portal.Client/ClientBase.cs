@@ -34,10 +34,16 @@ internal abstract class ClientBase
     => await ExecuteAsync<T>(HttpMethod.Delete, path, cancellationToken);
   protected async Task<T?> GetAsync<T>(string path, CancellationToken cancellationToken)
     => await ExecuteAsync<T>(HttpMethod.Get, path, cancellationToken);
+  protected async Task<T?> PatchAsync<T>(string path, CancellationToken cancellationToken)
+  => await ExecuteAsync<T>(HttpMethod.Patch, path, cancellationToken);
   protected async Task<T?> PatchAsync<T>(string path, object payload, CancellationToken cancellationToken)
     => await ExecuteAsync<T>(HttpMethod.Patch, path, payload, cancellationToken);
+  protected async Task<T?> PostAsync<T>(string path, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Post, path, cancellationToken);
   protected async Task<T?> PostAsync<T>(string path, object payload, CancellationToken cancellationToken)
     => await ExecuteAsync<T>(HttpMethod.Post, path, payload, cancellationToken);
+  protected async Task<T?> PutAsync<T>(string path, CancellationToken cancellationToken)
+    => await ExecuteAsync<T>(HttpMethod.Put, path, cancellationToken);
   protected async Task<T?> PutAsync<T>(string path, object payload, CancellationToken cancellationToken)
     => await ExecuteAsync<T>(HttpMethod.Put, path, payload, cancellationToken);
 

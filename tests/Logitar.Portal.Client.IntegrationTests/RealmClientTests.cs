@@ -48,7 +48,7 @@ internal class RealmClientTests
       {
         UniqueSlug = "desjardins"
       };
-      Realm? realm = await _realmService.CreateAsync(create, cancellationToken);
+      Realm realm = await _realmService.CreateAsync(create, cancellationToken);
       _context.Succeed(name);
 
       name = $"{Sut}.{nameof(_realmService.ReplaceAsync)}";

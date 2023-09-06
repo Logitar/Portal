@@ -8,15 +8,23 @@ import PictureInput from "@/components/users/PictureInput.vue";
 import ProfileInput from "@/components/users/ProfileInput.vue";
 import TimeZoneSelect from "@/components/users/TimeZoneSelect.vue";
 import WebsiteInput from "@/components/users/WebsiteInput.vue";
-import type { ProfileUpdatedEvent, User } from "@/types/users";
+import type { UpdateUserPayload } from "@/types/users/payloads";
+import type { User, UserUpdatedEvent } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { saveProfile } from "@/api/account";
+import { updateUser } from "@/api/users";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
-const props = defineProps<{
-  user: User;
-}>();
+const props = withDefaults(
+  defineProps<{
+    isProfile?: boolean;
+    user: User;
+  }>(),
+  {
+    isProfile: false,
+  }
+);
 
 const birthdate = ref<Date>();
 const firstName = ref<string>("");
@@ -66,13 +74,13 @@ watchEffect(() => {
 });
 
 const emit = defineEmits<{
-  (e: "profile-updated", event: ProfileUpdatedEvent): void;
+  (e: "user-updated", event: UserUpdatedEvent): void;
 }>();
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     const reference = props.user;
-    const user = await saveProfile({
+    const payload: UpdateUserPayload = {
       firstName: firstName.value !== reference.firstName ? { value: firstName.value } : undefined,
       middleName: middleName.value !== reference.middleName ? { value: middleName.value } : undefined,
       lastName: lastName.value !== reference.lastName ? { value: lastName.value } : undefined,
@@ -84,8 +92,9 @@ const onSubmit = handleSubmit(async () => {
       picture: picture.value !== reference.picture ? { value: picture.value } : undefined,
       profile: profile.value !== reference.profile ? { value: profile.value } : undefined,
       website: website.value !== reference.website ? { value: website.value } : undefined,
-    });
-    emit("profile-updated", { user });
+    };
+    const user = props.isProfile ? await saveProfile(payload) : await updateUser(props.user.id, payload);
+    emit("user-updated", { user });
   } catch (e: unknown) {
     handleError(e);
   }
@@ -93,30 +102,28 @@ const onSubmit = handleSubmit(async () => {
 </script>
 
 <template>
-  <div>
-    <form @submit.prevent="onSubmit">
-      <div class="mb-3">
-        <icon-submit :disabled="!hasChanges || isSubmitting" icon="fas fa-floppy-disk" :loading="isSubmitting" text="actions.save" />
-      </div>
-      <div class="row">
-        <PersonNameInput class="col-lg-6" type="first" validate v-model="firstName" />
-        <PersonNameInput class="col-lg-6" type="last" validate v-model="lastName" />
-      </div>
-      <div class="row">
-        <PersonNameInput class="col-lg-6" type="middle" validate v-model="middleName" />
-        <PersonNameInput class="col-lg-6" type="nick" validate v-model="nickname" />
-      </div>
-      <div class="row">
-        <BirthdateInput class="col-lg-6" v-model="birthdate" />
-        <GenderSelect class="col-lg-6" v-model="gender" />
-      </div>
-      <div class="row">
-        <locale-select class="col-lg-6" placeholder="users.locale.placeholder" v-model="locale" />
-        <TimeZoneSelect class="col-lg-6" v-model="timeZone" />
-      </div>
-      <PictureInput v-model="picture" />
-      <ProfileInput v-model="profile" />
-      <WebsiteInput v-model="website" />
-    </form>
-  </div>
+  <form @submit.prevent="onSubmit">
+    <div class="mb-3">
+      <icon-submit :disabled="!hasChanges || isSubmitting" icon="fas fa-floppy-disk" :loading="isSubmitting" text="actions.save" />
+    </div>
+    <div class="row">
+      <PersonNameInput class="col-lg-6" type="first" validate v-model="firstName" />
+      <PersonNameInput class="col-lg-6" type="last" validate v-model="lastName" />
+    </div>
+    <div class="row">
+      <PersonNameInput class="col-lg-6" type="middle" validate v-model="middleName" />
+      <PersonNameInput class="col-lg-6" type="nick" validate v-model="nickname" />
+    </div>
+    <div class="row">
+      <BirthdateInput class="col-lg-6" v-model="birthdate" />
+      <GenderSelect class="col-lg-6" v-model="gender" />
+    </div>
+    <div class="row">
+      <locale-select class="col-lg-6" placeholder="users.locale.placeholder" v-model="locale" />
+      <TimeZoneSelect class="col-lg-6" v-model="timeZone" />
+    </div>
+    <PictureInput v-model="picture" />
+    <ProfileInput v-model="profile" />
+    <WebsiteInput v-model="website" />
+  </form>
 </template>
