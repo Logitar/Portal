@@ -57,7 +57,7 @@ export type SearchUsersPayload = SearchPayload & {
   hasPassword?: boolean;
   isConfirmed?: boolean;
   isDisabled?: boolean;
-  sort: UserSortOption[];
+  sort?: UserSortOption[];
 };
 
 export type SignInPayload = {

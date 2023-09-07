@@ -75,6 +75,17 @@ const router = createRouter({
       path: "/create-role",
       component: () => import("./views/roles/RoleEdit.vue"),
     },
+    // Sessions
+    {
+      name: "SessionList",
+      path: "/sessions",
+      component: () => import("./views/sessions/SessionList.vue"),
+    },
+    {
+      name: "SessionView",
+      path: "/sessions/:id",
+      component: () => import("./views/sessions/SessionView.vue"),
+    },
     // Users
     {
       name: "UserList",

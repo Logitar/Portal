@@ -1,0 +1,20 @@
+{
+  "empty": "There are no results.",
+  "isActive": {
+    "label": "Active",
+    "placeholder": "Select an option"
+  },
+  "isPersistent": {
+    "label": "Persistent",
+    "placeholder": "Select an option"
+  },
+  "sort": {
+    "options": {
+      "SignedOutOn": "Signed-out on",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Sessions"
+  }
+}

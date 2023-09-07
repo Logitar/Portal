@@ -94,6 +94,9 @@ async function onDelete(user: User, hideModal: () => void): Promise<void> {
 function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
+    case "isConfirmed":
+    case "isDisabled":
+    case "realm":
     case "search":
     case "count":
       query.page = "1";

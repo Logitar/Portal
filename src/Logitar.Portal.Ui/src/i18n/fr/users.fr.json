@@ -147,6 +147,10 @@
     "title": "Profil",
     "updated": "Votre profil a été modifié."
   },
+  "select": {
+    "label": "Utilisateur",
+    "placeholder": "Sélectionnez un utilisateur"
+  },
   "signIn": {
     "failed": "Connexion échouée !",
     "invalidCredentials": "Veuillez vérifier que vous avez entré votre adresse courriel ou nom d’utilisateur et mot de passe.",

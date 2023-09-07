@@ -1,0 +1,20 @@
+{
+  "empty": "Il n’y a aucun résultat.",
+  "isActive": {
+    "label": "Active",
+    "placeholder": "Sélectionnez une option"
+  },
+  "isPersistent": {
+    "label": "Persistante",
+    "placeholder": "Sélectionnez une option"
+  },
+  "sort": {
+    "options": {
+      "SignedOutOn": "Déconnexion",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "title": {
+    "list": "Sessions"
+  }
+}

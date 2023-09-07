@@ -147,6 +147,10 @@
     "title": "Profile",
     "updated": "Your profile has been updated."
   },
+  "select": {
+    "label": "User",
+    "placeholder": "Select an user"
+  },
   "signIn": {
     "failed": "Sign in failed!",
     "invalidCredentials": "Please check you provided the correct email address/username and password.",

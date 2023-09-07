@@ -18,7 +18,7 @@ export type RoleSortOption = SortOption & {
 
 export type SearchRolesPayload = SearchPayload & {
   realm?: string;
-  sort: RoleSortOption[];
+  sort?: RoleSortOption[];
 };
 
 export type UpdateRolePayload = {
