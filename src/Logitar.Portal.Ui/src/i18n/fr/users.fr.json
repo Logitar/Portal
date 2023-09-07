@@ -63,9 +63,6 @@
     },
     "placeholder": "Sélectionnez votre genre"
   },
-  "identifiers": {
-    "title": "Identifiants"
-  },
   "isConfirmed": {
     "label": "Confirmé",
     "placeholder": "Sélectionnez une option"

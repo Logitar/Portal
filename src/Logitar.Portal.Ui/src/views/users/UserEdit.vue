@@ -9,7 +9,6 @@ import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
-import StatusInfo from "@/components/shared/StatusInfo.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
@@ -171,7 +170,7 @@ onMounted(async () => {
           <ViewSessionsLink :user="user" />
         </p>
         <p v-if="user.disabledBy && user.disabledOn">
-          <StatusInfo :actor="user.disabledBy" class="text-danger" :date="user.disabledOn" format="users.disabledFormat" />
+          <status-info :actor="user.disabledBy" class="text-danger" :date="user.disabledOn" format="users.disabledFormat" />
         </p>
         <div class="mb-3">
           <icon-button class="me-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
@@ -199,8 +198,8 @@ onMounted(async () => {
               <custom-attribute-list :loading="isLoading" :model="user.customAttributes" v-model="customAttributes" />
             </form>
           </app-tab>
-          <app-tab title="users.identifiers.title">
-            <p>TODO(fpion): implement user identifiers</p>
+          <app-tab title="identifiers.title">
+            <identifier-list :identifiers="user.identifiers" />
           </app-tab>
           <app-tab title="roles.title.list">
             <p>TODO(fpion): implement user roles</p>
