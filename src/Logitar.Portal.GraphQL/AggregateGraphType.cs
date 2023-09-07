@@ -6,8 +6,11 @@ namespace Logitar.Portal.GraphQL;
 
 internal abstract class AggregateGraphType<T> : ObjectGraphType<T> where T : Aggregate
 {
-  protected AggregateGraphType()
+  protected AggregateGraphType(string? description = null)
   {
+    Name = typeof(T).Name;
+    Description = description;
+
     Field(x => x.CreatedBy, type: typeof(NonNullGraphType<ActorGraphType>))
       .Description("The actor who created the resource.");
     Field(x => x.CreatedOn)

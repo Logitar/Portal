@@ -6,11 +6,8 @@ namespace Logitar.Portal.GraphQL.Roles;
 
 internal class RoleGraphType : AggregateGraphType<Role>
 {
-  public RoleGraphType()
+  public RoleGraphType() : base("Represents a role into the identity system. Roles are typically used to assign permissions to actors.")
   {
-    Name = nameof(Role);
-    Description = "Represents a role into the identity system. Roles are typically used to assign permissions to actors.";
-
     Field(x => x.Id)
       .Description("The unique identifier of the role.");
 
