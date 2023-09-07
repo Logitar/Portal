@@ -211,9 +211,8 @@ internal class Mapper
 
     if (source.EmailAddress != null)
     {
-      destination.Email = new Email
+      destination.Email = new Email(source.EmailAddress)
       {
-        Address = source.EmailAddress,
         VerifiedBy = source.EmailVerifiedBy == null ? null : FindActor(source.EmailVerifiedBy),
         VerifiedOn = source.EmailVerifiedOn.HasValue ? ToUniversalTime(source.EmailVerifiedOn.Value) : null,
         IsVerified = source.IsEmailVerified

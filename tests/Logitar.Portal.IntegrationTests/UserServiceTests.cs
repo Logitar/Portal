@@ -427,7 +427,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   public async Task ReadAsync_it_should_return_the_user_found_by_identifier()
   {
     KeyValuePair<string, string> identifier = _user.Identifiers.Single();
-    User? user = await _userService.ReadAsync(identifierKey: identifier.Key, identifierValue: identifier.Value);
+    User? user = await _userService.ReadAsync(realm: _realm.UniqueSlug, identifierKey: identifier.Key, identifierValue: identifier.Value);
     Assert.NotNull(user);
     Assert.Equal(_user.Id.ToGuid(), user.Id);
   }
