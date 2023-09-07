@@ -5,6 +5,7 @@ import persistedState from "pinia-plugin-persistedstate";
 import App from "./App.vue";
 import fontAwesome from "./fontAwesome";
 import i18n from "./i18n";
+import jsonViewer from "./jsonViewer";
 import maz from "./maz";
 import router from "./router";
 import sharedComponents from "./components/shared";
@@ -23,6 +24,7 @@ pinia.use(persistedState);
 
 app.use(fontAwesome);
 app.use(i18n);
+app.use(jsonViewer);
 app.use(maz);
 app.use(pinia);
 app.use(router);

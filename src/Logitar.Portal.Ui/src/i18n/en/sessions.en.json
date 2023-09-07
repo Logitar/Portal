@@ -1,5 +1,7 @@
 {
+  "additionalInformation": "Additional Information",
   "empty": "There are no results.",
+  "ipAddress": "IP Address",
   "isActive": {
     "label": "Active",
     "placeholder": "Select an option"
@@ -15,6 +17,7 @@
     }
   },
   "title": {
-    "list": "Sessions"
+    "list": "Sessions",
+    "view": "View session"
   }
 }

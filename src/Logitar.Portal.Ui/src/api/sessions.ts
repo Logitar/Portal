@@ -1,7 +1,11 @@
 import type { SearchResults } from "@/types/search";
 import type { SearchSessionsPayload } from "@/types/sessions/payloads";
 import type { Session } from "@/types/sessions";
-import { graphQL } from ".";
+import { get, graphQL } from ".";
+
+export async function readSession(id: string): Promise<Session> {
+  return (await get<Session>(`/api/sessions/${id}`)).data;
+}
 
 const searchSessionsQuery = `
 query($payload: SearchSessionsPayload!) {
