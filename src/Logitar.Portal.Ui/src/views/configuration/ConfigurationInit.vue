@@ -42,7 +42,7 @@ const onSubmit = handleSubmit(async () => {
         lastName: lastName.value,
       },
     });
-    account.signIn(result.user);
+    account.signIn(result.session);
     configuration.initialize(result.configuration);
     router.push({ name: "ConfigurationEdit" });
   } catch (e: unknown) {

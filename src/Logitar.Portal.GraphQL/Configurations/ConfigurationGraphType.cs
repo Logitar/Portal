@@ -6,11 +6,8 @@ namespace Logitar.Portal.GraphQL.Configurations;
 
 internal class ConfigurationGraphType : AggregateGraphType<Configuration>
 {
-  public ConfigurationGraphType() : base()
+  public ConfigurationGraphType() : base("Represents the configuration of the system.")
   {
-    Name = nameof(Configuration);
-    Description = "Represents the configuration of the system.";
-
     Field(x => x.DefaultLocale)
       .Description("The code (ISO 639-1) of the default locale (language) of the system.");
     Field(x => x.Secret)

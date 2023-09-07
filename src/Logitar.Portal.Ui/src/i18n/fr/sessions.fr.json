@@ -1,0 +1,33 @@
+{
+  "additionalInformation": {
+    "empty": "Aucune information additionnelle à afficher.",
+    "title": "Informations additionnelles"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "ipAddress": "Adresse IP",
+  "isActive": {
+    "label": "Active",
+    "placeholder": "Sélectionnez une option"
+  },
+  "isPersistent": {
+    "label": "Persistante",
+    "placeholder": "Sélectionnez une option"
+  },
+  "signOut": {
+    "confirm": "Désirez-vous vraiment déconnecter la session suivante ? Vous serez déconnecté de l’application.",
+    "submit": "Déconnecter",
+    "success": "La session a été déconnectée.",
+    "title": "Déconnecter une session"
+  },
+  "sort": {
+    "options": {
+      "SignedOutOn": "Déconnexion",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "title": {
+    "list": "Sessions",
+    "view": "Examiner la session"
+  },
+  "view": "Voir les sessions"
+}

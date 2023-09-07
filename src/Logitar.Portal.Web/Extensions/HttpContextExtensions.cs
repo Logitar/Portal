@@ -12,6 +12,7 @@ internal static class HttpContextExtensions
 {
   private const string ApiKeyKey = "ApiKey";
   private const string SessionIdKey = "SessionId";
+  private const string SessionKey = "Session";
   private const string UserKey = "User";
 
   public static string GetAdditionalInformation(this HttpContext context)
@@ -47,6 +48,7 @@ internal static class HttpContextExtensions
   }
 
   public static ApiKey? GetApiKey(this HttpContext context) => context.GetItem<ApiKey>(ApiKeyKey);
+  public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key)
   {
@@ -54,6 +56,7 @@ internal static class HttpContextExtensions
   }
 
   public static void SetApiKey(this HttpContext context, ApiKey? apiKey) => context.SetItem(ApiKeyKey, apiKey);
+  public static void SetSession(this HttpContext context, Session? session) => context.SetItem(SessionKey, session);
   public static void SetUser(this HttpContext context, User? user) => context.SetItem(UserKey, user);
   private static void SetItem<T>(this HttpContext context, object key, T? value)
   {

@@ -20,25 +20,20 @@ public class ConfigurationController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult<Models.Configuration.InitializeConfigurationResult>> InitializeAsync([FromBody] Models.Configuration.InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<InitializeConfigurationResult>> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
   {
-    Contracts.Configurations.InitializeConfigurationPayload initializePayload = new()
+    payload.Session = new SessionPayload
     {
-      Locale = payload.Locale,
-      User = payload.User,
-      Session = new SessionPayload
-      {
-        CustomAttributes = HttpContext.GetSessionCustomAttributes()
-      }
+      CustomAttributes = HttpContext.GetSessionCustomAttributes()
     };
-    Contracts.Configurations.InitializeConfigurationResult result = await _configurationService.InitializeAsync(initializePayload, cancellationToken);
+    InitializeConfigurationResult result = await _configurationService.InitializeAsync(payload, cancellationToken);
 
     HttpContext.SignIn(result.Session);
 
     User user = result.Session.User;
     Uri uri = new($"{Request.Scheme}://{Request.Host}/api/users/{user.Id}");
 
-    return Created(uri, new Models.Configuration.InitializeConfigurationResult(result));
+    return Created(uri, result);
   }
 
   [HttpGet("initialized")]

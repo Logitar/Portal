@@ -26,37 +26,37 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     if (sessionId.HasValue)
     {
       Session? session = _cacheService.GetSession(sessionId.Value) ?? await _sessionQuerier.ReadAsync(sessionId.Value);
-      AuthenticateResult? failure = null;
       if (session == null)
       {
-        failure = AuthenticateResult.Fail($"The session 'Id={sessionId}' could not be found.");
+        return Fail($"The session 'Id={sessionId}' could not be found.");
       }
       else if (!session.IsActive)
       {
-        failure = AuthenticateResult.Fail($"The session 'Id={session.Id}' has ended.");
+        return Fail($"The session 'Id={session.Id}' has ended.");
       }
       else if (session.User.IsDisabled)
       {
-        failure = AuthenticateResult.Fail($"The User is disabled for session 'Id={session.Id}'.");
+        return Fail($"The User is disabled for session 'Id={session.Id}'.");
       }
 
-      if (failure != null)
-      {
-        Context.SignOut();
+      _cacheService.SetSession(session);
 
-        return failure;
-      }
+      Context.SetSession(session);
+      Context.SetUser(session.User);
 
-      _cacheService.SetSession(session!);
-
-      Context.SetUser(session!.User);
-
-      ClaimsPrincipal principal = new(session.User.CreateClaimsIdentity(Scheme.Name));
+      ClaimsPrincipal principal = new(session.CreateClaimsIdentity(Scheme.Name));
       AuthenticationTicket ticket = new(principal, Scheme.Name);
 
       return AuthenticateResult.Success(ticket);
     }
 
     return AuthenticateResult.NoResult();
+  }
+
+  private AuthenticateResult Fail(string reason)
+  {
+    Context.SignOut();
+
+    return AuthenticateResult.Fail(reason);
   }
 }

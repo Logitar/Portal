@@ -8,11 +8,8 @@ namespace Logitar.Portal.GraphQL.Users;
 
 internal class UserGraphType : AggregateGraphType<User>
 {
-  public UserGraphType()
+  public UserGraphType() : base("Represents an user into the identity system. Users are actors who represent a person.")
   {
-    Name = nameof(User);
-    Description = "Represents an user into the identity system. Users are actors who represent a person.";
-
     Field(x => x.Id)
       .Description("The unique identifier of the user.");
 

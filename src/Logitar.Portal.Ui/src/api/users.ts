@@ -33,6 +33,9 @@ query($payload: SearchUsersPayload!) {
       }
       fullName
       picture
+      realm {
+        id
+      }
       updatedBy {
         id
         type
@@ -55,6 +58,10 @@ type SearchUsersResponse = {
 };
 export async function searchUsers(payload: SearchUsersPayload): Promise<SearchResults<User>> {
   return (await graphQL<SearchUsersRequest, SearchUsersResponse>(searchUsersQuery, { payload })).data.users;
+}
+
+export async function signOut(id: string): Promise<User> {
+  return (await patch<void, User>(`/api/users/${id}/sign/out`)).data;
 }
 
 export async function updateUser(id: string, payload: UpdateUserPayload): Promise<User> {

@@ -26,8 +26,8 @@ const router = useRouter();
 const onSubmit = handleSubmit(async () => {
   try {
     invalidCredentials.value = false;
-    const user = await signIn({ uniqueName: username.value, password: password.value, remember: remember.value });
-    account.signIn(user);
+    const session = await signIn({ uniqueName: username.value, password: password.value, isPersistent: remember.value });
+    account.signIn(session);
     const redirect: string | undefined = route.query.redirect?.toString();
     router.push(redirect ?? { name: "Profile" });
   } catch (e: unknown) {

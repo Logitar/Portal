@@ -6,11 +6,8 @@ namespace Logitar.Portal.GraphQL.Realms;
 
 internal class RealmGraphType : AggregateGraphType<Realm>
 {
-  public RealmGraphType()
+  public RealmGraphType() : base("Represents a hard tenant into the identity system.")
   {
-    Name = nameof(Realm);
-    Description = "Represents a hard tenant into the identity system.";
-
     Field(x => x.Id)
       .Description("The unique identifier of the realm.");
 

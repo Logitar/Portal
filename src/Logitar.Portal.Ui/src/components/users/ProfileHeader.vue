@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { User } from "@/types/users";
 
 const { d, t } = useI18n();
@@ -56,7 +57,7 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
         <td>
           {{ d(user.authenticatedOn, "medium") }}
           <br />
-          TODO(fpion): View sessions
+          <ViewSessionsLink :user="user" />
         </td>
       </tr>
     </tbody>

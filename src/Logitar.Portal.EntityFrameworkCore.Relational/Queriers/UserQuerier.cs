@@ -95,13 +95,15 @@ internal class UserQuerier : IUserQuerier
         ?? throw new EntityNotFoundException<RealmEntity>(realmIdOrUniqueSlug);
     }
 
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
     string key = identifierKey.Trim();
     string valueNormalized = identifierValue.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)
-      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.Key == key && y.ValueNormalized == valueNormalized), cancellationToken);
+      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.TenantId == tenantId
+        && y.Key == key && y.ValueNormalized == valueNormalized), cancellationToken);
     if (user == null)
     {
       return null;

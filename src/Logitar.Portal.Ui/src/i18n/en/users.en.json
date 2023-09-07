@@ -33,8 +33,12 @@
     "success": "The user has been deleted.",
     "title": "Delete user"
   },
-  "disable": "Disable",
-  "disabled": "The user has been disabled.",
+  "disable": {
+    "confirm": "Do you really want to disable the following user? All access to its account and services will be revoked.",
+    "submit": "Disable",
+    "success": "The user has been disabled.",
+    "title": "Disable user"
+  },
   "disabledFormat": "Disabled on {date} by",
   "email": {
     "address": {
@@ -44,8 +48,12 @@
     "verified": "Verified"
   },
   "empty": "There are no results.",
-  "enable": "Enable",
-  "enabled": "The user has been enabled.",
+  "enable": {
+    "confirm": "Do you really want to enable the following user? All access to its account and services will be restored.",
+    "submit": "Enable",
+    "success": "The user has been enabled.",
+    "title": "Enable user"
+  },
   "gender": {
     "label": "Gender",
     "options": {
@@ -147,6 +155,10 @@
     "title": "Profile",
     "updated": "Your profile has been updated."
   },
+  "select": {
+    "label": "User",
+    "placeholder": "Select an user"
+  },
   "signIn": {
     "failed": "Sign in failed!",
     "invalidCredentials": "Please check you provided the correct email address/username and password.",
@@ -155,7 +167,18 @@
     "title": "Sign In"
   },
   "signOut": {
-    "title": "Sign Out"
+    "confirm": "Do you really want to sign out this user?",
+    "other": {
+      "portal": "The user will be signed out of the application and any other device using this application.",
+      "realm": "The user will be signed out of any application using the Portal."
+    },
+    "self": "You will be signed out of the application and any other device using this application.",
+    "submit": "Sign out user",
+    "success": "The user has been signed-out.",
+    "title": {
+      "modal": "Sign out user",
+      "page": "Sign Out"
+    }
   },
   "sort": {
     "options": {

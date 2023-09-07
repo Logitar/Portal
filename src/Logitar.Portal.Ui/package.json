@@ -24,6 +24,7 @@
     "@vee-validate/i18n": "^4.9.6",
     "@vee-validate/rules": "^4.9.6",
     "bootstrap": "^5.3.0",
+    "clipboard": "^2.0.11",
     "libphonenumber-js": "^1.10.34",
     "maz-ui": "^3.9.0",
     "md5": "^2.3.0",
@@ -33,7 +34,8 @@
     "vee-validate": "^4.9.6",
     "vue": "^3.3.2",
     "vue-i18n": "9.3.0-beta.19",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "vue3-json-viewer": "^2.2.2"
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^0.11.0",

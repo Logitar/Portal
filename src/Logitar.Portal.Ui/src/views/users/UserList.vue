@@ -3,10 +3,11 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
+import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import type { User } from "@/types/users";
 import type { UserSort, SearchUsersPayload } from "@/types/users/payloads";
-import { deleteUser, searchUsers, updateUser } from "@/api/users";
+import { deleteUser, searchUsers } from "@/api/users";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -91,32 +92,25 @@ async function onDelete(user: User, hideModal: () => void): Promise<void> {
   }
 }
 
+function onUserUpdated(user: User): void {
+  const index = users.value.findIndex(({ id }) => id === user.id);
+  if (index >= 0) {
+    users.value.splice(index, 1, user);
+  }
+}
+
 function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
+    case "isConfirmed":
+    case "isDisabled":
+    case "realm":
     case "search":
     case "count":
       query.page = "1";
       break;
   }
   router.replace({ ...route, query });
-}
-
-async function toggleDisabled(user: User): Promise<void> {
-  if (!isLoading.value) {
-    isLoading.value = true;
-    try {
-      const updatedUser = await updateUser(user.id, {
-        isDisabled: !user.isDisabled,
-      });
-      await refresh();
-      toasts.success(`users.${updatedUser.isDisabled ? "disabled" : "enabled"}`);
-    } catch (e: unknown) {
-      handleError(e);
-    } finally {
-      isLoading.value = false;
-    }
-  }
 }
 
 watch(
@@ -237,15 +231,7 @@ watch(
             <td>{{ user.authenticatedOn ? d(user.authenticatedOn, "medium") : "—" }}</td>
             <td><status-block :actor="user.updatedBy" :date="user.updatedOn" /></td>
             <td>
-              <icon-button
-                class="me-1"
-                :disabled="isLoading || account.authenticated?.id === user.id"
-                :icon="`fas fa-${user.isDisabled ? 'lock-open' : 'lock'}`"
-                :loading="isLoading"
-                :text="`users.${user.isDisabled ? 'enable' : 'disable'}`"
-                variant="warning"
-                @click="toggleDisabled(user)"
-              />
+              <ToggleUserStatus class="me-1" :disabled="account.authenticated?.id === user.id" :user="user" @user-updated="onUserUpdated" />
               <icon-button
                 class="ms-1"
                 :disabled="isLoading || account.authenticated?.id === user.id"

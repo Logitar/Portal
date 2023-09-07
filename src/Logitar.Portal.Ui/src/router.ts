@@ -26,22 +26,22 @@ const router = createRouter({
       component: () => import("./views/configuration/ConfigurationInit.vue"),
       meta: { isPublic: true },
     },
-    // Users
+    // Account
     {
       name: "Profile",
       path: "/user/profile",
-      component: () => import("./views/users/ProfileView.vue"),
+      component: () => import("./views/account/ProfileView.vue"),
     },
     {
       name: "SignIn",
       path: "/user/sign-in",
-      component: () => import("./views/users/SignIn.vue"),
+      component: () => import("./views/account/SignIn.vue"),
       meta: { isPublic: true },
     },
     {
       name: "SignOut",
       path: "/user/sign-out",
-      component: () => import("./views/users/SignOut.vue"),
+      component: () => import("./views/account/SignOut.vue"),
     },
     // Realms
     {
@@ -74,6 +74,17 @@ const router = createRouter({
       name: "CreateRole",
       path: "/create-role",
       component: () => import("./views/roles/RoleEdit.vue"),
+    },
+    // Sessions
+    {
+      name: "SessionList",
+      path: "/sessions",
+      component: () => import("./views/sessions/SessionList.vue"),
+    },
+    {
+      name: "SessionEdit",
+      path: "/sessions/:id",
+      component: () => import("./views/sessions/SessionEdit.vue"),
     },
     // Users
     {
