@@ -18,7 +18,7 @@
   "count": "Count",
   "custom": "Custom",
   "customAttributes": {
-    "empty": "There are no custom attribute.",
+    "empty": "There is no custom attribute.",
     "key": {
       "label": "Key",
       "placeholder": "Enter the key of the attribute"
@@ -38,9 +38,16 @@
     "placeholder": "Enter a display name"
   },
   "general": "General",
-  "home": {
-    "clickMe": "Click Me! ({count})",
-    "title": "Home"
+  "identifiers": {
+    "empty": "There is no identifier.",
+    "key": {
+      "label": "Key"
+    },
+    "value": {
+      "label": "Value"
+    },
+    "title": "Identifiers",
+    "updatedOn": "Updated on"
   },
   "loading": "Loading...",
   "locale": {

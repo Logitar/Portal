@@ -1,6 +1,6 @@
 {
   "claimMappings": {
-    "empty": "There are no claim mapping.",
+    "empty": "There is no claim mapping.",
     "name": {
       "label": "Name",
       "placeholder": "Enter the name of the claim"

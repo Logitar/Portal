@@ -38,9 +38,16 @@
     "placeholder": "Entrez un nom d’affichage"
   },
   "general": "Général",
-  "home": {
-    "clickMe": "Cliquez-moi ! ({count})",
-    "title": "Accueil"
+  "identifiers": {
+    "empty": "Il n’y a aucun identifiant.",
+    "key": {
+      "label": "Clé"
+    },
+    "value": {
+      "label": "Valeur"
+    },
+    "title": "Identifiants",
+    "updatedOn": "Dernière modification"
   },
   "loading": "Chargement...",
   "locale": {
