@@ -2,5 +2,13 @@
 
 public record Email : Contact, IEmailAddress
 {
-  public string Address { get; set; } = string.Empty;
+  public Email() : this(string.Empty)
+  {
+  }
+  public Email(string address) : base()
+  {
+    Address = address;
+  }
+
+  public string Address { get; set; }
 }

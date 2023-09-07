@@ -323,8 +323,44 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     await AssertRefreshTokenAsync(session.RefreshToken);
   }
 
-  [Fact(DisplayName = "SignInAsync: it should create a session.")]
-  public async Task SignInAsync_it_should_create_a_session()
+  [Fact(DisplayName = "SignInAsync: it should create a session by email address.")]
+  public async Task SignInAsync_it_should_create_a_session_by_email_address()
+  {
+    Assert.NotNull(_user.Email);
+    SignInPayload payload = new()
+    {
+      Realm = $" {_realm.UniqueSlug.ToLower()} ",
+      UniqueName = $" {_user.Email.Address.ToLower()} ",
+      Password = PasswordString,
+      IsPersistent = false,
+      CustomAttributes = new CustomAttribute[]
+  {
+        new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"),
+        new("IpAddress", Faker.Internet.Ip())
+  }
+    };
+
+    Session session = await _sessionService.SignInAsync(payload);
+
+    Assert.NotEqual(Guid.Empty, session.Id);
+    Assert.Equal(Actor, session.CreatedBy);
+    AssertIsNear(session.CreatedOn);
+    Assert.Equal(Actor, session.UpdatedBy);
+    AssertIsNear(session.UpdatedOn);
+    Assert.True(session.Version >= 1);
+
+    Assert.False(session.IsPersistent);
+    Assert.Null(session.RefreshToken);
+    Assert.True(session.IsActive);
+    Assert.Null(session.SignedOutBy);
+    Assert.Null(session.SignedOutOn);
+    Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
+
+    Assert.Equal(_user.Id.ToGuid(), session.User.Id);
+  }
+
+  [Fact(DisplayName = "SignInAsync: it should create a session by unique name.")]
+  public async Task SignInAsync_it_should_create_a_session_by_unique_name()
   {
     SignInPayload payload = new()
     {

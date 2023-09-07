@@ -100,8 +100,33 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(user.Realm);
   }
 
-  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user.")]
-  public async Task AuthenticateAsync_it_should_authenticate_the_realm_user()
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user by email address.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_realm_user_by_email_address()
+  {
+    Assert.NotNull(_user.Email);
+    AuthenticateUserPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug.ToUpper()}  ",
+      UniqueName = $"  {_user.Email.Address}  ",
+      Password = PasswordString
+    };
+
+    User user = await _userService.AuthenticateAsync(payload);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > 1);
+
+    Assert.Equal(user.UpdatedOn, user.AuthenticatedOn);
+
+    Assert.NotNull(user.Realm);
+    Assert.Equal(_realm.Id.ToGuid(), user.Realm.Id);
+  }
+
+  [Fact(DisplayName = "AuthenticateAsync: it should authenticate the realm user by unique name.")]
+  public async Task AuthenticateAsync_it_should_authenticate_the_realm_user_by_unique_name()
   {
     AuthenticateUserPayload payload = new()
     {

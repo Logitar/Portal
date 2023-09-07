@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
@@ -40,12 +41,23 @@ internal class SignInCommandHandler : IRequestHandler<SignInCommand, Session>
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
         ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
     }
-
-    UserAggregate user = await _userRepository.LoadAsync(realm?.Id.Value, payload.UniqueName, cancellationToken)
-      ?? throw new UserNotFoundException(realm, payload.UniqueName);
-    // TODO(fpion): sign-in by email address if it is unique in the realm
-
+    string? tenantId = realm?.Id.Value;
     IUserSettings userSettings = realm?.UserSettings ?? _applicationContext.Configuration.UserSettings;
+
+    UserAggregate? user = await _userRepository.LoadAsync(tenantId, payload.UniqueName, cancellationToken);
+    if (user == null && realm?.RequireUniqueEmail == true)
+    {
+      Email email = new(payload.UniqueName);
+      IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId, email, cancellationToken);
+      if (users.Count() == 1)
+      {
+        user = users.Single();
+      }
+    }
+    if (user == null)
+    {
+      throw new UserNotFoundException(realm, payload.UniqueName);
+    }
 
     byte[]? secretBytes = null;
     Password? secret = payload.IsPersistent
