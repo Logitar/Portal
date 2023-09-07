@@ -11,6 +11,7 @@ import RealmSelect from "@/components/realms/RealmSelect.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import StatusInfo from "@/components/shared/StatusInfo.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
+import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
@@ -146,14 +147,7 @@ onMounted(async () => {
         <p v-if="user.authenticatedOn">
           {{ t("users.authenticatedOnFormat", { date: d(user.authenticatedOn, "medium") }) }}
           <br />
-          <RouterLink
-            :to="{
-              name: 'SessionList',
-              query: { realm: user.realm?.id ?? '', user: user.id, sort: 'UpdatedOn', isDescending: 'true', page: '1', count: '10' },
-            }"
-          >
-            {{ t("sessions.view") }}
-          </RouterLink>
+          <ViewSessionsLink :user="user" />
         </p>
         <p v-if="user.disabledBy && user.disabledOn">
           <StatusInfo :actor="user.disabledBy" class="text-danger" :date="user.disabledOn" format="users.disabledFormat" />
