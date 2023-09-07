@@ -33,8 +33,12 @@
     "success": "L’utilisateur a été supprimé.",
     "title": "Supprimer l’utilisateur"
   },
-  "disable": "Désactiver",
-  "disabled": "L’utilisateur a été désactivé.",
+  "disable": {
+    "confirm": "Désirez-vous vraiment désactiver l’utilisateur suivant ? Tout accès à son compte et à ses services sera révoqué.",
+    "submit": "Désactiver",
+    "success": "L’utilisateur a été désactivé.",
+    "title": "Désactivation"
+  },
   "disabledFormat": "Désactivé le {date} par",
   "email": {
     "address": {
@@ -44,8 +48,12 @@
     "verified": "Vérifiée"
   },
   "empty": "Il n’y a aucun résultat.",
-  "enable": "Activer",
-  "enabled": "L’utilisateur a été activé.",
+  "enable": {
+    "confirm": "Désirez-vous vraiment activer l’utilisateur suivant ? Tout accès à son compte et à ses services sera restauré.",
+    "submit": "Activer",
+    "success": "L’utilisateur a été activé.",
+    "title": "Activation"
+  },
   "gender": {
     "label": "Genre",
     "options": {
@@ -159,7 +167,18 @@
     "title": "Connexion"
   },
   "signOut": {
-    "title": "Déconnexion"
+    "confirm": "Désirez-vous vraiment déconnecter l’utilisateur suivant ?",
+    "other": {
+      "portal": "L’utilisateur sera déconnecté de l’application et de tout appareil utilisant cette application.",
+      "realm": "L’utilisateur sera déconnecté de toute application utilisant le Portal."
+    },
+    "self": "Vous serez déconnecté de l’application et de tout appareil utilisant cette application.",
+    "submit": "Déconnecter l’utilisateur",
+    "success": "L’utilisateur a été déconnecté.",
+    "title": {
+      "modal": "Déconnecter l’utilisateur",
+      "page": "Déconnexion"
+    }
   },
   "sort": {
     "options": {

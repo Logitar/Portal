@@ -56,7 +56,14 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
         <td>
           {{ d(user.authenticatedOn, "medium") }}
           <br />
-          TODO(fpion): View sessions
+          <RouterLink
+            :to="{
+              name: 'SessionList',
+              query: { realm: user.realm?.id ?? '', user: user.id, sort: 'UpdatedOn', isDescending: 'true', page: '1', count: '10' },
+            }"
+          >
+            {{ t("sessions.view") }}
+          </RouterLink>
         </td>
       </tr>
     </tbody>

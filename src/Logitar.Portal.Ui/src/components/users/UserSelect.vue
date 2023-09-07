@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from "vue";
+import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { User } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
@@ -15,7 +16,7 @@ const props = withDefaults(
     label?: string;
     modelValue?: string;
     placeholder?: string;
-    realm?: string;
+    realm?: Realm;
     required?: boolean;
   }>(),
   {
@@ -51,7 +52,7 @@ watch(
   async (realm) => {
     try {
       const search = await searchUsers({
-        realm: realm || undefined,
+        realm: realm?.id,
       });
       users.value = search.results;
     } catch (e: unknown) {

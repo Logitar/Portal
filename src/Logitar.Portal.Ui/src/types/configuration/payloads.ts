@@ -1,9 +1,16 @@
+import type { CustomAttribute } from "@/types/customAttributes";
 import type { LoggingSettings } from ".";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 
 export type InitializeConfigurationPayload = {
   locale: string;
   user: UserPayload;
+  session?: SessionPayload;
+};
+
+export type SessionPayload = {
+  isPersistent: boolean;
+  customAttributes: CustomAttribute[];
 };
 
 export type UpdateConfigurationPayload = {

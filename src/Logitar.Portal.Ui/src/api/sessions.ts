@@ -1,7 +1,7 @@
 import type { SearchResults } from "@/types/search";
 import type { SearchSessionsPayload } from "@/types/sessions/payloads";
 import type { Session } from "@/types/sessions";
-import { get, graphQL } from ".";
+import { get, graphQL, patch } from ".";
 
 export async function readSession(id: string): Promise<Session> {
   return (await get<Session>(`/api/sessions/${id}`)).data;
@@ -46,4 +46,8 @@ type SearchSessionsResponse = {
 };
 export async function searchSessions(payload: SearchSessionsPayload): Promise<SearchResults<Session>> {
   return (await graphQL<SearchSessionsRequest, SearchSessionsResponse>(searchSessionsQuery, { payload })).data.sessions;
+}
+
+export async function signOut(id: string): Promise<Session> {
+  return (await patch<void, Session>(`/api/sessions/${id}/sign/out`)).data;
 }

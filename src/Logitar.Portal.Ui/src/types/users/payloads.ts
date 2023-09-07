@@ -60,12 +60,6 @@ export type SearchUsersPayload = SearchPayload & {
   sort?: UserSortOption[];
 };
 
-export type SignInPayload = {
-  uniqueName: string;
-  password: string;
-  remember: boolean;
-};
-
 export type UpdateUserPayload = {
   uniqueName?: string;
   password?: ChangePasswordPayload;

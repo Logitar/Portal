@@ -2,7 +2,6 @@
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
-using Logitar.Portal.Web.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,23 +43,16 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<User>> SignInAsync([FromBody] PortalSignInPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInPayload payload, CancellationToken cancellationToken)
   {
-    SignInPayload signInPayload = new()
-    {
-      UniqueName = payload.UniqueName,
-      Password = payload.Password,
-      IsPersistent = payload.Remember,
-      CustomAttributes = HttpContext.GetSessionCustomAttributes()
-    };
-    Session session = await _sessionService.SignInAsync(signInPayload, cancellationToken);
+    payload.Realm = null;
+    payload.CustomAttributes = HttpContext.GetSessionCustomAttributes();
+    Session session = await _sessionService.SignInAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/sessions/{session.Id}");
 
     HttpContext.SignIn(session);
 
-    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/sessions/{session.Id}");
-    User user = session.User;
-
-    return Created(uri, user);
+    return Created(uri, session);
   }
 
   [Authorize(Policy = Policies.PortalActor)]

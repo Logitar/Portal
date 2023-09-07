@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
+import SignOutSession from "@/components/sessions/SignOutSession.vue";
+import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import UserSelect from "@/components/users/UserSelect.vue";
+import type { ApiError } from "@/types/api";
+import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Session } from "@/types/sessions";
 import type { SessionSort, SearchSessionsPayload } from "@/types/sessions/payloads";
+import type { User } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
+import { readRealm } from "@/api/realms";
+import { readUser } from "@/api/users";
 import { searchSessions } from "@/api/sessions";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
@@ -18,6 +25,8 @@ const router = useRouter();
 const { d, rt, t, tm } = useI18n();
 
 const isLoading = ref<boolean>(false);
+const selectedRealm = ref<Realm>();
+const selectedUser = ref<User>();
 const sessions = ref<Session[]>([]);
 const timestamp = ref<number>(0);
 const total = ref<number>(0);
@@ -37,6 +46,16 @@ const sortOptions = computed<SelectOption[]>(() =>
     "text"
   )
 );
+
+function onSessionSignedOut(session: Session): void {
+  const index = sessions.value.findIndex(({ id }) => id === session.id);
+  if (index >= 0) {
+    sessions.value.splice(index, 1, session);
+  }
+}
+function onUserSignedOut(): void {
+  refresh();
+}
 
 async function refresh(): Promise<void> {
   const parameters: SearchSessionsPayload = {
@@ -83,6 +102,16 @@ function setQuery(key: string, value: string): void {
   router.replace({ ...route, query });
 }
 
+function onRealmSelected(realm?: Realm): void {
+  selectedRealm.value = realm;
+  selectedUser.value = undefined;
+  setQuery("realm", realm?.id ?? "");
+}
+function onUserSelected(user?: User): void {
+  selectedUser.value = user;
+  setQuery("user", user?.id ?? "");
+}
+
 watch(
   () => route,
   (route) => {
@@ -115,6 +144,27 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+onMounted(async () => {
+  try {
+    const realm = route.query.realm?.toString();
+    const user = route.query.user?.toString();
+    if (user) {
+      const foundUser = await readUser(user);
+      selectedUser.value = foundUser;
+      selectedRealm.value = foundUser.realm;
+    } else if (realm) {
+      selectedRealm.value = await readRealm(realm);
+    }
+  } catch (e: unknown) {
+    const { status } = e as ApiError;
+    if (status === 404) {
+      router.push({ path: "/not-found" });
+    } else {
+      handleError(e);
+    }
+  }
+});
 </script>
 
 <template>
@@ -122,13 +172,18 @@ watch(
     <div class="container">
       <h1>{{ t("sessions.title.list") }}</h1>
       <div class="my-2">
-        <icon-button :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-        <!-- TODO(fpion): sign-out all button if an user is selected -->
-        <!-- TODO(fpion): modal if current user is selected -->
+        <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
+        <SignOutUser
+          v-if="selectedUser"
+          class="ms-1"
+          :disabled="sessions.every(({ isActive }) => !isActive)"
+          :user="selectedUser"
+          @signed-out="onUserSignedOut"
+        />
       </div>
       <div class="row">
-        <RealmSelect class="col-lg-4" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
-        <UserSelect class="col-lg-4" :model-value="user" :realm="realm" @update:model-value="setQuery('user', $event)" />
+        <RealmSelect class="col-lg-4" :model-value="realm" @realm-selected="onRealmSelected" />
+        <UserSelect class="col-lg-4" :model-value="user" :realm="selectedRealm" @user-selected="onUserSelected" />
         <yes-no-select
           class="col-lg-4"
           id="isPersistent"
@@ -171,7 +226,7 @@ watch(
           <tbody>
             <tr v-for="session in sessions" :key="session.id">
               <td>
-                <RouterLink :to="{ name: 'SessionView', params: { id: session.id } }">{{ d(session.updatedOn, "medium") }}</RouterLink>
+                <RouterLink :to="{ name: 'SessionEdit', params: { id: session.id } }">{{ d(session.updatedOn, "medium") }}</RouterLink>
               </td>
               <td>
                 <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">
@@ -191,17 +246,7 @@ watch(
                 <app-badge v-else>{{ t("sessions.isActive.label") }}</app-badge>
               </td>
               <td>{{ t(session.isPersistent ? "yes" : "no") }}</td>
-              <td>
-                <icon-button
-                  :disabled="!session.isActive"
-                  icon="fas fa-arrow-right-from-bracket"
-                  :loading="isLoading"
-                  text="users.signOut.title"
-                  variant="warning"
-                />
-                <!-- TODO(fpion): danger variant if current session -->
-                <!-- TODO(fpion): modal if current session -->
-              </td>
+              <td><SignOutSession :session="session" @signed-out="onSessionSignedOut" /></td>
             </tr>
           </tbody>
         </table>

@@ -8,7 +8,9 @@ import ContactInformation from "@/components/users/ContactInformation.vue";
 import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
+import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import StatusInfo from "@/components/shared/StatusInfo.vue";
+import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
@@ -82,10 +84,26 @@ function onRealmSelected(selected?: Realm) {
   realmId.value = selected?.id;
 }
 
+function onStatusToggled(updatedUser: User) {
+  if (user.value) {
+    user.value.disabledBy = updatedUser.disabledBy;
+    user.value.disabledOn = updatedUser.disabledOn;
+    user.value.isDisabled = updatedUser.isDisabled;
+  }
+}
+
+function onUserSignedOut(signedOut: User): void {
+  if (user.value) {
+    user.value.updatedBy = signedOut.updatedBy;
+    user.value.updatedOn = signedOut.updatedOn;
+    user.value.version = signedOut.version;
+  }
+}
+
 function onUserUpdated(event: UserUpdatedEvent): void {
   user.value = event.user;
   if (account.authenticated?.id === event.user.id) {
-    account.signIn(event.user);
+    account.setUser(event.user);
   }
   toasts.success(event.toast ?? "users.updated");
 }
@@ -128,12 +146,22 @@ onMounted(async () => {
         <p v-if="user.authenticatedOn">
           {{ t("users.authenticatedOnFormat", { date: d(user.authenticatedOn, "medium") }) }}
           <br />
-          TODO(fpion): View sessions
+          <RouterLink
+            :to="{
+              name: 'SessionList',
+              query: { realm: user.realm?.id ?? '', user: user.id, sort: 'UpdatedOn', isDescending: 'true', page: '1', count: '10' },
+            }"
+          >
+            {{ t("sessions.view") }}
+          </RouterLink>
         </p>
-        <p v-if="user.disabledBy && user.disabledOn"><StatusInfo :actor="user.disabledBy" :date="user.disabledOn" format="user.disabledFormat" /></p>
+        <p v-if="user.disabledBy && user.disabledOn">
+          <StatusInfo :actor="user.disabledBy" class="text-danger" :date="user.disabledOn" format="users.disabledFormat" />
+        </p>
         <div class="mb-3">
-          <!-- TODO(fpion): enable/disable button -->
-          <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
+          <icon-button class="me-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
+          <ToggleUserStatus class="mx-1" :user="user" @user-updated="onStatusToggled" />
+          <SignOutUser class="ms-1" :user="user" @signed-out="onUserSignedOut" />
         </div>
         <RealmSelect disabled :model-value="realmId" />
         <app-tabs>

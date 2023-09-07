@@ -27,7 +27,7 @@ const uniqueNameSettings = computed<UniqueNameSettings | undefined>(() => user.v
 
 function onUserUpdated(event: UserUpdatedEvent): void {
   user.value = event.user;
-  account.signIn(event.user);
+  account.setUser(event.user);
   toasts.success(event.toast ?? "users.profile.updated");
 }
 
