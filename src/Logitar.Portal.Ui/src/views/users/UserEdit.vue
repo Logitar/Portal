@@ -19,7 +19,8 @@ import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
 import type { User, UserUpdatedEvent } from "@/types/users";
-import { createUser, readUser } from "@/api/users";
+import { createUser, readUser, updateUser } from "@/api/users";
+import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
 import { readRealm } from "@/api/realms";
@@ -37,6 +38,7 @@ const configuration = ref<Configuration>();
 const confirm = ref<string>("");
 const customAttributes = ref<CustomAttribute[]>([]);
 const hasLoaded = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 const password = ref<string>("");
 const realm = ref<Realm>();
 const realmId = ref<string>();
@@ -76,6 +78,25 @@ const onCreate = handleSubmit(async () => {
       uniqueNameAlreadyUsed.value = true;
     } else {
       handleError(e);
+    }
+  }
+});
+const onSaveCustomAttributes = handleSubmit(async () => {
+  if (user.value && !isLoading.value) {
+    isLoading.value = true;
+    try {
+      const customAttributeModifications = getCustomAttributeModifications(user.value.customAttributes, customAttributes.value);
+      if (customAttributeModifications.length) {
+        const updatedUser = await updateUser(user.value.id, {
+          customAttributes: customAttributeModifications,
+        });
+        setModel(updatedUser);
+        toasts.success("users.updated");
+      }
+    } catch (e: unknown) {
+      handleError(e);
+    } finally {
+      isLoading.value = false;
     }
   }
 });
@@ -173,15 +194,16 @@ onMounted(async () => {
           <app-tab title="users.tabs.contact">
             <ContactInformation :user="user" @user-updated="onUserUpdated" />
           </app-tab>
-          <app-tab title="roles.title.list">
-            <p>TODO(fpion): implement user roles</p>
+          <app-tab title="customAttributes.title">
+            <form @submit.prevent="onSaveCustomAttributes">
+              <custom-attribute-list :loading="isLoading" :model="user.customAttributes" v-model="customAttributes" />
+            </form>
           </app-tab>
           <app-tab title="users.identifiers.title">
             <p>TODO(fpion): implement user identifiers</p>
           </app-tab>
-          <app-tab title="customAttributes.title">
-            <!-- TODO(fpion): how to save -->
-            <custom-attribute-list v-model="customAttributes" />
+          <app-tab title="roles.title.list">
+            <p>TODO(fpion): implement user roles</p>
           </app-tab>
         </app-tabs>
       </template>

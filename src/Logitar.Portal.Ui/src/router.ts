@@ -4,7 +4,7 @@ import { useAccountStore } from "@/stores/account";
 import { useConfigurationStore } from "@/stores/configuration";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.MODE === "development" ? import.meta.env.BASE_URL : "/app"),
+  history: createWebHistory(import.meta.env.MODE === "development" ? import.meta.env.BASE_URL : "/app"), // TODO(fpion): refactor
   routes: [
     {
       name: "Dashboard",
