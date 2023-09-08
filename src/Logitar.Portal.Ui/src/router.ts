@@ -102,6 +102,12 @@ const router = createRouter({
       path: "/sessions/:id",
       component: () => import("./views/sessions/SessionEdit.vue"),
     },
+    // Tokens
+    {
+      name: "Tokens",
+      path: "/tokens",
+      component: () => import("./views/TokenView.vue"),
+    },
     // Users
     {
       name: "UserList",

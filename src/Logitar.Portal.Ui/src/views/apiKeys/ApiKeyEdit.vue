@@ -168,7 +168,7 @@ onMounted(async () => {
         <br />
         <FormInput id="clipboard" :model-value="xApiKey" readonly ref="clipboardRef" @focus="$event.target.select()">
           <template #append>
-            <icon-button icon="fas fa-clipboard" text="apiKeys.clipboard" variant="warning" @click="copyToClipboard()" />
+            <icon-button icon="fas fa-clipboard" text="actions.clipboard" variant="warning" @click="copyToClipboard()" />
           </template>
         </FormInput>
         {{ t("apiKeys.string.warning") }}
