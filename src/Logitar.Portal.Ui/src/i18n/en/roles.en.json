@@ -6,6 +6,14 @@
     "title": "Delete role"
   },
   "empty": "There are no results.",
+  "manage": {
+    "add": "Add role",
+    "empty": "There are no roles."
+  },
+  "select": {
+    "label": "Role",
+    "placeholder": "Select a role"
+  },
   "sort": {
     "options": {
       "DisplayName": "Display name",
