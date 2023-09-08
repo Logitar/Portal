@@ -27,7 +27,7 @@ internal class Mapper
     ApiKey destination = new()
     {
       Id = new AggregateId(source.AggregateId).ToGuid(),
-      Title = source.Title,
+      DisplayName = source.Title,
       Description = source.Description,
       ExpiresOn = source.ExpiresOn,
       AuthenticatedOn = source.AuthenticatedOn,

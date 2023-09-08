@@ -126,7 +126,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
   {
     CreateApiKeyPayload payload = new()
     {
-      Title = "  Default  ",
+      DisplayName = "  Default  ",
       Description = "    ",
       ExpiresOn = DateTime.Now.AddYears(1),
       CustomAttributes = new CustomAttribute[]
@@ -146,7 +146,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(apiKey.CreatedBy, apiKey.UpdatedBy);
     Assert.True(apiKey.Version >= 1);
 
-    Assert.Equal(payload.Title.Trim(), apiKey.Title);
+    Assert.Equal(payload.DisplayName.Trim(), apiKey.DisplayName);
     Assert.Equal(payload.Description?.CleanTrim(), apiKey.Description);
     AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
 
@@ -166,7 +166,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     CreateApiKeyPayload payload = new()
     {
       Realm = $"  {_realm.UniqueSlug}  ",
-      Title = "Default",
+      DisplayName = "Default",
       Roles = new string[]
       {
         $"  {_readUsers.Id.ToGuid().ToString().ToUpper()}  ",
@@ -184,7 +184,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(apiKey.CreatedBy, apiKey.UpdatedBy);
     Assert.True(apiKey.Version >= 1);
 
-    Assert.Equal(payload.Title, apiKey.Title);
+    Assert.Equal(payload.DisplayName, apiKey.DisplayName);
 
     Assert.Equal(2, apiKey.Roles.Count());
     Assert.Contains(apiKey.Roles, role => role.Id == _readUsers.Id.ToGuid());
@@ -203,7 +203,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     CreateApiKeyPayload payload = new()
     {
       Realm = _realm.UniqueSlug,
-      Title = "Default",
+      DisplayName = "Default",
       Roles = new string[] { _readUsers.UniqueName, "read_realms", "read_roles" }
     };
 
@@ -269,7 +269,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
 
     ReplaceApiKeyPayload payload = new()
     {
-      Title = $"  {_apiKey.Title}2  ",
+      DisplayName = $"  {_apiKey.DisplayName}2  ",
       Description = "    ",
       ExpiresOn = _apiKey.ExpiresOn?.AddMonths(-6),
       CustomAttributes = new CustomAttribute[]
@@ -290,7 +290,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(apiKey.UpdatedOn);
     Assert.True(apiKey.Version > version);
 
-    Assert.Equal(payload.Title.Trim(), apiKey.Title);
+    Assert.Equal(payload.DisplayName.Trim(), apiKey.DisplayName);
     Assert.Equal(payload.Description?.CleanTrim(), apiKey.Description);
     AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
 
@@ -317,7 +317,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
   {
     ReplaceApiKeyPayload payload = new()
     {
-      Title = _apiKey.Title,
+      DisplayName = _apiKey.DisplayName,
       ExpiresOn = _apiKey.ExpiresOn,
       Roles = new string[] { "read_users", "read_roles", "read_realms" }
     };
@@ -359,7 +359,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     await AggregateRepository.SaveAsync(new AggregateRoot[] { notInRealm, notMatching, idNotIn, apiKey1, apiKey2, apiKey3, expired });
 
     ApiKeyAggregate[] apiKeys = new[] { _apiKey, apiKey1, apiKey2, apiKey3 }
-      .OrderBy(x => x.Title).Skip(1).Take(2).ToArray();
+      .OrderBy(x => x.DisplayName).Skip(1).Take(2).ToArray();
 
     HashSet<Guid> ids = (await PortalContext.ApiKeys.AsNoTracking().ToArrayAsync())
       .Select(user => new AggregateId(user.AggregateId).ToGuid()).ToHashSet();
@@ -385,7 +385,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
       },
       Sort = new ApiKeySortOption[]
       {
-        new(ApiKeySort.Title)
+        new(ApiKeySort.DisplayName)
       },
       Skip = 1,
       Limit = 2
@@ -437,7 +437,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
 
     UpdateApiKeyPayload payload = new()
     {
-      Title = $"  {_apiKey.Title}2  ",
+      DisplayName = $"  {_apiKey.DisplayName}2  ",
       Description = new Modification<string>("    "),
       ExpiresOn = _apiKey.ExpiresOn?.AddMonths(-6),
       CustomAttributes = new CustomAttributeModification[]
@@ -463,7 +463,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(apiKey.UpdatedOn);
     Assert.True(apiKey.Version > _apiKey.Version);
 
-    Assert.Equal(payload.Title.Trim(), apiKey.Title);
+    Assert.Equal(payload.DisplayName.Trim(), apiKey.DisplayName);
     Assert.Equal(payload.Description.Value?.CleanTrim(), apiKey.Description);
     AssertEqual(payload.ExpiresOn, apiKey.ExpiresOn);
 

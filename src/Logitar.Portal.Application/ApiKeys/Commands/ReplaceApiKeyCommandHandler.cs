@@ -49,9 +49,9 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
 
     ReplaceApiKeyPayload payload = command.Payload;
 
-    if (reference == null || payload.Title.Trim() != reference.Title)
+    if (reference == null || payload.DisplayName.Trim() != reference.DisplayName)
     {
-      apiKey.Title = payload.Title;
+      apiKey.DisplayName = payload.DisplayName;
     }
     if (reference == null || payload.Description?.CleanTrim() != reference.Description)
     {

@@ -34,7 +34,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
   {
     CreateApiKeyPayload payload = new()
     {
-      Title = "Default"
+      DisplayName = "Default"
     };
 
     ApiKey? apiKey = await _apiKeyService.CreateAsync(payload);
@@ -46,7 +46,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(apiKey.Id, actor.Id);
     Assert.Equal(ActorType.ApiKey, actor.Type);
     Assert.False(actor.IsDeleted);
-    Assert.Equal(apiKey.Title, actor.DisplayName);
+    Assert.Equal(apiKey.DisplayName, actor.DisplayName);
     Assert.Null(actor.EmailAddress);
     Assert.Null(actor.PictureUrl);
 
@@ -105,7 +105,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
       Id = actorId.ToGuid(),
       Type = ActorType.ApiKey,
       IsDeleted = false,
-      DisplayName = aggregate.Title
+      DisplayName = aggregate.DisplayName
     };
     _cacheService.SetActor(actorId, cached);
 
@@ -178,13 +178,13 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
       Id = actorId.ToGuid(),
       Type = ActorType.ApiKey,
       IsDeleted = false,
-      DisplayName = aggregate.Title
+      DisplayName = aggregate.DisplayName
     };
     _cacheService.SetActor(actorId, cached);
 
     UpdateApiKeyPayload payload = new()
     {
-      Title = "Par défaut"
+      DisplayName = "Par défaut"
     };
     ApiKey? apiKey = await _apiKeyService.UpdateAsync(aggregate.Id.ToGuid(), payload);
     Assert.NotNull(apiKey);
@@ -195,7 +195,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(apiKey.Id, actor.Id);
     Assert.Equal(ActorType.ApiKey, actor.Type);
     Assert.False(actor.IsDeleted);
-    Assert.Equal(apiKey.Title, actor.DisplayName);
+    Assert.Equal(apiKey.DisplayName, actor.DisplayName);
     Assert.Null(actor.EmailAddress);
     Assert.Null(actor.PictureUrl);
 

@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.ApiKeys;
 
 public record UpdateApiKeyPayload
 {
-  public string? Title { get; set; }
+  public string? DisplayName { get; set; }
   public Modification<string>? Description { get; set; }
   public DateTime? ExpiresOn { get; set; }
 

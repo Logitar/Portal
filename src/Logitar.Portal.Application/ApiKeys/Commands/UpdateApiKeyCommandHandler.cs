@@ -43,9 +43,9 @@ internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand,
 
     UpdateApiKeyPayload payload = command.Payload;
 
-    if (payload.Title != null)
+    if (payload.DisplayName != null)
     {
-      apiKey.Title = payload.Title;
+      apiKey.DisplayName = payload.DisplayName;
     }
     if (payload.Description != null)
     {

@@ -3,7 +3,7 @@
 public enum ApiKeySort
 {
   AuthenticatedOn,
+  DisplayName,
   ExpiresOn,
-  Title,
   UpdatedOn
 }

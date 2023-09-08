@@ -11,7 +11,7 @@ internal record ApiKeyEntity : AggregateEntity
 
     Secret = created.Secret?.Encode();
 
-    Title = created.Title;
+    Title = created.DisplayName;
   }
 
   private ApiKeyEntity() : base()

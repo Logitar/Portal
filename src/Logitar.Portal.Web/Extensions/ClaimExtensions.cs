@@ -14,7 +14,7 @@ internal static class ClaimExtensions
 
     identity.AddClaim(new(Rfc7519ClaimNames.Subject, apiKey.Id.ToString()));
     identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.UpdatedAt, apiKey.UpdatedOn));
-    identity.AddClaim(new(Rfc7519ClaimNames.FullName, apiKey.Title));
+    identity.AddClaim(new(Rfc7519ClaimNames.FullName, apiKey.DisplayName));
 
     if (apiKey.AuthenticatedOn.HasValue)
     {

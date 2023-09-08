@@ -14,14 +14,14 @@ internal record ActorEntity
     Type = ActorType.ApiKey;
     IsDeleted = apiKey.IsDeleted;
 
-    DisplayName = apiKey.Title;
+    DisplayName = apiKey.DisplayName;
   }
   public ActorEntity(ApiKeyCreatedEvent created)
   {
     Id = created.AggregateId.ToGuid();
     Type = ActorType.ApiKey;
 
-    DisplayName = created.Title;
+    DisplayName = created.DisplayName;
   }
 
   public ActorEntity(UserAggregate user)

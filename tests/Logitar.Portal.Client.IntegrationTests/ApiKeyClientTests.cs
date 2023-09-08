@@ -30,7 +30,7 @@ internal class ApiKeyClientTests
       CreateApiKeyPayload create = new()
       {
         Realm = _context.Realm.UniqueSlug,
-        Title = "Default API Key"
+        DisplayName = "Default API Key"
       };
       ApiKey apiKey = await _apiKeyService.CreateAsync(create, cancellationToken);
       string xApiKey = apiKey.XApiKey ?? string.Empty;
@@ -39,7 +39,7 @@ internal class ApiKeyClientTests
       name = $"{Sut}.{nameof(_apiKeyService.ReplaceAsync)}";
       ReplaceApiKeyPayload replace = new()
       {
-        Title = apiKey.Title,
+        DisplayName = apiKey.DisplayName,
         Description = "This is the default API key.",
         ExpiresOn = DateTime.Now.AddYears(1),
         Roles = new string[] { $"  {_context.Role.UniqueName}  " }
@@ -64,7 +64,7 @@ internal class ApiKeyClientTests
       ApiKey delete = await _apiKeyService.CreateAsync(new CreateApiKeyPayload
       {
         Realm = _context.Realm.Id.ToString(),
-        Title = apiKey.Title,
+        DisplayName = apiKey.DisplayName,
       }, cancellationToken);
       delete = await _apiKeyService.DeleteAsync(delete.Id, cancellationToken)
         ?? throw new InvalidOperationException("The result should not be null.");
