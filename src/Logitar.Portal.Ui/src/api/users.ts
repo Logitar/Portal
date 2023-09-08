@@ -1,6 +1,5 @@
-import type { CreateUserPayload, SearchUsersPayload, UpdateUserPayload } from "@/types/users";
+import type { CreateUserPayload, SearchUsersPayload, UpdateUserPayload, User } from "@/types/users";
 import type { SearchResults } from "@/types/search";
-import type { User } from "@/types/users";
 import { _delete, get, graphQL, patch, post } from ".";
 
 export async function createUser(payload: CreateUserPayload): Promise<User> {
