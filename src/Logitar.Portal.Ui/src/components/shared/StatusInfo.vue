@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+
 import type { Actor } from "@/types/actor";
 
 const { d, t } = useI18n();

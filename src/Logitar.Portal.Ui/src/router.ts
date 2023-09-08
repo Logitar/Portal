@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+
 import { isConfigurationInitialized } from "./api/configuration";
 import { useAccountStore } from "@/stores/account";
 import { useConfigurationStore } from "@/stores/configuration";

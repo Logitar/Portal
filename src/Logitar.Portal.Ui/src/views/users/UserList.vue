@@ -2,11 +2,11 @@
 import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
+import type { SearchUsersPayload, User, UserSort } from "@/types/users";
 import type { SelectOption, ToastUtils } from "@/types/components";
-import type { User } from "@/types/users";
-import type { UserSort, SearchUsersPayload } from "@/types/users/payloads";
 import { deleteUser, searchUsers } from "@/api/users";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
@@ -21,9 +21,9 @@ const toasts = inject(toastsKey) as ToastUtils;
 const { d, rt, t, tm } = useI18n();
 
 const isLoading = ref<boolean>(false);
-const users = ref<User[]>([]);
 const timestamp = ref<number>(0);
 const total = ref<number>(0);
+const users = ref<User[]>([]);
 
 const count = computed<number>(() => Number(route.query.count) || 10);
 const isConfirmed = computed<boolean | undefined>(() => (route.query.isConfirmed ? route.query.isConfirmed === "true" : undefined));

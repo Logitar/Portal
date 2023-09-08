@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+
 import type { UniqueNameSettings } from "@/types/settings";
 import type { ValidationRules } from "@/types/validation";
 

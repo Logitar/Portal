@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+
 import RoleSelect from "./RoleSelect.vue";
 import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";

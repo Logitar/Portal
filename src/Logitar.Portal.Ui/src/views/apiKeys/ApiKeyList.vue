@@ -2,9 +2,9 @@
 import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import RealmSelect from "@/components/realms/RealmSelect.vue";
-import type { ApiKey } from "@/types/apiKeys";
-import type { ApiKeySort, SearchApiKeysPayload } from "@/types/apiKeys/payloads";
+import type { ApiKey, ApiKeySort, SearchApiKeysPayload } from "@/types/apiKeys";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteApiKey, searchApiKeys } from "@/api/apiKeys";
 import { handleErrorKey, toastsKey } from "@/inject/App";

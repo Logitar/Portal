@@ -1,4 +1,4 @@
-import type { CreateRolePayload, SearchRolesPayload, UpdateRolePayload } from "@/types/roles/payloads";
+import type { CreateRolePayload, SearchRolesPayload, UpdateRolePayload } from "@/types/roles";
 import type { Role } from "@/types/roles";
 import type { SearchResults } from "@/types/search";
 import { _delete, get, graphQL, patch, post } from ".";

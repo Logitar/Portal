@@ -1,5 +1,4 @@
-import type { Configuration, IsConfigurationInitializedResult } from "@/types/configuration";
-import type { InitializeConfigurationPayload, UpdateConfigurationPayload } from "@/types/configuration/payloads";
+import type { Configuration, InitializeConfigurationPayload, IsConfigurationInitializedResult, UpdateConfigurationPayload } from "@/types/configuration";
 import type { InitializeConfigurationResult } from "@/types/configuration";
 import { get, patch, post } from ".";
 

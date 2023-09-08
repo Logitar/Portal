@@ -1,5 +1,4 @@
-import type { CreateRealmPayload, SearchRealmsPayload, UpdateRealmPayload } from "@/types/realms/payloads";
-import type { Realm } from "@/types/realms";
+import type { CreateRealmPayload, Realm, SearchRealmsPayload, UpdateRealmPayload } from "@/types/realms";
 import type { SearchResults } from "@/types/search";
 import { _delete, get, graphQL, patch, post } from ".";
 

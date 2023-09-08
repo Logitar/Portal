@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
 import FormInput from "@/components/shared/FormInput.vue";
 import type { ConfirmedParams } from "@/types/validation";
 import type { PasswordSettings } from "@/types/settings";

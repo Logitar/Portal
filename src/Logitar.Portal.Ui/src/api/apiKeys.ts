@@ -1,5 +1,4 @@
-import type { ApiKey } from "@/types/apiKeys";
-import type { CreateApiKeyPayload, SearchApiKeysPayload, UpdateApiKeyPayload } from "@/types/apiKeys/payloads";
+import type { ApiKey, CreateApiKeyPayload, SearchApiKeysPayload, UpdateApiKeyPayload } from "@/types/apiKeys";
 import type { SearchResults } from "@/types/search";
 import { _delete, get, graphQL, patch, post } from ".";
 

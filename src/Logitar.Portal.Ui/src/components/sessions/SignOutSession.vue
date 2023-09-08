@@ -2,6 +2,7 @@
 import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+
 import AppModal from "@/components/shared/AppModal.vue";
 import type { Session } from "@/types/sessions";
 import type { ToastUtils } from "@/types/components";

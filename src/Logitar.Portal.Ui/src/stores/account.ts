@@ -1,5 +1,6 @@
-import { ref } from "vue";
 import { defineStore } from "pinia";
+import { ref } from "vue";
+
 import type { Session } from "@/types/sessions";
 import type { User } from "@/types/users";
 

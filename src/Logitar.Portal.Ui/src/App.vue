@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { provide, ref } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { Tooltip } from "bootstrap";
+import { provide, ref } from "vue";
+
 import AppFooter from "./components/layout/AppFooter.vue";
 import AppNavbar from "./components/layout/AppNavbar.vue";
 import ToastContainer from "./components/layout/ToastContainer.vue";

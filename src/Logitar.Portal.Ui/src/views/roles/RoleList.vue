@@ -2,9 +2,9 @@
 import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import RealmSelect from "@/components/realms/RealmSelect.vue";
-import type { Role } from "@/types/roles";
-import type { RoleSort, SearchRolesPayload } from "@/types/roles/payloads";
+import type { Role, RoleSort, SearchRolesPayload } from "@/types/roles";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteRole, searchRoles } from "@/api/roles";
 import { handleErrorKey, toastsKey } from "@/inject/App";

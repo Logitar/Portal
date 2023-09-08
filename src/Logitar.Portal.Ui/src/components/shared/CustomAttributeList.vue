@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+
 import CustomAttributeEdit from "./CustomAttributeEdit.vue";
 import type { CustomAttribute } from "@/types/customAttributes";
 

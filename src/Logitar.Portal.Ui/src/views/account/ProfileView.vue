@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
 import AuthenticationInformation from "@/components/users/AuthenticationInformation.vue";
 import ContactInformation from "@/components/users/ContactInformation.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";

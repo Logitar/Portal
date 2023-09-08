@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
 import type { Identifier } from "@/types/identifier";
 
 const { t } = useI18n();

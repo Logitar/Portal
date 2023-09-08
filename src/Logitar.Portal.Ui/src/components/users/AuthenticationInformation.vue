@@ -2,14 +2,14 @@
 import { computed, inject, ref, watchEffect } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
+
 import PasswordInput from "./PasswordInput.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
-import type { User, UserUpdatedEvent } from "@/types/users";
+import type { User, UpdateUserPayload, UserUpdatedEvent } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { saveProfile } from "@/api/account";
 import { updateUser } from "@/api/users";
-import type { UpdateUserPayload } from "@/types/users/payloads";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const { d, t } = useI18n();

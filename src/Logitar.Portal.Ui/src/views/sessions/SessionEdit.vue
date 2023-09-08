@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
 import SignOutSession from "@/components/sessions/SignOutSession.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import type { ApiError } from "@/types/api";

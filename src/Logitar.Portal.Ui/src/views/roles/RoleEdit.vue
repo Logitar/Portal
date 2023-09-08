@@ -3,6 +3,7 @@ import { computed, inject, onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Configuration } from "@/types/configuration";
@@ -17,11 +18,11 @@ import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
 import { readRealm } from "@/api/realms";
 
-const { t } = useI18n();
+const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
 const router = useRouter();
-const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
+const { t } = useI18n();
 
 const defaults = {
   uniqueName: "",

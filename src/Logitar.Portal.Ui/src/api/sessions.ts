@@ -1,5 +1,5 @@
 import type { SearchResults } from "@/types/search";
-import type { SearchSessionsPayload } from "@/types/sessions/payloads";
+import type { SearchSessionsPayload } from "@/types/sessions";
 import type { Session } from "@/types/sessions";
 import { get, graphQL, patch } from ".";
 

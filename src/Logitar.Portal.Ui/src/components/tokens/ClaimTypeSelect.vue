@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+
 import claimTypes from "@/resources/claimTypes.json";
 import type { SelectOption } from "@/types/components";
 import { orderBy } from "@/helpers/arrayUtils";
