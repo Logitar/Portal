@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ClaimTypeSelect from "./ClaimTypeSelect.vue";
 import type { Claim } from "@/types/tokens";
 import { assign } from "@/helpers/objectUtils";
 
@@ -48,8 +49,6 @@ function onUpdate(changes: object): void {
       required
       @update:model-value="onUpdate({ value: $event })"
     />
-    <div class="col">
-      <!-- TODO(fpion): implement claim types -->
-    </div>
+    <ClaimTypeSelect class="col" :id="`${id}_type`" :model-value="claim.type" no-label @update:model-value="onUpdate({ type: $event || null })" />
   </div>
 </template>

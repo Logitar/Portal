@@ -45,8 +45,8 @@ function update(index: number, mapping: ClaimMapping): void {
     <template v-if="modelValue.length">
       <div class="row">
         <h5 class="col">{{ t("customAttributes.key.label") }}</h5>
-        <h5 class="col">{{ t("realms.claimMappings.name.label") }}</h5>
-        <h5 class="col">{{ t("realms.claimMappings.type.label") }}</h5>
+        <h5 class="col">{{ t("tokens.claims.name.label") }}</h5>
+        <h5 class="col">{{ t("tokens.claims.type.label") }}</h5>
       </div>
       <ClaimMappingEdit
         v-for="(claimMapping, index) in modelValue"

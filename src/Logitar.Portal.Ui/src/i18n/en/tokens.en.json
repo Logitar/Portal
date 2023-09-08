@@ -11,7 +11,8 @@
     },
     "title": "Claims",
     "type": {
-      "label": "Type"
+      "label": "Type",
+      "placeholder": "Select a claim type"
     },
     "value": {
       "label": "Value",

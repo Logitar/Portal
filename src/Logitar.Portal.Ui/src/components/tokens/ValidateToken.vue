@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onMounted, ref } from "vue";
+import { inject, onUpdated, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import EmailAddressInput from "../users/EmailAddressInput.vue";
@@ -54,9 +54,7 @@ const onSubmit = handleSubmit(async () => {
   }
 });
 
-onMounted(() => {
-  registerTooltips(); // TODO(fpion): tooltips are not found because they are not rendered yet
-});
+onUpdated(() => registerTooltips());
 </script>
 
 <template>
