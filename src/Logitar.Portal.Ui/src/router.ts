@@ -43,6 +43,22 @@ const router = createRouter({
       path: "/user/sign-out",
       component: () => import("./views/account/SignOut.vue"),
     },
+    // API keys
+    {
+      name: "ApiKeyList",
+      path: "/api-keys",
+      component: () => import("./views/apiKeys/ApiKeyList.vue"),
+    },
+    {
+      name: "ApiKeyEdit",
+      path: "/api-keys/:id",
+      component: () => import("./views/apiKeys/ApiKeyEdit.vue"),
+    },
+    {
+      name: "CreateApiKey",
+      path: "/create-api-key",
+      component: () => import("./views/apiKeys/ApiKeyEdit.vue"),
+    },
     // Realms
     {
       name: "RealmList",
