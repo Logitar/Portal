@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Contracts.Constants;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,25 +36,39 @@ public class AccountController : ControllerBase
   [HttpPatch("profile")]
   public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
   {
-    Guid id = HttpContext.GetUser()?.Id
+    try
+    {
+      Guid id = HttpContext.GetUser()?.Id
       ?? throw new InvalidOperationException("The User context item is required.");
-    User user = await _userService.UpdateAsync(id, payload, cancellationToken)
-      ?? throw new InvalidOperationException("The user update operation returned null.");
+      User user = await _userService.UpdateAsync(id, payload, cancellationToken)
+        ?? throw new InvalidOperationException("The user update operation returned null.");
 
-    return Ok(user);
+      return Ok(user);
+    }
+    catch (InvalidCredentialsException)
+    {
+      return InvalidCredentials();
+    }
   }
 
   [HttpPost("sign/in")]
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInPayload payload, CancellationToken cancellationToken)
   {
-    payload.Realm = null;
-    payload.CustomAttributes = HttpContext.GetSessionCustomAttributes();
-    Session session = await _sessionService.SignInAsync(payload, cancellationToken);
-    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/sessions/{session.Id}");
+    try
+    {
+      payload.Realm = null;
+      payload.CustomAttributes = HttpContext.GetSessionCustomAttributes();
+      Session session = await _sessionService.SignInAsync(payload, cancellationToken);
+      Uri uri = new($"{Request.Scheme}://{Request.Host}/api/sessions/{session.Id}");
 
-    HttpContext.SignIn(session);
+      HttpContext.SignIn(session);
 
-    return Created(uri, session);
+      return Created(uri, session);
+    }
+    catch (InvalidCredentialsException)
+    {
+      return InvalidCredentials();
+    }
   }
 
   [Authorize(Policy = Policies.PortalActor)]
@@ -68,5 +84,10 @@ public class AccountController : ControllerBase
     HttpContext.SignOut();
 
     return NoContent();
+  }
+
+  private ActionResult InvalidCredentials()
+  {
+    return BadRequest(new ErrorDetail("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
   }
 }

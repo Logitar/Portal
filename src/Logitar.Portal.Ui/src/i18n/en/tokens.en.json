@@ -50,6 +50,12 @@
   },
   "title": "Tokens",
   "validated": {
+    "error": {
+      "code": "Code",
+      "help": "Please review the details below.",
+      "lead": "An error has occurred.",
+      "message": "Message"
+    },
     "title": "Result"
   }
 }

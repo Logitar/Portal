@@ -5,6 +5,7 @@ import { useI18n } from "vue-i18n";
 import EmailAddressInput from "../users/EmailAddressInput.vue";
 import FormInput from "@/components/shared/FormInput.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
+import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Claim, ValidatedToken } from "@/types/tokens";
 import type { Realm } from "@/types/realms";
 import { registerTooltipsKey } from "@/inject/App";
@@ -15,10 +16,12 @@ const { d, t } = useI18n();
 
 const audience = ref<string>("");
 const consume = ref<boolean>(false);
+const error = ref<ErrorDetail>();
 const issuer = ref<string>("");
 const purpose = ref<string>("");
 const realm = ref<Realm>();
 const secret = ref<string>("");
+const showError = ref<boolean>(false);
 const token = ref<string>("");
 const validatedToken = ref<ValidatedToken>();
 
@@ -39,6 +42,8 @@ function isDateTimeClaim(claim: Claim): boolean {
 
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  error.value = undefined;
+  validatedToken.value = undefined;
   try {
     validatedToken.value = await validateToken({
       token: token.value,
@@ -50,7 +55,17 @@ const onSubmit = handleSubmit(async () => {
       secret: secret.value,
     });
   } catch (e: unknown) {
-    emit("error", e);
+    const { data, status } = e as ApiError;
+    if (status === 400) {
+      const detail = data as ErrorDetail;
+      if (detail.errorCode && detail.errorMessage) {
+        error.value = detail;
+        showError.value = true;
+      }
+    }
+    if (!error.value) {
+      emit("error", e);
+    }
   }
 });
 
@@ -83,8 +98,25 @@ onUpdated(() => registerTooltips());
         <FormInput class="col-lg-6" id="issuer" label="tokens.issuer.label" placeholder="tokens.issuer.placeholder" v-model="issuer" />
       </div>
     </form>
+    <h3 v-if="error || validatedToken">{{ t("tokens.validated.title") }}</h3>
+    <template v-if="error">
+      <app-alert dismissible variant="warning" v-model="showError">
+        <strong>{{ t("tokens.validated.error.lead") }}</strong> {{ t("tokens.validated.error.help") }}
+      </app-alert>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th scope="row">{{ t("tokens.validated.error.code") }}</th>
+            <td>{{ error.errorCode }}</td>
+          </tr>
+          <tr>
+            <th scope="row">{{ t("tokens.validated.error.message") }}</th>
+            <td>{{ error.errorMessage }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </template>
     <template v-if="validatedToken">
-      <h3>{{ t("tokens.validated.title") }}</h3>
       <div class="row">
         <EmailAddressInput class="col-lg-6" disabled :model-value="validatedToken.emailAddress" />
         <FormInput class="col-lg-6" id="subject" label="tokens.subject.label" placeholder="tokens.subject.placeholder" :model-value="validatedToken.subject" />

@@ -50,6 +50,12 @@
   },
   "title": "Jetons",
   "validated": {
+    "error": {
+      "code": "Code",
+      "help": "Veuillez examiner les détails ci-dessous.",
+      "lead": "Une erreur est survenue.",
+      "message": "Message"
+    },
     "title": "Résultat"
   }
 }
