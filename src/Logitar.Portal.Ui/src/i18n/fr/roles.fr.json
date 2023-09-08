@@ -6,6 +6,14 @@
     "title": "Supprimer le rôle"
   },
   "empty": "Il n’y a aucun résultat.",
+  "manage": {
+    "add": "Ajouter un rôle",
+    "empty": "Il n’y a aucun rôle."
+  },
+  "select": {
+    "label": "Rôle",
+    "placeholder": "Sélectionnez un rôle"
+  },
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",

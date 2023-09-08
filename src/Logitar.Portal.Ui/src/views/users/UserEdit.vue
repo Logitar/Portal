@@ -5,6 +5,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import AuthenticationInformation from "@/components/users/AuthenticationInformation.vue";
 import ContactInformation from "@/components/users/ContactInformation.vue";
+import ManageRoles from "@/components/roles/ManageRoles.vue";
 import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
@@ -12,10 +13,12 @@ import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
+import type { CollectionAction } from "@/types/modifications";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Realm } from "@/types/realms";
+import type { Role } from "@/types/roles";
 import type { ToastUtils } from "@/types/components";
 import type { User, UserUpdatedEvent } from "@/types/users";
 import { createUser, readUser, updateUser } from "@/api/users";
@@ -100,12 +103,29 @@ const onSaveCustomAttributes = handleSubmit(async () => {
   }
 });
 
-function onRealmSelected(selected?: Realm) {
+function onRealmSelected(selected?: Realm): void {
   realm.value = selected;
   realmId.value = selected?.id;
 }
 
-function onStatusToggled(updatedUser: User) {
+async function onRoleToggled(role: Role, action: CollectionAction): Promise<void> {
+  if (user.value && !isLoading.value) {
+    isLoading.value = true;
+    try {
+      const updatedUser = await updateUser(user.value.id, {
+        roles: [{ role: role.id, action }],
+      });
+      setModel(updatedUser);
+      toasts.success("users.updated");
+    } catch (e: unknown) {
+      handleError(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+}
+
+function onStatusToggled(updatedUser: User): void {
   if (user.value) {
     user.value.disabledBy = updatedUser.disabledBy;
     user.value.disabledOn = updatedUser.disabledOn;
@@ -202,7 +222,13 @@ onMounted(async () => {
             <identifier-list :identifiers="user.identifiers" />
           </app-tab>
           <app-tab title="roles.title.list">
-            <p>TODO(fpion): implement user roles</p>
+            <ManageRoles
+              :loading="isLoading"
+              :realm="realm"
+              :roles="user.roles"
+              @role-added="onRoleToggled($event, 'Add')"
+              @role-removed="onRoleToggled($event, 'Remove')"
+            />
           </app-tab>
         </app-tabs>
       </template>

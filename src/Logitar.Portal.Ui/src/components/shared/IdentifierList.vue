@@ -11,7 +11,7 @@ defineProps<{
 
 <template>
   <div>
-    <table class="table table-striped">
+    <table v-if="identifiers.length" class="table table-striped">
       <thead>
         <tr>
           <th scope="col">{{ t("identifiers.key.label") }}</th>
@@ -29,5 +29,6 @@ defineProps<{
         </tr>
       </tbody>
     </table>
+    <p v-else>{{ t("identifiers.empty") }}</p>
   </div>
 </template>
