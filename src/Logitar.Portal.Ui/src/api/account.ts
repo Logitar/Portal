@@ -1,7 +1,6 @@
 import type { Session } from "@/types/sessions";
-import type { SignInPayload } from "@/types/sessions/payloads";
-import type { UpdateUserPayload } from "@/types/users/payloads";
-import type { User } from "@/types/users";
+import type { SignInPayload } from "@/types/sessions";
+import type { UpdateUserPayload, User } from "@/types/users";
 import { get, post, patch } from ".";
 
 export async function getProfile(): Promise<User> {

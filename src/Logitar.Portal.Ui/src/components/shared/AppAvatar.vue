@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import md5 from "md5";
+import { computed } from "vue";
+
 import type { BadgeVariant } from "@/types/components";
 
 const props = withDefaults(

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+
 import { slugify } from "@/helpers/stringUtils";
 
 const props = withDefaults(

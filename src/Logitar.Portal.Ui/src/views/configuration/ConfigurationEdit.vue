@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
+
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import LoggingSettingsEdit from "@/components/configuration/LoggingSettingsEdit.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
@@ -13,10 +14,10 @@ import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration, updateConfiguration } from "@/api/configuration";
 import { useConfigurationStore } from "@/stores/configuration";
 
-const { t } = useI18n();
 const configurationStore = useConfigurationStore();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
+const { t } = useI18n();
 
 const defaults = {
   defaultLocale: "",

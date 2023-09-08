@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
+
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import { handleErrorKey } from "@/inject/App";

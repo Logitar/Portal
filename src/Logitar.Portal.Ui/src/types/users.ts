@@ -1,7 +1,21 @@
+import type { Actor } from "@/types/actor";
+import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
+import type { Identifier } from "@/types/identifier";
 import type { Modification } from "@/types/modifications";
+import type { Realm } from "@/types/realms";
+import type { Role } from "@/types/roles";
 import type { RoleModification } from "@/types/roles";
 import type { SearchPayload, SortOption } from "@/types/search";
+
+export type Address = Contact & {
+  street: string;
+  locality: string;
+  region?: string;
+  postalCode?: string;
+  country: string;
+  formatted: string;
+};
 
 export type AddressPayload = {
   street: string;
@@ -10,6 +24,12 @@ export type AddressPayload = {
   postalCode?: string;
   country: string;
   isVerified: boolean;
+};
+
+export type AuthenticatedUser = {
+  displayName?: string;
+  emailAddress?: string;
+  picture?: string;
 };
 
 export type ChangePasswordPayload = {
@@ -40,9 +60,34 @@ export type CreateUserPayload = {
   roles?: string[];
 };
 
+export type Contact = {
+  isVerified: boolean;
+  verifiedBy?: Actor;
+  verifiedOn?: string;
+};
+
+export type CountrySettings = {
+  code: string;
+  postalCode?: string;
+  regions: string[];
+};
+
+export type Email = Contact & {
+  address: string;
+};
+
 export type EmailPayload = {
   address: string;
   isVerified: boolean;
+};
+
+export type PersonNameType = "first" | "last" | "middle" | "nick";
+
+export type Phone = Contact & {
+  countryCode?: string;
+  number: string;
+  extension?: string;
+  e164Formatted: string;
 };
 
 export type PhonePayload = {
@@ -82,6 +127,38 @@ export type UpdateUserPayload = {
   roles?: RoleModification[];
 };
 
+export type User = Aggregate & {
+  id: string;
+  uniqueName: string;
+  hasPassword: boolean;
+  passwordChangedBy?: Actor;
+  passwordChangedOn?: string;
+  disabledBy?: Actor;
+  disabledOn?: string;
+  isDisabled: boolean;
+  authenticatedOn?: string;
+  address?: Address;
+  email?: Email;
+  phone?: Phone;
+  isConfirmed: boolean;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  fullName?: string;
+  nickname?: string;
+  birthdate?: string;
+  gender?: string;
+  locale?: string;
+  timeZone?: string;
+  picture?: string;
+  profile?: string;
+  website?: string;
+  customAttributes: CustomAttribute[];
+  identifiers: Identifier[];
+  roles: Role[];
+  realm?: Realm;
+};
+
 export type UserSort =
   | "AuthenticatedOn"
   | "Birthdate"
@@ -99,4 +176,9 @@ export type UserSort =
 
 export type UserSortOption = SortOption & {
   field: UserSort;
+};
+
+export type UserUpdatedEvent = {
+  toast?: string;
+  user: User;
 };

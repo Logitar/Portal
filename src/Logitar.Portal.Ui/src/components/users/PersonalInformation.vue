@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from "vue";
 import { useForm } from "vee-validate";
+
 import BirthdateInput from "@/components/users/BirthdateInput.vue";
 import GenderSelect from "@/components/users/GenderSelect.vue";
 import PersonNameInput from "@/components/users/PersonNameInput.vue";
@@ -8,8 +9,7 @@ import PictureInput from "@/components/users/PictureInput.vue";
 import ProfileInput from "@/components/users/ProfileInput.vue";
 import TimeZoneSelect from "@/components/users/TimeZoneSelect.vue";
 import WebsiteInput from "@/components/users/WebsiteInput.vue";
-import type { UpdateUserPayload } from "@/types/users/payloads";
-import type { User, UserUpdatedEvent } from "@/types/users";
+import type { User, UpdateUserPayload, UserUpdatedEvent } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { saveProfile } from "@/api/account";
 import { updateUser } from "@/api/users";

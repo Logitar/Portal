@@ -1,5 +1,4 @@
-import type { CreateUserPayload, SearchUsersPayload, UpdateUserPayload } from "@/types/users/payloads";
-import type { User } from "@/types/users";
+import type { CreateUserPayload, SearchUsersPayload, UpdateUserPayload, User } from "@/types/users";
 import type { SearchResults } from "@/types/search";
 import { _delete, get, graphQL, patch, post } from ".";
 

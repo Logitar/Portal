@@ -3,6 +3,7 @@ import { inject, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonNameInput from "@/components/users/PersonNameInput.vue";

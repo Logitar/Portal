@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
 import LoggingExtentSelect from "./LoggingExtentSelect.vue";
 import type { LoggingSettings } from "@/types/configuration";
 import { assign } from "@/helpers/objectUtils";

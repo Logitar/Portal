@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from "vue-router";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import type { RouteLocationRaw } from "vue-router";
+
 import type { User } from "@/types/users";
 
 const { t } = useI18n();

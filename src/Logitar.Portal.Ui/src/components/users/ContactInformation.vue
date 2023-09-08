@@ -2,6 +2,7 @@
 import { computed, inject, ref, watchEffect } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
+
 import AddressLocalityInput from "./AddressLocalityInput.vue";
 import AddressStreetTextarea from "./AddressStreetTextarea.vue";
 import CountrySelect from "./CountrySelect.vue";
@@ -10,8 +11,7 @@ import PhoneExtensionInput from "@/components/users/PhoneExtensionInput.vue";
 import PhoneNumberInput from "@/components/users/PhoneNumberInput.vue";
 import PostalCodeInput from "@/components/users/PostalCodeInput.vue";
 import RegionSelect from "@/components/users/RegionSelect.vue";
-import type { AddressPayload, EmailPayload, PhonePayload, UpdateUserPayload } from "@/types/users/payloads";
-import type { CountrySettings } from "@/types/users";
+import type { AddressPayload, CountrySettings, EmailPayload, PhonePayload, UpdateUserPayload } from "@/types/users";
 import type { User, UserUpdatedEvent } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { saveProfile } from "@/api/account";

@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
+
 import ClaimList from "./ClaimList.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import FormInput from "../shared/FormInput.vue";

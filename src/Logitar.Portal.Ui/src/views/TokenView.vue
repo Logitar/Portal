@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { inject } from "vue";
+import { useI18n } from "vue-i18n";
+
 import CreateToken from "@/components/tokens/CreateToken.vue";
 import ValidateToken from "@/components/tokens/ValidateToken.vue";
-import { useI18n } from "vue-i18n";
 import { handleErrorKey } from "@/inject/App";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;

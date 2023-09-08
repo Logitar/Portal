@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import SignOutSession from "@/components/sessions/SignOutSession.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
@@ -9,8 +10,7 @@ import UserSelect from "@/components/users/UserSelect.vue";
 import type { ApiError } from "@/types/api";
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
-import type { Session } from "@/types/sessions";
-import type { SessionSort, SearchSessionsPayload } from "@/types/sessions/payloads";
+import type { Session, SessionSort, SearchSessionsPayload } from "@/types/sessions";
 import type { User } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";

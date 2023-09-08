@@ -3,13 +3,13 @@ import { computed, inject, onMounted, onUpdated, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import ClaimMappingList from "@/components/realms/ClaimMappingList.vue";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
-import type { ClaimMapping, Realm } from "@/types/realms";
-import type { ClaimMappingModification } from "@/types/realms/payloads";
+import type { ClaimMapping, ClaimMappingModification, Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
@@ -17,12 +17,12 @@ import { createRealm, readRealmByUniqueSlug, updateRealm } from "@/api/realms";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const registerTooltips = inject(registerTooltipsKey) as () => void;
+const route = useRoute();
+const router = useRouter();
 const toasts = inject(toastsKey) as ToastUtils;
+const { t } = useI18n();
 
 const defaults = {
   uniqueSlug: "",
@@ -58,10 +58,10 @@ const realm = ref<Realm>();
 const requireConfirmedAccount = ref<boolean>(defaults.requireConfirmedAccount);
 const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
-const uniqueSlug = ref<string>(defaults.uniqueSlug);
-const url = ref<string>(defaults.url);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
+const uniqueSlug = ref<string>(defaults.uniqueSlug);
 const uniqueSlugAlreadyUsed = ref<boolean>(false);
+const url = ref<string>(defaults.url);
 
 const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;

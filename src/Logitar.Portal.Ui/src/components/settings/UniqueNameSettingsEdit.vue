@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
 import type { UniqueNameSettings } from "@/types/settings";
 import { assign } from "@/helpers/objectUtils";
 

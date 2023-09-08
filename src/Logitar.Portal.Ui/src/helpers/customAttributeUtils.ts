@@ -1,5 +1,4 @@
-import type { CustomAttribute } from "@/types/customAttributes";
-import type { CustomAttributeModification } from "@/types/customAttributes";
+import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 
 export function getCustomAttributeModifications(source: CustomAttribute[], destination: CustomAttribute[]): CustomAttributeModification[] {
   const modifications: CustomAttributeModification[] = [];

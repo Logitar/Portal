@@ -1,8 +1,14 @@
-import type { ClaimMapping } from ".";
+import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
-import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Modification } from "@/types/modifications";
+import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { SearchPayload, SortOption } from "@/types/search";
+
+export type ClaimMapping = {
+  key: string;
+  name: string;
+  type?: string;
+};
 
 export type ClaimMappingModification = {
   key: string;
@@ -26,6 +32,22 @@ export type CreateRealmPayload = {
 };
 
 export type RealmSort = "DisplayName" | "UniqueSlug" | "UpdatedOn";
+
+export type Realm = Aggregate & {
+  id: string;
+  uniqueSlug: string;
+  displayName?: string;
+  description?: string;
+  defaultLocale?: string;
+  secret: string;
+  url?: string;
+  requireUniqueEmail: boolean;
+  requireConfirmedAccount: boolean;
+  uniqueNameSettings: UniqueNameSettings;
+  passwordSettings: PasswordSettings;
+  claimMappings: ClaimMapping[];
+  customAttributes: CustomAttribute[];
+};
 
 export type RealmSortOption = SortOption & {
   field: RealmSort;

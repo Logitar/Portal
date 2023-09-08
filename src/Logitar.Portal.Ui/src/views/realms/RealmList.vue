@@ -2,19 +2,19 @@
 import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
-import type { Realm } from "@/types/realms";
-import type { RealmSort, SearchRealmsPayload } from "@/types/realms/payloads";
+
+import type { Realm, RealmSort, SearchRealmsPayload } from "@/types/realms";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteRealm, searchRealms } from "@/api/realms";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
 
-const { rt, t, tm } = useI18n();
+const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
 const router = useRouter();
-const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
+const { rt, t, tm } = useI18n();
 
 const isLoading = ref<boolean>(false);
 const realms = ref<Realm[]>([]);

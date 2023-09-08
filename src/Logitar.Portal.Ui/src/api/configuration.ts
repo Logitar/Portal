@@ -1,6 +1,10 @@
-import type { Configuration, IsConfigurationInitializedResult } from "@/types/configuration";
-import type { InitializeConfigurationPayload, UpdateConfigurationPayload } from "@/types/configuration/payloads";
-import type { InitializeConfigurationResult } from "@/types/configuration";
+import type {
+  Configuration,
+  InitializeConfigurationPayload,
+  InitializeConfigurationResult,
+  IsConfigurationInitializedResult,
+  UpdateConfigurationPayload,
+} from "@/types/configuration";
 import { get, patch, post } from ".";
 
 export async function initializeConfiguration(payload: InitializeConfigurationPayload): Promise<InitializeConfigurationResult> {

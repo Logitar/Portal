@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
+import { computed, ref, watchEffect } from "vue";
 import { setLocale } from "@vee-validate/i18n";
+import { useI18n } from "vue-i18n";
+
 import locales from "@/resources/locales.json";
 import type { AuthenticatedUser } from "@/types/users";
 import type { Hyperlink } from "@/types/components";
 import type { Locale } from "@/types/i18n";
-import { orderBy } from "@/helpers/arrayUtils";
 import { combineURL } from "@/helpers/stringUtils";
+import { orderBy } from "@/helpers/arrayUtils";
 import { useAccountStore } from "@/stores/account";
 import { useConfigurationStore } from "@/stores/configuration";
 import { useI18nStore } from "@/stores/i18n";

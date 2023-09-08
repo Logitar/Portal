@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
+
 import countries from "@/resources/countries.json";
 import type { CountrySettings } from "@/types/users";
 import type { SelectOption } from "@/types/components";
