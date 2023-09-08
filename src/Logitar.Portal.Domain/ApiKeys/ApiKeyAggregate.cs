@@ -67,7 +67,7 @@ public class ApiKeyAggregate : AggregateRoot
       if (value != _displayName)
       {
         ApiKeyUpdatedEvent updated = GetLatestEvent<ApiKeyUpdatedEvent>();
-        updated.Title = value;
+        updated.DisplayName = value;
         _displayName = value;
       }
     }
@@ -200,9 +200,9 @@ public class ApiKeyAggregate : AggregateRoot
 
   protected virtual void Apply(ApiKeyUpdatedEvent updated)
   {
-    if (updated.Title != null)
+    if (updated.DisplayName != null)
     {
-      _displayName = updated.Title;
+      _displayName = updated.DisplayName;
     }
     if (updated.Description != null)
     {

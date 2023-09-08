@@ -92,9 +92,9 @@ internal record ActorEntity
       throw new InvalidOperationException($"An {nameof(ApiKeyUpdatedEvent)} cannot be used to update an actor of type '{Type}'.");
     }
 
-    if (updated.Title != null)
+    if (updated.DisplayName != null)
     {
-      DisplayName = updated.Title;
+      DisplayName = updated.DisplayName;
     }
   }
   public void Update(UserAggregate user)

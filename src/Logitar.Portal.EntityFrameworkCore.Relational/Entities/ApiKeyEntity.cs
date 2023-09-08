@@ -60,9 +60,9 @@ internal record ApiKeyEntity : AggregateEntity
   {
     Update(updated);
 
-    if (updated.Title != null)
+    if (updated.DisplayName != null)
     {
-      Title = updated.Title;
+      Title = updated.DisplayName;
     }
     if (updated.Description != null)
     {

@@ -32,7 +32,7 @@ internal class UpdateApiKeyActorHandler : INotificationHandler<ApiKeyUpdatedEven
 
       _context.Actors.Add(actor);
     }
-    else if (@event.Title != null)
+    else if (@event.DisplayName != null)
     {
       actor.Update(@event);
     }
