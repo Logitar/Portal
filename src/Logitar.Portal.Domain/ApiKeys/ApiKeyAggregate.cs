@@ -18,7 +18,7 @@ public class ApiKeyAggregate : AggregateRoot
 
   private Password? _secret = null;
 
-  private string _title = string.Empty;
+  private string _displayName = string.Empty;
   private string? _description = null;
   private DateTime? _expiresOn = null;
 
@@ -26,11 +26,11 @@ public class ApiKeyAggregate : AggregateRoot
   {
   }
 
-  public ApiKeyAggregate(string title, Password secret, string? tenantId = null, ActorId actorId = default, AggregateId? id = null)
+  public ApiKeyAggregate(string displayName, Password secret, string? tenantId = null, ActorId actorId = default, AggregateId? id = null)
     : base(id)
   {
-    title = title.Trim();
-    new TitleValidator(nameof(Title)).ValidateAndThrow(title);
+    displayName = displayName.Trim();
+    new DisplayNameValidator(nameof(DisplayName)).ValidateAndThrow(displayName);
 
     tenantId = tenantId?.CleanTrim();
     if (tenantId != null)
@@ -42,7 +42,7 @@ public class ApiKeyAggregate : AggregateRoot
     {
       Secret = secret,
       TenantId = tenantId,
-      Title = title
+      DisplayName = displayName
     });
   }
   protected virtual void Apply(ApiKeyCreatedEvent created)
@@ -51,24 +51,24 @@ public class ApiKeyAggregate : AggregateRoot
 
     TenantId = created.TenantId;
 
-    _title = created.Title;
+    _displayName = created.DisplayName;
   }
 
   public string? TenantId { get; private set; }
 
-  public string Title
+  public string DisplayName
   {
-    get => _title;
+    get => _displayName;
     set
     {
       value = value.Trim();
-      new TitleValidator(nameof(Title)).ValidateAndThrow(value);
+      new DisplayNameValidator(nameof(DisplayName)).ValidateAndThrow(value);
 
-      if (value != _title)
+      if (value != _displayName)
       {
         ApiKeyUpdatedEvent updated = GetLatestEvent<ApiKeyUpdatedEvent>();
-        updated.Title = value;
-        _title = value;
+        updated.DisplayName = value;
+        _displayName = value;
       }
     }
   }
@@ -200,9 +200,9 @@ public class ApiKeyAggregate : AggregateRoot
 
   protected virtual void Apply(ApiKeyUpdatedEvent updated)
   {
-    if (updated.Title != null)
+    if (updated.DisplayName != null)
     {
-      _title = updated.Title;
+      _displayName = updated.DisplayName;
     }
     if (updated.Description != null)
     {
@@ -253,5 +253,5 @@ public class ApiKeyAggregate : AggregateRoot
     return updated;
   }
 
-  public override string ToString() => $"{Title} | {base.ToString()}";
+  public override string ToString() => $"{DisplayName} | {base.ToString()}";
 }

@@ -4,7 +4,7 @@ public record CreateApiKeyPayload
 {
   public string? Realm { get; set; }
 
-  public string Title { get; set; } = string.Empty;
+  public string DisplayName { get; set; } = string.Empty;
   public string? Description { get; set; }
   public DateTime? ExpiresOn { get; set; }
 

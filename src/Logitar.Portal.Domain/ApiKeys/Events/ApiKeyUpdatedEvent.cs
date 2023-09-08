@@ -6,7 +6,7 @@ namespace Logitar.Portal.Domain.ApiKeys.Events;
 
 public record ApiKeyUpdatedEvent : DomainEvent, INotification
 {
-  public string? Title { get; set; }
+  public string? DisplayName { get; set; }
   public Modification<string>? Description { get; set; }
   public DateTime? ExpiresOn { get; set; }
 

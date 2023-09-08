@@ -168,7 +168,7 @@ watch(
           id="isConfirmed"
           label="users.isConfirmed.label"
           placeholder="users.isConfirmed.placeholder"
-          :model-value="isConfirmed"
+          :model-value="isConfirmed?.toString()"
           @update:model-value="setQuery('isConfirmed', $event)"
         />
         <yes-no-select
@@ -176,7 +176,7 @@ watch(
           id="isDisabled"
           label="users.isDisabled.label"
           placeholder="users.isDisabled.placeholder"
-          :model-value="isDisabled"
+          :model-value="isDisabled?.toString()"
           @update:model-value="setQuery('isDisabled', $event)"
         />
       </div>

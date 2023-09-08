@@ -189,7 +189,7 @@ onMounted(async () => {
           id="isPersistent"
           label="sessions.isPersistent.label"
           placeholder="sessions.isPersistent.placeholder"
-          :model-value="isPersistent"
+          :model-value="isPersistent?.toString()"
           @update:model-value="setQuery('isPersistent', $event)"
         />
       </div>
@@ -199,7 +199,7 @@ onMounted(async () => {
           id="isActive"
           label="sessions.isActive.label"
           placeholder="sessions.isActive.placeholder"
-          :model-value="isActive"
+          :model-value="isActive?.toString()"
           @update:model-value="setQuery('isActive', $event)"
         />
         <sort-select

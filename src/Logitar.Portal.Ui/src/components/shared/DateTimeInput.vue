@@ -52,5 +52,9 @@ function onModelValueUpdate(value: string): void {
     :required="required"
     type="datetime-local"
     @update:model-value="onModelValueUpdate"
-  />
+  >
+    <template #append>
+      <slot name="append"></slot>
+    </template>
+  </form-input>
 </template>

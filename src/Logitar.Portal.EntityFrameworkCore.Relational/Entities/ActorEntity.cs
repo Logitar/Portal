@@ -14,14 +14,14 @@ internal record ActorEntity
     Type = ActorType.ApiKey;
     IsDeleted = apiKey.IsDeleted;
 
-    DisplayName = apiKey.Title;
+    DisplayName = apiKey.DisplayName;
   }
   public ActorEntity(ApiKeyCreatedEvent created)
   {
     Id = created.AggregateId.ToGuid();
     Type = ActorType.ApiKey;
 
-    DisplayName = created.Title;
+    DisplayName = created.DisplayName;
   }
 
   public ActorEntity(UserAggregate user)
@@ -92,9 +92,9 @@ internal record ActorEntity
       throw new InvalidOperationException($"An {nameof(ApiKeyUpdatedEvent)} cannot be used to update an actor of type '{Type}'.");
     }
 
-    if (updated.Title != null)
+    if (updated.DisplayName != null)
     {
-      DisplayName = updated.Title;
+      DisplayName = updated.DisplayName;
     }
   }
   public void Update(UserAggregate user)

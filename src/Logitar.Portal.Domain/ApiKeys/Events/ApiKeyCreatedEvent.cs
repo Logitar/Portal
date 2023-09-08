@@ -15,5 +15,5 @@ public record ApiKeyCreatedEvent : DomainEvent, INotification
 
   public string? TenantId { get; init; }
 
-  public string Title { get; init; } = string.Empty;
+  public string DisplayName { get; init; } = string.Empty;
 }
