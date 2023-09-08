@@ -4,6 +4,7 @@
     "back": "Retour",
     "cancel": "Annuler",
     "clear": "Vider",
+    "clipboard": "Copier dans le presse-papier",
     "close": "Vider",
     "create": "Créer",
     "delete": "Supprimer",
@@ -11,7 +12,8 @@
     "refresh": "Rafraîchir",
     "remove": "Retirer",
     "revert": "Annuler",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "validate": "Valider"
   },
   "brand": "Portal",
   "by": "Par",

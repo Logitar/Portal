@@ -1,22 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import claimTypes from "@/resources/claimTypes.json";
+import ClaimTypeSelect from "@/components/tokens/ClaimTypeSelect.vue";
 import type { ClaimMapping } from "@/types/realms";
-import type { SelectOption } from "@/types/components";
 import { assign } from "@/helpers/objectUtils";
-import { orderBy } from "@/helpers/arrayUtils";
 
 const props = defineProps<{
   claimMapping: ClaimMapping;
   id: string;
 }>();
-
-const claimTypeOptions = computed<SelectOption[]>(() =>
-  orderBy(
-    claimTypes.map(({ id, name }) => ({ value: id, text: name })),
-    "text"
-  )
-);
 
 const emit = defineEmits<{
   (e: "remove"): void;
@@ -53,22 +43,13 @@ function onUpdate(changes: object): void {
     <form-input
       class="col"
       :id="`${id}_name`"
-      label="realms.claimMappings.name.label"
+      label="tokens.claims.name.label"
       :model-value="claimMapping.name"
       no-label
-      placeholder="realms.claimMappings.name.placeholder"
+      placeholder="tokens.claims.name.placeholder"
       required
       @update:model-value="onUpdate({ name: $event })"
     />
-    <form-select
-      class="col"
-      :id="`${id}_type`"
-      label="realms.claimMappings.type.label"
-      :model-value="claimMapping.type"
-      no-label
-      :options="claimTypeOptions"
-      placeholder="realms.claimMappings.type.placeholder"
-      @update:model-value="onUpdate({ type: $event || null })"
-    />
+    <ClaimTypeSelect class="col" :id="`${id}_type`" :model-value="claimMapping.type" no-label @update:model-value="onUpdate({ type: $event || null })" />
   </div>
 </template>

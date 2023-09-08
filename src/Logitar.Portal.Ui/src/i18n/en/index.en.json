@@ -4,6 +4,7 @@
     "back": "Back",
     "cancel": "Cancel",
     "clear": "Clear",
+    "clipboard": "Copy to clipboard",
     "close": "Close",
     "create": "Create",
     "delete": "Delete",
@@ -11,7 +12,8 @@
     "refresh": "Refresh",
     "remove": "Remove",
     "revert": "Revert",
-    "save": "Save"
+    "save": "Save",
+    "validate": "Validate"
   },
   "brand": "Portal",
   "by": "By",

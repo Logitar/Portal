@@ -1,15 +1,7 @@
 {
   "claimMappings": {
     "empty": "There is no claim mapping.",
-    "name": {
-      "label": "Name",
-      "placeholder": "Enter the name of the claim"
-    },
-    "title": "Claim Mappings",
-    "type": {
-      "label": "Type",
-      "placeholder": "Select a claim type"
-    }
+    "title": "Claim Mappings"
   },
   "created": "The realm has been created.",
   "defaultLocale": "Default Locale",

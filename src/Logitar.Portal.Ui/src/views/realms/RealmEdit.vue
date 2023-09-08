@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref } from "vue";
+import { computed, inject, onMounted, onUpdated, ref } from "vue";
 import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -187,9 +187,9 @@ onMounted(async () => {
       }
     }
   }
-  registerTooltips();
   hasLoaded.value = true;
 });
+onUpdated(() => registerTooltips());
 </script>
 
 <template>

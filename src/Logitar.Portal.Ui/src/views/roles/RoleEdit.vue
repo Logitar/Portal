@@ -13,7 +13,7 @@ import type { ToastUtils } from "@/types/components";
 import type { UniqueNameSettings } from "@/types/settings";
 import { createRole, readRole, updateRole } from "@/api/roles";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
-import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
+import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
 import { readRealm } from "@/api/realms";
 
@@ -21,7 +21,6 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
-const registerTooltips = inject(registerTooltipsKey) as () => void;
 const toasts = inject(toastsKey) as ToastUtils;
 
 const defaults = {
@@ -130,7 +129,6 @@ onMounted(async () => {
       handleError(e);
     }
   }
-  registerTooltips();
   hasLoaded.value = true;
 });
 </script>

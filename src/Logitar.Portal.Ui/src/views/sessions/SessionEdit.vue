@@ -7,12 +7,11 @@ import type { ApiError } from "@/types/api";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { Session } from "@/types/sessions";
 import type { User } from "@/types/users";
-import { handleErrorKey, registerTooltipsKey } from "@/inject/App";
+import { handleErrorKey } from "@/inject/App";
 import { readSession } from "@/api/sessions";
 import { useRoute, useRouter } from "vue-router";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
-const registerTooltips = inject(registerTooltipsKey) as () => void;
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -47,7 +46,6 @@ onMounted(async () => {
       handleError(e);
     }
   }
-  registerTooltips();
 });
 </script>
 

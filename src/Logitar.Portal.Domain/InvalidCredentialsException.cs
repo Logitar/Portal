@@ -2,7 +2,9 @@
 
 public class InvalidCredentialsException : Exception
 {
-  public InvalidCredentialsException(string message = "The specified credentials are not valid.", Exception? innerException = null)
+  public const string ErrorMessage = "The specified credentials are not valid.";
+
+  public InvalidCredentialsException(string message = ErrorMessage, Exception? innerException = null)
     : base(message, innerException)
   {
   }

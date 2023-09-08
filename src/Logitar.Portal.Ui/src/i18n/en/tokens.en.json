@@ -1,0 +1,61 @@
+{
+  "audience": {
+    "label": "Audience",
+    "placeholder": "Specify an audience or leave blank to use default"
+  },
+  "claims": {
+    "empty": "There is no claim.",
+    "name": {
+      "label": "Name",
+      "placeholder": "Enter the name of the claim"
+    },
+    "title": "Claims",
+    "type": {
+      "label": "Type",
+      "placeholder": "Select a claim type"
+    },
+    "value": {
+      "label": "Value",
+      "placeholder": "Enter the value of the claim"
+    }
+  },
+  "consume": "Consume",
+  "created": {
+    "decoder": "Go to decoder",
+    "heading": "Your new token",
+    "title": "Token"
+  },
+  "emailAddressPlaceholder": "Enter an email address",
+  "input": {
+    "label": "Token",
+    "placeholder": "Paste your token"
+  },
+  "isConsumable": "Is consumable",
+  "issuer": {
+    "label": "Issuer",
+    "placeholder": "Specify an issuer or leave blank to use default"
+  },
+  "lifetime": "Lifetime (seconds)",
+  "purpose": {
+    "label": "Purpose",
+    "placeholder": "Enter a token purpose"
+  },
+  "secret": {
+    "label": "Secret",
+    "placeholder": "Paste a token secret or leave blank to use default"
+  },
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter a subject claim, for example an ID"
+  },
+  "title": "Tokens",
+  "validated": {
+    "error": {
+      "code": "Code",
+      "help": "Please review the details below.",
+      "lead": "An error has occurred.",
+      "message": "Message"
+    },
+    "title": "Result"
+  }
+}

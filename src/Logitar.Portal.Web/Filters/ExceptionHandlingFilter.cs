@@ -52,9 +52,9 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
       context.Result = new ConflictObjectResult(identifierAlreadyUsed.Failure);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is InvalidCredentialsException)
+    else if (context.Exception is InvalidCredentialsException invalidCredentials)
     {
-      context.Result = new BadRequestObjectResult(new ErrorDetail("InvalidCredentials", "The specified credentials are not valid."));
+      context.Result = new BadRequestObjectResult(ErrorDetail.From(invalidCredentials));
       context.ExceptionHandled = true;
     }
     else if (context.Exception is SecurityTokenException securityToken)
@@ -64,7 +64,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     }
     else if (context.Exception is TooManyResultsException tooManyResults)
     {
-      context.Result = new BadRequestObjectResult(ErrorDetail.From(tooManyResults, "There are too many results."));
+      context.Result = new BadRequestObjectResult(ErrorDetail.From(tooManyResults));
       context.ExceptionHandled = true;
     }
     else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
@@ -80,7 +80,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The API key is expired."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
 
   private static IActionResult HandleCannotPostponeExpirationException(ExceptionContext context)
@@ -90,7 +90,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
   {
-    return new JsonResult(ErrorDetail.From(context.Exception, "The configuration has already been initialized."))
+    return new JsonResult(ErrorDetail.From(context.Exception))
     {
       StatusCode = StatusCodes.Status403Forbidden
     };
@@ -128,7 +128,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The session is not active."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
 
   private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)
@@ -138,12 +138,12 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 
   private static IActionResult HandleUserIsDisabledException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The user is disabled."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
 
   private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception, "The user is not confirmed."));
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)

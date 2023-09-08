@@ -9,10 +9,11 @@ import { handleErrorKey } from "@/inject/App";
 import { signIn } from "@/api/account";
 import { useAccountStore } from "@/stores/account";
 
-const { t } = useI18n();
-const handleError = inject(handleErrorKey) as (e: unknown) => void;
-
 const account = useAccountStore();
+const handleError = inject(handleErrorKey) as (e: unknown) => void;
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
 
 const invalidCredentials = ref<boolean>(false);
 const password = ref<string>("");
@@ -21,8 +22,6 @@ const remember = ref<boolean>(false);
 const username = ref<string>("");
 
 const { handleSubmit, isSubmitting } = useForm();
-const route = useRoute();
-const router = useRouter();
 const onSubmit = handleSubmit(async () => {
   try {
     invalidCredentials.value = false;

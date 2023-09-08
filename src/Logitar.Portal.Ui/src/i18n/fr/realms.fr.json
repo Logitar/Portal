@@ -1,15 +1,7 @@
 {
   "claimMappings": {
     "empty": "Il n’y a aucune association de revendication.",
-    "name": {
-      "label": "Nom",
-      "placeholder": "Entrez le nom de la revendication"
-    },
-    "title": "Associations de revendications",
-    "type": {
-      "label": "Type",
-      "placeholder": "Sélectionnez un type de revendication"
-    }
+    "title": "Associations de revendications"
   },
   "created": "Le royaume a été créé.",
   "defaultLocale": "Langue par défaut",

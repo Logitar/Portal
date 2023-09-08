@@ -7,6 +7,7 @@ import realms from "./realms.fr.json";
 import roles from "./roles.fr.json";
 import sessions from "./sessions.fr.json";
 import settings from "./settings.fr.json";
+import tokens from "./tokens.fr.json";
 import users from "./users.fr.json";
 
 export default {
@@ -19,5 +20,6 @@ export default {
   roles,
   sessions,
   settings,
+  tokens,
   users,
 };
