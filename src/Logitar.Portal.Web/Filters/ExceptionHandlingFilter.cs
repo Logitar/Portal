@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Users;
@@ -22,6 +23,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
     [typeof(CannotPostponeExpirationException)] = HandleCannotPostponeExpirationException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
+    [typeof(DictionaryAlreadyExistingException)] = HandleDictionaryAlreadyExistingException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
@@ -94,6 +96,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     {
       StatusCode = StatusCodes.Status403Forbidden
     };
+  }
+
+  private static IActionResult HandleDictionaryAlreadyExistingException(ExceptionContext context)
+  {
+    return new ConflictObjectResult(((DictionaryAlreadyExistingException)context.Exception).Failure);
   }
 
   private static IActionResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)
