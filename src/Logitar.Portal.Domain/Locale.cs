@@ -2,6 +2,7 @@
 
 public record Locale
 {
+  private const string DefaultLocaleCode = "en";
   private const int LOCALE_CUSTOM_UNSPECIFIED = 0x1000;
 
   private readonly CultureInfo _culture;
@@ -20,7 +21,7 @@ public record Locale
     }
   }
 
-  public static Locale Default { get; } = new("en");
+  public static Locale Default { get; } = new(DefaultLocaleCode);
 
   public string Code => _culture.Name;
 }
