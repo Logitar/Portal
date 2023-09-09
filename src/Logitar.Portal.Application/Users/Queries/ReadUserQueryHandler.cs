@@ -14,7 +14,7 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, User?>
 
   public async Task<User?> Handle(ReadUserQuery query, CancellationToken cancellationToken)
   {
-    Dictionary<Guid, User> users = new(capacity: 2);
+    Dictionary<Guid, User> users = new(capacity: 3);
 
     if (query.Id.HasValue)
     {

@@ -5,7 +5,7 @@ namespace Logitar.Portal.Application.Users;
 
 public class UserNotFoundException : InvalidCredentialsException
 {
-  private const string ErrorMessage = "The specified user could not be found.";
+  private new const string ErrorMessage = "The specified user could not be found.";
 
   public UserNotFoundException(RealmAggregate? realm, string uniqueName) : base(BuildMessage(realm, uniqueName))
   {
