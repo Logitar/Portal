@@ -157,18 +157,18 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _realmService.ReadAsync(Guid.Empty, $"{_realm.UniqueSlug}-2"));
   }
 
-  [Fact(DisplayName = "ReadAsync: it should return the realm found by unique slug.")]
-  public async Task ReadAsync_it_should_return_the_realmfound_by_unique_slug()
-  {
-    Realm? realm = await _realmService.ReadAsync(uniqueSlug: $" {_realm.UniqueSlug} ");
-    Assert.NotNull(realm);
-    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
-  }
-
   [Fact(DisplayName = "ReadAsync: it should return the realm found by ID.")]
   public async Task ReadAsync_it_should_return_the_realm_found_by_Id()
   {
     Realm? realm = await _realmService.ReadAsync(_realm.Id.ToGuid());
+    Assert.NotNull(realm);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the realm found by unique slug.")]
+  public async Task ReadAsync_it_should_return_the_realmfound_by_unique_slug()
+  {
+    Realm? realm = await _realmService.ReadAsync(uniqueSlug: $" {_realm.UniqueSlug} ");
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }

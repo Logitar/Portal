@@ -159,18 +159,18 @@ public class RoleServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _roleService.ReadAsync(Guid.Empty, _realm.UniqueSlug, $"{_role.UniqueName}2"));
   }
 
-  [Fact(DisplayName = "ReadAsync: it should return the role found by unique name.")]
-  public async Task ReadAsync_it_should_return_the_role_found_by_unique_name()
-  {
-    Role? role = await _roleService.ReadAsync(realm: $" {_realm.Id.ToGuid()} ", uniqueName: $" {_role.UniqueName} ");
-    Assert.NotNull(role);
-    Assert.Equal(_role.Id.ToGuid(), role.Id);
-  }
-
   [Fact(DisplayName = "ReadAsync: it should return the role found by ID.")]
   public async Task ReadAsync_it_should_return_the_role_found_by_Id()
   {
     Role? role = await _roleService.ReadAsync(_role.Id.ToGuid());
+    Assert.NotNull(role);
+    Assert.Equal(_role.Id.ToGuid(), role.Id);
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the role found by unique name.")]
+  public async Task ReadAsync_it_should_return_the_role_found_by_unique_name()
+  {
+    Role? role = await _roleService.ReadAsync(realm: $" {_realm.Id.ToGuid()} ", uniqueName: $" {_role.UniqueName} ");
     Assert.NotNull(role);
     Assert.Equal(_role.Id.ToGuid(), role.Id);
   }

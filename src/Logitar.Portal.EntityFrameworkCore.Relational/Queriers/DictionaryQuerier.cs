@@ -97,13 +97,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
       .ApplyIdInFilter(Db.Dictionaries.AggregateId, payload.IdIn)
       .Where(Db.Dictionaries.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.Dictionaries.Table);
-    _sqlHelper.ApplyTextSearch(builder, payload.Search);
-
-    if (!string.IsNullOrWhiteSpace(payload.Locale))
-    {
-      string locale = payload.Locale.Trim();
-      builder = builder.Where(Db.Dictionaries.Locale, Operators.IsEqualTo(locale));
-    }
+    _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Dictionaries.Locale);
 
     IQueryable<DictionaryEntity> query = _dictionaries.FromQuery(builder.Build())
       .AsNoTracking();
