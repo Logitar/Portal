@@ -3,6 +3,7 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Sessions;
@@ -66,6 +67,21 @@ internal class Mapper
         Extent = source.LoggingSettings.Extent,
         OnlyErrors = source.LoggingSettings.OnlyErrors
       }
+    };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
+  {
+    Dictionary destination = new()
+    {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
+      Realm = realm,
+      Locale = source.Locale,
+      Entries = source.Entries.Select(entry => new DictionaryEntry(entry.Key, entry.Value))
     };
 
     MapAggregate(source, destination);
