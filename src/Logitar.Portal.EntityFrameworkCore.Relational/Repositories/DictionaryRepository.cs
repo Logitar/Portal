@@ -4,6 +4,7 @@ using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Realms;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
@@ -47,6 +48,28 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
     return base.Load<DictionaryAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
   }
 
+  public async Task<IEnumerable<DictionaryAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  {
+    string tenantId = realm.Id.Value;
+
+    IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
+      .Join(Db.Dictionaries.AggregateId, Db.Events.AggregateId,
+        new OperatorCondition(Db.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .Where(Db.Dictionaries.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
+      .SelectAll(Db.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return base.Load<DictionaryAggregate>(events.Select(EventSerializer.Deserialize));
+  }
+
   public async Task SaveAsync(DictionaryAggregate dictionary, CancellationToken cancellationToken)
     => await base.SaveAsync(dictionary, cancellationToken);
+  public async Task SaveAsync(IEnumerable<DictionaryAggregate> dictionaries, CancellationToken cancellationToken)
+    => await base.SaveAsync(dictionaries, cancellationToken);
 }

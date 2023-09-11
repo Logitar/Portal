@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Sessions;
@@ -44,7 +45,7 @@ internal class Program
     Console.WriteLine();
 
     CancellationToken cancellationToken = default;
-    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 1);
+    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 8 + 1);
     context.Start();
 
     if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
@@ -96,6 +97,13 @@ internal class Program
 
     TokenClientTests tokenTests = new(context, _faker, serviceProvider.GetRequiredService<ITokenService>()); // 2 tests
     if (!await tokenTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    DictionaryClientTests dictionaryTests = new(context, _faker, serviceProvider.GetRequiredService<IDictionaryService>()); // 8 tests
+    if (!await dictionaryTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;

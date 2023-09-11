@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
@@ -121,6 +122,8 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should delete the realm.")]
   public async Task DeleteAsync_it_should_delete_the_realm()
   {
+    DictionaryAggregate dictionary = new(new Locale("fr"), _realm.Id.Value);
+
     RoleAggregate role = new(_realm.UniqueNameSettings, "admin", _realm.Id.Value);
 
     Password secret = PasswordService.Generate(_realm.PasswordSettings, ApiKeyAggregate.SecretLength, out _);
@@ -132,13 +135,14 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     SessionAggregate session = new(user);
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { role, apiKey, user, session });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { dictionary, role, apiKey, user, session });
 
     Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
 
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
+    Assert.Null(await PortalContext.Dictionaries.SingleOrDefaultAsync(x => x.AggregateId == dictionary.Id.Value));
     Assert.Null(await PortalContext.Sessions.SingleOrDefaultAsync(x => x.AggregateId == session.Id.Value));
     Assert.Null(await PortalContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value));
     Assert.Null(await PortalContext.ApiKeys.SingleOrDefaultAsync(x => x.AggregateId == apiKey.Id.Value));
