@@ -64,6 +64,17 @@ internal static class Db
     public static readonly ColumnId UniqueNameNormalized = new(nameof(RoleEntity.UniqueNameNormalized), Table);
   }
 
+  public static class Senders
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Senders));
+
+    public static readonly ColumnId AggregateId = new(nameof(SenderEntity.AggregateId), Table);
+    public static readonly ColumnId DisplayName = new(nameof(SenderEntity.DisplayName), Table);
+    public static readonly ColumnId EmailAddress = new(nameof(SenderEntity.EmailAddress), Table);
+    public static readonly ColumnId IsDefault = new(nameof(SenderEntity.IsDefault), Table);
+    public static readonly ColumnId TenantId = new(nameof(SenderEntity.TenantId), Table);
+  }
+
   public static class Sessions
   {
     public static readonly TableId Table = new(nameof(PortalContext.Sessions));

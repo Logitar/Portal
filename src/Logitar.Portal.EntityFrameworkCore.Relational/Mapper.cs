@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Users;
@@ -149,6 +150,25 @@ internal class Mapper
       DisplayName = source.DisplayName,
       Description = source.Description,
       CustomAttributes = ToCustomAttributes(source.CustomAttributes),
+      Realm = realm
+    };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Sender ToSender(SenderEntity source, Realm? realm)
+  {
+    Sender destination = new()
+    {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
+      IsDefault = source.IsDefault,
+      EmailAddress = source.EmailAddress,
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      Provider = source.Provider,
+      Settings = source.Settings.Select(setting => new ProviderSetting(setting.Key, setting.Value)),
       Realm = realm
     };
 

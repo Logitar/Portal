@@ -6,6 +6,7 @@ using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
@@ -14,6 +15,7 @@ using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
@@ -51,6 +53,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<IRoleQuerier, RoleQuerier>()
+      .AddScoped<ISenderQuerier, SenderQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>()
       .AddScoped<IUserQuerier, UserQuerier>();
   }
@@ -63,6 +66,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IDictionaryRepository, DictionaryRepository>()
       .AddScoped<IRealmRepository, RealmRepository>()
       .AddScoped<IRoleRepository, RoleRepository>()
+      .AddScoped<ISenderRepository, SenderRepository>()
       .AddScoped<ISessionRepository, SessionRepository>()
       .AddScoped<IUserRepository, UserRepository>();
   }
