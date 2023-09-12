@@ -29,7 +29,7 @@ internal class SenderService : ISenderService
     return await _pipeline.ExecuteAsync(new ReadSenderQuery(id), cancellationToken);
   }
 
-  public async Task<Sender?> ReadDefaultAsync(string? realm, CancellationToken cancellationToken = default)
+  public async Task<Sender?> ReadDefaultAsync(string? realm, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new ReadDefaultSenderQuery(realm), cancellationToken);
   }

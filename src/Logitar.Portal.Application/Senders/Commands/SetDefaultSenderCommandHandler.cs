@@ -33,6 +33,8 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
       @default.Update(_applicationContext.ActorId);
     }
 
+    // TODO(fpion): if @default == sender, do nothing
+
     sender.IsDefault = true;
     sender.Update(_applicationContext.ActorId);
 
