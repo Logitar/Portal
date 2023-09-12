@@ -92,6 +92,22 @@ const router = createRouter({
       path: "/create-role",
       component: () => import("./views/roles/RoleEdit.vue"),
     },
+    // Senders
+    {
+      name: "SenderList",
+      path: "/senders",
+      component: () => import("./views/senders/SenderList.vue"),
+    },
+    {
+      name: "SenderEdit",
+      path: "/senders/:id",
+      component: () => import("./views/senders/SenderEdit.vue"),
+    },
+    {
+      name: "CreateSender",
+      path: "/create-sender",
+      component: () => import("./views/senders/SenderEdit.vue"),
+    },
     // Sessions
     {
       name: "SessionList",

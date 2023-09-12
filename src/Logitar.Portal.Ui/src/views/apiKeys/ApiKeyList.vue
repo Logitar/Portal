@@ -43,7 +43,7 @@ function isApiKeyExpired(apiKey: ApiKey): boolean {
 
 async function refresh(): Promise<void> {
   const parameters: SearchApiKeysPayload = {
-    realm: realm.value,
+    realm: realm.value || undefined,
     status: typeof isExpired.value === "boolean" ? { isExpired: isExpired.value } : undefined,
     search: {
       terms: search.value

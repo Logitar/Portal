@@ -4,6 +4,7 @@ using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain;
@@ -21,6 +22,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
+    [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
     [typeof(CannotPostponeExpirationException)] = HandleCannotPostponeExpirationException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
     [typeof(DictionaryAlreadyExistingException)] = HandleDictionaryAlreadyExistingException,
@@ -81,6 +83,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   }
 
   private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
+  }
+
+  private static IActionResult HandleCannotDeleteDefaultSenderException(ExceptionContext context)
   {
     return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }

@@ -1,0 +1,42 @@
+{
+  "cannotDeleteDefaultSender": {
+    "help": "Un expéditeur par défaut ne peut être supprimé que lorsqu’il est seul dans son royaume.",
+    "lead": "L’expéditeur n’a pu être supprimé !"
+  },
+  "created": "L’expéditeur a été créé.",
+  "default": {
+    "submit": "Défaut",
+    "success": "L’expéditeur a été défini comme par défaut."
+  },
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer l’expéditeur suivant ?",
+    "success": "L’expéditeur a été supprimé.",
+    "title": "Supprimer l’expéditeur"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "providers": {
+    "label": "Fournisseur",
+    "options": {
+      "SendGrid": "SendGrid"
+    },
+    "placeholder": "Sélectionnez un fournisseur",
+    "sendGrid": {
+      "apiKey": {
+        "label": "Clé d’API",
+        "placeholder": "Collez votre clé d’API SendGrid"
+      }
+    }
+  },
+  "sort": {
+    "options": {
+      "DisplayName": "Nom d’affichage",
+      "EmailAddress": "Adresse courriel",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "title": {
+    "list": "Expéditeurs",
+    "new": "Nouvel expéditeur"
+  },
+  "updated": "L’expéditeur a été enregistré."
+}

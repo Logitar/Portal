@@ -5,6 +5,7 @@ import dashboard from "./dashboard.fr.json";
 import index from "./index.fr.json";
 import realms from "./realms.fr.json";
 import roles from "./roles.fr.json";
+import senders from "./senders.fr.json";
 import sessions from "./sessions.fr.json";
 import settings from "./settings.fr.json";
 import tokens from "./tokens.fr.json";
@@ -18,6 +19,7 @@ export default {
   dashboard,
   realms,
   roles,
+  senders,
   sessions,
   settings,
   tokens,
