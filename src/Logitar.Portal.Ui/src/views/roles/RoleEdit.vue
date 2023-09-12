@@ -45,6 +45,7 @@ const uniqueNameAlreadyUsed = ref<boolean>(false);
 const hasChanges = computed<boolean>(() => {
   const model = role.value ?? defaults;
   return (
+    realm.value?.id !== role.value?.realm?.id ||
     displayName.value !== (model.displayName ?? "") ||
     uniqueName.value !== model.uniqueName ||
     description.value !== (model.description ?? "") ||

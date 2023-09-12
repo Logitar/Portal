@@ -12,10 +12,12 @@ public class PortalContext : DbContext
   internal DbSet<ActorEntity> Actors { get; private set; }
   internal DbSet<ApiKeyEntity> ApiKeys { get; private set; }
   internal DbSet<ApiKeyRoleEntity> ApiKeyRoles { get; private set; }
+  internal DbSet<DictionaryEntity> Dictionaries { get; private set; }
   internal DbSet<LogEntity> Logs { get; private set; }
   internal DbSet<LogEventEntity> LogEvents { get; private set; }
   internal DbSet<RealmEntity> Realms { get; private set; }
   internal DbSet<RoleEntity> Roles { get; private set; }
+  internal DbSet<SenderEntity> Senders { get; private set; }
   internal DbSet<SessionEntity> Sessions { get; private set; }
   internal DbSet<BlacklistedTokenEntity> TokenBlacklist { get; private set; }
   internal DbSet<UserEntity> Users { get; private set; }

@@ -11,11 +11,11 @@ import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
 
-const { rt, t, tm } = useI18n();
+const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
 const router = useRouter();
-const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
+const { rt, t, tm } = useI18n();
 
 const isLoading = ref<boolean>(false);
 const roles = ref<Role[]>([]);
@@ -38,7 +38,7 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchRolesPayload = {
-    realm: realm.value,
+    realm: realm.value || undefined,
     search: {
       terms: search.value
         .split(" ")

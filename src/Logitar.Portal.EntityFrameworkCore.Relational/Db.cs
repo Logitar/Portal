@@ -25,6 +25,15 @@ internal static class Db
     public static readonly ColumnId RoleId = new(nameof(ApiKeyRoleEntity.RoleId), Table);
   }
 
+  public static class Dictionaries
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Dictionaries));
+
+    public static readonly ColumnId AggregateId = new(nameof(DictionaryEntity.AggregateId), Table);
+    public static readonly ColumnId Locale = new(nameof(DictionaryEntity.Locale), Table);
+    public static readonly ColumnId TenantId = new(nameof(DictionaryEntity.TenantId), Table);
+  }
+
   public static class Events
   {
     public static readonly TableId Table = new(nameof(EventContext.Events));
@@ -53,6 +62,17 @@ internal static class Db
     public static readonly ColumnId TenantId = new(nameof(RoleEntity.TenantId), Table);
     public static readonly ColumnId UniqueName = new(nameof(RoleEntity.UniqueName), Table);
     public static readonly ColumnId UniqueNameNormalized = new(nameof(RoleEntity.UniqueNameNormalized), Table);
+  }
+
+  public static class Senders
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Senders));
+
+    public static readonly ColumnId AggregateId = new(nameof(SenderEntity.AggregateId), Table);
+    public static readonly ColumnId DisplayName = new(nameof(SenderEntity.DisplayName), Table);
+    public static readonly ColumnId EmailAddress = new(nameof(SenderEntity.EmailAddress), Table);
+    public static readonly ColumnId IsDefault = new(nameof(SenderEntity.IsDefault), Table);
+    public static readonly ColumnId TenantId = new(nameof(SenderEntity.TenantId), Table);
   }
 
   public static class Sessions

@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain;
@@ -20,8 +22,10 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
+    [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
     [typeof(CannotPostponeExpirationException)] = HandleCannotPostponeExpirationException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
+    [typeof(DictionaryAlreadyExistingException)] = HandleDictionaryAlreadyExistingException,
     [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(InvalidGenderException)] = HandleInvalidGenderException,
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
@@ -83,6 +87,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
 
+  private static IActionResult HandleCannotDeleteDefaultSenderException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
+  }
+
   private static IActionResult HandleCannotPostponeExpirationException(ExceptionContext context)
   {
     return new BadRequestObjectResult(((CannotPostponeExpirationException)context.Exception).Failure);
@@ -94,6 +103,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     {
       StatusCode = StatusCodes.Status403Forbidden
     };
+  }
+
+  private static IActionResult HandleDictionaryAlreadyExistingException(ExceptionContext context)
+  {
+    return new ConflictObjectResult(((DictionaryAlreadyExistingException)context.Exception).Failure);
   }
 
   private static IActionResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)

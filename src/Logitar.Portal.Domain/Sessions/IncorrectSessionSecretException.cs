@@ -2,7 +2,7 @@
 
 public class IncorrectSessionSecretException : InvalidCredentialsException
 {
-  private const string ErrorMessage = "The specified secret did not match the session.";
+  private new const string ErrorMessage = "The specified secret did not match the session.";
 
   public IncorrectSessionSecretException(SessionAggregate session, string secret)
     : base(BuildMessage(session, secret))

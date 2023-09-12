@@ -2,7 +2,7 @@
 
 public class IncorrectUserPasswordException : InvalidCredentialsException
 {
-  private const string ErrorMessage = "The specified password did not match the user.";
+  private new const string ErrorMessage = "The specified password did not match the user.";
 
   public IncorrectUserPasswordException(UserAggregate user, string password)
     : base(BuildMessage(user, password))

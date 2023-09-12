@@ -43,7 +43,7 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchUsersPayload = {
-    realm: realm.value,
+    realm: realm.value || undefined,
     isConfirmed: isConfirmed.value,
     isDisabled: isDisabled.value,
     search: {

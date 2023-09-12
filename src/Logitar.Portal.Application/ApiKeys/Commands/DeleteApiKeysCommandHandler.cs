@@ -5,23 +5,23 @@ namespace Logitar.Portal.Application.ApiKeys.Commands;
 
 internal class DeleteApiKeysCommandHandler : INotificationHandler<DeleteApiKeysCommand>
 {
+  private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IApplicationContext _applicationContext;
-  private readonly IApiKeyRepository _userRepository;
 
-  public DeleteApiKeysCommandHandler(IApplicationContext applicationContext, IApiKeyRepository userRepository)
+  public DeleteApiKeysCommandHandler(IApiKeyRepository apiKeyRepository, IApplicationContext applicationContext)
   {
+    _apiKeyRepository = apiKeyRepository;
     _applicationContext = applicationContext;
-    _userRepository = userRepository;
   }
 
   public async Task Handle(DeleteApiKeysCommand command, CancellationToken cancellationToken)
   {
-    IEnumerable<ApiKeyAggregate> apiKeys = await _userRepository.LoadAsync(command.Realm, cancellationToken);
+    IEnumerable<ApiKeyAggregate> apiKeys = await _apiKeyRepository.LoadAsync(command.Realm, cancellationToken);
     foreach (ApiKeyAggregate apiKey in apiKeys)
     {
       apiKey.Delete(_applicationContext.ActorId);
     }
 
-    await _userRepository.SaveAsync(apiKeys, cancellationToken);
+    await _apiKeyRepository.SaveAsync(apiKeys, cancellationToken);
   }
 }

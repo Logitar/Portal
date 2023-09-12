@@ -51,6 +51,7 @@ const xApiKey = ref<string>();
 const hasChanges = computed<boolean>(() => {
   const model = apiKey.value ?? defaults;
   return (
+    realm.value?.id !== apiKey.value?.realm?.id ||
     displayName.value !== (model.displayName ?? "") ||
     description.value !== (model.description ?? "") ||
     expiresOn.value?.getTime() !== (apiKey.value?.expiresOn ? new Date(apiKey.value.expiresOn) : undefined)?.getTime() ||

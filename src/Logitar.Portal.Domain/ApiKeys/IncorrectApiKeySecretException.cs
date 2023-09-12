@@ -2,7 +2,7 @@
 
 public class IncorrectApiKeySecretException : InvalidCredentialsException
 {
-  private const string ErrorMessage = "The specified secret did not match the API key.";
+  private new const string ErrorMessage = "The specified secret did not match the API key.";
 
   public IncorrectApiKeySecretException(ApiKeyAggregate apiKey, string secret)
     : base(BuildMessage(apiKey, secret))

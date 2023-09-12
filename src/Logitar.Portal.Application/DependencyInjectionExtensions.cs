@@ -1,14 +1,18 @@
 ﻿using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Contracts.Users;
@@ -33,8 +37,10 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IApiKeyService, ApiKeyService>()
       .AddTransient<IConfigurationService, ConfigurationService>()
+      .AddTransient<IDictionaryService, DictionaryService>()
       .AddTransient<IRealmService, RealmService>()
       .AddTransient<IRoleService, RoleService>()
+      .AddTransient<ISenderService, SenderService>()
       .AddTransient<ISessionService, SessionService>()
       .AddTransient<ITokenService, TokenService>()
       .AddTransient<IUserService, UserService>();
