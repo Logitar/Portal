@@ -16,11 +16,11 @@ internal class SenderUpdatedEventHandler : INotificationHandler<SenderUpdatedEve
 
   public async Task Handle(SenderUpdatedEvent @event, CancellationToken cancellationToken)
   {
-    SenderEntity role = await _context.Senders
+    SenderEntity sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken)
       ?? throw new EntityNotFoundException<SenderEntity>(@event.AggregateId);
 
-    role.Update(@event);
+    sender.Update(@event);
 
     await _context.SaveChangesAsync(cancellationToken);
   }
