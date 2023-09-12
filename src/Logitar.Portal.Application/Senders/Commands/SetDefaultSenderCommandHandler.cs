@@ -26,26 +26,27 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
       return null;
     }
 
-    SenderAggregate? @default = await _senderRepository.LoadDefaultAsync(sender.TenantId, cancellationToken);
-    if (@default != null)
+    if (!sender.IsDefault)
     {
-      @default.IsDefault = false;
-      @default.Update(_applicationContext.ActorId);
+      SenderAggregate? @default = await _senderRepository.LoadDefaultAsync(sender.TenantId, cancellationToken);
+      if (@default != null)
+      {
+        @default.IsDefault = false;
+        @default.Update(_applicationContext.ActorId);
+      }
+
+      sender.IsDefault = true;
+      sender.Update(_applicationContext.ActorId);
+
+      List<SenderAggregate> senders = new(capacity: 2);
+      if (@default != null)
+      {
+        senders.Add(@default);
+      }
+      senders.Add(sender);
+
+      await _senderRepository.SaveAsync(senders, cancellationToken);
     }
-
-    // TODO(fpion): if @default == sender, do nothing
-
-    sender.IsDefault = true;
-    sender.Update(_applicationContext.ActorId);
-
-    List<SenderAggregate> senders = new(capacity: 2);
-    if (@default != null)
-    {
-      senders.Add(@default);
-    }
-    senders.Add(sender);
-
-    await _senderRepository.SaveAsync(senders, cancellationToken);
 
     return await _senderQuerier.ReadAsync(sender, cancellationToken);
   }

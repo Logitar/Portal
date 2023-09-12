@@ -288,6 +288,20 @@ public class SenderServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Null(await _senderService.SetDefaultAsync(Guid.Empty));
   }
 
+  [Fact(DisplayName = "SetDefaultAsync: it should return the sender not updated when it is already default.")]
+  public async Task SetDefaultAsync_it_should_return_the_sender_not_updated_when_it_is_already_default()
+  {
+    Sender? sender = await _senderService.SetDefaultAsync(_sender.Id.ToGuid());
+    Assert.NotNull(sender);
+
+    Assert.Equal(_sender.Id.ToGuid(), sender.Id);
+    Assert.Equal(Guid.Empty, sender.CreatedBy.Id);
+    AssertEqual(_sender.CreatedOn, sender.CreatedOn);
+    Assert.Equal(Guid.Empty, sender.UpdatedBy.Id);
+    AssertEqual(_sender.UpdatedOn, sender.UpdatedOn);
+    Assert.Equal(_sender.Version, sender.Version);
+  }
+
   [Fact(DisplayName = "SetDefaultAsync: it should set the default sender.")]
   public async Task SetDefaultAsync_it_should_set_the_default_sender()
   {
