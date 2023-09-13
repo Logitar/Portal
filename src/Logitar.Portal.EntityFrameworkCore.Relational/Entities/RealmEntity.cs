@@ -88,7 +88,10 @@ internal record RealmEntity : AggregateEntity
   public SenderEntity? PasswordRecoverySender { get; private set; }
   public int? PasswordRecoverySenderId { get; private set; }
 
-  public void Update(RealmUpdatedEvent updated, SenderEntity? passwordRecoverySender)
+  public TemplateEntity? PasswordRecoveryTemplate { get; private set; }
+  public int? PasswordRecoveryTemplateId { get; private set; }
+
+  public void Update(RealmUpdatedEvent updated, SenderEntity? passwordRecoverySender, TemplateEntity? passwordRecoveryTemplate)
   {
     Update(updated);
 
@@ -164,6 +167,11 @@ internal record RealmEntity : AggregateEntity
     {
       PasswordRecoverySender = passwordRecoverySender;
       PasswordRecoverySenderId = passwordRecoverySender?.SenderId;
+    }
+    if (updated.PasswordRecoveryTemplateId != null)
+    {
+      PasswordRecoveryTemplate = passwordRecoveryTemplate;
+      PasswordRecoveryTemplateId = passwordRecoveryTemplate?.TemplateId;
     }
   }
 

@@ -85,6 +85,19 @@ internal static class Db
     public static readonly ColumnId UserId = new(nameof(SessionEntity.UserId), Table);
   }
 
+  public static class Templates
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Templates));
+
+    public static readonly ColumnId AggregateId = new(nameof(TemplateEntity.AggregateId), Table);
+    public static readonly ColumnId ContentType = new(nameof(TemplateEntity.ContentType), Table);
+    public static readonly ColumnId DisplayName = new(nameof(TemplateEntity.DisplayName), Table);
+    public static readonly ColumnId Subject = new(nameof(TemplateEntity.Subject), Table);
+    public static readonly ColumnId TenantId = new(nameof(TemplateEntity.TenantId), Table);
+    public static readonly ColumnId UniqueName = new(nameof(TemplateEntity.UniqueName), Table);
+    public static readonly ColumnId UniqueNameNormalized = new(nameof(TemplateEntity.UniqueNameNormalized), Table);
+  }
+
   public static class Users
   {
     public static readonly TableId Table = new(nameof(PortalContext.Users));
