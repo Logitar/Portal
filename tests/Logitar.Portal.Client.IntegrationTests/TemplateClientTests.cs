@@ -64,7 +64,10 @@ internal class TemplateClientTests
       Template other = await _templateService.CreateAsync(new CreateTemplatePayload
       {
         Realm = _context.Realm.Id.ToString(),
-        UniqueName = "CreateUser"
+        UniqueName = "CreateUser",
+        Subject = "CreateUser_Subject",
+        ContentType = MediaTypeNames.Text.Plain,
+        Contents = "CreateUser_Body"
       }, cancellationToken);
       other = await _templateService.DeleteAsync(other.Id, cancellationToken)
         ?? throw new InvalidOperationException("The result should not be null.");
