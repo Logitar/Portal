@@ -3,6 +3,7 @@ using Logitar.Portal.Application.Dictionaries.Commands;
 using Logitar.Portal.Application.Roles.Commands;
 using Logitar.Portal.Application.Senders.Commands;
 using Logitar.Portal.Application.Sessions.Commands;
+using Logitar.Portal.Application.Templates.Commands;
 using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
@@ -34,14 +35,12 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     }
     Realm result = await _realmQuerier.ReadAsync(realm, cancellationToken);
 
-    if (realm.PasswordRecoverySenderId.HasValue)
-    {
-      realm.RemovePasswordRecoverySender();
-      realm.Update(_applicationContext.ActorId);
+    realm.RemovePasswordRecoverySender();
+    realm.RemovePasswordRecoveryTemplate();
+    realm.Update(_applicationContext.ActorId);
+    await _realmRepository.SaveAsync(realm, cancellationToken);
 
-      await _realmRepository.SaveAsync(realm, cancellationToken);
-    }
-
+    await _publisher.Publish(new DeleteTemplatesCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteSendersCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteDictionariesCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteSessionsCommand(realm), cancellationToken);
