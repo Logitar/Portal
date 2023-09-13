@@ -11,6 +11,7 @@ using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -35,6 +36,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(RolesNotFoundException)] = HandleRolesNotFoundException,
     [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
+    [typeof(TemplateNotInRealmException)] = HandleTemplateNotInRealmException,
     [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
     [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
     [typeof(UserIsNotConfirmedException)] = HandleUserIsNotConfirmedException,
@@ -150,6 +152,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)
   {
     return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
+  }
+
+  private static IActionResult HandleTemplateNotInRealmException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((TemplateNotInRealmException)context.Exception).Failure);
   }
 
   private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)
