@@ -56,6 +56,10 @@ public class TemplateAggregate : AggregateRoot
     TenantId = created.TenantId;
 
     UniqueName = created.UniqueName;
+
+    _subject = created.Subject;
+    _contentType = created.ContentType;
+    _contents = created.Contents;
   }
 
   public string? TenantId { get; private set; }

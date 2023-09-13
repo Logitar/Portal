@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="System.Net.Mime" />
     <Using Include="System.Reflection" />
     <Using Include="Xunit" />
   </ItemGroup>

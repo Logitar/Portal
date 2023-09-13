@@ -39,7 +39,7 @@ public class RealmAggregateTests
   [Fact(DisplayName = "It should remove the password recovery template.")]
   public void It_should_remove_the_password_recovery_template()
   {
-    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", "text/plain", "Hello World!", tenantId: _realm.Id.Value)
+    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", MediaTypeNames.Text.Plain, "Hello World!", tenantId: _realm.Id.Value)
     {
       DisplayName = "Test Template"
     };
@@ -65,7 +65,7 @@ public class RealmAggregateTests
   [Fact(DisplayName = "It should set the specified password recovery template.")]
   public void It_should_set_the_specified_password_recovery_template()
   {
-    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", "text/plain", "Hello World!", tenantId: _realm.Id.Value)
+    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", MediaTypeNames.Text.Plain, "Hello World!", tenantId: _realm.Id.Value)
     {
       DisplayName = "Test Template"
     };
@@ -88,7 +88,7 @@ public class RealmAggregateTests
   [Fact(DisplayName = "It should throw TemplateNotInRealmException when setting a password recovery template from a different realm.")]
   public void It_should_throw_TemplateNotInRealmException_when_setting_a_password_recovery_template_from_a_different_realm()
   {
-    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", "text/plain", "Hello World!", tenantId: null);
+    TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", MediaTypeNames.Text.Plain, "Hello World!", tenantId: null);
 
     var exception = Assert.Throws<TemplateNotInRealmException>(() => _realm.SetPasswordRecoveryTemplate(template, nameof(template)));
     Assert.Equal(template.ToString(), exception.Template);
