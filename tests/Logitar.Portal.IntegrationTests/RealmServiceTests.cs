@@ -26,6 +26,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   private readonly IRealmService _realmService;
 
   private readonly RealmAggregate _realm;
+  private readonly SenderAggregate _sender;
 
   public RealmServiceTests() : base()
   {
@@ -41,13 +42,18 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     _realm.SetClaimMapping("HourlyRate", new ReadOnlyClaimMapping("rate", "double"));
     _realm.SetCustomAttribute("PhoneNumber", "+15148454636");
     _realm.SetCustomAttribute("PostalCode", "H2X 3Y2");
+
+    _sender = new(Faker.Internet.Email(), ProviderType.SendGrid, isDefault: true, tenantId: _realm.Id.Value)
+    {
+      DisplayName = Faker.Name.FullName()
+    };
   }
 
   public override async Task InitializeAsync()
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(_realm);
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender });
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a realm.")]
@@ -126,7 +132,9 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   {
     string tenantId = _realm.Id.Value;
 
-    SenderAggregate sender = new(Faker.Internet.Email(), ProviderType.SendGrid, isDefault: true, tenantId);
+    SenderAggregate sender = new(Faker.Internet.Email(), ProviderType.SendGrid, isDefault: false, tenantId);
+    _realm.SetPasswordRecoverySender(sender, nameof(sender));
+
     DictionaryAggregate dictionary = new(new Locale("fr"), tenantId);
 
     RoleAggregate role = new(_realm.UniqueNameSettings, "admin", tenantId);
@@ -140,7 +148,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     SessionAggregate session = new(user);
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { dictionary, role, apiKey, user, session });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, _realm, dictionary, role, apiKey, user, session });
 
     Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
 
@@ -241,7 +249,8 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       {
         new("LocationKind", "ShoppingMall"),
         new("PhoneNumber", "+15148454636")
-      }
+      },
+      PasswordRecoverySenderId = _sender.Id.ToGuid()
     };
 
     Realm? realm = await _realmService.ReplaceAsync(_realm.Id.ToGuid(), payload, version);
@@ -280,6 +289,9 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       && customAttribute.Value == "+15148454636");
     Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PostalAddress"
       && customAttribute.Value == "150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2");
+
+    Assert.NotNull(realm.PasswordRecoverySender);
+    Assert.Equal(_sender.Id.ToGuid(), realm.PasswordRecoverySender.Id);
   }
 
   [Fact(DisplayName = "ReplaceAsync: it should return null when the realm is not found.")]
@@ -399,6 +411,9 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "UpdateAsync: it should update the realm.")]
   public async Task UpdateAsync_it_should_update_the_realm()
   {
+    _realm.SetPasswordRecoverySender(_sender, nameof(_sender));
+    await AggregateRepository.SaveAsync(_realm);
+
     UpdateRealmPayload payload = new()
     {
       Description = new Modification<string>("Indoor complex featuring shops with apparel, accessories & housewares, plus a food court & a grocer."),
@@ -423,7 +438,8 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       {
         new("PostalCode", value: null),
         new("  PostalAddress  ", "  150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2  ")
-      }
+      },
+      PasswordRecoverySenderId = new Modification<Guid?>(null)
     };
 
     Realm? realm = await _realmService.UpdateAsync(_realm.Id.ToGuid(), payload);
@@ -452,5 +468,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       && customAttribute.Value == "+15148454636");
     Assert.Contains(realm.CustomAttributes, customAttribute => customAttribute.Key == "PostalAddress"
       && customAttribute.Value == "150 Saint-Catherine St W, Montreal, Quebec H2X 3Y2");
+
+    Assert.Null(realm.PasswordRecoverySender);
   }
 }

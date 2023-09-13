@@ -20,7 +20,16 @@ internal class RealmUpdatedEventHandler : INotificationHandler<RealmUpdatedEvent
       .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken)
       ?? throw new EntityNotFoundException<RealmEntity>(@event.AggregateId);
 
-    realm.Update(@event);
+    SenderEntity? sender = null;
+    if (@event.PasswordRecoverySenderId?.Value.HasValue == true)
+    {
+      string senderId = @event.PasswordRecoverySenderId.Value.Value.ToString();
+      sender = await _context.Senders
+        .SingleOrDefaultAsync(x => x.AggregateId == senderId, cancellationToken)
+        ?? throw new EntityNotFoundException<SenderEntity>(senderId);
+    }
+
+    realm.Update(@event, sender);
 
     await _context.SaveChangesAsync(cancellationToken);
   }

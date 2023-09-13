@@ -6,6 +6,7 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -109,6 +110,19 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
 
     return await base.LoadAsync<RealmAggregate>(id, cancellationToken)
       ?? throw new AggregateNotFoundException<RealmAggregate>(id, $"{nameof(role)}.{nameof(role.TenantId)}");
+  }
+
+  public async Task<RealmAggregate?> LoadAsync(SenderAggregate sender, CancellationToken cancellationToken)
+  {
+    if (sender.TenantId == null)
+    {
+      return null;
+    }
+
+    AggregateId id = new(sender.TenantId);
+
+    return await base.LoadAsync<RealmAggregate>(id, cancellationToken)
+      ?? throw new AggregateNotFoundException<RealmAggregate>(id, $"{nameof(sender)}.{nameof(sender.TenantId)}");
   }
 
   public async Task<RealmAggregate?> LoadAsync(SessionAggregate session, CancellationToken cancellationToken)

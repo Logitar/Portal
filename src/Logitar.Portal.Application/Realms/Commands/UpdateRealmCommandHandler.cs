@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Senders;
 using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
@@ -10,12 +11,15 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
   private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
+  private readonly ISenderRepository _senderRepository;
 
-  public UpdateRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
+  public UpdateRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier,
+    IRealmRepository realmRepository, ISenderRepository senderRepository)
   {
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
+    _senderRepository = senderRepository;
   }
 
   public async Task<Realm?> Handle(UpdateRealmCommand command, CancellationToken cancellationToken)
@@ -99,6 +103,21 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
       else
       {
         realm.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      }
+    }
+
+    if (payload.PasswordRecoverySenderId != null)
+    {
+      if (payload.PasswordRecoverySenderId.Value.HasValue)
+      {
+        Guid senderId = payload.PasswordRecoverySenderId.Value.Value;
+        SenderAggregate sender = await _senderRepository.LoadAsync(senderId, cancellationToken)
+          ?? throw new AggregateNotFoundException<SenderAggregate>(senderId, nameof(payload.PasswordRecoverySenderId));
+        realm.SetPasswordRecoverySender(sender, nameof(payload.PasswordRecoverySenderId));
+      }
+      else
+      {
+        realm.RemovePasswordRecoverySender();
       }
     }
 

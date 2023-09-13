@@ -3,6 +3,7 @@ using Logitar.EventSourcing;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain.Realms.Events;
 using Logitar.Portal.Domain.Realms.Validators;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Validators;
 using Logitar.Security.Cryptography;
@@ -233,6 +234,8 @@ public class RealmAggregate : AggregateRoot
 
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
+  public AggregateId? PasswordRecoverySenderId { get; private set; }
+
   public IUserSettings UserSettings => new ReadOnlyUserSettings(RequireUniqueEmail,
     RequireConfirmedAccount, UniqueNameSettings, PasswordSettings);
 
@@ -260,6 +263,16 @@ public class RealmAggregate : AggregateRoot
     }
   }
 
+  public void RemovePasswordRecoverySender()
+  {
+    if (PasswordRecoverySenderId.HasValue)
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.PasswordRecoverySenderId = new Modification<AggregateId?>(null);
+      PasswordRecoverySenderId = null;
+    }
+  }
+
   public void SetClaimMapping(string key, ReadOnlyClaimMapping claimMapping)
   {
     key = key.Trim();
@@ -284,6 +297,21 @@ public class RealmAggregate : AggregateRoot
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.CustomAttributes[key] = value;
       _customAttributes[key] = value;
+    }
+  }
+
+  public void SetPasswordRecoverySender(SenderAggregate sender, string propertyName)
+  {
+    if (sender.TenantId != Id.Value)
+    {
+      throw new SenderNotInRealmException(sender, this, propertyName ?? nameof(PasswordRecoverySenderId));
+    }
+
+    if (sender.Id != PasswordRecoverySenderId)
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.PasswordRecoverySenderId = new Modification<AggregateId?>(sender?.Id);
+      PasswordRecoverySenderId = sender?.Id;
     }
   }
 
@@ -371,6 +399,11 @@ public class RealmAggregate : AggregateRoot
       {
         _customAttributes[customAttribute.Key] = customAttribute.Value;
       }
+    }
+
+    if (updated.PasswordRecoverySenderId != null)
+    {
+      PasswordRecoverySenderId = updated.PasswordRecoverySenderId.Value;
     }
   }
 

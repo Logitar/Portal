@@ -33,7 +33,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     }
     string? tenantId = realm?.Id.Value;
 
-    IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(realm, cancellationToken);
     bool isDefault = !senders.Any();
 
     SenderAggregate sender = new(payload.EmailAddress, payload.Provider, isDefault, tenantId, _applicationContext.ActorId)

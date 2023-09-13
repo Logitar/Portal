@@ -34,6 +34,14 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     }
     Realm result = await _realmQuerier.ReadAsync(realm, cancellationToken);
 
+    if (realm.PasswordRecoverySenderId.HasValue)
+    {
+      realm.RemovePasswordRecoverySender();
+      realm.Update(_applicationContext.ActorId);
+
+      await _realmRepository.SaveAsync(realm, cancellationToken);
+    }
+
     await _publisher.Publish(new DeleteSendersCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteDictionariesCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteSessionsCommand(realm), cancellationToken);
