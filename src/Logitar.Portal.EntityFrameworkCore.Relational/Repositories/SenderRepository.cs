@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +25,9 @@ internal class SenderRepository : EventSourcing.EntityFrameworkCore.Relational.A
   public async Task<SenderAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
     => await base.LoadAsync<SenderAggregate>(id, version, cancellationToken);
 
-  public async Task<IEnumerable<SenderAggregate>> LoadAsync(string? tenantId, CancellationToken cancellationToken)
+  public async Task<IEnumerable<SenderAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    tenantId = tenantId?.CleanTrim();
+    string? tenantId = realm?.Id.Value;
 
     IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
       .Join(Db.Senders.AggregateId, Db.Events.AggregateId,

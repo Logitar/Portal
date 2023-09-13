@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Settings;
 using MediatR;
 
@@ -12,12 +13,15 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
   private readonly IApplicationContext _applicationContext;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
+  private readonly ISenderRepository _senderRepository;
 
-  public ReplaceRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
+  public ReplaceRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier,
+    IRealmRepository realmRepository, ISenderRepository senderRepository)
   {
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
+    _senderRepository = senderRepository;
   }
 
   public async Task<Realm?> Handle(ReplaceRealmCommand command, CancellationToken cancellationToken)
@@ -39,6 +43,13 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     Uri? url = payload.Url?.GetUrl(nameof(payload.Url));
     ReadOnlyUniqueNameSettings uniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
     ReadOnlyPasswordSettings passwordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
+
+    SenderAggregate? sender = null;
+    if (payload.PasswordRecoverySenderId.HasValue)
+    {
+      sender = await _senderRepository.LoadAsync(payload.PasswordRecoverySenderId.Value, cancellationToken)
+        ?? throw new AggregateNotFoundException<SenderAggregate>(payload.PasswordRecoverySenderId.Value, nameof(payload.PasswordRecoverySenderId));
+    }
 
     if (reference == null || payload.UniqueSlug.Trim() != reference.UniqueSlug)
     {
@@ -114,6 +125,18 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
       realm.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+    }
+
+    if (reference == null || sender?.Id != reference.PasswordRecoverySenderId)
+    {
+      if (sender == null)
+      {
+        realm.RemovePasswordRecoverySender();
+      }
+      else
+      {
+        realm.SetPasswordRecoverySender(sender, nameof(payload.PasswordRecoverySenderId));
+      }
     }
 
     realm.Update(_applicationContext.ActorId);

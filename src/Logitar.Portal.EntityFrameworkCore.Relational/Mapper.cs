@@ -138,6 +138,11 @@ internal class Mapper
 
     MapAggregate(source, destination);
 
+    if (source.PasswordRecoverySender != null)
+    {
+      destination.PasswordRecoverySender = ToSender(source.PasswordRecoverySender, realm: null);
+    }
+
     return destination;
   }
 

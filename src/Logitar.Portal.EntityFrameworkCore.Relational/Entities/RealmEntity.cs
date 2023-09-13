@@ -85,9 +85,12 @@ internal record RealmEntity : AggregateEntity
     }
   }
 
-  public void Update(RealmUpdatedEvent updated)
+  public SenderEntity? PasswordRecoverySender { get; private set; }
+  public int? PasswordRecoverySenderId { get; private set; }
+
+  public void Update(RealmUpdatedEvent updated, SenderEntity? passwordRecoverySender)
   {
-    base.Update(updated);
+    Update(updated);
 
     if (updated.UniqueSlug != null)
     {
@@ -155,6 +158,12 @@ internal record RealmEntity : AggregateEntity
       {
         CustomAttributes[customAttribute.Key] = customAttribute.Value;
       }
+    }
+
+    if (updated.PasswordRecoverySenderId != null)
+    {
+      PasswordRecoverySender = passwordRecoverySender;
+      PasswordRecoverySenderId = passwordRecoverySender?.SenderId;
     }
   }
 

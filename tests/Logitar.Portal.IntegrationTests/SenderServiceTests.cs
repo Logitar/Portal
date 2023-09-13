@@ -1,7 +1,9 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
@@ -13,6 +15,7 @@ namespace Logitar.Portal;
 [Trait(Traits.Category, Categories.Integration)]
 public class SenderServiceTests : IntegrationTests, IAsyncLifetime
 {
+  private readonly IRealmQuerier _realmQuerier;
   private readonly ISenderService _senderService;
 
   private readonly RealmAggregate _realm;
@@ -20,6 +23,7 @@ public class SenderServiceTests : IntegrationTests, IAsyncLifetime
 
   public SenderServiceTests() : base()
   {
+    _realmQuerier = ServiceProvider.GetRequiredService<IRealmQuerier>();
     _senderService = ServiceProvider.GetRequiredService<ISenderService>();
 
     _realm = new("logitar");
@@ -108,6 +112,24 @@ public class SenderServiceTests : IntegrationTests, IAsyncLifetime
     deleted = await _senderService.DeleteAsync(_sender.Id.ToGuid());
     Assert.NotNull(deleted);
     Assert.Equal(_sender.Id.ToGuid(), deleted.Id);
+  }
+
+  [Fact(DisplayName = "DeleteAsync: it should remove the realm password recovery sender.")]
+  public async Task DeleteAsync_it_should_remove_the_realm_password_recovery_sender()
+  {
+    _realm.SetPasswordRecoverySender(_sender, nameof(_sender));
+    await AggregateRepository.SaveAsync(_realm);
+
+    Sender? sender = await _senderService.DeleteAsync(_sender.Id.ToGuid());
+    Assert.NotNull(sender);
+    Assert.Equal(_sender.Id.ToGuid(), sender.Id);
+
+    RealmAggregate? aggregate = await AggregateRepository.LoadAsync<RealmAggregate>(_realm.Id);
+    Assert.NotNull(aggregate);
+    Assert.False(aggregate.PasswordRecoverySenderId.HasValue);
+
+    Realm realm = await _realmQuerier.ReadAsync(_realm);
+    Assert.Null(realm.PasswordRecoverySender);
   }
 
   [Fact(DisplayName = "DeleteAsync: it should return null when the sender is not found.")]

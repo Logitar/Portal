@@ -28,5 +28,7 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.Property(x => x.DisplayName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Provider).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<ProviderType>());
     builder.Property(x => x.SettingsSerialized).HasColumnName(nameof(SenderEntity.Settings));
+
+    builder.HasOne(x => x.PasswordRecoveryInRealm).WithOne(x => x.PasswordRecoverySender).OnDelete(DeleteBehavior.Restrict);
   }
 }

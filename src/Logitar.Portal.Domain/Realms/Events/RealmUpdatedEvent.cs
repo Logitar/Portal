@@ -24,4 +24,6 @@ public record RealmUpdatedEvent : DomainEvent, INotification
   public Dictionary<string, ReadOnlyClaimMapping?> ClaimMappings { get; init; } = new();
 
   public Dictionary<string, string?> CustomAttributes { get; init; } = new();
+
+  public Modification<AggregateId?>? PasswordRecoverySenderId { get; set; }
 }

@@ -21,4 +21,6 @@ public record UpdateRealmPayload
   public IEnumerable<ClaimMappingModification> ClaimMappings { get; set; } = Enumerable.Empty<ClaimMappingModification>();
 
   public IEnumerable<CustomAttributeModification> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttributeModification>();
+
+  public Modification<Guid?>? PasswordRecoverySenderId { get; set; }
 }

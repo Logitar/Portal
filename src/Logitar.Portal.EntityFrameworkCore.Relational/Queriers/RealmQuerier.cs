@@ -37,6 +37,7 @@ internal class RealmQuerier : IRealmQuerier
     }
 
     RealmEntity[] realms = await _realms.AsNoTracking()
+      .Include(x => x.PasswordRecoverySender)
       .Where(x => x.AggregateId == aggregateId || x.UniqueSlugNormalized == uniqueSlugNormalized)
       .ToArrayAsync(cancellationToken);
     if (realms.Length == 0)
@@ -62,6 +63,7 @@ internal class RealmQuerier : IRealmQuerier
     string aggregateId = id.Value;
 
     RealmEntity? realm = await _realms.AsNoTracking()
+      .Include(x => x.PasswordRecoverySender)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
     if (realm == null)
     {
@@ -76,6 +78,7 @@ internal class RealmQuerier : IRealmQuerier
     string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
 
     RealmEntity? realm = await _realms.AsNoTracking()
+      .Include(x => x.PasswordRecoverySender)
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
     if (realm == null)
     {
@@ -92,7 +95,8 @@ internal class RealmQuerier : IRealmQuerier
       .SelectAll(Db.Realms.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Realms.UniqueSlug, Db.Realms.DisplayName);
 
-    IQueryable<RealmEntity> query = _realms.FromQuery(builder.Build()).AsNoTracking();
+    IQueryable<RealmEntity> query = _realms.FromQuery(builder.Build()).AsNoTracking()
+      .Include(x => x.PasswordRecoverySender);
     long total = await query.LongCountAsync(cancellationToken);
 
     IOrderedQueryable<RealmEntity>? ordered = null;
