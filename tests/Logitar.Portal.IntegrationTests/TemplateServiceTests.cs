@@ -119,7 +119,7 @@ public class TemplateServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should remove the realm password recovery template.")]
   public async Task DeleteAsync_it_should_remove_the_realm_password_recovery_template()
   {
-    _realm.SetPasswordRecoveryTemplate(_template, nameof(_template));
+    _realm.SetPasswordRecoveryTemplate(_template);
     await AggregateRepository.SaveAsync(_realm);
 
     Template? template = await _templateService.DeleteAsync(_template.Id.ToGuid());

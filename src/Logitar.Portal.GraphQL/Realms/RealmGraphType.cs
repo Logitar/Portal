@@ -1,6 +1,8 @@
 ﻿using GraphQL.Types;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.GraphQL.Senders;
 using Logitar.Portal.GraphQL.Settings;
+using Logitar.Portal.GraphQL.Templates;
 
 namespace Logitar.Portal.GraphQL.Realms;
 
@@ -40,5 +42,10 @@ internal class RealmGraphType : AggregateGraphType<Realm>
 
     Field(x => x.CustomAttributes, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<CustomAttributeGraphType>>>))
       .Description("The custom attributes of the realm.");
+
+    Field(x => x.PasswordRecoverySender, type: typeof(SenderGraphType))
+      .Description("The sender used for password recovery in the realm.");
+    Field(x => x.PasswordRecoveryTemplate, type: typeof(TemplateGraphType))
+      .Description("The template used for password recovery in the realm.");
   }
 }

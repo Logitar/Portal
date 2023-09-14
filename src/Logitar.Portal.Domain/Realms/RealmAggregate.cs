@@ -312,11 +312,11 @@ public class RealmAggregate : AggregateRoot
     }
   }
 
-  public void SetPasswordRecoverySender(SenderAggregate sender, string propertyName)
+  public void SetPasswordRecoverySender(SenderAggregate sender)
   {
     if (sender.TenantId != Id.Value)
     {
-      throw new SenderNotInRealmException(sender, this, propertyName ?? nameof(PasswordRecoverySenderId));
+      throw new SenderNotInRealmException(sender, this, nameof(PasswordRecoverySenderId));
     }
 
     if (sender.Id != PasswordRecoverySenderId)
@@ -327,11 +327,11 @@ public class RealmAggregate : AggregateRoot
     }
   }
 
-  public void SetPasswordRecoveryTemplate(TemplateAggregate template, string propertyName)
+  public void SetPasswordRecoveryTemplate(TemplateAggregate template)
   {
     if (template.TenantId != Id.Value)
     {
-      throw new TemplateNotInRealmException(template, this, propertyName ?? nameof(PasswordRecoverySenderId));
+      throw new TemplateNotInRealmException(template, this, nameof(PasswordRecoveryTemplateId));
     }
 
     if (template.Id != PasswordRecoveryTemplateId)
@@ -431,6 +431,10 @@ public class RealmAggregate : AggregateRoot
     if (updated.PasswordRecoverySenderId != null)
     {
       PasswordRecoverySenderId = updated.PasswordRecoverySenderId.Value;
+    }
+    if (updated.PasswordRecoveryTemplateId != null)
+    {
+      PasswordRecoveryTemplateId = updated.PasswordRecoveryTemplateId.Value;
     }
   }
 

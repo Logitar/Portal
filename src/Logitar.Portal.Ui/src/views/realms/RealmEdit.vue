@@ -7,11 +7,15 @@ import { useRoute, useRouter } from "vue-router";
 import ClaimMappingList from "@/components/realms/ClaimMappingList.vue";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
+import SenderSelect from "@/components/senders/SenderSelect.vue";
+import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { ClaimMapping, ClaimMappingModification, Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
+import type { Sender } from "@/types/senders";
+import type { Template } from "@/types/templates";
 import type { ToastUtils } from "@/types/components";
 import { createRealm, readRealmByUniqueSlug, updateRealm } from "@/api/realms";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
@@ -53,6 +57,8 @@ const defaultLocale = ref<string>(defaults.defaultLocale);
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const hasLoaded = ref<boolean>(false);
+const passwordRecoverySender = ref<Sender>();
+const passwordRecoveryTemplate = ref<Template>();
 const passwordSettings = ref<PasswordSettings>(defaults.passwordSettings);
 const realm = ref<Realm>();
 const requireConfirmedAccount = ref<boolean>(defaults.requireConfirmedAccount);
@@ -75,6 +81,8 @@ const hasChanges = computed<boolean>(() => {
     requireUniqueEmail.value !== model.requireUniqueEmail ||
     JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings) ||
     JSON.stringify(passwordSettings.value) !== JSON.stringify(model.passwordSettings) ||
+    passwordRecoverySender.value?.id !== realm.value?.passwordRecoverySender?.id ||
+    passwordRecoveryTemplate.value?.id !== realm.value?.passwordRecoveryTemplate?.id ||
     secret.value !== model.secret ||
     JSON.stringify(claimMappings.value) !== JSON.stringify(model.claimMappings) ||
     JSON.stringify(customAttributes.value) !== JSON.stringify(model.customAttributes)
@@ -89,13 +97,15 @@ function setModel(model: Realm): void {
   defaultLocale.value = model.defaultLocale ?? "";
   description.value = model.description ?? "";
   displayName.value = model.displayName ?? "";
+  passwordRecoverySender.value = model.passwordRecoverySender;
+  passwordRecoveryTemplate.value = model.passwordRecoveryTemplate;
   passwordSettings.value = model.passwordSettings;
   requireConfirmedAccount.value = model.requireConfirmedAccount;
   requireUniqueEmail.value = model.requireUniqueEmail;
   secret.value = model.secret;
+  uniqueNameSettings.value = model.uniqueNameSettings;
   uniqueSlug.value = model.uniqueSlug;
   url.value = model.url ?? "";
-  uniqueNameSettings.value = model.uniqueNameSettings;
 }
 
 function getClaimMappingModifications(source: ClaimMapping[], destination: ClaimMapping[]): ClaimMappingModification[] {
@@ -139,6 +149,10 @@ const onSubmit = handleSubmit(async () => {
         passwordSettings: JSON.stringify(passwordSettings.value) !== JSON.stringify(realm.value.passwordSettings) ? passwordSettings.value : undefined,
         claimMappings: claimMappingModifications.length ? claimMappingModifications : undefined,
         customAttributes: customAttributeModifications.length ? customAttributeModifications : undefined,
+        passwordRecoverySenderId:
+          passwordRecoverySender.value?.id !== realm.value.passwordRecoverySender?.id ? { value: passwordRecoverySender.value?.id } : undefined,
+        passwordRecoveryTemplateId:
+          passwordRecoveryTemplate.value?.id !== realm.value.passwordRecoveryTemplate?.id ? { value: passwordRecoveryTemplate.value?.id } : undefined,
       });
       setModel(updatedRealm);
       toasts.success("realms.updated");
@@ -250,6 +264,22 @@ onUpdated(() => registerTooltips());
             </form-checkbox>
             <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
             <PasswordSettingsEdit v-model="passwordSettings" />
+            <h5>{{ t("realms.passwordRecovery.title") }}</h5>
+            <div class="row">
+              <SenderSelect
+                class="col-lg-6"
+                :realm="realm"
+                :model-value="passwordRecoverySender?.id"
+                placeholder="realms.passwordRecovery.sender.placeholder"
+                @sender-selected="passwordRecoverySender = $event"
+              />
+              <TemplateSelect
+                class="col-lg-6"
+                :realm="realm"
+                :model-value="passwordRecoveryTemplate?.id"
+                @template-selected="passwordRecoveryTemplate = $event"
+              />
+            </div>
             <h5>{{ t("settings.jwt.title") }}</h5>
             <JwtSecretField :old-value="realm?.secret" validate v-model="secret" warning="realms.jwt.secret.warning" />
           </app-tab>

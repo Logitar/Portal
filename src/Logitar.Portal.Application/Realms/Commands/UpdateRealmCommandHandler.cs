@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Templates;
 using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
@@ -12,14 +13,16 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
   private readonly ISenderRepository _senderRepository;
+  private readonly ITemplateRepository _templateRepository;
 
   public UpdateRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier,
-    IRealmRepository realmRepository, ISenderRepository senderRepository)
+    IRealmRepository realmRepository, ISenderRepository senderRepository, ITemplateRepository templateRepository)
   {
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
     _senderRepository = senderRepository;
+    _templateRepository = templateRepository;
   }
 
   public async Task<Realm?> Handle(UpdateRealmCommand command, CancellationToken cancellationToken)
@@ -113,11 +116,25 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
         Guid senderId = payload.PasswordRecoverySenderId.Value.Value;
         SenderAggregate sender = await _senderRepository.LoadAsync(senderId, cancellationToken)
           ?? throw new AggregateNotFoundException<SenderAggregate>(senderId, nameof(payload.PasswordRecoverySenderId));
-        realm.SetPasswordRecoverySender(sender, nameof(payload.PasswordRecoverySenderId));
+        realm.SetPasswordRecoverySender(sender);
       }
       else
       {
         realm.RemovePasswordRecoverySender();
+      }
+    }
+    if (payload.PasswordRecoveryTemplateId != null)
+    {
+      if (payload.PasswordRecoveryTemplateId.Value.HasValue)
+      {
+        Guid templateId = payload.PasswordRecoveryTemplateId.Value.Value;
+        TemplateAggregate template = await _templateRepository.LoadAsync(templateId, cancellationToken)
+          ?? throw new AggregateNotFoundException<TemplateAggregate>(templateId, nameof(payload.PasswordRecoveryTemplateId));
+        realm.SetPasswordRecoveryTemplate(template);
+      }
+      else
+      {
+        realm.RemovePasswordRecoveryTemplate();
       }
     }
 

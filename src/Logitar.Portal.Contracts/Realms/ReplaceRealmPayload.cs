@@ -23,4 +23,5 @@ public record ReplaceRealmPayload
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public Guid? PasswordRecoverySenderId { get; set; }
+  public Guid? PasswordRecoveryTemplateId { get; set; }
 }

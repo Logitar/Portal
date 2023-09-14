@@ -16,6 +16,12 @@
       "warning": "Changer le secret invalidera tous les jetons actifs dans ce royaume. Appuyez sur le bouton ci-dessous afin d’annuler le changement."
     }
   },
+  "passwordRecovery": {
+    "sender": {
+      "placeholder": "Utiliser l’expéditeur par défaut"
+    },
+    "title": "Récupération du mot de passe"
+  },
   "requireConfirmedAccount": {
     "info": "En activant ce paramètre, une coordonnée confirmée sera nécessaire afin de permettre à un utilisateur de se connecter et de gérer son compte.",
     "label": "Exiger un compte confirmé"
