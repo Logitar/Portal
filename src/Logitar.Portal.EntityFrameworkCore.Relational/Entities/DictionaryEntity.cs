@@ -37,6 +37,11 @@ internal record DictionaryEntity : AggregateEntity
       }
     }
   }
+  public int EntryCount
+  {
+    get => Entries.Count;
+    private set { }
+  }
 
   public void Update(DictionaryUpdatedEvent updated)
   {

@@ -18,5 +18,7 @@ internal class DictionaryGraphType : AggregateGraphType<Dictionary>
 
     Field(x => x.Entries, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<DictionaryEntryGraphType>>>))
       .Description("The entries in the dictionary.");
+    Field(x => x.EntryCount)
+      .Description("The number of entries in the dictionary.");
   }
 }

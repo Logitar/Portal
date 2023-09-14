@@ -23,4 +23,5 @@ public record UpdateRealmPayload
   public IEnumerable<CustomAttributeModification> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttributeModification>();
 
   public Modification<Guid?>? PasswordRecoverySenderId { get; set; }
+  public Modification<Guid?>? PasswordRecoveryTemplateId { get; set; }
 }

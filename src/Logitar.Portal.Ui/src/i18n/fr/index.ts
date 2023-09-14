@@ -2,6 +2,7 @@ import apiKeys from "./apiKeys.fr.json";
 import configuration from "./configuration.fr.json";
 import countries from "./countries.fr.json";
 import dashboard from "./dashboard.fr.json";
+import dictionaries from "./dictionaries.fr.json";
 import index from "./index.fr.json";
 import realms from "./realms.fr.json";
 import roles from "./roles.fr.json";
@@ -18,6 +19,7 @@ export default {
   configuration,
   countries,
   dashboard,
+  dictionaries,
   realms,
   roles,
   senders,

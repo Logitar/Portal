@@ -3,10 +3,10 @@ import { computed, inject, ref, watch } from "vue";
 
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
-import type { User } from "@/types/users";
+import type { Sender } from "@/types/senders";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchUsers } from "@/api/users";
+import { searchSenders } from "@/api/senders";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -22,21 +22,21 @@ const props = withDefaults(
   }>(),
   {
     disabled: false,
-    id: "user",
-    label: "users.select.label",
-    placeholder: "users.select.placeholder",
+    id: "sender",
+    label: "senders.select.label",
+    placeholder: "senders.select.placeholder",
     required: false,
   }
 );
 
-const users = ref<User[]>([]);
+const senders = ref<Sender[]>([]);
 
 const options = computed<SelectOption[]>(() =>
   orderBy(
-    users.value.map(
-      ({ id, uniqueName, fullName }) =>
+    senders.value.map(
+      ({ id, emailAddress, displayName }) =>
         ({
-          text: fullName ? `${fullName} (${uniqueName})` : uniqueName,
+          text: displayName ? `${displayName} <${emailAddress}>` : emailAddress,
           value: id,
         } as SelectOption)
     ),
@@ -46,17 +46,17 @@ const options = computed<SelectOption[]>(() =>
 
 const emit = defineEmits<{
   (e: "update:model-value", value: string): void;
-  (e: "user-selected", value: User | undefined): void;
+  (e: "sender-selected", value: Sender | undefined): void;
 }>();
 
 watch(
   () => props.realm,
   async (realm) => {
     try {
-      const search = await searchUsers({
+      const search = await searchSenders({
         realm: realm?.id,
       });
-      users.value = search.results;
+      senders.value = search.results;
     } catch (e: unknown) {
       handleError(e);
     }
@@ -67,8 +67,8 @@ watch(
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
-  const selectedUser = id ? users.value.find((user) => user.id === id) : undefined;
-  emit("user-selected", selectedUser);
+  const selectedSender = id ? senders.value.find((sender) => sender.id === id) : undefined;
+  emit("sender-selected", selectedSender);
 }
 </script>
 

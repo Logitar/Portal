@@ -29,7 +29,7 @@ public class RealmAggregateTests
     {
       DisplayName = _faker.Name.FullName()
     };
-    _realm.SetPasswordRecoverySender(sender, nameof(sender));
+    _realm.SetPasswordRecoverySender(sender);
     Assert.Equal(sender.Id, _realm.PasswordRecoverySenderId);
 
     _realm.RemovePasswordRecoverySender();
@@ -43,7 +43,7 @@ public class RealmAggregateTests
     {
       DisplayName = "Test Template"
     };
-    _realm.SetPasswordRecoveryTemplate(template, nameof(template));
+    _realm.SetPasswordRecoveryTemplate(template);
     Assert.Equal(template.Id, _realm.PasswordRecoveryTemplateId);
 
     _realm.RemovePasswordRecoveryTemplate();
@@ -58,7 +58,7 @@ public class RealmAggregateTests
       DisplayName = _faker.Name.FullName()
     };
 
-    _realm.SetPasswordRecoverySender(sender, nameof(sender));
+    _realm.SetPasswordRecoverySender(sender);
     Assert.Equal(sender.Id, _realm.PasswordRecoverySenderId);
   }
 
@@ -70,7 +70,7 @@ public class RealmAggregateTests
       DisplayName = "Test Template"
     };
 
-    _realm.SetPasswordRecoveryTemplate(template, nameof(template));
+    _realm.SetPasswordRecoveryTemplate(template);
     Assert.Equal(template.Id, _realm.PasswordRecoveryTemplateId);
   }
 
@@ -79,10 +79,10 @@ public class RealmAggregateTests
   {
     SenderAggregate sender = new(_faker.Internet.Email(), ProviderType.SendGrid, isDefault: true, tenantId: null);
 
-    var exception = Assert.Throws<SenderNotInRealmException>(() => _realm.SetPasswordRecoverySender(sender, nameof(sender)));
+    var exception = Assert.Throws<SenderNotInRealmException>(() => _realm.SetPasswordRecoverySender(sender));
     Assert.Equal(sender.ToString(), exception.Sender);
     Assert.Equal(_realm.ToString(), exception.Realm);
-    Assert.Equal(nameof(sender), exception.PropertyName);
+    Assert.Equal(nameof(_realm.PasswordRecoverySenderId), exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw TemplateNotInRealmException when setting a password recovery template from a different realm.")]
@@ -90,9 +90,9 @@ public class RealmAggregateTests
   {
     TemplateAggregate template = new(_realm.UniqueNameSettings, "test", "Test", MediaTypeNames.Text.Plain, "Hello World!", tenantId: null);
 
-    var exception = Assert.Throws<TemplateNotInRealmException>(() => _realm.SetPasswordRecoveryTemplate(template, nameof(template)));
+    var exception = Assert.Throws<TemplateNotInRealmException>(() => _realm.SetPasswordRecoveryTemplate(template));
     Assert.Equal(template.ToString(), exception.Template);
     Assert.Equal(_realm.ToString(), exception.Realm);
-    Assert.Equal(nameof(template), exception.PropertyName);
+    Assert.Equal(nameof(_realm.PasswordRecoveryTemplateId), exception.PropertyName);
   }
 }

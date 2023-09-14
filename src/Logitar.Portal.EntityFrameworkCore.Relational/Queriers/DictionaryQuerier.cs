@@ -108,6 +108,11 @@ internal class DictionaryQuerier : IDictionaryQuerier
     {
       switch (sort.Field)
       {
+        case DictionarySort.EntryCount:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.EntryCount) : query.OrderBy(x => x.EntryCount))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.EntryCount) : ordered.ThenBy(x => x.EntryCount));
+          break;
         case DictionarySort.Locale:
           ordered = (ordered == null)
             ? (sort.IsDescending ? query.OrderByDescending(x => x.Locale) : query.OrderBy(x => x.Locale))

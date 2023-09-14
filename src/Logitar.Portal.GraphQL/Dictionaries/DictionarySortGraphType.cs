@@ -10,6 +10,7 @@ internal class DictionarySortGraphType : EnumerationGraphType<DictionarySort>
     Name = nameof(DictionarySort);
     Description = "Represents the available dictionary fields for sorting.";
 
+    Add(DictionarySort.EntryCount, "The dictionaries will be sorted by their number of entries.");
     Add(DictionarySort.Locale, "The dictionaries will be sorted by their locale code.");
     Add(DictionarySort.UpdatedOn, "The dictionaries will be sorted by their latest update date and time.");
   }

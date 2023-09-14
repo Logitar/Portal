@@ -156,7 +156,9 @@ watch(
         <tbody>
           <tr v-for="realm in realms" :key="realm.id">
             <td>
-              <RouterLink :to="{ name: 'RealmEdit', params: { uniqueSlug: realm.uniqueSlug } }">{{ realm.uniqueSlug }}</RouterLink>
+              <RouterLink :to="{ name: 'RealmEdit', params: { uniqueSlug: realm.uniqueSlug } }">
+                <font-awesome-icon icon="fas fa-edit" />{{ realm.uniqueSlug }}
+              </RouterLink>
             </td>
             <td>{{ realm.displayName ?? "—" }}</td>
             <td><status-block :actor="realm.updatedBy" :date="realm.updatedOn" /></td>

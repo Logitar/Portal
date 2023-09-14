@@ -27,6 +27,11 @@
       }
     }
   },
+
+  "select": {
+    "label": "Expéditeur",
+    "placeholder": "Sélectionnez un expéditeur"
+  },
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",

@@ -3,10 +3,10 @@ import { computed, inject, ref, watch } from "vue";
 
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
-import type { User } from "@/types/users";
+import type { Template } from "@/types/templates";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchUsers } from "@/api/users";
+import { searchTemplates } from "@/api/templates";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -22,21 +22,21 @@ const props = withDefaults(
   }>(),
   {
     disabled: false,
-    id: "user",
-    label: "users.select.label",
-    placeholder: "users.select.placeholder",
+    id: "template",
+    label: "templates.select.label",
+    placeholder: "templates.select.placeholder",
     required: false,
   }
 );
 
-const users = ref<User[]>([]);
+const templates = ref<Template[]>([]);
 
 const options = computed<SelectOption[]>(() =>
   orderBy(
-    users.value.map(
-      ({ id, uniqueName, fullName }) =>
+    templates.value.map(
+      ({ id, uniqueName, displayName }) =>
         ({
-          text: fullName ? `${fullName} (${uniqueName})` : uniqueName,
+          text: displayName ? `${displayName} (${uniqueName})` : uniqueName,
           value: id,
         } as SelectOption)
     ),
@@ -46,17 +46,17 @@ const options = computed<SelectOption[]>(() =>
 
 const emit = defineEmits<{
   (e: "update:model-value", value: string): void;
-  (e: "user-selected", value: User | undefined): void;
+  (e: "template-selected", value: Template | undefined): void;
 }>();
 
 watch(
   () => props.realm,
   async (realm) => {
     try {
-      const search = await searchUsers({
+      const search = await searchTemplates({
         realm: realm?.id,
       });
-      users.value = search.results;
+      templates.value = search.results;
     } catch (e: unknown) {
       handleError(e);
     }
@@ -67,8 +67,8 @@ watch(
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
-  const selectedUser = id ? users.value.find((user) => user.id === id) : undefined;
-  emit("user-selected", selectedUser);
+  const selectedTemplate = id ? templates.value.find((template) => template.id === id) : undefined;
+  emit("template-selected", selectedTemplate);
 }
 </script>
 

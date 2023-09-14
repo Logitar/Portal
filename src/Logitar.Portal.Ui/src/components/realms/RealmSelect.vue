@@ -28,6 +28,7 @@ withDefaults(
 );
 
 const realms = ref<Realm[]>([]);
+
 const options = computed<SelectOption[]>(() =>
   orderBy(
     realms.value.map(

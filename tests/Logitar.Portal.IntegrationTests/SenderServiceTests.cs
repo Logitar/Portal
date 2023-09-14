@@ -117,7 +117,7 @@ public class SenderServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should remove the realm password recovery sender.")]
   public async Task DeleteAsync_it_should_remove_the_realm_password_recovery_sender()
   {
-    _realm.SetPasswordRecoverySender(_sender, nameof(_sender));
+    _realm.SetPasswordRecoverySender(_sender);
     await AggregateRepository.SaveAsync(_realm);
 
     Sender? sender = await _senderService.DeleteAsync(_sender.Id.ToGuid());

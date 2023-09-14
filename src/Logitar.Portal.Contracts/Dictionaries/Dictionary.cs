@@ -10,4 +10,5 @@ public record Dictionary : Aggregate
   public string Locale { get; set; } = string.Empty;
 
   public IEnumerable<DictionaryEntry> Entries { get; set; } = Enumerable.Empty<DictionaryEntry>();
+  public int EntryCount { get; set; }
 }

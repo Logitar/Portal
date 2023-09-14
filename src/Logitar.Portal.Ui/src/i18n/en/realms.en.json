@@ -16,6 +16,12 @@
       "warning": "Changing the secret will invalidate all active tokens in this realm. Press the button below to revert the change."
     }
   },
+  "passwordRecovery": {
+    "sender": {
+      "placeholder": "Use default sender"
+    },
+    "title": "Password Recovery"
+  },
   "requireConfirmedAccount": {
     "info": "By enabling this setting, a confirmed email address or phone number will be required for users to sign-in and manage their account.",
     "label": "Require confirmed account"

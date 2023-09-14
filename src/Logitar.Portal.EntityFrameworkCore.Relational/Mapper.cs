@@ -83,7 +83,8 @@ internal class Mapper
       Id = new AggregateId(source.AggregateId).ToGuid(),
       Realm = realm,
       Locale = source.Locale,
-      Entries = source.Entries.Select(entry => new DictionaryEntry(entry.Key, entry.Value))
+      Entries = source.Entries.Select(entry => new DictionaryEntry(entry.Key, entry.Value)),
+      EntryCount = source.EntryCount
     };
 
     MapAggregate(source, destination);

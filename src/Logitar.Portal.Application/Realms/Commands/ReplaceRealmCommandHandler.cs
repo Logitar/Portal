@@ -4,6 +4,7 @@ using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Settings;
+using Logitar.Portal.Domain.Templates;
 using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
@@ -14,14 +15,16 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
   private readonly ISenderRepository _senderRepository;
+  private readonly ITemplateRepository _templateRepository;
 
   public ReplaceRealmCommandHandler(IApplicationContext applicationContext, IRealmQuerier realmQuerier,
-    IRealmRepository realmRepository, ISenderRepository senderRepository)
+    IRealmRepository realmRepository, ISenderRepository senderRepository, ITemplateRepository templateRepository)
   {
     _applicationContext = applicationContext;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
     _senderRepository = senderRepository;
+    _templateRepository = templateRepository;
   }
 
   public async Task<Realm?> Handle(ReplaceRealmCommand command, CancellationToken cancellationToken)
@@ -49,6 +52,12 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     {
       sender = await _senderRepository.LoadAsync(payload.PasswordRecoverySenderId.Value, cancellationToken)
         ?? throw new AggregateNotFoundException<SenderAggregate>(payload.PasswordRecoverySenderId.Value, nameof(payload.PasswordRecoverySenderId));
+    }
+    TemplateAggregate? template = null;
+    if (payload.PasswordRecoveryTemplateId.HasValue)
+    {
+      template = await _templateRepository.LoadAsync(payload.PasswordRecoveryTemplateId.Value, cancellationToken)
+        ?? throw new AggregateNotFoundException<TemplateAggregate>(payload.PasswordRecoveryTemplateId.Value, nameof(payload.PasswordRecoveryTemplateId));
     }
 
     if (reference == null || payload.UniqueSlug.Trim() != reference.UniqueSlug)
@@ -135,7 +144,18 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
       }
       else
       {
-        realm.SetPasswordRecoverySender(sender, nameof(payload.PasswordRecoverySenderId));
+        realm.SetPasswordRecoverySender(sender);
+      }
+    }
+    if (reference == null || template?.Id != reference.PasswordRecoveryTemplateId)
+    {
+      if (template == null)
+      {
+        realm.RemovePasswordRecoveryTemplate();
+      }
+      else
+      {
+        realm.SetPasswordRecoveryTemplate(template);
       }
     }
 

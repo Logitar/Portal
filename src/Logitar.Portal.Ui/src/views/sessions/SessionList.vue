@@ -226,7 +226,9 @@ onMounted(async () => {
           <tbody>
             <tr v-for="session in sessions" :key="session.id">
               <td>
-                <RouterLink :to="{ name: 'SessionEdit', params: { id: session.id } }">{{ d(session.updatedOn, "medium") }}</RouterLink>
+                <RouterLink :to="{ name: 'SessionEdit', params: { id: session.id } }">
+                  <font-awesome-icon icon="fas fa-edit" />{{ d(session.updatedOn, "medium") }}
+                </RouterLink>
               </td>
               <td>
                 <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">

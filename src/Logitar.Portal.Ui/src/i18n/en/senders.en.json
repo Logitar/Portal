@@ -27,6 +27,10 @@
       }
     }
   },
+  "select": {
+    "label": "Sender",
+    "placeholder": "Select a sender"
+  },
   "sort": {
     "options": {
       "DisplayName": "Display name",

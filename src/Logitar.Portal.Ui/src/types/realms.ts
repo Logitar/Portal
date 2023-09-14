@@ -3,6 +3,8 @@ import type { CustomAttribute, CustomAttributeModification } from "@/types/custo
 import type { Modification } from "@/types/modifications";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { SearchPayload, SortOption } from "@/types/search";
+import type { Sender } from "./senders";
+import type { Template } from "./templates";
 
 export type ClaimMapping = {
   key: string;
@@ -47,6 +49,8 @@ export type Realm = Aggregate & {
   passwordSettings: PasswordSettings;
   claimMappings: ClaimMapping[];
   customAttributes: CustomAttribute[];
+  passwordRecoverySender?: Sender;
+  passwordRecoveryTemplate?: Template;
 };
 
 export type RealmSortOption = SortOption & {
@@ -70,4 +74,6 @@ export type UpdateRealmPayload = {
   passwordSettings?: PasswordSettings;
   claimMappings?: ClaimMappingModification[];
   customAttributes?: CustomAttributeModification[];
+  passwordRecoverySenderId?: Modification<string>;
+  passwordRecoveryTemplateId?: Modification<string>;
 };

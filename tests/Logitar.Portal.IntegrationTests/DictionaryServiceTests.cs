@@ -69,6 +69,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.Locale.Trim(), dictionary.Locale);
 
     Assert.Equal(3, dictionary.Entries.Count());
+    Assert.Equal(3, dictionary.EntryCount);
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Red" && customAttribute.Value == "Rojo");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Green" && customAttribute.Value == "Verde");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Blue" && customAttribute.Value == "Azul");
@@ -192,6 +193,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
     Assert.True(dictionary.Version > 1);
 
     Assert.Equal(3, dictionary.Entries.Count());
+    Assert.Equal(3, dictionary.EntryCount);
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Red" && customAttribute.Value == "Rouge");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Blue" && customAttribute.Value == "Cyan");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Jaune" && customAttribute.Value == "Yellow");
@@ -300,6 +302,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
     Assert.True(dictionary.Version > 1);
 
     Assert.Equal(3, dictionary.Entries.Count());
+    Assert.Equal(3, dictionary.EntryCount);
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Red" && customAttribute.Value == "Rouge");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Blue" && customAttribute.Value == "Cyan");
     Assert.Contains(dictionary.Entries, customAttribute => customAttribute.Key == "Yellow" && customAttribute.Value == "Jaune");
