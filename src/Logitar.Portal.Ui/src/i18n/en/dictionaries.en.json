@@ -6,6 +6,18 @@
     "title": "Delete dictionary"
   },
   "empty": "There are no results.",
+  "entries": {
+    "empty": "There are no entries.",
+    "key": {
+      "label": "Key",
+      "placeholder": "Enter the key of the entry"
+    },
+    "title": "Entries",
+    "value": {
+      "label": "Value",
+      "placeholder": "Enter the value of the entry"
+    }
+  },
   "sort": {
     "options": {
       "EntryCount": "Entries",

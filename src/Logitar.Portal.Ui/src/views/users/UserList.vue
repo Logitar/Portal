@@ -213,7 +213,7 @@ watch(
                 <app-avatar :display-name="user.fullName ?? user.uniqueName" :email-address="user.email?.address" :url="user.picture" />
               </RouterLink>
               {{ " " }}
-              <RouterLink :to="{ name: 'UserEdit', params: { id: user.id } }">{{ user.uniqueName }}</RouterLink>
+              <RouterLink :to="{ name: 'UserEdit', params: { id: user.id } }"><font-awesome-icon icon="fas fa-edit" />{{ user.uniqueName }}</RouterLink>
             </td>
             <td>{{ user.fullName ?? "—" }}</td>
             <td>

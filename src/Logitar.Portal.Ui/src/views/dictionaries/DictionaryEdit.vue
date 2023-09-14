@@ -4,11 +4,12 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
+import DictionaryEntryList from "@/components/dictionaries/DictionaryEntryList.vue";
 import LocaleSelect from "@/components/shared/LocaleSelect.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import locales from "@/resources/locales.json";
 import type { ApiError } from "@/types/api";
-import type { Dictionary, DictionaryEntry } from "@/types/dictionaries";
+import type { Dictionary, DictionaryEntry, DictionaryEntryModification } from "@/types/dictionaries";
 import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
@@ -55,12 +56,33 @@ function setModel(model: Dictionary): void {
   realmId.value = model.realm?.id;
 }
 
+function getDictionaryEntryModifications(source: DictionaryEntry[], destination: DictionaryEntry[]): DictionaryEntryModification[] {
+  const modifications: DictionaryEntryModification[] = [];
+
+  const destinationKeys = new Set(destination.map(({ key }) => key));
+  for (const dictionaryEntry of source) {
+    const key = dictionaryEntry.key;
+    if (!destinationKeys.has(key)) {
+      modifications.push({ key });
+    }
+  }
+
+  const sourceMap = new Map(source.map(({ key, value }) => [key, value]));
+  for (const dictionaryEntry of destination) {
+    if (sourceMap.get(dictionaryEntry.key) !== dictionaryEntry.value) {
+      modifications.push(dictionaryEntry);
+    }
+  }
+
+  return modifications;
+}
+
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     if (dictionary.value) {
       const updatedDictionary = await updateDictionary(dictionary.value.id, {
-        entries: [], // TODO(fpion): implement
+        entries: getDictionaryEntryModifications(dictionary.value.entries, entries.value),
       });
       setModel(updatedDictionary);
       toasts.success("dictionaries.updated");
@@ -129,6 +151,8 @@ onMounted(async () => {
           <RealmSelect class="col-lg-6" :disabled="Boolean(dictionary)" :model-value="realmId" @realm-selected="onRealmSelected" />
           <LocaleSelect class="col-lg-6" :disabled="Boolean(dictionary)" required v-model="locale" />
         </div>
+        <h3>{{ t("dictionaries.entries.title") }}</h3>
+        <DictionaryEntryList v-model="entries" />
       </form>
     </template>
   </main>

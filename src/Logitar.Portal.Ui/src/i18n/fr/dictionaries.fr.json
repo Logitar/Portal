@@ -6,13 +6,17 @@
     "title": "Supprimer le dictionnaire"
   },
   "empty": "Il n’y a aucun résultat.",
-  "manage": {
-    "add": "Ajouter un dictionnaire",
-    "empty": "Il n’y a aucun dictionnaire."
-  },
-  "select": {
-    "label": "Dictionnaire",
-    "placeholder": "Sélectionnez un dictionnaire"
+  "entries": {
+    "empty": "Il n’y a aucune entrée.",
+    "key": {
+      "label": "Clé",
+      "placeholder": "Entrez la clé de l’entrée"
+    },
+    "title": "Entrées",
+    "value": {
+      "label": "Valeur",
+      "placeholder": "Entrez la valeur de l’entrée"
+    }
   },
   "sort": {
     "options": {

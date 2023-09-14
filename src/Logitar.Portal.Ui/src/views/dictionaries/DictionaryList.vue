@@ -169,8 +169,8 @@ watch(
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ t("realms.select.label") }}</th>
             <th scope="col">{{ t("dictionaries.sort.options.Locale") }}</th>
+            <th scope="col">{{ t("realms.select.label") }}</th>
             <th scope="col">{{ t("dictionaries.sort.options.EntryCount") }}</th>
             <th scope="col">{{ t("dictionaries.sort.options.UpdatedOn") }}</th>
             <th scope="col"></th>
@@ -179,18 +179,20 @@ watch(
         <tbody>
           <tr v-for="dictionary in dictionaries" :key="dictionary.id">
             <td>
+              <RouterLink :to="{ name: 'DictionaryEdit', params: { id: dictionary.id } }">
+                <font-awesome-icon icon="fas fa-edit" />{{ getLocaleName(dictionary.locale) }}
+              </RouterLink>
+            </td>
+            <td>
               <RouterLink v-if="dictionary.realm" :to="{ name: 'RealmEdit', params: { uniqueSlug: dictionary.realm.uniqueSlug } }" target="_blank">
                 {{ dictionary.realm.displayName ?? dictionary.realm.uniqueSlug }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
               </RouterLink>
               <template v-else>{{ t("brand") }}</template>
             </td>
-            <td>{{ getLocaleName(dictionary.locale) }}</td>
             <td>{{ dictionary.entryCount }}</td>
             <td><status-block :actor="dictionary.updatedBy" :date="dictionary.updatedOn" /></td>
             <td>
-              <icon-button class="me-1" icon="fas fa-edit" text="actions.edit" :to="{ name: 'DictionaryEdit', params: { id: dictionary.id } }" />
               <icon-button
-                class="ms-1"
                 :disabled="isLoading"
                 icon="trash"
                 text="actions.delete"

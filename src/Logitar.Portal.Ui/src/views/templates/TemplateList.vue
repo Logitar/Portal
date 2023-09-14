@@ -177,7 +177,9 @@ watch(
         <tbody>
           <tr v-for="template in templates" :key="template.id">
             <td>
-              <RouterLink :to="{ name: 'TemplateEdit', params: { id: template.id } }">{{ template.uniqueName }}</RouterLink>
+              <RouterLink :to="{ name: 'TemplateEdit', params: { id: template.id } }">
+                <font-awesome-icon icon="fas fa-edit" />{{ template.uniqueName }}
+              </RouterLink>
             </td>
             <td>{{ template.displayName ?? "—" }}</td>
             <td>{{ t(`templates.contentType.options.${template.contentType}`) }}</td>

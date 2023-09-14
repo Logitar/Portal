@@ -195,7 +195,9 @@ watch(
         <tbody>
           <tr v-for="sender in senders" :key="sender.id">
             <td>
-              <RouterLink :to="{ name: 'SenderEdit', params: { id: sender.id } }">{{ sender.emailAddress }}</RouterLink>
+              <RouterLink :to="{ name: 'SenderEdit', params: { id: sender.id } }">
+                <font-awesome-icon icon="fas fa-edit" />{{ sender.emailAddress }}
+              </RouterLink>
             </td>
             <td>{{ sender.displayName ?? "—" }}</td>
             <td>{{ t(`senders.providers.options.${sender.provider}`) }}</td>

@@ -188,7 +188,7 @@ watch(
         <tbody>
           <tr v-for="apiKey in apiKeys" :key="apiKey.id">
             <td>
-              <RouterLink :to="{ name: 'ApiKeyEdit', params: { id: apiKey.id } }">{{ apiKey.displayName }}</RouterLink>
+              <RouterLink :to="{ name: 'ApiKeyEdit', params: { id: apiKey.id } }"><font-awesome-icon icon="fas fa-edit" />{{ apiKey.displayName }}</RouterLink>
             </td>
             <td>
               <app-badge v-if="isApiKeyExpired(apiKey)">{{ t("apiKeys.expired") }}</app-badge>
