@@ -14,6 +14,7 @@ internal class DictionaryConfiguration : AggregateConfiguration<DictionaryEntity
     builder.HasKey(x => x.DictionaryId);
 
     builder.HasIndex(x => x.TenantId);
+    builder.HasIndex(x => x.EntryCount);
     builder.HasIndex(x => new { x.TenantId, x.Locale }).IsUnique();
 
     builder.Ignore(x => x.Entries);

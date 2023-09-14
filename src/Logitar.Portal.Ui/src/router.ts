@@ -60,6 +60,22 @@ const router = createRouter({
       path: "/create-api-key",
       component: () => import("./views/apiKeys/ApiKeyEdit.vue"),
     },
+    // Dictionaries
+    {
+      name: "DictionaryList",
+      path: "/dictionaries",
+      component: () => import("./views/dictionaries/DictionaryList.vue"),
+    },
+    {
+      name: "DictionaryEdit",
+      path: "/dictionaries/:id",
+      component: () => import("./views/dictionaries/DictionaryEdit.vue"),
+    },
+    {
+      name: "CreateDictionary",
+      path: "/create-dictionary",
+      component: () => import("./views/dictionaries/DictionaryEdit.vue"),
+    },
     // Realms
     {
       name: "RealmList",

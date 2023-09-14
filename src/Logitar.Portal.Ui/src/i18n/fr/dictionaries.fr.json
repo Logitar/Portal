@@ -1,0 +1,29 @@
+{
+  "created": "Le dictionnaire a été créé.",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer le dictionnaire suivant ?",
+    "success": "Le dictionnaire a été supprimé.",
+    "title": "Supprimer le dictionnaire"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "manage": {
+    "add": "Ajouter un dictionnaire",
+    "empty": "Il n’y a aucun dictionnaire."
+  },
+  "select": {
+    "label": "Dictionnaire",
+    "placeholder": "Sélectionnez un dictionnaire"
+  },
+  "sort": {
+    "options": {
+      "EntryCount": "Entrées",
+      "Locale": "Langue",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "title": {
+    "list": "Dictionnaires",
+    "new": "Nouveau dictionnaire"
+  },
+  "updated": "Le dictionnaire a été enregistré."
+}

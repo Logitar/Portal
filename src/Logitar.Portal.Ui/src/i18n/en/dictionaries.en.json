@@ -1,0 +1,21 @@
+{
+  "created": "The dictionary has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following dictionary?",
+    "success": "The dictionary has been deleted.",
+    "title": "Delete dictionary"
+  },
+  "empty": "There are no results.",
+  "sort": {
+    "options": {
+      "EntryCount": "Entries",
+      "Locale": "Locale",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Dictionaries",
+    "new": "New dictionary"
+  },
+  "updated": "The dictionary has been updated."
+}
