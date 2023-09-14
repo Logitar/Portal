@@ -186,8 +186,15 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
   {
     if (payload.SenderId.HasValue)
     {
-      return await _senderRepository.LoadAsync(payload.SenderId.Value, cancellationToken)
+      SenderAggregate sender = await _senderRepository.LoadAsync(payload.SenderId.Value, cancellationToken)
         ?? throw new AggregateNotFoundException<SenderAggregate>(payload.SenderId.Value, nameof(payload.SenderId));
+
+      if (sender.TenantId != realm?.Id.Value)
+      {
+        throw new SenderNotInRealmException(sender, realm, nameof(payload.SenderId));
+      }
+
+      return sender;
     }
 
     string? tenantId = realm?.Id.Value;
@@ -202,6 +209,10 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     if (Guid.TryParse(payload.Template, out Guid id))
     {
       template = await _templateRepository.LoadAsync(id, cancellationToken);
+      if (template != null && template.TenantId != realm?.Id.Value)
+      {
+        throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
+      }
     }
     else
     {
