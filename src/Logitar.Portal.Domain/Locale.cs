@@ -19,9 +19,15 @@ public record Locale
     {
       throw new ArgumentOutOfRangeException(nameof(code), "The locale cannot be an user-defined culture.");
     }
+
+    if (!string.IsNullOrWhiteSpace(_culture.Parent?.Name))
+    {
+      Parent = new Locale(_culture.Parent.Name);
+    }
   }
 
   public static Locale Default { get; } = new(DefaultLocaleCode);
 
   public string Code => _culture.Name;
+  public Locale? Parent { get; }
 }

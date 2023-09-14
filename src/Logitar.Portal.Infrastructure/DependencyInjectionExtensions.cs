@@ -16,8 +16,11 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalInfrastructure(this IServiceCollection services)
   {
+    Assembly assembly = typeof(DependencyInjectionExtensions).Assembly;
+
     return services
       .AddLogitarPortalApplication()
+      .AddMediatR(config => config.RegisterServicesFromAssembly(assembly))
       .AddPasswordStrategies()
       .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(new JsonConverter[]

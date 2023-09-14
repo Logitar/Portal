@@ -48,9 +48,9 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
     return base.Load<DictionaryAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
   }
 
-  public async Task<IEnumerable<DictionaryAggregate>> LoadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  public async Task<IEnumerable<DictionaryAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    string tenantId = realm.Id.Value;
+    string? tenantId = realm?.Id.Value;
 
     IQuery query = _sqlHelper.QueryFrom(Db.Events.Table)
       .Join(Db.Dictionaries.AggregateId, Db.Events.AggregateId,

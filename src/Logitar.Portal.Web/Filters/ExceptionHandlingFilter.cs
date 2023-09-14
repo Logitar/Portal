@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
@@ -19,6 +20,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Logitar.Portal.Web.Filters;
 
+/// <summary>
+/// TODO(fpion): refactor
+/// </summary>
 internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 {
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
@@ -33,6 +37,8 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
     [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
     [typeof(InvalidUrlException)] = HandleInvalidUrlException,
+    [typeof(MissingRecipientAddressesException)] = HandleMissingRecipientAddressesException,
+    [typeof(RealmHasNoDefaultSenderException)] = HandleRealmHasNoDefaultSenderException,
     [typeof(RolesNotFoundException)] = HandleRolesNotFoundException,
     [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
@@ -40,6 +46,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
     [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
     [typeof(UserIsNotConfirmedException)] = HandleUserIsNotConfirmedException,
+    [typeof(UsersNotFoundException)] = HandleUsersNotFoundException,
     [typeof(ValidationException)] = HandleValidationException
   };
 
@@ -139,6 +146,16 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     return new BadRequestObjectResult(((InvalidUrlException)context.Exception).Failure);
   }
 
+  private static IActionResult HandleMissingRecipientAddressesException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((MissingRecipientAddressesException)context.Exception).Failure);
+  }
+
+  private static IActionResult HandleRealmHasNoDefaultSenderException(ExceptionContext context)
+  {
+    return new BadRequestObjectResult(((RealmHasNoDefaultSenderException)context.Exception).Failure);
+  }
+
   private static IActionResult HandleRolesNotFoundException(ExceptionContext context)
   {
     return new NotFoundObjectResult(((RolesNotFoundException)context.Exception).Failure);
@@ -172,6 +189,11 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
   private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext context)
   {
     return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
+  }
+
+  private static IActionResult HandleUsersNotFoundException(ExceptionContext context)
+  {
+    return new NotFoundObjectResult(((UsersNotFoundException)context.Exception).Failure);
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)

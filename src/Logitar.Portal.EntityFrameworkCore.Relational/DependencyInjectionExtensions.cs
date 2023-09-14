@@ -14,6 +14,7 @@ using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Senders;
@@ -67,6 +68,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IApiKeyRepository, ApiKeyRepository>()
       .AddScoped<IConfigurationRepository, ConfigurationRepository>()
       .AddScoped<IDictionaryRepository, DictionaryRepository>()
+      .AddScoped<IMessageRepository, MessageRepository>()
       .AddScoped<IRealmRepository, RealmRepository>()
       .AddScoped<IRoleRepository, RoleRepository>()
       .AddScoped<ISenderRepository, SenderRepository>()

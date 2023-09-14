@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Senders;
@@ -31,6 +32,7 @@ public static class DependencyInjectionExtensions
       .AddTransient<IApiKeyService, ApiKeyClient>()
       .AddTransient<IConfigurationService, ConfigurationClient>()
       .AddTransient<IDictionaryService, DictionaryClient>()
+      .AddTransient<IMessageService, MessageClient>()
       .AddTransient<IRealmService, RealmClient>()
       .AddTransient<IRoleService, RoleClient>()
       .AddTransient<ISenderService, SenderClient>()

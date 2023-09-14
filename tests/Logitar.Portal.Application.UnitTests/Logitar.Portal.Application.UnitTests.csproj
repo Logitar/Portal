@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -8,7 +8,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>Logitar.Portal.Domain</RootNamespace>
+    <RootNamespace>Logitar.Portal.Application</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,13 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Logitar.Portal.Domain\Logitar.Portal.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Logitar.Portal.Application\Logitar.Portal.Application.csproj" />
     <ProjectReference Include="..\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.Net.Mime" />
-    <Using Include="System.Reflection" />
     <Using Include="Xunit" />
   </ItemGroup>
 
