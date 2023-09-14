@@ -6,6 +6,7 @@ withDefaults(
     label?: string;
     modelValue?: string;
     name?: string;
+    noLabel?: boolean;
     placeholder?: string;
     rows?: number;
     required?: boolean;
@@ -14,6 +15,7 @@ withDefaults(
     disabled: false,
     id: "description",
     label: "description.label",
+    noLabel: false,
     placeholder: "description.placeholder",
     required: false,
     rows: 15,
@@ -33,6 +35,7 @@ defineEmits<{
     :label="label"
     :model-value="modelValue"
     :name="name"
+    :no-label="noLabel"
     :placeholder="placeholder"
     :required="required"
     :rows="rows"

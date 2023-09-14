@@ -9,6 +9,7 @@ using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -142,6 +143,10 @@ internal class Mapper
     {
       destination.PasswordRecoverySender = ToSender(source.PasswordRecoverySender, realm: null);
     }
+    if (source.PasswordRecoveryTemplate != null)
+    {
+      destination.PasswordRecoveryTemplate = ToTemplate(source.PasswordRecoveryTemplate, realm: null);
+    }
 
     return destination;
   }
@@ -197,6 +202,25 @@ internal class Mapper
     {
       destination.User = ToUser(source.User, realm);
     }
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Template ToTemplate(TemplateEntity source, Realm? realm)
+  {
+    Template destination = new()
+    {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
+      UniqueName = source.UniqueName,
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      Subject = source.Subject,
+      ContentType = source.ContentType,
+      Contents = source.Contents,
+      Realm = realm
+    };
 
     MapAggregate(source, destination);
 

@@ -11,7 +11,7 @@ internal class SearchSendersPayloadGraphType : SearchPayloadInputGraphType<Searc
       .Description("The unique identifier or unique name of the realm in which to search.");
 
     Field(x => x.Provider, type: typeof(ProviderTypeGraphType))
-      .Description("When specified, will filter senders that do not have the specified type.");
+      .Description("When specified, will filter out senders that do not have the specified type.");
 
     Field(x => x.Sort, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<SenderSortOptionGraphType>>>))
       .DefaultValue(Enumerable.Empty<SenderSortOption>())

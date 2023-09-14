@@ -5,6 +5,7 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ public static class DependencyInjectionExtensions
       .AddTransient<IRoleService, RoleClient>()
       .AddTransient<ISenderService, SenderClient>()
       .AddTransient<ISessionService, SessionClient>()
+      .AddTransient<ITemplateService, TemplateClient>()
       .AddTransient<ITokenService, TokenClient>()
       .AddTransient<IUserService, UserClient>();
   }

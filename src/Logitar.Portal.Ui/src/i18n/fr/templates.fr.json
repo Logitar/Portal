@@ -1,0 +1,41 @@
+{
+  "created": "Le gabarit a été créé.",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer le gabarit suivant ?",
+    "success": "Le gabarit a été supprimé.",
+    "title": "Supprimer le gabarit"
+  },
+  "contentType": {
+    "label": "Type de contenu",
+    "options": {
+      "text/html": "HTML",
+      "text/plain": "Texte brut"
+    },
+    "placeholder": "Sélectionnez un type de contenu"
+  },
+  "contents": {
+    "label": "Contenu",
+    "placeholder": "Entrez le contenu des messages envoyés utilisant ce gabarit. Vous pouvez utiliser le langage Razor."
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "select": {
+    "label": "Gabarit",
+    "placeholder": "Sélectionnez un gabarit"
+  },
+  "sort": {
+    "options": {
+      "DisplayName": "Nom d’affichage",
+      "UniqueName": "Nom unique",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "subject": {
+    "label": "Sujet",
+    "placeholder": "Entrez le sujet des messages envoyés utilisant ce gabarit."
+  },
+  "title": {
+    "list": "Gabarits",
+    "new": "Nouveau gabarit"
+  },
+  "updated": "Le gabarit a été enregistré."
+}

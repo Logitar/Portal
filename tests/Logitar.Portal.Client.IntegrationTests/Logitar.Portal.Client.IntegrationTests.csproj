@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Using Include="System.Net.Http.Json" />
+    <Using Include="System.Net.Mime" />
   </ItemGroup>
 
 </Project>

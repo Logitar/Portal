@@ -1,0 +1,41 @@
+{
+  "created": "The template has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following template?",
+    "success": "The template has been deleted.",
+    "title": "Delete template"
+  },
+  "contentType": {
+    "label": "Content type",
+    "options": {
+      "text/html": "HTML",
+      "text/plain": "Plain text"
+    },
+    "placeholder": "Select a content type"
+  },
+  "contents": {
+    "label": "Contents",
+    "placeholder": "Enter the contents of the messages sent using this template. You can use the Razor language system."
+  },
+  "empty": "There are no results.",
+  "select": {
+    "label": "Template",
+    "placeholder": "Select a template"
+  },
+  "sort": {
+    "options": {
+      "DisplayName": "Display name",
+      "UniqueName": "Unique name",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "subject": {
+    "label": "Subject",
+    "placeholder": "Enter the subject of the messages sent using this template."
+  },
+  "title": {
+    "list": "Templates",
+    "new": "New template"
+  },
+  "updated": "The template has been updated."
+}

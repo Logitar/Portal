@@ -8,6 +8,7 @@ import roles from "./roles.en.json";
 import senders from "./senders.en.json";
 import sessions from "./sessions.en.json";
 import settings from "./settings.en.json";
+import templates from "./templates.en.json";
 import tokens from "./tokens.en.json";
 import users from "./users.en.json";
 
@@ -22,6 +23,7 @@ export default {
   senders,
   sessions,
   settings,
+  templates,
   tokens,
   users,
 };

@@ -8,6 +8,7 @@ using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.ApiKeys;
@@ -17,6 +18,7 @@ using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Logging;
@@ -55,6 +57,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IRoleQuerier, RoleQuerier>()
       .AddScoped<ISenderQuerier, SenderQuerier>()
       .AddScoped<ISessionQuerier, SessionQuerier>()
+      .AddScoped<ITemplateQuerier, TemplateQuerier>()
       .AddScoped<IUserQuerier, UserQuerier>();
   }
 
@@ -68,6 +71,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IRoleRepository, RoleRepository>()
       .AddScoped<ISenderRepository, SenderRepository>()
       .AddScoped<ISessionRepository, SessionRepository>()
+      .AddScoped<ITemplateRepository, TemplateRepository>()
       .AddScoped<IUserRepository, UserRepository>();
   }
 }

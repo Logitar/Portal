@@ -5,6 +5,7 @@ using Logitar.Portal.Domain.Realms.Events;
 using Logitar.Portal.Domain.Realms.Validators;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Settings;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Validators;
 using Logitar.Security.Cryptography;
 
@@ -235,6 +236,7 @@ public class RealmAggregate : AggregateRoot
   public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
 
   public AggregateId? PasswordRecoverySenderId { get; private set; }
+  public AggregateId? PasswordRecoveryTemplateId { get; private set; }
 
   public IUserSettings UserSettings => new ReadOnlyUserSettings(RequireUniqueEmail,
     RequireConfirmedAccount, UniqueNameSettings, PasswordSettings);
@@ -270,6 +272,16 @@ public class RealmAggregate : AggregateRoot
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.PasswordRecoverySenderId = new Modification<AggregateId?>(null);
       PasswordRecoverySenderId = null;
+    }
+  }
+
+  public void RemovePasswordRecoveryTemplate()
+  {
+    if (PasswordRecoveryTemplateId.HasValue)
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.PasswordRecoveryTemplateId = new Modification<AggregateId?>(null);
+      PasswordRecoveryTemplateId = null;
     }
   }
 
@@ -312,6 +324,21 @@ public class RealmAggregate : AggregateRoot
       RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
       updated.PasswordRecoverySenderId = new Modification<AggregateId?>(sender?.Id);
       PasswordRecoverySenderId = sender?.Id;
+    }
+  }
+
+  public void SetPasswordRecoveryTemplate(TemplateAggregate template, string propertyName)
+  {
+    if (template.TenantId != Id.Value)
+    {
+      throw new TemplateNotInRealmException(template, this, propertyName ?? nameof(PasswordRecoverySenderId));
+    }
+
+    if (template.Id != PasswordRecoveryTemplateId)
+    {
+      RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+      updated.PasswordRecoveryTemplateId = new Modification<AggregateId?>(template?.Id);
+      PasswordRecoveryTemplateId = template?.Id;
     }
   }
 

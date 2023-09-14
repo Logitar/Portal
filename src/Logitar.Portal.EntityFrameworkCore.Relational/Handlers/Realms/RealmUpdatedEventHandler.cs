@@ -29,7 +29,16 @@ internal class RealmUpdatedEventHandler : INotificationHandler<RealmUpdatedEvent
         ?? throw new EntityNotFoundException<SenderEntity>(senderId);
     }
 
-    realm.Update(@event, sender);
+    TemplateEntity? template = null;
+    if (@event.PasswordRecoveryTemplateId?.Value.HasValue == true)
+    {
+      string templateId = @event.PasswordRecoveryTemplateId.Value.Value.ToString();
+      template = await _context.Templates
+        .SingleOrDefaultAsync(x => x.AggregateId == templateId, cancellationToken)
+        ?? throw new EntityNotFoundException<TemplateEntity>(templateId);
+    }
+
+    realm.Update(@event, sender, template);
 
     await _context.SaveChangesAsync(cancellationToken);
   }

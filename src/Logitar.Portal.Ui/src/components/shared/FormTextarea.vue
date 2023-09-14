@@ -17,6 +17,7 @@ const props = withDefaults(
     minLength?: number;
     modelValue?: string;
     name?: string;
+    noLabel?: boolean;
     placeholder?: string;
     required?: boolean;
     rows?: number;
@@ -25,6 +26,7 @@ const props = withDefaults(
   {
     cols: 20,
     disabled: false,
+    noLabel: false,
     required: false,
     rows: 2,
   }
@@ -68,7 +70,7 @@ const validationListeners = computed<ValidationListeners>(() => ({
 
 <template>
   <div class="mb-3">
-    <label v-if="label" :for="id" class="form-label">
+    <label v-if="!noLabel && label" :for="id" class="form-label">
       <template v-if="required"><span class="text-danger">*</span></template> {{ t(label) }}
     </label>
     <slot name="before"></slot>

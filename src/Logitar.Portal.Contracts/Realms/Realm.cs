@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Settings;
+using Logitar.Portal.Contracts.Templates;
 
 namespace Logitar.Portal.Contracts.Realms;
 
@@ -26,4 +27,5 @@ public record Realm : Aggregate
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
   public Sender? PasswordRecoverySender { get; set; }
+  public Template? PasswordRecoveryTemplate { get; set; }
 }

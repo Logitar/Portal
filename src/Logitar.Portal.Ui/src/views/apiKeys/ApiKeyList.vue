@@ -147,7 +147,7 @@ watch(
         class="ms-1"
         icon="fas fa-plus"
         text="actions.create"
-        :to="{ name: 'CreateApiKey', query: { realm: realm ? realm : undefined } }"
+        :to="{ name: 'CreateApiKey', query: { realm: realm || undefined } }"
         variant="success"
       />
     </div>
