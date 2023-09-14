@@ -18,16 +18,16 @@ withDefaults(
   }>(),
   {
     disabled: false,
-    id: "provider",
-    label: "senders.providers.label",
-    placeholder: "senders.providers.placeholder",
+    id: "contentType",
+    label: "templates.contentType.label",
+    placeholder: "templates.contentType.placeholder",
     required: false,
   }
 );
 
 const options = computed<SelectOption[]>(() =>
   orderBy(
-    Object.entries(tm(rt("senders.providers.options"))).map(([value, text]) => ({ text, value } as SelectOption)),
+    Object.entries(tm(rt("templates.contentType.options"))).map(([value, text]) => ({ text, value } as SelectOption)),
     "text"
   )
 );

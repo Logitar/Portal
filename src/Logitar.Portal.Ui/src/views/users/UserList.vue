@@ -157,7 +157,7 @@ watch(
           class="ms-1"
           icon="fas fa-plus"
           text="actions.create"
-          :to="{ name: 'CreateUser', query: { realm: realm ? realm : undefined } }"
+          :to="{ name: 'CreateUser', query: { realm: realm || undefined } }"
           variant="success"
         />
       </div>

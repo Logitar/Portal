@@ -134,13 +134,7 @@ watch(
     <h1>{{ t("roles.title.list") }}</h1>
     <div class="my-2">
       <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-      <icon-button
-        class="ms-1"
-        icon="fas fa-plus"
-        text="actions.create"
-        :to="{ name: 'CreateRole', query: { realm: realm ? realm : undefined } }"
-        variant="success"
-      />
+      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateRole', query: { realm: realm || undefined } }" variant="success" />
     </div>
     <RealmSelect :model-value="realm" @update:model-value="setQuery('realm', $event)" />
     <div class="row">
