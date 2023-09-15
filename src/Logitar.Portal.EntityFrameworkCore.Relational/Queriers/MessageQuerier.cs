@@ -71,7 +71,7 @@ internal class MessageQuerier : IMessageQuerier
     }
     if (payload.Status.HasValue)
     {
-      builder = builder.Where(Db.Messages.Status, Operators.IsEqualTo(payload.Status.Value));
+      builder = builder.Where(Db.Messages.Status, Operators.IsEqualTo(payload.Status.Value.ToString()));
     }
     if (!string.IsNullOrWhiteSpace(payload.Template))
     {

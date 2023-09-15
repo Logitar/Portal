@@ -2,6 +2,7 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain;
@@ -12,6 +13,7 @@ using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Settings;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
@@ -90,8 +92,131 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender, _template, _user }.Concat(_dictionaries.Values));
   }
 
-  [Fact(DisplayName = "It should send a message to a Portal user.")]
-  public async Task It_should_send_a_message_to_a_Portal_user()
+  [Fact(DisplayName = "ReadAsync: it should return null when the message is not found.")]
+  public async Task ReadAsync_it_should_return_null_when_the_message_is_not_found()
+  {
+    Assert.Null(await _messageService.ReadAsync(Guid.Empty));
+  }
+
+  [Fact(DisplayName = "ReadAsync: it should return the message found by ID.")]
+  public async Task ReadAsync_it_should_return_the_message_found_by_Id()
+  {
+    Recipients recipients = new(new ReadOnlyRecipient[]
+    {
+      new(_recipient, Faker.Name.FullName())
+    });
+    MessageAggregate aggregate = new("Test", "Hello World!", recipients, _sender, _template, _realm);
+    await AggregateRepository.SaveAsync(aggregate);
+
+    Message? message = await _messageService.ReadAsync(aggregate.Id.ToGuid());
+    Assert.NotNull(message);
+    Assert.Equal(aggregate.Id.ToGuid(), message.Id);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return empty results when none are matching.")]
+  public async Task SearchAsync_it_should_return_empty_results_when_none_are_matching()
+  {
+    SearchMessagesPayload payload = new()
+    {
+      IdIn = new[] { Guid.Empty }
+    };
+
+    SearchResults<Message> results = await _messageService.SearchAsync(payload);
+
+    Assert.Empty(results.Results);
+    Assert.Equal(0, results.Total);
+  }
+
+  [Fact(DisplayName = "SearchAsync: it should return the correct results.")]
+  public async Task SearchAsync_it_should_return_the_correct_results()
+  {
+    SenderAggregate sender = new(_sender.EmailAddress, _sender.Provider, isDefault: true)
+    {
+      DisplayName = _sender.DisplayName
+    };
+
+    Assert.NotNull(Configuration);
+    TemplateAggregate template = new(Configuration.UniqueNameSettings, _template.UniqueName, _template.Subject, _template.ContentType, _template.Contents)
+    {
+      DisplayName = _template.DisplayName
+    };
+
+    TemplateAggregate createUser = new(_realm.UniqueNameSettings, "CreateUser", "CreateUser_Subject", MediaTypeNames.Text.Html, "CreateUser_Body", _realm.Id.Value)
+    {
+      DisplayName = "Create User"
+    };
+
+    Recipients recipients = new(new ReadOnlyRecipient[]
+    {
+      new(_recipient, Faker.Name.FullName())
+    });
+    string body = "Hello World!";
+
+    MessageAggregate notMatching = new("Test", body, recipients, sender, template);
+    MessageAggregate idNotIn = new("Reset your password", body, recipients, _sender, _template, _realm);
+    MessageAggregate notInRealm = new("Réinitialiser votre mot de passe", body, recipients, sender, template);
+    MessageAggregate demo = new("Confirm your account", body, recipients, _sender, _template, _realm, isDemo: true);
+    MessageAggregate otherTemplate = new("Confirmer votre compte", body, recipients, _sender, createUser, _realm);
+    MessageAggregate message1 = new("Reset your password", body, recipients, _sender, _template, _realm);
+    MessageAggregate message2 = new("Réinitialiser votre mot de passe", body, recipients, _sender, _template, _realm);
+    MessageAggregate message3 = new("Confirm your account", body, recipients, _sender, _template, _realm);
+    MessageAggregate message4 = new("Confirmer votre compte", body, recipients, _sender, _template, _realm);
+
+    MessageAggregate failed = new("Test", "Hello World!", recipients, _sender, _template, _realm, isDemo: true);
+    failed.Fail(new SendMessageResult());
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[]
+    {
+      sender, template, createUser,
+      notMatching, idNotIn, notInRealm, demo, otherTemplate, failed,
+      message1, message2, message3, message4
+    });
+
+    MessageAggregate[] messages = new[] { message1, message2, message3, message4 }
+      .OrderBy(x => x.Subject.Replace('é', 'e').Replace(" ", null)).Skip(1).Take(2).ToArray();
+
+    HashSet<Guid> ids = (await PortalContext.Messages.AsNoTracking().ToArrayAsync())
+      .Select(message => new AggregateId(message.AggregateId).ToGuid()).ToHashSet();
+    ids.Remove(idNotIn.Id.ToGuid());
+
+    SearchMessagesPayload payload = new()
+    {
+      Search = new TextSearch
+      {
+        Operator = SearchOperator.Or,
+        Terms = new SearchTerm[]
+       {
+          new("%your%"),
+          new("%votre%"),
+          new(Guid.NewGuid().ToString())
+       }
+      },
+      IdIn = ids,
+      Realm = $" {_realm.UniqueSlug.ToUpper()} ",
+      IsDemo = false,
+      Status = MessageStatus.Unsent,
+      Template = $" {_template.UniqueName} ",
+      Sort = new MessageSortOption[]
+      {
+        new(MessageSort.Subject)
+      },
+      Skip = 1,
+      Limit = 2
+    };
+
+    SearchResults<Message> results = await _messageService.SearchAsync(payload);
+
+    Assert.Equal(messages.Length, results.Results.Count());
+    Assert.Equal(4, results.Total);
+
+    for (int i = 0; i < messages.Length; i++)
+    {
+      Assert.Equal(messages[i].Id.ToGuid(), results.Results.ElementAt(i).Id);
+    }
+  }
+
+  [Fact(DisplayName = "SendAsync: it should send a message to a Portal user.")]
+  public async Task SendAsync_it_should_send_a_message_to_a_Portal_user()
   {
     SenderAggregate sender = new(_sender.EmailAddress, _sender.Provider, isDefault: true)
     {
@@ -178,8 +303,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     }
   }
 
-  [Fact(DisplayName = "It should send a message to a realm user.")]
-  public async Task It_should_send_a_message_to_a_realm_user()
+  [Fact(DisplayName = "SendAsync: it should send a message to a realm user.")]
+  public async Task SendAsync_it_should_send_a_message_to_a_realm_user()
   {
     string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUriSafeBase64();
     SendMessagePayload payload = new()
@@ -262,8 +387,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     }
   }
 
-  [Fact(DisplayName = "It should send a message to a recipient who is not an user.")]
-  public async Task It_should_send_a_message_to_a_recipient_who_is_not_an_user()
+  [Fact(DisplayName = "SendAsync: it should send a message to a recipient who is not an user.")]
+  public async Task SendAsync_it_should_send_a_message_to_a_recipient_who_is_not_an_user()
   {
     SendMessagePayload payload = new()
     {
@@ -340,8 +465,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     }
   }
 
-  [Fact(DisplayName = "It should send a message to multiple recipients.")]
-  public async Task It_should_send_a_message_to_multiple_recipients()
+  [Fact(DisplayName = "SendAsync: it should send a message to multiple recipients.")]
+  public async Task SendAsync_it_should_send_a_message_to_multiple_recipients()
   {
     string displayName = Faker.Name.FullName();
     SendMessagePayload payload = new()
