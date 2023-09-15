@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Messages.Events;
@@ -10,6 +11,7 @@ internal record MessageEntity : AggregateEntity
   private static readonly JsonSerializerOptions _serializerOptions = new();
   static MessageEntity()
   {
+    _serializerOptions.Converters.Add(new AggregateIdConverter());
     _serializerOptions.Converters.Add(new JsonStringEnumConverter());
   }
 
@@ -74,8 +76,8 @@ internal record MessageEntity : AggregateEntity
   public RealmSummary? RealmSummary { get; private set; }
   public string? RealmSummarySerialized
   {
-    get => RealmSummary == null ? null : JsonSerializer.Serialize(RealmSummary);
-    private set => RealmSummary = value == null ? null : JsonSerializer.Deserialize<RealmSummary>(value);
+    get => RealmSummary == null ? null : JsonSerializer.Serialize(RealmSummary, _serializerOptions);
+    private set => RealmSummary = value == null ? null : JsonSerializer.Deserialize<RealmSummary>(value, _serializerOptions);
   }
 
   public SenderEntity? Sender { get; private set; }
@@ -83,8 +85,8 @@ internal record MessageEntity : AggregateEntity
   public SenderSummary SenderSummary { get; private set; } = new();
   public string SenderSummarySerialized
   {
-    get => JsonSerializer.Serialize(SenderSummary);
-    private set => SenderSummary = JsonSerializer.Deserialize<SenderSummary>(value) ?? new();
+    get => JsonSerializer.Serialize(SenderSummary, _serializerOptions);
+    private set => SenderSummary = JsonSerializer.Deserialize<SenderSummary>(value, _serializerOptions) ?? new();
   }
 
   public TemplateEntity? Template { get; private set; }
@@ -92,8 +94,8 @@ internal record MessageEntity : AggregateEntity
   public TemplateSummary TemplateSummary { get; private set; } = new();
   public string TemplateSummarySerialized
   {
-    get => JsonSerializer.Serialize(TemplateSummary);
-    private set => TemplateSummary = JsonSerializer.Deserialize<TemplateSummary>(value) ?? new();
+    get => JsonSerializer.Serialize(TemplateSummary, _serializerOptions);
+    private set => TemplateSummary = JsonSerializer.Deserialize<TemplateSummary>(value, _serializerOptions) ?? new();
   }
 
   public bool IgnoreUserLocale { get; private set; }
