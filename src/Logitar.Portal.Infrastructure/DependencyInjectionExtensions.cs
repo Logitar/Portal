@@ -5,7 +5,7 @@ using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Converters;
-using Logitar.Portal.Infrastructure.Messages;
+using Logitar.Portal.Infrastructure.Messages.Providers;
 using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 using Logitar.Portal.Infrastructure.Passwords;
 using Logitar.Portal.Infrastructure.Passwords.Strategies;
@@ -33,7 +33,6 @@ public static class DependencyInjectionExtensions
         new TimeZoneEntryConverter(),
         serviceProvider.GetRequiredService<PasswordConverter>()
       }))
-      .AddSingleton<IMessageHandlerFactory, MessageHandlerFactory>()
       .AddSingleton<IPasswordService, PasswordService>()
       .AddSingleton<ITokenManager, JsonWebTokenManager>()
       .AddSingleton<PasswordConverter>()
@@ -49,6 +48,6 @@ public static class DependencyInjectionExtensions
 
   private static IServiceCollection AddProviderStrategies(this IServiceCollection services)
   {
-    return services.AddSingleton<ISendGridStrategy, SendGridStrategy>();
+    return services.AddSingleton<IProviderStrategy, SendGridStrategy>();
   }
 }
