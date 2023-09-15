@@ -62,7 +62,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender, _template, _message });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender, _template });
   }
 
   [Fact(DisplayName = "CreateAsync: it should create a realm.")]
