@@ -1,8 +1,10 @@
-﻿namespace Logitar.Portal.Contracts.Messages;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Messages;
 
-public interface IMessageService
+namespace Logitar.Portal.Application.Messages;
+
+public interface IMessageQuerier
 {
   Task<Message?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken = default);
-  Task<SentMessages> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default);
 }

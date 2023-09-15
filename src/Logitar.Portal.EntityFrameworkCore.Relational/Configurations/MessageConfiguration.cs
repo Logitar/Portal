@@ -15,6 +15,11 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.ToTable(nameof(PortalContext.Messages));
     builder.HasKey(x => x.MessageId);
 
+    builder.HasIndex(x => x.Subject);
+    builder.HasIndex(x => x.RecipientCount);
+    builder.HasIndex(x => x.IsDemo);
+    builder.HasIndex(x => x.Status);
+
     builder.Ignore(x => x.RealmSummary);
     builder.Ignore(x => x.SenderSummary);
     builder.Ignore(x => x.TemplateSummary);

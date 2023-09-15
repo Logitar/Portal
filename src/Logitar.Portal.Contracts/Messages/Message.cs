@@ -4,7 +4,7 @@ using Logitar.Portal.Contracts.Templates;
 
 namespace Logitar.Portal.Contracts.Messages;
 
-public record Message
+public record Message : Aggregate
 {
   public Guid Id { get; set; }
 

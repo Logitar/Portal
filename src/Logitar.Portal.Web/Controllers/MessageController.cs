@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Constants;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,19 @@ public class MessageController : ControllerBase
   public MessageController(IMessageService messageService)
   {
     _messageService = messageService;
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Message>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Message? message = await _messageService.ReadAsync(id, cancellationToken);
+    return message == null ? NotFound() : Ok(message);
+  }
+
+  [HttpPost("search")]
+  public async Task<ActionResult<SearchResults<Message>>> SearchAsync([FromBody] SearchMessagesPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _messageService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPost("send")]
