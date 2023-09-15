@@ -45,7 +45,7 @@ internal class TemplateClientTests
         Description = "This is the template used for password recovery.",
         Subject = "PasswordRecovery_Subject",
         ContentType = MediaTypeNames.Text.Plain,
-        Contents = "PasswordRecovery_Body"
+        Contents = @"@(Model.Resource(""PasswordRecovery_Body"").Replace(""{code}"", Model.Variable(""Code"")))"
       };
       template = await _templateService.ReplaceAsync(template.Id, replace, template.Version, cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");

@@ -59,6 +59,8 @@ internal class DictionaryClientTests
       {
         Entries = new DictionaryEntryModification[]
         {
+          new("PasswordRecovery_Body", "Votre code d’accès afin de réinitialiser votre mot de passe est : {code}."),
+          new("PasswordRecovery_Subject", "Réinitialiser votre mot de passe"),
           new("White", "Blanc"),
           new("Blue", "Bleu"),
           new("Yellow", value: null),

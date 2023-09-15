@@ -48,7 +48,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
 
     IConfiguration configuration = ServiceProvider.GetRequiredService<IConfiguration>();
     _recipient = configuration.GetValue<string>(RecipientKey)
-      ?? throw new InvalidOperationException($"The configuration key '{RecipientKey}' is required.");
+      ?? throw new InvalidOperationException($"The configuration '{RecipientKey}' is required.");
 
     _realm = new("logitar")
     {
