@@ -1,9 +1,10 @@
 ﻿using FluentValidation.Results;
 using Logitar.EventSourcing;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class AggregateNotFoundException : Exception
+public class AggregateNotFoundException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified aggregate could not be found.";
 

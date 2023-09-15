@@ -3,7 +3,7 @@ using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Domain.Senders;
 
-public class SenderNotInRealmException : Exception
+public class SenderNotInRealmException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified sender must be in the specified realm.";
 

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Domain.ApiKeys;
 
-public class CannotPostponeExpirationException : Exception
+public class CannotPostponeExpirationException : Exception, IFailureException
 {
   private const string ErrorMessage = "The API key expiration cannot be postponed.";
 

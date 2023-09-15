@@ -1,9 +1,10 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application.Messages;
 
-public class RealmHasNoDefaultSenderException : Exception
+public class RealmHasNoDefaultSenderException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified realm has no default sender.";
 

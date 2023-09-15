@@ -5,6 +5,10 @@ namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
 internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
 {
+  public SendEmailCommandHandler()
+  {
+  }
+
   public Task Handle(SendEmailCommand command, CancellationToken cancellationToken)
   {
     throw new NotImplementedException(); // TODO(fpion): implement

@@ -20,33 +20,30 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Logitar.Portal.Web.Filters;
 
-/// <summary>
-/// TODO(fpion): refactor
-/// </summary>
 internal class ExceptionHandlingFilter : ExceptionFilterAttribute
 {
   private readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
-    [typeof(ApiKeyIsExpiredException)] = HandleApiKeyIsExpiredException,
-    [typeof(CannotDeleteDefaultSenderException)] = HandleCannotDeleteDefaultSenderException,
-    [typeof(CannotPostponeExpirationException)] = HandleCannotPostponeExpirationException,
+    [typeof(ApiKeyIsExpiredException)] = HandleBadRequestDetailException,
+    [typeof(CannotDeleteDefaultSenderException)] = HandleBadRequestDetailException,
+    [typeof(CannotPostponeExpirationException)] = HandleBadRequestFailureException,
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
-    [typeof(DictionaryAlreadyExistingException)] = HandleDictionaryAlreadyExistingException,
-    [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
-    [typeof(InvalidGenderException)] = HandleInvalidGenderException,
-    [typeof(InvalidLocaleException)] = HandleInvalidLocaleException,
-    [typeof(InvalidTimeZoneEntryException)] = HandleInvalidTimeZoneEntryException,
-    [typeof(InvalidUrlException)] = HandleInvalidUrlException,
-    [typeof(MissingRecipientAddressesException)] = HandleMissingRecipientAddressesException,
-    [typeof(RealmHasNoDefaultSenderException)] = HandleRealmHasNoDefaultSenderException,
-    [typeof(RolesNotFoundException)] = HandleRolesNotFoundException,
-    [typeof(SenderNotInRealmException)] = HandleSenderNotInRealmException,
-    [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
-    [typeof(TemplateNotInRealmException)] = HandleTemplateNotInRealmException,
-    [typeof(UniqueSlugAlreadyUsedException)] = HandleUniqueSlugAlreadyUsedException,
-    [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
-    [typeof(UserIsNotConfirmedException)] = HandleUserIsNotConfirmedException,
-    [typeof(UsersNotFoundException)] = HandleUsersNotFoundException,
+    [typeof(DictionaryAlreadyExistingException)] = HandleBadRequestDetailException,
+    [typeof(EmailAddressAlreadyUsedException)] = HandleBadRequestDetailException,
+    [typeof(InvalidGenderException)] = HandleBadRequestFailureException,
+    [typeof(InvalidLocaleException)] = HandleBadRequestFailureException,
+    [typeof(InvalidTimeZoneEntryException)] = HandleBadRequestFailureException,
+    [typeof(InvalidUrlException)] = HandleBadRequestFailureException,
+    [typeof(MissingRecipientAddressesException)] = HandleBadRequestFailureException,
+    [typeof(RealmHasNoDefaultSenderException)] = HandleBadRequestFailureException,
+    [typeof(RolesNotFoundException)] = HandleNotFoundFailureException,
+    [typeof(SenderNotInRealmException)] = HandleBadRequestFailureException,
+    [typeof(SessionIsNotActiveException)] = HandleBadRequestDetailException,
+    [typeof(TemplateNotInRealmException)] = HandleBadRequestFailureException,
+    [typeof(UniqueSlugAlreadyUsedException)] = HandleBadRequestDetailException,
+    [typeof(UserIsDisabledException)] = HandleBadRequestDetailException,
+    [typeof(UserIsNotConfirmedException)] = HandleBadRequestDetailException,
+    [typeof(UsersNotFoundException)] = HandleNotFoundFailureException,
     [typeof(ValidationException)] = HandleValidationException
   };
 
@@ -57,34 +54,34 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
       context.Result = handler(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is AggregateNotFoundException aggregateNotFound)
+    else if (context.Exception is AggregateNotFoundException)
     {
-      context.Result = new NotFoundObjectResult(aggregateNotFound.Failure);
+      context.Result = HandleNotFoundFailureException(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is IdentifierAlreadyUsedException identifierAlreadyUsed)
+    else if (context.Exception is IdentifierAlreadyUsedException)
     {
-      context.Result = new ConflictObjectResult(identifierAlreadyUsed.Failure);
+      context.Result = HandleConflictFailureException(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is InvalidCredentialsException invalidCredentials)
+    else if (context.Exception is InvalidCredentialsException)
     {
-      context.Result = new BadRequestObjectResult(ErrorDetail.From(invalidCredentials));
+      context.Result = HandleBadRequestDetailException(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is SecurityTokenException securityToken)
+    else if (context.Exception is SecurityTokenException)
     {
-      context.Result = new BadRequestObjectResult(ErrorDetail.From(securityToken));
+      context.Result = HandleBadRequestDetailException(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is TooManyResultsException tooManyResults)
+    else if (context.Exception is TooManyResultsException)
     {
-      context.Result = new BadRequestObjectResult(ErrorDetail.From(tooManyResults));
+      context.Result = HandleBadRequestDetailException(context);
       context.ExceptionHandled = true;
     }
-    else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
+    else if (context.Exception is UniqueNameAlreadyUsedException)
     {
-      context.Result = new ConflictObjectResult(uniqueNameAlreadyUsed.Failure);
+      context.Result = HandleConflictFailureException(context);
       context.ExceptionHandled = true;
     }
     else
@@ -93,19 +90,13 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     }
   }
 
-  private static IActionResult HandleApiKeyIsExpiredException(ExceptionContext context)
+  private static IActionResult HandleBadRequestDetailException(ExceptionContext context)
   {
     return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
   }
-
-  private static IActionResult HandleCannotDeleteDefaultSenderException(ExceptionContext context)
+  private static IActionResult HandleBadRequestFailureException(ExceptionContext context)
   {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
-  }
-
-  private static IActionResult HandleCannotPostponeExpirationException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((CannotPostponeExpirationException)context.Exception).Failure);
+    return new BadRequestObjectResult(((IFailureException)context.Exception).Failure);
   }
 
   private static IActionResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
@@ -116,84 +107,14 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     };
   }
 
-  private static IActionResult HandleDictionaryAlreadyExistingException(ExceptionContext context)
+  private static IActionResult HandleConflictFailureException(ExceptionContext context)
   {
-    return new ConflictObjectResult(((DictionaryAlreadyExistingException)context.Exception).Failure);
+    return new ConflictObjectResult(((IFailureException)context.Exception).Failure);
   }
 
-  private static IActionResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)
+  private static IActionResult HandleNotFoundFailureException(ExceptionContext context)
   {
-    return new ConflictObjectResult(((EmailAddressAlreadyUsedException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleInvalidGenderException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((InvalidGenderException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleInvalidLocaleException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((InvalidLocaleException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleInvalidTimeZoneEntryException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((InvalidTimeZoneEntryException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleInvalidUrlException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((InvalidUrlException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleMissingRecipientAddressesException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((MissingRecipientAddressesException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleRealmHasNoDefaultSenderException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((RealmHasNoDefaultSenderException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleRolesNotFoundException(ExceptionContext context)
-  {
-    return new NotFoundObjectResult(((RolesNotFoundException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleSenderNotInRealmException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((SenderNotInRealmException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleSessionIsNotActiveException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
-  }
-
-  private static IActionResult HandleTemplateNotInRealmException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(((TemplateNotInRealmException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleUniqueSlugAlreadyUsedException(ExceptionContext context)
-  {
-    return new ConflictObjectResult(((UniqueSlugAlreadyUsedException)context.Exception).Failure);
-  }
-
-  private static IActionResult HandleUserIsDisabledException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
-  }
-
-  private static IActionResult HandleUserIsNotConfirmedException(ExceptionContext context)
-  {
-    return new BadRequestObjectResult(ErrorDetail.From(context.Exception));
-  }
-
-  private static IActionResult HandleUsersNotFoundException(ExceptionContext context)
-  {
-    return new NotFoundObjectResult(((UsersNotFoundException)context.Exception).Failure);
+    return new NotFoundObjectResult(((IFailureException)context.Exception).Failure);
   }
 
   private static IActionResult HandleValidationException(ExceptionContext context)

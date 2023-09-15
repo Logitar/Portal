@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Messages;
 
-public class MissingRecipientAddressesException : Exception
+public class MissingRecipientAddressesException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified recipients are missing an email address.";
 

@@ -3,7 +3,7 @@ using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Dictionaries;
 
-public class DictionaryAlreadyExistingException : Exception
+public class DictionaryAlreadyExistingException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified dictionary already exists.";
 

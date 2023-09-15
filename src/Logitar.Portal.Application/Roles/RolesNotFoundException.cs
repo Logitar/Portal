@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Roles;
 
-public class RolesNotFoundException : Exception
+public class RolesNotFoundException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified roles could not be found.";
 

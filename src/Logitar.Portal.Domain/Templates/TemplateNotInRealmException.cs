@@ -3,7 +3,7 @@ using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Domain.Templates;
 
-public class TemplateNotInRealmException : Exception
+public class TemplateNotInRealmException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified template must be in the specified realm.";
 

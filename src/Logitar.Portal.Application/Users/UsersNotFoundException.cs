@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Users;
 
-public class UsersNotFoundException : Exception
+public class UsersNotFoundException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified users could not be found.";
 
