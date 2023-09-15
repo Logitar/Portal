@@ -76,6 +76,8 @@ public class MessageAggregate : AggregateRoot
     Variables = new Variables(created.Variables);
 
     IsDemo = created.IsDemo;
+
+    Status = MessageStatus.Unsent;
   }
 
   public string Subject { get; private set; } = string.Empty;

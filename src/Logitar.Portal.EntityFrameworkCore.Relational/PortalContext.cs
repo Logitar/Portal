@@ -15,7 +15,9 @@ public class PortalContext : DbContext
   internal DbSet<DictionaryEntity> Dictionaries { get; private set; }
   internal DbSet<LogEntity> Logs { get; private set; }
   internal DbSet<LogEventEntity> LogEvents { get; private set; }
+  internal DbSet<MessageEntity> Messages { get; private set; }
   internal DbSet<RealmEntity> Realms { get; private set; }
+  internal DbSet<RecipientEntity> Recipients { get; private set; }
   internal DbSet<RoleEntity> Roles { get; private set; }
   internal DbSet<SenderEntity> Senders { get; private set; }
   internal DbSet<SessionEntity> Sessions { get; private set; }

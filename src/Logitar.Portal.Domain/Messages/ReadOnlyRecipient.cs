@@ -28,7 +28,7 @@ public record ReadOnlyRecipient
   public AggregateId? UserId { get; }
 
   [JsonIgnore]
-  public UserAggregate? User { get; private set; }
+  public UserAggregate? User { get; set; }
 
   public static ReadOnlyRecipient From(UserAggregate user, RecipientType type = RecipientType.To)
   {
@@ -37,7 +37,7 @@ public record ReadOnlyRecipient
       throw new ArgumentException($"The {nameof(user.Email)} is required.", nameof(user));
     }
 
-    return new ReadOnlyRecipient(user.Email.Address, user.FullName ?? user.UniqueName, type, user.Id)
+    return new ReadOnlyRecipient(user.Email.Address, user.FullName, type, user.Id)
     {
       User = user
     };

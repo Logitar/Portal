@@ -51,6 +51,8 @@ internal record SenderEntity : AggregateEntity
 
   public RealmEntity? PasswordRecoveryInRealm { get; private set; }
 
+  public List<MessageEntity> Messages { get; private set; } = new();
+
   public void Update(SenderUpdatedEvent updated)
   {
     base.Update(updated);

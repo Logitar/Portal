@@ -38,6 +38,8 @@ internal record TemplateEntity : AggregateEntity
 
   public RealmEntity? PasswordRecoveryInRealm { get; private set; }
 
+  public List<MessageEntity> Messages { get; private set; } = new();
+
   public void Update(TemplateUpdatedEvent updated)
   {
     base.Update(updated);
