@@ -5,6 +5,8 @@ using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
@@ -12,17 +14,27 @@ using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace Logitar.Portal;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class MessageServiceTests : IntegrationTests, IAsyncLifetime
 {
+  private const string RecipientKey = "Recipient";
   private const string SenderKey = "Sender";
   private const string SendGridKey = "SendGrid";
 
+  private static readonly Locale _americanEnglish = new("en-US");
+  private static readonly Locale _canadianEnglish = new("en-CA");
+  private static readonly Locale _english = new("en");
+  private static readonly Locale _french = new("fr");
+
   private readonly IMessageService _messageService;
 
+  private readonly string _recipient;
+
+  private readonly Dictionary<Locale, DictionaryAggregate> _dictionaries = new();
   private readonly RealmAggregate _realm;
   private readonly SenderAggregate _sender;
   private readonly TemplateAggregate _template;
@@ -32,9 +44,13 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   {
     _messageService = ServiceProvider.GetRequiredService<IMessageService>();
 
+    IConfiguration configuration = ServiceProvider.GetRequiredService<IConfiguration>();
+    _recipient = configuration.GetValue<string>(RecipientKey)
+      ?? throw new InvalidOperationException($"The configuration key '{RecipientKey}' is required.");
+
     _realm = new("logitar")
     {
-      DefaultLocale = new Locale("fr"),
+      DefaultLocale = _french,
       DisplayName = "Logitar"
     };
     string tenantId = _realm.Id.Value;
@@ -50,71 +66,313 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
 
     _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, tenantId)
     {
-      Email = new EmailAddress(Faker.Person.Email),
+      Email = new EmailAddress(_recipient),
       FirstName = Faker.Person.FirstName,
       LastName = Faker.Person.LastName,
       Birthdate = Faker.Person.DateOfBirth,
       Gender = new Gender(Faker.Person.Gender.ToString()),
-      Locale = _realm.DefaultLocale,
+      Locale = _canadianEnglish,
       Picture = new Uri(Faker.Person.Avatar),
       Website = new Uri($"https://www.{Faker.Person.Website}/")
     };
+    Assert.NotNull(_user.Locale.Parent);
+
+    _dictionaries[_americanEnglish] = CreateDictionary(_americanEnglish, tenantId);
+    _dictionaries[_canadianEnglish] = CreateDictionary(_canadianEnglish, tenantId);
+    _dictionaries[_english] = CreateDictionary(_english, tenantId);
+    _dictionaries[_french] = CreateDictionary(_french, tenantId);
   }
 
   public override async Task InitializeAsync()
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender, _template, _user });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _sender, _template, _user }.Concat(_dictionaries.Values));
   }
 
   [Fact(DisplayName = "It should send a message to a Portal user.")]
   public async Task It_should_send_a_message_to_a_Portal_user()
   {
-    Assert.Fail("TODO(fpion): implement");
+    SenderAggregate sender = new(_sender.EmailAddress, _sender.Provider, isDefault: true)
+    {
+      DisplayName = _sender.DisplayName
+    };
+    foreach (KeyValuePair<string, string> setting in _sender.Settings)
+    {
+      sender.SetSetting(setting.Key, setting.Value);
+    }
+
+    Assert.NotNull(Configuration);
+    TemplateAggregate template = new(Configuration.UniqueNameSettings, _template.UniqueName, _template.Subject, _template.ContentType, _template.Contents)
+    {
+      DisplayName = _template.DisplayName
+    };
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, template });
+
+    Assert.NotNull(User);
+    SendMessagePayload payload = new()
+    {
+      Template = template.Id.ToGuid().ToString(),
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = User.Id.ToGuid().ToString()
+        }
+      }
+    };
+
+    SentMessages sentMessages = await _messageService.SendAsync(payload);
+    AggregateId messageId = new(Assert.Single(sentMessages.Ids));
+
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(messageId);
+    Assert.NotNull(message);
+    Assert.Equal(messageId, message.Id);
+
+    Assert.Equal(template.Subject, message.Subject);
+    Assert.Null(message.Realm);
+    Assert.Equal(SenderSummary.From(sender), message.Sender);
+    Assert.Equal(TemplateSummary.From(template), message.Template);
+    Assert.False(message.IgnoreUserLocale);
+    Assert.Equal(User.Locale, message.Locale);
+    Assert.Empty(message.Variables.AsDictionary());
+    Assert.False(message.IsDemo);
+
+    string body = @"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
+<html xmlns=""http://www.w3.org/1999/xhtml"" lang=""{locale}"" xml:lang=""{locale}"">
+<head>
+  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
+</head>
+<body>
+  <p><strong>PasswordRecovery_Hello</strong></p>
+  <p>PasswordRecovery_PasswordLost</p>
+  <p>
+    PasswordRecovery_ClickLink
+    <br />
+    <a href=""PasswordRecovery_PageUrl"">PasswordRecovery_PageUrl</a>
+  </p>
+  <p>PasswordRecovery_OtherwiseDelete</p>
+  <p>
+    Cordially
+    <br />
+    <i>Team</i>
+  </p>
+</body>
+</html>".Replace("{locale}", User.Locale?.Code);
+    Assert.Equal(body, message.Body);
+
+    ReadOnlyRecipient recipient = Assert.Single(message.Recipients.AsEnumerable());
+    Assert.Equal(RecipientType.To, recipient.Type);
+    Assert.Equal(User.Email?.Address, recipient.Address);
+    Assert.Equal(User.FullName, recipient.DisplayName);
+    Assert.Equal(User.Id, recipient.UserId);
+
+    if (message.Status == MessageStatus.Unsent)
+    {
+      Assert.Null(message.Result);
+    }
+    else
+    {
+      Assert.NotNull(message.Result);
+    }
   }
 
   [Fact(DisplayName = "It should send a message to a realm user.")]
   public async Task It_should_send_a_message_to_a_realm_user()
   {
-    Assert.Fail("TODO(fpion): implement");
+    string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUriSafeBase64();
+    SendMessagePayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug}  ",
+      SenderId = _sender.Id.ToGuid(),
+      Template = $"  {_template.UniqueName}  ",
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = $"  {_user.UniqueName}  "
+        }
+      },
+      IgnoreUserLocale = true,
+      Locale = "  en-US  ",
+      Variables = new Variable[]
+      {
+        new("Token", token)
+      }
+    };
 
-    //SendMessagePayload payload = new()
-    //{
-    //  Realm = $"  {_realm.UniqueSlug.ToUpper()}  ",
-    //  SenderId = _sender.Id.ToGuid(),
-    //  Template = $"  {_template.UniqueName.ToUpper()}  ",
-    //  Recipients = new RecipientPayload[]
-    //  {
-    //    new()
-    //    {
-    //      User = $"  {_user.UniqueName.ToUpper()}  "
-    //    }
-    //  },
-    //  IgnoreUserLocale = true,
-    //  Locale = $"  {_dictionary.Locale}  ",
-    //  Variables = new Variable[]
-    //  {
-    //    new("Code", "112656"),
-    //    new("Guid", Guid.NewGuid().ToString())
-    //  }
-    //};
+    SentMessages sentMessages = await _messageService.SendAsync(payload);
+    AggregateId messageId = new(Assert.Single(sentMessages.Ids));
 
-    //SentMessages sentMessages = await _messageService.SendAsync(payload);
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(messageId);
+    Assert.NotNull(message);
+    Assert.Equal(messageId, message.Id);
+    Assert.Equal(ActorId, message.CreatedBy);
+    AssertIsNear(message.CreatedOn);
+    Assert.Equal(ActorId, message.UpdatedBy);
+    AssertIsNear(message.UpdatedOn);
+    Assert.True(message.Version > 1);
 
-    // TODO(fpion): implement
+    Assert.Equal("Reset your password", message.Subject);
+    Assert.Equal(RealmSummary.From(_realm), message.Realm);
+    Assert.Equal(SenderSummary.From(_sender), message.Sender);
+    Assert.Equal(TemplateSummary.From(_template), message.Template);
+    Assert.True(message.IgnoreUserLocale);
+    Assert.Equal(payload.Locale.Trim(), message.Locale?.Code);
+    Assert.Equal(payload.Variables.ToDictionary(x => x.Key, x => x.Value), message.Variables.AsDictionary());
+    Assert.False(message.IsDemo);
+
+    string body = @"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
+<html xmlns=""http://www.w3.org/1999/xhtml"" lang=""en-CA"" xml:lang=""en-CA"">
+<head>
+  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
+</head>
+<body>
+  <p><strong>Bonjour {name} !</strong></p>
+  <p>It seems you have lost your password...</p>
+  <p>
+    In this case, please click on the link below to reset it:
+    <br />
+    <a href=""https://www.logitar.com/en-us/user/reset-password?token={token}"">https://www.logitar.com/en-us/user/reset-password?token={token}</a>
+  </p>
+  <p>If we&#39;ve been mistaken, we suggest you to delete this message.</p>
+  <p>
+    Cordially,
+    <br />
+    <i>The Logitar Team</i>
+  </p>
+</body>
+</html>".Replace("{name}", _user.FullName).Replace("{token}", token);
+    Assert.Equal(body, message.Body);
+
+    ReadOnlyRecipient recipient = Assert.Single(message.Recipients.AsEnumerable());
+    Assert.Equal(RecipientType.To, recipient.Type);
+    Assert.Equal(_user.Email?.Address, recipient.Address);
+    Assert.Equal(_user.FullName, recipient.DisplayName);
+    Assert.Equal(_user.Id, recipient.UserId);
+
+    if (message.Status == MessageStatus.Unsent)
+    {
+      Assert.Null(message.Result);
+    }
+    else
+    {
+      Assert.NotNull(message.Result);
+    }
   }
 
   [Fact(DisplayName = "It should send a message to a recipient who is not an user.")]
   public async Task It_should_send_a_message_to_a_recipient_who_is_not_an_user()
   {
-    Assert.Fail("TODO(fpion): implement");
+    SendMessagePayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Template = _template.UniqueName,
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          Address = _recipient,
+          DisplayName = Faker.Name.FullName()
+        }
+      }
+    };
+
+    SentMessages sentMessages = await _messageService.SendAsync(payload);
+    AggregateId messageId = new(Assert.Single(sentMessages.Ids));
+
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(messageId);
+    Assert.NotNull(message);
+    Assert.Equal(messageId, message.Id);
+    Assert.Equal(ActorId, message.CreatedBy);
+    AssertIsNear(message.CreatedOn);
+    Assert.Equal(ActorId, message.UpdatedBy);
+    AssertIsNear(message.UpdatedOn);
+    Assert.True(message.Version > 1);
+
+    Assert.Equal("Réinitialiser votre mot de passe", message.Subject);
+    Assert.Equal(RealmSummary.From(_realm), message.Realm);
+    Assert.Equal(SenderSummary.From(_sender), message.Sender);
+    Assert.Equal(TemplateSummary.From(_template), message.Template);
+    Assert.False(message.IgnoreUserLocale);
+    Assert.Null(message.Locale);
+    Assert.Empty(message.Variables.AsDictionary());
+    Assert.False(message.IsDemo);
+
+    string body = @"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
+<html xmlns=""http://www.w3.org/1999/xhtml"">
+<head>
+  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
+</head>
+<body>
+  <p><strong>Bonjour  !</strong></p>
+  <p>Vous semblez avoir perdu votre mot de passe...</p>
+  <p>
+    Si c’est bien le cas, veuillez cliquer sur le lien ci-dessous afin de le r&#233;initialiser :
+    <br />
+    <a href=""https://www.logitar.ca/fr/compte/reinitialiser-mot-de-passe?token=Token"">https://www.logitar.ca/fr/compte/reinitialiser-mot-de-passe?token=Token</a>
+  </p>
+  <p>Si nous avons fait erreur, veuillez supprimer ce message.</p>
+  <p>
+    Cordialement,
+    <br />
+    <i>L’&#233;quipe Logitar</i>
+  </p>
+</body>
+</html>";
+    Assert.Equal(body, message.Body);
+
+    RecipientPayload recipientPayload = Assert.Single(payload.Recipients);
+    ReadOnlyRecipient recipient = Assert.Single(message.Recipients.AsEnumerable());
+    Assert.Equal(RecipientType.To, recipient.Type);
+    Assert.Equal(recipientPayload.Address, recipient.Address);
+    Assert.Equal(recipientPayload.DisplayName, recipient.DisplayName);
+    Assert.Null(recipient.UserId);
+
+    if (message.Status == MessageStatus.Unsent)
+    {
+      Assert.Null(message.Result);
+    }
+    else
+    {
+      Assert.NotNull(message.Result);
+    }
   }
 
   [Fact(DisplayName = "It should send a message to multiple recipients.")]
   public async Task It_should_send_a_message_to_multiple_recipients()
   {
-    Assert.Fail("TODO(fpion): implement");
+    string displayName = Faker.Name.FullName();
+    SendMessagePayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Template = _template.UniqueName,
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = _user.UniqueName
+        },
+        new()
+        {
+          Address = _recipient,
+          DisplayName = displayName
+        }
+      },
+      Locale = _realm.DefaultLocale?.Code
+    };
+
+    SentMessages sentMessages = await _messageService.SendAsync(payload);
+
+    HashSet<AggregateId> messageIds = sentMessages.Ids.Select(id => new AggregateId(id)).ToHashSet();
+    Assert.Equal(payload.Recipients.Count(), messageIds.Count);
+
+    IEnumerable<MessageAggregate> messages = await AggregateRepository.LoadAsync<MessageAggregate>(messageIds);
+    Assert.Equal(messageIds.Count, messages.Count());
+    Assert.Contains(messages, message => message.Recipients.To.Single().UserId == _user.Id && message.Locale == _user.Locale);
+    Assert.Contains(messages, message => message.Recipients.To.Single().Address == _recipient && message.Recipients.To.Single().DisplayName == displayName
+      && !message.Recipients.To.Single().UserId.HasValue && message.Locale == _realm.DefaultLocale);
   }
 
   [Fact(DisplayName = "SendAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
@@ -279,6 +537,20 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await _messageService.SendAsync(payload));
     Assert.Equal(payload.Recipients.Skip(1).Select(recipient => recipient.User), exception.MissingUsers);
     Assert.Equal(nameof(payload.Recipients), exception.PropertyName);
+  }
+
+  private static DictionaryAggregate CreateDictionary(Locale locale, string? tenantId = null)
+  {
+    string json = File.ReadAllText($"Dictionaries/{locale.Code}.json", Encoding.UTF8);
+    Dictionary<string, string> entries = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+
+    DictionaryAggregate dictionary = new(locale, tenantId);
+    foreach (KeyValuePair<string, string> entry in entries)
+    {
+      dictionary.SetEntry(entry.Key, entry.Value);
+    }
+
+    return dictionary;
   }
 
   private SenderAggregate? CreateSender(bool isDefault = false, string? tenantId = null)

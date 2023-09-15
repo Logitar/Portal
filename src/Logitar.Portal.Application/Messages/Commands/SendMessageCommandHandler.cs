@@ -100,7 +100,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     Locale defaultLocale = realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale;
     _ = dictionaries.TryGetValue(defaultLocale, out DictionaryAggregate? @default);
 
-    return new Dictionaries(fallback, target, @default);
+    return new Dictionaries(target, fallback, @default);
   }
 
   private async Task<RealmAggregate?> ResolveRealmAsync(SendMessagePayload payload, CancellationToken cancellationToken)
