@@ -19,7 +19,7 @@ internal class MessageClient : ClientBase, IMessageService
   public async Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
     return await PostAsync<SearchResults<Message>>($"{Path}/search", payload, cancellationToken)
-  ?? throw new InvalidOperationException("The results should not be null.");
+      ?? throw new InvalidOperationException("The results should not be null.");
   }
 
   public async Task<SentMessages> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)
