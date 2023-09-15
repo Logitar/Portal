@@ -72,19 +72,27 @@ internal static class SendMessageResultExtensions
   {
     Dictionary<string, string> data = new(capacity: 5);
 
-    if (detail.Content != null)
+    if (!string.IsNullOrWhiteSpace(detail.Content))
     {
-      data["Content"] = detail.Content;
+      data["Content"] = detail.Content.Trim();
     }
 
-    if (detail.ReasonPhrase != null)
+    if (!string.IsNullOrWhiteSpace(detail.ReasonPhrase))
     {
-      data["ReasonPhrase"] = detail.ReasonPhrase;
+      data["ReasonPhrase"] = detail.ReasonPhrase.Trim();
     }
 
     data["StatusCode"] = detail.StatusCode.ToString();
-    data["StatusText"] = detail.StatusText;
-    data["Version"] = detail.Version;
+
+    if (!string.IsNullOrWhiteSpace(detail.StatusText))
+    {
+      data["StatusText"] = detail.StatusText.Trim();
+    }
+
+    if (!string.IsNullOrWhiteSpace(detail.Version))
+    {
+      data["Version"] = detail.Version.Trim();
+    }
 
     return new SendMessageResult(data);
   }

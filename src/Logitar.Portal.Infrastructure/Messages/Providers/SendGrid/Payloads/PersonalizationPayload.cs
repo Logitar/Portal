@@ -7,8 +7,8 @@ internal record PersonalizationPayload
   public PersonalizationPayload(Recipients recipients)
   {
     Bcc = recipients.Bcc.Any() ? recipients.Bcc.Select(recipient => new RecipientPayload(recipient)) : null;
-    Bcc = recipients.CC.Any() ? recipients.CC.Select(recipient => new RecipientPayload(recipient)) : null;
-    Bcc = recipients.To.Any() ? recipients.To.Select(recipient => new RecipientPayload(recipient)) : null;
+    CC = recipients.CC.Any() ? recipients.CC.Select(recipient => new RecipientPayload(recipient)) : null;
+    To = recipients.To.Any() ? recipients.To.Select(recipient => new RecipientPayload(recipient)) : null;
   }
 
   [JsonPropertyName("bcc")]
