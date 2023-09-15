@@ -36,7 +36,6 @@ internal record MessageEntity : AggregateEntity
 
     Realm = realm;
     RealmId = realm?.RealmId;
-    RealmSummary = created.Realm;
 
     Sender = sender;
     SenderId = sender.SenderId;
@@ -73,12 +72,6 @@ internal record MessageEntity : AggregateEntity
 
   public RealmEntity? Realm { get; private set; }
   public int? RealmId { get; private set; }
-  public RealmSummary? RealmSummary { get; private set; }
-  public string? RealmSummarySerialized
-  {
-    get => RealmSummary == null ? null : JsonSerializer.Serialize(RealmSummary, _serializerOptions);
-    private set => RealmSummary = value == null ? null : JsonSerializer.Deserialize<RealmSummary>(value, _serializerOptions);
-  }
 
   public SenderEntity? Sender { get; private set; }
   public int? SenderId { get; private set; }

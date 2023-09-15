@@ -4,6 +4,7 @@ using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Logging;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
@@ -54,6 +55,7 @@ public static class DependencyInjectionExtensions
       .AddScoped<IApiKeyQuerier, ApiKeyQuerier>()
       .AddScoped<IConfigurationQuerier, ConfigurationQuerier>()
       .AddScoped<IDictionaryQuerier, DictionaryQuerier>()
+      .AddScoped<IMessageQuerier, MessageQuerier>()
       .AddScoped<IRealmQuerier, RealmQuerier>()
       .AddScoped<IRoleQuerier, RoleQuerier>()
       .AddScoped<ISenderQuerier, SenderQuerier>()

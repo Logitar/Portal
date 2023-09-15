@@ -42,12 +42,25 @@ internal static class Db
     public static readonly ColumnId AggregateType = new(nameof(EventEntity.AggregateType), Table);
   }
 
+  public static class Messages
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Messages));
+
+    public static readonly ColumnId AggregateId = new(nameof(MessageEntity.AggregateId), Table);
+    public static readonly ColumnId IsDemo = new(nameof(MessageEntity.IsDemo), Table);
+    public static readonly ColumnId RealmId = new(nameof(MessageEntity.RealmId), Table);
+    public static readonly ColumnId Status = new(nameof(MessageEntity.Status), Table);
+    public static readonly ColumnId Subject = new(nameof(MessageEntity.Subject), Table);
+    public static readonly ColumnId TemplateId = new(nameof(MessageEntity.TemplateId), Table);
+  }
+
   public static class Realms
   {
     public static readonly TableId Table = new(nameof(PortalContext.Realms));
 
     public static readonly ColumnId AggregateId = new(nameof(RealmEntity.AggregateId), Table);
     public static readonly ColumnId DisplayName = new(nameof(RealmEntity.DisplayName), Table);
+    public static readonly ColumnId RealmId = new(nameof(RealmEntity.RealmId), Table);
     public static readonly ColumnId UniqueSlug = new(nameof(RealmEntity.UniqueSlug), Table);
     public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
   }
@@ -93,6 +106,7 @@ internal static class Db
     public static readonly ColumnId ContentType = new(nameof(TemplateEntity.ContentType), Table);
     public static readonly ColumnId DisplayName = new(nameof(TemplateEntity.DisplayName), Table);
     public static readonly ColumnId Subject = new(nameof(TemplateEntity.Subject), Table);
+    public static readonly ColumnId TemplateId = new(nameof(TemplateEntity.TemplateId), Table);
     public static readonly ColumnId TenantId = new(nameof(TemplateEntity.TenantId), Table);
     public static readonly ColumnId UniqueName = new(nameof(TemplateEntity.UniqueName), Table);
     public static readonly ColumnId UniqueNameNormalized = new(nameof(TemplateEntity.UniqueNameNormalized), Table);

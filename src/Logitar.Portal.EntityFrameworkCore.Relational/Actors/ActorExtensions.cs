@@ -36,6 +36,40 @@ internal static class ActorExtensions
     return new[] { new ActorId(identifier.CreatedBy), new ActorId(identifier.UpdatedBy) };
   }
 
+  public static IEnumerable<ActorId> GetActorIds(this MessageEntity message)
+  {
+    List<ActorId> actorIds = new(capacity: 8 + (7 * message.Recipients.Count))
+    {
+      new ActorId(message.CreatedBy),
+      new ActorId(message.UpdatedBy)
+    };
+
+    foreach (RecipientEntity recipient in message.Recipients)
+    {
+      if (recipient.User != null)
+      {
+        actorIds.AddRange(recipient.User.GetActorIds());
+      }
+    }
+
+    if (message.Realm != null)
+    {
+      actorIds.AddRange(message.Realm.GetActorIds());
+    }
+
+    if (message.Sender != null)
+    {
+      actorIds.AddRange(message.Sender.GetActorIds());
+    }
+
+    if (message.Template != null)
+    {
+      actorIds.AddRange(message.Template.GetActorIds());
+    }
+
+    return actorIds.Distinct();
+  }
+
   public static IEnumerable<ActorId> GetActorIds(this SessionEntity session)
   {
     List<ActorId> actorIds = new(capacity: 10)

@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.ApiKeys.Commands;
 using Logitar.Portal.Application.Dictionaries.Commands;
+using Logitar.Portal.Application.Messages.Commands;
 using Logitar.Portal.Application.Roles.Commands;
 using Logitar.Portal.Application.Senders.Commands;
 using Logitar.Portal.Application.Sessions.Commands;
@@ -40,6 +41,7 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     realm.Update(_applicationContext.ActorId);
     await _realmRepository.SaveAsync(realm, cancellationToken);
 
+    await _publisher.Publish(new DeleteMessagesCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteTemplatesCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteSendersCommand(realm), cancellationToken);
     await _publisher.Publish(new DeleteDictionariesCommand(realm), cancellationToken);

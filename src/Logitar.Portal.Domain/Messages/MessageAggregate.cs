@@ -99,6 +99,8 @@ public class MessageAggregate : AggregateRoot
   public SendMessageResult? Result { get; private set; }
   public MessageStatus Status { get; private set; }
 
+  public void Delete(ActorId actorId = default) => ApplyChange(new MessageDeletedEvent(actorId));
+
   public void Fail(SendMessageResult result, ActorId actorId = default)
   {
     ApplyChange(new MessageFailedEvent(actorId)
