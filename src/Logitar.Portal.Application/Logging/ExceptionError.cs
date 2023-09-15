@@ -22,8 +22,8 @@ public record ExceptionError : Error
       object? value = exception.Data[key];
       if (value != null)
       {
-        string serializedKey = JsonSerializer.Serialize(key, key.GetType(), SerializerOptions);
-        string serializedValue = JsonSerializer.Serialize(value, value.GetType(), SerializerOptions);
+        string serializedKey = key as string ?? JsonSerializer.Serialize(key, key.GetType(), SerializerOptions);
+        string serializedValue = value as string ?? JsonSerializer.Serialize(value, value.GetType(), SerializerOptions);
 
         data[serializedKey] = serializedValue;
       }

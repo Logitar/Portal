@@ -13,16 +13,16 @@ public record MessageCreatedEvent : DomainEvent, INotification
   public string Subject { get; init; } = string.Empty;
   public string Body { get; init; } = string.Empty;
 
-  public Recipients Recipients { get; init; } = new(); // TODO(fpion): converter?
+  public IEnumerable<ReadOnlyRecipient> Recipients { get; init; } = Enumerable.Empty<ReadOnlyRecipient>();
 
-  public AggregateId? RealmId { get; init; }
-  public AggregateId SenderId { get; init; }
-  public AggregateId TemplateId { get; init; }
+  public RealmSummary? Realm { get; init; }
+  public SenderSummary Sender { get; init; } = new();
+  public TemplateSummary Template { get; init; } = new();
 
   public bool IgnoreUserLocale { get; init; }
   public Locale? Locale { get; init; }
 
-  public Variables Variables { get; init; } = new(); // TODO(fpion): converter?
+  public Dictionary<string, string> Variables { get; init; } = new();
 
   public bool IsDemo { get; init; }
 }

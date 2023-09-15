@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Http;
 
 namespace Logitar.Portal.Client;
 
@@ -80,7 +81,7 @@ internal abstract class ClientBase
     }
     catch (Exception innerException)
     {
-      HttpResponseDetail detail = await HttpResponseDetail.CreateAsync(response, cancellationToken);
+      HttpResponseDetail detail = await response.DetailAsync(cancellationToken);
       throw new HttpFailureException(detail, innerException);
     }
 

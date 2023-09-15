@@ -22,4 +22,6 @@ public record Variables
   }
 
   public string Resolve(string key) => _variables.TryGetValue(key, out string? value) ? value : key;
+
+  public Dictionary<string, string> AsDictionary() => new(_variables);
 }

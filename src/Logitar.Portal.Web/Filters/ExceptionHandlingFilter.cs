@@ -10,6 +10,7 @@ using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
 using Logitar.Portal.Domain.Templates;
@@ -35,6 +36,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(InvalidTimeZoneEntryException)] = HandleBadRequestFailureException,
     [typeof(InvalidUrlException)] = HandleBadRequestFailureException,
     [typeof(MissingRecipientAddressesException)] = HandleBadRequestFailureException,
+    [typeof(MissingToRecipientException)] = HandleBadRequestDetailException,
     [typeof(RealmHasNoDefaultSenderException)] = HandleBadRequestFailureException,
     [typeof(RolesNotFoundException)] = HandleNotFoundFailureException,
     [typeof(SenderNotInRealmException)] = HandleBadRequestFailureException,
@@ -44,6 +46,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(UserIsDisabledException)] = HandleBadRequestDetailException,
     [typeof(UserIsNotConfirmedException)] = HandleBadRequestDetailException,
     [typeof(UsersNotFoundException)] = HandleNotFoundFailureException,
+    [typeof(UsersNotInRealmException)] = HandleBadRequestFailureException,
     [typeof(ValidationException)] = HandleValidationException
   };
 

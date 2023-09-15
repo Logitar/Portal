@@ -25,7 +25,6 @@ public record Message
 
   public bool IsDemo { get; set; }
 
-  public ErrorDetail? Error { get; set; }
-  // TODO(fpion): Result
+  public IEnumerable<ResultData> Result { get; set; } = Enumerable.Empty<ResultData>();
   public MessageStatus Status { get; set; }
 }

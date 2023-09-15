@@ -36,9 +36,16 @@ public record Recipients
           break;
       }
     }
+
+    if (!_to.Any())
+    {
+      throw new MissingToRecipientException();
+    }
   }
 
   public IReadOnlyCollection<ReadOnlyRecipient> Bcc => _bcc.AsReadOnly();
   public IReadOnlyCollection<ReadOnlyRecipient> CC => _cc.AsReadOnly();
   public IReadOnlyCollection<ReadOnlyRecipient> To => _to.AsReadOnly();
+
+  public IEnumerable<ReadOnlyRecipient> AsEnumerable() => _bcc.Concat(_cc).Concat(_to);
 }

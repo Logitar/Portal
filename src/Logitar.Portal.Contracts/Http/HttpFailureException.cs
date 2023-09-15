@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Client;
+﻿namespace Logitar.Portal.Contracts.Http;
 
 public class HttpFailureException : Exception
 {

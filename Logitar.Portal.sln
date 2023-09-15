@@ -44,7 +44,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Domain.UnitT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{D703064F-9DE7-47AF-B756-C5D9AD0671CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Application.UnitTests", "tests\Logitar.Portal.Application.UnitTests\Logitar.Portal.Application.UnitTests.csproj", "{FAD32087-ECF7-4716-B6BA-A10AB618C205}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Application.UnitTests", "tests\Logitar.Portal.Application.UnitTests\Logitar.Portal.Application.UnitTests.csproj", "{FAD32087-ECF7-4716-B6BA-A10AB618C205}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Infrastructure.UnitTests", "tests\Logitar.Portal.Infrastructure.UnitTests\Logitar.Portal.Infrastructure.UnitTests.csproj", "{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,6 +114,10 @@ Global
 		{FAD32087-ECF7-4716-B6BA-A10AB618C205}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAD32087-ECF7-4716-B6BA-A10AB618C205}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAD32087-ECF7-4716-B6BA-A10AB618C205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +128,7 @@ Global
 		{0896C155-EBAF-4274-8A2B-45CA1E2E8393} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
 		{D703064F-9DE7-47AF-B756-C5D9AD0671CB} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
 		{FAD32087-ECF7-4716-B6BA-A10AB618C205} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
+		{1D2AE716-20DF-42F2-BEF5-77BAB5A0E462} = {70362C32-26BA-4D9E-A3AA-4987173433D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55C506C2-F420-403F-B2E6-A47E2DF4C4B6}
