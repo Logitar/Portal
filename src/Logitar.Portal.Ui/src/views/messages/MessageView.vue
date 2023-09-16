@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import ContentSection from "@/components/messages/ContentSection.vue";
-import RecipientsSection from "@/components/messages/RecipientsSection.vue";
+import RecipientSection from "@/components/messages/RecipientSection.vue";
 import StatusSection from "@/components/messages/StatusSection.vue";
 import type { ApiError } from "@/types/api";
 import type { Message } from "@/types/messages";
@@ -50,7 +50,7 @@ onMounted(async () => {
           <ContentSection :message="message" />
         </app-tab>
         <app-tab title="messages.recipients.label">
-          <RecipientsSection :recipients="message.recipients" />
+          <RecipientSection :recipients="message.recipients" />
         </app-tab>
       </app-tabs>
     </template>
