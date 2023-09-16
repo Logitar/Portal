@@ -4,6 +4,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Senders;
@@ -12,6 +13,7 @@ using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -105,6 +107,96 @@ internal class Mapper
       UpdatedOn = ToUniversalTime(source.UpdatedOn),
       Version = source.Version
     };
+  }
+
+  public Message ToMessage(MessageEntity source)
+  {
+    Realm? realm = source.Realm == null ? null : ToRealm(source.Realm);
+
+    Message destination = new()
+    {
+      Id = new AggregateId(source.AggregateId).ToGuid(),
+      Subject = source.Subject,
+      Body = source.Body,
+      Recipients = source.Recipients.Select(recipient => ToRecipient(recipient, realm)),
+      RecipientCount = source.RecipientCount,
+      Realm = realm,
+      IgnoreUserLocale = source.IgnoreUserLocale,
+      Locale = source.Locale,
+      Variables = source.Variables.Select(variable => new Variable(variable.Key, variable.Value)),
+      IsDemo = source.IsDemo,
+      Result = source.Result.Select(data => new ResultData(data.Key, data.Value)),
+      Status = source.Status
+    };
+
+    MapAggregate(source, destination);
+
+    if (source.Sender != null)
+    {
+      destination.Sender = ToSender(source.Sender, realm);
+    }
+    else if (source.SenderSummary != null)
+    {
+      SenderSummary summary = source.SenderSummary;
+      destination.Sender = new Sender
+      {
+        Id = summary.Id.ToGuid(),
+        IsDefault = summary.IsDefault,
+        Provider = summary.Provider,
+        EmailAddress = summary.Address,
+        DisplayName = summary.DisplayName
+      };
+    }
+
+    if (source.Template != null)
+    {
+      destination.Template = ToTemplate(source.Template, realm);
+    }
+    else if (source.TemplateSummary != null)
+    {
+      TemplateSummary summary = source.TemplateSummary;
+      destination.Template = new Template
+      {
+        Id = summary.Id.ToGuid(),
+        UniqueName = summary.UniqueName,
+        DisplayName = summary.DisplayName,
+        ContentType = summary.ContentType
+      };
+    }
+
+    return destination;
+  }
+  public Recipient ToRecipient(RecipientEntity source, Realm? realm)
+  {
+    Recipient destination = new()
+    {
+      Type = source.Type,
+      Address = source.Address,
+      DisplayName = source.DisplayName
+    };
+
+    if (source.User != null)
+    {
+      destination.User = ToUser(source.User, realm);
+    }
+    else if (source.UserSummary != null)
+    {
+      UserSummary summary = source.UserSummary;
+      destination.User = new User
+      {
+        Id = summary.Id,
+        UniqueName = summary.UniqueName,
+        FullName = summary.FullName,
+        Email = new Email
+        {
+          Address = summary.EmailAddress
+        },
+        Picture = summary.Picture,
+        Realm = realm
+      };
+    }
+
+    return destination;
   }
 
   public Realm ToRealm(RealmEntity source)

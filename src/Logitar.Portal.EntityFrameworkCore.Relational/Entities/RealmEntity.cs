@@ -91,6 +91,8 @@ internal record RealmEntity : AggregateEntity
   public TemplateEntity? PasswordRecoveryTemplate { get; private set; }
   public int? PasswordRecoveryTemplateId { get; private set; }
 
+  public List<MessageEntity> Messages { get; private set; } = new();
+
   public void Update(RealmUpdatedEvent updated, SenderEntity? passwordRecoverySender, TemplateEntity? passwordRecoveryTemplate)
   {
     Update(updated);

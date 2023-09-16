@@ -7,6 +7,7 @@ import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { Role, RoleSort, SearchRolesPayload } from "@/types/roles";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteRole, searchRoles } from "@/api/roles";
+import { formatRole } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -177,7 +178,7 @@ watch(
               />
               <delete-modal
                 confirm="roles.delete.confirm"
-                :display-name="role.displayName ? `${role.displayName} (${role.uniqueName})` : role.uniqueName"
+                :display-name="formatRole(role)"
                 :id="`deleteModal_${role.id}`"
                 :loading="isLoading"
                 title="roles.delete.title"

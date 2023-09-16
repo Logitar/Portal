@@ -1,0 +1,62 @@
+{
+  "contents": {
+    "generated": "Le contenu de ce message a été généré en utilisant le gabarit",
+    "ignoreUserLocale": "Ignorer la langue de l’utilisateur",
+    "localization": "Traduction",
+    "type": {
+      "options": {
+        "text/html": "Contenu HTML",
+        "text/plain": "Contenu texte brut"
+      }
+    },
+    "variables": "Variables",
+    "viewAsHtml": "Visionner en HTML",
+    "warning": "La section suivante peut contenir de l’information sensible."
+  },
+  "demo": {
+    "hint": "Ce message est une démonstration.",
+    "label": "Démo"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "recipients": {
+    "associatedUser": "Utilisateur associé",
+    "label": "Destinataires",
+    "type": {
+      "label": "Type",
+      "options": {
+        "Bcc": "Bcc",
+        "CC": "CC",
+        "To": "To"
+      }
+    }
+  },
+  "resultData": "Données de résultat",
+  "sent": {
+    "on": "Expédié le",
+    "portal": "Ce message a été expédié au travers du Portal.",
+    "provider": "en utilisant le fournisseur",
+    "realm": "Ce message a été expédié au travers du royaume",
+    "sender": "Ce message a été expédié par"
+  },
+  "sort": {
+    "options": {
+      "RecipientCount": "Destinataires",
+      "Subject": "Sujet",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "status": {
+    "format": "Statut :",
+    "label": "Statut",
+    "options": {
+      "Failed": "Échoué",
+      "Succeeded": "Expédié",
+      "Unsent": "En attente"
+    },
+    "placeholder": "Sélectionnez un statut"
+  },
+  "title": {
+    "list": "Messages",
+    "view": "Visionner le message"
+  }
+}

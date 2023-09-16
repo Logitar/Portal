@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class InvalidLocaleException : Exception
+public class InvalidLocaleException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified locale is not valid.";
 

@@ -4,6 +4,7 @@ import { computed, inject, ref, watch } from "vue";
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { User } from "@/types/users";
+import { formatUser } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchUsers } from "@/api/users";
@@ -34,10 +35,10 @@ const users = ref<User[]>([]);
 const options = computed<SelectOption[]>(() =>
   orderBy(
     users.value.map(
-      ({ id, uniqueName, fullName }) =>
+      (user) =>
         ({
-          text: fullName ? `${fullName} (${uniqueName})` : uniqueName,
-          value: id,
+          text: formatUser(user),
+          value: user.id,
         } as SelectOption)
     ),
     "text"

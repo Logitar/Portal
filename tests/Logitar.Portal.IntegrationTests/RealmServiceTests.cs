@@ -8,6 +8,7 @@ using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
@@ -140,11 +141,17 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   {
     string tenantId = _realm.Id.Value;
 
+    SenderAggregate sender = new(Faker.Internet.Email(), ProviderType.SendGrid, isDefault: false, tenantId);
+    _realm.SetPasswordRecoverySender(sender);
+
     TemplateAggregate template = new(_realm.UniqueNameSettings, "CreateUser", "CreateUser_Subject", MediaTypeNames.Text.Plain, "CreateUser_Body", tenantId);
     _realm.SetPasswordRecoveryTemplate(template);
 
-    SenderAggregate sender = new(Faker.Internet.Email(), ProviderType.SendGrid, isDefault: false, tenantId);
-    _realm.SetPasswordRecoverySender(sender);
+    Recipients recipients = new(new ReadOnlyRecipient[]
+    {
+      new(Faker.Person.Email, Faker.Person.FullName)
+    });
+    MessageAggregate message = new("Test", "Hello World!", recipients, sender, template, _realm);
 
     DictionaryAggregate dictionary = new(new Locale("fr"), tenantId);
 
@@ -159,14 +166,15 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
 
     SessionAggregate session = new(user);
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { template, sender, _realm, dictionary, role, apiKey, user, session });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, template, message, _realm, dictionary, role, apiKey, user, session });
 
     Realm? realm = await _realmService.DeleteAsync(_realm.Id.ToGuid());
 
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
-    Assert.Null(await PortalContext.Templates.SingleOrDefaultAsync(x => x.AggregateId == sender.Id.Value));
+    Assert.Null(await PortalContext.Messages.SingleOrDefaultAsync(x => x.AggregateId == message.Id.Value));
+    Assert.Null(await PortalContext.Templates.SingleOrDefaultAsync(x => x.AggregateId == template.Id.Value));
     Assert.Null(await PortalContext.Senders.SingleOrDefaultAsync(x => x.AggregateId == sender.Id.Value));
     Assert.Null(await PortalContext.Dictionaries.SingleOrDefaultAsync(x => x.AggregateId == dictionary.Id.Value));
     Assert.Null(await PortalContext.Sessions.SingleOrDefaultAsync(x => x.AggregateId == session.Id.Value));

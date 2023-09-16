@@ -399,6 +399,124 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.ToTable("LogEvents", (string)null);
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.MessageEntity", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IgnoreUserLocale")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<int?>("RealmId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ResultSerialized")
+                        .HasColumnType("text")
+                        .HasColumnName("Result");
+
+                    b.Property<int?>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SenderSummarySerialized")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("SenderSummary");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("TemplateId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TemplateSummarySerialized")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("TemplateSummary");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VariablesSerialized")
+                        .HasColumnType("text")
+                        .HasColumnName("Variables");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("AggregateId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("IsDemo");
+
+                    b.HasIndex("RealmId");
+
+                    b.HasIndex("RecipientCount");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("Subject");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("UpdatedOn");
+
+                    b.HasIndex("Version");
+
+                    b.ToTable("Messages", (string)null);
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RealmEntity", b =>
                 {
                     b.Property<int>("RealmId")
@@ -537,6 +655,47 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("Version");
 
                     b.ToTable("Realms", (string)null);
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RecipientEntity", b =>
+                {
+                    b.Property<long>("RecipientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("RecipientId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserSummarySerialized")
+                        .HasColumnType("text")
+                        .HasColumnName("UserSummary");
+
+                    b.HasKey("RecipientId");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Recipients", (string)null);
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RoleEntity", b =>
@@ -1267,6 +1426,30 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Log");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.MessageEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RealmEntity", "Realm")
+                        .WithMany("Messages")
+                        .HasForeignKey("RealmId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.SenderEntity", "Sender")
+                        .WithMany("Messages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.TemplateEntity", "Template")
+                        .WithMany("Messages")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Realm");
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("Template");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RealmEntity", b =>
                 {
                     b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.SenderEntity", "PasswordRecoverySender")
@@ -1282,6 +1465,24 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("PasswordRecoverySender");
 
                     b.Navigation("PasswordRecoveryTemplate");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RecipientEntity", b =>
+                {
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.MessageEntity", "Message")
+                        .WithMany("Recipients")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserEntity", "User")
+                        .WithMany("Recipients")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Message");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.SessionEntity", b =>
@@ -1326,19 +1527,35 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Navigation("Events");
                 });
 
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.MessageEntity", b =>
+                {
+                    b.Navigation("Recipients");
+                });
+
+            modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.RealmEntity", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.SenderEntity", b =>
                 {
+                    b.Navigation("Messages");
+
                     b.Navigation("PasswordRecoveryInRealm");
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.TemplateEntity", b =>
                 {
+                    b.Navigation("Messages");
+
                     b.Navigation("PasswordRecoveryInRealm");
                 });
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.UserEntity", b =>
                 {
                     b.Navigation("Identifiers");
+
+                    b.Navigation("Recipients");
 
                     b.Navigation("Sessions");
                 });

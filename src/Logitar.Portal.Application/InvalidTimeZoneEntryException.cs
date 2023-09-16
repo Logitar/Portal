@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class InvalidTimeZoneEntryException : Exception
+public class InvalidTimeZoneEntryException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified time zone entry is not valid.";
 

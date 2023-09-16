@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class InvalidUrlException : Exception
+public class InvalidUrlException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified URL is not valid.";
 

@@ -1,9 +1,10 @@
 ﻿using FluentValidation.Results;
 using Logitar.EventSourcing;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class UniqueNameAlreadyUsedException : Exception
+public class UniqueNameAlreadyUsedException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified unique name is already used.";
 

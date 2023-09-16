@@ -51,7 +51,7 @@ const isPasswordRequired = computed<boolean>(() => Boolean(current.value) || Boo
 
 watchEffect(() => {
   const user = props.user;
-  uniqueName.value = user.uniqueName; // TODO(fpion): doesn't seem to work after updating the user
+  uniqueName.value = user.uniqueName; // TODO(fpion): doesn't seem to work after updating the user (#301)
 });
 
 function reset(): void {

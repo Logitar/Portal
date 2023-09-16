@@ -98,6 +98,11 @@ internal class SenderQuerier : ISenderQuerier
       .SelectAll(Db.Senders.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Senders.EmailAddress, Db.Senders.DisplayName);
 
+    if (payload.Provider.HasValue)
+    {
+      builder = builder.Where(Db.Senders.Provider, Operators.IsEqualTo(payload.Provider.Value.ToString()));
+    }
+
     IQueryable<SenderEntity> query = _senders.FromQuery(builder.Build())
       .AsNoTracking();
     long total = await query.LongCountAsync(cancellationToken);

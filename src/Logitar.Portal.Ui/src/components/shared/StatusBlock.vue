@@ -46,9 +46,9 @@ const variant = computed<string | undefined>(() => (props.actor.type === "ApiKey
     <div class="d-flex">
       <div class="d-flex align-content-center flex-wrap mx-1">
         <a v-if="href" :href="href" target="_blank">
-          <app-avatar :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :url="actor.picture" :variant="variant" />
+          <app-avatar :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :url="actor.pictureUrl" :variant="variant" />
         </a>
-        <app-avatar v-else :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :url="actor.picture" :variant="variant" />
+        <app-avatar v-else :display-name="displayName" :email-address="actor.emailAddress" :icon="icon" :url="actor.pictureUrl" :variant="variant" />
       </div>
     </div>
     <div>

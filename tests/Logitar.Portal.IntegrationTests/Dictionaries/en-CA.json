@@ -1,0 +1,3 @@
+{
+  "PasswordRecovery_PageUrl": "https://www.logitar.ca/en/user/reset-password?token={token}"
+}

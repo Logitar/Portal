@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Realms;
 
-public class UniqueSlugAlreadyUsedException : Exception
+public class UniqueSlugAlreadyUsedException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified unique slug is already used.";
 

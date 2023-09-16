@@ -1,8 +1,9 @@
 ﻿using FluentValidation.Results;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application;
 
-public class InvalidGenderException : Exception
+public class InvalidGenderException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified gender is not valid.";
 

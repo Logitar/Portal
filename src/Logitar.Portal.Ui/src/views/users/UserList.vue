@@ -8,6 +8,7 @@ import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import type { SearchUsersPayload, User, UserSort } from "@/types/users";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteUser, searchUsers } from "@/api/users";
+import { formatUser } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -123,9 +124,9 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
                 isConfirmed: "",
                 isDisabled: "",
+                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -243,7 +244,7 @@ watch(
               />
               <delete-modal
                 confirm="users.delete.confirm"
-                :display-name="user.fullName ? `${user.fullName} (${user.uniqueName})` : user.uniqueName"
+                :display-name="formatUser(user)"
                 :id="`deleteModal_${user.id}`"
                 :loading="isLoading"
                 title="users.delete.title"

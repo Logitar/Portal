@@ -1,14 +1,5 @@
 ﻿using Bogus;
-using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Dictionaries;
-using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Roles;
-using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Contracts.Templates;
-using Logitar.Portal.Contracts.Tokens;
-using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,8 +13,9 @@ internal class Program
   static async Task Main(string[] args)
   {
     IConfiguration configuration = new ConfigurationBuilder()
-      .AddCommandLine(args)
       .AddJsonFile("appsettings.json")
+      .AddUserSecrets("f025312d-905b-40e5-8eee-e06d4afe6b51")
+      .AddCommandLine(args)
       .Build();
 
     PortalSettings settings = new()
@@ -36,9 +28,23 @@ internal class Program
       }
     };
 
+    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 8 + 9 + 8 + 4 + 1);
+
     IServiceProvider serviceProvider = new ServiceCollection()
       .AddSingleton(configuration)
+      .AddSingleton(context)
+      .AddSingleton(_faker)
       .AddLogitarPortalClient(settings)
+      .AddTransient<ApiKeyClientTests>()
+      .AddTransient<DictionaryClientTests>()
+      .AddTransient<MessageClientTests>()
+      .AddTransient<RealmClientTests>()
+      .AddTransient<RoleClientTests>()
+      .AddTransient<SenderClientTests>()
+      .AddTransient<SessionClientTests>()
+      .AddTransient<TemplateClientTests>()
+      .AddTransient<TokenClientTests>()
+      .AddTransient<UserClientTests>()
       .BuildServiceProvider();
 
     Console.Write("Press a key to start the integration tests.");
@@ -47,7 +53,6 @@ internal class Program
     Console.WriteLine();
 
     CancellationToken cancellationToken = default;
-    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 8 + 9 + 8 + 1);
     context.Start();
 
     if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
@@ -56,28 +61,28 @@ internal class Program
       return;
     }
 
-    RealmClientTests realmTests = new(context, _faker, serviceProvider.GetRequiredService<IRealmService>()); // 7 tests
+    RealmClientTests realmTests = serviceProvider.GetRequiredService<RealmClientTests>(); // 7 tests
     if (!await realmTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    RoleClientTests roleTests = new(context, _faker, serviceProvider.GetRequiredService<IRoleService>()); // 8 tests
+    RoleClientTests roleTests = serviceProvider.GetRequiredService<RoleClientTests>(); // 8 tests
     if (!await roleTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    UserClientTests userTests = new(context, _faker, serviceProvider.GetRequiredService<IUserService>()); // 12 tests
+    UserClientTests userTests = serviceProvider.GetRequiredService<UserClientTests>(); // 12 tests
     if (!await userTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    SessionClientTests sessionTests = new(context, _faker, serviceProvider.GetRequiredService<ISessionService>()); // 7 tests
+    SessionClientTests sessionTests = serviceProvider.GetRequiredService<SessionClientTests>(); // 7 tests
     if (!await sessionTests.ExecuteAsync(cancellationToken))
     {
       context.End();
@@ -90,36 +95,43 @@ internal class Program
       return;
     }
 
-    ApiKeyClientTests apiKeyTests = new(context, _faker, serviceProvider.GetRequiredService<IApiKeyService>()); // 8 tests
+    ApiKeyClientTests apiKeyTests = serviceProvider.GetRequiredService<ApiKeyClientTests>(); // 8 tests
     if (!await apiKeyTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    TokenClientTests tokenTests = new(context, _faker, serviceProvider.GetRequiredService<ITokenService>()); // 2 tests
+    TokenClientTests tokenTests = serviceProvider.GetRequiredService<TokenClientTests>(); // 2 tests
     if (!await tokenTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    DictionaryClientTests dictionaryTests = new(context, _faker, serviceProvider.GetRequiredService<IDictionaryService>()); // 8 tests
+    DictionaryClientTests dictionaryTests = serviceProvider.GetRequiredService<DictionaryClientTests>(); // 8 tests
     if (!await dictionaryTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    SenderClientTests senderTests = new(context, _faker, serviceProvider.GetRequiredService<ISenderService>()); // 9 tests
+    SenderClientTests senderTests = serviceProvider.GetRequiredService<SenderClientTests>(); // 9 tests
     if (!await senderTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
     }
 
-    TemplateClientTests templateTests = new(context, _faker, serviceProvider.GetRequiredService<ITemplateService>()); // 8 tests
+    TemplateClientTests templateTests = serviceProvider.GetRequiredService<TemplateClientTests>(); // 8 tests
     if (!await templateTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    MessageClientTests messageTests = serviceProvider.GetRequiredService<MessageClientTests>(); // 4 tests
+    if (!await messageTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;

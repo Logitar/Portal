@@ -15,6 +15,7 @@ import {
   faClipboard,
   faCog,
   faEdit,
+  faEnvelope,
   faEye,
   faEyeSlash,
   faFloppyDisk,
@@ -38,6 +39,7 @@ import {
   faUser,
   faUserClock,
   faUserGroup,
+  faUserSlash,
   faUsers,
   faVial,
 } from "@fortawesome/free-solid-svg-icons";
@@ -55,6 +57,7 @@ library.add(
   faClipboard,
   faCog,
   faEdit,
+  faEnvelope,
   faEye,
   faEyeSlash,
   faFloppyDisk,
@@ -78,6 +81,7 @@ library.add(
   faUser,
   faUserClock,
   faUserGroup,
+  faUserSlash,
   faUsers,
   faVial
 );

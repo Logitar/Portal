@@ -8,6 +8,7 @@ import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import type { Template, TemplateSort, SearchTemplatesPayload } from "@/types/templates";
 import { deleteTemplate, searchTemplates } from "@/api/templates";
+import { formatTemplate } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -111,8 +112,8 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
                 contentType: "",
+                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -195,7 +196,7 @@ watch(
               />
               <delete-modal
                 confirm="templates.delete.confirm"
-                :display-name="template.displayName ? `${template.displayName} (${template.uniqueName})` : template.uniqueName"
+                :display-name="formatTemplate(template)"
                 :id="`deleteModal_${template.id}`"
                 :loading="isLoading"
                 title="templates.delete.title"

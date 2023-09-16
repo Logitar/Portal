@@ -2,6 +2,7 @@
 using Logitar.Portal.GraphQL.ApiKeys;
 using Logitar.Portal.GraphQL.Configurations;
 using Logitar.Portal.GraphQL.Dictionaries;
+using Logitar.Portal.GraphQL.Messages;
 using Logitar.Portal.GraphQL.Realms;
 using Logitar.Portal.GraphQL.Roles;
 using Logitar.Portal.GraphQL.Senders;
@@ -20,6 +21,7 @@ internal class RootQuery : ObjectGraphType
     ApiKeyQueries.Register(this);
     ConfigurationQueries.Register(this);
     DictionaryQueries.Register(this);
+    MessageQueries.Register(this);
     RealmQueries.Register(this);
     RoleQueries.Register(this);
     SenderQueries.Register(this);

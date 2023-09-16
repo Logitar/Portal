@@ -1,9 +1,10 @@
 ﻿using FluentValidation.Results;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
 
 namespace Logitar.Portal.Application.Users;
 
-public class EmailAddressAlreadyUsedException : Exception
+public class EmailAddressAlreadyUsedException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified email address is already used.";
 

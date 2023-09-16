@@ -4,6 +4,7 @@ import { computed, inject, ref, watch } from "vue";
 import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { SelectOption } from "@/types/components";
+import { formatRole } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchRoles } from "@/api/roles";
@@ -42,10 +43,10 @@ const options = computed<SelectOption[]>(() =>
     roles.value
       .filter(({ id }) => !excludedIds.value.has(id))
       .map(
-        ({ id, uniqueName, displayName }) =>
+        (role) =>
           ({
-            text: displayName ? `${displayName} (${uniqueName})` : uniqueName,
-            value: id,
+            text: formatRole(role),
+            value: role.id,
           } as SelectOption)
       ),
     "text"

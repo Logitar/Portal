@@ -14,6 +14,7 @@ import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
 import { createDictionary, readDictionary, updateDictionary } from "@/api/dictionaries";
+import { formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readRealm } from "@/api/realms";
 
@@ -40,10 +41,7 @@ const hasChanges = computed<boolean>(() => {
 const title = computed<string>(() => {
   if (dictionary.value) {
     const locale: Locale | undefined = locales.find(({ code }) => code === dictionary.value?.locale);
-    return [
-      dictionary.value.realm ? dictionary.value.realm.displayName ?? dictionary.value.realm.uniqueSlug : t("brand"),
-      locale?.nativeName ?? dictionary.value.locale,
-    ].join(" | ");
+    return [dictionary.value.realm ? formatRealm(dictionary.value.realm) : t("brand"), locale?.nativeName ?? dictionary.value.locale].join(" | ");
   }
   return t("dictionaries.title.new");
 });

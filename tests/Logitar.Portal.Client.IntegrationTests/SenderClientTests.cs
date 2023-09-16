@@ -1,22 +1,33 @@
 ﻿using Bogus;
+using Logitar.Portal.Client.Settings;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Senders;
+using Microsoft.Extensions.Configuration;
 
 namespace Logitar.Portal.Client;
 
 internal class SenderClientTests
 {
+  private const string SenderKey = "Sender";
+  private const string SendGridKey = "SendGrid";
   private const string Sut = "SenderClient";
 
   private readonly TestContext _context;
   private readonly Faker _faker;
   private readonly ISenderService _senderService;
+  private readonly SenderSettings _senderSettings;
+  private readonly SendGridSettings _sendGridSettings;
 
-  public SenderClientTests(TestContext context, Faker faker, ISenderService senderService)
+  public SenderClientTests(IConfiguration configuration, TestContext context, Faker faker, ISenderService senderService)
   {
     _context = context;
     _faker = faker;
     _senderService = senderService;
+
+    _senderSettings = configuration.GetSection(SenderKey).Get<SenderSettings>()
+      ?? throw new InvalidOperationException($"The configuration section '{SenderKey}' is required.");
+    _sendGridSettings = configuration.GetSection(SendGridKey).Get<SendGridSettings>()
+      ?? throw new InvalidOperationException($"The configuration section '{SendGridKey}' is required.");
   }
 
   public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
@@ -38,12 +49,12 @@ internal class SenderClientTests
       name = $"{Sut}.{nameof(_senderService.ReplaceAsync)}";
       ReplaceSenderPayload replace = new()
       {
-        EmailAddress = create.EmailAddress,
-        DisplayName = _faker.Person.FullName,
+        EmailAddress = _senderSettings.Address,
+        DisplayName = _senderSettings.DisplayName ?? "Logitar.Portal.Client.IntegrationTests",
         Settings = new ProviderSetting[]
         {
-          new("ApiKey", "SG.ABC.1234567890"),
-          new("BaseUrl", "https://api.sendgrid.com/v3/mail/send")
+          new("BaseUrl", "https://api.sendgrid.com/"),
+          new("Basic", "dGVzdDpIZWxsbyBXb3JsZCE=")
         }
       };
       sender = await _senderService.ReplaceAsync(sender.Id, replace, sender.Version, cancellationToken)
@@ -56,9 +67,9 @@ internal class SenderClientTests
         Description = new Modification<string>("This is the sender used per default in this realm."),
         Settings = new ProviderSettingModification[]
         {
-          new("ApiKey", value: null),
-          new("BaseUrl", "https://api.sendgrid.com/"),
-          new("Basic", "dGVzdDpIZWxsbyBXb3JsZCE=")
+          new("ApiKey", _sendGridSettings.ApiKey),
+          new("BaseUrl", "https://api.sendgrid.com/v3/mail/send"),
+          new("Basic", value: null)
         }
       };
       sender = await _senderService.UpdateAsync(sender.Id, update, cancellationToken)

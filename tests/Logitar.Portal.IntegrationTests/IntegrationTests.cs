@@ -34,6 +34,7 @@ public abstract class IntegrationTests
   {
     IConfiguration configuration = new ConfigurationBuilder()
       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+      .AddUserSecrets("6ca0768e-971e-4542-b972-5d74f0e35f49")
       .Build();
 
     ServiceCollection services = new();
@@ -89,6 +90,7 @@ public abstract class IntegrationTests
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Actors"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"UPDATE ""Realms"" SET ""PasswordRecoveryTemplateId"" = NULL;");
     await PortalContext.Database.ExecuteSqlRawAsync(@"UPDATE ""Realms"" SET ""PasswordRecoverySenderId"" = NULL;");
+    await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Messages"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Templates"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Senders"";");
     await PortalContext.Database.ExecuteSqlRawAsync(@"DELETE FROM ""Dictionaries"";");

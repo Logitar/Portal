@@ -109,6 +109,7 @@ internal record UserEntity : AggregateEntity
   }
 
   public List<UserIdentifierEntity> Identifiers { get; } = new();
+  public List<RecipientEntity> Recipients { get; } = new();
   public List<RoleEntity> Roles { get; } = new();
   public List<SessionEntity> Sessions { get; } = new();
 

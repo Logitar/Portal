@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Infrastructure.Passwords;
 
-public class PasswordStrategyNotSupportedException : Exception
+public class PasswordStrategyNotSupportedException : NotSupportedException
 {
   public PasswordStrategyNotSupportedException(string key)
     : base($"The password strategy '{key}' is not supported.")

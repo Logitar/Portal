@@ -76,6 +76,17 @@ const router = createRouter({
       path: "/create-dictionary",
       component: () => import("./views/dictionaries/DictionaryEdit.vue"),
     },
+    // Messages
+    {
+      name: "MessageList",
+      path: "/messages",
+      component: () => import("./views/messages/MessageList.vue"),
+    },
+    {
+      name: "MessageView",
+      path: "/messages/:id",
+      component: () => import("./views/messages/MessageView.vue"),
+    },
     // Realms
     {
       name: "RealmList",
