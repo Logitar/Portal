@@ -20,8 +20,8 @@ internal class RealmGraphType : AggregateGraphType<Realm>
     Field(x => x.Description, nullable: true)
       .Description("The description of the realm.");
 
-    Field(x => x.DefaultLocale, nullable: true)
-      .Description("The code (ISO 639-1) of the default locale (language) of the realm.");
+    Field(x => x.DefaultLocale, type: typeof(LocaleGraphType))
+      .Description("The default language of the realm.");
     Field(x => x.Secret)
       .Description("The secret to use to sign security tokens of the realm.");
     Field(x => x.Url, nullable: true)

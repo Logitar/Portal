@@ -50,7 +50,7 @@ const hasChanges = computed<boolean>(() => {
     nickname.value !== (user.nickname ?? "") ||
     birthdate.value?.getTime() !== (user.birthdate ? new Date(user.birthdate) : undefined)?.getTime() ||
     gender.value !== (user.gender ?? "") ||
-    locale.value !== (user.locale ?? "") ||
+    locale.value !== (user.locale?.code ?? "") ||
     timeZone.value !== (user.timeZone ?? "") ||
     picture.value !== (user.picture ?? "") ||
     profile.value !== (user.profile ?? "") ||
@@ -64,7 +64,7 @@ watchEffect(() => {
   firstName.value = user.firstName ?? "";
   gender.value = user.gender ?? "";
   lastName.value = user.lastName ?? "";
-  locale.value = user.locale ?? "";
+  locale.value = user.locale?.code ?? "";
   middleName.value = user.middleName ?? "";
   nickname.value = user.nickname ?? "";
   picture.value = user.picture ?? "";
@@ -87,7 +87,7 @@ const onSubmit = handleSubmit(async () => {
       nickname: nickname.value !== reference.nickname ? { value: nickname.value } : undefined,
       birthdate: birthdate.value !== reference.birthdate ? { value: birthdate.value } : undefined,
       gender: gender.value !== reference.gender ? { value: gender.value } : undefined,
-      locale: locale.value !== reference.locale ? { value: locale.value } : undefined,
+      locale: locale.value !== reference.locale?.code ? { value: locale.value } : undefined,
       timeZone: timeZone.value !== reference.timeZone ? { value: timeZone.value } : undefined,
       picture: picture.value !== reference.picture ? { value: picture.value } : undefined,
       profile: profile.value !== reference.profile ? { value: profile.value } : undefined,

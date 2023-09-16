@@ -20,7 +20,6 @@ const toasts = inject(toastsKey) as ToastUtils;
 const { t } = useI18n();
 
 const defaults = {
-  defaultLocale: "",
   loggingSettings: {
     extent: "ActivityOnly",
     onlyErrors: false,
@@ -39,7 +38,7 @@ const defaults = {
 };
 
 const configuration = ref<Configuration>();
-const defaultLocale = ref<string>(defaults.defaultLocale);
+const defaultLocale = ref<string>("");
 const loggingSettings = ref<LoggingSettings>(defaults.loggingSettings);
 const passwordSettings = ref<PasswordSettings>(defaults.passwordSettings);
 const secret = ref<string>(defaults.secret);
@@ -48,7 +47,7 @@ const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
 const hasChanges = computed<boolean>(() => {
   const model = configuration.value ?? defaults;
   return (
-    defaultLocale.value !== (model.defaultLocale ?? "") ||
+    defaultLocale.value !== configuration.value?.defaultLocale.code ||
     JSON.stringify(loggingSettings.value) !== JSON.stringify(model.loggingSettings) ||
     JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings) ||
     JSON.stringify(passwordSettings.value) !== JSON.stringify(model.passwordSettings) ||
@@ -58,7 +57,7 @@ const hasChanges = computed<boolean>(() => {
 
 function setModel(model: Configuration): void {
   configuration.value = model;
-  defaultLocale.value = model.defaultLocale;
+  defaultLocale.value = model.defaultLocale.code;
   loggingSettings.value = model.loggingSettings;
   uniqueNameSettings.value = model.uniqueNameSettings;
   passwordSettings.value = model.passwordSettings;
@@ -69,7 +68,7 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     const updatedConfiguration = await updateConfiguration({
-      defaultLocale: defaultLocale.value !== configuration.value?.defaultLocale ? defaultLocale.value : undefined,
+      defaultLocale: defaultLocale.value !== configuration.value?.defaultLocale.code ? defaultLocale.value : undefined,
       secret: secret.value !== configuration.value?.secret ? secret.value : undefined,
       uniqueNameSettings:
         JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(configuration.value?.uniqueNameSettings) ? uniqueNameSettings.value : undefined,

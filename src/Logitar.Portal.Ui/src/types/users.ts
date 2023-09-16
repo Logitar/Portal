@@ -2,6 +2,7 @@ import type { Actor } from "@/types/actor";
 import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { Identifier } from "@/types/identifier";
+import type { Locale } from "@/types/i18n";
 import type { Modification } from "@/types/modifications";
 import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
@@ -148,7 +149,7 @@ export type User = Aggregate & {
   nickname?: string;
   birthdate?: string;
   gender?: string;
-  locale?: string;
+  locale?: Locale;
   timeZone?: string;
   picture?: string;
   profile?: string;

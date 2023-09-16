@@ -1,5 +1,6 @@
 import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
+import type { Locale } from "@/types/i18n";
 import type { Modification } from "@/types/modifications";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { SearchPayload, SortOption } from "@/types/search";
@@ -40,7 +41,7 @@ export type Realm = Aggregate & {
   uniqueSlug: string;
   displayName?: string;
   description?: string;
-  defaultLocale?: string;
+  defaultLocale?: Locale;
   secret: string;
   url?: string;
   requireUniqueEmail: boolean;

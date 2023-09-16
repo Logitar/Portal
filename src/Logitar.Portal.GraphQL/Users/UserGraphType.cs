@@ -58,8 +58,8 @@ internal class UserGraphType : AggregateGraphType<User>
       .Description("The date of birth of the user.");
     Field(x => x.Gender, nullable: true)
       .Description("The gender of the user.");
-    Field(x => x.Locale, nullable: true)
-      .Description("The code (ISO 639-1) of the user's locale (language).");
+    Field(x => x.Locale, type: typeof(LocaleGraphType))
+      .Description("The preferred communication language of the user.");
     Field(x => x.TimeZone, nullable: true)
       .Description("The identifier of the user's time zone, from the tz database.");
 

@@ -1,4 +1,5 @@
 import type { Aggregate } from "@/types/aggregate";
+import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 import type { Sender } from "@/types/senders";
@@ -15,7 +16,7 @@ export type Message = Aggregate & {
   sender: Sender;
   template: Template;
   ignoreUserLocale: boolean;
-  locale?: string;
+  locale?: Locale;
   variables: Variable[];
   isDemo: boolean;
   result: ResultData[];

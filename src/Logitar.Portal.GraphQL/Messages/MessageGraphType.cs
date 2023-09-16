@@ -32,8 +32,8 @@ internal class MessageGraphType : AggregateGraphType<Message>
 
     Field(x => x.IgnoreUserLocale)
       .Description("A value indicating whether or not the user locale has been ignored when translating the message contents.");
-    Field(x => x.Locale, nullable: true)
-      .Description("The code (ISO 639-1) of the locale (language) in which the message has been translated.");
+    Field(x => x.Locale, type: typeof(LocaleGraphType))
+      .Description("The language in which the message has been translated.");
 
     Field(x => x.Variables, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<VariableGraphType>>>))
       .Description("The variables used to inject values in the compiled message contents.");

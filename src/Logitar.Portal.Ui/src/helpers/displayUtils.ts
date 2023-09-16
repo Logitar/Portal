@@ -1,10 +1,16 @@
+import i18n from "@/i18n";
+import type { Dictionary } from "@/types/dictionaries";
 import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
 import type { User } from "@/types/users";
 
-// TODO(fpion): formatDictionary (#334)
+const { t } = i18n.global;
+
+export function formatDictionary(dictionary: Dictionary): string {
+  return [dictionary.realm ? formatRealm(dictionary.realm) : t("brand"), dictionary.locale.nativeName].join(" | ");
+}
 
 export function formatRealm(realm: Realm): string {
   return realm.displayName ? `${realm.displayName} (${realm.uniqueSlug})` : realm.uniqueSlug;

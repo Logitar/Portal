@@ -31,7 +31,6 @@ const { t } = useI18n();
 const defaults = {
   uniqueSlug: "",
   displayName: "",
-  defaultLocale: "",
   url: "",
   description: "",
   requireConfirmedAccount: true,
@@ -53,7 +52,7 @@ const defaults = {
 
 const claimMappings = ref<ClaimMapping[]>(defaults.claimMappings);
 const customAttributes = ref<CustomAttribute[]>(defaults.customAttributes);
-const defaultLocale = ref<string>(defaults.defaultLocale);
+const defaultLocale = ref<string>("");
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const hasLoaded = ref<boolean>(false);
@@ -74,7 +73,7 @@ const hasChanges = computed<boolean>(() => {
   return (
     displayName.value !== (model.displayName ?? "") ||
     uniqueSlug.value !== model.uniqueSlug ||
-    defaultLocale.value !== (model.defaultLocale ?? "") ||
+    defaultLocale.value !== (realm.value?.defaultLocale?.code ?? "") ||
     url.value !== (model.url ?? "") ||
     description.value !== (model.description ?? "") ||
     requireConfirmedAccount.value !== model.requireConfirmedAccount ||
@@ -94,7 +93,7 @@ function setModel(model: Realm): void {
   realm.value = model;
   claimMappings.value = model.claimMappings.map((item) => ({ ...item }));
   customAttributes.value = model.customAttributes.map((item) => ({ ...item }));
-  defaultLocale.value = model.defaultLocale ?? "";
+  defaultLocale.value = model.defaultLocale?.code ?? "";
   description.value = model.description ?? "";
   displayName.value = model.displayName ?? "";
   passwordRecoverySender.value = model.passwordRecoverySender;

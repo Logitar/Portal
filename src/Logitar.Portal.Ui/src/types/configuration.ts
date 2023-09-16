@@ -1,10 +1,11 @@
 import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute } from "@/types/customAttributes";
+import type { Locale } from "@/types/i18n";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Session } from "@/types/sessions";
 
 export type Configuration = Aggregate & {
-  defaultLocale: string;
+  defaultLocale: Locale;
   secret: string;
   uniqueNameSettings: UniqueNameSettings;
   passwordSettings: PasswordSettings;

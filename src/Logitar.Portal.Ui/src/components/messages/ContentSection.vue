@@ -43,7 +43,7 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
         <div class="mb-3">
           <form-checkbox disabled id="ignoreUserLocale" label="messages.contents.ignoreUserLocale" :model-value="message.ignoreUserLocale" />
         </div>
-        <locale-select disabled :model-value="message.locale" />
+        <locale-select disabled :model-value="message.locale?.code" />
       </app-accordion-item>
       <app-accordion-item title="messages.contents.variables">
         <json-viewer boxed copyable expanded :value="variables" />

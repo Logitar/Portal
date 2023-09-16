@@ -7,14 +7,12 @@ import { useRoute, useRouter } from "vue-router";
 import DictionaryEntryList from "@/components/dictionaries/DictionaryEntryList.vue";
 import LocaleSelect from "@/components/shared/LocaleSelect.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
-import locales from "@/resources/locales.json";
 import type { ApiError } from "@/types/api";
 import type { Dictionary, DictionaryEntry, DictionaryEntryModification } from "@/types/dictionaries";
-import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
 import { createDictionary, readDictionary, updateDictionary } from "@/api/dictionaries";
-import { formatRealm } from "@/helpers/displayUtils";
+import { formatDictionary } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readRealm } from "@/api/realms";
 
@@ -34,22 +32,16 @@ const realmId = ref<string>();
 const hasChanges = computed<boolean>(() => {
   return (
     realm.value?.id !== dictionary.value?.realm?.id ||
-    locale.value !== dictionary.value?.locale ||
+    locale.value !== dictionary.value?.locale.code ||
     JSON.stringify(entries.value) !== JSON.stringify(dictionary.value?.entries ?? [])
   );
 });
-const title = computed<string>(() => {
-  if (dictionary.value) {
-    const locale: Locale | undefined = locales.find(({ code }) => code === dictionary.value?.locale);
-    return [dictionary.value.realm ? formatRealm(dictionary.value.realm) : t("brand"), locale?.nativeName ?? dictionary.value.locale].join(" | ");
-  }
-  return t("dictionaries.title.new");
-});
+const title = computed<string>(() => (dictionary.value ? formatDictionary(dictionary.value) : t("dictionaries.title.new")));
 
 function setModel(model: Dictionary): void {
   dictionary.value = model;
   entries.value = model.entries.map((item) => ({ ...item }));
-  locale.value = model.locale;
+  locale.value = model.locale.code;
   realm.value = model.realm;
   realmId.value = model.realm?.id;
 }

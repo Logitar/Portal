@@ -4,12 +4,10 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import RealmSelect from "@/components/realms/RealmSelect.vue";
-import locales from "@/resources/locales.json";
 import type { Dictionary, DictionarySort, SearchDictionariesPayload } from "@/types/dictionaries";
-import type { Locale } from "@/types/i18n";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteDictionary, searchDictionaries } from "@/api/dictionaries";
-import { formatRealm } from "@/helpers/displayUtils";
+import { formatDictionary, formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -38,14 +36,6 @@ const sortOptions = computed<SelectOption[]>(() =>
     "text"
   )
 );
-
-const indexedLocales = new Map<string, Locale>(locales.map((locale) => [locale.code, locale]));
-function getLocaleName(code: string): string {
-  return indexedLocales.get(code)?.nativeName ?? code;
-}
-function formatDisplayName(dictionary: Dictionary): string {
-  return [dictionary.realm ? formatRealm(dictionary.realm) : t("brand"), getLocaleName(dictionary.locale)].join(" | ");
-}
 
 async function refresh(): Promise<void> {
   const parameters: SearchDictionariesPayload = {
@@ -181,7 +171,7 @@ watch(
           <tr v-for="dictionary in dictionaries" :key="dictionary.id">
             <td>
               <RouterLink :to="{ name: 'DictionaryEdit', params: { id: dictionary.id } }">
-                <font-awesome-icon icon="fas fa-edit" />{{ getLocaleName(dictionary.locale) }}
+                <font-awesome-icon icon="fas fa-edit" />{{ dictionary.locale.nativeName }}
               </RouterLink>
             </td>
             <td>
@@ -203,7 +193,7 @@ watch(
               />
               <delete-modal
                 confirm="dictionaries.delete.confirm"
-                :display-name="formatDisplayName(dictionary)"
+                :display-name="formatDictionary(dictionary)"
                 :id="`deleteModal_${dictionary.id}`"
                 :loading="isLoading"
                 title="dictionaries.delete.title"
