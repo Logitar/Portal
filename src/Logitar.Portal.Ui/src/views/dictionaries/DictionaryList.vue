@@ -9,6 +9,7 @@ import type { Dictionary, DictionarySort, SearchDictionariesPayload } from "@/ty
 import type { Locale } from "@/types/i18n";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteDictionary, searchDictionaries } from "@/api/dictionaries";
+import { formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -43,7 +44,7 @@ function getLocaleName(code: string): string {
   return indexedLocales.get(code)?.nativeName ?? code;
 }
 function formatDisplayName(dictionary: Dictionary): string {
-  return [dictionary.realm ? dictionary.realm.displayName ?? dictionary.realm.uniqueSlug : t("brand"), getLocaleName(dictionary.locale)].join(" | ");
+  return [dictionary.realm ? formatRealm(dictionary.realm) : t("brand"), getLocaleName(dictionary.locale)].join(" | ");
 }
 
 async function refresh(): Promise<void> {
@@ -185,7 +186,7 @@ watch(
             </td>
             <td>
               <RouterLink v-if="dictionary.realm" :to="{ name: 'RealmEdit', params: { uniqueSlug: dictionary.realm.uniqueSlug } }" target="_blank">
-                {{ dictionary.realm.displayName ?? dictionary.realm.uniqueSlug }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
+                {{ formatRealm(dictionary.realm) }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
               </RouterLink>
               <template v-else>{{ t("brand") }}</template>
             </td>

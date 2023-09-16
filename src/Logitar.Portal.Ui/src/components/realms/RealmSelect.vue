@@ -3,6 +3,7 @@ import { computed, inject, onMounted, ref } from "vue";
 
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
+import { formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchRealms } from "@/api/realms";
@@ -32,10 +33,10 @@ const realms = ref<Realm[]>([]);
 const options = computed<SelectOption[]>(() =>
   orderBy(
     realms.value.map(
-      ({ id, uniqueSlug, displayName }) =>
+      (realm) =>
         ({
-          text: displayName ? `${displayName} (${uniqueSlug})` : uniqueSlug,
-          value: id,
+          text: formatRealm(realm),
+          value: realm.id,
         } as SelectOption)
     ),
     "text"

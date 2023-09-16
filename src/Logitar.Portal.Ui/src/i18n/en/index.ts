@@ -4,6 +4,7 @@ import countries from "./countries.en.json";
 import dashboard from "./dashboard.en.json";
 import dictionaries from "./dictionaries.en.json";
 import index from "./index.en.json";
+import messages from "./messages.en.json";
 import realms from "./realms.en.json";
 import roles from "./roles.en.json";
 import senders from "./senders.en.json";
@@ -20,6 +21,7 @@ export default {
   countries,
   dashboard,
   dictionaries,
+  messages,
   realms,
   roles,
   senders,

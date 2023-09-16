@@ -1,5 +1,7 @@
 import type { App } from "vue";
 
+import AppAccordion from "./AppAccordion.vue";
+import AppAccordionItem from "./AppAccordionItem.vue";
 import AppAlert from "./AppAlert.vue";
 import AppAvatar from "./AppAvatar.vue";
 import AppBadge from "./AppBadge.vue";
@@ -33,6 +35,8 @@ import UrlInput from "./UrlInput.vue";
 import YesNoSelect from "./YesNoSelect.vue";
 
 export default function (app: App) {
+  app.component("app-accordion", AppAccordion);
+  app.component("app-accordion-item", AppAccordionItem);
   app.component("app-alert", AppAlert);
   app.component("app-avatar", AppAvatar);
   app.component("app-badge", AppBadge);

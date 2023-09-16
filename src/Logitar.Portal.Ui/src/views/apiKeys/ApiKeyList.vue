@@ -114,10 +114,10 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
-                status: "",
-                search: "",
                 isExpired: "",
+                realm: "",
+                search: "",
+                status: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
                 page: 1,

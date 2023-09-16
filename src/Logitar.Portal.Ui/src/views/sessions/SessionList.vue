@@ -122,10 +122,10 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
-                user: "",
                 isActive: "",
                 isPersistent: "",
+                realm: "",
+                user: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
                 page: 1,
@@ -168,93 +168,91 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main>
-    <div class="container">
-      <h1>{{ t("sessions.title.list") }}</h1>
-      <div class="my-2">
-        <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-        <SignOutUser
-          v-if="selectedUser"
-          class="ms-1"
-          :disabled="sessions.every(({ isActive }) => !isActive)"
-          :user="selectedUser"
-          @signed-out="onUserSignedOut"
-        />
-      </div>
-      <div class="row">
-        <RealmSelect class="col-lg-4" :model-value="realm" @realm-selected="onRealmSelected" />
-        <UserSelect class="col-lg-4" :model-value="user" :realm="selectedRealm" @user-selected="onUserSelected" />
-        <yes-no-select
-          class="col-lg-4"
-          id="isPersistent"
-          label="sessions.isPersistent.label"
-          placeholder="sessions.isPersistent.placeholder"
-          :model-value="isPersistent?.toString()"
-          @update:model-value="setQuery('isPersistent', $event)"
-        />
-      </div>
-      <div class="row">
-        <yes-no-select
-          class="col-lg-4"
-          id="isActive"
-          label="sessions.isActive.label"
-          placeholder="sessions.isActive.placeholder"
-          :model-value="isActive?.toString()"
-          @update:model-value="setQuery('isActive', $event)"
-        />
-        <sort-select
-          class="col-lg-4"
-          :descending="isDescending"
-          :model-value="sort"
-          :options="sortOptions"
-          @descending="setQuery('isDescending', $event)"
-          @update:model-value="setQuery('sort', $event)"
-        />
-        <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
-      </div>
-      <template v-if="sessions.length">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">{{ t("sessions.sort.options.UpdatedOn") }}</th>
-              <th scope="col">{{ t("users.select.label") }}</th>
-              <th scope="col">{{ t("sessions.sort.options.SignedOutOn") }}</th>
-              <th scope="col">{{ t("sessions.isPersistent.label") }}</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="session in sessions" :key="session.id">
-              <td>
-                <RouterLink :to="{ name: 'SessionEdit', params: { id: session.id } }">
-                  <font-awesome-icon icon="fas fa-edit" />{{ d(session.updatedOn, "medium") }}
-                </RouterLink>
-              </td>
-              <td>
-                <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">
-                  <app-avatar
-                    :display-name="session.user.fullName ?? session.user.uniqueName"
-                    :email-address="session.user.email?.address"
-                    :url="session.user.picture"
-                  />
-                </RouterLink>
-                {{ " " }}
-                <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">
-                  {{ session.user.fullName ?? session.user.uniqueName }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
-                </RouterLink>
-              </td>
-              <td>
-                <status-block v-if="session.signedOutBy && session.signedOutOn" :actor="session.signedOutBy" :date="session.signedOutOn" />
-                <app-badge v-else>{{ t("sessions.isActive.label") }}</app-badge>
-              </td>
-              <td>{{ t(session.isPersistent ? "yes" : "no") }}</td>
-              <td><SignOutSession :session="session" @signed-out="onSessionSignedOut" /></td>
-            </tr>
-          </tbody>
-        </table>
-        <app-pagination :count="count" :model-value="page" :total="total" @update:model-value="setQuery('page', $event)" />
-      </template>
-      <p v-else>{{ t("sessions.empty") }}</p>
+  <main class="container">
+    <h1>{{ t("sessions.title.list") }}</h1>
+    <div class="my-2">
+      <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
+      <SignOutUser
+        v-if="selectedUser"
+        class="ms-1"
+        :disabled="sessions.every(({ isActive }) => !isActive)"
+        :user="selectedUser"
+        @signed-out="onUserSignedOut"
+      />
     </div>
+    <div class="row">
+      <RealmSelect class="col-lg-4" :model-value="realm" @realm-selected="onRealmSelected" />
+      <UserSelect class="col-lg-4" :model-value="user" :realm="selectedRealm" @user-selected="onUserSelected" />
+      <yes-no-select
+        class="col-lg-4"
+        id="isPersistent"
+        label="sessions.isPersistent.label"
+        placeholder="sessions.isPersistent.placeholder"
+        :model-value="isPersistent?.toString()"
+        @update:model-value="setQuery('isPersistent', $event)"
+      />
+    </div>
+    <div class="row">
+      <yes-no-select
+        class="col-lg-4"
+        id="isActive"
+        label="sessions.isActive.label"
+        placeholder="sessions.isActive.placeholder"
+        :model-value="isActive?.toString()"
+        @update:model-value="setQuery('isActive', $event)"
+      />
+      <sort-select
+        class="col-lg-4"
+        :descending="isDescending"
+        :model-value="sort"
+        :options="sortOptions"
+        @descending="setQuery('isDescending', $event)"
+        @update:model-value="setQuery('sort', $event)"
+      />
+      <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
+    </div>
+    <template v-if="sessions.length">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">{{ t("sessions.sort.options.UpdatedOn") }}</th>
+            <th scope="col">{{ t("users.select.label") }}</th>
+            <th scope="col">{{ t("sessions.sort.options.SignedOutOn") }}</th>
+            <th scope="col">{{ t("sessions.isPersistent.label") }}</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="session in sessions" :key="session.id">
+            <td>
+              <RouterLink :to="{ name: 'SessionEdit', params: { id: session.id } }">
+                <font-awesome-icon icon="fas fa-edit" />{{ d(session.updatedOn, "medium") }}
+              </RouterLink>
+            </td>
+            <td>
+              <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">
+                <app-avatar
+                  :display-name="session.user.fullName ?? session.user.uniqueName"
+                  :email-address="session.user.email?.address"
+                  :url="session.user.picture"
+                />
+              </RouterLink>
+              {{ " " }}
+              <RouterLink :to="{ name: 'UserEdit', params: { id: session.user.id } }" target="_blank">
+                {{ session.user.fullName ?? session.user.uniqueName }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
+              </RouterLink>
+            </td>
+            <td>
+              <status-block v-if="session.signedOutBy && session.signedOutOn" :actor="session.signedOutBy" :date="session.signedOutOn" />
+              <app-badge v-else>{{ t("sessions.isActive.label") }}</app-badge>
+            </td>
+            <td>{{ t(session.isPersistent ? "yes" : "no") }}</td>
+            <td><SignOutSession :session="session" @signed-out="onSessionSignedOut" /></td>
+          </tr>
+        </tbody>
+      </table>
+      <app-pagination :count="count" :model-value="page" :total="total" @update:model-value="setQuery('page', $event)" />
+    </template>
+    <p v-else>{{ t("sessions.empty") }}</p>
   </main>
 </template>

@@ -4,6 +4,7 @@ import { computed, inject, ref, watch } from "vue";
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Template } from "@/types/templates";
+import { formatTemplate } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchTemplates } from "@/api/templates";
@@ -34,10 +35,10 @@ const templates = ref<Template[]>([]);
 const options = computed<SelectOption[]>(() =>
   orderBy(
     templates.value.map(
-      ({ id, uniqueName, displayName }) =>
+      (template) =>
         ({
-          text: displayName ? `${displayName} (${uniqueName})` : uniqueName,
-          value: id,
+          text: formatTemplate(template),
+          value: template.id,
         } as SelectOption)
     ),
     "text"

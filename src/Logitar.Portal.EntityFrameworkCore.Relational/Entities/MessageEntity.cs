@@ -133,6 +133,8 @@ internal record MessageEntity : AggregateEntity
 
   public void Succeed(MessageSucceededEvent succeeded)
   {
+    Update(succeeded);
+
     foreach (KeyValuePair<string, string> data in succeeded.Result)
     {
       Result[data.Key] = data.Value;
@@ -143,6 +145,8 @@ internal record MessageEntity : AggregateEntity
 
   public void Fail(MessageFailedEvent failed)
   {
+    Update(failed);
+
     foreach (KeyValuePair<string, string> data in failed.Result)
     {
       Result[data.Key] = data.Value;

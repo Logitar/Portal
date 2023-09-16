@@ -4,5 +4,5 @@ export type Actor = {
   isDeleted: boolean;
   displayName: string;
   emailAddress?: string;
-  picture?: string;
+  pictureUrl?: string;
 };

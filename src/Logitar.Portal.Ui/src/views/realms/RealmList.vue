@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import type { Realm, RealmSort, SearchRealmsPayload } from "@/types/realms";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteRealm, searchRealms } from "@/api/realms";
+import { formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -173,7 +174,7 @@ watch(
               />
               <delete-modal
                 confirm="realms.delete.confirm"
-                :display-name="realm.displayName ? `${realm.displayName} (${realm.uniqueSlug})` : realm.uniqueSlug"
+                :display-name="formatRealm(realm)"
                 :id="`deleteModal_${realm.id}`"
                 :loading="isLoading"
                 title="realms.delete.title"

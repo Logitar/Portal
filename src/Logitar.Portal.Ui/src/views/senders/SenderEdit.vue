@@ -15,6 +15,7 @@ import type { ProviderSetting, ProviderSettingModification, ProviderType, Sender
 import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
 import { createSender, readSender, updateSender } from "@/api/senders";
+import { formatSender } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
 import { readRealm } from "@/api/realms";
@@ -53,12 +54,7 @@ const hasChanges = computed<boolean>(() => {
     JSON.stringify(settings.value) !== JSON.stringify(sender.value?.settings ?? [])
   );
 });
-const title = computed<string>(() => {
-  if (sender.value) {
-    return sender.value.displayName ? `${sender.value.displayName} <${sender.value.emailAddress}>` : sender.value.emailAddress;
-  }
-  return t("senders.title.new");
-});
+const title = computed<string>(() => (sender.value ? formatSender(sender.value) : t("senders.title.new")));
 
 function setModel(model: Sender): void {
   sender.value = model;

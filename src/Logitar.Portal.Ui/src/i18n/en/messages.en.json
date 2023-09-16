@@ -1,0 +1,62 @@
+{
+  "contents": {
+    "generated": "This message contents were generated using the template",
+    "ignoreUserLocale": "Ignore user locale",
+    "localization": "Localization",
+    "type": {
+      "options": {
+        "text/html": "HTML content",
+        "text/plain": "Plain text content"
+      }
+    },
+    "variables": "Variables",
+    "viewAsHtml": "View as HTML",
+    "warning": "The following section may contain sensitive information."
+  },
+  "demo": {
+    "hint": "This message is a demo message.",
+    "label": "Demo"
+  },
+  "empty": "There are no results.",
+  "recipients": {
+    "associatedUser": "Associated user",
+    "label": "Recipients",
+    "type": {
+      "label": "Type",
+      "options": {
+        "Bcc": "Bcc",
+        "CC": "CC",
+        "To": "To"
+      }
+    }
+  },
+  "resultData": "Result data",
+  "sent": {
+    "on": "Sent on",
+    "portal": "This message was sent through the Portal.",
+    "provider": "using the provider",
+    "realm": "This message was sent through the realm",
+    "sender": "This message was sent from"
+  },
+  "sort": {
+    "options": {
+      "RecipientCount": "Recipients",
+      "Subject": "Subject",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "status": {
+    "format": "Status:",
+    "label": "Status",
+    "options": {
+      "Failed": "Failed",
+      "Succeeded": "Sent",
+      "Unsent": "Unsent"
+    },
+    "placeholder": "Select a status"
+  },
+  "title": {
+    "list": "Messages",
+    "view": "View message"
+  }
+}

@@ -45,8 +45,8 @@ internal class MessageQuerier : IMessageQuerier
   public async Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(Db.Messages.Table)
-      .Join(Db.Realms.RealmId, Db.Messages.RealmId)
-      .Join(Db.Templates.TemplateId, Db.Messages.TemplateId)
+      .Join(new Join(JoinKind.Left, Db.Realms.RealmId, Db.Messages.RealmId))
+      .Join(new Join(JoinKind.Left, Db.Templates.TemplateId, Db.Messages.TemplateId))
       .ApplyIdInFilter(Db.Messages.AggregateId, payload.IdIn)
       .SelectAll(Db.Messages.Table);
     _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.Messages.Subject);
@@ -57,12 +57,19 @@ internal class MessageQuerier : IMessageQuerier
     }
     else
     {
-      string aggregateId = payload.Realm.Trim();
       string uniqueSlugNormalized = payload.Realm.Trim().ToUpper();
-      builder = builder.WhereOr(
-        new OperatorCondition(Db.Realms.AggregateId, Operators.IsEqualTo(aggregateId)),
+      List<Condition> conditions = new(capacity: 2)
+      {
         new OperatorCondition(Db.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlugNormalized))
-      );
+      };
+
+      if (Guid.TryParse(payload.Realm.Trim(), out Guid id))
+      {
+        string aggregateId = new AggregateId(id).Value;
+        conditions.Add(new OperatorCondition(Db.Realms.AggregateId, Operators.IsEqualTo(aggregateId)));
+      }
+
+      builder = conditions.Count == 1 ? builder.Where(conditions.Single()) : builder.WhereOr(conditions.ToArray());
     }
 
     if (payload.IsDemo.HasValue)
@@ -75,12 +82,19 @@ internal class MessageQuerier : IMessageQuerier
     }
     if (!string.IsNullOrWhiteSpace(payload.Template))
     {
-      string aggregateId = payload.Template.Trim();
       string uniqueNameNormalized = payload.Template.Trim().ToUpper();
-      builder = builder.WhereOr(
-        new OperatorCondition(Db.Templates.AggregateId, Operators.IsEqualTo(aggregateId)),
+      List<Condition> conditions = new(capacity: 2)
+      {
         new OperatorCondition(Db.Templates.UniqueNameNormalized, Operators.IsEqualTo(uniqueNameNormalized))
-      );
+      };
+
+      if (Guid.TryParse(payload.Template.Trim(), out Guid id))
+      {
+        string aggregateId = new AggregateId(id).Value;
+        conditions.Add(new OperatorCondition(Db.Templates.AggregateId, Operators.IsEqualTo(aggregateId)));
+      }
+
+      builder = conditions.Count == 1 ? builder.Where(conditions.Single()) : builder.WhereOr(conditions.ToArray());
     }
 
     IQueryable<MessageEntity> query = _messages.FromQuery(builder.Build())

@@ -4,6 +4,7 @@ import { computed, inject, ref, watch } from "vue";
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Sender } from "@/types/senders";
+import { formatSender } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchSenders } from "@/api/senders";
@@ -34,10 +35,10 @@ const senders = ref<Sender[]>([]);
 const options = computed<SelectOption[]>(() =>
   orderBy(
     senders.value.map(
-      ({ id, emailAddress, displayName }) =>
+      (sender) =>
         ({
-          text: displayName ? `${displayName} <${emailAddress}>` : emailAddress,
-          value: id,
+          text: formatSender(sender),
+          value: sender.id,
         } as SelectOption)
     ),
     "text"

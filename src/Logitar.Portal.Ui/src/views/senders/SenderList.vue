@@ -10,6 +10,7 @@ import type { ApiError, ErrorDetail } from "@/types/api";
 import type { ProviderType, Sender, SenderSort, SearchSendersPayload } from "@/types/senders";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteSender, searchSenders } from "@/api/senders";
+import { formatSender } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
@@ -126,8 +127,8 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
                 provider: "",
+                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -215,7 +216,7 @@ watch(
               />
               <delete-modal
                 confirm="senders.delete.confirm"
-                :display-name="sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress"
+                :display-name="formatSender(sender)"
                 :id="`deleteModal_${sender.id}`"
                 :loading="isLoading"
                 title="senders.delete.title"
