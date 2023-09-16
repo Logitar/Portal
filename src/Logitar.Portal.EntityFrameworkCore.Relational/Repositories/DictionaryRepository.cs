@@ -26,7 +26,7 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
   public async Task<DictionaryAggregate?> LoadAsync(AggregateId id, long? version, CancellationToken cancellationToken)
     => await LoadAsync<DictionaryAggregate>(id, version, cancellationToken);
 
-  public async Task<DictionaryAggregate?> LoadAsync(string? tenantId, Locale locale, CancellationToken cancellationToken)
+  public async Task<DictionaryAggregate?> LoadAsync(string? tenantId, ReadOnlyLocale locale, CancellationToken cancellationToken)
   {
     tenantId = tenantId?.CleanTrim();
     string localeCode = locale.Code;

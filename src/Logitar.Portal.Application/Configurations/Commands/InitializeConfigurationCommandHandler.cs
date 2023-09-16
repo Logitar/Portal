@@ -41,7 +41,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     }
 
     InitializeConfigurationPayload payload = command.Payload;
-    Locale locale = payload.Locale.GetRequiredLocale(nameof(payload.Locale));
+    ReadOnlyLocale locale = payload.Locale.GetRequiredLocale(nameof(payload.Locale));
 
     AggregateId userId = AggregateId.NewId();
     ActorId actorId = new(userId.ToGuid());

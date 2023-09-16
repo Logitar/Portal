@@ -34,7 +34,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = Locale,
       Url = new Uri("https://www.desjardins.com/")
     };
 
@@ -55,7 +55,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       LastName = Faker.Person.LastName,
       Birthdate = Faker.Person.DateOfBirth,
       Gender = new Gender(Faker.Person.Gender.ToString()),
-      Locale = new Locale(Faker.Locale),
+      Locale = Locale,
       TimeZone = new TimeZoneEntry("America/Montreal"),
       Picture = new Uri(Faker.Person.Avatar),
       Website = _realm.Url
@@ -292,7 +292,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.Nickname, user.Nickname);
     AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
-    Assert.Equal(payload.Locale, user.Locale);
+    Assert.Equal(payload.Locale, user.Locale?.Code);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
     Assert.Equal(payload.Picture, user.Picture);
     Assert.Null(user.Profile);
@@ -560,7 +560,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.Nickname, user.Nickname);
     AssertEqual(payload.Birthdate, user.Birthdate);
     Assert.Equal(payload.Gender.ToLower(), user.Gender);
-    Assert.Equal(payload.Locale, user.Locale);
+    Assert.Equal(payload.Locale, user.Locale?.Code);
     Assert.Equal(payload.TimeZone.Trim(), user.TimeZone);
     Assert.Equal(payload.Picture, user.Picture);
     Assert.Null(user.Profile);
@@ -831,7 +831,7 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
       Nickname = string.Concat(faker.Person.FirstName.First(), faker.Person.LastName).ToLower(),
       Birthdate = faker.Person.DateOfBirth,
       Gender = new Gender(faker.Person.Gender.ToString()),
-      Locale = new Locale(faker.Locale),
+      Locale = new ReadOnlyLocale(faker.Locale),
       TimeZone = new TimeZoneEntry(timeZone ?? "America/Montreal"),
       Picture = new Uri(faker.Person.Avatar),
       Website = new Uri($"https://www.{faker.Person.Website}/")

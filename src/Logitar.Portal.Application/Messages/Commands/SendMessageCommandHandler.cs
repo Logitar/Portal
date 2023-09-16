@@ -39,14 +39,14 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
   public async Task<SentMessages> Handle(SendMessageCommand command, CancellationToken cancellationToken)
   {
     SendMessagePayload payload = command.Payload;
-    Locale? sharedLocale = payload.Locale?.GetLocale(nameof(payload.Locale));
+    ReadOnlyLocale? sharedLocale = payload.Locale?.GetLocale(nameof(payload.Locale));
 
     RealmAggregate? realm = await ResolveRealmAsync(payload, cancellationToken);
     SenderAggregate? sender = await ResolveSenderAsync(payload, realm, cancellationToken);
     TemplateAggregate? template = await ResolveTemplateAsync(payload, realm, cancellationToken);
     Recipients allRecipients = await ResolveRecipientsAsync(payload, realm, cancellationToken);
 
-    Dictionary<Locale, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
+    Dictionary<ReadOnlyLocale, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
     Dictionaries sharedDictionaries = ResolveDictionaries(allDictionaries, sharedLocale, realm);
 
@@ -56,7 +56,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
 
     foreach (ReadOnlyRecipient recipient in allRecipients.To)
     {
-      Locale? locale = sharedLocale;
+      ReadOnlyLocale? locale = sharedLocale;
       Dictionaries dictionaries = sharedDictionaries;
       if (!payload.IgnoreUserLocale && recipient.User != null && recipient.User.Locale != sharedLocale)
       {
@@ -83,7 +83,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     return new SentMessages(messages.Select(message => message.Id.ToGuid()));
   }
 
-  private Dictionaries ResolveDictionaries(Dictionary<Locale, DictionaryAggregate> dictionaries, Locale? locale, RealmAggregate? realm)
+  private Dictionaries ResolveDictionaries(Dictionary<ReadOnlyLocale, DictionaryAggregate> dictionaries, ReadOnlyLocale? locale, RealmAggregate? realm)
   {
     DictionaryAggregate? target = null;
     if (locale != null)
@@ -97,7 +97,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       _ = dictionaries.TryGetValue(locale.Parent, out fallback);
     }
 
-    Locale defaultLocale = realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale;
+    ReadOnlyLocale defaultLocale = realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale;
     _ = dictionaries.TryGetValue(defaultLocale, out DictionaryAggregate? @default);
 
     return new Dictionaries(target, fallback, @default);

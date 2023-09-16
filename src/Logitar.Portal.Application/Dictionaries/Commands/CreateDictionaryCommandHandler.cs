@@ -25,7 +25,7 @@ internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionary
   public async Task<Dictionary> Handle(CreateDictionaryCommand command, CancellationToken cancellationToken)
   {
     CreateDictionaryPayload payload = command.Payload;
-    Locale locale = payload.Locale.GetRequiredLocale(nameof(payload.Locale));
+    ReadOnlyLocale locale = payload.Locale.GetRequiredLocale(nameof(payload.Locale));
 
     RealmAggregate? realm = null;
     if (payload.Realm != null)

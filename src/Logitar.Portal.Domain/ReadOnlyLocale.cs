@@ -1,13 +1,13 @@
 ﻿namespace Logitar.Portal.Domain;
 
-public record Locale
+public record ReadOnlyLocale
 {
   private const string DefaultLocaleCode = "en";
   private const int LOCALE_CUSTOM_UNSPECIFIED = 0x1000;
 
   private readonly CultureInfo _culture;
 
-  public Locale(string code)
+  public ReadOnlyLocale(string code)
   {
     if (string.IsNullOrWhiteSpace(code))
     {
@@ -22,12 +22,12 @@ public record Locale
 
     if (!string.IsNullOrWhiteSpace(_culture.Parent?.Name))
     {
-      Parent = new Locale(_culture.Parent.Name);
+      Parent = new ReadOnlyLocale(_culture.Parent.Name);
     }
   }
 
-  public static Locale Default { get; } = new(DefaultLocaleCode);
+  public static ReadOnlyLocale Default { get; } = new(DefaultLocaleCode);
 
   public string Code => _culture.Name;
-  public Locale? Parent { get; }
+  public ReadOnlyLocale? Parent { get; }
 }

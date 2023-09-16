@@ -23,7 +23,9 @@ query($payload: SearchDictionariesPayload!) {
         uniqueSlug
         displayName
       }
-      locale
+      locale {
+        nativeName
+      }
       entryCount
       updatedBy {
         id

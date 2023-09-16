@@ -27,7 +27,7 @@ internal static class InputExtensions
     }
   }
 
-  public static Locale? GetLocale(this string code, string propertyName)
+  public static ReadOnlyLocale? GetLocale(this string code, string propertyName)
   {
     if (string.IsNullOrWhiteSpace(code))
     {
@@ -36,18 +36,18 @@ internal static class InputExtensions
 
     try
     {
-      return new Locale(code);
+      return new ReadOnlyLocale(code);
     }
     catch (Exception innerException)
     {
       throw new InvalidLocaleException(code, propertyName, innerException);
     }
   }
-  public static Locale GetRequiredLocale(this string code, string propertyName)
+  public static ReadOnlyLocale GetRequiredLocale(this string code, string propertyName)
   {
     try
     {
-      return new Locale(code);
+      return new ReadOnlyLocale(code);
     }
     catch (Exception innerException)
     {

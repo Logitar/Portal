@@ -1,4 +1,5 @@
 import type { Aggregate } from "@/types/aggregate";
+import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 
@@ -11,7 +12,7 @@ export type CreateDictionaryPayload = {
 export type Dictionary = Aggregate & {
   id: string;
   realm?: Realm;
-  locale: string;
+  locale: Locale;
   entries: DictionaryEntry[];
   entryCount: number;
 };

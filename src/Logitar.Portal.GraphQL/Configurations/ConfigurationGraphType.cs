@@ -8,8 +8,8 @@ internal class ConfigurationGraphType : AggregateGraphType<Configuration>
 {
   public ConfigurationGraphType() : base("Represents the configuration of the system.")
   {
-    Field(x => x.DefaultLocale)
-      .Description("The code (ISO 639-1) of the default locale (language) of the system.");
+    Field(x => x.DefaultLocale, type: typeof(NonNullGraphType<LocaleGraphType>))
+      .Description("The default language of the system.");
     Field(x => x.Secret)
       .Description("The secret to use to sign Portal security tokens.");
 

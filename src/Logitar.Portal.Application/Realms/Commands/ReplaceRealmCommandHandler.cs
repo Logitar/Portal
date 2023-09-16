@@ -42,7 +42,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     }
 
     ReplaceRealmPayload payload = command.Payload;
-    Locale? defaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale));
+    ReadOnlyLocale? defaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale));
     Uri? url = payload.Url?.GetUrl(nameof(payload.Url));
     ReadOnlyUniqueNameSettings uniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
     ReadOnlyPasswordSettings passwordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();

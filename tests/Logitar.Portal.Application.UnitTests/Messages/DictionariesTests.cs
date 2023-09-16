@@ -10,16 +10,16 @@ public class DictionariesTests
 
   public DictionariesTests()
   {
-    DictionaryAggregate @default = new(new Locale("en"));
+    DictionaryAggregate @default = new(new ReadOnlyLocale("en"));
     @default.SetEntry("ClickLink", "Please click the link below.");
     @default.SetEntry("Message", "Hello World!");
     @default.SetEntry("PasswordRecovery_Subject", "Reset your password");
 
-    DictionaryAggregate fallback = new(new Locale("fr"));
+    DictionaryAggregate fallback = new(new ReadOnlyLocale("fr"));
     fallback.SetEntry("ClickLink", "Veuillez cliquer sur le lien suivant.");
     fallback.SetEntry("PasswordRecovery_Subject", "Réinitialiser votre mot de passe");
 
-    DictionaryAggregate target = new(new Locale("fr-CA"));
+    DictionaryAggregate target = new(new ReadOnlyLocale("fr-CA"));
     target.SetEntry("ClickLink", "Veuillez cliquer sur le lien ci-dessous.");
 
     _dictionaries = new(target, fallback, @default);

@@ -5,7 +5,6 @@ using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Roles;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.ApiKeys;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
@@ -35,7 +34,7 @@ public class ApiKeyServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("desjardins")
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = Locale,
       Url = new Uri("https://www.desjardins.com/")
     };
 

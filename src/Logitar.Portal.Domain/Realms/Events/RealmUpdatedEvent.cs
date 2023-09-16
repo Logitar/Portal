@@ -11,7 +11,7 @@ public record RealmUpdatedEvent : DomainEvent, INotification
   public Modification<string>? DisplayName { get; set; }
   public Modification<string>? Description { get; set; }
 
-  public Modification<Locale>? DefaultLocale { get; set; }
+  public Modification<ReadOnlyLocale>? DefaultLocale { get; set; }
   public string? Secret { get; set; }
   public Modification<Uri>? Url { get; set; }
 

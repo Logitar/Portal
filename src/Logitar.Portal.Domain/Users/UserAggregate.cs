@@ -31,7 +31,7 @@ public class UserAggregate : AggregateRoot
 
   private DateTime? _birthdate = null;
   private Gender? _gender = null;
-  private Locale? _locale = null;
+  private ReadOnlyLocale? _locale = null;
   private TimeZoneEntry? _timeZone = null;
 
   private Uri? _picture = null;
@@ -239,7 +239,7 @@ public class UserAggregate : AggregateRoot
       }
     }
   }
-  public Locale? Locale
+  public ReadOnlyLocale? Locale
   {
     get => _locale;
     set
@@ -247,7 +247,7 @@ public class UserAggregate : AggregateRoot
       if (value != _locale)
       {
         UserUpdatedEvent updated = GetLatestEvent<UserUpdatedEvent>();
-        updated.Locale = new Modification<Locale>(value);
+        updated.Locale = new Modification<ReadOnlyLocale>(value);
         _locale = value;
       }
     }

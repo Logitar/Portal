@@ -133,7 +133,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
   private static void SetPersonalInformation(UserAggregate user, UserAggregate? reference, ReplaceUserPayload payload)
   {
     Gender? gender = payload.Gender?.GetGender(nameof(payload.Gender));
-    Locale? locale = payload.Locale?.GetLocale(nameof(payload.Locale));
+    ReadOnlyLocale? locale = payload.Locale?.GetLocale(nameof(payload.Locale));
     TimeZoneEntry? timeZone = payload.TimeZone?.GetTimeZone(nameof(payload.TimeZone));
     Uri? picture = payload.Picture?.GetUrl(nameof(payload.Picture));
     Uri? profile = payload.Profile?.GetUrl(nameof(payload.Profile));

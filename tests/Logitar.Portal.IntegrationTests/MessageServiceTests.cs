@@ -27,16 +27,16 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   private const string SenderKey = "Sender";
   private const string SendGridKey = "SendGrid";
 
-  private static readonly Locale _americanEnglish = new("en-US");
-  private static readonly Locale _canadianEnglish = new("en-CA");
-  private static readonly Locale _english = new("en");
-  private static readonly Locale _french = new("fr");
+  private static readonly ReadOnlyLocale _americanEnglish = new("en-US");
+  private static readonly ReadOnlyLocale _canadianEnglish = new("en-CA");
+  private static readonly ReadOnlyLocale _english = new("en");
+  private static readonly ReadOnlyLocale _french = new("fr");
 
   private readonly IMessageService _messageService;
 
   private readonly string _recipient;
 
-  private readonly Dictionary<Locale, DictionaryAggregate> _dictionaries = new();
+  private readonly Dictionary<ReadOnlyLocale, DictionaryAggregate> _dictionaries = new();
   private readonly RealmAggregate _realm;
   private readonly SenderAggregate _sender;
   private readonly TemplateAggregate _template;
@@ -582,7 +582,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   {
     RealmAggregate realm = new("desjardins")
     {
-      DefaultLocale = new Locale("fr-CA"),
+      DefaultLocale = new ReadOnlyLocale("fr-CA"),
       DisplayName = "Desjardins",
       Url = new Uri("https://www.desjardins.com/")
     };
@@ -664,7 +664,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Recipients), exception.PropertyName);
   }
 
-  private static DictionaryAggregate CreateDictionary(Locale locale, string? tenantId = null)
+  private static DictionaryAggregate CreateDictionary(ReadOnlyLocale locale, string? tenantId = null)
   {
     string json = File.ReadAllText($"Dictionaries/{locale.Code}.json", Encoding.UTF8);
     Dictionary<string, string> entries = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();

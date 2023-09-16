@@ -38,7 +38,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("desjardins", requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = Locale,
       Url = new Uri("https://www.desjardins.com/")
     };
     _realm.SetClaimMapping("EmployeeId", new ReadOnlyClaimMapping("employee_no"));
@@ -112,7 +112,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.UniqueSlug, realm.UniqueSlug);
     Assert.Equal(payload.DisplayName, realm.DisplayName);
     Assert.Null(realm.Description);
-    Assert.Equal(payload.DefaultLocale, realm.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, realm.DefaultLocale?.Code);
     Assert.Equal(32, realm.Secret.Length);
     Assert.Equal(payload.Url, realm.Url);
     Assert.Equal(payload.RequireUniqueEmail, realm.RequireUniqueEmail);
@@ -153,7 +153,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     });
     MessageAggregate message = new("Test", "Hello World!", recipients, sender, template, _realm);
 
-    DictionaryAggregate dictionary = new(new Locale("fr"), tenantId);
+    DictionaryAggregate dictionary = new(new ReadOnlyLocale("fr"), tenantId);
 
     RoleAggregate role = new(_realm.UniqueNameSettings, "admin", tenantId);
 
@@ -288,7 +288,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.UniqueSlug.Trim(), realm.UniqueSlug);
     Assert.Equal(payload.DisplayName.Trim(), realm.DisplayName);
     Assert.Null(realm.Description);
-    Assert.Equal(payload.DefaultLocale.Trim(), realm.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale.Trim(), realm.DefaultLocale?.Code);
     Assert.Equal(payload.Secret.Trim(), realm.Secret);
     Assert.Equal(payload.Url.Trim(), realm.Url);
     Assert.Equal(payload.RequireUniqueEmail, realm.RequireUniqueEmail);

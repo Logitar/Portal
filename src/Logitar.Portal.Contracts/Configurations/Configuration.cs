@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Configurations;
 
 public record Configuration : Aggregate
 {
-  public string DefaultLocale { get; set; } = string.Empty;
+  public Locale DefaultLocale { get; set; } = new();
   public string Secret { get; set; } = string.Empty;
 
   public UniqueNameSettings UniqueNameSettings { get; set; } = new();

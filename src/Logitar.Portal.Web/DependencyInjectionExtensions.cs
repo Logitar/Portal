@@ -22,7 +22,7 @@ public static class DependencyInjectionExtensions
      })
      .AddJsonOptions(options =>
      {
-       options.JsonSerializerOptions.Converters.Add(new LocaleConverter());
+       options.JsonSerializerOptions.Converters.Add(new ReadOnlyLocaleConverter());
        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
      });
 

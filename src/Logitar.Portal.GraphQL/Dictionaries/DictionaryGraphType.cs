@@ -13,8 +13,8 @@ internal class DictionaryGraphType : AggregateGraphType<Dictionary>
 
     Field(x => x.Realm, type: typeof(RealmGraphType))
       .Description("The realm in which the dictionary resides.");
-    Field(x => x.Locale)
-      .Description("The code (ISO 639-1) of the dictionary's locale (language).");
+    Field(x => x.Locale, type: typeof(NonNullGraphType<LocaleGraphType>))
+      .Description("The language of the dictionary.");
 
     Field(x => x.Entries, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<DictionaryEntryGraphType>>>))
       .Description("The entries in the dictionary.");

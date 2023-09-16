@@ -18,7 +18,7 @@ public class MessageAggregate : AggregateRoot
 
   public MessageAggregate(string subject, string body, Recipients recipients, SenderAggregate sender,
     TemplateAggregate template, RealmAggregate? realm = null, bool ignoreUserLocale = false,
-    Locale? locale = null, Variables? variables = null, bool isDemo = false, ActorId actorId = default,
+    ReadOnlyLocale? locale = null, Variables? variables = null, bool isDemo = false, ActorId actorId = default,
     AggregateId? id = null) : base(id)
   {
     subject = subject.Trim();
@@ -90,7 +90,7 @@ public class MessageAggregate : AggregateRoot
   public TemplateSummary Template { get; private set; } = new();
 
   public bool IgnoreUserLocale { get; private set; }
-  public Locale? Locale { get; private set; }
+  public ReadOnlyLocale? Locale { get; private set; }
 
   public Variables Variables { get; private set; } = new();
 

@@ -34,7 +34,7 @@ public class CacheServiceTests
 
     _cacheService = serviceProvider.GetRequiredService<ICacheService>();
 
-    Locale locale = new(_faker.Locale);
+    ReadOnlyLocale locale = new(_faker.Locale);
     _configuration = new(locale);
 
     _user = new(_configuration.UniqueNameSettings, _faker.Person.UserName)

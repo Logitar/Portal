@@ -12,5 +12,5 @@ public record DictionaryCreatedEvent : DomainEvent, INotification
 
   public string? TenantId { get; init; }
 
-  public Locale Locale { get; init; } = Locale.Default;
+  public ReadOnlyLocale Locale { get; init; } = ReadOnlyLocale.Default;
 }

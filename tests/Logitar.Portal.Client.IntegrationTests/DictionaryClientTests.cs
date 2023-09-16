@@ -102,7 +102,7 @@ internal class DictionaryClientTests
       ?? throw new InvalidOperationException("The result should not be null.");
       _context.Succeed(name);
       name = $"{Sut}.{nameof(_dictionaryService.ReadAsync)}:Locale";
-      dictionary = await _dictionaryService.ReadAsync(realm: _context.Realm.Id.ToString(), locale: dictionary.Locale, cancellationToken: cancellationToken)
+      dictionary = await _dictionaryService.ReadAsync(realm: _context.Realm.Id.ToString(), locale: dictionary.Locale.Code, cancellationToken: cancellationToken)
         ?? throw new InvalidOperationException("The result should not be null.");
       _context.Succeed(name);
     }
