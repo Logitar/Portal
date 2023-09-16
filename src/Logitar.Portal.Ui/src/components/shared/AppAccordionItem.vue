@@ -23,8 +23,7 @@ const id = ref<string>(uuidv4());
 const parent = ref<string>();
 
 function setParentId(value?: string): void {
-  console.log("setParentId: ", value);
-  parent.value = value;
+  parent.value = value ? `#${value}` : undefined;
 }
 onMounted(() => {
   if (bindItem) {

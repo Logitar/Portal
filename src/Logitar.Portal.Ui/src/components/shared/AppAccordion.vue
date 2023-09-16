@@ -12,7 +12,7 @@ const props = withDefaults(
   {
     alwaysOpen: false,
     flush: false,
-    id: "accordion2",
+    id: "accordion",
   }
 );
 
