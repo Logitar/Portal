@@ -19,7 +19,7 @@ public record Message : Aggregate
   public Template Template { get; set; } = new();
 
   public bool IgnoreUserLocale { get; set; }
-  public string? Locale { get; set; }
+  public Locale? Locale { get; set; }
 
   public IEnumerable<Variable> Variables { get; set; } = Enumerable.Empty<Variable>();
 

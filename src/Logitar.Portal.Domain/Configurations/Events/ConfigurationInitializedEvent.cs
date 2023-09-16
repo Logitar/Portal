@@ -11,7 +11,7 @@ public record ConfigurationInitializedEvent : DomainEvent, INotification
     ActorId = actorId;
   }
 
-  public Locale DefaultLocale { get; init; } = Locale.Default;
+  public ReadOnlyLocale DefaultLocale { get; init; } = ReadOnlyLocale.Default;
   public string Secret { get; init; } = string.Empty;
 
   public ReadOnlyUniqueNameSettings UniqueNameSettings { get; init; } = new();

@@ -17,7 +17,7 @@ public class RealmAggregateTests
     _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(_faker.Locale),
+      DefaultLocale = new ReadOnlyLocale(_faker.Locale),
       Url = new Uri("https://www.desjardins.com/")
     };
   }

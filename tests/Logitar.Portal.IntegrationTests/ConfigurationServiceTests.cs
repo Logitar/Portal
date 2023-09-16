@@ -96,7 +96,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(payload.User.EmailAddress, user.Email?.Address);
     Assert.Equal(payload.User.FirstName, user.FirstName);
     Assert.Equal(payload.User.LastName, user.LastName);
-    Assert.Equal(payload.Locale, user.Locale);
+    Assert.Equal(payload.Locale, user.Locale?.Code);
 
     await AssertUserPasswordAsync(user.Id);
 
@@ -181,7 +181,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(configuration.UpdatedOn);
     Assert.True(configuration.Version > 1);
 
-    Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale.Code);
     Assert.NotEqual(oldSecret, configuration.Secret);
     Assert.Equal(payload.PasswordSettings, configuration.PasswordSettings);
 
@@ -245,7 +245,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(configuration.UpdatedOn);
     Assert.True(configuration.Version > 1);
 
-    Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, configuration.DefaultLocale.Code);
     Assert.NotEqual(oldSecret, configuration.Secret);
     Assert.Equal(uniqueNameSettings.AllowedCharacters, configuration.UniqueNameSettings.AllowedCharacters);
     Assert.Equal(payload.PasswordSettings, configuration.PasswordSettings);

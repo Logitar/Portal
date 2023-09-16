@@ -32,7 +32,7 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
     }
 
     ReplaceConfigurationPayload payload = command.Payload;
-    Locale defaultLocale = payload.DefaultLocale.GetRequiredLocale(nameof(payload.DefaultLocale));
+    ReadOnlyLocale defaultLocale = payload.DefaultLocale.GetRequiredLocale(nameof(payload.DefaultLocale));
     ReadOnlyLoggingSettings loggingSettings = payload.LoggingSettings.ToReadOnlyLoggingSettings();
     ReadOnlyPasswordSettings passwordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
     ReadOnlyUniqueNameSettings uniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();

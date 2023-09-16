@@ -13,7 +13,7 @@ public class ConfigurationAggregate : AggregateRoot
 
   public static readonly AggregateId UniqueId = new("CONFIGURATION");
 
-  private Locale _defaultLocale = Locale.Default;
+  private ReadOnlyLocale _defaultLocale = ReadOnlyLocale.Default;
   private string _secret = string.Empty;
 
   private ReadOnlyUniqueNameSettings _uniqueNameSettings = new();
@@ -25,7 +25,7 @@ public class ConfigurationAggregate : AggregateRoot
   {
   }
 
-  public ConfigurationAggregate(Locale defaultLocale, ActorId actorId = default) : base(UniqueId)
+  public ConfigurationAggregate(ReadOnlyLocale defaultLocale, ActorId actorId = default) : base(UniqueId)
   {
     ApplyChange(new ConfigurationInitializedEvent(actorId)
     {
@@ -44,7 +44,7 @@ public class ConfigurationAggregate : AggregateRoot
     _loggingSettings = initialized.LoggingSettings;
   }
 
-  public Locale DefaultLocale
+  public ReadOnlyLocale DefaultLocale
   {
     get => _defaultLocale;
     set

@@ -17,7 +17,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
   private readonly IDictionaryService _dictionaryService;
 
   private readonly RealmAggregate _realm;
-  private readonly Locale _locale = new("fr");
+  private readonly ReadOnlyLocale _locale = new("fr");
   private readonly DictionaryAggregate _dictionary;
 
   public DictionaryServiceTests() : base()
@@ -66,7 +66,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
     AssertIsNear(dictionary.UpdatedOn);
     Assert.True(dictionary.Version >= 1);
 
-    Assert.Equal(payload.Locale.Trim(), dictionary.Locale);
+    Assert.Equal(payload.Locale.Trim(), dictionary.Locale.Code);
 
     Assert.Equal(3, dictionary.Entries.Count());
     Assert.Equal(3, dictionary.EntryCount);
@@ -110,7 +110,7 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "DeleteAsync: it should delete the dictionary.")]
   public async Task DeleteAsync_it_should_delete_the_dictionary()
   {
-    Locale locale = new("es");
+    ReadOnlyLocale locale = new("es");
     DictionaryAggregate other = new(locale, _realm.Id.Value);
     await AggregateRepository.SaveAsync(other);
 
@@ -224,11 +224,11 @@ public class DictionaryServiceTests : IntegrationTests, IAsyncLifetime
   public async Task SearchAsync_it_should_return_the_correct_results()
   {
     DictionaryAggregate notInRealm = new(_locale);
-    DictionaryAggregate french = new(new Locale("fr"), _realm.Id.Value);
-    DictionaryAggregate dictionary1 = new(new Locale("en-AU"), _realm.Id.Value);
-    DictionaryAggregate dictionary2 = new(new Locale("en-CA"), _realm.Id.Value);
-    DictionaryAggregate dictionary3 = new(new Locale("en-GB"), _realm.Id.Value);
-    DictionaryAggregate dictionary4 = new(new Locale("en-US"), _realm.Id.Value);
+    DictionaryAggregate french = new(new ReadOnlyLocale("fr"), _realm.Id.Value);
+    DictionaryAggregate dictionary1 = new(new ReadOnlyLocale("en-AU"), _realm.Id.Value);
+    DictionaryAggregate dictionary2 = new(new ReadOnlyLocale("en-CA"), _realm.Id.Value);
+    DictionaryAggregate dictionary3 = new(new ReadOnlyLocale("en-GB"), _realm.Id.Value);
+    DictionaryAggregate dictionary4 = new(new ReadOnlyLocale("en-US"), _realm.Id.Value);
     await AggregateRepository.SaveAsync(new[] { notInRealm, french, dictionary1, dictionary2, dictionary3, dictionary4 });
 
     DictionaryAggregate[] dictionaries = new[] { dictionary1, dictionary2, dictionary3, dictionary4 }

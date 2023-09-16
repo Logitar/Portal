@@ -20,7 +20,7 @@ public record MessageCreatedEvent : DomainEvent, INotification
   public TemplateSummary Template { get; init; } = new();
 
   public bool IgnoreUserLocale { get; init; }
-  public Locale? Locale { get; init; }
+  public ReadOnlyLocale? Locale { get; init; }
 
   public Dictionary<string, string> Variables { get; init; } = new();
 

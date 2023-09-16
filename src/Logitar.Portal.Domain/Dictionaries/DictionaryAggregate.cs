@@ -14,7 +14,7 @@ public class DictionaryAggregate : AggregateRoot
   {
   }
 
-  public DictionaryAggregate(Locale locale, string? tenantId = null, ActorId actorId = default, AggregateId? id = null)
+  public DictionaryAggregate(ReadOnlyLocale locale, string? tenantId = null, ActorId actorId = default, AggregateId? id = null)
     : base(id)
   {
     tenantId = tenantId?.CleanTrim();
@@ -38,7 +38,7 @@ public class DictionaryAggregate : AggregateRoot
 
   public string? TenantId { get; private set; }
 
-  public Locale Locale { get; private set; } = Locale.Default;
+  public ReadOnlyLocale Locale { get; private set; } = ReadOnlyLocale.Default;
 
   public IReadOnlyDictionary<string, string> Entries => _entries.AsReadOnly();
 

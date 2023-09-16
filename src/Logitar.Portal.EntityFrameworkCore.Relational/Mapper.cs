@@ -12,9 +12,11 @@ using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
+using System.Globalization;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
@@ -50,7 +52,7 @@ internal class Mapper
   {
     Configuration destination = new()
     {
-      DefaultLocale = source.DefaultLocale.Code,
+      DefaultLocale = ToLocale(source.DefaultLocale),
       Secret = source.Secret,
       UniqueNameSettings = new UniqueNameSettings
       {
@@ -84,7 +86,7 @@ internal class Mapper
     {
       Id = new AggregateId(source.AggregateId).ToGuid(),
       Realm = realm,
-      Locale = source.Locale,
+      Locale = ToLocale(source.Locale),
       Entries = source.Entries.Select(entry => new DictionaryEntry(entry.Key, entry.Value)),
       EntryCount = source.EntryCount
     };
@@ -122,7 +124,7 @@ internal class Mapper
       RecipientCount = source.RecipientCount,
       Realm = realm,
       IgnoreUserLocale = source.IgnoreUserLocale,
-      Locale = source.Locale,
+      Locale = source.Locale == null ? null : ToLocale(source.Locale),
       Variables = source.Variables.Select(variable => new Variable(variable.Key, variable.Value)),
       IsDemo = source.IsDemo,
       Result = source.Result.Select(data => new ResultData(data.Key, data.Value)),
@@ -207,7 +209,7 @@ internal class Mapper
       UniqueSlug = source.UniqueSlug,
       DisplayName = source.DisplayName,
       Description = source.Description,
-      DefaultLocale = source.DefaultLocale,
+      DefaultLocale = source.DefaultLocale == null ? null : ToLocale(source.DefaultLocale),
       Secret = source.Secret,
       Url = source.Url,
       RequireUniqueEmail = source.RequireUniqueEmail,
@@ -340,7 +342,7 @@ internal class Mapper
       Nickname = source.Nickname,
       Birthdate = source.Birthdate.HasValue ? ToUniversalTime(source.Birthdate.Value) : null,
       Gender = source.Gender,
-      Locale = source.Locale,
+      Locale = source.Locale == null ? null : ToLocale(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,
@@ -417,5 +419,21 @@ internal class Mapper
 
   private static IEnumerable<CustomAttribute> ToCustomAttributes(Dictionary<string, string> customAttributes)
     => customAttributes.Select(customAttribute => new CustomAttribute(customAttribute.Key, customAttribute.Value));
+
+  private static Locale ToLocale(ReadOnlyLocale locale) => ToLocale(locale.Code);
+  private static Locale ToLocale(string code)
+  {
+    CultureInfo culture = CultureInfo.GetCultureInfo(code);
+
+    return new Locale
+    {
+      Id = culture.LCID,
+      Code = culture.Name,
+      DisplayName = culture.DisplayName,
+      EnglishName = culture.EnglishName,
+      NativeName = culture.NativeName
+    };
+  }
+
   private static DateTime ToUniversalTime(DateTime value) => DateTime.SpecifyKind(value, DateTimeKind.Utc);
 }

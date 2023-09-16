@@ -22,7 +22,7 @@ public record UserUpdatedEvent : DomainEvent, INotification
 
   public Modification<DateTime?>? Birthdate { get; set; }
   public Modification<Gender>? Gender { get; set; }
-  public Modification<Locale>? Locale { get; set; }
+  public Modification<ReadOnlyLocale>? Locale { get; set; }
   public Modification<TimeZoneEntry>? TimeZone { get; set; }
 
   public Modification<Uri>? Picture { get; set; }

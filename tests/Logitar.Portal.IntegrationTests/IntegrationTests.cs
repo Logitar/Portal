@@ -7,6 +7,7 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Sessions;
@@ -67,6 +68,7 @@ public abstract class IntegrationTests
   }
 
   protected Faker Faker { get; } = new();
+  protected ReadOnlyLocale Locale => new(Faker.Locale);
   protected bool InitializeConfiguration { get; set; } = true;
 
   protected IServiceProvider ServiceProvider { get; }

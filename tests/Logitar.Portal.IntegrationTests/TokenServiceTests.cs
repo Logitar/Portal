@@ -2,7 +2,6 @@
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Contracts.Tokens;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Logitar.Security.Claims;
@@ -33,7 +32,7 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = Locale,
       Url = new Uri("https://www.desjardins.com/")
     };
   }

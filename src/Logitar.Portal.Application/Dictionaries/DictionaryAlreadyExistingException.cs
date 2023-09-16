@@ -7,7 +7,7 @@ public class DictionaryAlreadyExistingException : Exception, IFailureException
 {
   private const string ErrorMessage = "The specified dictionary already exists.";
 
-  public DictionaryAlreadyExistingException(string? tenantId, Locale locale, string propertyName)
+  public DictionaryAlreadyExistingException(string? tenantId, ReadOnlyLocale locale, string propertyName)
     : base(BuildMessage(tenantId, locale, propertyName))
   {
     TenantId = tenantId;
@@ -37,7 +37,7 @@ public class DictionaryAlreadyExistingException : Exception, IFailureException
     CustomState = new { TenantId }
   };
 
-  private static string BuildMessage(string? tenantId, Locale locale, string propertyName)
+  private static string BuildMessage(string? tenantId, ReadOnlyLocale locale, string propertyName)
   {
     StringBuilder message = new();
 

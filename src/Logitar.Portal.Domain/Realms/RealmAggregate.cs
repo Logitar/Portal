@@ -22,7 +22,7 @@ public class RealmAggregate : AggregateRoot
   private string? _displayName = null;
   private string? _description = null;
 
-  private Locale? _defaultLocale = null;
+  private ReadOnlyLocale? _defaultLocale = null;
   private string _secret = string.Empty;
   private Uri? _url = null;
 
@@ -127,7 +127,7 @@ public class RealmAggregate : AggregateRoot
     }
   }
 
-  public Locale? DefaultLocale
+  public ReadOnlyLocale? DefaultLocale
   {
     get => _defaultLocale;
     set
@@ -135,7 +135,7 @@ public class RealmAggregate : AggregateRoot
       if (value != _defaultLocale)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
-        updated.DefaultLocale = new Modification<Locale>(value);
+        updated.DefaultLocale = new Modification<ReadOnlyLocale>(value);
         _defaultLocale = value;
       }
     }

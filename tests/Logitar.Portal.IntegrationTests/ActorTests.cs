@@ -134,7 +134,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
       LastName = faker.Person.LastName,
       Birthdate = faker.Person.DateOfBirth,
       Gender = new Gender(faker.Person.Gender.ToString()),
-      Locale = new Locale(faker.Locale),
+      Locale = new ReadOnlyLocale(faker.Locale),
       Picture = new Uri(faker.Person.Avatar)
     };
     await AggregateRepository.SaveAsync(aggregate);
@@ -214,7 +214,7 @@ public class ActorTests : IntegrationTests, IAsyncLifetime
       LastName = faker.Person.LastName,
       Birthdate = faker.Person.DateOfBirth,
       Gender = new Gender(faker.Person.Gender.ToString()),
-      Locale = new Locale(faker.Locale),
+      Locale = new ReadOnlyLocale(faker.Locale),
       Picture = new Uri(faker.Person.Avatar)
     };
     await AggregateRepository.SaveAsync(aggregate);

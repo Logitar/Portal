@@ -2,16 +2,16 @@
 
 namespace Logitar.Portal.Infrastructure.Converters;
 
-public class LocaleConverter : JsonConverter<Locale?>
+public class LocaleConverter : JsonConverter<ReadOnlyLocale?>
 {
-  public override Locale? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+  public override ReadOnlyLocale? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
   {
     string? code = reader.GetString();
 
-    return code == null ? null : new Locale(code);
+    return code == null ? null : new ReadOnlyLocale(code);
   }
 
-  public override void Write(Utf8JsonWriter writer, Locale? locale, JsonSerializerOptions options)
+  public override void Write(Utf8JsonWriter writer, ReadOnlyLocale? locale, JsonSerializerOptions options)
   {
     writer.WriteStringValue(locale?.Code);
   }

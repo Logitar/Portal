@@ -95,7 +95,7 @@ internal static class ClaimExtensions
     }
     if (user.Locale != null)
     {
-      identity.AddClaim(new(Rfc7519ClaimNames.Locale, user.Locale));
+      identity.AddClaim(new(Rfc7519ClaimNames.Locale, user.Locale.Code));
     }
     if (user.TimeZone != null)
     {

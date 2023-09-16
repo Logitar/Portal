@@ -4,7 +4,6 @@ using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Passwords;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Sessions;
@@ -33,7 +32,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
     {
       DisplayName = "Desjardins",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = Locale,
       Url = new Uri("https://www.desjardins.com/")
     };
 
@@ -44,7 +43,7 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
       LastName = Faker.Person.LastName,
       Birthdate = Faker.Person.DateOfBirth,
       Gender = new Gender(Faker.Person.Gender.ToString()),
-      Locale = new Locale(Faker.Locale),
+      Locale = Locale,
       TimeZone = new TimeZoneEntry("America/Montreal"),
       Picture = new Uri(Faker.Person.Avatar),
       Website = _realm.Url
