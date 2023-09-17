@@ -263,13 +263,13 @@ onUpdated(() => registerTooltips());
             </form-checkbox>
             <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
             <PasswordSettingsEdit v-model="passwordSettings" />
-            <h5>{{ t("realms.passwordRecovery.title") }}</h5>
+            <h5>{{ t("realms.passwordRecovery") }}</h5>
             <div class="row">
               <SenderSelect
                 class="col-lg-6"
                 :realm="realm"
                 :model-value="passwordRecoverySender?.id"
-                placeholder="realms.passwordRecovery.sender.placeholder"
+                placeholder="senders.select.useDefault"
                 @sender-selected="passwordRecoverySender = $event"
               />
               <TemplateSelect

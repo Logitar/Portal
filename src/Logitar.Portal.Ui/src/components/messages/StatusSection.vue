@@ -27,13 +27,16 @@ const resultData = computed<object | undefined>(() =>
           {{ formatRealm(message.realm) }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" /> </RouterLink
         >.
       </template>
-      <template v-else>{{ t("messages.sent.portal") }}</template>
+      <template v-else>
+        {{ t("messages.sent.portal") }} <strong>{{ t("brand") }}</strong
+        >.
+      </template>
       <br />
       {{ t("messages.sent.sender") }}
       <RouterLink v-if="message.sender.version" :to="{ name: 'SenderEdit', params: { id: message.sender.id } }" target="_blank">
         {{ formatSender(message.sender) }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
       </RouterLink>
-      <template v-else>{{ formatSender(message.sender) }}</template>
+      <strong v-else>{{ formatSender(message.sender) }}</strong>
       {{ t("messages.sent.provider") }}
       <strong>{{ t(`senders.providers.options.${message.sender.provider}`) }}</strong
       >.

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { ProviderSetting } from "@/types/senders";
 
+const { t } = useI18n();
 type SettingKeys = "ApiKey";
 
 const props = withDefaults(
@@ -41,6 +43,7 @@ function setSetting(key: SettingKeys, value: string): void {
 
 <template>
   <div :id="id">
+    <h3>{{ t("senders.providers.sendGrid.settings") }}</h3>
     <form-input
       id="apiKey"
       label="senders.providers.sendGrid.apiKey.label"

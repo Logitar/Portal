@@ -4,6 +4,7 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
+import DemoMessage from "@/components/messages/DemoMessage.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import ProviderTypeSelect from "./ProviderTypeSelect.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
@@ -165,31 +166,39 @@ onMounted(async () => {
     <template v-if="hasLoaded">
       <h1>{{ title }}</h1>
       <status-detail v-if="sender" :aggregate="sender" />
-      <form @submit.prevent="onSubmit">
-        <div class="mb-3">
-          <icon-submit
-            class="me-1"
-            :disabled="isSubmitting || !hasChanges"
-            :icon="sender ? 'save' : 'plus'"
-            :loading="isSubmitting"
-            :text="sender ? 'actions.save' : 'actions.create'"
-            :variant="sender ? undefined : 'success'"
-          />
-          <icon-button class="mx-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
-          <SetDefaultSender v-if="sender" class="ms-1" :sender="sender" @error="handleError" @success="onSetDefault" />
-        </div>
-        <div class="row">
-          <RealmSelect class="col-lg-6" :disabled="Boolean(sender)" :model-value="realmId" @realm-selected="onRealmSelected" />
-          <ProviderTypeSelect class="col-lg-6" :disabled="Boolean(sender)" required v-model="provider" />
-        </div>
-        <div class="row">
-          <EmailAddressInput class="col-lg-6" required validate v-model="emailAddress" />
-          <display-name-input class="col-lg-6" validate v-model="displayName" />
-        </div>
-        <description-textarea v-model="description" />
-        <h3>{{ t("settings.title") }}</h3>
-        <SendGridSettings v-if="provider === 'SendGrid'" v-model="settings" />
-      </form>
+      <div class="mb-3">
+        <icon-button icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
+      </div>
+      <app-tabs>
+        <app-tab active title="general">
+          <form @submit.prevent="onSubmit">
+            <div class="mb-3">
+              <icon-submit
+                class="me-1"
+                :disabled="isSubmitting || !hasChanges"
+                :icon="sender ? 'save' : 'plus'"
+                :loading="isSubmitting"
+                :text="sender ? 'actions.save' : 'actions.create'"
+                :variant="sender ? undefined : 'success'"
+              />
+              <SetDefaultSender v-if="sender" class="ms-1" :sender="sender" @error="handleError" @success="onSetDefault" />
+            </div>
+            <div class="row">
+              <RealmSelect class="col-lg-6" :disabled="Boolean(sender)" :model-value="realmId" @realm-selected="onRealmSelected" />
+              <ProviderTypeSelect class="col-lg-6" :disabled="Boolean(sender)" required v-model="provider" />
+            </div>
+            <div class="row">
+              <EmailAddressInput class="col-lg-6" required validate v-model="emailAddress" />
+              <display-name-input class="col-lg-6" validate v-model="displayName" />
+            </div>
+            <description-textarea v-model="description" />
+            <SendGridSettings v-if="provider === 'SendGrid'" v-model="settings" />
+          </form>
+        </app-tab>
+        <app-tab :disabled="!sender" title="messages.demo.label">
+          <DemoMessage :sender="sender" @error="handleError" />
+        </app-tab>
+      </app-tabs>
     </template>
   </main>
 </template>

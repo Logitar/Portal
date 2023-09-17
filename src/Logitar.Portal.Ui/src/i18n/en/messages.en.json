@@ -9,13 +9,32 @@
         "text/plain": "Plain text content"
       }
     },
-    "variables": "Variables",
+    "variables": {
+      "empty": "There are no variables.",
+      "key": {
+        "label": "Key",
+        "placeholder": "Enter the key of the variable"
+      },
+      "title": "Variables",
+      "value": {
+        "label": "Value",
+        "placeholder": "Enter the value of the variable"
+      }
+    },
     "viewAsHtml": "View as HTML",
     "warning": "The following section may contain sensitive information."
   },
   "demo": {
+    "emailRequired": "You need an email address to receive a demo message.",
     "hint": "This message is a demo message.",
-    "label": "Demo"
+    "label": "Demo",
+    "status": {
+      "Failed": "The message was not sent due to an unexpected failure.",
+      "Succeeded": "The message has been successfully sent.",
+      "Unsent": "The message has not been sent yet."
+    },
+    "submit": "Send to me",
+    "view": "View detail"
   },
   "empty": "There are no results.",
   "recipients": {
@@ -33,7 +52,7 @@
   "resultData": "Result data",
   "sent": {
     "on": "Sent on",
-    "portal": "This message was sent through the Portal.",
+    "portal": "This message was sent through the",
     "provider": "using the provider",
     "realm": "This message was sent through the realm",
     "sender": "This message was sent from"

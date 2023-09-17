@@ -13,7 +13,9 @@ const props = defineProps<{
 
 const viewAsHtml = ref<boolean>(props.message.template.contentType === "text/html");
 
-const variables = computed<object>(() => Object.fromEntries(props.message.variables.map(({ key, value }) => [key, value])));
+const variables = computed<object | undefined>(() =>
+  props.message.variables.length ? Object.fromEntries(props.message.variables.map(({ key, value }) => [key, value])) : undefined
+);
 </script>
 
 <template>
@@ -25,7 +27,7 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
           {{ formatTemplate(message.template) }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" /> </RouterLink
         >.
       </template>
-      <template v-else>{{ formatTemplate(message.template) }}.</template>
+      <strong v-else>{{ formatTemplate(message.template) }}.</strong>
     </p>
     <h3>{{ message.subject }}</h3>
     <p>
@@ -45,8 +47,9 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
         </div>
         <locale-select disabled :model-value="message.locale?.code" />
       </app-accordion-item>
-      <app-accordion-item title="messages.contents.variables">
-        <json-viewer boxed copyable expanded :value="variables" />
+      <app-accordion-item title="messages.contents.variables.title">
+        <json-viewer v-if="variables" boxed copyable expanded :value="variables" />
+        <p v-else>{{ t("messages.contents.variables.empty") }}</p>
       </app-accordion-item>
     </app-accordion>
   </section>

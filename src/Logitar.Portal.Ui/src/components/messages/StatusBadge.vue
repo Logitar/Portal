@@ -17,6 +17,8 @@ const variant = computed<BadgeVariant>(() => {
       return "danger";
     case "Succeeded":
       return "success";
+    case "Unsent":
+      return "warning";
     default:
       return "secondary";
   }
