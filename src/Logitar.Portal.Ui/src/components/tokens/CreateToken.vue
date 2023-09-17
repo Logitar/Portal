@@ -21,10 +21,10 @@ const emailAddress = ref<string>("");
 const isConsumable = ref<boolean>(false);
 const issuer = ref<string>("");
 const lifetime = ref<number>(0);
-const purpose = ref<string>("");
 const realm = ref<Realm>();
 const secret = ref<string>("");
 const subject = ref<string>("");
+const type = ref<string>("");
 
 const emit = defineEmits<{
   (e: "error", value: unknown): void;
@@ -42,12 +42,12 @@ const onSubmit = handleSubmit(async () => {
   try {
     createdToken.value = await createToken({
       isConsumable: isConsumable.value,
-      purpose: purpose.value,
       realm: realm.value?.id,
       audience: audience.value,
       issuer: issuer.value,
       lifetime: lifetime.value,
       secret: secret.value,
+      type: type.value,
       subject: subject.value,
       emailAddress: emailAddress.value,
       claims: claims.value,
@@ -87,7 +87,7 @@ const onSubmit = handleSubmit(async () => {
           type="number"
           @update:model-value="lifetime = Number($event)"
         />
-        <FormInput class="col-lg-6" id="purpose" label="tokens.purpose.label" placeholder="tokens.purpose.placeholder" v-model="purpose" />
+        <FormInput class="col-lg-6" id="type" label="tokens.type.label" placeholder="tokens.type.placeholder" v-model="type" />
       </div>
       <div class="row">
         <FormInput class="col-lg-6" id="audience" label="tokens.audience.label" placeholder="tokens.audience.placeholder" v-model="audience" />

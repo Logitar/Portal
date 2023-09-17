@@ -72,11 +72,11 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     CreateTokenPayload payload = new()
     {
       IsConsumable = true,
-      Purpose = "  CreateUser  ",
       Realm = $"  {_realm.UniqueSlug.ToUpper()}  ",
       Algorithm = SecurityAlgorithms.HmacSha512,
       Audience = $"  {{Url}}oauth2  ",
       Lifetime = 7 * 24 * 60 * 60,
+      Type = "  createuser+jwt  ",
       Secret = "k_C!W9{f-(w57>LU+p:&<ZXtjSV@h$8;K#PyTmrFsM?bz[uQ`=RYd~.v*N]^ED6}",
       EmailAddress = $"  {Faker.Person.Email}  ",
       Claims = new Contracts.Tokens.Claim[]
@@ -87,10 +87,8 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
 
     CreatedToken createdToken = await _tokenService.CreateAsync(payload);
 
-    ClaimsPrincipal principal = _tokenManager.Validate(createdToken.Token, payload.Secret);
-    Assert.Equal(9, principal.Claims.Count());
-    Assert.Contains(principal.Claims, claim => claim.Type == OtherClaimNames.Purpose
-      && claim.Value == payload.Purpose.Trim());
+    ClaimsPrincipal principal = _tokenManager.Validate(createdToken.Token, payload.Secret, type: payload.Type.Trim());
+    Assert.Equal(8, principal.Claims.Count());
     Assert.Contains(principal.Claims, claim => claim.Type == Rfc7519ClaimNames.Audience
       && claim.Value == "https://www.desjardins.com/oauth2");
     Assert.Contains(principal.Claims, claim => claim.Type == Rfc7519ClaimNames.EmailAddress
@@ -211,28 +209,6 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Realm), exception.PropertyName);
   }
 
-  [Fact(DisplayName = "ValidateAsync: it should throw InvalidSecurityTokenPurposeException when the token purpose is not met.")]
-  public async Task ValidateAsync_it_should_throw_InvalidSecurityTokenPurposeException_when_the_token_purpose_is_not_met()
-  {
-    ClaimsIdentity identity = new();
-    identity.AddClaim(new(Rfc7519ClaimNames.Audience, _applicationContext.BaseUrl!.ToString()));
-    identity.AddClaim(new(Rfc7519ClaimNames.Issuer, _applicationContext.BaseUrl!.ToString()));
-    identity.AddClaim(new(OtherClaimNames.Purpose, "CreateUser"));
-    identity.AddClaim(new(OtherClaimNames.Purpose, "VerifyEmail"));
-
-    Assert.NotNull(Configuration);
-    string token = _tokenManager.Create(identity, Configuration.Secret);
-
-    ValidateTokenPayload payload = new(token)
-    {
-      Purpose = "  ResetPassword  "
-    };
-
-    var exception = await Assert.ThrowsAsync<InvalidSecurityTokenPurposeException>(async () => await _tokenService.ValidateAsync(payload));
-    Assert.Equal("resetpassword", exception.RequiredPurpose);
-    Assert.Equal(new[] { "createuser", "verifyemail" }, exception.ActualPurposes);
-  }
-
   [Fact(DisplayName = "ValidateAsync: it should throw SecurityTokenBlacklistedException when the token is blacklisted.")]
   public async Task ValidateAsync_it_should_throw_SecurityTokenBlacklistedException_when_the_token_is_blacklisted()
   {
@@ -303,8 +279,8 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
   {
     CreateTokenPayload createPayload = new()
     {
-      Purpose = "create_user",
       Realm = _realm.UniqueSlug,
+      Type = "createuser+jwt",
       Claims = new Contracts.Tokens.Claim[]
       {
         new(Rfc7519ClaimNames.Username, Faker.Person.UserName),
@@ -318,8 +294,8 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     ValidateTokenPayload validatePayload = new(createdToken.Token)
     {
       Consume = true,
-      Purpose = createPayload.Purpose,
-      Realm = _realm.Id.ToGuid().ToString()
+      Realm = _realm.Id.ToGuid().ToString(),
+      Type = createPayload.Type
     };
     ValidatedToken validatedToken = await _tokenService.ValidateAsync(validatePayload);
 

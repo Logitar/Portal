@@ -28,9 +28,9 @@ internal class TokenClientTests
       CreateTokenPayload create = new()
       {
         IsConsumable = true,
-        Purpose = "ResetPassword",
         Realm = _context.Realm.UniqueSlug,
         Lifetime = 900, // 15 minutes
+        Type = "resetpassword+jwt",
         Subject = _context.User.Id.ToString(),
         EmailAddress = _context.User.Email?.Address,
         Claims = new Claim[]
@@ -46,8 +46,8 @@ internal class TokenClientTests
       {
         Token = createdToken.Token,
         Consume = true,
-        Purpose = create.Purpose,
-        Realm = create.Realm
+        Realm = create.Realm,
+        Type = create.Type
       };
       _ = await _tokenService.ValidateAsync(validate, cancellationToken);
       _context.Succeed(name);

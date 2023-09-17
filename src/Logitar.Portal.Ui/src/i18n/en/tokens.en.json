@@ -36,10 +36,6 @@
     "placeholder": "Specify an issuer or leave blank to use default"
   },
   "lifetime": "Lifetime (seconds)",
-  "purpose": {
-    "label": "Purpose",
-    "placeholder": "Enter a token purpose"
-  },
   "secret": {
     "label": "Secret",
     "placeholder": "Paste a token secret or leave blank to use default"
@@ -49,6 +45,10 @@
     "placeholder": "Enter a subject claim, for example an ID"
   },
   "title": "Tokens",
+  "type": {
+    "label": "Type",
+    "placeholder": "Enter a token type, for example jwt"
+  },
   "validated": {
     "error": {
       "code": "Code",

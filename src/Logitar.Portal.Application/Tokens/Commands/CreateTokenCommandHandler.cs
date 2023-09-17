@@ -46,10 +46,6 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     {
       identity.AddClaim(new(Rfc7519ClaimNames.TokenId, Guid.NewGuid().ToString()));
     }
-    if (!string.IsNullOrWhiteSpace(payload.Purpose))
-    {
-      identity.AddClaim(new(OtherClaimNames.Purpose, payload.Purpose.Trim()));
-    }
 
     if (!string.IsNullOrWhiteSpace(payload.Subject))
     {
@@ -69,8 +65,9 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     string? algorithm = payload.Algorithm?.CleanTrim();
     string? audience = TokenHelper.GetAudience(payload.Audience, realm, _applicationContext.BaseUrl);
     string? issuer = TokenHelper.GetIssuer(payload.Issuer, realm, _applicationContext.BaseUrl);
+    string? type = payload.Type?.CleanTrim();
 
-    string token = _tokenManager.Create(identity, secret, expires, algorithm, audience, issuer);
+    string token = _tokenManager.Create(identity, secret, expires, algorithm, audience, issuer, type);
 
     return new CreatedToken(token);
   }
