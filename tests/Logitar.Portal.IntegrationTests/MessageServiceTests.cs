@@ -234,7 +234,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     Assert.NotNull(User);
-    User.Email = new EmailAddress(_recipient);
+    SetUserEmail(_recipient);
 
     await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, template, User });
 
