@@ -13,6 +13,23 @@ export type ErrorDetail = {
   errorMessage: string;
 };
 
+export type GraphQLError = {
+  extensions?: GraphQLErrorExtensions;
+  locations?: GraphQLLocation[];
+  message?: string;
+};
+
+export type GraphQLErrorExtensions = {
+  code?: string;
+  codes?: string[];
+  details?: string;
+};
+
+export type GraphQLLocation = {
+  column?: number;
+  line?: number;
+};
+
 export type GraphQLRequest<T> = {
   query: string;
   variables?: T;
@@ -20,5 +37,5 @@ export type GraphQLRequest<T> = {
 
 export type GraphQLResponse<T> = {
   data?: T;
-  errors?: unknown[];
+  errors?: GraphQLError[];
 };
