@@ -51,7 +51,7 @@ const isPasswordRequired = computed<boolean>(() => Boolean(current.value) || Boo
 
 watchEffect(() => {
   const user = props.user;
-  uniqueName.value = user.uniqueName; // TODO(fpion): doesn't seem to work after updating the user (#301)
+  uniqueName.value = user.uniqueName;
 });
 
 function reset(): void {
@@ -64,7 +64,7 @@ const emit = defineEmits<{
   (e: "user-updated", event: UserUpdatedEvent): void;
 }>();
 const { handleSubmit, isSubmitting } = useForm();
-const onSubmit = handleSubmit(async (_, { resetForm }) => {
+const onSubmit = handleSubmit(async () => {
   invalidCredentials.value = false;
   uniqueNameAlreadyUsed.value = false;
   try {
@@ -85,9 +85,7 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
       const user = await updateUser(props.user.id, payload);
       emit("user-updated", { user, toast: payload.uniqueName ? undefined : "users.password.changed" });
     }
-    resetForm();
   } catch (e: unknown) {
-    reset();
     currentRef.value?.focus();
     const { data, status } = e as ApiError;
     if (status === 400 && (data as ErrorDetail)?.errorCode === "InvalidCredentials") {
@@ -97,6 +95,8 @@ const onSubmit = handleSubmit(async (_, { resetForm }) => {
     } else {
       handleError(e);
     }
+  } finally {
+    reset();
   }
 });
 </script>
