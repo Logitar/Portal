@@ -14,7 +14,7 @@ internal class JsonWebTokenManager : ITokenManager
     _tokenHandler.InboundClaimTypeMap.Clear();
   }
 
-  public string Create(ClaimsIdentity subject, string secret, DateTime? expires, string? algorithm, string? audience, string? issuer)
+  public string Create(ClaimsIdentity subject, string secret, DateTime? expires, string? algorithm, string? audience, string? issuer, string? type)
   {
     SigningCredentials signingCredentials = new(GetSecurityKey(secret), algorithm ?? DefaultAlgorithm);
 
@@ -24,7 +24,8 @@ internal class JsonWebTokenManager : ITokenManager
       Expires = expires,
       Issuer = issuer,
       SigningCredentials = signingCredentials,
-      Subject = subject
+      Subject = subject,
+      TokenType = type
     };
 
     SecurityToken token = _tokenHandler.CreateToken(tokenDescriptor);
@@ -32,7 +33,7 @@ internal class JsonWebTokenManager : ITokenManager
     return _tokenHandler.WriteToken(token);
   }
 
-  public ClaimsPrincipal Validate(string token, string secret, string? audience, string? issuer)
+  public ClaimsPrincipal Validate(string token, string secret, string? audience, string? issuer, string? type)
   {
     SecurityKey key = GetSecurityKey(secret);
 
@@ -45,6 +46,10 @@ internal class JsonWebTokenManager : ITokenManager
       ValidateIssuer = issuer != null,
       ValidateIssuerSigningKey = true
     };
+    if (type != null)
+    {
+      validationParameters.ValidTypes = new[] { type };
+    }
 
     return _tokenHandler.ValidateToken(token, validationParameters, out _);
   }

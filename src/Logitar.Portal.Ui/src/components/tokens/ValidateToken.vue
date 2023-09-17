@@ -19,11 +19,11 @@ const audience = ref<string>("");
 const consume = ref<boolean>(false);
 const error = ref<ErrorDetail>();
 const issuer = ref<string>("");
-const purpose = ref<string>("");
 const realm = ref<Realm>();
 const secret = ref<string>("");
 const showError = ref<boolean>(false);
 const token = ref<string>("");
+const type = ref<string>("");
 const validatedToken = ref<ValidatedToken>();
 
 const emit = defineEmits<{
@@ -49,11 +49,11 @@ const onSubmit = handleSubmit(async () => {
     validatedToken.value = await validateToken({
       token: token.value,
       consume: consume.value,
-      purpose: purpose.value,
       realm: realm.value?.id,
       audience: audience.value,
       issuer: issuer.value,
       secret: secret.value,
+      type: type.value,
     });
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
@@ -93,7 +93,7 @@ onUpdated(() => registerTooltips());
         />
       </div>
       <form-checkbox class="mb-2" id="consume" label="tokens.consume" v-model="consume" />
-      <FormInput id="purpose" label="tokens.purpose.label" placeholder="tokens.purpose.placeholder" v-model="purpose" />
+      <FormInput id="type" label="tokens.type.label" placeholder="tokens.type.placeholder" v-model="type" />
       <div class="row">
         <FormInput class="col-lg-6" id="audience" label="tokens.audience.label" placeholder="tokens.audience.placeholder" v-model="audience" />
         <FormInput class="col-lg-6" id="issuer" label="tokens.issuer.label" placeholder="tokens.issuer.placeholder" v-model="issuer" />

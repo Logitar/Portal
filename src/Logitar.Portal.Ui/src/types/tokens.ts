@@ -6,13 +6,13 @@ export type Claim = {
 
 export type CreateTokenPayload = {
   isConsumable: boolean;
-  purpose?: string;
   realm?: string;
   algorithm?: string;
   audience?: string;
   issuer?: string;
   lifetime: number;
   secret?: string;
+  type?: string;
   subject?: string;
   emailAddress?: string;
   claims: Claim[];
@@ -25,11 +25,11 @@ export type CreatedToken = {
 export type ValidateTokenPayload = {
   token: string;
   consume: boolean;
-  purpose?: string;
   realm?: string;
   audience?: string;
   issuer?: string;
   secret?: string;
+  type?: string;
 };
 
 export type ValidatedToken = {

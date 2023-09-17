@@ -36,10 +36,6 @@
     "placeholder": "Spécifiez un émetteur ou laissez vide pour utiliser la valeur par défaut"
   },
   "lifetime": "Durée de vie (secondes)",
-  "purpose": {
-    "label": "Usage",
-    "placeholder": "Entrez un usage de jeton"
-  },
   "secret": {
     "label": "Secret",
     "placeholder": "Collez un secret de jeton ou laissez vide pour utiliser la valeur par défaut"
@@ -49,6 +45,10 @@
     "placeholder": "Entrez un sujet de revendication, par un exemple un identifiant"
   },
   "title": "Jetons",
+  "type": {
+    "label": "Type",
+    "placeholder": "Entrez un type de jeton, par exemple jwt"
+  },
   "validated": {
     "error": {
       "code": "Code",

@@ -3,7 +3,6 @@
 public record CreateTokenPayload
 {
   public bool IsConsumable { get; set; }
-  public string? Purpose { get; set; }
   public string? Realm { get; set; }
 
   public string? Algorithm { get; set; }
@@ -11,6 +10,7 @@ public record CreateTokenPayload
   public string? Issuer { get; set; }
   public int Lifetime { get; set; }
   public string? Secret { get; set; }
+  public string? Type { get; set; }
 
   public string? Subject { get; set; }
   public string? EmailAddress { get; set; }

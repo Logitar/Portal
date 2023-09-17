@@ -45,8 +45,9 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
     secret ??= realm?.Secret ?? configuration.Secret;
     string? audience = TokenHelper.GetAudience(payload.Audience, realm, _applicationContext.BaseUrl);
     string? issuer = TokenHelper.GetIssuer(payload.Issuer, realm, _applicationContext.BaseUrl);
+    string? type = payload.Type?.CleanTrim();
 
-    ClaimsPrincipal principal = _tokenManager.Validate(payload.Token, secret, audience, issuer);
+    ClaimsPrincipal principal = _tokenManager.Validate(payload.Token, secret, audience, issuer, type);
 
     IEnumerable<Guid> ids = principal.FindAll(Rfc7519ClaimNames.TokenId).Select(x => Guid.Parse(x.Value));
     if (ids.Any())
@@ -55,18 +56,6 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
       if (blacklisted.Any())
       {
         throw new SecurityTokenBlacklistedException(blacklisted);
-      }
-    }
-
-    if (!string.IsNullOrWhiteSpace(payload.Purpose))
-    {
-      string purpose = payload.Purpose.Trim().ToLower();
-
-      IEnumerable<System.Security.Claims.Claim> purposeClaims = principal.FindAll(OtherClaimNames.Purpose);
-      HashSet<string> purposes = purposeClaims.SelectMany(x => x.Value.Split().Select(y => y.ToLower())).ToHashSet();
-      if (!purposes.Contains(purpose))
-      {
-        throw new InvalidSecurityTokenPurposeException(purpose, purposes);
       }
     }
 
