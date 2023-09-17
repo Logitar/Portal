@@ -5,6 +5,7 @@ using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +25,18 @@ internal class MessageQuerier : IMessageQuerier
     _sqlHelper = sqlHelper;
   }
 
+  public async Task<Message> ReadAsync(MessageAggregate message, CancellationToken cancellationToken)
+  {
+    return await ReadAsync(message.Id, cancellationToken)
+      ?? throw new EntityNotFoundException<MessageEntity>(message.Id);
+  }
   public async Task<Message?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(new AggregateId(id), cancellationToken);
+  }
+  private async Task<Message?> ReadAsync(AggregateId id, CancellationToken cancellationToken)
+  {
+    string aggregateId = id.Value;
 
     MessageEntity? message = await _messages.AsNoTracking()
       .Include(x => x.Realm)
@@ -143,6 +153,6 @@ internal class MessageQuerier : IMessageQuerier
     Dictionary<ActorId, Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return messages.Select(message => mapper.ToMessage(message));
+    return messages.Select(mapper.ToMessage);
   }
 }

@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 
 import type { Message } from "@/types/messages";
 import { formatTemplate } from "@/helpers/displayUtils";
+import { isEmpty } from "@/helpers/objectUtils";
 
 const { t } = useI18n();
 
@@ -25,7 +26,7 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
           {{ formatTemplate(message.template) }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" /> </RouterLink
         >.
       </template>
-      <template v-else>{{ formatTemplate(message.template) }}.</template>
+      <strong v-else>{{ formatTemplate(message.template) }}.</strong>
     </p>
     <h3>{{ message.subject }}</h3>
     <p>
@@ -45,8 +46,9 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
         </div>
         <locale-select disabled :model-value="message.locale?.code" />
       </app-accordion-item>
-      <app-accordion-item title="messages.contents.variables">
-        <json-viewer boxed copyable expanded :value="variables" />
+      <app-accordion-item title="messages.contents.variables.title">
+        <p v-if="isEmpty(variables)">{{ t("messages.contents.variables.empty") }}</p>
+        <json-viewer v-else boxed copyable expanded :value="variables" />
       </app-accordion-item>
     </app-accordion>
   </section>

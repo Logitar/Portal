@@ -5,4 +5,5 @@ public interface IMessageService
   Task<Message?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken = default);
   Task<SentMessages> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken = default);
+  Task<Message> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken = default);
 }

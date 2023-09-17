@@ -44,4 +44,13 @@ public class MessageController : ControllerBase
 
     return Ok(sentMessages);
   }
+
+  [HttpPost("send/demo")]
+  public async Task<ActionResult<Message>> SendDemoAsync([FromBody] SendDemoMessagePayload payload, CancellationToken cancellationToken)
+  {
+    Message message = await _messageService.SendDemoAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/messages/{message.Id}");
+
+    return Created(uri, message);
+  }
 }

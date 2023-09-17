@@ -8,5 +8,6 @@ public record DictionaryDeletedEvent : DomainEvent, INotification
   public DictionaryDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

@@ -62,8 +62,6 @@ watch(
     }
   }
 );
-
-// TODO(fpion): not working when always-open is false (#335)
 </script>
 
 <template>

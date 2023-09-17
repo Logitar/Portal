@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.EventSourcing.Infrastructure;
+﻿using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Messages.Events;
@@ -21,13 +20,13 @@ internal record MessageEntity : AggregateEntity
     Subject = created.Subject;
     Body = created.Body;
 
-    Dictionary<Guid, UserEntity> usersById = users.ToDictionary(u => new AggregateId(u.AggregateId).ToGuid(), u => u);
+    Dictionary<string, UserEntity> usersById = users.ToDictionary(u => u.AggregateId, u => u);
     foreach (ReadOnlyRecipient recipient in created.Recipients)
     {
       UserEntity? user = null;
-      if (recipient.User != null)
+      if (recipient.UserId.HasValue)
       {
-        _ = usersById.TryGetValue(recipient.User.Id.ToGuid(), out user);
+        _ = usersById.TryGetValue(recipient.UserId.Value.Value, out user);
       }
 
       Recipients.Add(new RecipientEntity(recipient, this, user));

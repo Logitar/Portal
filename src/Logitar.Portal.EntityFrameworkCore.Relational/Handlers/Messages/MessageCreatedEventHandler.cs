@@ -36,7 +36,7 @@ internal class MessageCreatedEventHandler : INotificationHandler<MessageCreatedE
         .SingleOrDefaultAsync(x => x.AggregateId == @event.Template.Id.Value, cancellationToken)
         ?? throw new EntityNotFoundException<TemplateEntity>(@event.Template.Id);
 
-      IEnumerable<string> userIds = @event.Recipients.Where(x => x.User != null).Select(x => x.User!.Id.Value).Distinct();
+      IEnumerable<string> userIds = @event.Recipients.Where(x => x.UserId.HasValue).Select(x => x.UserId!.Value.Value).Distinct();
       UserEntity[] users = await _context.Users.Where(x => userIds.Contains(x.AggregateId)).ToArrayAsync(cancellationToken);
 
       message = new(@event, realm, sender, template, users);

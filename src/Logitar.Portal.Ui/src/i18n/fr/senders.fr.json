@@ -24,13 +24,14 @@
       "apiKey": {
         "label": "Clé d’API",
         "placeholder": "Collez votre clé d’API SendGrid"
-      }
+      },
+      "settings": "Paramètres de SendGrid"
     }
   },
-
   "select": {
     "label": "Expéditeur",
-    "placeholder": "Sélectionnez un expéditeur"
+    "placeholder": "Sélectionnez un expéditeur",
+    "useDefault": "Utiliser l’expéditeur par défaut"
   },
   "sort": {
     "options": {

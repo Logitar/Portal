@@ -9,13 +9,36 @@
         "text/plain": "Contenu texte brut"
       }
     },
-    "variables": "Variables",
+    "variables": {
+      "empty": "Il n’y a aucune variable.",
+      "key": {
+        "label": "Clé",
+        "placeholder": "Entrez la clé de la variable"
+      },
+      "title": "Variables",
+      "value": {
+        "label": "Valeur",
+        "placeholder": "Entrez la valeur de la variable"
+      }
+    },
     "viewAsHtml": "Visionner en HTML",
     "warning": "La section suivante peut contenir de l’information sensible."
   },
   "demo": {
+    "emailRequired": "Vous devez avoir une adresse courriel afin de recevoir un message de démo.",
     "hint": "Ce message est une démonstration.",
-    "label": "Démo"
+    "label": "Démo",
+    "realmHasNoDefaultSender": {
+      "help": "Aucun expéditeur par défaut n’a été configuré pour le royaume dans lequel le gabarit réside.",
+      "lead": "Expédition échouée !"
+    },
+    "status": {
+      "Failed": "Le message n’a pas été envoyé en raison d’une erreur inattendue.",
+      "Succeeded": "Le message a été envoyé avec succès.",
+      "Unsent": "Le message n’a pas encore été envoyé."
+    },
+    "submit": "Expédier à moi",
+    "view": "Voir les détails"
   },
   "empty": "Il n’y a aucun résultat.",
   "recipients": {
@@ -33,7 +56,7 @@
   "resultData": "Données de résultat",
   "sent": {
     "on": "Expédié le",
-    "portal": "Ce message a été expédié au travers du Portal.",
+    "portal": "Ce message a été expédié au travers du",
     "provider": "en utilisant le fournisseur",
     "realm": "Ce message a été expédié au travers du royaume",
     "sender": "Ce message a été expédié par"

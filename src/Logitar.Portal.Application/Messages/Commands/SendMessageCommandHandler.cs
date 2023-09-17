@@ -142,7 +142,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
         }
         else
         {
-          recipients.Add(new ReadOnlyRecipient(recipient.Address!, recipient.DisplayName, recipient.Type));
+          recipients.Add(new ReadOnlyRecipient(recipient.Address, recipient.DisplayName, recipient.Type));
         }
       }
       else

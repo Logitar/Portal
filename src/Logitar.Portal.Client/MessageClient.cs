@@ -27,4 +27,9 @@ internal class MessageClient : ClientBase, IMessageService
     return await PostAsync<SentMessages>($"{Path}/send", payload, cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");
   }
+
+  public Task<Message> SendDemoAsync(SendDemoMessagePayload payload, CancellationToken cancellationToken)
+  {
+    throw new NotSupportedException();
+  }
 }

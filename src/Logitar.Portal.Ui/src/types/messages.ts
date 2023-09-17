@@ -53,6 +53,13 @@ export type SearchMessagesPayload = SearchPayload & {
   sort?: MessageSortOption[];
 };
 
+export type SendDemoMessagePayload = {
+  senderId?: string;
+  templateId: string;
+  locale?: string;
+  variables: Variable[];
+};
+
 export type Variable = {
   key: string;
   value: string;

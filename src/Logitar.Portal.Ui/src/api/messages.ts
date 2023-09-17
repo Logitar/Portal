@@ -1,6 +1,6 @@
-import type { Message, SearchMessagesPayload } from "@/types/messages";
+import type { Message, SearchMessagesPayload, SendDemoMessagePayload } from "@/types/messages";
 import type { SearchResults } from "@/types/search";
-import { get, graphQL } from ".";
+import { get, graphQL, post } from ".";
 
 export async function readMessage(id: string): Promise<Message> {
   return (await get<Message>(`/api/messages/${id}`)).data;
@@ -49,4 +49,8 @@ type SearchMessagesResponse = {
 };
 export async function searchMessages(payload: SearchMessagesPayload): Promise<SearchResults<Message>> {
   return (await graphQL<SearchMessagesRequest, SearchMessagesResponse>(searchMessagesQuery, { payload })).data.messages;
+}
+
+export async function sendDemoMessage(payload: SendDemoMessagePayload): Promise<Message> {
+  return (await post<SendDemoMessagePayload, Message>("/api/messages/send/demo", payload)).data;
 }

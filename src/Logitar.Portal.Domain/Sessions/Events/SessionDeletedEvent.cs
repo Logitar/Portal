@@ -8,5 +8,6 @@ public record SessionDeletedEvent : DomainEvent, INotification
   public SessionDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

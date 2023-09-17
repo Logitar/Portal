@@ -5,6 +5,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import ContentTypeSelect from "@/components/templates/ContentTypeSelect.vue";
+import DemoMessage from "@/components/messages/DemoMessage.vue";
 import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Configuration } from "@/types/configuration";
@@ -177,10 +178,13 @@ onMounted(async () => {
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>
             <form-input id="subject" label="templates.subject.label" :maxLength="255" placeholder="templates.subject.placeholder" required v-model="subject" />
-            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required rows="20" v-model="contents" />
+            <form-textarea id="contents" label="templates.contents.label" placeholder="templates.contents.placeholder" required :rows="20" v-model="contents" />
           </app-tab>
           <app-tab title="description.label">
             <description-textarea no-label v-model="description" />
+          </app-tab>
+          <app-tab :disabled="!template" title="messages.demo.label">
+            <DemoMessage v-if="template" :template="template" @error="handleError" />
           </app-tab>
         </app-tabs>
       </form>

@@ -8,5 +8,6 @@ public record TemplateDeletedEvent : DomainEvent, INotification
   public TemplateDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }
