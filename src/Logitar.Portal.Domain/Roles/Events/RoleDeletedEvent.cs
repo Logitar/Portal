@@ -8,5 +8,6 @@ public record RoleDeletedEvent : DomainEvent, INotification
   public RoleDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

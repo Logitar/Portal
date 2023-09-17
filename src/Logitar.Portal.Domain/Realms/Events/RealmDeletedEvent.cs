@@ -8,5 +8,6 @@ public record RealmDeletedEvent : DomainEvent, INotification
   public RealmDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

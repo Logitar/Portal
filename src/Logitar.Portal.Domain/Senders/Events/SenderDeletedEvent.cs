@@ -8,5 +8,6 @@ public record SenderDeletedEvent : DomainEvent, INotification
   public SenderDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

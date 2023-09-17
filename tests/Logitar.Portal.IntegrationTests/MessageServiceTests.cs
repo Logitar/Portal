@@ -233,9 +233,11 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
       DisplayName = _template.DisplayName
     };
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, template });
-
     Assert.NotNull(User);
+    User.Email = new EmailAddress(_recipient);
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { sender, template, User });
+
     SendMessagePayload payload = new()
     {
       Template = template.Id.ToGuid().ToString(),
@@ -664,6 +666,268 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Recipients), exception.PropertyName);
   }
 
+  [Fact(DisplayName = "SendDemoAsync: it should send a demo message with all arguments.")]
+  public async Task SendDemoAsync_it_should_send_a_demo_message_with_all_arguments()
+  {
+    Assert.NotNull(User);
+    SetUserEmail(_recipient);
+
+    SenderAggregate sender = new(_sender.EmailAddress, _sender.Provider, isDefault: false, _sender.TenantId)
+    {
+      DisplayName = Faker.Name.FullName()
+    };
+    foreach (KeyValuePair<string, string> setting in _sender.Settings)
+    {
+      sender.SetSetting(setting.Key, setting.Value);
+    }
+
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { User, sender });
+
+    string token = "9dFny0oyBUqd2e4ESh_xzQ";
+    SendDemoMessagePayload payload = new()
+    {
+      SenderId = sender.Id.ToGuid(),
+      TemplateId = _template.Id.ToGuid(),
+      Locale = "  en-US  ",
+      Variables = new Variable[]
+      {
+        new("Token", token)
+      }
+    };
+
+    Message message = await _messageService.SendDemoAsync(payload);
+
+    Assert.NotEqual(Guid.Empty, message.Id);
+    Assert.Equal(ActorId.ToGuid(), message.CreatedBy.Id);
+    AssertIsNear(message.CreatedOn);
+    Assert.Equal(message.CreatedBy, message.UpdatedBy);
+    Assert.True(message.CreatedOn < message.UpdatedOn);
+    Assert.Equal(2, message.Version);
+
+    Assert.Equal("Reset your password", message.Subject);
+    Assert.Equal(_realm.Id.ToGuid(), message.Realm?.Id);
+    Assert.Equal(sender.Id.ToGuid(), message.Sender.Id);
+    Assert.Equal(_template.Id.ToGuid(), message.Template.Id);
+    Assert.True(message.IgnoreUserLocale);
+    Assert.Equal(payload.Locale.Trim(), message.Locale?.Code);
+    Assert.Equal(payload.Variables, message.Variables);
+    Assert.True(message.IsDemo);
+
+    string body = @"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
+<html xmlns=""http://www.w3.org/1999/xhtml"" lang=""en"" xml:lang=""en"">
+<head>
+  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
+</head>
+<body>
+  <p><strong>Bonjour {name} !</strong></p>
+  <p>It seems you have lost your password...</p>
+  <p>
+    In this case, please click on the link below to reset it:
+    <br />
+    <a href=""https://www.logitar.com/en-us/user/reset-password?token={token}"">https://www.logitar.com/en-us/user/reset-password?token={token}</a>
+  </p>
+  <p>If we&#39;ve been mistaken, we suggest you to delete this message.</p>
+  <p>
+    Cordially,
+    <br />
+    <i>The Logitar Team</i>
+  </p>
+</body>
+</html>".Replace("{name}", User.FullName).Replace("{token}", token);
+    Assert.Equal(body, message.Body);
+
+    Assert.Equal(1, message.RecipientCount);
+    Recipient recipient = Assert.Single(message.Recipients);
+    Assert.Equal(RecipientType.To, recipient.Type);
+    Assert.Equal(User.Id.ToGuid(), recipient.User?.Id);
+    Assert.Equal(User.Email?.Address, recipient.Address);
+    Assert.Equal(User.FullName, recipient.DisplayName);
+
+    if (message.Status == MessageStatus.Unsent)
+    {
+      Assert.Null(message.Result);
+    }
+    else
+    {
+      Assert.NotNull(message.Result);
+    }
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should send a demo message with default arguments.")]
+  public async Task SendDemoAsync_it_should_send_a_demo_message_with_default_arguments()
+  {
+    Assert.NotNull(User);
+    SetUserEmail(_recipient);
+    await AggregateRepository.SaveAsync(User);
+
+    SendDemoMessagePayload payload = new()
+    {
+      TemplateId = _template.Id.ToGuid()
+    };
+
+    Message message = await _messageService.SendDemoAsync(payload);
+
+    Assert.NotEqual(Guid.Empty, message.Id);
+    Assert.Equal(ActorId.ToGuid(), message.CreatedBy.Id);
+    AssertIsNear(message.CreatedOn);
+    Assert.Equal(message.CreatedBy, message.UpdatedBy);
+    Assert.True(message.CreatedOn < message.UpdatedOn);
+    Assert.Equal(2, message.Version);
+
+    Assert.Equal("Reset your password", message.Subject);
+    Assert.Equal(_realm.Id.ToGuid(), message.Realm?.Id);
+    Assert.Equal(_sender.Id.ToGuid(), message.Sender.Id);
+    Assert.Equal(_template.Id.ToGuid(), message.Template.Id);
+    Assert.False(message.IgnoreUserLocale);
+    Assert.Equal(User.Locale?.Code, message.Locale?.Code);
+    Assert.Empty(message.Variables);
+    Assert.True(message.IsDemo);
+
+    string body = @"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
+<html xmlns=""http://www.w3.org/1999/xhtml"" lang=""en"" xml:lang=""en"">
+<head>
+  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
+</head>
+<body>
+  <p><strong>Bonjour {name} !</strong></p>
+  <p>It seems you have lost your password...</p>
+  <p>
+    In this case, please click on the link below to reset it:
+    <br />
+    <a href=""https://www.logitar.com/en/user/reset-password?token=Token"">https://www.logitar.com/en/user/reset-password?token=Token</a>
+  </p>
+  <p>If we&#39;ve been mistaken, we suggest you to delete this message.</p>
+  <p>
+    Cordially,
+    <br />
+    <i>The Logitar Team</i>
+  </p>
+</body>
+</html>".Replace("{name}", User.FullName);
+    Assert.Equal(body, message.Body);
+
+    Assert.Equal(1, message.RecipientCount);
+    Recipient recipient = Assert.Single(message.Recipients);
+    Assert.Equal(RecipientType.To, recipient.Type);
+    Assert.Equal(User.Id.ToGuid(), recipient.User?.Id);
+    Assert.Equal(User.Email?.Address, recipient.Address);
+    Assert.Equal(User.FullName, recipient.DisplayName);
+
+    if (message.Status == MessageStatus.Unsent)
+    {
+      Assert.Null(message.Result);
+    }
+    else
+    {
+      Assert.NotNull(message.Result);
+    }
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw AggregateNotFoundException when the sender could not be found.")]
+  public async Task SendDemoAsync_it_should_throw_AggregateNotFoundException_when_the_sender_could_not_be_found()
+  {
+    SendDemoMessagePayload payload = new()
+    {
+      SenderId = Guid.Empty,
+      TemplateId = _template.Id.ToGuid()
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<SenderAggregate>>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Equal(payload.SenderId.ToString(), exception.Id);
+    Assert.Equal(nameof(payload.SenderId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw AggregateNotFoundException when the template could not be found.")]
+  public async Task SendDemoAsync_it_should_throw_AggregateNotFoundException_when_the_template_could_not_be_found()
+  {
+    SendDemoMessagePayload payload = new()
+    {
+      TemplateId = Guid.Empty
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<TemplateAggregate>>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Equal(payload.TemplateId.ToString(), exception.Id);
+    Assert.Equal(nameof(payload.TemplateId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw AggregateNotFoundException when the user could not be found.")]
+  public async Task SendDemoAsync_it_should_throw_AggregateNotFoundException_when_the_user_could_not_be_found()
+  {
+    Assert.NotNull(Session);
+    Session.Delete(ActorId);
+    Assert.NotNull(User);
+    User.Delete(ActorId);
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { Session, User });
+
+    SendDemoMessagePayload payload = new()
+    {
+      TemplateId = _template.Id.ToGuid()
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<UserAggregate>>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Equal(User.Id.Value, exception.Id);
+    Assert.Equal(nameof(IApplicationContext.ActorId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw MissingRecipientAddressesException when the user has no email address.")]
+  public async Task SendDemoAsync_it_should_throw_MissingRecipientAddressesException_when_the_user_has_no_email_address()
+  {
+    Assert.NotNull(User);
+    SetUserEmail(address: null);
+    await AggregateRepository.SaveAsync(User);
+
+    SendDemoMessagePayload payload = new()
+    {
+      TemplateId = _template.Id.ToGuid()
+    };
+
+    var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Equal(new[] { User.Id.ToGuid().ToString() }, exception.Recipients);
+    Assert.Equal(nameof(IApplicationContext.ActorId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw RealmHasNoDefaultSenderException when the realm has no default sender.")]
+  public async Task SendDemoAsync_it_should_throw_RealmHasNoDefaultSenderException_when_the_realm_has_not_default_sender()
+  {
+    Assert.NotNull(Configuration);
+    TemplateAggregate template = new(Configuration.UniqueNameSettings, _template.UniqueName, _template.Subject, _template.ContentType, _template.Contents)
+    {
+      DisplayName = _template.DisplayName
+    };
+    await AggregateRepository.SaveAsync(template);
+
+    SendDemoMessagePayload payload = new()
+    {
+      TemplateId = template.Id.ToGuid()
+    };
+
+    var exception = await Assert.ThrowsAsync<RealmHasNoDefaultSenderException>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Null(exception.Realm);
+    Assert.Equal(nameof(payload.TemplateId), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "SendDemoAsync: it should throw SenderNotInRealmException when the sender is not in the realm.")]
+  public async Task SendDemoAsync_it_should_throw_SenderNotInRealmException_when_the_sender_is_not_in_the_realm()
+  {
+    Assert.NotNull(Configuration);
+    TemplateAggregate template = new(Configuration.UniqueNameSettings, _template.UniqueName, _template.Subject, _template.ContentType, _template.Contents)
+    {
+      DisplayName = _template.DisplayName
+    };
+    await AggregateRepository.SaveAsync(template);
+
+    SendDemoMessagePayload payload = new()
+    {
+      SenderId = _sender.Id.ToGuid(),
+      TemplateId = template.Id.ToGuid()
+    };
+
+    var exception = await Assert.ThrowsAsync<SenderNotInRealmException>(async () => await _messageService.SendDemoAsync(payload));
+    Assert.Equal(_sender.ToString(), exception.Sender);
+    Assert.Null(exception.Realm);
+    Assert.Equal(nameof(payload.SenderId), exception.PropertyName);
+  }
+
   private static DictionaryAggregate CreateDictionary(ReadOnlyLocale locale, string? tenantId = null)
   {
     string json = File.ReadAllText($"Dictionaries/{locale.Code}.json", Encoding.UTF8);
@@ -700,5 +964,13 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     }
 
     return null;
+  }
+
+  private void SetUserEmail(string? address)
+  {
+    if (User != null)
+    {
+      User.Email = address == null ? null : new EmailAddress(address);
+    }
   }
 }

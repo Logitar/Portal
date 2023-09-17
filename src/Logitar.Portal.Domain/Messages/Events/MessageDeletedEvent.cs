@@ -8,5 +8,6 @@ public record MessageDeletedEvent : DomainEvent, INotification
   public MessageDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }

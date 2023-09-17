@@ -8,5 +8,6 @@ public record ApiKeyDeletedEvent : DomainEvent, INotification
   public ApiKeyDeletedEvent(ActorId actorId)
   {
     ActorId = actorId;
+    IsDeleted = true;
   }
 }
