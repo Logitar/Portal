@@ -28,6 +28,10 @@
     "emailRequired": "You need an email address to receive a demo message.",
     "hint": "This message is a demo message.",
     "label": "Demo",
+    "realmHasNoDefaultSender": {
+      "help": "No default sender has been configured for the realm in which the template resides.",
+      "lead": "Sending failed!"
+    },
     "status": {
       "Failed": "The message was not sent due to an unexpected failure.",
       "Succeeded": "The message has been successfully sent.",

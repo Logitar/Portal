@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import { computed, inject, onMounted, onUnmounted, onUpdated, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 import type { TabOptions } from "@/types/components";
@@ -40,6 +40,11 @@ onMounted(() => {
 onUnmounted(() => {
   if (unbindTab) {
     unbindTab(options.value);
+  }
+});
+onUpdated(() => {
+  if (bindTab) {
+    bindTab(options.value);
   }
 });
 </script>

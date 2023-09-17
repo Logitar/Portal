@@ -184,7 +184,7 @@ onMounted(async () => {
             <description-textarea no-label v-model="description" />
           </app-tab>
           <app-tab :disabled="!template" title="messages.demo.label">
-            <DemoMessage :template="template" @error="handleError" />
+            <DemoMessage v-if="template" :template="template" @error="handleError" />
           </app-tab>
         </app-tabs>
       </form>

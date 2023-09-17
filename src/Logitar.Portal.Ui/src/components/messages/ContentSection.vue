@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 
 import type { Message } from "@/types/messages";
 import { formatTemplate } from "@/helpers/displayUtils";
+import { isEmpty } from "@/helpers/objectUtils";
 
 const { t } = useI18n();
 
@@ -13,9 +14,7 @@ const props = defineProps<{
 
 const viewAsHtml = ref<boolean>(props.message.template.contentType === "text/html");
 
-const variables = computed<object | undefined>(() =>
-  props.message.variables.length ? Object.fromEntries(props.message.variables.map(({ key, value }) => [key, value])) : undefined
-);
+const variables = computed<object>(() => Object.fromEntries(props.message.variables.map(({ key, value }) => [key, value])));
 </script>
 
 <template>
@@ -48,8 +47,8 @@ const variables = computed<object | undefined>(() =>
         <locale-select disabled :model-value="message.locale?.code" />
       </app-accordion-item>
       <app-accordion-item title="messages.contents.variables.title">
-        <json-viewer v-if="variables" boxed copyable expanded :value="variables" />
-        <p v-else>{{ t("messages.contents.variables.empty") }}</p>
+        <p v-if="isEmpty(variables)">{{ t("messages.contents.variables.empty") }}</p>
+        <json-viewer v-else boxed copyable expanded :value="variables" />
       </app-accordion-item>
     </app-accordion>
   </section>

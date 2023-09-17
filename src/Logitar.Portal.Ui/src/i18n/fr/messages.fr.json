@@ -28,6 +28,10 @@
     "emailRequired": "Vous devez avoir une adresse courriel afin de recevoir un message de démo.",
     "hint": "Ce message est une démonstration.",
     "label": "Démo",
+    "realmHasNoDefaultSender": {
+      "help": "Aucun expéditeur par défaut n’a été configuré pour le royaume dans lequel le gabarit réside.",
+      "lead": "Expédition échouée !"
+    },
     "status": {
       "Failed": "Le message n’a pas été envoyé en raison d’une erreur inattendue.",
       "Succeeded": "Le message a été envoyé avec succès.",

@@ -7,6 +7,7 @@ import SenderSelect from "@/components/senders/SenderSelect.vue";
 import StatusBadge from "./StatusBadge.vue";
 import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import VariableList from "./VariableList.vue";
+import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Message, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
@@ -20,9 +21,13 @@ const props = defineProps<{
   sender?: Sender;
   template?: Template;
 }>();
+if ((!props.sender && !props.template) || (props.sender && props.template)) {
+  throw new Error("Only one of the following properties must be specified: sender, template.");
+}
 
 const locale = ref<string | undefined>(account.authenticated?.locale?.code);
 const message = ref<Message>();
+const realmHasNoDefaultSender = ref<boolean>(false);
 const selectedSender = ref<Sender>();
 const selectedTemplate = ref<Template>();
 const showStatus = ref<boolean>(false);
@@ -40,14 +45,14 @@ const variant = computed<string>(() => {
       return "secondary";
   }
 });
-const hasEmail = computed<boolean>(() => Boolean(account.authenticated?.email));
+const userHasNoEmail = computed<boolean>(() => !account.authenticated?.email);
 
 const emit = defineEmits<{
   (e: "error", value: unknown): void;
 }>();
-
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  realmHasNoDefaultSender.value = false;
   try {
     message.value = await sendDemoMessage({
       senderId: props.sender?.id ?? selectedSender.value?.id,
@@ -57,7 +62,12 @@ const onSubmit = handleSubmit(async () => {
     });
     showStatus.value = true;
   } catch (e: unknown) {
-    emit("error", e);
+    const { data, status } = e as ApiError;
+    if (status === 400 && (data as ErrorDetail)?.errorCode === "RealmHasNoDefaultSender") {
+      realmHasNoDefaultSender.value = true;
+    } else {
+      emit("error", e);
+    }
   }
 });
 </script>
@@ -71,9 +81,12 @@ const onSubmit = handleSubmit(async () => {
         {{ t("messages.demo.view") }} <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
       </RouterLink>
     </app-alert>
+    <app-alert dismissible variant="warning" v-model="realmHasNoDefaultSender">
+      <strong>{{ t("messages.demo.realmHasNoDefaultSender.lead") }}</strong> {{ t("messages.demo.realmHasNoDefaultSender.help") }}
+    </app-alert>
     <div class="mb-3">
-      <icon-submit class="me-1" :disabled="!hasEmail || isSubmitting" icon="fas fa-paper-plane" :loading="isSubmitting" text="messages.demo.submit" />
-      <span v-if="!hasEmail" class="ms-1 text-danger">{{ t("messages.demo.emailRequired") }}</span>
+      <icon-submit class="me-1" :disabled="userHasNoEmail || isSubmitting" icon="fas fa-paper-plane" :loading="isSubmitting" text="messages.demo.submit" />
+      <span v-if="userHasNoEmail" class="ms-1 text-danger">{{ t("messages.demo.emailRequired") }}</span>
     </div>
     <div class="row">
       <TemplateSelect

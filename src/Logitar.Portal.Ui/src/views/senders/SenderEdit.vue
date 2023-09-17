@@ -196,7 +196,7 @@ onMounted(async () => {
           </form>
         </app-tab>
         <app-tab :disabled="!sender" title="messages.demo.label">
-          <DemoMessage :sender="sender" @error="handleError" />
+          <DemoMessage v-if="sender" :sender="sender" @error="handleError" />
         </app-tab>
       </app-tabs>
     </template>

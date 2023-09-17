@@ -11,11 +11,11 @@ import type { Message, MessageSort, MessageStatus, SearchMessagesPayload } from 
 import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Template } from "@/types/templates";
+import { formatSender, formatTemplate } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
 import { isEmpty } from "@/helpers/objectUtils";
 import { orderBy } from "@/helpers/arrayUtils";
 import { searchMessages } from "@/api/messages";
-import { formatSender, formatTemplate } from "@/helpers/displayUtils";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
