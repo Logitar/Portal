@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { RouterLink, useRouter } from "vue-router";
-import { computed, ref, watchEffect } from "vue";
+import { RouterLink } from "vue-router";
+import { computed, watchEffect } from "vue";
 import { setLocale } from "@vee-validate/i18n";
 import { useI18n } from "vue-i18n";
 
@@ -19,10 +19,7 @@ const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
 const configuration = useConfigurationStore();
 const environment = import.meta.env.MODE.toLowerCase();
 const i18n = useI18nStore();
-const router = useRouter();
 const { availableLocales, locale, t } = useI18n();
-
-const search = ref<string>("");
 
 const otherLocales = computed<Locale[]>(() => {
   const otherLocales = new Set<string>(availableLocales.filter((item) => item !== locale.value));
@@ -47,12 +44,6 @@ const user = computed<AuthenticatedUser>(() => ({
   emailAddress: account.authenticated?.email?.address,
   picture: account.authenticated?.picture,
 }));
-
-function onSearch(): void {
-  const query = { search: search.value, page: 1, count: 10 };
-  search.value = "";
-  router.push({ name: "RealmList", query });
-}
 
 watchEffect(() => {
   if (i18n.locale) {
@@ -143,13 +134,6 @@ watchEffect(() => {
             </li>
           </template>
         </ul>
-
-        <form v-if="account.authenticated" class="d-flex" role="search" @submit.prevent="onSearch">
-          <div class="input-group">
-            <input class="form-control" :placeholder="t('search.label')" type="search" v-model="search" aria-label="Search" />
-            <button class="btn btn-outline-primary" :disabled="!search" type="submit"><font-awesome-icon icon="fas fa-search" /></button>
-          </div>
-        </form>
 
         <ul class="navbar-nav mb-2 mb-lg-0">
           <template v-if="i18n.locale">
