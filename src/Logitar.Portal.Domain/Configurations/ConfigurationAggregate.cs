@@ -1,20 +1,15 @@
-﻿using FluentValidation;
-using Logitar.EventSourcing;
+﻿using Logitar.EventSourcing;
 using Logitar.Portal.Domain.Configurations.Events;
 using Logitar.Portal.Domain.Settings;
-using Logitar.Portal.Domain.Validators;
-using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Domain.Configurations;
 
 public class ConfigurationAggregate : AggregateRoot
 {
-  private const int SecretLength = 256 / 8;
-
   public static readonly AggregateId UniqueId = new("CONFIGURATION");
 
   private ReadOnlyLocale _defaultLocale = ReadOnlyLocale.Default;
-  private string _secret = string.Empty;
+  private JwtSecret _secret = JwtSecret.Generate();
 
   private ReadOnlyUniqueNameSettings _uniqueNameSettings = new();
   private ReadOnlyPasswordSettings _passwordSettings = new();
@@ -29,8 +24,7 @@ public class ConfigurationAggregate : AggregateRoot
   {
     ApplyChange(new ConfigurationInitializedEvent(actorId)
     {
-      DefaultLocale = defaultLocale,
-      Secret = RandomStringGenerator.GetString(SecretLength)
+      DefaultLocale = defaultLocale
     });
   }
   protected virtual void Apply(ConfigurationInitializedEvent initialized)
@@ -57,21 +51,11 @@ public class ConfigurationAggregate : AggregateRoot
       }
     }
   }
-  public string Secret
+  public JwtSecret Secret
   {
     get => _secret;
     set
     {
-      if (string.IsNullOrWhiteSpace(value))
-      {
-        value = RandomStringGenerator.GetString(SecretLength);
-      }
-      else
-      {
-        value = value.Trim();
-        new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
-      }
-
       if (value != _secret)
       {
         ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
@@ -124,6 +108,15 @@ public class ConfigurationAggregate : AggregateRoot
 
   public IUserSettings UserSettings => new ReadOnlyUserSettings(requireUniqueEmail: false,
     requireConfirmedAccount: false, UniqueNameSettings, PasswordSettings);
+
+  public void GenerateNewSecret()
+  {
+    JwtSecret secret = JwtSecret.Generate();
+
+    ConfigurationUpdatedEvent updated = GetLatestEvent<ConfigurationUpdatedEvent>();
+    updated.Secret = secret;
+    _secret = secret;
+  }
 
   public void Update(ActorId actorId)
   {

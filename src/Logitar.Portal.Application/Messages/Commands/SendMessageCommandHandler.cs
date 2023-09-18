@@ -41,9 +41,9 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     SendMessagePayload payload = command.Payload;
     ReadOnlyLocale? sharedLocale = payload.Locale?.GetLocale(nameof(payload.Locale));
 
-    RealmAggregate? realm = await ResolveRealmAsync(payload, cancellationToken);
+    RealmAggregate? realm = await ResolveRealmAsync(command, cancellationToken);
     SenderAggregate? sender = await ResolveSenderAsync(payload, realm, cancellationToken);
-    TemplateAggregate? template = await ResolveTemplateAsync(payload, realm, cancellationToken);
+    TemplateAggregate? template = await ResolveTemplateAsync(command, realm, cancellationToken);
     Recipients allRecipients = await ResolveRecipientsAsync(payload, realm, cancellationToken);
 
     Dictionary<ReadOnlyLocale, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
@@ -72,7 +72,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       Recipients recipients = new(new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc));
 
       MessageAggregate message = new(subject, body, recipients, sender, template, realm,
-        payload.IgnoreUserLocale, locale, variables, isDemo: false, _applicationContext.ActorId);
+        payload.IgnoreUserLocale, locale, variables, command.IsDemo, _applicationContext.ActorId);
       messages.Add(message);
 
       await _mediator.Publish(new SendEmailCommand(message, sender), cancellationToken);
@@ -103,8 +103,15 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     return new Dictionaries(target, fallback, @default);
   }
 
-  private async Task<RealmAggregate?> ResolveRealmAsync(SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<RealmAggregate?> ResolveRealmAsync(SendMessageCommand command, CancellationToken cancellationToken)
   {
+    if (command.Realm != null)
+    {
+      return command.Realm;
+    }
+
+    SendMessagePayload payload = command.Payload;
+
     if (string.IsNullOrWhiteSpace(payload.Realm))
     {
       return null;
@@ -203,23 +210,24 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       ?? throw new RealmHasNoDefaultSenderException(realm, nameof(payload.Realm));
   }
 
-  private async Task<TemplateAggregate> ResolveTemplateAsync(SendMessagePayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  private async Task<TemplateAggregate> ResolveTemplateAsync(SendMessageCommand command, RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    TemplateAggregate? template;
-    if (Guid.TryParse(payload.Template, out Guid id))
+    SendMessagePayload payload = command.Payload;
+    string? tenantId = realm?.Id.Value;
+
+    TemplateAggregate? template = command.Template ?? (Guid.TryParse(payload.Template, out Guid id)
+      ? await _templateRepository.LoadAsync(id, cancellationToken)
+      : await _templateRepository.LoadAsync(tenantId, payload.Template, cancellationToken));
+
+    if (template == null)
     {
-      template = await _templateRepository.LoadAsync(id, cancellationToken);
-      if (template != null && template.TenantId != realm?.Id.Value)
-      {
-        throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
-      }
+      throw new AggregateNotFoundException<TemplateAggregate>(payload.Template, nameof(payload.Template));
     }
-    else
+    else if (template.TenantId != tenantId)
     {
-      string? tenantId = realm?.Id.Value;
-      template = await _templateRepository.LoadAsync(tenantId, payload.Template, cancellationToken);
+      throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
     }
 
-    return template ?? throw new AggregateNotFoundException<TemplateAggregate>(payload.Template, nameof(payload.Template));
+    return template;
   }
 }

@@ -2,8 +2,8 @@
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Users;
-using Logitar.Portal.Domain.Validators;
 using Logitar.Security.Claims;
 using MediatR;
 
@@ -25,16 +25,11 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
   public async Task<CreatedToken> Handle(CreateTokenCommand command, CancellationToken cancellationToken)
   {
     CreateTokenPayload payload = command.Payload;
-
-    string? secret = payload.Secret?.CleanTrim();
-    if (secret != null)
-    {
-      new SecretValidator(nameof(payload.Secret)).ValidateAndThrow(secret);
-    }
+    JwtSecret? secret = string.IsNullOrWhiteSpace(payload.Secret) ? null : new(payload.Secret);
 
     ConfigurationAggregate configuration = _applicationContext.Configuration;
-    RealmAggregate? realm = null;
-    if (!string.IsNullOrWhiteSpace(payload.Realm))
+    RealmAggregate? realm = command.Realm;
+    if (realm == null && !string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
        ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
@@ -67,7 +62,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     string? issuer = TokenHelper.GetIssuer(payload.Issuer, realm, _applicationContext.BaseUrl);
     string? type = payload.Type?.CleanTrim();
 
-    string token = _tokenManager.Create(identity, secret, expires, algorithm, audience, issuer, type);
+    string token = _tokenManager.Create(identity, secret.Value, expires, algorithm, audience, issuer, type);
 
     return new CreatedToken(token);
   }

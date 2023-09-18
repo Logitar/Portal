@@ -4,6 +4,7 @@ namespace Logitar.Portal.Application.Tokens;
 
 internal static class TokenHelper
 {
+  public static string? GetAudience(RealmAggregate? realm, Uri? baseUrl) => GetAudience(realm, baseUrl);
   public static string? GetAudience(string? format, RealmAggregate? realm, Uri? baseUrl)
   {
     string? audience = Format(format, realm);
@@ -19,6 +20,7 @@ internal static class TokenHelper
     return baseUrl?.ToString();
   }
 
+  public static string? GetIssuer(RealmAggregate? realm, Uri? baseUrl) => GetIssuer(realm, baseUrl);
   public static string? GetIssuer(string? format, RealmAggregate? realm, Uri? baseUrl)
   {
     string? issuer = Format(format, realm);

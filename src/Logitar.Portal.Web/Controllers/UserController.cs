@@ -61,6 +61,15 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
+  [HttpPost("password/recover")]
+  public async Task<ActionResult<RecoverPasswordResult>> RecoverPasswordAsync([FromBody] RecoverPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    RecoverPasswordResult result = await _userService.RecoverPasswordAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/messages/{result.MessageId}");
+
+    return Created(uri, result);
+  }
+
   [HttpDelete("{id}/identifiers/key:{key}")]
   public async Task<ActionResult<User>> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
   {
@@ -68,17 +77,23 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
-  [HttpPut("{id}/identifiers")]
-  public async Task<ActionResult<User>> SaveIdentifierAsync(Guid id, [FromBody] SaveIdentifierPayload payload, CancellationToken cancellationToken)
+  [HttpPost("password/reset")]
+  public async Task<ActionResult<User>> ResetPasswordAsync([FromBody] ResetPasswordPayload payload, CancellationToken cancellationToken)
   {
-    User? user = await _userService.SaveIdentifierAsync(id, payload, cancellationToken);
-    return user == null ? NotFound() : Ok(user);
+    return Ok(await _userService.ResetPasswordAsync(payload, cancellationToken));
   }
 
   [HttpPut("{id}")]
   public async Task<ActionResult<User>> ReplaceAsync(Guid id, [FromBody] ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
     User? user = await _userService.ReplaceAsync(id, payload, version, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
+  [HttpPut("{id}/identifiers")]
+  public async Task<ActionResult<User>> SaveIdentifierAsync(Guid id, [FromBody] SaveIdentifierPayload payload, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.SaveIdentifierAsync(id, payload, cancellationToken);
     return user == null ? NotFound() : Ok(user);
   }
 

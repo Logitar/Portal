@@ -10,7 +10,7 @@ internal record RealmEntity : AggregateEntity
   {
     UniqueSlug = created.UniqueSlug;
 
-    Secret = created.Secret;
+    Secret = created.Secret.Value;
 
     RequireUniqueEmail = created.RequireUniqueEmail;
     RequireConfirmedAccount = created.RequireConfirmedAccount;
@@ -116,7 +116,7 @@ internal record RealmEntity : AggregateEntity
     }
     if (updated.Secret != null)
     {
-      Secret = updated.Secret;
+      Secret = updated.Secret.Value;
     }
     if (updated.Url != null)
     {

@@ -7,14 +7,11 @@ using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Validators;
-using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Domain.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
-  private const int SecretLength = 256 / 8;
-
   private readonly Dictionary<string, ReadOnlyClaimMapping> _claimMappings = new();
   private readonly Dictionary<string, string> _customAttributes = new();
 
@@ -23,7 +20,7 @@ public class RealmAggregate : AggregateRoot
   private string? _description = null;
 
   private ReadOnlyLocale? _defaultLocale = null;
-  private string _secret = string.Empty;
+  private JwtSecret _secret = JwtSecret.Generate();
   private Uri? _url = null;
 
   private bool _requireUniqueEmail = false;
@@ -36,31 +33,14 @@ public class RealmAggregate : AggregateRoot
   {
   }
 
-  public RealmAggregate(string uniqueSlug, string? secret = null, bool requireUniqueEmail = false, bool requireConfirmedAccount = false,
-    ReadOnlyUniqueNameSettings? uniqueNameSettings = null, ReadOnlyPasswordSettings? passwordSettings = null, ActorId actorId = default, AggregateId? id = null)
-      : base(id)
+  public RealmAggregate(string uniqueSlug, ActorId actorId = default, AggregateId? id = null) : base(id)
   {
     uniqueSlug = uniqueSlug.Trim();
     new UniqueSlugValidator(nameof(UniqueSlug)).ValidateAndThrow(uniqueSlug);
 
-    if (string.IsNullOrWhiteSpace(secret))
-    {
-      secret = RandomStringGenerator.GetString(SecretLength);
-    }
-    else
-    {
-      secret = secret.Trim();
-      new SecretValidator(nameof(Secret)).ValidateAndThrow(secret);
-    }
-
     ApplyChange(new RealmCreatedEvent(actorId)
     {
-      UniqueSlug = uniqueSlug,
-      Secret = secret,
-      RequireUniqueEmail = requireUniqueEmail,
-      RequireConfirmedAccount = requireConfirmedAccount,
-      UniqueNameSettings = uniqueNameSettings ?? new(),
-      PasswordSettings = passwordSettings ?? new()
+      UniqueSlug = uniqueSlug
     });
   }
   protected virtual void Apply(RealmCreatedEvent created)
@@ -140,21 +120,11 @@ public class RealmAggregate : AggregateRoot
       }
     }
   }
-  public string Secret
+  public JwtSecret Secret
   {
     get => _secret;
     set
     {
-      if (string.IsNullOrWhiteSpace(value))
-      {
-        value = RandomStringGenerator.GetString(SecretLength);
-      }
-      else
-      {
-        value = value.Trim();
-        new SecretValidator(nameof(Secret)).ValidateAndThrow(value);
-      }
-
       if (value != _secret)
       {
         RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
@@ -242,6 +212,15 @@ public class RealmAggregate : AggregateRoot
     RequireConfirmedAccount, UniqueNameSettings, PasswordSettings);
 
   public void Delete(ActorId actorId = default) => ApplyChange(new RealmDeletedEvent(actorId));
+
+  public void GenerateNewSecret()
+  {
+    JwtSecret secret = JwtSecret.Generate();
+
+    RealmUpdatedEvent updated = GetLatestEvent<RealmUpdatedEvent>();
+    updated.Secret = secret;
+    _secret = secret;
+  }
 
   public void RemoveClaimMapping(string key)
   {

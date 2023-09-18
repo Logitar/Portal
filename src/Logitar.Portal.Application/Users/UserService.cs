@@ -34,6 +34,11 @@ internal class UserService : IUserService
     return await _pipeline.ExecuteAsync(new ReadUserQuery(id, realm, uniqueName, identifierKey, identifierValue), cancellationToken);
   }
 
+  public async Task<RecoverPasswordResult> RecoverPasswordAsync(RecoverPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new RecoverPasswordCommand(payload), cancellationToken);
+  }
+
   public async Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new RemoveUserIdentifierCommand(id, key), cancellationToken);
@@ -42,6 +47,11 @@ internal class UserService : IUserService
   public async Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _pipeline.ExecuteAsync(new ReplaceUserCommand(id, payload, version), cancellationToken);
+  }
+
+  public async Task<User> ResetPasswordAsync(ResetPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    return await _pipeline.ExecuteAsync(new ResetPasswordCommand(payload), cancellationToken);
   }
 
   public async Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)

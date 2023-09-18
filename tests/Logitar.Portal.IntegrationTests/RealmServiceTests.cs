@@ -35,11 +35,12 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
   {
     _realmService = ServiceProvider.GetRequiredService<IRealmService>();
 
-    _realm = new("desjardins", requireConfirmedAccount: true)
+    _realm = new("desjardins")
     {
       DisplayName = "Desjardins",
       DefaultLocale = Locale,
-      Url = new Uri("https://www.desjardins.com/")
+      Url = new Uri("https://www.desjardins.com/"),
+      RequireConfirmedAccount = true
     };
     _realm.SetClaimMapping("EmployeeId", new ReadOnlyClaimMapping("employee_no"));
     _realm.SetClaimMapping("HourlyRate", new ReadOnlyClaimMapping("rate", "double"));
@@ -335,7 +336,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       DisplayName = _realm.DisplayName,
       Description = _realm.Description,
       DefaultLocale = _realm.DefaultLocale?.Code,
-      Secret = _realm.Secret,
+      Secret = _realm.Secret.Value,
       Url = _realm.Url?.ToString(),
       RequireUniqueEmail = _realm.RequireUniqueEmail,
       RequireConfirmedAccount = _realm.RequireConfirmedAccount,
@@ -371,7 +372,7 @@ public class RealmServiceTests : IntegrationTests, IAsyncLifetime
       DisplayName = _realm.DisplayName,
       Description = _realm.Description,
       DefaultLocale = _realm.DefaultLocale?.Code,
-      Secret = _realm.Secret,
+      Secret = _realm.Secret.Value,
       Url = _realm.Url?.ToString(),
       RequireUniqueEmail = _realm.RequireUniqueEmail,
       RequireConfirmedAccount = _realm.RequireConfirmedAccount,

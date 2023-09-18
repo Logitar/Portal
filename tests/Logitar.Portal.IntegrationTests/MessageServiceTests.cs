@@ -16,7 +16,6 @@ using Logitar.Portal.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 
 namespace Logitar.Portal;
 
@@ -903,7 +902,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
 
     var exception = await Assert.ThrowsAsync<RealmHasNoDefaultSenderException>(async () => await _messageService.SendDemoAsync(payload));
     Assert.Null(exception.Realm);
-    Assert.Equal(nameof(payload.TemplateId), exception.PropertyName);
+    Assert.Equal(nameof(SendMessagePayload.Realm), exception.PropertyName);
   }
 
   [Fact(DisplayName = "SendDemoAsync: it should throw SenderNotInRealmException when the sender is not in the realm.")]

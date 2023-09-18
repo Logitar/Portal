@@ -16,7 +16,6 @@ using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
-using System.Globalization;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
@@ -53,7 +52,7 @@ internal class Mapper
     Configuration destination = new()
     {
       DefaultLocale = ToLocale(source.DefaultLocale),
-      Secret = source.Secret,
+      Secret = source.Secret.Value,
       UniqueNameSettings = new UniqueNameSettings
       {
         AllowedCharacters = source.UniqueNameSettings.AllowedCharacters

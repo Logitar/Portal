@@ -28,16 +28,27 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
       throw new UniqueSlugAlreadyUsedException(payload.UniqueSlug, nameof(payload.UniqueSlug));
     }
 
-    ReadOnlyUniqueNameSettings? uniqueNameSettings = payload.UniqueNameSettings?.ToReadOnlyUniqueNameSettings();
-    ReadOnlyPasswordSettings? passwordSettings = payload.PasswordSettings?.ToReadOnlyPasswordSettings();
-    RealmAggregate realm = new(payload.UniqueSlug, payload.Secret, payload.RequireUniqueEmail,
-      payload.RequireConfirmedAccount, uniqueNameSettings, passwordSettings, _applicationContext.ActorId)
+    RealmAggregate realm = new(payload.UniqueSlug, _applicationContext.ActorId)
     {
       DisplayName = payload.DisplayName,
       Description = payload.Description,
       DefaultLocale = payload.DefaultLocale?.GetLocale(nameof(payload.DefaultLocale)),
-      Url = payload.Url?.GetUrl(nameof(payload.Url))
+      Url = payload.Url?.GetUrl(nameof(payload.Url)),
+      RequireUniqueEmail = payload.RequireUniqueEmail,
+      RequireConfirmedAccount = payload.RequireConfirmedAccount
     };
+    if (!string.IsNullOrWhiteSpace(payload.Secret))
+    {
+      realm.Secret = new JwtSecret(payload.Secret);
+    }
+    if (payload.UniqueNameSettings != null)
+    {
+      realm.UniqueNameSettings = payload.UniqueNameSettings.ToReadOnlyUniqueNameSettings();
+    }
+    if (payload.PasswordSettings != null)
+    {
+      realm.PasswordSettings = payload.PasswordSettings.ToReadOnlyPasswordSettings();
+    }
 
     foreach (ClaimMapping claimMapping in payload.ClaimMappings)
     {

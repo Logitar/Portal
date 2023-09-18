@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.Domain.Templates;
 using MediatR;
 
@@ -60,7 +61,14 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     }
     if (payload.Secret != null)
     {
-      realm.Secret = payload.Secret;
+      if (string.IsNullOrWhiteSpace(payload.Secret))
+      {
+        realm.GenerateNewSecret();
+      }
+      else
+      {
+        realm.Secret = new JwtSecret(payload.Secret);
+      }
     }
     if (payload.Url != null)
     {

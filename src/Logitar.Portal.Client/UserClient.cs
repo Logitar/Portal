@@ -84,6 +84,12 @@ internal class UserClient : ClientBase, IUserService
     return users.Values.SingleOrDefault();
   }
 
+  public async Task<RecoverPasswordResult> RecoverPasswordAsync(RecoverPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    return await PostAsync<RecoverPasswordResult>($"{Path}/password/recover", payload, cancellationToken)
+      ?? throw new InvalidOperationException("The result should not be null.");
+  }
+
   public async Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
   {
     return await DeleteAsync<User>($"{Path}/{id}/identifiers/key:{key}", cancellationToken);
@@ -101,6 +107,12 @@ internal class UserClient : ClientBase, IUserService
     }
 
     return await PutAsync<User>(path.ToString(), payload, cancellationToken);
+  }
+
+  public async Task<User> ResetPasswordAsync(ResetPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    return await PostAsync<User>($"{Path}/password/reset", payload, cancellationToken)
+      ?? throw new InvalidOperationException("The result should not be null.");
   }
 
   public async Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken)

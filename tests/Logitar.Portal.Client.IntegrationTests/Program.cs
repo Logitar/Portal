@@ -137,6 +137,10 @@ internal class Program
       return;
     }
 
+    // TODO(fpion): send demo message
+
+    // TODO(fpion): password recovery tests
+
     await realmTests.DeleteAsync(cancellationToken); // 1 test
     context.End();
   }
