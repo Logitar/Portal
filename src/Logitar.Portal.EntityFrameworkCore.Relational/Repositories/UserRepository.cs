@@ -77,6 +77,9 @@ internal class UserRepository : EventSourcing.EntityFrameworkCore.Relational.Agg
     return base.Load<UserAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
   }
 
+  public async Task<IEnumerable<UserAggregate>> LoadAsync(IEnumerable<AggregateId> ids, CancellationToken cancellationToken)
+    => await LoadAsync<UserAggregate>(ids, cancellationToken);
+
   public async Task<IEnumerable<UserAggregate>> LoadAsync(RoleAggregate role, CancellationToken cancellationToken)
   {
     string aggregateId = role.Id.Value;

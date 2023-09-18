@@ -7,5 +7,4 @@ using MediatR;
 namespace Logitar.Portal.Application.Messages.Commands;
 
 internal record SendMessageCommand(SendMessagePayload Payload, bool IsDemo = false,
-  RealmAggregate? Realm = null, TemplateAggregate? Template = null, UserAggregate? User = null)
-    : IRequest<SentMessages>;
+  RealmAggregate? Realm = null, TemplateAggregate? Template = null, UserAggregate? User = null) : IRequest<SentMessages>;

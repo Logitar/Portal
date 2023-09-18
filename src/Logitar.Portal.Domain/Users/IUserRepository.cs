@@ -11,6 +11,7 @@ public interface IUserRepository
   Task<UserAggregate?> LoadAsync(AggregateId id, long? version = null, CancellationToken cancellationToken = default);
   Task<UserAggregate?> LoadAsync(string? tenantId, string uniqueName, CancellationToken cancellationToken = default);
   Task<UserAggregate?> LoadAsync(string? tenantId, string identifierKey, string identifierValue, CancellationToken cancellationToken = default);
+  Task<IEnumerable<UserAggregate>> LoadAsync(IEnumerable<AggregateId> ids, CancellationToken cancellationToken = default);
   Task<IEnumerable<UserAggregate>> LoadAsync(RealmAggregate? realm, CancellationToken cancellationToken = default);
   Task<IEnumerable<UserAggregate>> LoadAsync(RoleAggregate role, CancellationToken cancellationToken = default);
   Task<IEnumerable<UserAggregate>> LoadAsync(string? tenantId, IEmailAddress email, CancellationToken cancellationToken = default);

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Users;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Dictionaries;
@@ -123,33 +124,65 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
 
   private async Task<Recipients> ResolveRecipientsAsync(SendMessageCommand command, RealmAggregate? realm, CancellationToken cancellationToken)
   {
-    bool uniqueEmail = realm?.RequireUniqueEmail ?? false;
+    SendMessagePayload payload = command.Payload;
 
-    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, cancellationToken);
-
-    int capacity = users.Count();
-    Dictionary<Guid, UserAggregate> usersById = new(capacity + 1);
-    Dictionary<string, UserAggregate> usersByUniqueName = new(capacity);
-    foreach (UserAggregate user in users)
+    int capacity = payload.Recipients.Count();
+    HashSet<AggregateId> userIds = new(capacity);
+    bool hasUniqueNameOrEmailAddressUserRecipient = false;
+    foreach (RecipientPayload recipient in payload.Recipients)
     {
-      usersById[user.Id.ToGuid()] = user;
-      usersByUniqueName[user.UniqueName.ToUpper()] = user;
-
-      if (user.Email != null && uniqueEmail)
+      if (!string.IsNullOrWhiteSpace(recipient.User))
       {
-        usersByUniqueName[user.Email.Address.ToUpper()] = user;
+        string user = recipient.User.Trim();
+        if (Guid.TryParse(user, out Guid id))
+        {
+          userIds.Add(new AggregateId(id));
+        }
+        else
+        {
+          hasUniqueNameOrEmailAddressUserRecipient = true;
+        }
       }
+    }
+    if (command.User != null)
+    {
+      userIds.Remove(command.User.Id);
+    }
+
+    Dictionary<Guid, UserAggregate> usersById = new(capacity);
+    if (userIds.Any())
+    {
+      usersById = (await _userRepository.LoadAsync(userIds, cancellationToken))
+        .ToDictionary(x => x.Id.ToGuid(), x => x);
     }
     if (command.User != null)
     {
       usersById[command.User.Id.ToGuid()] = command.User;
     }
 
+    Dictionary<string, UserAggregate> usersByUniqueName = new(capacity);
+    if (hasUniqueNameOrEmailAddressUserRecipient)
+    {
+      bool uniqueEmail = realm?.RequireUniqueEmail ?? false;
+
+      IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, cancellationToken);
+      foreach (UserAggregate user in users)
+      {
+        usersByUniqueName[user.UniqueName.ToUpper()] = user;
+
+        if (user.Email != null && uniqueEmail)
+        {
+          usersByUniqueName[user.Email.Address.ToUpper()] = user;
+        }
+      }
+    }
+
     List<ReadOnlyRecipient> recipients = new(capacity);
     List<string> missingUsers = new(capacity);
     List<string> missingEmails = new(capacity);
+    List<UserAggregate> notInRealm = new(capacity);
 
-    SendMessagePayload payload = command.Payload;
+    string? tenantId = realm?.Id.Value;
     int index = 0;
     foreach (RecipientPayload recipient in payload.Recipients)
     {
@@ -180,6 +213,10 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
         {
           missingEmails.Add($"{nameof(payload.Recipients)}[{index}].{nameof(recipient.User)}:{user.Id.ToGuid()}");
         }
+        else if (user.TenantId?.Equals(tenantId) == false)
+        {
+          notInRealm.Add(user);
+        }
         else
         {
           recipients.Add(ReadOnlyRecipient.From(user));
@@ -189,13 +226,17 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       index++;
     }
 
+    if (missingUsers.Any())
+    {
+      throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
+    }
     if (missingEmails.Any())
     {
       throw new MissingRecipientAddressesException(missingEmails, nameof(payload.Recipients));
     }
-    if (missingUsers.Any())
+    if (notInRealm.Any())
     {
-      throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
+      throw new UsersNotInRealmException(notInRealm, realm, nameof(payload.Recipients));
     }
 
     return new Recipients(recipients);
@@ -205,15 +246,8 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
   {
     if (payload.SenderId.HasValue)
     {
-      SenderAggregate sender = await _senderRepository.LoadAsync(payload.SenderId.Value, cancellationToken)
+      return await _senderRepository.LoadAsync(payload.SenderId.Value, cancellationToken)
         ?? throw new AggregateNotFoundException<SenderAggregate>(payload.SenderId.Value, nameof(payload.SenderId));
-
-      if (sender.TenantId != realm?.Id.Value)
-      {
-        throw new SenderNotInRealmException(sender, realm, nameof(payload.SenderId));
-      }
-
-      return sender;
     }
 
     string? tenantId = realm?.Id.Value;
@@ -227,19 +261,9 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     SendMessagePayload payload = command.Payload;
     string? tenantId = realm?.Id.Value;
 
-    TemplateAggregate? template = command.Template ?? (Guid.TryParse(payload.Template, out Guid id)
+    return (command.Template ?? (Guid.TryParse(payload.Template, out Guid id)
       ? await _templateRepository.LoadAsync(id, cancellationToken)
-      : await _templateRepository.LoadAsync(tenantId, payload.Template, cancellationToken));
-
-    if (template == null)
-    {
-      throw new AggregateNotFoundException<TemplateAggregate>(payload.Template, nameof(payload.Template));
-    }
-    else if (template.TenantId != tenantId)
-    {
-      throw new TemplateNotInRealmException(template, realm, nameof(payload.Template));
-    }
-
-    return template;
+      : await _templateRepository.LoadAsync(tenantId, payload.Template, cancellationToken)
+    )) ?? throw new AggregateNotFoundException<TemplateAggregate>(payload.Template, nameof(payload.Template));
   }
 }
