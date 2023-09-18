@@ -50,7 +50,7 @@ internal class SendDemoMessageCommandHandler : IRequestHandler<SendDemoMessageCo
       Locale = payload.Locale,
       Variables = payload.Variables
     };
-    SentMessages sentMessages = await _mediator.Send(new SendMessageCommand(sendMessage, IsDemo: true, Template: template), cancellationToken);
+    SentMessages sentMessages = await _mediator.Send(new SendMessageCommand(sendMessage, IsDemo: true, Realm: null, template, user), cancellationToken);
 
     Guid messageId = sentMessages.Ids.Single();
     return await _messageQuerier.ReadAsync(messageId, cancellationToken)

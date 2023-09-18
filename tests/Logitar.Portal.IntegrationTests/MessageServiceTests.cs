@@ -888,8 +888,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await _messageService.SendDemoAsync(payload));
-    Assert.Equal(new[] { User.Id.ToGuid().ToString() }, exception.Recipients);
-    Assert.Equal(nameof(IApplicationContext.ActorId), exception.PropertyName);
+    Assert.Equal(new[] { $"Recipients[0].User:{User.Id.ToGuid()}" }, exception.Recipients);
+    Assert.Equal(nameof(SendMessagePayload.Recipients), exception.PropertyName);
   }
 
   [Fact(DisplayName = "SendDemoAsync: it should throw RealmHasNoDefaultSenderException when the realm has no default sender.")]

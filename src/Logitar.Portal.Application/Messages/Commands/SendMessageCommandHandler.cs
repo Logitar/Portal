@@ -44,7 +44,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     RealmAggregate? realm = await ResolveRealmAsync(command, cancellationToken);
     SenderAggregate? sender = await ResolveSenderAsync(payload, realm, cancellationToken);
     TemplateAggregate? template = await ResolveTemplateAsync(command, realm, cancellationToken);
-    Recipients allRecipients = await ResolveRecipientsAsync(payload, realm, cancellationToken);
+    Recipients allRecipients = await ResolveRecipientsAsync(command, realm, cancellationToken);
 
     Dictionary<ReadOnlyLocale, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(realm, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
@@ -121,14 +121,14 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
   }
 
-  private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
+  private async Task<Recipients> ResolveRecipientsAsync(SendMessageCommand command, RealmAggregate? realm, CancellationToken cancellationToken)
   {
     bool uniqueEmail = realm?.RequireUniqueEmail ?? false;
 
     IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, cancellationToken);
 
     int capacity = users.Count();
-    Dictionary<Guid, UserAggregate> usersById = new(capacity);
+    Dictionary<Guid, UserAggregate> usersById = new(capacity + 1);
     Dictionary<string, UserAggregate> usersByUniqueName = new(capacity);
     foreach (UserAggregate user in users)
     {
@@ -140,11 +140,16 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
         usersByUniqueName[user.Email.Address.ToUpper()] = user;
       }
     }
+    if (command.User != null)
+    {
+      usersById[command.User.Id.ToGuid()] = command.User;
+    }
 
     List<ReadOnlyRecipient> recipients = new(capacity);
     List<string> missingUsers = new(capacity);
     List<string> missingEmails = new(capacity);
 
+    SendMessagePayload payload = command.Payload;
     int index = 0;
     foreach (RecipientPayload recipient in payload.Recipients)
     {
