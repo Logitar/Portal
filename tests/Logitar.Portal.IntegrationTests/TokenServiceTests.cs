@@ -149,7 +149,7 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _tokenService.CreateAsync(payload));
-    Assert.Contains(exception.Errors, error => error.ErrorCode == "MinimumLengthValidator" /*&& error.PropertyName == "Secret"*/); // TODO(fpion): fix PropertyName
+    Assert.Contains(exception.Errors, error => error.ErrorCode == "MinimumLengthValidator" && error.PropertyName == "Secret");
   }
 
   [Fact(DisplayName = "ValidateAsync: it should consume a consumable token.")]
@@ -244,7 +244,7 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _tokenService.ValidateAsync(payload));
-    Assert.Contains(exception.Errors, error => error.ErrorCode == "MinimumLengthValidator" /*&& error.PropertyName == "Secret"*/); // TODO(fpion): fix PropertyName
+    Assert.Contains(exception.Errors, error => error.ErrorCode == "MinimumLengthValidator" && error.PropertyName == "Secret");
   }
 
   [Fact(DisplayName = "ValidateAsync: it should validate a Portal token.")]
