@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Contracts.Settings;
-using Logitar.Portal.Domain.Settings.Validators;
 
 namespace Logitar.Portal.Domain.Settings;
 
@@ -29,4 +28,18 @@ public record ReadOnlyPasswordSettings : IPasswordSettings
   public bool RequireDigit { get; }
 
   public string Strategy { get; }
+}
+
+internal class ReadOnlyPasswordSettingsValidator : AbstractValidator<ReadOnlyPasswordSettings>
+{
+  public ReadOnlyPasswordSettingsValidator()
+  {
+    RuleFor(x => x.RequiredLength).GreaterThan(0);
+
+    RuleFor(x => x.RequiredUniqueChars).GreaterThan(0)
+      .LessThanOrEqualTo(x => x.RequiredLength);
+
+    RuleFor(x => x.Strategy).NotEmpty()
+      .MaximumLength(byte.MaxValue);
+  }
 }

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Contracts.Settings;
-using Logitar.Portal.Domain.Settings.Validators;
 
 namespace Logitar.Portal.Domain.Settings;
 
@@ -14,4 +13,13 @@ public record ReadOnlyUniqueNameSettings : IUniqueNameSettings
   }
 
   public string? AllowedCharacters { get; }
+}
+
+internal class ReadOnlyUniqueNameSettingsValidator : AbstractValidator<ReadOnlyUniqueNameSettings>
+{
+  public ReadOnlyUniqueNameSettingsValidator()
+  {
+    When(x => x.AllowedCharacters != null, () => RuleFor(x => x.AllowedCharacters).NotEmpty()
+      .MaximumLength(byte.MaxValue));
+  }
 }
