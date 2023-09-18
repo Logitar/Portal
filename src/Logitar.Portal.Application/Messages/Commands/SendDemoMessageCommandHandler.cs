@@ -43,7 +43,7 @@ internal class SendDemoMessageCommandHandler : IRequestHandler<SendDemoMessageCo
       {
         new()
         {
-          User = user.Id.ToGuid().ToString() // TODO(fpion): when sending a message in a realm, this will throw an UsersNotFoundException since the user is a Portal user.
+          User = user.Id.ToGuid().ToString()
         }
       },
       IgnoreUserLocale = !string.IsNullOrWhiteSpace(payload.Locale),

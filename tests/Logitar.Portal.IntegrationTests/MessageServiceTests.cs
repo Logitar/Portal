@@ -52,7 +52,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("logitar")
     {
       DefaultLocale = _french,
-      DisplayName = "Logitar"
+      DisplayName = "Logitar",
+      RequireUniqueEmail = true
     };
     string tenantId = _realm.Id.Value;
 
@@ -469,6 +470,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "SendAsync: it should send a message to multiple recipients.")]
   public async Task SendAsync_it_should_send_a_message_to_multiple_recipients()
   {
+    Assert.NotNull(User);
+    Assert.NotNull(_user.Email);
     string displayName = Faker.Name.FullName();
     SendMessagePayload payload = new()
     {
@@ -478,7 +481,11 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
       {
         new()
         {
-          User = _user.UniqueName
+          User = User.Id.ToGuid().ToString()
+        },
+        new()
+        {
+          User = _user.Email.Address
         },
         new()
         {

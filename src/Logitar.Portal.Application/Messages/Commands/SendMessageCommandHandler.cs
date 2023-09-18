@@ -123,6 +123,8 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
 
   private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, RealmAggregate? realm, CancellationToken cancellationToken)
   {
+    bool uniqueEmail = realm?.RequireUniqueEmail ?? false;
+
     IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(realm, cancellationToken);
 
     int capacity = users.Count();
@@ -132,6 +134,11 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     {
       usersById[user.Id.ToGuid()] = user;
       usersByUniqueName[user.UniqueName.ToUpper()] = user;
+
+      if (user.Email != null && uniqueEmail)
+      {
+        usersByUniqueName[user.Email.Address.ToUpper()] = user;
+      }
     }
 
     List<ReadOnlyRecipient> recipients = new(capacity);
