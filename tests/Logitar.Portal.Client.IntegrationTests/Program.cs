@@ -8,6 +8,7 @@ namespace Logitar.Portal.Client.IntegrationTests;
 internal class Program
 {
   private const string PasswordString = "Test123!";
+  private const string RecipientKey = "Recipient";
   private static readonly Faker _faker = new();
 
   static async Task Main(string[] args)
@@ -28,7 +29,7 @@ internal class Program
       }
     };
 
-    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 8 + 9 + 8 + 4 + 1);
+    TestContext context = new(count: 1 + 7 + 8 + 12 + 7 + 1 + 8 + 2 + 8 + 9 + 8 + 5 + 2 + 1);
 
     IServiceProvider serviceProvider = new ServiceCollection()
       .AddSingleton(configuration)
@@ -36,9 +37,12 @@ internal class Program
       .AddSingleton(_faker)
       .AddLogitarPortalClient(settings)
       .AddTransient<ApiKeyClientTests>()
+      .AddTransient<ConfigurationClient>()
       .AddTransient<DictionaryClientTests>()
+      .AddTransient<MessageClient>()
       .AddTransient<MessageClientTests>()
       .AddTransient<RealmClientTests>()
+      .AddTransient<ResetPasswordTests>()
       .AddTransient<RoleClientTests>()
       .AddTransient<SenderClientTests>()
       .AddTransient<SessionClientTests>()
@@ -55,7 +59,7 @@ internal class Program
     CancellationToken cancellationToken = default;
     context.Start();
 
-    if (!await InitializeConfigurationAsync(context, serviceProvider, cancellationToken)) // 1 test
+    if (!await InitializeConfigurationAsync(serviceProvider, cancellationToken)) // 1 test
     {
       context.End();
       return;
@@ -130,8 +134,15 @@ internal class Program
       return;
     }
 
-    MessageClientTests messageTests = serviceProvider.GetRequiredService<MessageClientTests>(); // 4 tests
+    MessageClientTests messageTests = serviceProvider.GetRequiredService<MessageClientTests>(); // 5 tests
     if (!await messageTests.ExecuteAsync(cancellationToken))
+    {
+      context.End();
+      return;
+    }
+
+    ResetPasswordTests resetPasswordTests = serviceProvider.GetRequiredService<ResetPasswordTests>(); // 2 tests
+    if (!await resetPasswordTests.ExecuteAsync(cancellationToken))
     {
       context.End();
       return;
@@ -141,14 +152,19 @@ internal class Program
     context.End();
   }
 
-  private static async Task<bool> InitializeConfigurationAsync(TestContext context, IServiceProvider serviceProvider, CancellationToken cancellationToken)
+  private static async Task<bool> InitializeConfigurationAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken)
   {
-    string name = nameof(InitializeConfigurationAsync);
+    ConfigurationClient client = serviceProvider.GetRequiredService<ConfigurationClient>();
+    IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    TestContext context = serviceProvider.GetRequiredService<TestContext>();
+    PortalSettings settings = serviceProvider.GetRequiredService<PortalSettings>();
 
+    string recipient = configuration.GetValue<string>(RecipientKey)
+      ?? throw new InvalidOperationException($"The configuration '{RecipientKey}' is required.");
+
+    string name = nameof(InitializeConfigurationAsync);
     try
     {
-      HttpClient client = serviceProvider.GetRequiredService<HttpClient>();
-      PortalSettings settings = serviceProvider.GetRequiredService<PortalSettings>();
       if (settings.BasicAuthentication == null)
       {
         throw new InvalidOperationException($"The 'Portal.{nameof(settings.BasicAuthentication)}' settings are required.");
@@ -161,13 +177,13 @@ internal class Program
         {
           UniqueName = settings.BasicAuthentication.Username,
           Password = settings.BasicAuthentication.Password,
-          EmailAddress = _faker.Person.Email,
+          EmailAddress = recipient,
           FirstName = _faker.Person.FirstName,
           LastName = _faker.Person.LastName
         }
       };
-      ConfigurationClient service = new(client, settings);
-      _ = await service.InitializeAsync(payload, cancellationToken);
+
+      _ = await client.InitializeAsync(payload, cancellationToken);
 
       context.Succeed(name);
     }

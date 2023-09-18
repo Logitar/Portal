@@ -16,7 +16,6 @@ using Logitar.Portal.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 
 namespace Logitar.Portal;
 
@@ -53,7 +52,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     _realm = new("logitar")
     {
       DefaultLocale = _french,
-      DisplayName = "Logitar"
+      DisplayName = "Logitar",
+      RequireUniqueEmail = true
     };
     string tenantId = _realm.Id.Value;
 
@@ -470,6 +470,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "SendAsync: it should send a message to multiple recipients.")]
   public async Task SendAsync_it_should_send_a_message_to_multiple_recipients()
   {
+    Assert.NotNull(User);
+    Assert.NotNull(_user.Email);
     string displayName = Faker.Name.FullName();
     SendMessagePayload payload = new()
     {
@@ -479,7 +481,11 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
       {
         new()
         {
-          User = _user.UniqueName
+          User = User.Id.ToGuid().ToString()
+        },
+        new()
+        {
+          User = _user.Email.Address
         },
         new()
         {
@@ -603,15 +609,31 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "SendAsync: it should throw SenderNotInRealmException when the sender is not in the realm.")]
   public async Task SendAsync_it_should_throw_SenderNotInRealmException_when_the_sender_is_not_in_the_realm()
   {
+    Assert.NotNull(Configuration);
+    TemplateAggregate template = new(Configuration.UniqueNameSettings, _template.UniqueName, _template.Subject, _template.ContentType, _template.Contents)
+    {
+      DisplayName = _template.DisplayName
+    };
+    await AggregateRepository.SaveAsync(template);
+
+    Assert.NotNull(User);
     SendMessagePayload payload = new()
     {
-      SenderId = _sender.Id.ToGuid()
+      SenderId = _sender.Id.ToGuid(),
+      Template = template.Id.ToGuid().ToString(),
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = User.Id.ToGuid().ToString()
+        }
+      }
     };
 
     var exception = await Assert.ThrowsAsync<SenderNotInRealmException>(async () => await _messageService.SendAsync(payload));
     Assert.Equal(_sender.ToString(), exception.Sender);
     Assert.Null(exception.Realm);
-    Assert.Equal(nameof(payload.SenderId), exception.PropertyName);
+    Assert.Equal(nameof(MessageAggregate.Sender), exception.PropertyName);
   }
 
   [Fact(DisplayName = "SendAsync: it should throw TemplateNotInRealmException when the template is not in the realm.")]
@@ -627,7 +649,14 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     SendMessagePayload payload = new()
     {
       Realm = _realm.UniqueSlug,
-      Template = template.Id.ToGuid().ToString()
+      Template = template.Id.ToGuid().ToString(),
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = _user.Id.ToGuid().ToString()
+        }
+      }
     };
 
     var exception = await Assert.ThrowsAsync<TemplateNotInRealmException>(async () => await _messageService.SendAsync(payload));
@@ -636,8 +665,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(nameof(payload.Template), exception.PropertyName);
   }
 
-  [Fact(DisplayName = "SendAsync: it should throw UsersNotFoundException when some users are not in the realm.")]
-  public async Task SendAsync_it_should_throw_UsersNotFoundException_when_some_users_are_not_in_the_realm()
+  [Fact(DisplayName = "SendAsync: it should throw UsersNotFoundException when some users could not be found.")]
+  public async Task SendAsync_it_should_throw_UsersNotFoundException_when_some_users_could_not_be_found()
   {
     Assert.NotNull(User);
     SendMessagePayload payload = new()
@@ -648,11 +677,11 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
       {
         new()
         {
-          User = _user.Id.ToGuid().ToString()
+          User = User.Id.ToGuid().ToString()
         },
         new()
         {
-          User = User.Id.ToGuid().ToString()
+          User = _user.Id.ToGuid().ToString()
         },
         new()
         {
@@ -662,7 +691,44 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await _messageService.SendAsync(payload));
-    Assert.Equal(payload.Recipients.Skip(1).Select(recipient => recipient.User), exception.MissingUsers);
+    Assert.Equal(Guid.Empty.ToString(), exception.MissingUsers.Single());
+  }
+
+  [Fact(DisplayName = "SendAsync: it should throw UsersNotInRealmException when some users are not in the realm.")]
+  public async Task SendAsync_it_should_throw_UsersNotInRealmException_when_some_users_are_not_in_the_realm()
+  {
+    RealmAggregate realm = new($"{_realm.UniqueSlug}-2");
+    UserAggregate user = new(realm.UniqueNameSettings, Faker.Person.UserName, realm.Id.Value)
+    {
+      Email = new EmailAddress(_recipient)
+    };
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { realm, user });
+
+    Assert.NotNull(User);
+    SendMessagePayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Template = _template.UniqueName,
+      Recipients = new RecipientPayload[]
+      {
+        new()
+        {
+          User = User.Id.ToGuid().ToString()
+        },
+        new()
+        {
+          User = _user.Id.ToGuid().ToString()
+        },
+        new()
+        {
+          User = user.Id.ToGuid().ToString()
+        }
+      }
+    };
+
+    var exception = await Assert.ThrowsAsync<UsersNotInRealmException>(async () => await _messageService.SendAsync(payload));
+    Assert.Equal(user.ToString(), exception.Users.Single());
+    Assert.Equal(_realm.ToString(), exception.Realm);
     Assert.Equal(nameof(payload.Recipients), exception.PropertyName);
   }
 
@@ -882,8 +948,8 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     };
 
     var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await _messageService.SendDemoAsync(payload));
-    Assert.Equal(new[] { User.Id.ToGuid().ToString() }, exception.Recipients);
-    Assert.Equal(nameof(IApplicationContext.ActorId), exception.PropertyName);
+    Assert.Equal(new[] { $"Recipients[0].User:{User.Id.ToGuid()}" }, exception.Recipients);
+    Assert.Equal(nameof(SendMessagePayload.Recipients), exception.PropertyName);
   }
 
   [Fact(DisplayName = "SendDemoAsync: it should throw RealmHasNoDefaultSenderException when the realm has no default sender.")]
@@ -903,7 +969,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
 
     var exception = await Assert.ThrowsAsync<RealmHasNoDefaultSenderException>(async () => await _messageService.SendDemoAsync(payload));
     Assert.Null(exception.Realm);
-    Assert.Equal(nameof(payload.TemplateId), exception.PropertyName);
+    Assert.Equal(nameof(SendMessagePayload.Realm), exception.PropertyName);
   }
 
   [Fact(DisplayName = "SendDemoAsync: it should throw SenderNotInRealmException when the sender is not in the realm.")]
@@ -925,7 +991,7 @@ public class MessageServiceTests : IntegrationTests, IAsyncLifetime
     var exception = await Assert.ThrowsAsync<SenderNotInRealmException>(async () => await _messageService.SendDemoAsync(payload));
     Assert.Equal(_sender.ToString(), exception.Sender);
     Assert.Null(exception.Realm);
-    Assert.Equal(nameof(payload.SenderId), exception.PropertyName);
+    Assert.Equal(nameof(MessageAggregate.Sender), exception.PropertyName);
   }
 
   private static DictionaryAggregate CreateDictionary(ReadOnlyLocale locale, string? tenantId = null)

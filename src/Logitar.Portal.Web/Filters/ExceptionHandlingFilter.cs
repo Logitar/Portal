@@ -38,6 +38,7 @@ internal class ExceptionHandlingFilter : ExceptionFilterAttribute
     [typeof(MissingRecipientAddressesException)] = HandleBadRequestFailureException,
     [typeof(MissingToRecipientException)] = HandleBadRequestDetailException,
     [typeof(RealmHasNoDefaultSenderException)] = HandleBadRequestFailureException,
+    [typeof(RealmHasNoPasswordRecoveryTemplateException)] = HandleBadRequestDetailException,
     [typeof(RolesNotFoundException)] = HandleNotFoundFailureException,
     [typeof(SenderNotInRealmException)] = HandleBadRequestFailureException,
     [typeof(SessionIsNotActiveException)] = HandleBadRequestDetailException,

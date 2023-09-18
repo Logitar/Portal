@@ -389,6 +389,9 @@ public class UserAggregate : AggregateRoot
     }
   }
 
+  public void ResetPassword(Password password, ActorId actorId = default) => ApplyChange(new UserPasswordResetEvent(actorId, password));
+  protected virtual void Apply(UserPasswordResetEvent passwordReset) => _password = passwordReset.Password;
+
   public void SetCustomAttribute(string key, string value)
   {
     key = key.Trim();

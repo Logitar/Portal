@@ -29,6 +29,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(new JsonConverter[]
       {
         new GenderConverter(),
+        new JwtSecretConverter(),
         new ReadOnlyLocaleConverter(),
         new TimeZoneEntryConverter(),
         serviceProvider.GetRequiredService<PasswordConverter>()

@@ -1,55 +1,90 @@
 ﻿using Bogus;
 using Logitar.EventSourcing;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Tokens.Commands;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain;
+using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Roles;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Sessions;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
+using Logitar.Portal.Settings;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Logitar.Portal;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class UserServiceTests : IntegrationTests, IAsyncLifetime
 {
+  private const string RecipientKey = "Recipient";
+  private const string SenderKey = "Sender";
+  private const string SendGridKey = "SendGrid";
+
+  private static readonly ReadOnlyLocale _americanEnglish = new("en-US");
+  private static readonly ReadOnlyLocale _canadianEnglish = new("en-CA");
+  private static readonly ReadOnlyLocale _english = new("en");
+  private static readonly ReadOnlyLocale _french = new("fr");
+
+  private readonly IMediator _mediator;
   private readonly IUserService _userService;
 
+  private readonly string _recipient;
+
+  private readonly Dictionary<ReadOnlyLocale, DictionaryAggregate> _dictionaries = new();
   private readonly RealmAggregate _realm;
   private readonly RoleAggregate _readUsers;
   private readonly RoleAggregate _writeUsers;
   private readonly UserAggregate _user;
+  private readonly SenderAggregate _sender;
+  private readonly TemplateAggregate _template;
 
   public UserServiceTests() : base()
   {
+    _mediator = ServiceProvider.GetRequiredService<IMediator>();
     _userService = ServiceProvider.GetRequiredService<IUserService>();
 
-    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
+    IConfiguration configuration = ServiceProvider.GetRequiredService<IConfiguration>();
+    _recipient = configuration.GetValue<string>(RecipientKey)
+      ?? throw new InvalidOperationException($"The configuration '{RecipientKey}' is required.");
+
+    _realm = new("desjardins")
     {
       DisplayName = "Desjardins",
       DefaultLocale = Locale,
-      Url = new Uri("https://www.desjardins.com/")
+      Url = new Uri("https://www.desjardins.com/"),
+      RequireUniqueEmail = true,
+      RequireConfirmedAccount = true
     };
+    string tenantId = _realm.Id.Value;
 
-    _readUsers = new(_realm.UniqueNameSettings, "read_users", _realm.Id.Value)
+    _readUsers = new(_realm.UniqueNameSettings, "read_users", tenantId)
     {
       DisplayName = "Read Users"
     };
-    _writeUsers = new(_realm.UniqueNameSettings, "write_users", _realm.Id.Value)
+    _writeUsers = new(_realm.UniqueNameSettings, "write_users", tenantId)
     {
       DisplayName = "Write Users"
     };
 
-    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)
+    _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, tenantId)
     {
-      Email = new EmailAddress(Faker.Person.Email, isVerified: true),
+      Email = new EmailAddress(_recipient, isVerified: true),
       Phone = new PhoneNumber("+15148454636", "CA", "123456"),
       FirstName = Faker.Person.FirstName,
       LastName = Faker.Person.LastName,
@@ -68,13 +103,27 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     _user.SetCustomAttribute("HourlyRate", "25.00");
     _user.SetIdentifier("HealthInsuranceNumber", BuildHealthInsuranceNumber(Faker));
     _user.SetPassword(PasswordService.Create(_realm.PasswordSettings, PasswordString));
+
+    _sender = CreateSender(isDefault: true, tenantId)
+      ?? throw new InvalidOperationException($"The sender could not be created. Please ensure you have the required '{SenderKey}' configuration section and at least one provider settings section.");
+
+    string contents = File.ReadAllText("Templates/PasswordRecovery.cshtml", Encoding.UTF8);
+    _template = new(_realm.UniqueNameSettings, "PasswordRecovery", "PasswordRecovery_Subject", MediaTypeNames.Text.Html, contents, tenantId)
+    {
+      DisplayName = "Password Recovery"
+    };
+
+    _dictionaries[_americanEnglish] = CreateDictionary(_americanEnglish, tenantId);
+    _dictionaries[_canadianEnglish] = CreateDictionary(_canadianEnglish, tenantId);
+    _dictionaries[_english] = CreateDictionary(_english, tenantId);
+    _dictionaries[_french] = CreateDictionary(_french, tenantId);
   }
 
   public override async Task InitializeAsync()
   {
     await base.InitializeAsync();
 
-    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _user });
+    await AggregateRepository.SaveAsync(new AggregateRoot[] { _realm, _readUsers, _writeUsers, _user, _sender, _template }.Concat(_dictionaries.Values));
   }
 
   [Fact(DisplayName = "AuthenticateAsync: it should authenticate the Portal user.")]
@@ -325,13 +374,14 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
   [Fact(DisplayName = "CreateAsync: it should throw EmailAddressAlreadyUsedException when the email address is already used.")]
   public async Task CreateAsync_it_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
   {
+    Assert.NotNull(_user.Email);
     CreateUserPayload payload = new()
     {
       Realm = _realm.UniqueSlug,
       UniqueName = $"{_user.UniqueName}2",
       Email = new EmailPayload
       {
-        Address = Faker.Person.Email
+        Address = _user.Email.Address
       }
     };
 
@@ -441,6 +491,106 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     );
     Assert.Equal(1, exception.Expected);
     Assert.Equal(2, exception.Actual);
+  }
+
+  [Fact(DisplayName = "RecoverPasswordAsync: it should send a message to the user found by email address.")]
+  public async Task RecoverPasswordAsync_it_should_send_a_message_to_the_user_found_by_email_address()
+  {
+    await SetPasswordRecoveryTemplateAsync();
+
+    Assert.NotNull(_user.Email);
+    RecoverPasswordPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug}  ",
+      UniqueName = $"  {_user.Email.Address}  ",
+      IgnoreUserLocale = true,
+      Locale = $"  {_french.Code}  "
+    };
+
+    RecoverPasswordResult result = await _userService.RecoverPasswordAsync(payload);
+    Assert.Equal(result.User.Id, _user.Id.ToGuid());
+
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(new AggregateId(result.MessageId));
+
+    Assert.NotNull(message);
+    Assert.Equal(_realm.Id, message.Realm?.Id);
+    Assert.Equal(_sender.Id, message.Sender.Id);
+    Assert.Equal(_template.Id, message.Template.Id);
+    Assert.True(message.IgnoreUserLocale);
+    Assert.Equal(_french, message.Locale);
+    Assert.False(message.IsDemo);
+
+    ReadOnlyRecipient recipient = Assert.Single(message.Recipients.AsEnumerable());
+    Assert.Equal(_user.Id, recipient.UserId);
+  }
+
+  [Fact(DisplayName = "RecoverPasswordAsync: it should send a message to the user found by unique name.")]
+  public async Task RecoverPasswordAsync_it_should_send_a_message_to_the_user_found_by_unique_name()
+  {
+    await SetPasswordRecoveryTemplateAsync();
+
+    RecoverPasswordPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug}  ",
+      UniqueName = $"  {_user.UniqueName}  "
+    };
+
+    RecoverPasswordResult result = await _userService.RecoverPasswordAsync(payload);
+    Assert.Equal(result.User.Id, _user.Id.ToGuid());
+
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(new AggregateId(result.MessageId));
+
+    Assert.NotNull(message);
+    Assert.Equal(_realm.Id, message.Realm?.Id);
+    Assert.Equal(_sender.Id, message.Sender.Id);
+    Assert.Equal(_template.Id, message.Template.Id);
+    Assert.False(message.IgnoreUserLocale);
+    Assert.Equal(Locale, message.Locale);
+    Assert.False(message.IsDemo);
+
+    ReadOnlyRecipient recipient = Assert.Single(message.Recipients.AsEnumerable());
+    Assert.Equal(_user.Id, recipient.UserId);
+  }
+
+  [Fact(DisplayName = "RecoverPasswordAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
+  public async Task RecoverPasswordAsync_it_should_throw_AggregateNotFoundException_when_the_realm_could_not_be_found()
+  {
+    RecoverPasswordPayload payload = new()
+    {
+      Realm = Guid.Empty.ToString()
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _userService.RecoverPasswordAsync(payload));
+    Assert.Equal(payload.Realm, exception.Id);
+    Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "RecoverPasswordAsync: it should throw RealmHasNoPasswordRecoveryTemplateException when the realm has no password recovery template.")]
+  public async Task RecoverPasswordAsync_it_should_throw_RealmHasNoPasswordRecoveryTemplateException_when_the_realm_has_no_password_recovery_template()
+  {
+    RecoverPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug
+    };
+
+    var exception = await Assert.ThrowsAsync<RealmHasNoPasswordRecoveryTemplateException>(async () => await _userService.RecoverPasswordAsync(payload));
+    Assert.Equal(_realm.ToString(), exception.Realm);
+  }
+
+  [Fact(DisplayName = "RecoverPasswordAsync: it should throw UserNotFoundException when the user could not be found.")]
+  public async Task RecoverPasswordAsync_it_should_throw_UserNotFoundException_when_the_user_could_not_be_found()
+  {
+    await SetPasswordRecoveryTemplateAsync();
+
+    RecoverPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      UniqueName = $"{_user.UniqueName}2"
+    };
+
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.RecoverPasswordAsync(payload));
+    Assert.Equal(_realm.ToString(), exception.Realm);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "RemoveIdentifierAsync: it should remove an existing identifier.")]
@@ -652,6 +802,148 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(user.TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
     Assert.Equal(nameof(payload.UniqueName), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should reset the user password.")]
+  public async Task ResetPasswordAsync_it_should_reset_the_user_password()
+  {
+    await SetPasswordRecoveryTemplateAsync();
+
+    RecoverPasswordPayload recoverPassword = new()
+    {
+      Realm = _realm.UniqueSlug,
+      UniqueName = _user.UniqueName
+    };
+    RecoverPasswordResult result = await _userService.RecoverPasswordAsync(recoverPassword);
+
+    MessageAggregate? message = await AggregateRepository.LoadAsync<MessageAggregate>(new AggregateId(result.MessageId));
+    Assert.NotNull(message);
+
+    string newPassword = string.Concat(PasswordString, '*');
+    ResetPasswordPayload payload = new()
+    {
+      Realm = $"  {_realm.UniqueSlug}  ",
+      Token = message.Variables.Resolve("Token"),
+      Password = newPassword
+    };
+    User user = await _userService.ResetPasswordAsync(payload);
+
+    Assert.Equal(_user.Id.ToGuid(), user.Id);
+    Assert.Equal(Guid.Empty, user.CreatedBy.Id);
+    AssertEqual(_user.CreatedOn, user.CreatedOn);
+    Assert.Equal(Actor, user.UpdatedBy);
+    AssertIsNear(user.UpdatedOn);
+    Assert.True(user.Version > _user.Version);
+
+    Assert.True(user.HasPassword);
+    Assert.Equal(Actor, user.PasswordChangedBy);
+    AssertIsNear(user.PasswordChangedOn);
+
+    await AssertUserPasswordAsync(user.Id, newPassword);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw AggregateNotFoundException when the realm could not be found.")]
+  public async Task ResetPasswordAsync_it_should_throw_AggregateNotFoundException_when_the_realm_could_not_be_found()
+  {
+    ResetPasswordPayload payload = new()
+    {
+      Realm = Guid.Empty.ToString()
+    };
+
+    var exception = await Assert.ThrowsAsync<AggregateNotFoundException<RealmAggregate>>(async () => await _userService.ResetPasswordAsync(payload));
+    Assert.Equal(payload.Realm, exception.Id);
+    Assert.Equal(nameof(payload.Realm), exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw an exception when the token is not valid.")]
+  public async Task ResetPasswordAsync_it_should_throw_an_exception_when_the_token_is_not_valid()
+  {
+    CreateTokenPayload createToken = new();
+    CreatedToken createdToken = await _mediator.Send(new CreateTokenCommand(createToken, _realm));
+
+    ResetPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Token = createdToken.Token,
+      Password = PasswordString
+    };
+
+    await Assert.ThrowsAsync<SecurityTokenInvalidTypeException>(async () => await _userService.ResetPasswordAsync(payload));
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw InvalidCredentialsException when the subject claim is missing.")]
+  public async Task ResetPasswordAsync_it_should_throw_InvalidCredentialsException_when_the_subject_claim_is_missing()
+  {
+    CreateTokenPayload createToken = new()
+    {
+      Type = "resetpassword+jwt"
+    };
+    CreatedToken createdToken = await _mediator.Send(new CreateTokenCommand(createToken, _realm));
+
+    ResetPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Token = createdToken.Token,
+      Password = PasswordString
+    };
+
+    var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(async () => await _userService.ResetPasswordAsync(payload));
+    Assert.StartsWith("The Subject claim is required and must be a valid user GUID.", exception.Message);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw InvalidCredentialsException when the subject claim is not a valid GUID.")]
+  public async Task ResetPasswordAsync_it_should_throw_InvalidCredentialsException_when_the_subject_claim_is_not_a_valid_GUID()
+  {
+    CreateTokenPayload createToken = new()
+    {
+      Subject = _user.Id.Value,
+      Type = "resetpassword+jwt"
+    };
+    CreatedToken createdToken = await _mediator.Send(new CreateTokenCommand(createToken, _realm));
+
+    ResetPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Token = createdToken.Token,
+      Password = PasswordString
+    };
+
+    var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(async () => await _userService.ResetPasswordAsync(payload));
+    Assert.StartsWith("The Subject claim is required and must be a valid user GUID.", exception.Message);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw InvalidCredentialsException when the user could not be found.")]
+  public async Task ResetPasswordAsync_it_should_throw_InvalidCredentialsException_when_the_user_could_not_be_found()
+  {
+    CreateTokenPayload createToken = new()
+    {
+      Subject = Guid.Empty.ToString(),
+      Type = "resetpassword+jwt"
+    };
+    CreatedToken createdToken = await _mediator.Send(new CreateTokenCommand(createToken, _realm));
+
+    ResetPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Token = createdToken.Token,
+      Password = PasswordString
+    };
+
+    var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(async () => await _userService.ResetPasswordAsync(payload));
+    Assert.StartsWith("The user 'Id=00000000-0000-0000-0000-000000000000' could not be found.", exception.Message);
+  }
+
+  [Fact(DisplayName = "ResetPasswordAsync: it should throw ValidationException when the password is too weak.")]
+  public async Task ResetPasswordAsync_it_should_throw_ValidationException_when_the_password_is_to_weak()
+  {
+    ResetPasswordPayload payload = new()
+    {
+      Realm = _realm.UniqueSlug,
+      Password = "AAaa!!11"
+    };
+
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _userService.ResetPasswordAsync(payload));
+    Assert.Contains(exception.Errors, error => error.ErrorCode == "PasswordRequiresUniqueChars" && error.PropertyName == "Password");
   }
 
   [Fact(DisplayName = "SaveIdentifierAsync: it should return null when the user is not found.")]
@@ -1080,5 +1372,49 @@ public class UserServiceTests : IntegrationTests, IAsyncLifetime
     hin.Append(faker.Random.Number(1, 99).ToString("00"));
 
     return hin.ToString().ToUpper();
+  }
+
+  private static DictionaryAggregate CreateDictionary(ReadOnlyLocale locale, string? tenantId = null)
+  {
+    string json = File.ReadAllText($"Dictionaries/{locale.Code}.json", Encoding.UTF8);
+    Dictionary<string, string> entries = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+
+    DictionaryAggregate dictionary = new(locale, tenantId);
+    foreach (KeyValuePair<string, string> entry in entries)
+    {
+      dictionary.SetEntry(entry.Key, entry.Value);
+    }
+
+    return dictionary;
+  }
+
+  private SenderAggregate? CreateSender(bool isDefault = false, string? tenantId = null)
+  {
+    IConfiguration configuration = ServiceProvider.GetRequiredService<IConfiguration>();
+    SenderSettings? settings = configuration.GetSection(SenderKey).Get<SenderSettings>();
+    if (settings == null)
+    {
+      return null;
+    }
+
+    SendGridSettings? sendGrid = configuration.GetSection(SendGridKey).Get<SendGridSettings>();
+    if (sendGrid != null)
+    {
+      SenderAggregate sender = new(settings.Address, ProviderType.SendGrid, isDefault, tenantId)
+      {
+        DisplayName = settings.DisplayName ?? "Logitar.Portal.IntegrationTests"
+      };
+      sender.SetSetting(nameof(sendGrid.ApiKey), sendGrid.ApiKey);
+
+      return sender;
+    }
+
+    return null;
+  }
+
+  private async Task SetPasswordRecoveryTemplateAsync()
+  {
+    _realm.SetPasswordRecoveryTemplate(_template);
+    await AggregateRepository.SaveAsync(_realm);
   }
 }

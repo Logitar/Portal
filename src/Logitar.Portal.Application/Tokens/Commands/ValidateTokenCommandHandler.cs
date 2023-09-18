@@ -1,8 +1,7 @@
-﻿using FluentValidation;
-using Logitar.Portal.Contracts.Tokens;
+﻿using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
-using Logitar.Portal.Domain.Validators;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Security.Claims;
 using MediatR;
 
@@ -27,16 +26,11 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
   public async Task<ValidatedToken> Handle(ValidateTokenCommand command, CancellationToken cancellationToken)
   {
     ValidateTokenPayload payload = command.Payload;
-
-    string? secret = payload.Secret?.CleanTrim();
-    if (secret != null)
-    {
-      new SecretValidator(nameof(payload.Secret)).ValidateAndThrow(secret);
-    }
+    JwtSecret? secret = string.IsNullOrWhiteSpace(payload.Secret) ? null : new(payload.Secret);
 
     ConfigurationAggregate configuration = _applicationContext.Configuration;
-    RealmAggregate? realm = null;
-    if (!string.IsNullOrWhiteSpace(payload.Realm))
+    RealmAggregate? realm = command.Realm;
+    if (realm == null && !string.IsNullOrWhiteSpace(payload.Realm))
     {
       realm = await _realmRepository.FindAsync(payload.Realm, cancellationToken)
        ?? throw new AggregateNotFoundException<RealmAggregate>(payload.Realm, nameof(payload.Realm));
@@ -47,7 +41,7 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
     string? issuer = TokenHelper.GetIssuer(payload.Issuer, realm, _applicationContext.BaseUrl);
     string? type = payload.Type?.CleanTrim();
 
-    ClaimsPrincipal principal = _tokenManager.Validate(payload.Token, secret, audience, issuer, type);
+    ClaimsPrincipal principal = _tokenManager.Validate(payload.Token, secret.Value, audience, issuer, type);
 
     IEnumerable<Guid> ids = principal.FindAll(Rfc7519ClaimNames.TokenId).Select(x => Guid.Parse(x.Value));
     if (ids.Any())

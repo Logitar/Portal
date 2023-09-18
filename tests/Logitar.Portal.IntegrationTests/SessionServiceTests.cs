@@ -29,11 +29,13 @@ public class SessionServiceTests : IntegrationTests, IAsyncLifetime
   {
     _sessionService = ServiceProvider.GetRequiredService<ISessionService>();
 
-    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
+    _realm = new("desjardins")
     {
       DisplayName = "Desjardins",
       DefaultLocale = Locale,
-      Url = new Uri("https://www.desjardins.com/")
+      Url = new Uri("https://www.desjardins.com/"),
+      RequireUniqueEmail = true,
+      RequireConfirmedAccount = true
     };
 
     _user = new(_realm.UniqueNameSettings, Faker.Person.UserName, _realm.Id.Value)

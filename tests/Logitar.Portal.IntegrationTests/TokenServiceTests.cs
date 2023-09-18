@@ -3,6 +3,7 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Logitar.Security.Claims;
 using Logitar.Security.Cryptography;
@@ -29,11 +30,13 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     _tokenManager = ServiceProvider.GetRequiredService<ITokenManager>();
     _tokenService = ServiceProvider.GetRequiredService<ITokenService>();
 
-    _realm = new("desjardins", requireUniqueEmail: true, requireConfirmedAccount: true)
+    _realm = new("desjardins")
     {
       DisplayName = "Desjardins",
       DefaultLocale = Locale,
-      Url = new Uri("https://www.desjardins.com/")
+      Url = new Uri("https://www.desjardins.com/"),
+      RequireUniqueEmail = true,
+      RequireConfirmedAccount = true
     };
   }
 
@@ -55,8 +58,8 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     CreatedToken createdToken = await _tokenService.CreateAsync(payload);
 
     Assert.NotNull(Configuration);
-    string secret = Configuration.Secret;
-    ClaimsPrincipal principal = _tokenManager.Validate(createdToken.Token, secret);
+    JwtSecret secret = Configuration.Secret;
+    ClaimsPrincipal principal = _tokenManager.Validate(createdToken.Token, secret.Value);
     Assert.Equal(6, principal.Claims.Count());
     Assert.Contains(principal.Claims, claim => claim.Type == Rfc7519ClaimNames.Audience && claim.Value == _applicationContext.BaseUrl?.ToString());
     Assert.Contains(principal.Claims, claim => claim.Type == Rfc7519ClaimNames.ExpirationTime && long.TryParse(claim.Value, out _));
@@ -221,7 +224,7 @@ public class TokenServiceTests : IntegrationTests, IAsyncLifetime
     identity.AddClaim(new(Rfc7519ClaimNames.TokenId, blacklistedId.ToString()));
     identity.AddClaim(new(Rfc7519ClaimNames.TokenId, Guid.NewGuid().ToString()));
 
-    string token = _tokenManager.Create(identity, _realm.Secret);
+    string token = _tokenManager.Create(identity, _realm.Secret.Value);
 
     ValidateTokenPayload payload = new(token)
     {

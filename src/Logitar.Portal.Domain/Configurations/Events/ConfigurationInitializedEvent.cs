@@ -12,7 +12,7 @@ public record ConfigurationInitializedEvent : DomainEvent, INotification
   }
 
   public ReadOnlyLocale DefaultLocale { get; init; } = ReadOnlyLocale.Default;
-  public string Secret { get; init; } = string.Empty;
+  public JwtSecret Secret { get; init; } = JwtSecret.Generate();
 
   public ReadOnlyUniqueNameSettings UniqueNameSettings { get; init; } = new();
   public ReadOnlyPasswordSettings PasswordSettings { get; init; } = new();

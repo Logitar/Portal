@@ -12,14 +12,16 @@ internal class MessageClientTests
 
   private readonly TestContext _context;
   private readonly Faker _faker;
+  private readonly MessageClient _messageClient;
   private readonly IMessageService _messageService;
   private readonly string _recipient;
 
-  public MessageClientTests(IConfiguration configuration, TestContext context, Faker faker, IMessageService messageService)
+  public MessageClientTests(IConfiguration configuration, TestContext context, Faker faker, MessageClient messageClient, IMessageService messageService)
   {
     _context = context;
     _faker = faker;
     _messageService = messageService;
+    _messageClient = messageClient;
     _recipient = configuration.GetValue<string>(RecipientKey) ?? throw new InvalidOperationException($"The configuration '{RecipientKey}' is required.");
   }
 
@@ -46,7 +48,7 @@ internal class MessageClientTests
         Locale = "fr",
         Variables = new Variable[]
         {
-          new("Code", "864516")
+          new("Token", Guid.NewGuid().ToString())
         }
       };
       SentMessages sentMessages = await _messageService.SendAsync(send, cancellationToken);
@@ -72,6 +74,19 @@ internal class MessageClientTests
       name = $"{Sut}.{nameof(_messageService.ReadAsync)}:Id";
       message = await _messageService.ReadAsync(message.Id, cancellationToken: cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");
+      _context.Succeed(name);
+
+      name = $"{Sut}.{nameof(_messageService.SendDemoAsync)}";
+      SendDemoMessagePayload payload = new()
+      {
+        TemplateId = _context.Template.Id,
+        Locale = "fr-CA",
+        Variables = new Variable[]
+      {
+          new("Token", Guid.NewGuid().ToString())
+      }
+      };
+      _ = await _messageClient.SendDemoAsync(payload, cancellationToken);
       _context.Succeed(name);
     }
     catch (Exception exception)

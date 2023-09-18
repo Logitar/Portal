@@ -41,9 +41,16 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
     {
       configuration.DefaultLocale = defaultLocale;
     }
-    if (reference == null || payload.Secret.Trim() != reference.Secret)
+    if (reference == null || payload.Secret.Trim() != reference.Secret.Value)
     {
-      configuration.Secret = payload.Secret;
+      if (string.IsNullOrWhiteSpace(payload.Secret))
+      {
+        configuration.GenerateNewSecret();
+      }
+      else
+      {
+        configuration.Secret = new JwtSecret(payload.Secret);
+      }
     }
 
     if (reference == null || uniqueNameSettings != reference.UniqueNameSettings)

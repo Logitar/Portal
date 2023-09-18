@@ -111,7 +111,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     Assert.Equal(1, configuration.Version);
 
     Assert.Equal(payload.Locale, configuration.DefaultLocale.Code);
-    Assert.Equal(32, configuration.Secret.Length);
+    Assert.Equal(32, configuration.Secret.Value.Length);
     Assert.Equal(new ReadOnlyUniqueNameSettings(), configuration.UniqueNameSettings);
     Assert.Equal(new ReadOnlyPasswordSettings(), configuration.PasswordSettings);
     Assert.Equal(new ReadOnlyLoggingSettings(), configuration.LoggingSettings);
@@ -148,7 +148,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     await InitializeConfigurationAsync();
 
     Assert.NotNull(Configuration);
-    string oldSecret = Configuration.Secret;
+    string oldSecret = Configuration.Secret.Value;
 
     ReplaceConfigurationPayload payload = new()
     {
@@ -218,7 +218,7 @@ public class ConfigurationServiceTests : IntegrationTests, IAsyncLifetime
     await InitializeConfigurationAsync();
 
     Assert.NotNull(Configuration);
-    string oldSecret = Configuration.Secret;
+    string oldSecret = Configuration.Secret.Value;
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyLoggingSettings loggingSettings = new();

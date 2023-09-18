@@ -59,7 +59,7 @@ internal class DictionaryClientTests
       {
         Entries = new DictionaryEntryModification[]
         {
-          new("PasswordRecovery_Body", "Votre code d’accès afin de réinitialiser votre mot de passe est : {code}."),
+          new("PasswordRecovery_Body", "Cliquez sur le lien ci-dessous afin de réinitialiser votre mot de passe :\nhttps://www.logitar.ca/user/reset-password?token={token}"),
           new("PasswordRecovery_Subject", "Réinitialiser votre mot de passe"),
           new("White", "Blanc"),
           new("Blue", "Bleu"),

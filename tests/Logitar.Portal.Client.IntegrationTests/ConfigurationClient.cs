@@ -23,21 +23,25 @@ internal class ConfigurationClient : IConfigurationService
     using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
     response.EnsureSuccessStatusCode();
 
-    return new InitializeConfigurationResult();
+    JsonSerializerOptions serializerOptions = new();
+    serializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+    return await response.Content.ReadFromJsonAsync<InitializeConfigurationResult>(serializerOptions, cancellationToken)
+      ?? throw new InvalidOperationException("The result should not be null.");
   }
 
   public Task<Configuration?> ReadAsync(CancellationToken cancellationToken)
   {
-    throw new NotSupportedException();
+    throw new NotImplementedException();
   }
 
   public Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
   {
-    throw new NotSupportedException();
+    throw new NotImplementedException();
   }
 
   public Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotSupportedException();
+    throw new NotImplementedException();
   }
 }

@@ -13,7 +13,7 @@ public record RealmCreatedEvent : DomainEvent, INotification
 
   public string UniqueSlug { get; init; } = string.Empty;
 
-  public string Secret { get; init; } = string.Empty;
+  public JwtSecret Secret { get; init; } = JwtSecret.Generate();
 
   public bool RequireUniqueEmail { get; init; }
   public bool RequireConfirmedAccount { get; init; }

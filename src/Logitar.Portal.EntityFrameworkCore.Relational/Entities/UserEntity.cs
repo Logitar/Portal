@@ -140,6 +140,15 @@ internal record UserEntity : AggregateEntity
     IsDisabled = false;
   }
 
+  public void ResetPassword(UserPasswordResetEvent passwordReset)
+  {
+    Update(passwordReset);
+
+    Password = passwordReset.Password.Encode();
+    PasswordChangedBy = passwordReset.ActorId.Value;
+    PasswordChangedOn = passwordReset.OccurredOn.ToUniversalTime();
+  }
+
   public void SetIdentifier(UserIdentifierSetEvent @event)
   {
     Update(@event);

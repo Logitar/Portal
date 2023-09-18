@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Settings;
 using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
@@ -31,7 +32,14 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
     }
     if (payload.Secret != null)
     {
-      configuration.Secret = payload.Secret;
+      if (string.IsNullOrWhiteSpace(payload.Secret))
+      {
+        configuration.GenerateNewSecret();
+      }
+      else
+      {
+        configuration.Secret = new JwtSecret(payload.Secret);
+      }
     }
 
     if (payload.UniqueNameSettings != null)

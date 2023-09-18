@@ -83,9 +83,16 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     {
       realm.DefaultLocale = defaultLocale;
     }
-    if (reference == null || payload.Secret.Trim() != reference.Secret)
+    if (reference == null || payload.Secret.Trim() != reference.Secret.Value)
     {
-      realm.Secret = payload.Secret;
+      if (string.IsNullOrWhiteSpace(payload.Secret))
+      {
+        realm.GenerateNewSecret();
+      }
+      else
+      {
+        realm.Secret = new JwtSecret(payload.Secret);
+      }
     }
     if (reference == null || url != reference.Url)
     {

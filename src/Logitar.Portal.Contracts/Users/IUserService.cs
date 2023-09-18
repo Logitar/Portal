@@ -7,8 +7,10 @@ public interface IUserService
   Task<User?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
   Task<User?> ReadAsync(Guid? id = null, string? realm = null, string? uniqueName = null,
     string? identifierKey = null, string? identifierValue = null, CancellationToken cancellationToken = default);
+  Task<RecoverPasswordResult> RecoverPasswordAsync(RecoverPasswordPayload payload, CancellationToken cancellationToken = default);
   Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken = default);
   Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<User> ResetPasswordAsync(ResetPasswordPayload payload, CancellationToken cancellationToken = default);
   Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken = default);
   Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken = default);
   Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
