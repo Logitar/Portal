@@ -8,13 +8,13 @@ const { t } = useI18n();
   <main class="container">
     <div class="row vh-100 text-center align-items-center">
       <div class="col jumbotron">
-        <h1 class="display-4">{{ t("dashboard.lead") }}</h1>
+        <h1 class="display-4">{{ t("brand") }}</h1>
         <p class="lead">{{ t("dashboard.title") }}</p>
         <hr class="my-4" />
         <p>{{ t("dashboard.help") }}</p>
         <p class="lead">
           <RouterLink :to="{ name: 'Profile' }" class="btn btn-primary btn-lg" role="button">
-            <font-awesome-icon icon="fas fa-user" /> {{ t("dashboard.link") }}
+            <font-awesome-icon icon="fas fa-chess-rook" /> {{ t("dashboard.link") }}
           </RouterLink>
         </p>
       </div>
