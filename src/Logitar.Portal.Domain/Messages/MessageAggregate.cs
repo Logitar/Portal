@@ -27,9 +27,20 @@ public class MessageAggregate : AggregateRoot
     body = body.Trim();
     new ContentsValidator(nameof(Body)).ValidateAndThrow(body);
 
-    IEnumerable<UserAggregate> usersNotInRealm = recipients.AsEnumerable()
-      .Where(x => x.User != null && x.User.TenantId != realm?.Id.Value)
-      .Select(x => x.User!);
+    IEnumerable<UserAggregate> usersNotInRealm;
+    if (realm == null)
+    {
+      usersNotInRealm = recipients.AsEnumerable()
+        .Where(x => x.User?.TenantId != null)
+        .Select(x => x.User!);
+    }
+    else
+    {
+      string tenantId = realm.Id.Value;
+      usersNotInRealm = recipients.AsEnumerable()
+        .Where(x => x.User?.TenantId?.Equals(tenantId) == false)
+        .Select(x => x.User!);
+    }
     if (usersNotInRealm.Any())
     {
       throw new UsersNotInRealmException(usersNotInRealm, realm, nameof(Recipients));
