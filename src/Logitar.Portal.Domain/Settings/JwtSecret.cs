@@ -4,7 +4,7 @@ using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Domain.Settings;
 
-public record JwtSecret
+public record JwtSecret // TODO(fpion): JwtSecretConverter
 {
   public JwtSecret(string value)
   {
