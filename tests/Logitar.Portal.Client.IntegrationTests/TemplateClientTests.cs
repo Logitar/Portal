@@ -45,7 +45,7 @@ internal class TemplateClientTests
         Description = "This is the template used for password recovery.",
         Subject = "PasswordRecovery_Subject",
         ContentType = MediaTypeNames.Text.Plain,
-        Contents = @"@(Model.Resource(""PasswordRecovery_Body"").Replace(""{code}"", Model.Variable(""Code"")))"
+        Contents = @"@(Model.Resource(""PasswordRecovery_Body"").Replace(""{token}"", Model.Variable(""Token"")))"
       };
       template = await _templateService.ReplaceAsync(template.Id, replace, template.Version, cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");
@@ -98,6 +98,8 @@ internal class TemplateClientTests
       template = await _templateService.ReadAsync(realm: _context.Realm.Id.ToString(), uniqueName: template.UniqueName, cancellationToken: cancellationToken)
       ?? throw new InvalidOperationException("The result should not be null.");
       _context.Succeed(name);
+
+      _context.Template = template;
     }
     catch (Exception exception)
     {

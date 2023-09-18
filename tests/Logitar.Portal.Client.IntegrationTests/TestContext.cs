@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Client;
@@ -37,6 +38,13 @@ internal class TestContext
   {
     get => _user ?? throw new InvalidOperationException("The user has not been assigned yet.");
     set => _user = value;
+  }
+
+  private Template? _template = null;
+  public Template Template
+  {
+    get => _template ?? throw new InvalidOperationException("The template has not been assigned yet.");
+    set => _template = value;
   }
 
   private int Percentage => _index * 100 / _count;
