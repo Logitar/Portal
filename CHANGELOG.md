@@ -95,7 +95,7 @@ Nothing yet.
 - Final V1 release.
 
 [unreleased]: https://github.com/Logitar/Portal/compare/v3.0.0...HEAD
-[2.1.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
+[3.0.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/Logitar/Portal/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Logitar/Portal/compare/v1.1.5...v2.0.0
 [1.1.5]: https://github.com/Logitar/Portal/releases/tag/v1.1.5
