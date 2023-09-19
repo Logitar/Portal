@@ -13,7 +13,7 @@ const { t } = useI18n();
         <hr class="my-4" />
         <p>{{ t("dashboard.help") }}</p>
         <p class="lead">
-          <RouterLink :to="{ name: 'Profile' }" class="btn btn-primary btn-lg" role="button">
+          <RouterLink :to="{ name: 'RealmList' }" class="btn btn-primary btn-lg" role="button">
             <font-awesome-icon icon="fas fa-chess-rook" /> {{ t("dashboard.link") }}
           </RouterLink>
         </p>
