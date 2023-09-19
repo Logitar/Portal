@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20230915224615_CompleteMessageTables")]
-    partial class CompleteMessageTables
+    [Migration("20230918235543_Release_3_0_0")]
+    partial class Release_3_0_0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,6 +105,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime?>("ExpiresOn")
                         .HasColumnType("timestamp with time zone");
 
@@ -113,11 +118,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("TenantId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -143,11 +143,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedOn");
 
+                    b.HasIndex("DisplayName");
+
                     b.HasIndex("ExpiresOn");
 
                     b.HasIndex("TenantId");
-
-                    b.HasIndex("Title");
 
                     b.HasIndex("UpdatedBy");
 

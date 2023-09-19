@@ -102,6 +102,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime?>("ExpiresOn")
                         .HasColumnType("timestamp with time zone");
 
@@ -110,11 +115,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("TenantId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -140,11 +140,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedOn");
 
+                    b.HasIndex("DisplayName");
+
                     b.HasIndex("ExpiresOn");
 
                     b.HasIndex("TenantId");
-
-                    b.HasIndex("Title");
 
                     b.HasIndex("UpdatedBy");
 

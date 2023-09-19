@@ -76,7 +76,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
       .ApplyIdInFilter(Db.ApiKeys.AggregateId, payload.IdIn)
       .Where(Db.ApiKeys.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId))
       .SelectAll(Db.ApiKeys.Table);
-    _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.ApiKeys.Title);
+    _sqlHelper.ApplyTextSearch(builder, payload.Search, Db.ApiKeys.DisplayName);
 
     if (payload.Status != null)
     {
@@ -106,8 +106,8 @@ internal class ApiKeyQuerier : IApiKeyQuerier
           break;
         case ApiKeySort.DisplayName:
           ordered = (ordered == null)
-            ? (sort.IsDescending ? query.OrderByDescending(x => x.Title) : query.OrderBy(x => x.Title))
-            : (sort.IsDescending ? ordered.ThenByDescending(x => x.Title) : ordered.ThenBy(x => x.Title));
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.DisplayName) : ordered.ThenBy(x => x.DisplayName));
           break;
         case ApiKeySort.ExpiresOn:
           ordered = (ordered == null)
