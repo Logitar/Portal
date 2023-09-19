@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [3.0.1] - 2023-09-18
+
+### Fixed
+
+- CI/CD pipelines.
+- CHANGELOG links.
+
 ## [3.0.0] - 2023-09-18
 
 ### Added
