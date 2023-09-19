@@ -33,6 +33,7 @@ const selectedTemplate = ref<Template>();
 const showStatus = ref<boolean>(false);
 const variables = ref<Variable[]>([]);
 
+const userHasNoEmail = computed<boolean>(() => !account.authenticated?.email);
 const variant = computed<string>(() => {
   switch (message.value?.status) {
     case "Failed":
@@ -45,7 +46,6 @@ const variant = computed<string>(() => {
       return "secondary";
   }
 });
-const userHasNoEmail = computed<boolean>(() => !account.authenticated?.email);
 
 const emit = defineEmits<{
   (e: "error", value: unknown): void;

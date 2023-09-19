@@ -7,7 +7,7 @@ namespace Logitar.Portal.Web.Extensions;
 public static class OpenApiExtensions
 {
   private const string Title = "Portal API";
-  private static readonly Version Version = new(3, 0, 0);
+  private static readonly Version Version = new(3, 0, 2);
 
   public static IServiceCollection AddOpenApi(this IServiceCollection services)
   {
