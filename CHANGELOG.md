@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [3.0.1] - 2023-09-18
+
+### Fixed
+
+- CI/CD pipelines.
+- CHANGELOG links.
+
 ## [3.0.0] - 2023-09-18
 
 ### Added
@@ -94,8 +101,9 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.0...HEAD
-[2.1.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
+[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/Logitar/Portal/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/Logitar/Portal/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Logitar/Portal/compare/v1.1.5...v2.0.0
 [1.1.5]: https://github.com/Logitar/Portal/releases/tag/v1.1.5
