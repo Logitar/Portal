@@ -3,6 +3,6 @@
 public enum TemplateSort
 {
   DisplayName,
-  Key,
+  UniqueName,
   UpdatedOn
 }

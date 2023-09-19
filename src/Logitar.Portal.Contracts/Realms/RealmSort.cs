@@ -3,6 +3,6 @@
 public enum RealmSort
 {
   DisplayName,
-  UniqueName,
+  UniqueSlug,
   UpdatedOn
 }

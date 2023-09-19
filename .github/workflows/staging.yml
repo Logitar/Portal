@@ -3,7 +3,6 @@ name: Deploy Staging Portal to Azure
 on:
   push:
     branches:
-      - dev
       - "hotfix_**"
       - "release_**"
   workflow_dispatch:
@@ -13,17 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - uses: actions/checkout@v4
       - uses: azure/docker-login@v1
         with:
           login-server: francispion.azurecr.io
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          cd ./src/Logitar.Portal.UI
+          cd ./src/Logitar.Portal.Ui
           npm ci
           npm run build:staging
           cd ../..

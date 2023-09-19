@@ -2,10 +2,10 @@
 
 public interface IDictionaryService
 {
-  Task<Dictionary> CreateAsync(CreateDictionaryInput input, CancellationToken cancellationToken = default);
-  Task<Dictionary> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<Dictionary?> GetAsync(Guid? id = null, CancellationToken cancellationToken = default);
-  Task<PagedList<Dictionary>> GetAsync(string? locale = null, string? realm = null, DictionarySort? sort = null,
-    bool isDescending = false, int? skip = null, int? limit = null, CancellationToken cancellationToken = default);
-  Task<Dictionary> UpdateAsync(Guid id, UpdateDictionaryInput input, CancellationToken cancellationToken = default);
+  Task<Dictionary> CreateAsync(CreateDictionaryPayload payload, CancellationToken cancellationToken = default);
+  Task<Dictionary?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Dictionary?> ReadAsync(Guid? id = null, string? realm = null, string? locale = null, CancellationToken cancellationToken = default);
+  Task<Dictionary?> ReplaceAsync(Guid id, ReplaceDictionaryPayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<SearchResults<Dictionary>> SearchAsync(SearchDictionariesPayload payload, CancellationToken cancellationToken = default);
+  Task<Dictionary?> UpdateAsync(Guid id, UpdateDictionaryPayload payload, CancellationToken cancellationToken = default);
 }

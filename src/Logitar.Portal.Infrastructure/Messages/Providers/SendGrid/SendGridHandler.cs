@@ -1,14 +1,11 @@
-﻿using Logitar.Portal.Contracts.Errors;
-using Logitar.Portal.Core.Messages;
+﻿using Logitar.Portal.Contracts.Http;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid.Payloads;
-using System.Net.Http.Json;
 
 namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 
 internal class SendGridHandler : IMessageHandler
 {
-  private static readonly Uri _requestUri = new("https://api.sendgrid.com/v3/mail/send");
-
   private readonly HttpClient _client = new();
 
   public SendGridHandler(SendGridSettings settings)
@@ -24,13 +21,14 @@ internal class SendGridHandler : IMessageHandler
   public async Task<SendMessageResult> SendAsync(MessageAggregate message, CancellationToken cancellationToken)
   {
     SendMailPayload payload = new(message);
-    using HttpRequestMessage request = new(HttpMethod.Post, _requestUri)
+    Uri requestUri = new("https://api.sendgrid.com/v3/mail/send");
+    using HttpRequestMessage request = new(HttpMethod.Post, requestUri)
     {
       Content = JsonContent.Create(payload)
     };
 
     using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
-    SendMessageResult result = await response.GetSendMessageResultAsync(cancellationToken);
+    HttpResponseDetail detail = await response.DetailAsync(cancellationToken);
 
     try
     {
@@ -38,21 +36,9 @@ internal class SendGridHandler : IMessageHandler
     }
     catch (Exception innerException)
     {
-      Error error = new()
-      {
-        Severity = ErrorSeverity.Failure,
-        Code = response.StatusCode.ToString(),
-        Description = "The message sending failed.",
-        Data = result.Select(pair => new ErrorData
-        {
-          Key = pair.Key,
-          Value = pair.Value
-        })
-      };
-
-      throw new ErrorException(error, innerException);
+      throw new HttpFailureException(detail, innerException);
     }
 
-    return result;
+    return detail.ToSendMessageResult();
   }
 }

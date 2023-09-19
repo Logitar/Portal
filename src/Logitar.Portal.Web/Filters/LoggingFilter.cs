@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Core.Logging;
+﻿using Logitar.Portal.Application.Logging;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -17,7 +17,8 @@ public class LoggingFilter : ActionFilterAttribute
   {
     if (context.ActionDescriptor is ControllerActionDescriptor descriptor)
     {
-      await _loggingService.SetOperationAsync(type: descriptor.ControllerName, name: descriptor.ActionName);
+      Operation operation = new(descriptor.ControllerName, descriptor.ActionName);
+      _loggingService.SetOperation(operation);
     }
 
     await base.OnActionExecutionAsync(context, next);

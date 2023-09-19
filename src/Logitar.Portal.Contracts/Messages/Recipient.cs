@@ -1,12 +1,12 @@
-﻿namespace Logitar.Portal.Contracts.Messages;
+﻿using Logitar.Portal.Contracts.Users;
+
+namespace Logitar.Portal.Contracts.Messages;
 
 public record Recipient
 {
   public RecipientType Type { get; set; }
+  public User? User { get; set; }
 
   public string Address { get; set; } = string.Empty;
   public string? DisplayName { get; set; }
-
-  public Guid? UserId { get; set; }
-  public string? Username { get; set; }
 }

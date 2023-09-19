@@ -6,9 +6,9 @@ public record Dictionary : Aggregate
 {
   public Guid Id { get; set; }
 
-  public string Locale { get; set; } = string.Empty;
-
-  public IEnumerable<Entry> Entries { get; set; } = Enumerable.Empty<Entry>();
-
   public Realm? Realm { get; set; }
+  public Locale Locale { get; set; } = new();
+
+  public IEnumerable<DictionaryEntry> Entries { get; set; } = Enumerable.Empty<DictionaryEntry>();
+  public int EntryCount { get; set; }
 }

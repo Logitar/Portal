@@ -6,7 +6,7 @@ public record Actor
   public ActorType Type { get; set; }
   public bool IsDeleted { get; set; }
 
-  public string DisplayName { get; set; } = ActorType.System.ToString();
+  public string DisplayName { get; set; } = "System";
   public string? EmailAddress { get; set; }
-  public string? Picture { get; set; }
+  public string? PictureUrl { get; set; }
 }

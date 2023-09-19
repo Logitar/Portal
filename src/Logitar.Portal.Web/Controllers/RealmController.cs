@@ -1,14 +1,15 @@
-﻿using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Web.Constants;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Realms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
 
-[ApiExplorerSettings(IgnoreApi = true)]
+[ApiController]
 [Authorize(Policy = Policies.PortalActor)]
-[Route("realms")]
-public class RealmController : Controller
+[Route("api/realms")]
+public class RealmController : ControllerBase
 {
   private readonly IRealmService _realmService;
 
@@ -17,33 +18,53 @@ public class RealmController : Controller
     _realmService = realmService;
   }
 
-  [HttpGet("/create-realm")]
-  public ActionResult CreateRealm()
+  [HttpPost]
+  public async Task<ActionResult<Realm>> CreateAsync([FromBody] CreateRealmPayload payload, CancellationToken cancellationToken)
   {
-    return View(nameof(RealmEdit));
+    Realm realm = await _realmService.CreateAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/realms/{realm.Id}");
+
+    return Created(uri, realm);
   }
 
-  [HttpGet("{idOrUniqueName}")]
-  public async Task<ActionResult> RealmEdit(string idOrUniqueName, CancellationToken cancellationToken = default)
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Realm>> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    Guid? id = null;
-    if (Guid.TryParse(idOrUniqueName, out Guid realmId))
-    {
-      id = realmId;
-    }
-
-    Realm? realm = await _realmService.GetAsync(id, idOrUniqueName, cancellationToken);
-    if (realm == null)
-    {
-      return NotFound();
-    }
-
-    return View(realm);
+    Realm? realm = await _realmService.DeleteAsync(id, cancellationToken);
+    return realm == null ? NotFound() : Ok(realm);
   }
 
-  [HttpGet]
-  public ActionResult RealmList()
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Realm>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return View();
+    Realm? realm = await _realmService.ReadAsync(id, cancellationToken: cancellationToken);
+    return realm == null ? NotFound() : Ok(realm);
+  }
+
+  [HttpGet("unique-slug:{uniqueSlug}")]
+  public async Task<ActionResult<Realm>> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
+  {
+    Realm? realm = await _realmService.ReadAsync(uniqueSlug: uniqueSlug, cancellationToken: cancellationToken);
+    return realm == null ? NotFound() : Ok(realm);
+  }
+
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Realm>> ReplaceAsync(Guid id, [FromBody] ReplaceRealmPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    Realm? realm = await _realmService.ReplaceAsync(id, payload, version, cancellationToken);
+    return realm == null ? NotFound() : Ok(realm);
+  }
+
+  [HttpPost("search")]
+  public async Task<ActionResult<SearchResults<Realm>>> SearchAsync([FromBody] SearchRealmsPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _realmService.SearchAsync(payload, cancellationToken));
+  }
+
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<Realm>> UpdateAsync(Guid id, [FromBody] UpdateRealmPayload payload, CancellationToken cancellationToken)
+  {
+    Realm? realm = await _realmService.UpdateAsync(id, payload, cancellationToken);
+    return realm == null ? NotFound() : Ok(realm);
   }
 }

@@ -1,23 +1,18 @@
-﻿using Logitar.Portal.Contracts.Messages;
-
-namespace Logitar.Portal.Contracts.Users;
+﻿namespace Logitar.Portal.Contracts.Users;
 
 public interface IUserService
 {
-  Task<User> ChangePasswordAsync(Guid id, ChangePasswordInput input, CancellationToken cancellationToken = default);
-  Task<User> CreateAsync(CreateUserInput input, CancellationToken cancellationToken = default);
-  Task<User> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<User> DisableAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<User> EnableAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<User?> GetAsync(Guid? id = null, string? realm = null, string? username = null,
-    string? externalKey = null, string? externalValue = null, CancellationToken cancellationToken = default);
-  Task<PagedList<User>> GetAsync(bool? isConfirmed = null, bool? isDisabled = null, string? realm = null, string? search = null,
-    UserSort? sort = null, bool isDescending = false, int? skip = null, int? limit = null, CancellationToken cancellationToken = default);
-  Task<SentMessages> RecoverPasswordAsync(RecoverPasswordInput input, CancellationToken cancellationToken = default);
-  Task<User> ResetPasswordAsync(ResetPasswordInput input, CancellationToken cancellationToken = default);
-  Task<User> SetExternalIdentifierAsync(Guid id, string key, string? value, CancellationToken cancellationToken = default);
-  Task<User> UpdateAsync(Guid id, UpdateUserInput input, CancellationToken cancellationToken = default);
-  Task<User> VerifyAddressAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<User> VerifyEmailAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<User> VerifyPhoneAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User> AuthenticateAsync(AuthenticateUserPayload payload, CancellationToken cancellationToken = default);
+  Task<User> CreateAsync(CreateUserPayload payload, CancellationToken cancellationToken = default);
+  Task<User?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User?> ReadAsync(Guid? id = null, string? realm = null, string? uniqueName = null,
+    string? identifierKey = null, string? identifierValue = null, CancellationToken cancellationToken = default);
+  Task<RecoverPasswordResult> RecoverPasswordAsync(RecoverPasswordPayload payload, CancellationToken cancellationToken = default);
+  Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken = default);
+  Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<User> ResetPasswordAsync(ResetPasswordPayload payload, CancellationToken cancellationToken = default);
+  Task<User?> SaveIdentifierAsync(Guid id, SaveIdentifierPayload payload, CancellationToken cancellationToken = default);
+  Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken = default);
+  Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User?> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken = default);
 }

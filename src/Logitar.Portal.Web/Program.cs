@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Web;
 
-public class Program
+internal class Program
 {
   public static void Main()
   {

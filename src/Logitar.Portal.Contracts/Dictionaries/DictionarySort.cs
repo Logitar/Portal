@@ -2,7 +2,7 @@
 
 public enum DictionarySort
 {
-  Entries,
-  RealmLocale,
+  EntryCount,
+  Locale,
   UpdatedOn
 }

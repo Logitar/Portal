@@ -1,15 +1,14 @@
-﻿using System.Text.Json.Serialization;
+﻿using Logitar.Portal.Domain.Messages;
 
 namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid.Payloads;
 
 internal record PersonalizationPayload
 {
-  public PersonalizationPayload(IEnumerable<RecipientPayload> to,
-    IEnumerable<RecipientPayload>? cc = null, IEnumerable<RecipientPayload>? bcc = null)
+  public PersonalizationPayload(Recipients recipients)
   {
-    To = to?.Any() == true ? to : null;
-    CC = cc?.Any() == true ? cc : null;
-    Bcc = bcc?.Any() == true ? bcc : null;
+    Bcc = recipients.Bcc.Any() ? recipients.Bcc.Select(recipient => new RecipientPayload(recipient)) : null;
+    CC = recipients.CC.Any() ? recipients.CC.Select(recipient => new RecipientPayload(recipient)) : null;
+    To = recipients.To.Any() ? recipients.To.Select(recipient => new RecipientPayload(recipient)) : null;
   }
 
   [JsonPropertyName("bcc")]

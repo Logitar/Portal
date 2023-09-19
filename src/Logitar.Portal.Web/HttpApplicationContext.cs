@@ -1,13 +1,14 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application;
+using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Caching;
-using Logitar.Portal.Core.Configurations;
+using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Web;
 
-public class HttpApplicationContext : IApplicationContext
+internal class HttpApplicationContext : IApplicationContext
 {
   private readonly ICacheService _cacheService;
   private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,44 +19,30 @@ public class HttpApplicationContext : IApplicationContext
     _httpContextAccessor = httpContextAccessor;
   }
 
-  public Guid? ActivityId
-  {
-    get => _httpContextAccessor.HttpContext?.GetActivityId();
-    set => _httpContextAccessor.HttpContext?.SetActivityId(value);
-  }
-  public AggregateId ActorId
+  protected HttpContext Context => _httpContextAccessor.HttpContext
+    ?? throw new InvalidOperationException($"The {nameof(_httpContextAccessor.HttpContext)} is required.");
+
+  public ActorId ActorId
   {
     get
     {
-      Guid id = Guid.Empty;
-
-      if (_httpContextAccessor.HttpContext != null)
+      User? user = Context.GetUser();
+      if (user != null)
       {
-        User? user = _httpContextAccessor.HttpContext.GetUser();
-        if (user != null)
-        {
-          id = user.Id;
-        }
+        return new ActorId(user.Id);
       }
 
-      return new AggregateId(id);
+      ApiKey? apiKey = Context.GetApiKey();
+      if (apiKey != null)
+      {
+        return new ActorId(apiKey.Id);
+      }
+
+      return new ActorId(Guid.Empty);
     }
   }
 
-  public Uri? BaseUrl
-  {
-    get
-    {
-      if (_httpContextAccessor.HttpContext == null)
-      {
-        return null;
-      }
-
-      HttpRequest request = _httpContextAccessor.HttpContext.Request;
-
-      return new Uri($"{request.Scheme}://{request.Host}");
-    }
-  }
+  public Uri? BaseUrl => new($"{Context.Request.Scheme}://{Context.Request.Host}");
 
   public ConfigurationAggregate Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration could not be found in the cache.");

@@ -1,61 +1,59 @@
-﻿using Logitar.Portal.Core;
-using Logitar.Portal.Infrastructure;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Web.Authentication;
 using Logitar.Portal.Web.Authorization;
-using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Filters;
+using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authorization;
-using System.Text.Json.Serialization;
-
-using SharedSchemes = Logitar.Portal.Contracts.Constants.Schemes;
 
 namespace Logitar.Portal.Web;
 
 public static class DependencyInjectionExtensions
 {
-  public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services)
+  public static IServiceCollection AddLogitarPortalWeb(this IServiceCollection services, IConfiguration configuration)
   {
     services
-      .AddControllersWithViews(options =>
-      {
-        options.Filters.Add<ExceptionHandlingFilter>();
-        options.Filters.Add<LoggingFilter>();
-      })
-      .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+     .AddControllersWithViews(options =>
+     {
+       options.Filters.Add<ExceptionHandlingFilter>();
+       options.Filters.Add<LoggingFilter>();
+     })
+     .AddJsonOptions(options =>
+     {
+       options.JsonSerializerOptions.Converters.Add(new ReadOnlyLocaleConverter());
+       options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+     });
 
-    services
-      .AddAuthentication()
-      .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(SharedSchemes.Basic, options => { })
+    CorsSettings corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    services.AddSingleton(corsSettings);
+    services.AddCors(corsSettings);
+
+    services.AddAuthentication()
+      .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, options => { })
+      .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
 
     services.AddAuthorization(options =>
     {
-      options.AddPolicy(Policies.AuthenticatedPortalUser, new AuthorizationPolicyBuilder(Schemes.Session)
-        .RequireAuthenticatedUser()
-        .AddRequirements(new AuthenticatedPortalUserAuthorizationRequirement())
-        .Build());
       options.AddPolicy(Policies.PortalActor, new AuthorizationPolicyBuilder(Schemes.All)
         .RequireAuthenticatedUser()
         .AddRequirements(new PortalActorAuthorizationRequirement())
         .Build());
     });
 
-    services
-      .AddSession(options =>
-      {
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-      })
-      .AddDistributedMemoryCache();
+    CookiesSettings cookiesSettings = configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    services.AddSingleton(cookiesSettings);
+    services.AddSession(options =>
+    {
+      options.Cookie.SameSite = cookiesSettings.Session.SameSite;
+      options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
-    services.AddHttpContextAccessor();
-
-    services.AddLogitarPortalInfrastructure();
-
-    services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(DependencyInjectionExtensions).Assembly));
-
+    services.AddDistributedMemoryCache();
+    services.AddMemoryCache();
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
-    services.AddSingleton<IAuthorizationHandler, AuthenticatedPortalUserAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
 
     return services;

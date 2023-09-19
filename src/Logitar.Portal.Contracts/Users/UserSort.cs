@@ -2,13 +2,17 @@
 
 public enum UserSort
 {
+  AuthenticatedOn,
+  Birthdate,
   DisabledOn,
   EmailAddress,
+  FirstName,
   FullName,
-  LastFirstMiddleName,
+  LastName,
+  MiddleName,
+  Nickname,
   PasswordChangedOn,
-  PhoneE164Formatted,
-  SignedInOn,
-  UpdatedOn,
-  Username
+  PhoneNumber,
+  UniqueName,
+  UpdatedOn
 }

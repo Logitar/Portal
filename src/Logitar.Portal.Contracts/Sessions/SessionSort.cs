@@ -2,8 +2,6 @@
 
 public enum SessionSort
 {
-  IpAddress,
   SignedOutOn,
-  UpdatedOn,
-  User
+  UpdatedOn
 }

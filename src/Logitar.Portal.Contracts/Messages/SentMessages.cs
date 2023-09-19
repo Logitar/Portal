@@ -2,7 +2,13 @@
 
 public record SentMessages
 {
-  public IEnumerable<Guid> Success { get; set; } = Enumerable.Empty<Guid>();
-  public IEnumerable<Guid> Error { get; set; } = Enumerable.Empty<Guid>();
-  public IEnumerable<Guid> Unsent { get; set; } = Enumerable.Empty<Guid>();
+  public SentMessages() : this(Enumerable.Empty<Guid>())
+  {
+  }
+  public SentMessages(IEnumerable<Guid> ids)
+  {
+    Ids = ids;
+  }
+
+  public IEnumerable<Guid> Ids { get; set; }
 }

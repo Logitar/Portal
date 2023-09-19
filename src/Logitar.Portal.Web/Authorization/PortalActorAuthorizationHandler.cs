@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
@@ -27,6 +28,21 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
         else
         {
           context.Fail(new AuthorizationFailureReason(this, "The User should not belong to a Realm."));
+        }
+      }
+      else
+      {
+        ApiKey? apiKey = _httpContextAccessor.HttpContext.GetApiKey();
+        if (apiKey != null)
+        {
+          if (apiKey.Realm == null)
+          {
+            context.Succeed(requirement);
+          }
+          else
+          {
+            context.Fail(new AuthorizationFailureReason(this, "The API key should not belong to a Realm."));
+          }
         }
       }
     }

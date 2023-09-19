@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.32.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Logitar.Portal.Domain\Logitar.Portal.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Reflection" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Logitar.Portal.IntegrationTests" />
+  </ItemGroup>
+
+</Project>

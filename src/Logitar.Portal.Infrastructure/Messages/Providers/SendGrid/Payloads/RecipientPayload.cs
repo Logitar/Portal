@@ -1,11 +1,10 @@
-﻿using Logitar.Portal.Core.Messages;
-using System.Text.Json.Serialization;
+﻿using Logitar.Portal.Domain.Messages;
 
 namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid.Payloads;
 
 internal record RecipientPayload
 {
-  public RecipientPayload(Recipient recipient)
+  public RecipientPayload(ReadOnlyRecipient recipient)
   {
     Address = recipient.Address;
     DisplayName = recipient.DisplayName;

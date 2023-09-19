@@ -2,11 +2,10 @@
 
 public interface ISessionService
 {
-  Task<Session?> GetAsync(Guid? id = null, CancellationToken cancellationToken = default);
-  Task<PagedList<Session>> GetAsync(bool? isActive = null, bool? isPersistent = null, string? realm = null, Guid? userId = null,
-    SessionSort? sort = null, bool isDescending = false, int? skip = null, int? limit = null, CancellationToken cancellationToken = default);
-  Task<Session> RefreshAsync(RefreshInput input, CancellationToken cancellationToken = default);
-  Task<Session> SignInAsync(SignInInput input, string? realm, CancellationToken cancellationToken = default);
-  Task<Session> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<IEnumerable<Session>> SignOutUserAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Session> CreateAsync(CreateSessionPayload payload, CancellationToken cancellationToken = default);
+  Task<Session> RenewAsync(RenewPayload payload, CancellationToken cancellationToken = default);
+  Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken = default);
+  Task<Session> SignInAsync(SignInPayload payload, CancellationToken cancellationToken = default);
+  Task<Session?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
 }

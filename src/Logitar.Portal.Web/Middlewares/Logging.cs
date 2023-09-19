@@ -1,6 +1,5 @@
-﻿using Logitar.Portal.Contracts.Errors;
-using Logitar.Portal.Core;
-using Logitar.Portal.Core.Logging;
+﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -20,9 +19,7 @@ public class Logging
   public async Task InvokeAsync(HttpContext context, ILoggingService loggingService)
   {
     HttpRequest request = context.Request;
-    await loggingService.StartAsync(correlationId: context.TraceIdentifier, request.Method,
-      destination: request.GetDisplayUrl(), source: context.GetClientIpAddress(),
-      context.GetAdditionalInformation());
+    loggingService.Start(context.TraceIdentifier, request.Method, request.GetDisplayUrl(), context.GetClientIpAddress(), context.GetAdditionalInformation());
 
     try
     {
@@ -30,13 +27,13 @@ public class Logging
     }
     catch (Exception exception)
     {
-      await loggingService.AddErrorAsync(Error.From(exception), activityId: null);
+      loggingService.AddException(exception);
 
       throw;
     }
     finally
     {
-      await loggingService.SetActorsAsync(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSession()?.Id);
+      loggingService.SetActors(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSessionId());
 
       HttpResponse response = context.Response;
       await loggingService.EndAsync(response.StatusCode);

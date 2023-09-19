@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,18 +7,36 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Logitar.Portal.Client</RootNamespace>
-    <UserSecretsId>8d2d2156-5c9e-4d5d-828e-64f3c37d5829</UserSecretsId>
+    <UserSecretsId>f025312d-905b-40e5-8eee-e06d4afe6b51</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Logitar.Portal.Client\Logitar.Portal.Client.csproj" />
-    <ProjectReference Include="..\..\src\Logitar.Portal.Core\Logitar.Portal.Core.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Net.Http.Json" />
+    <Using Include="System.Net.Mime" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
   </ItemGroup>
 
 </Project>

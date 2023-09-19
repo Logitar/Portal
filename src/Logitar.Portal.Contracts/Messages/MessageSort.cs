@@ -2,6 +2,7 @@
 
 public enum MessageSort
 {
+  RecipientCount,
   Subject,
   UpdatedOn
 }

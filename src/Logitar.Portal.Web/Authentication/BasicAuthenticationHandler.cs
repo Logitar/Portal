@@ -1,35 +1,20 @@
 ﻿using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Core.Caching;
-using Logitar.Portal.Core.Claims;
-using Logitar.Portal.Core.Users;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Encodings.Web;
 
 namespace Logitar.Portal.Web.Authentication;
 
 internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
 {
-  private readonly ICacheService _cacheService;
-  private readonly IUserQuerier _userQuerier;
-  private readonly IUserRepository _userRepository;
+  private readonly IUserService _userService;
 
-  public BasicAuthenticationHandler(ICacheService cacheService,
-    IUserQuerier userQuerier,
-    IUserRepository userRepository,
-    IOptionsMonitor<BasicAuthenticationOptions> options,
-    ILoggerFactory logger,
-    UrlEncoder encoder,
-    ISystemClock clock) : base(options, logger, encoder, clock)
+  public BasicAuthenticationHandler(IUserService userService, IOptionsMonitor<BasicAuthenticationOptions> options,
+    ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
   {
-    _cacheService = cacheService;
-    _userQuerier = userQuerier;
-    _userRepository = userRepository;
+    _userService = userService;
   }
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -54,36 +39,26 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
             return AuthenticateResult.Fail($"The Basic credentials are not valid: '{credentials}'.");
           }
 
-          string username = credentials[..index];
-          string password = credentials[(index + 1)..];
-
-          CachedUser? cached = _cacheService.GetUser(username);
-          UserAggregate? user = cached?.Aggregate ?? await _userRepository.LoadAsync(realm: null, username);
-          if (user == null)
-          {
-            return AuthenticateResult.Fail($"The Portal user could not be found: '{username}'.");
-          }
-
           try
           {
-            _ = user.SignIn(password);
+            AuthenticateUserPayload payload = new()
+            {
+              UniqueName = credentials[..index],
+              Password = credentials[(index + 1)..]
+            };
+            User user = await _userService.AuthenticateAsync(payload);
+
+            Context.SetUser(user);
+
+            ClaimsPrincipal principal = new(user.CreateClaimsIdentity(Scheme.Name));
+            AuthenticationTicket ticket = new(principal, Scheme.Name);
+
+            return AuthenticateResult.Success(ticket);
           }
           catch (Exception exception)
           {
             return AuthenticateResult.Fail(exception);
           }
-
-          User userModel = cached?.Model ?? await _userQuerier.GetAsync(user);
-
-          cached = new(user, userModel);
-          _cacheService.SetUser(username, cached);
-
-          Context.SetUser(userModel);
-
-          ClaimsPrincipal principal = new(userModel.GetClaimsIdentity(Schemes.Basic));
-          AuthenticationTicket ticket = new(principal, Schemes.Basic);
-
-          return AuthenticateResult.Success(ticket);
         }
       }
     }

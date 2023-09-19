@@ -1,6 +1,4 @@
-﻿using Logitar.Portal.Contracts.Messages;
-using Logitar.Portal.Core.Messages;
-using System.Text.Json.Serialization;
+﻿using Logitar.Portal.Domain.Messages;
 
 namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid.Payloads;
 
@@ -8,27 +6,14 @@ internal record SendMailPayload
 {
   public SendMailPayload(MessageAggregate message)
   {
-    List<RecipientPayload> to = new(capacity: message.Recipients.Count());
-    List<RecipientPayload> cc = new(to.Capacity);
-    List<RecipientPayload> bcc = new(to.Capacity);
-    foreach (Logitar.Portal.Core.Messages.Recipient recipient in message.Recipients)
+    Contents = new ContentPayload[]
     {
-      switch (recipient.Type)
-      {
-        case RecipientType.Bcc:
-          bcc.Add(new RecipientPayload(recipient));
-          break;
-        case RecipientType.CC:
-          cc.Add(new RecipientPayload(recipient));
-          break;
-        case RecipientType.To:
-          to.Add(new RecipientPayload(recipient));
-          break;
-      }
-    }
-
-    Contents = new[] { new ContentPayload(message.Template, message.Body) };
-    Personalizations = new[] { new PersonalizationPayload(to, cc, bcc) };
+      new (message.Template, message.Body)
+    };
+    Personalizations = new PersonalizationPayload[]
+    {
+      new(message.Recipients)
+    };
     Sender = new SenderPayload(message.Sender);
     Subject = message.Subject;
   }

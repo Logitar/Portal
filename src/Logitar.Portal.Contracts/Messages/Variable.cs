@@ -2,6 +2,15 @@
 
 public record Variable
 {
-  public string Key { get; set; } = string.Empty;
-  public string Value { get; set; } = string.Empty;
+  public Variable() : this(string.Empty, string.Empty)
+  {
+  }
+  public Variable(string key, string value)
+  {
+    Key = key;
+    Value = value;
+  }
+
+  public string Key { get; set; }
+  public string Value { get; set; }
 }

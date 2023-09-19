@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Users.Contact;
+using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.Users;
 
@@ -8,21 +8,22 @@ public record User : Aggregate
 {
   public Guid Id { get; set; }
 
-  public string Username { get; set; } = string.Empty;
+  public string UniqueName { get; set; } = string.Empty;
 
+  public bool HasPassword { get; set; }
   public Actor? PasswordChangedBy { get; set; }
   public DateTime? PasswordChangedOn { get; set; }
-  public bool HasPassword { get; set; }
 
   public Actor? DisabledBy { get; set; }
   public DateTime? DisabledOn { get; set; }
   public bool IsDisabled { get; set; }
 
-  public DateTime? SignedInOn { get; set; }
+  public DateTime? AuthenticatedOn { get; set; }
 
   public Address? Address { get; set; }
   public Email? Email { get; set; }
   public Phone? Phone { get; set; }
+
   public bool IsConfirmed { get; set; }
 
   public string? FirstName { get; set; }
@@ -33,8 +34,7 @@ public record User : Aggregate
 
   public DateTime? Birthdate { get; set; }
   public string? Gender { get; set; }
-
-  public string? Locale { get; set; }
+  public Locale? Locale { get; set; }
   public string? TimeZone { get; set; }
 
   public string? Picture { get; set; }
@@ -43,7 +43,8 @@ public record User : Aggregate
 
   public IEnumerable<CustomAttribute> CustomAttributes { get; set; } = Enumerable.Empty<CustomAttribute>();
 
-  public IEnumerable<ExternalIdentifier> ExternalIdentifiers { get; set; } = Enumerable.Empty<ExternalIdentifier>();
+  public IEnumerable<Identifier> Identifiers { get; set; } = Enumerable.Empty<Identifier>();
+  public IEnumerable<Role> Roles { get; set; } = Enumerable.Empty<Role>();
 
   public Realm? Realm { get; set; }
 }

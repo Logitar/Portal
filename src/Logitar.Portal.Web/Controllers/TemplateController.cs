@@ -1,14 +1,16 @@
-﻿using Logitar.Portal.Contracts.Templates;
-using Logitar.Portal.Web.Constants;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Templates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
 
-[ApiExplorerSettings(IgnoreApi = true)]
+[ApiController]
 [Authorize(Policy = Policies.PortalActor)]
-[Route("templates")]
-public class TemplateController : Controller
+[Route("api/templates")]
+public class TemplateController : ControllerBase
 {
   private readonly ITemplateService _templateService;
 
@@ -17,27 +19,53 @@ public class TemplateController : Controller
     _templateService = templateService;
   }
 
-  [HttpGet("/create-template")]
-  public ActionResult CreateTemplate()
+  [HttpPost]
+  public async Task<ActionResult<Template>> CreateAsync([FromBody] CreateTemplatePayload payload, CancellationToken cancellationToken)
   {
-    return View(nameof(TemplateEdit));
+    Template template = await _templateService.CreateAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/templates/{template.Id}");
+
+    return Created(uri, template);
   }
 
-  [HttpGet]
-  public ActionResult TemplateList()
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<Template>> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    return View();
+    Template? template = await _templateService.DeleteAsync(id, cancellationToken);
+    return template == null ? NotFound() : Ok(template);
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult> TemplateEdit(Guid id, CancellationToken cancellationToken = default)
+  public async Task<ActionResult<Template>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.GetAsync(id, cancellationToken: cancellationToken);
-    if (template == null)
-    {
-      return NotFound();
-    }
+    Template? template = await _templateService.ReadAsync(id, cancellationToken: cancellationToken);
+    return template == null ? NotFound() : Ok(template);
+  }
 
-    return View(template);
+  [HttpGet("unique-name:{uniqueName}")]
+  public async Task<ActionResult<Role>> ReadAsync(string uniqueName, string? realm, CancellationToken cancellationToken)
+  {
+    Template? template = await _templateService.ReadAsync(realm: realm, uniqueName: uniqueName, cancellationToken: cancellationToken);
+    return template == null ? NotFound() : Ok(template);
+  }
+
+  [HttpPut("{id}")]
+  public async Task<ActionResult<Template>> ReplaceAsync(Guid id, [FromBody] ReplaceTemplatePayload payload, long? version, CancellationToken cancellationToken)
+  {
+    Template? template = await _templateService.ReplaceAsync(id, payload, version, cancellationToken);
+    return template == null ? NotFound() : Ok(template);
+  }
+
+  [HttpPost("search")]
+  public async Task<ActionResult<SearchResults<Template>>> SearchAsync([FromBody] SearchTemplatesPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _templateService.SearchAsync(payload, cancellationToken));
+  }
+
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<Template>> UpdateAsync(Guid id, [FromBody] UpdateTemplatePayload payload, CancellationToken cancellationToken)
+  {
+    Template? template = await _templateService.UpdateAsync(id, payload, cancellationToken);
+    return template == null ? NotFound() : Ok(template);
   }
 }

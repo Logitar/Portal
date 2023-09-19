@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [3.0.0] - 2023-09-18
+
+### Added
+
+- Implemented role management.
+- Documented software architecture.
+
+### Changed
+
+- Reimplemented logging.
+- Reimplemented configuration management.
+- Reimplemented HTTP client.
+- Reimplemented realm management.
+- Reimplemented user management.
+- Reimplemented session management.
+- Reimplemented API key management.
+- Reimplemented token management.
+- Reimplemented dictionary management.
+- Reimplemented sender management.
+- Reimplemented template management.
+- Reimplemented message management.
+
 ## [2.1.0] - 2023-05-01
 
 ### Added
@@ -72,7 +94,8 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Utar94/Portal/compare/v2.1.0...HEAD
-[2.1.0]: https://github.com/Utar94/Portal/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/Utar94/Portal/compare/v1.1.5...v2.0.0
-[1.1.5]: https://github.com/Utar94/Portal/releases/tag/v1.1.5
+[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.0...HEAD
+[2.1.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
+[2.1.0]: https://github.com/Logitar/Portal/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/Logitar/Portal/compare/v1.1.5...v2.0.0
+[1.1.5]: https://github.com/Logitar/Portal/releases/tag/v1.1.5

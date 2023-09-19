@@ -1,14 +1,15 @@
-﻿using Logitar.Portal.Contracts.Messages;
-using Logitar.Portal.Web.Constants;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
 
-[ApiExplorerSettings(IgnoreApi = true)]
+[ApiController]
 [Authorize(Policy = Policies.PortalActor)]
-[Route("messages")]
-public class MessageController : Controller
+[Route("api/messages")]
+public class MessageController : ControllerBase
 {
   private readonly IMessageService _messageService;
 
@@ -17,21 +18,39 @@ public class MessageController : Controller
     _messageService = messageService;
   }
 
-  [HttpGet]
-  public ActionResult MessageList()
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Message>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    return View();
+    Message? message = await _messageService.ReadAsync(id, cancellationToken);
+    return message == null ? NotFound() : Ok(message);
   }
 
-  [HttpGet("{id}")]
-  public async Task<ActionResult> MessageView(Guid id, CancellationToken cancellationToken)
+  [HttpPost("search")]
+  public async Task<ActionResult<SearchResults<Message>>> SearchAsync([FromBody] SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
-    Message? message = await _messageService.GetAsync(id, cancellationToken: cancellationToken);
-    if (message == null)
+    return Ok(await _messageService.SearchAsync(payload, cancellationToken));
+  }
+
+  [HttpPost("send")]
+  public async Task<ActionResult<SentMessages>> SendAsync([FromBody] SendMessagePayload payload, CancellationToken cancellationToken)
+  {
+    SentMessages sentMessages = await _messageService.SendAsync(payload, cancellationToken);
+    if (sentMessages.Ids.Count() == 1)
     {
-      return NotFound();
+      Uri uri = new($"{Request.Scheme}://{Request.Host}/api/messages/{sentMessages.Ids.Single()}");
+
+      return Created(uri, sentMessages);
     }
 
-    return View(message);
+    return Ok(sentMessages);
+  }
+
+  [HttpPost("send/demo")]
+  public async Task<ActionResult<Message>> SendDemoAsync([FromBody] SendDemoMessagePayload payload, CancellationToken cancellationToken)
+  {
+    Message message = await _messageService.SendDemoAsync(payload, cancellationToken);
+    Uri uri = new($"{Request.Scheme}://{Request.Host}/api/messages/{message.Id}");
+
+    return Created(uri, message);
   }
 }

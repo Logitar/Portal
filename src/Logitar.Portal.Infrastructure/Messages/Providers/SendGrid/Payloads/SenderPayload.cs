@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Core.Messages.Summaries;
-using System.Text.Json.Serialization;
+﻿using Logitar.Portal.Domain.Messages;
 
 namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid.Payloads;
 
@@ -7,7 +6,7 @@ internal record SenderPayload
 {
   public SenderPayload(SenderSummary sender)
   {
-    Address = sender.EmailAddress;
+    Address = sender.Address;
     DisplayName = sender.DisplayName;
   }
 

@@ -1,7 +1,9 @@
-﻿using Logitar.Portal.Client.Implementations;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Templates;
@@ -9,7 +11,6 @@ using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace Logitar.Portal.Client;
 
 public static class DependencyInjectionExtensions
@@ -28,13 +29,16 @@ public static class DependencyInjectionExtensions
 
     return services
       .AddHttpClient()
-      .AddTransient<IDictionaryService, DictionaryService>()
-      .AddTransient<IMessageService, MessageService>()
-      .AddTransient<IRealmService, RealmService>()
-      .AddTransient<ISenderService, SenderService>()
-      .AddTransient<ISessionService, SessionService>()
-      .AddTransient<ITemplateService, TemplateService>()
-      .AddTransient<ITokenService, TokenService>()
-      .AddTransient<IUserService, UserService>();
+      .AddTransient<IApiKeyService, ApiKeyClient>()
+      .AddTransient<IConfigurationService, ConfigurationClient>()
+      .AddTransient<IDictionaryService, DictionaryClient>()
+      .AddTransient<IMessageService, MessageClient>()
+      .AddTransient<IRealmService, RealmClient>()
+      .AddTransient<IRoleService, RoleClient>()
+      .AddTransient<ISenderService, SenderClient>()
+      .AddTransient<ISessionService, SessionClient>()
+      .AddTransient<ITemplateService, TemplateClient>()
+      .AddTransient<ITokenService, TokenClient>()
+      .AddTransient<IUserService, UserClient>();
   }
 }

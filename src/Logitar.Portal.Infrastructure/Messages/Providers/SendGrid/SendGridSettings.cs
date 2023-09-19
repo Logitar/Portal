@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
+﻿using FluentValidation;
+
+namespace Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 
 internal record SendGridSettings
 {
@@ -8,6 +10,8 @@ internal record SendGridSettings
     {
       ApiKey = apiKey;
     }
+
+    new SendGridSettingsValidator().ValidateAndThrow(this);
   }
 
   public string ApiKey { get; } = string.Empty;

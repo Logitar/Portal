@@ -7,6 +7,7 @@ namespace Logitar.Portal.Web.Extensions;
 public static class OpenApiExtensions
 {
   private const string Title = "Portal API";
+  private static readonly Version Version = new(3, 0, 0);
 
   public static IServiceCollection AddOpenApi(this IServiceCollection services)
   {
@@ -14,7 +15,7 @@ public static class OpenApiExtensions
     services.AddSwaggerGen(config =>
     {
       config.AddSecurity();
-      config.SwaggerDoc(name: $"v{Application.Version.Major}", new OpenApiInfo
+      config.SwaggerDoc(name: $"v{Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact
         {
@@ -29,7 +30,7 @@ public static class OpenApiExtensions
           Url = new Uri("https://github.com/Logitar/Portal/blob/main/LICENSE", UriKind.Absolute)
         },
         Title = Title,
-        Version = $"v{Application.Version}"
+        Version = $"v{Version}"
       });
     });
 
@@ -40,13 +41,40 @@ public static class OpenApiExtensions
   {
     builder.UseSwagger();
     builder.UseSwaggerUI(config => config.SwaggerEndpoint(
-      url: $"/swagger/v{Application.Version.Major}/swagger.json",
-      name: $"{Title} v{Application.Version}"
+      url: $"/swagger/v{Version.Major}/swagger.json",
+      name: $"{Title} v{Version}"
     ));
   }
 
   private static void AddSecurity(this SwaggerGenOptions options)
   {
+    options.AddSecurityDefinition(Schemes.ApiKey, new OpenApiSecurityScheme
+    {
+      Description = "Enter your API key in the input below:",
+      In = ParameterLocation.Header,
+      Name = Headers.XApiKey,
+      Scheme = Schemes.ApiKey,
+      Type = SecuritySchemeType.ApiKey
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Name = Headers.XApiKey,
+          Reference = new OpenApiReference
+          {
+            Id = Schemes.ApiKey,
+            Type = ReferenceType.SecurityScheme
+          },
+          Scheme = Schemes.ApiKey,
+          Type = SecuritySchemeType.ApiKey
+        },
+        new List<string>()
+      }
+    });
+
     options.AddSecurityDefinition(Schemes.Basic, new OpenApiSecurityScheme
     {
       Description = "Enter your credentials in the inputs below:",

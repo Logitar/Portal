@@ -1,11 +1,10 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Portal.Core.Caching.Commands;
-using Logitar.Portal.Infrastructure.Commands;
+﻿using Logitar.Portal.Application.Caching.Commands;
+using Logitar.Portal.Infrastructure;
 using MediatR;
 
 namespace Logitar.Portal;
 
-public class Program
+internal class Program
 {
   public static async Task Main(string[] args)
   {
@@ -19,13 +18,10 @@ public class Program
 
     startup.Configure(application);
 
-    TypeExtensions.DoNotUseFullAssemblyName = true;
-
     using IServiceScope scope = application.Services.CreateScope();
-
-    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-    await mediator.Publish(new InitializeDatabase());
-    await mediator.Publish(new InitializeCaching());
+    IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
+    await publisher.Publish(new InitializeDatabaseCommand());
+    await publisher.Publish(new InitializeCachingCommand());
 
     application.Run();
   }

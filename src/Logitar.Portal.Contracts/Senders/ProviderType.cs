@@ -2,5 +2,5 @@
 
 public enum ProviderType
 {
-  SendGrid
+  SendGrid = 0
 }

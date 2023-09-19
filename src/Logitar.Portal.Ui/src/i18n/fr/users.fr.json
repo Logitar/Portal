@@ -1,0 +1,210 @@
+{
+  "address": {
+    "country": {
+      "label": "Pays",
+      "placeholder": "Sélectionnez un pays"
+    },
+    "locality": {
+      "label": "Ville",
+      "placeholder": "Entrez votre ville"
+    },
+    "postalCode": {
+      "label": "Code postal",
+      "placeholder": "Entrez votre code postal"
+    },
+    "region": {
+      "label": "Région",
+      "placeholder": "Sélectionnez votre région"
+    },
+    "street": {
+      "label": "Numéro et nom de rue",
+      "placeholder": "Entrez votre numéro et nom de rue"
+    },
+    "title": "Adresse postale",
+    "verified": "Vérifiée"
+  },
+  "authenticatedOn": "Dernière connexion",
+  "authenticatedOnFormat": "Dernière connexion le {date}",
+  "birthdate": "Date de naissance",
+  "created": "L’utilisateur a été créé.",
+  "createdOn": "Création",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer l’utilisateur suivant ?",
+    "success": "L’utilisateur a été supprimé.",
+    "title": "Supprimer l’utilisateur"
+  },
+  "disable": {
+    "confirm": "Désirez-vous vraiment désactiver l’utilisateur suivant ? Tout accès à son compte et à ses services sera révoqué.",
+    "submit": "Désactiver",
+    "success": "L’utilisateur a été désactivé.",
+    "title": "Désactivation"
+  },
+  "disabledFormat": "Désactivé le {date} par",
+  "email": {
+    "address": {
+      "label": "Adresse courriel",
+      "placeholder": "Entrez votre adresse courriel"
+    },
+    "verified": "Vérifiée"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "enable": {
+    "confirm": "Désirez-vous vraiment activer l’utilisateur suivant ? Tout accès à son compte et à ses services sera restauré.",
+    "submit": "Activer",
+    "success": "L’utilisateur a été activé.",
+    "title": "Activation"
+  },
+  "gender": {
+    "label": "Genre",
+    "options": {
+      "female": "Femme",
+      "male": "Homme",
+      "other": "Autre"
+    },
+    "placeholder": "Sélectionnez votre genre"
+  },
+  "isConfirmed": {
+    "label": "Confirmé",
+    "placeholder": "Sélectionnez une option"
+  },
+  "isDisabled": {
+    "label": "Désactivé",
+    "placeholder": "Sélectionnez une option"
+  },
+  "locale": {
+    "placeholder": "Sélectionnez votre langue de communication préférée"
+  },
+  "name": {
+    "first": {
+      "label": "Prénom",
+      "placeholder": "Entrez votre prénom"
+    },
+    "full": "Nom",
+    "last": {
+      "label": "Nom de famille",
+      "placeholder": "Entrez votre nom de famille"
+    },
+    "middle": {
+      "label": "Nom intermédiaire",
+      "placeholder": "Entrez votre nom intermédiaire"
+    },
+    "nick": {
+      "label": "Surnom",
+      "placeholder": "Entrez votre surnom"
+    },
+    "user": {
+      "alreadyUsed": {
+        "help": "Veuillez entrer un nom d’utilisateur différent.",
+        "lead": "Le nom d’utilisateur est déjà utilisé."
+      },
+      "label": "Nom d’utilisateur",
+      "placeholder": "Entrez votre nom d’utilisateur"
+    }
+  },
+  "password": {
+    "changeFailed": "Modification du mot de passe échouée !",
+    "changed": "Le mot de passe de l’utilisateur a été modifié.",
+    "changedOn": "Dernière modification le {date}",
+    "confirm": {
+      "label": "Confirmation du mot de passe",
+      "placeholder": "Entrez à nouveau le même mot de passe"
+    },
+    "current": {
+      "label": "Mot de passe actuel",
+      "placeholder": "Entrez votre mot de passe actuel"
+    },
+    "invalidCredentials": "Veuillez vérifier que vous avez entré le bon mot de passe actuel.",
+    "label": "Mot de passe",
+    "new": {
+      "label": "Nouveau mot de passe",
+      "placeholder": "Entrez un nouveau mot de passe"
+    },
+    "placeholder": "Entrez votre mot de passe",
+    "submit": "Modifier",
+    "warning": "Évitez de changer le mot de passe d’un utilisateur sans leur consentement."
+  },
+  "phone": {
+    "countryCode": {
+      "label": "Code de pays",
+      "placeholder": "Sélectionnez un pays"
+    },
+    "e164": "Téléphone (E164)",
+    "extension": {
+      "label": "Extension téléphonique",
+      "placeholder": "Entrez votre extension téléphonique"
+    },
+    "invalid": "Le téléphone n’est pas valide.",
+    "number": {
+      "example": "Exemple :",
+      "label": "Numéro de téléphone",
+      "placeholder": "Entrez votre numéro de téléphone"
+    },
+    "verified": "Vérifié"
+  },
+  "picture": {
+    "label": "Photo",
+    "placeholder": "Collez le lien (URL) vers votre photo"
+  },
+  "profile": {
+    "label": "Profil",
+    "passwordChanged": "Votre mot de passe a été modifié.",
+    "placeholder": "Collez le lien (URL) vers votre profil",
+    "title": "Profil",
+    "updated": "Votre profil a été modifié."
+  },
+  "select": {
+    "label": "Utilisateur",
+    "placeholder": "Sélectionnez un utilisateur"
+  },
+  "signIn": {
+    "failed": "Connexion échouée !",
+    "invalidCredentials": "Veuillez vérifier que vous avez entré votre adresse courriel ou nom d’utilisateur et mot de passe.",
+    "remember": "Rester connecté",
+    "submit": "Se connecter",
+    "title": "Connexion"
+  },
+  "signOut": {
+    "confirm": "Désirez-vous vraiment déconnecter l’utilisateur suivant ?",
+    "other": {
+      "portal": "L’utilisateur sera déconnecté de l’application et de tout appareil utilisant cette application.",
+      "realm": "L’utilisateur sera déconnecté de toute application utilisant le Portal."
+    },
+    "self": "Vous serez déconnecté de l’application et de tout appareil utilisant cette application.",
+    "submit": "Déconnecter l’utilisateur",
+    "success": "L’utilisateur a été déconnecté.",
+    "title": {
+      "modal": "Déconnecter l’utilisateur",
+      "page": "Déconnexion"
+    }
+  },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Dernière authentification",
+      "EmailAddress": "Adresse courriel",
+      "FullName": "Nom complet",
+      "PhoneNumber": "Téléphone",
+      "UniqueName": "Nom unique",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "tabs": {
+    "authentication": "Informations d’authentification",
+    "contact": "Informations de contact",
+    "personal": "Informations personnelles"
+  },
+  "timeZone": {
+    "label": "Fuseau horaire",
+    "placeholder": "Sélectionnez votre fuseau horaire"
+  },
+  "title": {
+    "list": "Utilisateurs",
+    "new": "Nouvel utilisateur"
+  },
+  "updated": "L’utilisateur a été enregistré.",
+  "updatedOn": "Dernière modification",
+  "usernameOrEmailPlaceholder": "Entrez votre adresse courriel ou nom d’utilisateur",
+  "website": {
+    "label": "Site Web",
+    "placeholder": "Collez le lien (URL) vers votre site Web"
+  }
+}

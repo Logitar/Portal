@@ -2,11 +2,12 @@
 
 public interface ISenderService
 {
-  Task<Sender> CreateAsync(CreateSenderInput input, CancellationToken cancellationToken = default);
-  Task<Sender> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<Sender?> GetAsync(Guid? id = null, string? defaultInRealm = null, CancellationToken cancellationToken = default);
-  Task<PagedList<Sender>> GetAsync(ProviderType? provider = null, string? realm = null, string? search = null,
-    SenderSort? sort = null, bool isDescending = false, int? skip = null, int? limit = null, CancellationToken cancellationToken = default);
-  Task<Sender> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<Sender> UpdateAsync(Guid id, UpdateSenderInput input, CancellationToken cancellationToken = default);
+  Task<Sender> CreateAsync(CreateSenderPayload payload, CancellationToken cancellationToken = default);
+  Task<Sender?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Sender?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Sender?> ReadDefaultAsync(string? realm, CancellationToken cancellationToken = default);
+  Task<Sender?> ReplaceAsync(Guid id, ReplaceSenderPayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<SearchResults<Sender>> SearchAsync(SearchSendersPayload payload, CancellationToken cancellationToken = default);
+  Task<Sender?> SetDefaultAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Sender?> UpdateAsync(Guid id, UpdateSenderPayload payload, CancellationToken cancellationToken = default);
 }

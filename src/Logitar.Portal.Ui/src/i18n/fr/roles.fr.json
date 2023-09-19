@@ -1,0 +1,29 @@
+{
+  "created": "Le rôle a été créé.",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer le rôle suivant ?",
+    "success": "Le rôle a été supprimé.",
+    "title": "Supprimer le rôle"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "manage": {
+    "add": "Ajouter un rôle",
+    "empty": "Il n’y a aucun rôle."
+  },
+  "select": {
+    "label": "Rôle",
+    "placeholder": "Sélectionnez un rôle"
+  },
+  "sort": {
+    "options": {
+      "DisplayName": "Nom d’affichage",
+      "UniqueName": "Nom unique",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "title": {
+    "list": "Rôles",
+    "new": "Nouveau rôle"
+  },
+  "updated": "Le rôle a été enregistré."
+}

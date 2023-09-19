@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.7.1" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.19" />
+    <PackageReference Include="Logitar.EventSourcing" Version="4.0.1" />
+    <PackageReference Include="Logitar.Security" Version="5.2.0" />
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+    <PackageReference Include="NodaTime" Version="3.1.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Collections.Immutable" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.Net.Mime" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
+
+</Project>
