@@ -14,7 +14,7 @@ internal class ApiKeyConfiguration : AggregateConfiguration<ApiKeyEntity>, IEnti
     builder.HasKey(x => x.ApiKeyId);
 
     builder.HasIndex(x => x.TenantId);
-    builder.HasIndex(x => x.Title);
+    builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.ExpiresOn);
     builder.HasIndex(x => x.AuthenticatedOn);
 
@@ -22,7 +22,7 @@ internal class ApiKeyConfiguration : AggregateConfiguration<ApiKeyEntity>, IEnti
 
     builder.Property(x => x.TenantId).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Secret).HasMaxLength(byte.MaxValue);
-    builder.Property(x => x.Title).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.DisplayName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.CustomAttributesSerialized).HasColumnName(nameof(ApiKeyEntity.CustomAttributes));
 
     builder.HasMany(x => x.Roles).WithMany(x => x.ApiKeys).UsingEntity<ApiKeyRoleEntity>();

@@ -11,7 +11,7 @@ internal record ApiKeyEntity : AggregateEntity
 
     Secret = created.Secret?.Encode();
 
-    Title = created.DisplayName;
+    DisplayName = created.DisplayName;
   }
 
   private ApiKeyEntity() : base()
@@ -24,7 +24,7 @@ internal record ApiKeyEntity : AggregateEntity
 
   public string? Secret { get; private set; }
 
-  public string Title { get; private set; } = string.Empty;
+  public string DisplayName { get; private set; } = string.Empty;
   public string? Description { get; private set; }
   public DateTime? ExpiresOn { get; private set; }
 
@@ -62,7 +62,7 @@ internal record ApiKeyEntity : AggregateEntity
 
     if (updated.DisplayName != null)
     {
-      Title = updated.DisplayName;
+      DisplayName = updated.DisplayName;
     }
     if (updated.Description != null)
     {
