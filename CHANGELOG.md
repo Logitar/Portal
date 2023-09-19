@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [3.0.0] - 2023-09-18
+
 ### Added
 
 - Implemented role management.
@@ -90,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v2.1.0...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.0...HEAD
+[2.1.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/Logitar/Portal/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Logitar/Portal/compare/v1.1.5...v2.0.0
 [1.1.5]: https://github.com/Logitar/Portal/releases/tag/v1.1.5
