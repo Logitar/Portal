@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [3.0.3] - 2023-10-16
+
+### Added
+
+- Completed NuGet package documentation.
+
+### Fixed
+
+- Fixed NPM audits.
+
 ## [3.0.2] - 2023-09-19
 
 ### Fixed
@@ -107,7 +117,8 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.2...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.3...HEAD
+[3.0.3]: https://github.com/Logitar/Portal/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/Logitar/Portal/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/Logitar/Portal/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/Logitar/Portal/compare/v2.1.0...v3.0.0
