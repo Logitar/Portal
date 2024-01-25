@@ -1,5 +1,9 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
+using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 using Logitar.Portal.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +18,20 @@ public static class DependencyInjectionExtensions
       .AddLogitarIdentityWithEntityFrameworkCoreRelational()
       .AddLogitarPortalInfrastructure()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
-      .AddRepositories();
+      .AddQueriers()
+      .AddRepositories()
+      .AddTransient<IActorService, ActorService>();
+  }
+
+  private static IServiceCollection AddQueriers(this IServiceCollection services)
+  {
+    return services.AddTransient<IConfigurationQuerier, ConfigurationQuerier>();
   }
 
   private static IServiceCollection AddRepositories(this IServiceCollection services)
   {
-    return services.AddTransient<IRealmRepository, RealmRepository>();
+    return services
+      .AddTransient<IConfigurationRepository, ConfigurationRepository>()
+      .AddTransient<IRealmRepository, RealmRepository>();
   }
 }

@@ -1,6 +1,6 @@
 ﻿using Logitar.Identity.Contracts.Settings;
 
-namespace Logitar.Portal.Contracts.Realms;
+namespace Logitar.Portal.Contracts.Settings;
 
 public record UniqueNameSettings : IUniqueNameSettings
 {

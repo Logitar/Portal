@@ -1,10 +1,12 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Portal.Contracts.Realms;
+using Logitar.Identity.Contracts.Settings;
 
 namespace Logitar.Portal.Application;
 
 public interface IApplicationContext
 {
   ActorId ActorId { get; }
-  Realm Realm { get; set; }
+
+  IRoleSettings RoleSettings { get; }
+  IUserSettings UserSettings { get; }
 }

@@ -81,9 +81,12 @@ public class ConfigurationAggregate : AggregateRoot
   {
   }
 
-  public ConfigurationAggregate(LocaleUnit defaultLocale, ActorId actorId) : base(new ConfigurationId().AggregateId)
+  public static ConfigurationAggregate Initialize(LocaleUnit defaultLocale, ActorId actorId)
   {
-    Raise(new ConfigurationInitializedEvent(actorId, defaultLocale));
+    ConfigurationId id = new();
+    ConfigurationAggregate configuration = new(id.AggregateId);
+    configuration.Raise(new ConfigurationInitializedEvent(actorId, defaultLocale));
+    return configuration;
   }
   protected virtual void Apply(ConfigurationInitializedEvent @event)
   {

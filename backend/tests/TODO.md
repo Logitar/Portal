@@ -19,15 +19,32 @@
 
 ## Logitar.Portal.Application
 
+- CustomAttributeContractValidator
+- InitializeCachingCommandHandler
+- InitializeConfigurationCommandHandler
+- InitializeConfigurationValidator / SessionPayloadValidator / UserPayloadValidator
+- InitialUserValidator
 - PortalRoleSettingsResolver
 - PortalUserSettingsResolver
-- SeedPortalCommandHandler
+- ReadConfigurationQueryHandler
+
+## Logitar.Portal.Infrastructure
+
+- CacheService
 
 ## Logitar.Portal.EntityFrameworkCore.Relational
 
+- ActorService
+- ConfigurationQuerier
+- ConfigurationRepository
+- Handlers\Realms
+- Mapper
 - RealmRepository
 
 ## Logitar.Portal
 
+- CurrentUser
 - HttpApplicationContext
 - HttpContextExtensions
+- IsConfigurationInitialized
+- SettingsExtensions

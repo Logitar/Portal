@@ -1,6 +1,5 @@
 ﻿using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Settings;
-using Logitar.Portal.Contracts.Realms;
 using Microsoft.Extensions.Configuration;
 
 namespace Logitar.Portal.Application.Settings;
@@ -14,12 +13,5 @@ internal class PortalRoleSettingsResolver : RoleSettingsResolver
     _context = context;
   }
 
-  public override IRoleSettings Resolve()
-  {
-    Realm realm = _context.Realm;
-    return new RoleSettings
-    {
-      UniqueName = realm.UniqueNameSettings
-    };
-  }
+  public override IRoleSettings Resolve() => _context.RoleSettings;
 }

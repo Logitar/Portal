@@ -1,33 +1,30 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Settings;
 using Logitar.Portal.Application;
-using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;
 
 internal class HttpApplicationContext : IApplicationContext
 {
-  private readonly DefaultHttpContext _defaultContext = new();
+  private readonly ICacheService _cacheService;
   private readonly IHttpContextAccessor _httpContextAccessor;
-  private HttpContext Context => _httpContextAccessor.HttpContext ?? _defaultContext;
+  private HttpContext Context => _httpContextAccessor.HttpContext
+    ?? throw new InvalidOperationException($"The {nameof(_httpContextAccessor.HttpContext)} is required.");
 
   public ActorId ActorId { get; } = new(); // TODO(fpion): Actor Authentication
 
-  public Realm Realm
-  {
-    get => Context.GetRealm() ?? throw new InvalidOperationException("The Realm context item has not been set.");
-    set
-    {
-      if (Context.GetRealm() != null)
-      {
-        throw new InvalidOperationException("The Realm context item has already been set.");
-      }
-      Context.SetRealm(value);
-    }
-  }
+  public IRoleSettings RoleSettings => Context.GetRealm()?.GetRoleSettings()
+    ?? _cacheService.GetConfiguration()?.GetRoleSettings()
+    ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
+  public IUserSettings UserSettings => Context.GetRealm()?.GetUserSettings()
+    ?? _cacheService.GetConfiguration()?.GetUserSettings()
+    ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
 
-  public HttpApplicationContext(IHttpContextAccessor httpContextAccessor)
+  public HttpApplicationContext(ICacheService cacheService, IHttpContextAccessor httpContextAccessor)
   {
+    _cacheService = cacheService;
     _httpContextAccessor = httpContextAccessor;
   }
 }

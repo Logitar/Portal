@@ -1,6 +1,5 @@
 ﻿using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Settings;
-using Logitar.Portal.Contracts.Realms;
 using Microsoft.Extensions.Configuration;
 
 namespace Logitar.Portal.Application.Settings;
@@ -14,14 +13,5 @@ internal class PortalUserSettingsResolver : UserSettingsResolver
     _context = context;
   }
 
-  public override IUserSettings Resolve()
-  {
-    Realm realm = _context.Realm;
-    return new UserSettings
-    {
-      UniqueName = realm.UniqueNameSettings,
-      Password = realm.PasswordSettings,
-      RequireUniqueEmail = realm.RequireUniqueEmail
-    };
-  }
+  public override IUserSettings Resolve() => _context.UserSettings;
 }

@@ -7,14 +7,14 @@ namespace Logitar.Portal.Domain.Configurations.Events;
 
 public record ConfigurationInitializedEvent : DomainEvent, INotification
 {
-  public LocaleUnit DefaultLocale { get; }
+  public LocaleUnit? DefaultLocale { get; }
   public JwtSecretUnit Secret { get; }
 
   public ReadOnlyUniqueNameSettings UniqueNameSettings { get; }
   public ReadOnlyPasswordSettings PasswordSettings { get; }
   public bool RequireUniqueEmail { get; }
 
-  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit defaultLocale)
+  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit? defaultLocale)
   {
     ActorId = actorId;
 
@@ -27,7 +27,7 @@ public record ConfigurationInitializedEvent : DomainEvent, INotification
   }
 
   [JsonConstructor]
-  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit defaultLocale, ReadOnlyPasswordSettings passwordSettings, bool requireUniqueEmail,
+  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit? defaultLocale, ReadOnlyPasswordSettings passwordSettings, bool requireUniqueEmail,
     JwtSecretUnit secret, ReadOnlyUniqueNameSettings uniqueNameSettings)
   {
     ActorId = actorId;

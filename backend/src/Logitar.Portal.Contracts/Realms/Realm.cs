@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Realms;
+﻿using Logitar.Portal.Contracts.Settings;
+
+namespace Logitar.Portal.Contracts.Realms;
 
 public class Realm : Aggregate
 {
