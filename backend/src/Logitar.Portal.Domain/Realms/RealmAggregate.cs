@@ -8,13 +8,9 @@ namespace Logitar.Portal.Domain.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
-  public static readonly UniqueSlugUnit AdministrationUniqueSlug = new("portal");
-
   private RealmUpdatedEvent _updatedEvent = new();
 
   public new RealmId Id => new(base.Id);
-
-  public bool IsAdministration => UniqueSlug == AdministrationUniqueSlug;
 
   private UniqueSlugUnit? _uniqueSlug = null;
   public UniqueSlugUnit UniqueSlug => _uniqueSlug ?? throw new InvalidOperationException($"The {nameof(UniqueSlug)} has not been initialized yet.");
