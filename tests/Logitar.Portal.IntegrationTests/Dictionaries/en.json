@@ -1,9 +1,0 @@
-{
-  "Cordially": "Cordially,",
-  "PasswordRecovery_ClickLink": "In this case, please click on the link below to reset it:",
-  "PasswordRecovery_OtherwiseDelete": "If we've been mistaken, we suggest you to delete this message.",
-  "PasswordRecovery_PageUrl": "https://www.logitar.com/en/user/reset-password?token={token}",
-  "PasswordRecovery_PasswordLost": "It seems you have lost your password...",
-  "PasswordRecovery_Subject": "Reset your password",
-  "Team": "The Logitar Team"
-}
