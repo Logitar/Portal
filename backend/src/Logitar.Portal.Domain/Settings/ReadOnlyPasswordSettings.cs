@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Settings;
-using Logitar.Portal.Domain.Realms.Validators;
+using Logitar.Portal.Domain.Settings.Validators;
 
-namespace Logitar.Portal.Domain.Realms;
+namespace Logitar.Portal.Domain.Settings;
 
 public record ReadOnlyPasswordSettings : IPasswordSettings
 {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Contracts.Settings;
 
-namespace Logitar.Portal.Domain.Realms.Validators;
+namespace Logitar.Portal.Domain.Settings.Validators;
 
 internal class UniqueNameSettingsValidator : AbstractValidator<IUniqueNameSettings>
 {

@@ -2,6 +2,7 @@
 using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Domain.Realms.Events;
+using Logitar.Portal.Domain.Settings;
 
 namespace Logitar.Portal.Domain.Realms;
 

@@ -20,6 +20,7 @@ public static class DependencyInjectionExtensions
   {
     EventSerializer eventSerializer = new(serviceProvider.GetLogitarIdentityJsonConverters());
 
+    eventSerializer.RegisterConverter(new ConfigurationIdConverter());
     eventSerializer.RegisterConverter(new JwtSecretUnitConverter());
     eventSerializer.RegisterConverter(new RealmIdConverter());
     eventSerializer.RegisterConverter(new UniqueSlugConverter());

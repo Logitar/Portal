@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Domain.Realms.Validators;
+using Logitar.Portal.Domain.Settings.Validators;
 using Logitar.Security.Cryptography;
 
-namespace Logitar.Portal.Domain.Realms;
+namespace Logitar.Portal.Domain.Settings;
 
 public record JwtSecretUnit
 {

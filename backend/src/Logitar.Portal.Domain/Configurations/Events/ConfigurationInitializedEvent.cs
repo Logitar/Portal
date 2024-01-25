@@ -1,25 +1,24 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Domain.Settings;
 using MediatR;
 
-namespace Logitar.Portal.Domain.Realms.Events;
+namespace Logitar.Portal.Domain.Configurations.Events;
 
-public record RealmCreatedEvent : DomainEvent, INotification
+public record ConfigurationInitializedEvent : DomainEvent, INotification
 {
-  public UniqueSlugUnit UniqueSlug { get; }
-
+  public LocaleUnit DefaultLocale { get; }
   public JwtSecretUnit Secret { get; }
 
   public ReadOnlyUniqueNameSettings UniqueNameSettings { get; }
   public ReadOnlyPasswordSettings PasswordSettings { get; }
   public bool RequireUniqueEmail { get; }
 
-  public RealmCreatedEvent(ActorId actorId, UniqueSlugUnit uniqueSlug)
+  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit defaultLocale)
   {
     ActorId = actorId;
 
-    UniqueSlug = uniqueSlug;
-
+    DefaultLocale = defaultLocale;
     Secret = JwtSecretUnit.Generate();
 
     UniqueNameSettings = new();
@@ -28,13 +27,12 @@ public record RealmCreatedEvent : DomainEvent, INotification
   }
 
   [JsonConstructor]
-  internal RealmCreatedEvent(ActorId actorId, ReadOnlyPasswordSettings passwordSettings, bool requireUniqueEmail, JwtSecretUnit secret,
-    ReadOnlyUniqueNameSettings uniqueNameSettings, UniqueSlugUnit uniqueSlug)
+  public ConfigurationInitializedEvent(ActorId actorId, LocaleUnit defaultLocale, ReadOnlyPasswordSettings passwordSettings, bool requireUniqueEmail,
+    JwtSecretUnit secret, ReadOnlyUniqueNameSettings uniqueNameSettings)
   {
     ActorId = actorId;
 
-    UniqueSlug = uniqueSlug;
-
+    DefaultLocale = defaultLocale;
     Secret = secret;
 
     UniqueNameSettings = uniqueNameSettings;

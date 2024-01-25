@@ -1,6 +1,7 @@
 ﻿using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain;
 
-namespace Logitar.Portal.Domain.Realms.Validators;
+namespace Logitar.Portal.Domain.Settings.Validators;
 
 internal class JwtSecretValidator : AbstractValidator<string>
 {

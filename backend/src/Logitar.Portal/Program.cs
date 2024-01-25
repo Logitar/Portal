@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Application.Seeding.Commands;
-using Logitar.Portal.Infrastructure.Commands;
+﻿using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
 namespace Logitar.Portal;
@@ -20,7 +19,6 @@ public class Program
     using IServiceScope scope = application.Services.CreateScope();
     IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
-    await publisher.Publish(new SeedPortalCommand());
 
     application.Run();
   }

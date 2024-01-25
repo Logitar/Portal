@@ -7,6 +7,8 @@
 
 ## Logitar.Portal.Domain
 
+- ConfigurationAggregate
+- ConfigurationId
 - JwtSecretUnit / JwtSecretValidator
 - ReadOnlyPasswordSettings / PasswordSettingsValidator
 - ReadOnlyUniqueNameSettings / UniqueNameSettingsValidator

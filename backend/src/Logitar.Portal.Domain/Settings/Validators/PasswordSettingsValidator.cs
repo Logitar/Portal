@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Contracts.Settings;
 
-namespace Logitar.Portal.Domain.Realms.Validators;
+namespace Logitar.Portal.Domain.Settings.Validators;
 
 internal class PasswordSettingsValidator : AbstractValidator<IPasswordSettings>
 {
@@ -17,7 +17,7 @@ internal class PasswordSettingsValidator : AbstractValidator<IPasswordSettings>
 
   private static int GetMinimumLength(IPasswordSettings settings)
   {
-    int minimumLength = 0;
+    var minimumLength = 0;
     if (settings.RequireNonAlphanumeric)
     {
       minimumLength++;
