@@ -1,4 +1,9 @@
-﻿using Logitar.Portal.Extensions;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application;
+using Logitar.Portal.EntityFrameworkCore.Relational;
+using Logitar.Portal.EntityFrameworkCore.SqlServer;
+using Logitar.Portal.Extensions;
 using Logitar.Portal.Settings;
 
 namespace Logitar.Portal;
@@ -32,6 +37,22 @@ internal class Startup : StartupBase
     {
       services.AddOpenApi();
     }
+
+    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
+      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+    switch (databaseProvider)
+    {
+      case DatabaseProvider.EntityFrameworkCoreSqlServer:
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
+        healthChecks.AddDbContextCheck<EventContext>();
+        healthChecks.AddDbContextCheck<IdentityContext>();
+        healthChecks.AddDbContextCheck<PortalContext>();
+        break;
+      default:
+        throw new DatabaseProviderNotSupportedException(databaseProvider);
+    }
+
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
   }
 
   public override void Configure(IApplicationBuilder builder)

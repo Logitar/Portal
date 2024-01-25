@@ -1,0 +1,27 @@
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain;
+using Logitar.Identity.Domain.Shared;
+using MediatR;
+
+namespace Logitar.Portal.Domain.Realms.Events;
+
+public record RealmUpdatedEvent : DomainEvent, INotification
+{
+  public Modification<DisplayNameUnit>? DisplayName { get; set; }
+  public Modification<DescriptionUnit>? Description { get; set; }
+
+  public Modification<LocaleUnit>? DefaultLocale { get; set; }
+  public JwtSecretUnit? Secret { get; set; }
+  public Modification<UrlUnit>? Url { get; set; }
+
+  public ReadOnlyUniqueNameSettings? UniqueNameSettings { get; set; }
+  public ReadOnlyPasswordSettings? PasswordSettings { get; set; }
+  public bool? RequireUniqueEmail { get; set; }
+
+  public Dictionary<string, string?> CustomAttributes { get; } = [];
+
+  public bool HasChanges => DisplayName != null || Description != null
+    || DefaultLocale != null || Secret != null || Url != null
+    || UniqueNameSettings != null || PasswordSettings != null || RequireUniqueEmail != null
+    || CustomAttributes.Count > 0;
+}
