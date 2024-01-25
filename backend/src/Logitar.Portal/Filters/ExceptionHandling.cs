@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Errors;
+using Logitar.Portal.Contracts.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -30,7 +31,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static ConflictObjectResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
   {
     ConfigurationAlreadyInitializedException exception = (ConfigurationAlreadyInitializedException)context.Exception;
-    return new ConflictObjectResult(exception.Error);
+    return new ConflictObjectResult(new Error(exception.GetErrorCode(), exception.Message));
   }
 
   private static BadRequestObjectResult HandleValidationException(ExceptionContext context)

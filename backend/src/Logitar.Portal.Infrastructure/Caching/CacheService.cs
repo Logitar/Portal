@@ -10,6 +10,8 @@ namespace Logitar.Portal.Infrastructure.Caching;
 
 internal class CacheService : ICacheService
 {
+  private static readonly string ConfigurationKey = new ConfigurationId().Value;
+
   private readonly IMemoryCache _memoryCache;
   private readonly CachingSettings _settings;
 
@@ -25,9 +27,9 @@ internal class CacheService : ICacheService
   private static string GetActorKey(string id) => GetActorKey(new ActorId(id));
   private static string GetActorKey(ActorId id) => $"Actor.Id:{id}";
 
-  public Configuration? GetConfiguration() => GetItem<Configuration>(GetConfigurationKey());
-  public void SetConfiguration(Configuration configuration) => SetItem(GetConfigurationKey(), configuration);
-  private static string GetConfigurationKey() => new ConfigurationId().Value;
+  public Configuration? GetConfiguration() => GetItem<Configuration>(ConfigurationKey);
+  public void RemoveConfiguration() => RemoveItem(ConfigurationKey);
+  public void SetConfiguration(Configuration configuration) => SetItem(ConfigurationKey, configuration);
 
   private T? GetItem<T>(object key) => _memoryCache.TryGetValue(key, out object? value) ? (T?)value : default;
   private void RemoveItem(object key) => _memoryCache.Remove(key);

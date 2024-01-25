@@ -2,6 +2,7 @@
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
+using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Extensions;
 
 namespace Logitar.Portal;

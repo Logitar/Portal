@@ -19,8 +19,9 @@ public class ConfigurationController : ControllerBase
   }
 
   [HttpPost("initialize")]
-  public async Task<ActionResult<CurrentUser>> InitializeAsync([FromBody] InitializeConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<CurrentUser>> InitializeAsync([FromBody] InitializeConfigurationModel model, CancellationToken cancellationToken)
   {
+    InitializeConfigurationPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
     Session session = await _configurationService.InitializeAsync(payload, cancellationToken);
     HttpContext.SignIn(session);
 

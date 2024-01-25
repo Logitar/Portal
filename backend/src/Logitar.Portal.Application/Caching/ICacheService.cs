@@ -11,5 +11,6 @@ public interface ICacheService
   void RemoveActor(ActorId id);
 
   Configuration? GetConfiguration();
+  void RemoveConfiguration();
   void SetConfiguration(Configuration configuration);
 }

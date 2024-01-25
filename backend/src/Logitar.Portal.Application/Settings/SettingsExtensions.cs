@@ -2,11 +2,16 @@
 using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain.Configurations;
 
-namespace Logitar.Portal.Extensions;
+namespace Logitar.Portal.Application.Settings;
 
-internal static class SettingsExtensions
+public static class SettingsExtensions
 {
+  public static IRoleSettings GetRoleSettings(this ConfigurationAggregate configuration) => new RoleSettings
+  {
+    UniqueName = configuration.UniqueNameSettings
+  };
   public static IRoleSettings GetRoleSettings(this Configuration configuration) => new RoleSettings
   {
     UniqueName = configuration.UniqueNameSettings
@@ -16,6 +21,12 @@ internal static class SettingsExtensions
     UniqueName = realm.UniqueNameSettings
   };
 
+  public static IUserSettings GetUserSettings(this ConfigurationAggregate configuration) => new UserSettings
+  {
+    UniqueName = configuration.UniqueNameSettings,
+    Password = configuration.PasswordSettings,
+    RequireUniqueEmail = configuration.RequireUniqueEmail
+  };
   public static IUserSettings GetUserSettings(this Configuration configuration) => new UserSettings
   {
     UniqueName = configuration.UniqueNameSettings,

@@ -7,7 +7,9 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations.Validators;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Configurations;
@@ -53,10 +55,10 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
 
     LocaleUnit locale = new(payload.Locale);
     ConfigurationAggregate configuration = ConfigurationAggregate.Initialize(locale, actorId);
-    Configuration model = await _configurationQuerier.ReadAsync(configuration, cancellationToken);
-    _cacheService.SetConfiguration(model);
 
     UserPayload userPayload = payload.User;
+    new UserPayloadValidator(configuration.GetUserSettings()).ValidateAndThrow(userPayload);
+
     UniqueNameUnit uniqueName = new(configuration.UniqueNameSettings, userPayload.UniqueName);
     UserAggregate user = new(uniqueName, tenantId: null, actorId, userId)
     {
@@ -69,21 +71,47 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     {
       user.SetEmail(new EmailUnit(userPayload.Email.Address), actorId);
     }
-    Password password = _passwordManager.ValidateAndCreate(userPayload.Password);
-    user.SetPassword(password, actorId);
 
-    SessionPayload sessionPayload = payload.Session;
-    SessionAggregate session = user.SignIn();
-    foreach (CustomAttribute customAttribute in sessionPayload.CustomAttributes)
+    await CacheConfigurationAsync(configuration, user, cancellationToken); // NOTE(fpion): we need to cache the configuration for the user settings to be resolved when validating and creating the password
+    try
     {
-      session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Password password = _passwordManager.ValidateAndCreate(userPayload.Password);
+      user.SetPassword(password, actorId);
+
+      SessionPayload sessionPayload = payload.Session;
+      SessionAggregate session = user.SignIn();
+      foreach (CustomAttribute customAttribute in sessionPayload.CustomAttributes)
+      {
+        session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      }
+      session.Update(actorId);
+
+      await _configurationRepository.SaveAsync(configuration, cancellationToken);
+      await _userRepository.SaveAsync(user, cancellationToken);
+      await _sessionRepository.SaveAsync(session, cancellationToken);
+
+      return await _sessionQuerier.ReadAsync(session, cancellationToken);
     }
-    session.Update(actorId);
-
-    await _configurationRepository.SaveAsync(configuration, cancellationToken);
-    await _userRepository.SaveAsync(user, cancellationToken);
-    await _sessionRepository.SaveAsync(session, cancellationToken);
-
-    return await _sessionQuerier.ReadAsync(session, cancellationToken);
+    catch (Exception)
+    {
+      _cacheService.RemoveConfiguration();
+      throw;
+    }
   }
+
+  private async Task CacheConfigurationAsync(ConfigurationAggregate configuration, UserAggregate user, CancellationToken cancellationToken)
+  {
+    Actor actor = CreateActor(user);
+    _cacheService.SetActor(actor);
+    Configuration model = await _configurationQuerier.ReadAsync(configuration, cancellationToken);
+    _cacheService.SetConfiguration(model);
+  }
+
+  private static Actor CreateActor(UserAggregate user) => new(user.Id.Value, user.FullName ?? user.UniqueName.Value)
+  {
+    Type = ActorType.User,
+    IsDeleted = user.IsDeleted,
+    EmailAddress = user.Email?.Address,
+    PictureUrl = user.Picture?.Value
+  };
 }

@@ -15,5 +15,5 @@ internal class ConfigurationRepository : EventSourcing.EntityFrameworkCore.Relat
     => await LoadAsync<ConfigurationAggregate>(new ConfigurationId().AggregateId, cancellationToken);
 
   public async Task SaveAsync(ConfigurationAggregate configuration, CancellationToken cancellationToken)
-    => await base.SaveAsync(configuration, cancellationToken);
+    => await base.SaveAsync(configuration, cancellationToken); // TODO(fpion): saving the configuration should clear/update the cache?
 }

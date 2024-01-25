@@ -27,6 +27,7 @@
 - PortalRoleSettingsResolver
 - PortalUserSettingsResolver
 - ReadConfigurationQueryHandler
+- SettingsExtensions
 
 ## Logitar.Portal.Infrastructure
 
@@ -46,5 +47,5 @@
 - CurrentUser
 - HttpApplicationContext
 - HttpContextExtensions
+- InitializeConfigurationModel
 - IsConfigurationInitialized
-- SettingsExtensions
