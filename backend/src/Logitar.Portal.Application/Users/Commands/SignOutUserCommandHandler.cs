@@ -26,7 +26,7 @@ internal class SignOutUserCommandHandler : IRequestHandler<SignOutUserCommand, U
   {
     UserId id = new(command.Id);
     UserAggregate? user = await _userRepository.LoadAsync(id, cancellationToken);
-    if (user == null)
+    if (user == null /*|| user.TenantId?.Value != _applicationContext.Realm?.Id*/) // TODO(fpion): ensure User is in current Realm
     {
       return null;
     }

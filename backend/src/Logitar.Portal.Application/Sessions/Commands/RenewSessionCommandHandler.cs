@@ -39,6 +39,7 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
 
     SessionAggregate session = await _sessionRepository.LoadAsync(refreshToken.Id, cancellationToken)
       ?? throw new SessionNotFoundException(refreshToken.Id, nameof(payload.RefreshToken));
+    // TODO(fpion): ensure User is in current Realm
     ActorId actorId = new(session.UserId.Value);
 
     Password newSecret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
