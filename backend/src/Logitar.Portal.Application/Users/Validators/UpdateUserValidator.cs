@@ -10,5 +10,6 @@ internal class UpdateUserValidator : AbstractValidator<UpdateUserPayload>
   public UpdateUserValidator(IUserSettings userSettings)
   {
     When(x => x.UniqueName != null, () => RuleFor(x => x.UniqueName!).SetValidator(new UniqueNameValidator(userSettings.UniqueName)));
+    When(x => x.Password != null, () => RuleFor(x => x.Password!).SetValidator(new ChangePasswordValidator(userSettings.Password)));
   }
 }

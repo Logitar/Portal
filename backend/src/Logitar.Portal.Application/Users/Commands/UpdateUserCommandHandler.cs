@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
+using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Users.Validators;
@@ -12,13 +13,16 @@ namespace Logitar.Portal.Application.Users.Commands;
 internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, User?>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public UpdateUserCommandHandler(IApplicationContext applicationContext, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public UpdateUserCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
+    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
+    _passwordManager = passwordManager;
     _userManager = userManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -45,6 +49,19 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     {
       UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
       user.SetUniqueName(uniqueName, actorId);
+    }
+
+    if (payload.Password != null)
+    {
+      Password newPassword = _passwordManager.ValidateAndCreate(payload.Password.NewPassword);
+      if (payload.Password.CurrentPassword == null)
+      {
+        user.SetPassword(newPassword, actorId);
+      }
+      else
+      {
+        user.ChangePassword(payload.Password.CurrentPassword, newPassword, actorId);
+      }
     }
 
     if (payload.IsDisabled.HasValue)
