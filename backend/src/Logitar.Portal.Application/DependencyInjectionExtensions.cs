@@ -1,11 +1,13 @@
 ﻿using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
@@ -29,6 +31,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddTransient<IConfigurationService, ConfigurationFacade>()
+      .AddTransient<IRealmService, RealmFacade>()
       .AddTransient<IRoleService, RoleFacade>()
       .AddTransient<ISessionService, SessionFacade>()
       .AddTransient<IUserService, UserFacade>();

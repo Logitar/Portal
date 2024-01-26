@@ -3,7 +3,7 @@ using Logitar.Identity.Contracts.Settings;
 
 namespace Logitar.Portal.Domain.Settings.Validators;
 
-internal class UniqueNameSettingsValidator : AbstractValidator<IUniqueNameSettings>
+public class UniqueNameSettingsValidator : AbstractValidator<IUniqueNameSettings>
 {
   public UniqueNameSettingsValidator()
   {

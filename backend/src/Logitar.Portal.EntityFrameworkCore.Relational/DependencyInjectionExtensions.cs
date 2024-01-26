@@ -1,5 +1,6 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
@@ -30,6 +31,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddTransient<IConfigurationQuerier, ConfigurationQuerier>()
+      .AddTransient<IRealmQuerier, RealmQuerier>()
       .AddTransient<IRoleQuerier, RoleQuerier>()
       .AddTransient<ISessionQuerier, SessionQuerier>()
       .AddTransient<IUserQuerier, UserQuerier>();

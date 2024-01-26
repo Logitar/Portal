@@ -8,4 +8,6 @@ public interface IRealmQuerier
   Task<Realm> ReadAsync(RealmAggregate realm, CancellationToken cancellationToken = default);
   Task<Realm?> ReadAsync(RealmId id, CancellationToken cancellationToken = default);
   Task<Realm?> ReadAsync(string id, CancellationToken cancellationToken = default);
+
+  Task<Realm?> ReadByUniqueSlugAsync(string uniqueSlug, CancellationToken cancellationToken = default);
 }

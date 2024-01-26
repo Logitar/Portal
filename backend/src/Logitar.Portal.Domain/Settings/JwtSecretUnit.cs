@@ -17,6 +17,8 @@ public record JwtSecretUnit
     new JwtSecretValidator(propertyName).ValidateAndThrow(Value);
   }
 
+  public static JwtSecretUnit CreateOrGenerate(string? value) => string.IsNullOrWhiteSpace(value) ? Generate() : new(value);
+
   public static JwtSecretUnit Generate() => Generate(MinimumLength);
   public static JwtSecretUnit Generate(int length) => new(RandomStringGenerator.GetString(length));
 }

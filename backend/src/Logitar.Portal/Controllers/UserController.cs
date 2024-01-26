@@ -39,6 +39,13 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
+  [HttpPatch("{id}/password/reset")]
+  public async Task<ActionResult<User>> ResetPasswordAsync(string id, [FromBody] ResetUserPasswordPayload payload, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.ResetPasswordAsync(id, payload, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
   [HttpPatch("{id}")]
   public async Task<ActionResult<User>> UpdateAsync(string id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
   {

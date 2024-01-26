@@ -3,7 +3,7 @@ using Logitar.Identity.Domain;
 
 namespace Logitar.Portal.Domain.Settings.Validators;
 
-internal class JwtSecretValidator : AbstractValidator<string>
+public class JwtSecretValidator : AbstractValidator<string>
 {
   public JwtSecretValidator(string? propertyName = null)
   {

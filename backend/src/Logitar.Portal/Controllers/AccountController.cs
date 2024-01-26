@@ -31,6 +31,19 @@ public class AccountController : ControllerBase
     return Ok(User);
   }
 
+  [Authorize]
+  [HttpPatch("profile")]
+  public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
+  {
+    if (payload.Password != null)
+    {
+      payload.Password.CurrentPassword ??= string.Empty;
+    }
+
+    User user = await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required.");
+    return Ok(user);
+  }
+
   [HttpPost("sign/in")]
   public async Task<ActionResult<CurrentUser>> SignInAsync([FromBody] SignInSessionModel model, CancellationToken cancellationToken)
   {
