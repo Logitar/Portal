@@ -14,18 +14,21 @@ namespace Logitar.Portal.Controllers;
 public class AccountController : ControllerBase
 {
   private readonly ISessionService _sessionService;
+  private readonly IUserService _userService;
 
-  public AccountController(ISessionService sessionService)
+  public AccountController(ISessionService sessionService, IUserService userService)
   {
     _sessionService = sessionService;
+    _userService = userService;
   }
+
+  private new User User => HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
 
   [Authorize]
   [HttpGet("profile")]
   public ActionResult<User> GetProfile()
   {
-    User user = HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
-    return Ok(user);
+    return Ok(User);
   }
 
   [HttpPost("sign/in")]
@@ -43,6 +46,17 @@ public class AccountController : ControllerBase
     {
       return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
     }
+  }
+
+  [Authorize]
+  [HttpPost("sign/out/all")]
+  public async Task<ActionResult> SignOutAllAsync(CancellationToken cancellationToken)
+  {
+    _ = await _userService.SignOutAsync(User.Id, cancellationToken);
+
+    HttpContext.SignOut();
+
+    return NoContent();
   }
 
   [Authorize]
