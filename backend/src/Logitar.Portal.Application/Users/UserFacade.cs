@@ -17,4 +17,9 @@ internal class UserFacade : IUserService
   {
     return await _mediator.Send(new AuthenticateUserCommand(payload), cancellationToken);
   }
+
+  public async Task<User?> SignOutAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SignOutUserCommand(id), cancellationToken);
+  }
 }

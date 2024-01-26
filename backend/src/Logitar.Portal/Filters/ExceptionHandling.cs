@@ -1,7 +1,10 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Errors;
+using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Errors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +17,12 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
+    [typeof(IncorrectSessionSecretException)] = HandleIncorrectSessionSecretException,
     [typeof(IncorrectUserPasswordException)] = HandleIncorrectUserPasswordException,
+    [typeof(InvalidRefreshTokenException)] = HandleInvalidRefreshTokenException,
+    [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
+    [typeof(SessionIsNotPersistentException)] = HandleSessionIsNotPersistentException,
+    [typeof(SessionNotFoundException)] = HandleSessionNotFoundException,
     [typeof(UserHasNoPasswordException)] = HandleUserHasNoPasswordException,
     [typeof(UserIsDisabledException)] = HandleUserIsDisabledException,
     [typeof(UserNotFoundException)] = HandleUserNotFoundException,
@@ -26,6 +34,11 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     if (_handlers.TryGetValue(context.Exception.GetType(), out Func<ExceptionContext, IActionResult>? handler))
     {
       context.Result = handler(context);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is IdentifierAlreadyUsedException identifierAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(new Error(identifierAlreadyUsed.GetErrorCode(), IdentifierAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
       context.ExceptionHandled = true;
     }
     else
@@ -40,10 +53,40 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     return new ConflictObjectResult(new Error(exception.GetErrorCode(), exception.Message));
   }
 
+  private static BadRequestObjectResult HandleIncorrectSessionSecretException(ExceptionContext context)
+  {
+    IncorrectSessionSecretException exception = (IncorrectSessionSecretException)context.Exception;
+    return new BadRequestObjectResult(new Error(exception.GetErrorCode(), IncorrectSessionSecretException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
   private static BadRequestObjectResult HandleIncorrectUserPasswordException(ExceptionContext context)
   {
     IncorrectUserPasswordException exception = (IncorrectUserPasswordException)context.Exception;
     return new BadRequestObjectResult(new Error(exception.GetErrorCode(), IncorrectUserPasswordException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
+  private static BadRequestObjectResult HandleInvalidRefreshTokenException(ExceptionContext context)
+  {
+    InvalidRefreshTokenException exception = (InvalidRefreshTokenException)context.Exception;
+    return new BadRequestObjectResult(new Error(exception.GetErrorCode(), InvalidRefreshTokenException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
+  private static BadRequestObjectResult HandleSessionIsNotActiveException(ExceptionContext context)
+  {
+    SessionIsNotActiveException exception = (SessionIsNotActiveException)context.Exception; // TODO(fpion): does not inherit from InvalidCredentialsException
+    return new BadRequestObjectResult(new Error(exception.GetErrorCode(), SessionIsNotActiveException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
+  private static BadRequestObjectResult HandleSessionIsNotPersistentException(ExceptionContext context)
+  {
+    SessionIsNotPersistentException exception = (SessionIsNotPersistentException)context.Exception;
+    return new BadRequestObjectResult(new Error(exception.GetErrorCode(), SessionIsNotPersistentException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
+  private static BadRequestObjectResult HandleSessionNotFoundException(ExceptionContext context)
+  {
+    SessionNotFoundException exception = (SessionNotFoundException)context.Exception;
+    return new BadRequestObjectResult(new Error(exception.GetErrorCode(), SessionNotFoundException.ErrorMessage)); // TODO(fpion): include Data?
   }
 
   private static BadRequestObjectResult HandleUserHasNoPasswordException(ExceptionContext context)
