@@ -44,4 +44,19 @@ public class AccountController : ControllerBase
       return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
     }
   }
+
+  [Authorize]
+  [HttpPost("sign/out")]
+  public async Task<ActionResult> SignOutAsync(CancellationToken cancellationToken)
+  {
+    string? sessionId = HttpContext.GetSessionId();
+    if (sessionId != null)
+    {
+      _ = await _sessionService.SignOutAsync(sessionId, cancellationToken);
+    }
+
+    HttpContext.SignOut();
+
+    return NoContent();
+  }
 }

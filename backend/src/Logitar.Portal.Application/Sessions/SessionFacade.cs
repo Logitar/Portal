@@ -22,4 +22,9 @@ internal class SessionFacade : ISessionService
   {
     return await _mediator.Send(new SignInSessionCommand(payload), cancellationToken);
   }
+
+  public async Task<Session?> SignOutAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SignOutSessionCommand(id), cancellationToken);
+  }
 }
