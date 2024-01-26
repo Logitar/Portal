@@ -16,7 +16,8 @@ internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUser
   public AuthenticateUserCommandHandler(IApplicationContext applicationContext, IUserManager userManager, IUserQuerier userQuerier)
   {
     _applicationContext = applicationContext;
-    _userManager = userManager;    _userQuerier = userQuerier;
+    _userManager = userManager;
+    _userQuerier = userQuerier;
 
   }
 
