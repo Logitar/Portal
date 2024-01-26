@@ -46,6 +46,17 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     ActorId actorId = _applicationContext.ActorId;
     UserAggregate user = new(uniqueName, tenantId, actorId, userId);
 
+    SetAuthenticationInformation(payload, user, actorId);
+    SetContactInformation(payload, user, actorId);
+    user.Update(actorId);
+
+    await _userManager.SaveAsync(user, actorId, cancellationToken);
+
+    return await _userQuerier.ReadAsync(user, cancellationToken);
+  }
+
+  private void SetAuthenticationInformation(CreateUserPayload payload, UserAggregate user, ActorId actorId)
+  {
     if (payload.Password != null)
     {
       Password password = _passwordManager.ValidateAndCreate(payload.Password);
@@ -56,9 +67,24 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     {
       user.Disable(actorId);
     }
+  }
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
-
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+  private static void SetContactInformation(CreateUserPayload payload, UserAggregate user, ActorId actorId)
+  {
+    if (payload.Address != null)
+    {
+      AddressUnit address = payload.Address.ToAddressUnit();
+      user.SetAddress(address, actorId);
+    }
+    if (payload.Email != null)
+    {
+      EmailUnit email = payload.Email.ToEmailUnit();
+      user.SetEmail(email, actorId);
+    }
+    if (payload.Phone != null)
+    {
+      PhoneUnit phone = payload.Phone.ToPhoneUnit();
+      user.SetPhone(phone, actorId);
+    }
   }
 }

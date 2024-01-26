@@ -45,6 +45,17 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
     ActorId actorId = _applicationContext.ActorId;
 
+    SetAuthenticationInformation(payload, user, actorId, userSettings);
+    SetContactInformation(payload, user, actorId);
+    user.Update(actorId);
+
+    await _userManager.SaveAsync(user, actorId, cancellationToken);
+
+    return await _userQuerier.ReadAsync(user, cancellationToken);
+  }
+
+  private void SetAuthenticationInformation(UpdateUserPayload payload, UserAggregate user, ActorId actorId, IUserSettings userSettings)
+  {
     if (!string.IsNullOrWhiteSpace(payload.UniqueName))
     {
       UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
@@ -75,9 +86,24 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
         user.Enable(actorId);
       }
     }
+  }
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
-
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+  private static void SetContactInformation(UpdateUserPayload payload, UserAggregate user, ActorId actorId)
+  {
+    if (payload.Address != null)
+    {
+      AddressUnit? address = payload.Address.Value?.ToAddressUnit();
+      user.SetAddress(address, actorId);
+    }
+    if (payload.Email != null)
+    {
+      EmailUnit? email = payload.Email.Value?.ToEmailUnit();
+      user.SetEmail(email, actorId);
+    }
+    if (payload.Phone != null)
+    {
+      PhoneUnit? phone = payload.Phone.Value?.ToPhoneUnit();
+      user.SetPhone(phone, actorId);
+    }
   }
 }

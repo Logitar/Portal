@@ -51,6 +51,17 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
     ActorId actorId = _applicationContext.ActorId;
 
+    SetAuthenticationInformation(payload, user, reference, actorId, userSettings);
+    SetContactInformation(payload, user, reference, actorId);
+    user.Update(actorId);
+
+    await _userManager.SaveAsync(user, actorId, cancellationToken);
+
+    return await _userQuerier.ReadAsync(user, cancellationToken);
+  }
+
+  private void SetAuthenticationInformation(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId, IUserSettings userSettings)
+  {
     UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
@@ -71,9 +82,24 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Enable(actorId);
     }
+  }
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
-
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+  private static void SetContactInformation(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId)
+  {
+    AddressUnit? address = payload.Address?.ToAddressUnit();
+    if (reference == null || address != reference.Address)
+    {
+      user.SetAddress(address, actorId);
+    }
+    EmailUnit? email = payload.Email?.ToEmailUnit();
+    if (reference == null || email != reference.Email)
+    {
+      user.SetEmail(email, actorId);
+    }
+    PhoneUnit? phone = payload.Phone?.ToPhoneUnit();
+    if (reference == null || phone != reference.Phone)
+    {
+      user.SetPhone(phone, actorId);
+    }
   }
 }
