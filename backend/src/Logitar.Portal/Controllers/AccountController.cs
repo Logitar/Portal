@@ -42,7 +42,7 @@ public class AccountController : ControllerBase
       {
         payload.Password.CurrentPassword ??= string.Empty;
       }
-      payload.IsDisabled = false;
+      payload.IsDisabled = null;
       #endregion
 
       User user = await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required.");
