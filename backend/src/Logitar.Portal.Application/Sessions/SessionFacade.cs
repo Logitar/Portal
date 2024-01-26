@@ -13,6 +13,11 @@ internal class SessionFacade : ISessionService
     _mediator = mediator;
   }
 
+  public async Task<Session> RenewAsync(RenewSessionPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new RenewSessionCommand(payload), cancellationToken);
+  }
+
   public async Task<Session> SignInAsync(SignInSessionPayload payload, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new SignInSessionCommand(payload), cancellationToken);

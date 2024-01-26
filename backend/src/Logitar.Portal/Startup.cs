@@ -8,6 +8,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
+using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -98,6 +99,7 @@ internal class Startup : StartupBase
     builder.UseHttpsRedirection();
     builder.UseCors();
     builder.UseSession();
+    builder.UseMiddleware<RenewSession>();
     builder.UseAuthentication();
     builder.UseAuthorization();
 
