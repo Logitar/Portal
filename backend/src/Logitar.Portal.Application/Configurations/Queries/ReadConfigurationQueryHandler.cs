@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Domain.Configurations;
 using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Queries;
@@ -7,15 +8,17 @@ namespace Logitar.Portal.Application.Configurations.Queries;
 internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfigurationQuery, Configuration?>
 {
   private readonly ICacheService _cacheService;
+  private readonly IConfigurationQuerier _configurationQuerier;
 
-  public ReadConfigurationQueryHandler(ICacheService cacheService)
+  public ReadConfigurationQueryHandler(ICacheService cacheService, IConfigurationQuerier configurationQuerier)
   {
     _cacheService = cacheService;
+    _configurationQuerier = configurationQuerier;
   }
 
-  public Task<Configuration?> Handle(ReadConfigurationQuery _, CancellationToken cancellationToken)
+  public async Task<Configuration?> Handle(ReadConfigurationQuery _, CancellationToken cancellationToken)
   {
-    Configuration? configuration = _cacheService.GetConfiguration();
-    return Task.FromResult(configuration);
+    ConfigurationAggregate? configuration = _cacheService.GetConfiguration();
+    return configuration == null ? null : await _configurationQuerier.ReadAsync(configuration, cancellationToken);
   }
 }

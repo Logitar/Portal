@@ -9,7 +9,6 @@ using Logitar.Portal.Application.Configurations.Validators;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Configurations;
@@ -20,19 +19,16 @@ namespace Logitar.Portal.Application.Configurations.Commands;
 internal class InitializeConfigurationCommandHandler : IRequestHandler<InitializeConfigurationCommand, Session>
 {
   private readonly ICacheService _cacheService;
-  private readonly IConfigurationQuerier _configurationQuerier;
   private readonly IConfigurationRepository _configurationRepository;
   private readonly IPasswordManager _passwordManager;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
-  public InitializeConfigurationCommandHandler(ICacheService cacheService, IConfigurationQuerier configurationQuerier,
-    IConfigurationRepository configurationRepository, IPasswordManager passwordManager, ISessionQuerier sessionQuerier, ISessionRepository sessionRepository,
-    IUserRepository userRepository)
+  public InitializeConfigurationCommandHandler(ICacheService cacheService, IConfigurationRepository configurationRepository, IPasswordManager passwordManager,
+    ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserRepository userRepository)
   {
     _cacheService = cacheService;
-    _configurationQuerier = configurationQuerier;
     _configurationRepository = configurationRepository;
     _passwordManager = passwordManager;
     _sessionQuerier = sessionQuerier;
@@ -72,7 +68,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       user.SetEmail(new EmailUnit(userPayload.Email.Address), actorId);
     }
 
-    await CacheConfigurationAsync(configuration, user, cancellationToken); // NOTE(fpion): we need to cache the configuration for the user settings to be resolved when validating and creating the password
+    _cacheService.SetConfiguration(configuration); // NOTE(fpion): we need to cache the configuration for the user settings to be resolved when validating and creating the password
     try
     {
       Password password = _passwordManager.ValidateAndCreate(userPayload.Password);
@@ -98,20 +94,4 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       throw;
     }
   }
-
-  private async Task CacheConfigurationAsync(ConfigurationAggregate configuration, UserAggregate user, CancellationToken cancellationToken)
-  {
-    Actor actor = CreateActor(user);
-    _cacheService.SetActor(actor);
-    Configuration model = await _configurationQuerier.ReadAsync(configuration, cancellationToken);
-    _cacheService.SetConfiguration(model);
-  }
-
-  private static Actor CreateActor(UserAggregate user) => new(user.Id.Value, user.FullName ?? user.UniqueName.Value)
-  {
-    Type = ActorType.User,
-    IsDeleted = user.IsDeleted,
-    EmailAddress = user.Email?.Address,
-    PictureUrl = user.Picture?.Value
-  };
 }

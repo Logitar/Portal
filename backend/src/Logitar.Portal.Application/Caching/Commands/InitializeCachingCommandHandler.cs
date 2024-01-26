@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Application.Configurations;
-using Logitar.Portal.Contracts.Configurations;
+﻿using Logitar.Portal.Domain.Configurations;
 using MediatR;
 
 namespace Logitar.Portal.Application.Caching.Commands;
@@ -7,17 +6,17 @@ namespace Logitar.Portal.Application.Caching.Commands;
 internal class InitializeCachingCommandHandler : INotificationHandler<InitializeCachingCommand>
 {
   private readonly ICacheService _cacheService;
-  private readonly IConfigurationQuerier _configurationQuerier;
+  private readonly IConfigurationRepository _configurationRepository;
 
-  public InitializeCachingCommandHandler(ICacheService cacheService, IConfigurationQuerier configurationQuerier)
+  public InitializeCachingCommandHandler(ICacheService cacheService, IConfigurationRepository configurationRepository)
   {
     _cacheService = cacheService;
-    _configurationQuerier = configurationQuerier;
+    _configurationRepository = configurationRepository;
   }
 
   public async Task Handle(InitializeCachingCommand _, CancellationToken cancellationToken)
   {
-    Configuration? configuration = await _configurationQuerier.ReadAsync(cancellationToken);
+    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
     if (configuration != null)
     {
       _cacheService.SetConfiguration(configuration);

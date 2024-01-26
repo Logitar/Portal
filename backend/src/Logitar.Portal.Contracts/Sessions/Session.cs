@@ -9,7 +9,6 @@ public class Session : Aggregate
   public bool IsPersistent { get; set; }
 
   public bool IsActive { get; set; }
-
   public Actor? SignedOutBy { get; set; }
   public DateTime? SignedOutOn { get; set; }
 

@@ -1,7 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Actors;
-using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Infrastructure.Settings;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,9 +26,9 @@ internal class CacheService : ICacheService
   private static string GetActorKey(string id) => GetActorKey(new ActorId(id));
   private static string GetActorKey(ActorId id) => $"Actor.Id:{id}";
 
-  public Configuration? GetConfiguration() => GetItem<Configuration>(ConfigurationKey);
+  public ConfigurationAggregate? GetConfiguration() => GetItem<ConfigurationAggregate>(ConfigurationKey);
   public void RemoveConfiguration() => RemoveItem(ConfigurationKey);
-  public void SetConfiguration(Configuration configuration) => SetItem(ConfigurationKey, configuration);
+  public void SetConfiguration(ConfigurationAggregate configuration) => SetItem(ConfigurationKey, configuration);
 
   private T? GetItem<T>(object key) => _memoryCache.TryGetValue(key, out object? value) ? (T?)value : default;
   private void RemoveItem(object key) => _memoryCache.Remove(key);

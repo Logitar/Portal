@@ -1,17 +1,17 @@
 ﻿using Logitar.Portal.Constants;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Settings;
 using Microsoft.Extensions.Primitives;
-using System.Text;
-using System.Text.Json;
 
 namespace Logitar.Portal.Extensions;
 
 internal static class HttpContextExtensions
 {
+  private const string ApiKeyKey = nameof(ApiKey);
   private const string RealmKey = nameof(Realm);
   private const string SessionKey = nameof(Session);
   private const string SessionIdKey = "SessionId";
@@ -49,11 +49,13 @@ internal static class HttpContextExtensions
     return ipAddress;
   }
 
+  public static ApiKey? GetApiKey(this HttpContext context) => context.GetItem<ApiKey>(ApiKeyKey);
   public static Realm? GetRealm(this HttpContext context) => context.GetItem<Realm>(RealmKey);
   public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key) => context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
 
+  public static void SetApiKey(this HttpContext context, ApiKey? apiKey) => context.SetItem(ApiKeyKey, apiKey);
   public static void SetRealm(this HttpContext context, Realm? realm) => context.SetItem(RealmKey, realm);
   public static void SetSession(this HttpContext context, Session? session) => context.SetItem(SessionKey, session);
   public static void SetUser(this HttpContext context, User? user) => context.SetItem(UserKey, user);

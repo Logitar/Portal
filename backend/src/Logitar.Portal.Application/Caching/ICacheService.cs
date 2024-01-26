@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Contracts.Actors;
-using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Domain.Configurations;
 
 namespace Logitar.Portal.Application.Caching;
 
@@ -10,7 +10,7 @@ public interface ICacheService
   void SetActor(Actor actor);
   void RemoveActor(ActorId id);
 
-  Configuration? GetConfiguration();
+  ConfigurationAggregate? GetConfiguration();
   void RemoveConfiguration();
-  void SetConfiguration(Configuration configuration);
+  void SetConfiguration(ConfigurationAggregate configuration);
 }
