@@ -35,13 +35,23 @@ public class AccountController : ControllerBase
   [HttpPatch("profile")]
   public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
   {
-    if (payload.Password != null)
+    try
     {
-      payload.Password.CurrentPassword ??= string.Empty;
-    }
+      #region TODO(fpion): refactor
+      if (payload.Password != null)
+      {
+        payload.Password.CurrentPassword ??= string.Empty;
+      }
+      payload.IsDisabled = false;
+      #endregion
 
-    User user = await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required.");
-    return Ok(user);
+      User user = await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required.");
+      return Ok(user);
+    }
+    catch (InvalidCredentialsException)
+    {
+      return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
+    }
   }
 
   [HttpPost("sign/in")]
