@@ -12,8 +12,9 @@ public record CreateUserPayload
   {
   }
 
-  public CreateUserPayload(string uniqueName)
+  public CreateUserPayload(string uniqueName, string? password = null)
   {
     UniqueName = uniqueName;
+    Password = password;
   }
 }

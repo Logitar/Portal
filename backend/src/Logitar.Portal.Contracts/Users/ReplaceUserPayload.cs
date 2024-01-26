@@ -10,8 +10,9 @@ public record ReplaceUserPayload
   {
   }
 
-  public ReplaceUserPayload(string uniqueName)
+  public ReplaceUserPayload(string uniqueName, string? password = null)
   {
     UniqueName = uniqueName;
+    Password = password;
   }
 }
