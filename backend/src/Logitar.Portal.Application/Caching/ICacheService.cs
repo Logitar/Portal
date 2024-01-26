@@ -8,7 +8,7 @@ public interface ICacheService
 {
   Actor? GetActor(ActorId id);
   void SetActor(Actor actor);
-  void RemoveActor(ActorId id);
+  void RemoveActor(ActorId id); // TODO(fpion): remove when User or API key is modified
 
   ConfigurationAggregate? GetConfiguration();
   void RemoveConfiguration();
