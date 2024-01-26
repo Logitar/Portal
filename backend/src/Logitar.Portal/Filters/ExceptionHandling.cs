@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Errors;
 using Logitar.Portal.Application.Users;
@@ -26,6 +27,11 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     if (_handlers.TryGetValue(context.Exception.GetType(), out Func<ExceptionContext, IActionResult>? handler))
     {
       context.Result = handler(context);
+      context.ExceptionHandled = true;
+    }
+    else if (context.Exception is IdentifierAlreadyUsedException identifierAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(new Error(identifierAlreadyUsed.GetErrorCode(), IdentifierAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
       context.ExceptionHandled = true;
     }
     else
