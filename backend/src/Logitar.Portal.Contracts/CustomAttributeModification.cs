@@ -5,7 +5,7 @@ public record CustomAttributeModification
   public string Key { get; set; }
   public string? Value { get; set; }
 
-  public CustomAttributeModification() : this(string.Empty, value: string.Empty)
+  public CustomAttributeModification() : this(string.Empty, value: null)
   {
   }
 

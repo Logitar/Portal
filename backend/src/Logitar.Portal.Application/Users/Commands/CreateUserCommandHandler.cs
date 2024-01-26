@@ -32,7 +32,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     new CreateUserValidator(userSettings).ValidateAndThrow(payload);
 
     UserId? userId = UserId.TryCreate(payload.Id);
-    if (userId != null && _userRepository.LoadAsync(userId, cancellationToken) != null)
+    if (userId != null && _userRepository.LoadAsync(userId, includeDeleted: true, cancellationToken) != null)
     {
       throw new IdentifierAlreadyUsedException<UserAggregate>(payload.Id!, nameof(payload.Id));
     }

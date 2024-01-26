@@ -33,7 +33,7 @@ internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Rol
     new CreateRoleValidator(roleSettings).ValidateAndThrow(payload);
 
     RoleId? roleId = RoleId.TryCreate(payload.Id);
-    if (roleId != null && await _roleRepository.LoadAsync(roleId, cancellationToken) != null)
+    if (roleId != null && await _roleRepository.LoadAsync(roleId, includeDeleted: true, cancellationToken) != null)
     {
       throw new IdentifierAlreadyUsedException<RoleAggregate>(payload.Id!, nameof(payload.Id));
     }

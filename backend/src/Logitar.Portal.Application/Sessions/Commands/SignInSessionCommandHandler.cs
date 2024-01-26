@@ -35,7 +35,7 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
     new SignInSessionValidator().ValidateAndThrow(payload);
 
     SessionId? sessionId = SessionId.TryCreate(payload.Id);
-    if (sessionId != null && await _sessionRepository.LoadAsync(sessionId, cancellationToken) != null)
+    if (sessionId != null && await _sessionRepository.LoadAsync(sessionId, includeDeleted: true, cancellationToken) != null)
     {
       throw new IdentifierAlreadyUsedException<SessionAggregate>(payload.Id!, nameof(payload.Id));
     }
