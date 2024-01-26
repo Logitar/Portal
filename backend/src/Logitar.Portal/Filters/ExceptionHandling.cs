@@ -48,6 +48,11 @@ internal class ExceptionHandling : ExceptionFilterAttribute
       context.Result = new ConflictObjectResult(new Error(identifierAlreadyUsed.GetErrorCode(), IdentifierAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
       context.ExceptionHandled = true;
     }
+    else if (context.Exception is TooManyResultsException tooManyResults)
+    {
+      context.Result = new ConflictObjectResult(new Error(tooManyResults.GetErrorCode(), TooManyResultsException.ErrorMessage)); // TODO(fpion): include Data?
+      context.ExceptionHandled = true;
+    }
     else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
     {
       context.Result = new ConflictObjectResult(new Error(uniqueNameAlreadyUsed.GetErrorCode(), UniqueNameAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?

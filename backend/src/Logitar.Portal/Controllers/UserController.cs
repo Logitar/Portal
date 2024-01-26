@@ -25,6 +25,13 @@ public class UserController : ControllerBase
     return Created(uri, user);
   }
 
+  [HttpDelete("{id}")]
+  public async Task<ActionResult<User>> DeleteAsync(string id, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.DeleteAsync(id, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
   [HttpPut("{id}")]
   public async Task<ActionResult<User>> ReplaceAsync(string id, [FromBody] ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {

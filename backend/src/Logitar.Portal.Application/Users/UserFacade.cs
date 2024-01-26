@@ -23,6 +23,11 @@ internal class UserFacade : IUserService
     return await _mediator.Send(new CreateUserCommand(payload), cancellationToken);
   }
 
+  public async Task<User?> DeleteAsync(string id, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new DeleteUserCommand(id), cancellationToken);
+  }
+
   public async Task<User?> ReplaceAsync(string id, ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new ReplaceUserCommand(id, payload, version), cancellationToken);
