@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Sessions;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
@@ -17,6 +18,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static readonly Dictionary<Type, Func<ExceptionContext, IActionResult>> _handlers = new()
   {
     [typeof(ConfigurationAlreadyInitializedException)] = HandleConfigurationAlreadyInitializedException,
+    [typeof(EmailAddressAlreadyUsedException)] = HandleEmailAddressAlreadyUsedException,
     [typeof(IncorrectSessionSecretException)] = HandleIncorrectSessionSecretException,
     [typeof(IncorrectUserPasswordException)] = HandleIncorrectUserPasswordException,
     [typeof(InvalidRefreshTokenException)] = HandleInvalidRefreshTokenException,
@@ -36,10 +38,19 @@ internal class ExceptionHandling : ExceptionFilterAttribute
       context.Result = handler(context);
       context.ExceptionHandled = true;
     }
+    else if (context.Exception is CustomIdentifierAlreadyUsedException customIdentifierAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(new Error(customIdentifierAlreadyUsed.GetErrorCode(), CustomIdentifierAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
+      context.ExceptionHandled = true;
+    }
     else if (context.Exception is IdentifierAlreadyUsedException identifierAlreadyUsed)
     {
       context.Result = new ConflictObjectResult(new Error(identifierAlreadyUsed.GetErrorCode(), IdentifierAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
       context.ExceptionHandled = true;
+    }
+    else if (context.Exception is UniqueNameAlreadyUsedException uniqueNameAlreadyUsed)
+    {
+      context.Result = new ConflictObjectResult(new Error(uniqueNameAlreadyUsed.GetErrorCode(), UniqueNameAlreadyUsedException.ErrorMessage)); // TODO(fpion): include Data?
     }
     else
     {
@@ -50,6 +61,12 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static ConflictObjectResult HandleConfigurationAlreadyInitializedException(ExceptionContext context)
   {
     ConfigurationAlreadyInitializedException exception = (ConfigurationAlreadyInitializedException)context.Exception;
+    return new ConflictObjectResult(new Error(exception.GetErrorCode(), exception.Message));
+  }
+
+  private static ConflictObjectResult HandleEmailAddressAlreadyUsedException(ExceptionContext context)
+  {
+    EmailAddressAlreadyUsedException exception = (EmailAddressAlreadyUsedException)context.Exception;
     return new ConflictObjectResult(new Error(exception.GetErrorCode(), exception.Message));
   }
 
