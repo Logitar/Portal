@@ -9,6 +9,7 @@ using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
 using Logitar.Portal.Settings;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Logitar.Portal;
@@ -16,11 +17,14 @@ namespace Logitar.Portal;
 internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
+
+  private readonly bool _enableBasicAuthentication;
   private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
+    _enableBasicAuthentication = configuration.GetValue<bool>("EnableBasicAuthentication");
     _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
   }
 
@@ -35,8 +39,12 @@ internal class Startup : StartupBase
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
-    services.AddAuthentication()
+    AuthenticationBuilder authenticationBuilder = services.AddAuthentication()
      .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
+    if (_enableBasicAuthentication)
+    {
+      authenticationBuilder.AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { });
+    }
 
     services.AddAuthorizationBuilder()
       .SetDefaultPolicy(new AuthorizationPolicyBuilder(Schemes.All.ToArray())

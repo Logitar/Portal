@@ -1,6 +1,7 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
@@ -28,7 +29,8 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddTransient<IConfigurationQuerier, ConfigurationQuerier>()
-      .AddTransient<ISessionQuerier, SessionQuerier>();
+      .AddTransient<ISessionQuerier, SessionQuerier>()
+      .AddTransient<IUserQuerier, UserQuerier>();
   }
 
   private static IServiceCollection AddRepositories(this IServiceCollection services)
