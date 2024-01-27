@@ -50,7 +50,7 @@ internal class Mapper
     {
       Description = source.Description,
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
-      AuthenticatedOn = source.AuthenticatedOn,
+      AuthenticatedOn = AsUniversalTime(source.AuthenticatedOn),
       Realm = realm
     };
 
@@ -199,7 +199,7 @@ internal class Mapper
       Picture = source.Picture,
       Profile = source.Profile,
       Website = source.Website,
-      AuthenticatedOn = source.AuthenticatedOn,
+      AuthenticatedOn = AsUniversalTime(source.AuthenticatedOn),
       Realm = realm
     };
 
