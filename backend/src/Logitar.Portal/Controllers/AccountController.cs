@@ -11,7 +11,7 @@ namespace Logitar.Portal.Controllers;
 
 [ApiController]
 [Route("account")]
-public class AccountController : ControllerBase
+public class AccountController : ControllerBase // TODO(fpion): an User is required when using an API key.
 {
   private readonly ISessionService _sessionService;
   private readonly IUserService _userService;

@@ -1,4 +1,5 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
@@ -30,6 +31,7 @@ public static class DependencyInjectionExtensions
   private static IServiceCollection AddQueriers(this IServiceCollection services)
   {
     return services
+      .AddTransient<IApiKeyQuerier, ApiKeyQuerier>()
       .AddTransient<IConfigurationQuerier, ConfigurationQuerier>()
       .AddTransient<IRealmQuerier, RealmQuerier>()
       .AddTransient<IRoleQuerier, RoleQuerier>()

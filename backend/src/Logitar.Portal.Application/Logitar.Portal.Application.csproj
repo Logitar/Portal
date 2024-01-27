@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Using Include="System.Reflection" />
+    <Using Include="System.Text" />
   </ItemGroup>
 
 </Project>

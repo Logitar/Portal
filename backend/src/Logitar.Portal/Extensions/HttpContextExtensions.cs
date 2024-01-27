@@ -30,7 +30,7 @@ internal static class HttpContextExtensions
       customAttributes.Add(new("IpAddress", ipAddress));
     }
 
-    return customAttributes.AsReadOnly();
+    return customAttributes;
   }
   private static string GetAdditionalInformation(this HttpContext context)
   {

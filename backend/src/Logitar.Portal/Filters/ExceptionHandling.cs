@@ -5,6 +5,7 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Errors;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Errors;
@@ -22,6 +23,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     [typeof(IncorrectSessionSecretException)] = HandleIncorrectSessionSecretException,
     [typeof(IncorrectUserPasswordException)] = HandleIncorrectUserPasswordException,
     [typeof(InvalidRefreshTokenException)] = HandleInvalidRefreshTokenException,
+    [typeof(RolesNotFoundException)] = HandleRolesNotFoundException,
     [typeof(SessionIsNotActiveException)] = HandleSessionIsNotActiveException,
     [typeof(SessionIsNotPersistentException)] = HandleSessionIsNotPersistentException,
     [typeof(SessionNotFoundException)] = HandleSessionNotFoundException,
@@ -91,6 +93,12 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   {
     InvalidRefreshTokenException exception = (InvalidRefreshTokenException)context.Exception;
     return new BadRequestObjectResult(new Error(exception.GetErrorCode(), InvalidRefreshTokenException.ErrorMessage)); // TODO(fpion): include Data?
+  }
+
+  private static NotFoundObjectResult HandleRolesNotFoundException(ExceptionContext context)
+  {
+    RolesNotFoundException exception = (RolesNotFoundException)context.Exception;
+    return new NotFoundObjectResult(new Error(exception.GetErrorCode(), RolesNotFoundException.ErrorMessage)); // TODO(fpion): include Data?
   }
 
   private static BadRequestObjectResult HandleSessionIsNotActiveException(ExceptionContext context)

@@ -16,6 +16,12 @@ public class UserController : ControllerBase
     _userService = userService;
   }
 
+  [HttpPost("authenticate")]
+  public async Task<ActionResult<User>> AuthenticateAsync([FromBody] AuthenticateUserPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _userService.AuthenticateAsync(payload, cancellationToken));
+  }
+
   [HttpPost]
   public async Task<ActionResult<User>> CreateAsync([FromBody] CreateUserPayload payload, CancellationToken cancellationToken)
   {
@@ -43,6 +49,13 @@ public class UserController : ControllerBase
   public async Task<ActionResult<User>> ResetPasswordAsync(string id, [FromBody] ResetUserPasswordPayload payload, CancellationToken cancellationToken)
   {
     User? user = await _userService.ResetPasswordAsync(id, payload, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
+  [HttpPost("{id}/sign/out")]
+  public async Task<ActionResult<User>> SignOutAsync(string id, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.SignOutAsync(id, cancellationToken);
     return user == null ? NotFound() : Ok(user);
   }
 
