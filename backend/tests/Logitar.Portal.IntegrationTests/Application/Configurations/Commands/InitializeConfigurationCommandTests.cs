@@ -1,6 +1,4 @@
-﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.EventSourcing;
+﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
@@ -32,18 +30,6 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
-  public override async Task InitializeAsync()
-  {
-    await base.InitializeAsync();
-
-    TableId[] tables = [IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
-    foreach (TableId table in tables)
-    {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
-      await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
-    }
-  }
-
   [Fact(DisplayName = "It should initialize the configuration.")]
   public async Task It_should_initialize_the_configuration()
   {
@@ -73,10 +59,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
 
     Assert.False(session.IsPersistent);
     Assert.True(session.IsActive);
-    foreach (CustomAttribute customAttribute in sessionCustomAttributes)
-    {
-      Assert.Contains(customAttribute, session.CustomAttributes);
-    }
+    Assert.Equal(sessionCustomAttributes, session.CustomAttributes);
     Assert.Equal(session.User.Id, session.CreatedBy.Id);
     Assert.Equal(session.User.Id, session.UpdatedBy.Id);
 

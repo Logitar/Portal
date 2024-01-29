@@ -32,6 +32,8 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
+  protected TestApplicationContext ApplicationContext => (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
+
   protected IntegrationTests(bool initializeConfiguration = true)
   {
     _initializeConfiguration = initializeConfiguration;
@@ -60,7 +62,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     IPublisher publisher = ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
 
-    TableId[] tables = [EventDb.Events.Table];
+    TableId[] tables = [EventDb.Events.Table, IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
     foreach (TableId table in tables)
     {
       ICommand command = SqlServerDeleteBuilder.From(table).Build();

@@ -9,7 +9,7 @@ using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal;
 
-internal class TestApplicationContext : IApplicationContext
+public class TestApplicationContext : IApplicationContext
 {
   private readonly ICacheService _cacheService;
 
