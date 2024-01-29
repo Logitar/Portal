@@ -1,18 +1,26 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Settings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class SignInSessionCommandTests : IntegrationTests
 {
+  private readonly IPasswordManager _passwordManager;
+  private readonly IUserRepository _userRepository;
+
   public SignInSessionCommandTests() : base()
   {
+    _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
+    _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
   [Fact(DisplayName = "It should create a persistent session.")]
@@ -38,6 +46,37 @@ public class SignInSessionCommandTests : IntegrationTests
     RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
     Assert.Equal(session.Id, refreshToken.Id.AggregateId.ToGuid());
     Assert.Equal(RefreshToken.SecretLength, Convert.FromBase64String(refreshToken.Secret).Length);
+  }
+
+  [Fact(DisplayName = "It should create a realm session.")]
+  public async Task It_should_create_a_realm_session()
+  {
+    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
+    {
+      Id = Guid.NewGuid()
+    };
+    SetRealm(realm);
+
+    UserId userId = UserId.NewId();
+    ActorId actorId = new(userId.Value);
+    UniqueNameUnit uniqueName = new(realm.UniqueNameSettings, Faker.Person.UserName);
+    TenantId tenantId = new(new AggregateId(realm.Id).Value);
+    UserAggregate user = new(uniqueName, tenantId, actorId, userId);
+    user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
+    await _userRepository.SaveAsync(user);
+
+    SignInSessionPayload payload = new(uniqueName.Value, PasswordString);
+    SignInSessionCommand command = new(payload);
+    Session session = await Mediator.Send(command);
+
+    Assert.False(session.IsPersistent);
+    Assert.Null(session.RefreshToken);
+    Assert.True(session.IsActive);
+    Assert.Null(session.SignedOutBy);
+    Assert.Null(session.SignedOutOn);
+    Assert.Empty(session.CustomAttributes);
+    Assert.Equal(payload.UniqueName, session.User.UniqueName);
+    Assert.Same(realm, session.User.Realm);
   }
 
   [Fact(DisplayName = "It should create an ephemereal session.")]
@@ -72,7 +111,7 @@ public class SignInSessionCommandTests : IntegrationTests
     {
       Id = Guid.NewGuid()
     };
-    ApplicationContext.Realm = realm;
+    SetRealm(realm);
 
     SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString);
     SignInSessionCommand command = new(payload);
