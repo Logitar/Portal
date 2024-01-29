@@ -85,6 +85,7 @@ internal class Startup : StartupBase
     services.AddDistributedMemoryCache();
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
+    services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
   }
 
   public override void Configure(IApplicationBuilder builder)

@@ -7,6 +7,7 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
@@ -60,7 +61,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     IPublisher publisher = ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
 
-    TableId[] tables = [EventDb.Events.Table];
+    TableId[] tables = [EventDb.Events.Table, IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
     foreach (TableId table in tables)
     {
       ICommand command = SqlServerDeleteBuilder.From(table).Build();
@@ -88,4 +89,10 @@ public abstract class IntegrationTests : IAsyncLifetime
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
+
+  protected void SetRealm(Realm? realm)
+  {
+    TestApplicationContext applicationContext = (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
+    applicationContext.Realm = realm;
+  }
 }

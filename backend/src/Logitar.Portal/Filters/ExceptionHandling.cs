@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Configurations;
+﻿using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,12 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   public override void OnException(ExceptionContext context)
   {
     Exception exception = context.Exception;
-    if (IsConflictError(exception))
+    if (IsBadRequestError(exception))
+    {
+      context.Result = new BadRequestObjectResult(BuildError(exception));
+      context.ExceptionHandled = true;
+    }
+    else if (IsConflictError(exception))
     {
       context.Result = new ConflictObjectResult(BuildError(exception));
       context.ExceptionHandled = true;
@@ -47,6 +53,10 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     return error;
   }
 
+  private static bool IsBadRequestError(Exception exception)
+  {
+    return exception is InvalidCredentialsException;
+  }
   private static bool IsConflictError(Exception exception)
   {
     return exception is ConfigurationAlreadyInitializedException;
