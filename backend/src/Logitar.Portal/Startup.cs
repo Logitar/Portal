@@ -1,5 +1,16 @@
-﻿using Logitar.Portal.Extensions;
+﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application;
+using Logitar.Portal.Authentication;
+using Logitar.Portal.Authorization;
+using Logitar.Portal.Constants;
+using Logitar.Portal.EntityFrameworkCore.Relational;
+using Logitar.Portal.EntityFrameworkCore.SqlServer;
+using Logitar.Portal.Extensions;
+using Logitar.Portal.Filters;
 using Logitar.Portal.Settings;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Logitar.Portal;
 
@@ -18,12 +29,36 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllers(/*options => options.Filters.Add<ExceptionHandling>()*/) // TODO(fpion): ExceptionHandling
+    services.AddControllers(options => options.Filters.Add<ExceptionHandling>())
       .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
+
+    AuthenticationBuilder authenticationBuilder = services.AddAuthentication()
+      .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
+
+    AuthorizationPolicy portalActorPolicy = new AuthorizationPolicyBuilder(Schemes.All.ToArray())
+      .RequireAuthenticatedUser()
+      .AddRequirements(new PortalActorAuthorizationRequirement())
+      .Build();
+    services.AddAuthorizationBuilder()
+      .SetDefaultPolicy(portalActorPolicy)
+      .AddPolicy(Policies.PortalActor, portalActorPolicy)
+      .AddPolicy(Policies.PortalUser, new AuthorizationPolicyBuilder(Schemes.All.ToArray())
+        .RequireAuthenticatedUser()
+        .AddRequirements(new PortalUserAuthorizationRequirement())
+        .Build()
+      );
+
+    CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    services.AddSingleton(cookiesSettings);
+    services.AddSession(options =>
+    {
+      options.Cookie.SameSite = cookiesSettings.Session.SameSite;
+      options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
@@ -32,6 +67,24 @@ internal class Startup : StartupBase
     {
       services.AddOpenApi();
     }
+
+    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
+     ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+    switch (databaseProvider)
+    {
+      case DatabaseProvider.EntityFrameworkCoreSqlServer:
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
+        healthChecks.AddDbContextCheck<EventContext>();
+        healthChecks.AddDbContextCheck<IdentityContext>();
+        healthChecks.AddDbContextCheck<PortalContext>();
+        break;
+      default:
+        throw new DatabaseProviderNotSupportedException(databaseProvider);
+    }
+
+    services.AddDistributedMemoryCache();
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
+    services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
   }
 
   public override void Configure(IApplicationBuilder builder)
@@ -43,6 +96,9 @@ internal class Startup : StartupBase
 
     builder.UseHttpsRedirection();
     builder.UseCors();
+    builder.UseSession();
+    builder.UseAuthentication();
+    builder.UseAuthorization();
 
     if (builder is WebApplication application)
     {

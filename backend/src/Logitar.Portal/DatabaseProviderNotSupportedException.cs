@@ -16,7 +16,7 @@ internal class DatabaseProviderNotSupportedException : NotSupportedException
     DatabaseProvider = databaseProvider;
   }
 
-  private static string BuildMessage(DatabaseProvider databaseProvider) => new ErrorMessageBuilder(ErrorMessage) // TODO(fpion): remove the Logitar NuGet package when possible.
+  private static string BuildMessage(DatabaseProvider databaseProvider) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(DatabaseProvider), databaseProvider)
     .Build();
 }
