@@ -6,6 +6,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
@@ -32,6 +33,8 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected EventContext EventContext { get; }
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
+
+  private TestApplicationContext ApplicationContext => (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
 
   protected IntegrationTests(bool initializeConfiguration = true)
   {
@@ -90,9 +93,6 @@ public abstract class IntegrationTests : IAsyncLifetime
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
-  protected void SetRealm(Realm? realm)
-  {
-    TestApplicationContext applicationContext = (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
-    applicationContext.Realm = realm;
-  }
+  protected void SetActor(Actor actor) => ApplicationContext.Actor = actor;
+  protected void SetRealm(Realm? realm) => ApplicationContext.Realm = realm;
 }

@@ -13,8 +13,8 @@ internal class TestApplicationContext : IApplicationContext
 {
   private readonly ICacheService _cacheService;
 
-  public Actor Actor => throw new NotImplementedException();
-  public ActorId ActorId => throw new NotImplementedException();
+  public Actor Actor { get; set; } = Actor.System;
+  public ActorId ActorId => new(Actor.Id);
 
   public Configuration Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration was not found in the cache.");
