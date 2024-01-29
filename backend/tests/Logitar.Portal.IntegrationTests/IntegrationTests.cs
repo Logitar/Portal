@@ -4,7 +4,6 @@ using Logitar.Data.SqlServer;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
-using Logitar.Portal.Application.Caching.Commands;
 using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
@@ -86,8 +85,6 @@ public abstract class IntegrationTests : IAsyncLifetime
       InitializeConfigurationCommand command = new(payload);
       await Mediator.Send(command);
     }
-
-    await publisher.Publish(new InitializeCachingCommand());
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
