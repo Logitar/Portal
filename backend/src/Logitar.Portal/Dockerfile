@@ -9,15 +9,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Logitar.Portal/Logitar.Portal.csproj", "Logitar.Portal/"]
-RUN dotnet restore "./Logitar.Portal/./Logitar.Portal.csproj"
+COPY ["src/Logitar.Portal/Logitar.Portal.csproj", "src/Logitar.Portal/"]
+RUN dotnet restore "src/Logitar.Portal/Logitar.Portal.csproj"
 COPY . .
-WORKDIR "/src/Logitar.Portal"
-RUN dotnet build "./Logitar.Portal.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Logitar.Portal"
+RUN dotnet build "Logitar.Portal.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Logitar.Portal.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Logitar.Portal.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  portal_mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: Logitar.Portal_mssql
+    ports:
+      - 1437:1433
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: w8x6pF9H5QEJL7sN
+
+  portal_backend:
+    build:
+      context: ./backend
+      dockerfile: /src/Logitar.Portal/Dockerfile
+    image: portal_backend
+    container_name: Logitar.Portal_backend
+    depends_on:
+      - portal_mssql
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_Environment: Development
+      SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
+    ports:
+      - 8087:8080
