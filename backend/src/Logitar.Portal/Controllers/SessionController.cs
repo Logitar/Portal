@@ -16,6 +16,13 @@ public class SessionController : ControllerBase
     _sessionService = sessionService;
   }
 
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Session>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Session? session = await _sessionService.ReadAsync(id, cancellationToken);
+    return session == null ? NotFound() : Ok(session);
+  }
+
   [HttpPut("renew")]
   public async Task<ActionResult<Session>> RenewAsync([FromBody] RenewSessionPayload payload, CancellationToken cancellationToken)
   {
@@ -29,5 +36,12 @@ public class SessionController : ControllerBase
     Uri uri = new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}");
 
     return Created(uri, session);
+  }
+
+  [HttpPatch("{id}/sign/out")]
+  public async Task<ActionResult<Session>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Session? session = await _sessionService.SignOutAsync(id, cancellationToken);
+    return session == null ? NotFound() : Ok(session);
   }
 }
