@@ -3,8 +3,10 @@ using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Settings;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application;
@@ -25,6 +27,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddTransient<IConfigurationService, ConfigurationFacade>()
-      .AddTransient<ISessionService, SessionFacade>();
+      .AddTransient<ISessionService, SessionFacade>()
+      .AddTransient<IUserService, UserFacade>();
   }
 }
