@@ -42,8 +42,7 @@ internal class SessionQuerier : ISessionQuerier
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
     Realm? realm = _applicationContext.Realm;
-    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
-    if (session == null || session.User == null || session.User.TenantId != tenantId)
+    if (session == null || session.User == null || session.User.TenantId != _applicationContext.TenantId?.Value)
     {
       return null;
     }

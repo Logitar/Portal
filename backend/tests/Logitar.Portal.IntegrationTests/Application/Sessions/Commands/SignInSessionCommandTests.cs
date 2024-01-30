@@ -14,11 +14,13 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 [Trait(Traits.Category, Categories.Integration)]
 public class SignInSessionCommandTests : IntegrationTests
 {
+  private readonly IApplicationContext _applicationContext;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserRepository _userRepository;
 
   public SignInSessionCommandTests() : base()
   {
+    _applicationContext = ServiceProvider.GetRequiredService<IApplicationContext>();
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
@@ -116,7 +118,7 @@ public class SignInSessionCommandTests : IntegrationTests
     SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
-    Assert.Equal(new AggregateId(realm.Id).Value, exception.TenantId);
+    Assert.Equal(_applicationContext.TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }

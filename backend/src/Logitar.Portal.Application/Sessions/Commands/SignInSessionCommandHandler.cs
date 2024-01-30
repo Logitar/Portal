@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Sessions;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Sessions.Validators;
 using Logitar.Portal.Application.Users;
@@ -34,8 +35,8 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
     SignInSessionPayload payload = command.Payload;
     new SignInSessionValidator().ValidateAndThrow(payload);
 
-    string? tenantId = _applicationContext.Realm == null ? null : new AggregateId(_applicationContext.Realm.Id).Value;
-    FoundUsers users = await _userManager.FindAsync(tenantId, payload.UniqueName, cancellationToken);
+    TenantId? tenantId = _applicationContext.TenantId;
+    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.UniqueName, cancellationToken);
     UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.UniqueName, nameof(payload.UniqueName));
     ActorId actorId = new(user.Id.Value);
 

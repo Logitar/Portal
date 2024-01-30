@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Settings;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.Actors;
@@ -53,6 +54,7 @@ internal class HttpApplicationContext : IApplicationContext
   public Configuration Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration was not found in the cache.");
   public Realm? Realm => Context.GetRealm();
+  public TenantId? TenantId => Realm == null ? null : new(new AggregateId(Realm.Id).Value);
 
   public IRoleSettings RoleSettings
   {
