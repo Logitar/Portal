@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionCommand, Session>
+internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, Session>
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IPasswordManager _passwordManager;
@@ -20,7 +20,7 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserManager _userManager;
 
-  public SignInSessionCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
+  public CreateSessionCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
     ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserManager userManager)
   {
     _applicationContext = applicationContext;
@@ -30,15 +30,14 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
     _userManager = userManager;
   }
 
-  public async Task<Session> Handle(SignInSessionCommand command, CancellationToken cancellationToken)
+  public async Task<Session> Handle(CreateSessionCommand command, CancellationToken cancellationToken)
   {
-    SignInSessionPayload payload = command.Payload;
-    new SignInSessionValidator().ValidateAndThrow(payload);
+    CreateSessionPayload payload = command.Payload;
+    new CreateSessionValidator().ValidateAndThrow(payload);
 
     TenantId? tenantId = _applicationContext.TenantId;
-    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.UniqueName, cancellationToken);
-    UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.UniqueName, nameof(payload.UniqueName));
-    ActorId actorId = new(user.Id.Value);
+    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.User, cancellationToken);
+    UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.User, nameof(payload.User));
 
     Password? secret = null;
     string? secretString = null;
@@ -47,7 +46,8 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
       secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out secretString);
     }
 
-    SessionAggregate session = user.SignIn(payload.Password, secret, actorId);
+    ActorId actorId = _applicationContext.ActorId;
+    SessionAggregate session = user.SignIn(secret, actorId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
       session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);

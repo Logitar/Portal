@@ -38,7 +38,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
 
   private Error BuildError(Exception exception)
   {
-    Error error = new(GetErrorCode(exception), GetErrorMessage(exception));
+    Error error = new(exception.GetErrorCode(), GetErrorMessage(exception));
 
     foreach (object key in exception.Data.Keys)
     {
@@ -62,11 +62,5 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     return exception is ConfigurationAlreadyInitializedException;
   }
 
-  private static string GetErrorCode(Exception exception) // TODO(fpion): fix from Logitar class library
-  {
-    string code = exception.GetErrorCode();
-    int index = code.IndexOf('`');
-    return index < 0 ? code : code[..index];
-  }
   private static string GetErrorMessage(Exception exception) => exception.Message.Remove("\r").Split('\n').First();
 }

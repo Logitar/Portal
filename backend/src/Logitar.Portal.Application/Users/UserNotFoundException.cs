@@ -6,10 +6,10 @@ public class UserNotFoundException : InvalidCredentialsException
 {
   public new const string ErrorMessage = "The specified user could not be found.";
 
-  public string? TenantId
+  public TenantId? TenantId
   {
-    get => (string?)Data[nameof(TenantId)];
-    private set => Data[nameof(TenantId)] = value;
+    get => TenantId.TryCreate((string?)Data[nameof(TenantId)]);
+    private set => Data[nameof(TenantId)] = value?.Value;
   }
   public string User
   {
@@ -22,15 +22,15 @@ public class UserNotFoundException : InvalidCredentialsException
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public UserNotFoundException(string? tenantId, string user, string? propertyName = null) : base(BuildMessage(tenantId, user, propertyName))
+  public UserNotFoundException(TenantId? tenantId, string user, string? propertyName = null) : base(BuildMessage(tenantId, user, propertyName))
   {
     TenantId = tenantId;
     User = user;
     PropertyName = propertyName;
   }
 
-  private static string BuildMessage(string? tenantId, string user, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId, "<null>")
+  private static string BuildMessage(TenantId? tenantId, string user, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
+    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
     .AddData(nameof(User), user)
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();

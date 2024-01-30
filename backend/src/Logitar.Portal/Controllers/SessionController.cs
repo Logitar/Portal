@@ -16,6 +16,20 @@ public class SessionController : ControllerBase
     _sessionService = sessionService;
   }
 
+  [HttpPost]
+  public async Task<ActionResult<Session>> CreateAsync([FromBody] CreateSessionPayload payload, CancellationToken cancellationToken)
+  {
+    Session session = await _sessionService.CreateAsync(payload, cancellationToken);
+    return Created(GetLocation(session), session);
+  }
+
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Session>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Session? session = await _sessionService.ReadAsync(id, cancellationToken);
+    return session == null ? NotFound() : Ok(session);
+  }
+
   [HttpPut("renew")]
   public async Task<ActionResult<Session>> RenewAsync([FromBody] RenewSessionPayload payload, CancellationToken cancellationToken)
   {
@@ -26,8 +40,15 @@ public class SessionController : ControllerBase
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInSessionPayload payload, CancellationToken cancellationToken)
   {
     Session session = await _sessionService.SignInAsync(payload, cancellationToken);
-    Uri uri = new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}");
-
-    return Created(uri, session);
+    return Created(GetLocation(session), session);
   }
+
+  [HttpPatch("{id}/sign/out")]
+  public async Task<ActionResult<Session>> SignOutAsync(Guid id, CancellationToken cancellationToken)
+  {
+    Session? session = await _sessionService.SignOutAsync(id, cancellationToken);
+    return session == null ? NotFound() : Ok(session);
+  }
+
+  private Uri GetLocation(Session session) => new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}");
 }

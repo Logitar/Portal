@@ -15,19 +15,19 @@ namespace Logitar.Portal.Controllers;
 public class AccountController : ControllerBase
 {
   private readonly ISessionService _sessionService;
+  private readonly IUserService _userService;
 
-  public AccountController(ISessionService sessionService)
+  protected new User User => HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
+
+  public AccountController(ISessionService sessionService, IUserService userService)
   {
     _sessionService = sessionService;
+    _userService = userService;
   }
 
   [Authorize(Policy = Policies.PortalUser)]
   [HttpGet("profile")]
-  public ActionResult<User> GetProfile()
-  {
-    User user = HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
-    return Ok(user);
-  }
+  public ActionResult<User> GetProfile() => Ok(User);
 
   [HttpPost("sign/in")]
   public async Task<ActionResult<CurrentUser>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
@@ -44,5 +44,29 @@ public class AccountController : ControllerBase
     {
       return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
     }
+  }
+
+  [Authorize(Policy = Policies.PortalUser)]
+  [HttpPost("sign/out/all")]
+  public async Task<ActionResult> SignOutAllAsync(CancellationToken cancellationToken)
+  {
+    _ = await _userService.SignOutAsync(User.Id, cancellationToken);
+    HttpContext.SignOut();
+
+    return NoContent();
+  }
+
+  [Authorize(Policy = Policies.PortalUser)]
+  [HttpPost("sign/out")]
+  public async Task<ActionResult> SignOutAsync(CancellationToken cancellationToken)
+  {
+    Guid? sessionId = HttpContext.GetSessionId();
+    if (sessionId.HasValue)
+    {
+      _ = await _sessionService.SignOutAsync(sessionId.Value, cancellationToken);
+    }
+    HttpContext.SignOut();
+
+    return NoContent();
   }
 }
