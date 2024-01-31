@@ -51,4 +51,11 @@ public class ConfigurationController : ControllerBase
   {
     return Ok(await _configurationService.ReplaceAsync(payload, version, cancellationToken));
   }
+
+  [Authorize]
+  [HttpPatch]
+  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.UpdateAsync(payload, cancellationToken));
+  }
 }
