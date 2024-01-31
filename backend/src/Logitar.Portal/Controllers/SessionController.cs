@@ -1,4 +1,6 @@
-﻿using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Models.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +36,13 @@ public class SessionController : ControllerBase
   public async Task<ActionResult<Session>> RenewAsync([FromBody] RenewSessionPayload payload, CancellationToken cancellationToken)
   {
     return Ok(await _sessionService.RenewAsync(payload, cancellationToken));
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<SearchResults<Session>>> SearchAsync([FromQuery] SearchSessionsModel model, CancellationToken cancellationToken)
+  {
+    SearchSessionsPayload payload = model.ToPayload();
+    return Ok(await _sessionService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPost("sign/in")]

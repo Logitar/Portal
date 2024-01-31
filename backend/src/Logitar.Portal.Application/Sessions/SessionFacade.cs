@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Sessions.Queries;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
 using MediatR;
 
@@ -27,6 +28,11 @@ internal class SessionFacade : ISessionService
   public async Task<Session> RenewAsync(RenewSessionPayload payload, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new RenewSessionCommand(payload), cancellationToken);
+  }
+
+  public async Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SearchSessionsQuery(payload), cancellationToken);
   }
 
   public async Task<Session> SignInAsync(SignInSessionPayload payload, CancellationToken cancellationToken)
