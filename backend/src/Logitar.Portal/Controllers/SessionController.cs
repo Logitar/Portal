@@ -59,5 +59,5 @@ public class SessionController : ControllerBase
     return session == null ? NotFound() : Ok(session);
   }
 
-  private Uri GetLocation(Session session) => new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}");
+  private Uri GetLocation(Session session) => new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}"); // TODO(fpion): refactor
 }
