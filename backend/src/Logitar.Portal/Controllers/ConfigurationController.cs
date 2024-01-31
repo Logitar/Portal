@@ -44,4 +44,18 @@ public class ConfigurationController : ControllerBase
       ?? throw new InvalidOperationException("The configuration cannot be null if an actor is authenticated.");
     return Ok(configuration);
   }
+
+  [Authorize]
+  [HttpPut]
+  public async Task<ActionResult<Configuration>> ReplaceAsync([FromBody] ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.ReplaceAsync(payload, version, cancellationToken));
+  }
+
+  [Authorize]
+  [HttpPatch]
+  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _configurationService.UpdateAsync(payload, cancellationToken));
+  }
 }

@@ -8,7 +8,7 @@ public class PasswordSettingsValidator : AbstractValidator<IPasswordSettings>
   public PasswordSettingsValidator()
   {
     RuleFor(x => x.RequiredLength).GreaterThanOrEqualTo(x => GetRequiredLength(x));
-    RuleFor(x => x.RequiredUniqueChars).GreaterThanOrEqualTo(x => x.RequiredLength);
+    RuleFor(x => x.RequiredUniqueChars).LessThanOrEqualTo(x => x.RequiredLength);
     RuleFor(x => x.HashingStrategy).NotEmpty().MaximumLength(byte.MaxValue);
   }
 

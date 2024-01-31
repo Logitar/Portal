@@ -24,4 +24,14 @@ internal class ConfigurationFacade : IConfigurationService
   {
     return await _mediator.Send(new ReadConfigurationQuery(), cancellationToken);
   }
+
+  public async Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new ReplaceConfigurationCommand(payload, version), cancellationToken);
+  }
+
+  public async Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new UpdateConfigurationCommand(payload), cancellationToken);
+  }
 }
