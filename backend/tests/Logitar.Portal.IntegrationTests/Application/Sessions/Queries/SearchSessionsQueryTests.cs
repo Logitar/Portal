@@ -1,12 +1,9 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
+﻿using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Sessions.Queries;
@@ -41,16 +38,10 @@ public class SearchSessionsQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
-    TenantId tenantId = new(new AggregateId(realm.Id).Value);
-
-    UserAggregate user1 = new(new UniqueNameUnit(realm.UniqueNameSettings, Faker.Person.UserName), tenantId);
-    UserAggregate user2 = new(new UniqueNameUnit(realm.UniqueNameSettings, Faker.Internet.UserName()), tenantId);
+    UserAggregate user1 = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    UserAggregate user2 = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId);
     await _userRepository.SaveAsync([user1, user2]);
 
     SessionAggregate notInIds = user1.SignIn();
@@ -71,17 +62,17 @@ public class SearchSessionsQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    payload.Ids.Add(session1.Id.AggregateId.ToGuid());
-    payload.Ids.Add(session2.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> sessionIds = (await _sessionRepository.LoadAsync()).Select(session => session.Id.AggregateId.ToGuid());
+    payload.Ids.AddRange(sessionIds);
     payload.Ids.Add(Guid.NewGuid());
+    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("Hello World!"));
     payload.Sort.Add(new SessionSortOption(SessionSort.UpdatedOn, isDescending: true));
     SearchSessionsQuery query = new(payload);
     SearchResults<Session> results = await Mediator.Send(query);
 
-    Session? result = results.Items.SingleOrDefault();
-    Assert.NotNull(result);
-    Assert.Equal(session1.Id.AggregateId.ToGuid(), result.Id);
     Assert.Equal(2, results.Total);
+    Session session = Assert.Single(results.Items);
+    Assert.Equal(session1.Id.AggregateId.ToGuid(), session.Id);
   }
 }

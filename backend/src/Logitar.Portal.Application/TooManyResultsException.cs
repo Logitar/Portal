@@ -16,7 +16,7 @@ internal class TooManyResultsException : Exception
   }
   public int ActualCount
   {
-    get => (int)Data[nameof(ExpectedCount)]!;
+    get => (int)Data[nameof(ActualCount)]!;
     private set => Data[nameof(ActualCount)] = value;
   }
 
