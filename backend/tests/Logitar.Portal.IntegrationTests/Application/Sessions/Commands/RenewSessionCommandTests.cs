@@ -119,6 +119,28 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
 
+  [Fact(DisplayName = "It should throw SessionNotFoundException when the session is in another realm.")]
+  public async Task It_should_throw_SessionNotFoundException_when_the_session_is_in_another_realm()
+  {
+    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
+    {
+      Id = Guid.NewGuid()
+    };
+    SetRealm(realm);
+
+    SessionAggregate? session = (await _sessionRepository.LoadAsync()).SingleOrDefault();
+    Assert.NotNull(session);
+    _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
+
+    string refreshToken = RefreshToken.Encode(session.Id, secret);
+    RenewSessionPayload payload = new(refreshToken);
+    RenewSessionCommand command = new(payload);
+
+    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await Mediator.Send(command));
+    Assert.Equal(session.Id, exception.Id);
+    Assert.Equal("RefreshToken", exception.PropertyName);
+  }
+
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
