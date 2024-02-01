@@ -6,9 +6,7 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain.Settings;
 using Logitar.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,14 +41,9 @@ public class RenewSessionCommandTests : IntegrationTests
     };
     SetActor(actor);
 
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
-    TenantId tenantId = new(new AggregateId(realm.Id).Value);
-    UserAggregate user = new(new UniqueNameUnit(realm.UniqueNameSettings, Faker.Person.UserName), tenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
     ActorId actorId = new(actor.Id);
     SessionAggregate session = user.SignIn(secret, actorId);
@@ -116,6 +109,24 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(refreshToken.Id, exception.Id);
+    Assert.Equal("RefreshToken", exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "It should throw SessionNotFoundException when the session is in another realm.")]
+  public async Task It_should_throw_SessionNotFoundException_when_the_session_is_in_another_realm()
+  {
+    SetRealm();
+
+    SessionAggregate? session = (await _sessionRepository.LoadAsync()).SingleOrDefault();
+    Assert.NotNull(session);
+    _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
+
+    string refreshToken = RefreshToken.Encode(session.Id, secret);
+    RenewSessionPayload payload = new(refreshToken);
+    RenewSessionCommand command = new(payload);
+
+    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await Mediator.Send(command));
+    Assert.Equal(session.Id, exception.Id);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
 

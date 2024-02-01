@@ -16,7 +16,7 @@ public record SearchSessionsModel : SearchModel
   [FromQuery(Name = "persistent")]
   public bool? IsPersistent { get; set; }
 
-  public SearchSessionsPayload ToPayload()
+  public SearchSessionsPayload ToPayload() // TODO(fpion): refactor
   {
     SearchSessionsPayload payload = new()
     {

@@ -4,9 +4,7 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
@@ -53,17 +51,12 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a realm session.")]
   public async Task It_should_create_a_realm_session()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
     UserId userId = UserId.NewId();
     ActorId actorId = new(userId.Value);
-    UniqueNameUnit uniqueName = new(realm.UniqueNameSettings, Faker.Person.UserName);
-    TenantId tenantId = new(new AggregateId(realm.Id).Value);
-    UserAggregate user = new(uniqueName, tenantId, actorId, userId);
+    UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, Faker.Person.UserName);
+    UserAggregate user = new(uniqueName, TenantId, actorId, userId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
     await _userRepository.SaveAsync(user);
 
@@ -78,7 +71,7 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutOn);
     Assert.Empty(session.CustomAttributes);
     Assert.Equal(payload.UniqueName, session.User.UniqueName);
-    Assert.Same(realm, session.User.Realm);
+    Assert.Same(Realm, session.User.Realm);
   }
 
   [Fact(DisplayName = "It should create an ephemereal session.")]
@@ -109,11 +102,7 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UserNotFoundException when the user could not be found.")]
   public async Task It_should_throw_UserNotFoundException_when_the_user_could_not_be_found()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
     SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString);
     SignInSessionCommand command = new(payload);

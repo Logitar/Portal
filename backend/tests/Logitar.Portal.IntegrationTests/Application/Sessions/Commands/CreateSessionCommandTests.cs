@@ -1,10 +1,7 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Users;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Domain.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
@@ -47,14 +44,9 @@ public class CreateSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a realm session.")]
   public async Task It_should_create_a_realm_session()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
-    TenantId tenantId = new(new AggregateId(realm.Id).Value);
-    UserAggregate user = new(new UniqueNameUnit(realm.UniqueNameSettings, Faker.Person.UserName), tenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
     await _userRepository.SaveAsync(user);
 
     CreateSessionPayload payload = new(Faker.Person.UserName);
@@ -75,11 +67,7 @@ public class CreateSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UserNotFoundException when the user could not be found.")]
   public async Task It_should_throw_UserNotFoundException_when_the_user_could_not_be_found()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
     CreateSessionPayload payload = new(Faker.Person.UserName);
     CreateSessionCommand command = new(payload);

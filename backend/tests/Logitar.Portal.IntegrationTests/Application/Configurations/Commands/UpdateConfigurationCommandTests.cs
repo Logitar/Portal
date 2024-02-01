@@ -16,8 +16,20 @@ public class UpdateConfigurationCommandTests : IntegrationTests
     _configurationRepository = ServiceProvider.GetRequiredService<IConfigurationRepository>();
   }
 
-  [Fact(DisplayName = "It should replace the configuration.")]
-  public async Task It_should_replace_the_configuration()
+  [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
+  public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
+  {
+    UpdateConfigurationPayload payload = new()
+    {
+      DefaultLocale = new Modification<string>("test")
+    };
+    UpdateConfigurationCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    Assert.Equal("DefaultLocale.Value", exception.Errors.Single().PropertyName);
+  }
+
+  [Fact(DisplayName = "It should update the configuration.")]
+  public async Task It_should_update_the_configuration()
   {
     ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
@@ -41,17 +53,5 @@ public class UpdateConfigurationCommandTests : IntegrationTests
     Assert.Equal(payload.PasswordSettings, result.PasswordSettings);
     Assert.Equal(payload.RequireUniqueEmail, result.RequireUniqueEmail);
     Assert.Equal(payload.LoggingSettings, result.LoggingSettings);
-  }
-
-  [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
-  public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
-  {
-    UpdateConfigurationPayload payload = new()
-    {
-      DefaultLocale = new Modification<string>("test")
-    };
-    UpdateConfigurationCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
-    Assert.Equal("DefaultLocale.Value", exception.Errors.Single().PropertyName);
   }
 }

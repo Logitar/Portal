@@ -1,9 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,11 +28,7 @@ public class SignOutUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    Realm realm = new("tests", JwtSecretUnit.Generate().Value)
-    {
-      Id = Guid.NewGuid()
-    };
-    SetRealm(realm);
+    SetRealm();
 
     SignOutUserCommand command = new(Guid.NewGuid());
     User? user = await Mediator.Send(command);

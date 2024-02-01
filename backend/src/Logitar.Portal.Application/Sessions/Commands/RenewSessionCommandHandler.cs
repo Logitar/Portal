@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Sessions;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Sessions.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
@@ -16,14 +17,16 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
   private readonly IPasswordManager _passwordManager;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
+  private readonly IUserRepository _userRepository;
 
-  public RenewSessionCommandHandler(IApplicationContext applicationContext,
-    IPasswordManager passwordManager, ISessionQuerier sessionQuerier, ISessionRepository sessionRepository)
+  public RenewSessionCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
+    ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
     _passwordManager = passwordManager;
     _sessionQuerier = sessionQuerier;
     _sessionRepository = sessionRepository;
+    _userRepository = userRepository;
   }
 
   public async Task<Session> Handle(RenewSessionCommand command, CancellationToken cancellationToken)
@@ -43,6 +46,11 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
 
     SessionAggregate session = await _sessionRepository.LoadAsync(refreshToken.Id, cancellationToken)
       ?? throw new SessionNotFoundException(refreshToken.Id, nameof(payload.RefreshToken));
+    UserAggregate user = await _userRepository.LoadAsync(session, cancellationToken);
+    if (user.TenantId != _applicationContext.TenantId)
+    {
+      throw new SessionNotFoundException(refreshToken.Id, nameof(payload.RefreshToken));
+    }
 
     ActorId actorId = _applicationContext.Actor.Type == ActorType.System
       ? new(session.UserId.Value)

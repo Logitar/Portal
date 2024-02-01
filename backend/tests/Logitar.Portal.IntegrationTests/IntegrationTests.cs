@@ -1,7 +1,9 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.Data.SqlServer;
+using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
@@ -10,6 +12,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure.Commands;
@@ -34,6 +37,9 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
+  protected Realm Realm { get; }
+  protected TenantId TenantId => new(new AggregateId(Realm.Id).Value);
+
   private TestApplicationContext ApplicationContext => (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
 
   protected IntegrationTests(bool initializeConfiguration = true)
@@ -57,6 +63,15 @@ public abstract class IntegrationTests : IAsyncLifetime
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
+
+    Realm = new("tests", JwtSecretUnit.Generate().Value)
+    {
+      Id = Guid.NewGuid(),
+      DisplayName = "Tests",
+      DefaultLocale = Faker.Locale,
+      Url = $"https://www.{Faker.Internet.DomainName()}",
+      RequireUniqueEmail = true
+    };
   }
 
   public virtual async Task InitializeAsync()
@@ -94,5 +109,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
   protected void SetActor(Actor actor) => ApplicationContext.Actor = actor;
+
+  protected void SetRealm() => SetRealm(Realm);
   protected void SetRealm(Realm? realm) => ApplicationContext.Realm = realm;
 }
