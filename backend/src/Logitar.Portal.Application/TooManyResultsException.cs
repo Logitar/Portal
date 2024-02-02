@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Application;
 
-internal class TooManyResultsException : Exception
+public class TooManyResultsException : Exception
 {
   public const string ErrorMessage = "Too many results were found.";
 

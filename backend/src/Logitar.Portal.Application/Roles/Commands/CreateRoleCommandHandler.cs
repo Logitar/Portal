@@ -30,8 +30,9 @@ internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Rol
     CreateRolePayload payload = command.Payload;
     new CreateRoleValidator(roleSettings).ValidateAndThrow(payload);
 
-    UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     ActorId actorId = _applicationContext.ActorId;
+
+    UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     RoleAggregate role = new(uniqueName, _applicationContext.TenantId, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
