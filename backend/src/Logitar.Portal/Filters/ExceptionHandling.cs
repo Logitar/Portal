@@ -1,5 +1,7 @@
 ﻿using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +32,11 @@ internal class ExceptionHandling : ExceptionFilterAttribute
       context.Result = new ConflictObjectResult(BuildError(exception));
       context.ExceptionHandled = true;
     }
+    else if (IsNotFoundError(exception))
+    {
+      context.Result = new NotFoundObjectResult(BuildError(exception));
+      context.ExceptionHandled = true;
+    }
     else
     {
       base.OnException(context);
@@ -55,11 +62,15 @@ internal class ExceptionHandling : ExceptionFilterAttribute
 
   private static bool IsBadRequestError(Exception exception)
   {
-    return exception is InvalidCredentialsException;
+    return exception is InvalidCredentialsException || exception is TooManyResultsException;
   }
   private static bool IsConflictError(Exception exception)
   {
     return exception is ConfigurationAlreadyInitializedException;
+  }
+  private static bool IsNotFoundError(Exception exception)
+  {
+    return exception is RolesNotFoundException;
   }
 
   private static string GetErrorMessage(Exception exception) => exception.Message.Remove("\r").Split('\n').First();
