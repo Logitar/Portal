@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Extensions;
 using Logitar.Portal.Models.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ public class SessionController : ControllerBase
   public async Task<ActionResult<Session>> CreateAsync([FromBody] CreateSessionPayload payload, CancellationToken cancellationToken)
   {
     Session session = await _sessionService.CreateAsync(payload, cancellationToken);
-    return Created(GetLocation(session), session);
+    return Created(BuildLocation(session), session);
   }
 
   [HttpGet("{id}")]
@@ -49,7 +50,7 @@ public class SessionController : ControllerBase
   public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInSessionPayload payload, CancellationToken cancellationToken)
   {
     Session session = await _sessionService.SignInAsync(payload, cancellationToken);
-    return Created(GetLocation(session), session);
+    return Created(BuildLocation(session), session);
   }
 
   [HttpPatch("{id}/sign/out")]
@@ -59,5 +60,5 @@ public class SessionController : ControllerBase
     return session == null ? NotFound() : Ok(session);
   }
 
-  private Uri GetLocation(Session session) => new($"{Request.Scheme}://{Request.Host}/sessions/{session.Id}"); // TODO(fpion): refactor
+  private Uri BuildLocation(Session session) => HttpContext.BuildLocation("sessions/{id}", new Dictionary<string, string> { ["id"] = session.Id.ToString() });
 }

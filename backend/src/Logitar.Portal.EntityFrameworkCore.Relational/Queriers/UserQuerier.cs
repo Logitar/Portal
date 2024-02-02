@@ -4,6 +4,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
@@ -40,6 +41,43 @@ internal class UserQuerier : IUserQuerier
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+
+    Realm? realm = _applicationContext.Realm;
+    if (user == null || user.TenantId != _applicationContext.TenantId?.Value)
+    {
+      return null;
+    }
+
+    return await MapAsync(user, realm, cancellationToken);
+  }
+
+  public async Task<User?> ReadAsync(string uniqueName, CancellationToken cancellationToken)
+  {
+    string uniqueNameNormalized = uniqueName.Trim().ToUpper();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+
+    Realm? realm = _applicationContext.Realm;
+    if (user == null || user.TenantId != _applicationContext.TenantId?.Value)
+    {
+      return null;
+    }
+
+    return await MapAsync(user, realm, cancellationToken);
+  }
+
+  public async Task<User?> ReadAsync(CustomIdentifier identifier, CancellationToken cancellationToken)
+  {
+    string key = identifier.Key.Trim();
+    string value = identifier.Value.Trim();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.Key == key && y.Value == value), cancellationToken);
 
     Realm? realm = _applicationContext.Realm;
     if (user == null || user.TenantId != _applicationContext.TenantId?.Value)

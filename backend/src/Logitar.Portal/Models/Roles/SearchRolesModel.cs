@@ -1,20 +1,14 @@
 ﻿using Logitar.Portal.Contracts.Roles;
-using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Models.Search;
 
 namespace Logitar.Portal.Models.Roles;
 
 public record SearchRolesModel : SearchModel
 {
-  public SearchRolesPayload ToPayload() // TODO(fpion): refactor
+  public SearchRolesPayload ToPayload()
   {
-    SearchRolesPayload payload = new()
-    {
-      Ids = Ids,
-      Search = new TextSearch(SearchTerms.Select(value => new SearchTerm(value)), SearchOperator),
-      Skip = Skip,
-      Limit = Limit
-    };
+    SearchRolesPayload payload = new();
+    Fill(payload);
 
     foreach (string sort in Sort)
     {
