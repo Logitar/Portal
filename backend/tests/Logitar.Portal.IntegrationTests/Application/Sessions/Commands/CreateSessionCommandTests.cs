@@ -35,8 +35,7 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutOn);
     Assert.Empty(session.CustomAttributes);
 
-    UserAggregate? user = (await _userRepository.LoadAsync()).SingleOrDefault();
-    Assert.NotNull(user);
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Null(user.TenantId);
     Assert.Equal(user.Id.AggregateId.ToGuid(), session.User.Id);
   }

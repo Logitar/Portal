@@ -53,15 +53,23 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User?> ReadAsync(string uniqueName, CancellationToken cancellationToken)
   {
+    string? tenantId = _applicationContext.TenantId?.Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)
-      .SingleOrDefaultAsync(x => x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
 
     Realm? realm = _applicationContext.Realm;
-    if (user == null || user.TenantId != _applicationContext.TenantId?.Value)
+    if (user == null && (realm?.RequireUniqueEmail ?? _applicationContext.Configuration.RequireUniqueEmail))
+    {
+      user = await _users.AsNoTracking()
+        .Include(x => x.Identifiers)
+        .Include(x => x.Roles)
+        .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.EmailAddress == uniqueNameNormalized, cancellationToken);
+    }
+    if (user == null)
     {
       return null;
     }
@@ -71,21 +79,21 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User?> ReadAsync(CustomIdentifier identifier, CancellationToken cancellationToken)
   {
+    string? tenantId = _applicationContext.TenantId?.Value;
     string key = identifier.Key.Trim();
     string value = identifier.Value.Trim();
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)
-      .SingleOrDefaultAsync(x => x.Identifiers.Any(y => y.Key == key && y.Value == value), cancellationToken);
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.Identifiers.Any(y => y.Key == key && y.Value == value), cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (user == null || user.TenantId != _applicationContext.TenantId?.Value)
+    if (user == null)
     {
       return null;
     }
 
-    return await MapAsync(user, realm, cancellationToken);
+    return await MapAsync(user, _applicationContext.Realm, cancellationToken);
   }
 
   private async Task<User> MapAsync(UserEntity user, Realm? realm, CancellationToken cancellationToken = default)

@@ -117,8 +117,7 @@ public class RenewSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    SessionAggregate? session = (await _sessionRepository.LoadAsync()).SingleOrDefault();
-    Assert.NotNull(session);
+    SessionAggregate? session = Assert.Single(await _sessionRepository.LoadAsync());
     _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
 
     string refreshToken = RefreshToken.Encode(session.Id, secret);
