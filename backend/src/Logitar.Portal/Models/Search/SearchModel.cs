@@ -25,4 +25,36 @@ public record SearchModel
 
   [FromQuery(Name = "limit")]
   public int Limit { get; set; }
+
+  protected void Fill(SearchPayload payload, bool fillSort = false)
+  {
+    payload.Ids = Ids;
+
+    foreach (string term in SearchTerms)
+    {
+      payload.Search.Terms.Add(new SearchTerm(term));
+    }
+    payload.Search.Operator = SearchOperator;
+
+    if (fillSort)
+    {
+      foreach (string sort in Sort)
+      {
+        int index = sort.IndexOf(SortSeparator);
+        if (index < 0)
+        {
+          payload.Sort.Add(new SortOption(sort));
+        }
+        else
+        {
+          string field = sort[(index + 1)..];
+          bool isDescending = sort[..index].Equals(IsDescending, StringComparison.InvariantCultureIgnoreCase);
+          payload.Sort.Add(new SortOption(field, isDescending));
+        }
+      }
+    }
+
+    payload.Skip = Skip;
+    payload.Limit = Limit;
+  }
 }

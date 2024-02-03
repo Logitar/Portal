@@ -4,6 +4,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
@@ -48,6 +49,51 @@ internal class UserQuerier : IUserQuerier
     }
 
     return await MapAsync(user, realm, cancellationToken);
+  }
+
+  public async Task<User?> ReadAsync(string uniqueName, CancellationToken cancellationToken)
+  {
+    string? tenantId = _applicationContext.TenantId?.Value;
+    string uniqueNameNormalized = uniqueName.Trim().ToUpper();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
+
+    Realm? realm = _applicationContext.Realm;
+    if (user == null && (realm?.RequireUniqueEmail ?? _applicationContext.Configuration.RequireUniqueEmail))
+    {
+      user = await _users.AsNoTracking()
+        .Include(x => x.Identifiers)
+        .Include(x => x.Roles)
+        .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.EmailAddress == uniqueNameNormalized, cancellationToken);
+    }
+    if (user == null)
+    {
+      return null;
+    }
+
+    return await MapAsync(user, realm, cancellationToken);
+  }
+
+  public async Task<User?> ReadAsync(CustomIdentifier identifier, CancellationToken cancellationToken)
+  {
+    string? tenantId = _applicationContext.TenantId?.Value;
+    string key = identifier.Key.Trim();
+    string value = identifier.Value.Trim();
+
+    UserEntity? user = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.Identifiers.Any(y => y.Key == key && y.Value == value), cancellationToken);
+
+    if (user == null)
+    {
+      return null;
+    }
+
+    return await MapAsync(user, _applicationContext.Realm, cancellationToken);
   }
 
   private async Task<User> MapAsync(UserEntity user, Realm? realm, CancellationToken cancellationToken = default)

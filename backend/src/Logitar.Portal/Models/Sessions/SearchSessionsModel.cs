@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Contracts.Search;
-using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Models.Search;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,18 +15,15 @@ public record SearchSessionsModel : SearchModel
   [FromQuery(Name = "persistent")]
   public bool? IsPersistent { get; set; }
 
-  public SearchSessionsPayload ToPayload() // TODO(fpion): refactor
+  public SearchSessionsPayload ToPayload()
   {
     SearchSessionsPayload payload = new()
     {
-      Ids = Ids,
-      Search = new TextSearch(SearchTerms.Select(value => new SearchTerm(value)), SearchOperator),
       UserId = UserId,
       IsActive = IsActive,
-      IsPersistent = IsPersistent,
-      Skip = Skip,
-      Limit = Limit
+      IsPersistent = IsPersistent
     };
+    Fill(payload);
 
     foreach (string sort in Sort)
     {

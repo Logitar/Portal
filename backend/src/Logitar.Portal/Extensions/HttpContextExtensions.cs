@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Constants;
+﻿using Logitar.Net.Http;
+using Logitar.Portal.Constants;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Realms;
@@ -16,6 +17,21 @@ internal static class HttpContextExtensions
   private const string SessionKey = nameof(Session);
   private const string SessionIdKey = "SessionId";
   private const string UserKey = nameof(User);
+
+  public static Uri GetBaseUri(this HttpContext context) => new UrlBuilder()
+    .SetScheme(context.Request.Scheme, inferPort: true)
+    .SetHost(context.Request.Host.Value)
+    .BuildUri();
+  public static Uri BuildLocation(this HttpContext context, string path, IEnumerable<KeyValuePair<string, string>> parameters)
+  {
+    UrlBuilder builder = new(context.GetBaseUri());
+    builder.SetPath(path);
+    foreach (KeyValuePair<string, string> parameter in parameters)
+    {
+      builder.SetParameter(parameter.Key, parameter.Value);
+    }
+    return builder.BuildUri();
+  }
 
   public static IEnumerable<CustomAttribute> GetSessionCustomAttributes(this HttpContext context)
   {

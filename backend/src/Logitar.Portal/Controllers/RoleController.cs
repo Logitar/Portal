@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Extensions;
 using Logitar.Portal.Models.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ public class RoleController : ControllerBase
   public async Task<ActionResult<Role>> CreateAsync([FromBody] CreateRolePayload payload, CancellationToken cancellationToken)
   {
     Role role = await _roleService.CreateAsync(payload, cancellationToken);
-    return Created(GetLocation(role), role);
+    return Created(BuildLocation(role), role);
   }
 
   [HttpDelete("{id}")]
@@ -67,5 +68,5 @@ public class RoleController : ControllerBase
     return role == null ? NotFound() : Ok(role);
   }
 
-  private Uri GetLocation(Role role) => new($"{Request.Scheme}://{Request.Host}/roles/{role.Id}"); // TODO(fpion): refactor
+  private Uri BuildLocation(Role role) => HttpContext.BuildLocation("roles/{id}", new Dictionary<string, string> { ["id"] = role.Id.ToString() });
 }

@@ -46,8 +46,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing role.")]
   public async Task It_should_delete_an_existing_role()
   {
-    UserAggregate? user = (await _userRepository.LoadAsync()).SingleOrDefault();
-    Assert.NotNull(user);
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
     user.AddRole(_role);
     await _userRepository.SaveAsync(user);
 
@@ -56,8 +55,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     Assert.NotNull(role);
     Assert.Equal(command.Id, role.Id);
 
-    user = (await _userRepository.LoadAsync()).SingleOrDefault();
-    Assert.NotNull(user);
+    user = Assert.Single(await _userRepository.LoadAsync());
     Assert.False(user.HasRole(_role));
   }
 
