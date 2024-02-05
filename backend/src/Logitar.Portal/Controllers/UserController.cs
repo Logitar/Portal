@@ -18,6 +18,12 @@ public class UserController : ControllerBase
     _userService = userService;
   }
 
+  [HttpPatch("authenticate")]
+  public async Task<ActionResult<User>> AuthenticateAsync([FromBody] AuthenticateUserPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _userService.AuthenticateAsync(payload, cancellationToken));
+  }
+
   [HttpPost]
   public async Task<ActionResult<User>> CreateAsync([FromBody] CreateUserPayload payload, CancellationToken cancellationToken)
   {
