@@ -64,10 +64,15 @@ internal class UserQuerier : IUserQuerier
     Realm? realm = _applicationContext.Realm;
     if (user == null && (realm?.RequireUniqueEmail ?? _applicationContext.Configuration.RequireUniqueEmail))
     {
-      user = await _users.AsNoTracking()
+      UserEntity[] users = await _users.AsNoTracking()
         .Include(x => x.Identifiers)
         .Include(x => x.Roles)
-        .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.EmailAddress == uniqueNameNormalized, cancellationToken);
+        .Where(x => x.TenantId == tenantId && x.EmailAddressNormalized == uniqueNameNormalized)
+        .ToArrayAsync(cancellationToken);
+      if (users.Length == 1)
+      {
+        user = users.Single();
+      }
     }
     if (user == null)
     {
