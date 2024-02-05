@@ -60,11 +60,25 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
+  [HttpDelete("{id}/identifiers/key:{key}")]
+  public async Task<ActionResult<User>> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.RemoveIdentifierAsync(id, key, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
   [HttpPatch("{id}/password/reset")]
   public async Task<ActionResult<User>> ResetPasswordAsync(Guid id, [FromBody] ResetUserPasswordPayload payload, CancellationToken cancellationToken)
   {
     User? user = await _userService.ResetPasswordAsync(id, payload, cancellationToken);
     return user == null ? NotFound() : Ok();
+  }
+
+  [HttpPut("{id}/identifiers/key:{key}")]
+  public async Task<ActionResult<User>> SaveIdentifierAsync(Guid id, string key, [FromBody] SaveUserIdentifierPayload payload, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.SaveIdentifierAsync(id, key, payload, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
   }
 
   [HttpPut("{id}/sign/out")]

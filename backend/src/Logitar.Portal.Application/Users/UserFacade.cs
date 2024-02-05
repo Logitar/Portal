@@ -35,9 +35,19 @@ internal class UserFacade : IUserService
     return await _mediator.Send(new ReadUserQuery(id, uniqueName, identifier), cancellationToken);
   }
 
+  public async Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new RemoveUserIdentifierCommand(id, key), cancellationToken);
+  }
+
   public async Task<User?> ResetPasswordAsync(Guid id, ResetUserPasswordPayload payload, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new ResetUserPasswordCommand(id, payload), cancellationToken);
+  }
+
+  public async Task<User?> SaveIdentifierAsync(Guid id, string key, SaveUserIdentifierPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SaveUserIdentifierCommand(id, key, payload), cancellationToken);
   }
 
   public async Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken)
