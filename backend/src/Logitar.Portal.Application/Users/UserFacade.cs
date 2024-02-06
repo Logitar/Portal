@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Application.Users.Queries;
 using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
@@ -48,6 +49,11 @@ internal class UserFacade : IUserService
   public async Task<User?> SaveIdentifierAsync(Guid id, string key, SaveUserIdentifierPayload payload, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new SaveUserIdentifierCommand(id, key, payload), cancellationToken);
+  }
+
+  public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SearchUsersQuery(payload), cancellationToken);
   }
 
   public async Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken)

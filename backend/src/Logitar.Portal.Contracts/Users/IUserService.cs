@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Users;
+﻿using Logitar.Portal.Contracts.Search;
+
+namespace Logitar.Portal.Contracts.Users;
 
 public interface IUserService
 {
@@ -9,5 +11,6 @@ public interface IUserService
   Task<User?> RemoveIdentifierAsync(Guid id, string key, CancellationToken cancellationToken = default);
   Task<User?> ResetPasswordAsync(Guid id, ResetUserPasswordPayload payload, CancellationToken cancellationToken = default);
   Task<User?> SaveIdentifierAsync(Guid id, string key, SaveUserIdentifierPayload payload, CancellationToken cancellationToken = default);
+  Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken = default);
   Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
 }

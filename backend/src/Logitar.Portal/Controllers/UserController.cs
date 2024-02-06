@@ -1,6 +1,8 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Extensions;
+using Logitar.Portal.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -79,6 +81,13 @@ public class UserController : ControllerBase
   {
     User? user = await _userService.SaveIdentifierAsync(id, key, payload, cancellationToken);
     return user == null ? NotFound() : Ok(user);
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<SearchResults<User>>> SearchAsync([FromQuery] SearchUsersModel model, CancellationToken cancellationToken)
+  {
+    SearchUsersPayload payload = model.ToPayload();
+    return Ok(await _userService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPut("{id}/sign/out")]
