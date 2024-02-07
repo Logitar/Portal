@@ -2,8 +2,11 @@
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Roles.Queries;
 using Logitar.Portal.Application.Users.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
@@ -14,15 +17,17 @@ namespace Logitar.Portal.Application.Users.Commands;
 internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, User?>
 {
   private readonly IApplicationContext _applicationContext;
+  private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ReplaceUserCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
-    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public ReplaceUserCommandHandler(IApplicationContext applicationContext, IMediator mediator,
+    IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
+    _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
     _userQuerier = userQuerier;
@@ -53,6 +58,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     ReplaceContactInformation(payload, user, reference, actorId);
     ReplacePersonalInformation(payload, user, reference);
     ReplaceCustomAttributes(payload, user, reference);
+    await ReplaceRolesAsync(payload, user, reference, actorId, cancellationToken);
 
     user.Update(actorId);
     await _userManager.SaveAsync(user, actorId, cancellationToken);
@@ -205,6 +211,46 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
       if (!payloadKeys.Contains(key))
       {
         user.RemoveCustomAttribute(key);
+      }
+    }
+  }
+
+  private async Task ReplaceRolesAsync(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId, CancellationToken cancellationToken)
+  {
+    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    HashSet<RoleId> roleIds = new(capacity: roles.Count());
+
+    IEnumerable<RoleId> referenceRoles;
+    if (reference == null)
+    {
+      referenceRoles = user.Roles;
+
+      foreach (FoundRole found in roles)
+      {
+        roleIds.Add(found.Role.Id);
+        user.AddRole(found.Role, actorId);
+      }
+    }
+    else
+    {
+      referenceRoles = reference.Roles;
+
+      foreach (FoundRole found in roles)
+      {
+        if (!reference.HasRole(found.Role))
+        {
+          roleIds.Add(found.Role.Id);
+          user.AddRole(found.Role, actorId);
+        }
+      }
+    }
+
+    foreach (RoleId roleId in referenceRoles)
+    {
+      if (!roleIds.Contains(roleId))
+      {
+        RoleAggregate role = new(roleId.AggregateId);
+        user.RemoveRole(role, actorId);
       }
     }
   }

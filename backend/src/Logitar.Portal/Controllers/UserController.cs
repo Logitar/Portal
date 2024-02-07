@@ -104,5 +104,12 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<User>> UpdateAsync(Guid id, [FromBody] UpdateUserPayload payload, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.UpdateAsync(id, payload, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
   private Uri BuildLocation(User user) => HttpContext.BuildLocation("users/{id}", new Dictionary<string, string> { ["id"] = user.Id.ToString() });
 }

@@ -25,6 +25,7 @@ public record ReplaceUserPayload
   public string? Website { get; set; }
 
   public List<CustomAttribute> CustomAttributes { get; set; }
+  public List<string> Roles { get; set; }
 
   public ReplaceUserPayload() : this(string.Empty)
   {
@@ -34,5 +35,6 @@ public record ReplaceUserPayload
   {
     UniqueName = uniqueName;
     CustomAttributes = [];
+    Roles = [];
   }
 }

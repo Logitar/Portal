@@ -5,6 +5,7 @@ using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Models.Account;
+using Logitar.Portal.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,14 @@ public class AccountController : ControllerBase
   [Authorize(Policy = Policies.PortalUser)]
   [HttpGet("profile")]
   public ActionResult<User> GetProfile() => Ok(User);
+
+  [Authorize(Policy = Policies.PortalUser)]
+  [HttpPut("profile")]
+  public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
+  {
+    UpdateUserPayload payload = model.ToPayload();
+    return Ok(await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required."));
+  }
 
   [HttpPost("sign/in")]
   public async Task<ActionResult<CurrentUser>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
