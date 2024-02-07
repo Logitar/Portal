@@ -140,6 +140,10 @@ public class RealmAggregate : AggregateRoot
   protected virtual void Apply(RealmCreatedEvent @event)
   {
     _uniqueSlug = @event.UniqueSlug;
+    _secret = @event.Secret;
+    _uniqueNameSettings = @event.UniqueNameSettings;
+    _passwordSettings = @event.PasswordSettings;
+    _requireUniqueEmail = @event.RequireUniqueEmail;
   }
 
   public void Delete(ActorId actorId = default)

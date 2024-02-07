@@ -21,6 +21,9 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     _sqlHelper = sqlHelper;
   }
 
+  public async Task<IEnumerable<RealmAggregate>> LoadAsync(CancellationToken cancellationToken)
+    => await LoadAsync<RealmAggregate>(cancellationToken);
+
   public async Task<RealmAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await LoadAsync<RealmAggregate>(new AggregateId(id), cancellationToken);
 

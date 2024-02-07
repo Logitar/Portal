@@ -24,5 +24,5 @@ public record RealmUpdatedEvent : DomainEvent, INotification
   public bool HasChanges => DisplayName != null || Description != null
     || DefaultLocale != null || Secret != null || Url != null
     || UniqueNameSettings != null || PasswordSettings != null || RequireUniqueEmail.HasValue
-    || CustomAttributes.Count > 1;
+    || CustomAttributes.Count > 0;
 }
