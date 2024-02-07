@@ -101,10 +101,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
-    ReplaceRolePayload payload = new()
-    {
-      UniqueName = "AdmIn"
-    };
+    ReplaceRolePayload payload = new("AdmIn");
     ReplaceRoleCommand command = new(role.Id.AggregateId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);

@@ -62,7 +62,18 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
       role.Description = description;
     }
 
+    ReplaceCustomAttributes(payload, role, reference);
+
+    role.Update(actorId);
+    await _roleManager.SaveAsync(role, actorId, cancellationToken);
+
+    return await _roleQuerier.ReadAsync(role, cancellationToken);
+  }
+
+  private static void ReplaceCustomAttributes(ReplaceRolePayload payload, RoleAggregate role, RoleAggregate? reference)
+  {
     HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
+
     IEnumerable<string> referenceKeys;
     if (reference == null)
     {
@@ -90,6 +101,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
         }
       }
     }
+
     foreach (string key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
@@ -97,10 +109,5 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
         role.RemoveCustomAttribute(key);
       }
     }
-
-    role.Update(actorId);
-    await _roleManager.SaveAsync(role, actorId, cancellationToken);
-
-    return await _roleQuerier.ReadAsync(role, cancellationToken);
   }
 }
