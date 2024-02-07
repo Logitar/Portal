@@ -69,6 +69,13 @@ public class UserController : ControllerBase
     return user == null ? NotFound() : Ok(user);
   }
 
+  [HttpPut("{id}")]
+  public async Task<ActionResult<User>> ReplaceAsync(Guid id, [FromBody] ReplaceUserPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    User? user = await _userService.ReplaceAsync(id, payload, version, cancellationToken);
+    return user == null ? NotFound() : Ok(user);
+  }
+
   [HttpPatch("{id}/password/reset")]
   public async Task<ActionResult<User>> ResetPasswordAsync(Guid id, [FromBody] ResetUserPasswordPayload payload, CancellationToken cancellationToken)
   {
