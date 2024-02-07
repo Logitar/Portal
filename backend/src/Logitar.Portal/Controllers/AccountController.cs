@@ -31,7 +31,7 @@ public class AccountController : ControllerBase
   public ActionResult<User> GetProfile() => Ok(User);
 
   [Authorize(Policy = Policies.PortalUser)]
-  [HttpPut("profile")]
+  [HttpPatch("profile")]
   public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
   {
     UpdateUserPayload payload = model.ToPayload();
