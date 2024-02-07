@@ -46,8 +46,8 @@ internal class RealmManager : IRealmManager
     {
       await _publisher.Publish(new DeleteRealmSessionsCommand(realm, actorId), cancellationToken);
       await _publisher.Publish(new DeleteRealmUsersCommand(realm, actorId), cancellationToken);
-      await _publisher.Publish(new DeleteRealmRolesCommand(realm, actorId), cancellationToken);
       await _publisher.Publish(new DeleteRealmApiKeysCommand(realm, actorId), cancellationToken);
+      await _publisher.Publish(new DeleteRealmRolesCommand(realm, actorId), cancellationToken);
       await _publisher.Publish(new DeleteRealmOneTimePasswordsCommand(realm, actorId), cancellationToken);
     }
 
