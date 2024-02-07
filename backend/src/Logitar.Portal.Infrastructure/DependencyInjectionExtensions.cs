@@ -33,6 +33,8 @@ public static class DependencyInjectionExtensions
 
     converters.Add(new ConfigurationIdConverter());
     converters.Add(new JwtSecretConverter());
+    converters.Add(new RealmIdConverter());
+    converters.Add(new UniqueSlugConverter());
 
     return converters;
   }

@@ -9,6 +9,7 @@ using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
@@ -48,6 +49,30 @@ internal class Mapper
       RequireUniqueEmail = source.RequireUniqueEmail,
       LoggingSettings = new LoggingSettings(source.LoggingSettings)
     };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Realm ToRealm(RealmEntity source)
+  {
+    Realm destination = new(source.UniqueSlug, source.Secret)
+    {
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      DefaultLocale = source.DefaultLocale,
+      Url = source.Url,
+      UniqueNameSettings = new UniqueNameSettings(source.AllowedUniqueNameCharacters),
+      PasswordSettings = new PasswordSettings(source.RequiredPasswordLength, source.RequiredPasswordUniqueChars, source.PasswordsRequireNonAlphanumeric,
+        source.PasswordsRequireLowercase, source.PasswordsRequireUppercase, source.PasswordsRequireDigit, source.PasswordHashingStrategy),
+      RequireUniqueEmail = source.RequireUniqueEmail
+    };
+
+    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    {
+      destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
+    }
 
     MapAggregate(source, destination);
 
