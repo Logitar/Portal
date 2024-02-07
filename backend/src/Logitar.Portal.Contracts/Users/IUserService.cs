@@ -14,4 +14,5 @@ public interface IUserService
   Task<User?> SaveIdentifierAsync(Guid id, string key, SaveUserIdentifierPayload payload, CancellationToken cancellationToken = default);
   Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken = default);
   Task<User?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<User?> UpdateAsync(Guid id, UpdateUserPayload payload, CancellationToken cancellationToken = default);
 }

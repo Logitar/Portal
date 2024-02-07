@@ -1,7 +1,12 @@
-﻿using Logitar.Identity.Domain.Passwords;
+﻿using Logitar.Data;
+using Logitar.Data.SqlServer;
+using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
+using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +18,26 @@ namespace Logitar.Portal.Application.Users.Commands;
 public class ReplaceUserCommandTests : IntegrationTests
 {
   private readonly IPasswordManager _passwordManager;
+  private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
   public ReplaceUserCommandTests()
   {
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
+    _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
+  }
+
+  public override async Task InitializeAsync()
+  {
+    await base.InitializeAsync();
+
+    TableId[] tables = [IdentityDb.Roles.Table];
+    foreach (TableId table in tables)
+    {
+      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
+    }
   }
 
   [Fact(DisplayName = "It should replace an existing user.")]
@@ -26,12 +45,19 @@ public class ReplaceUserCommandTests : IntegrationTests
   {
     const string newPassword = "Test123!";
 
+    ReadOnlyUniqueNameSettings uniqueNameSettings = new();
+    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
+    RoleAggregate editor = new(new UniqueNameUnit(uniqueNameSettings, "editor"));
+    RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
+    await _roleRepository.SaveAsync([admin, editor, reviewer]);
+
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
     user.SetCustomAttribute("HourlyRate", "37.50");
     string jobTitle = Faker.Name.JobTitle();
     user.SetCustomAttribute("JobTitle", jobTitle);
     user.Update();
+    user.AddRole(admin);
     await _userRepository.SaveAsync(user);
     long version = user.Version;
 
@@ -39,6 +65,8 @@ public class ReplaceUserCommandTests : IntegrationTests
     string jobDescriptor = Faker.Name.JobDescriptor();
     user.SetCustomAttribute("JobDescriptor", jobDescriptor);
     user.Update();
+    user.AddRole(editor);
+    user.RemoveRole(admin);
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(Faker.Internet.UserName())
@@ -79,6 +107,8 @@ public class ReplaceUserCommandTests : IntegrationTests
     jobTitle = Faker.Name.JobTitle();
     payload.CustomAttributes.Add(new("JobTitle", jobTitle));
     payload.CustomAttributes.Add(new("Department", "Finance"));
+    payload.Roles.Add(admin.UniqueName.Value);
+    payload.Roles.Add(reviewer.UniqueName.Value);
     ReplaceUserCommand command = new(user.Id.AggregateId.ToGuid(), payload, version);
     User? result = await Mediator.Send(command);
     Assert.NotNull(result);
@@ -110,6 +140,10 @@ public class ReplaceUserCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "JobTitle" && c.Value == jobTitle);
     Assert.Contains(result.CustomAttributes, c => c.Key == "JobDescriptor" && c.Value == jobDescriptor);
     Assert.Contains(result.CustomAttributes, c => c.Key == "Department" && c.Value == "Finance");
+
+    Assert.Equal(2, result.Roles.Count);
+    Assert.Contains(result.Roles, r => r.Id == editor.Id.AggregateId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.AggregateId.ToGuid());
 
     UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value);
     Assert.NotNull(entity);
@@ -154,6 +188,19 @@ public class ReplaceUserCommandTests : IntegrationTests
     var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Email.Address, exception.Email.Address);
+  }
+
+  [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
+  public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
+  {
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+
+    ReplaceUserPayload payload = new(user.UniqueName.Value);
+    payload.Roles.Add("admin");
+    ReplaceUserCommand command = new(user.Id.AggregateId.ToGuid(), payload, Version: null);
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    Assert.Equal(payload.Roles, exception.Roles);
+    Assert.Equal("Roles", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
