@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.Domain" Version="0.11.4" />
+    <PackageReference Include="Logitar.Identity.Domain" Version="0.11.5" />
   </ItemGroup>
 
   <ItemGroup>

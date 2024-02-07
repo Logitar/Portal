@@ -1,0 +1,67 @@
+﻿using Logitar.Data;
+using Logitar.Data.SqlServer;
+using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Settings;
+using Logitar.Portal.EntityFrameworkCore.Relational;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Logitar.Portal.Application.Realms.Commands;
+
+[Trait(Traits.Category, Categories.Integration)]
+public class DeleteRealmCommandTests : IntegrationTests
+{
+  private readonly IRealmRepository _realmRepository;
+  private readonly IUserRepository _userRepository;
+
+  private readonly RealmAggregate _realm;
+
+  public DeleteRealmCommandTests()
+  {
+    _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
+    _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
+
+    _realm = new(new UniqueSlugUnit("tests"));
+  }
+
+  public override async Task InitializeAsync()
+  {
+    await base.InitializeAsync();
+
+    TableId[] tables = [PortalDb.Realms.Table];
+    foreach (TableId table in tables)
+    {
+      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
+    }
+
+    await _realmRepository.SaveAsync(_realm);
+  }
+
+  [Fact(DisplayName = "It should delete an existing realm.")]
+  public async Task It_should_delete_an_existing_realm()
+  {
+    UniqueNameUnit uniqueName = new(new ReadOnlyUniqueNameSettings(), Faker.Person.UserName);
+    TenantId tenantId = new(_realm.Id.Value);
+    UserAggregate user = new(uniqueName, tenantId);
+    await _userRepository.SaveAsync(user);
+
+    DeleteRealmCommand command = new(_realm.Id.AggregateId.ToGuid());
+    Realm? realm = await Mediator.Send(command);
+    Assert.NotNull(realm);
+    Assert.Equal(_realm.Id.AggregateId.ToGuid(), realm.Id);
+
+    Assert.Empty(await _userRepository.LoadAsync(tenantId));
+  }
+
+  [Fact(DisplayName = "It should return null when the realm cannot be found.")]
+  public async Task It_should_return_null_when_the_realm_cannot_be_found()
+  {
+    DeleteRealmCommand command = new(Guid.NewGuid());
+    Realm? realm = await Mediator.Send(command);
+    Assert.Null(realm);
+  }
+}
