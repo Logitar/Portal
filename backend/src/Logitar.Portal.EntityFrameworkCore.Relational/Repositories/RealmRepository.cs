@@ -3,7 +3,6 @@ using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
 using Logitar.Identity.Domain.Realms;
-using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Domain.Realms;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
 internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IRealmRepository
 {
-  private static readonly string AggregateType = typeof(UserAggregate).GetNamespaceQualifiedName();
+  private static readonly string AggregateType = typeof(RealmAggregate).GetNamespaceQualifiedName();
 
   private readonly ISqlHelper _sqlHelper;
 

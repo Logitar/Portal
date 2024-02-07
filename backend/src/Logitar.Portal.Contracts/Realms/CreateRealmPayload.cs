@@ -28,6 +28,7 @@ public record CreateRealmPayload
     Secret = secret;
     UniqueNameSettings = new();
     PasswordSettings = new();
+    RequireUniqueEmail = true;
     CustomAttributes = [];
   }
 }

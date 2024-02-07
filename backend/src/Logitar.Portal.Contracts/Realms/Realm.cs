@@ -28,6 +28,7 @@ public class Realm : Aggregate
     Secret = secret;
     UniqueNameSettings = new();
     PasswordSettings = new();
+    RequireUniqueEmail = true;
     CustomAttributes = [];
   }
 }
