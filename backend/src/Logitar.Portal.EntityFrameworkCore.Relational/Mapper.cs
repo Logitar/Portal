@@ -2,6 +2,7 @@
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
@@ -38,6 +39,31 @@ internal class Mapper
     EmailAddress = actor.EmailAddress,
     PictureUrl = actor.PictureUrl
   };
+
+  public ApiKey ToApiKey(ApiKeyEntity source, Realm? realm)
+  {
+    ApiKey destination = new(source.DisplayName)
+    {
+      Description = source.Description,
+      ExpiresOn = AsUniversalTime(source.ExpiresOn),
+      AuthenticatedOn = AsUniversalTime(source.AuthenticatedOn),
+      Realm = realm
+    };
+
+    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    {
+      destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
+    }
+
+    foreach (RoleEntity role in source.Roles)
+    {
+      destination.Roles.Add(ToRole(role, realm));
+    }
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
 
   public Configuration ToConfiguration(ConfigurationAggregate source)
   {

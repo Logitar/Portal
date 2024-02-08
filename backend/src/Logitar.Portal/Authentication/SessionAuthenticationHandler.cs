@@ -21,7 +21,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     Guid? sessionId = Context.GetSessionId();
     if (sessionId.HasValue)
     {
-      Session? session = /*_cacheService.GetSession(sessionId.Value) ??*/ await _sessionQuerier.ReadAsync(sessionId.Value); // TODO(fpion): caching
+      Session? session = await _sessionQuerier.ReadAsync(sessionId.Value);
       if (session == null)
       {
         return Fail($"The session 'Id={sessionId}' could not be found.");
@@ -34,8 +34,6 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
       {
         return Fail($"The User is disabled for session 'Id={session.Id}'.");
       }
-
-      //_cacheService.SetSession(session);
 
       Context.SetSession(session);
       Context.SetUser(session.User);
