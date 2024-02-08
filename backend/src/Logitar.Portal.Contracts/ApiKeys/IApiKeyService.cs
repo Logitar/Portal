@@ -6,4 +6,5 @@ public interface IApiKeyService
   Task<ApiKey?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
   Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken = default);
 }

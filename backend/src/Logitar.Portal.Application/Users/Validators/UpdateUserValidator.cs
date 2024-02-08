@@ -2,6 +2,7 @@
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users.Validators;
+using Logitar.Portal.Application.Roles.Validators;
 using Logitar.Portal.Application.Validators;
 using Logitar.Portal.Contracts.Users;
 
@@ -33,5 +34,6 @@ internal class UpdateUserValidator : AbstractValidator<UpdateUserPayload>
     When(x => !string.IsNullOrWhiteSpace(x.Website?.Value), () => RuleFor(x => x.Website!.Value!).SetValidator(new UrlValidator()));
 
     RuleForEach(x => x.CustomAttributes).SetValidator(new CustomAttributeModificationValidator());
+    RuleForEach(x => x.Roles).SetValidator(new RoleModificationValidator());
   }
 }

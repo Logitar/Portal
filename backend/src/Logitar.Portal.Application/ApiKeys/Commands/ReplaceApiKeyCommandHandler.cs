@@ -56,7 +56,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     {
       apiKey.Description = description;
     }
-    if (payload.ExpiresOn.HasValue)
+    if (payload.ExpiresOn.HasValue && (reference == null || payload.ExpiresOn != reference.ExpiresOn))
     {
       apiKey.SetExpiration(payload.ExpiresOn.Value);
     }
