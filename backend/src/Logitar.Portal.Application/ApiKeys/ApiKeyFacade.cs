@@ -28,4 +28,9 @@ internal class ApiKeyFacade : IApiKeyService
   {
     return await _mediator.Send(new ReadApiKeyQuery(id), cancellationToken);
   }
+
+  public async Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new ReplaceApiKeyCommand(id, payload, version), cancellationToken);
+  }
 }
