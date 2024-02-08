@@ -21,7 +21,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
-  public ReplaceUserCommandTests()
+  public ReplaceUserCommandTests() : base()
   {
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();

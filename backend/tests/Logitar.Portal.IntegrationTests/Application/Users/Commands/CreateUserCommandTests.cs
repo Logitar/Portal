@@ -14,7 +14,7 @@ public class CreateUserCommandTests : IntegrationTests
   private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
-  public CreateUserCommandTests()
+  public CreateUserCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();

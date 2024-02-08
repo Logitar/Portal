@@ -14,7 +14,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
   private readonly string _healthInsuranceNumber;
 
-  public SaveUserIdentifierCommandTests()
+  public SaveUserIdentifierCommandTests() : base()
   {
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 

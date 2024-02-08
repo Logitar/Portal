@@ -14,7 +14,7 @@ public class SearchRealmsQueryTests : IntegrationTests
 {
   private readonly IRealmRepository _realmRepository;
 
-  public SearchRealmsQueryTests()
+  public SearchRealmsQueryTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
   }

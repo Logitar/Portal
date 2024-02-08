@@ -9,7 +9,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
 {
   private readonly IUserRepository _userRepository;
 
-  public ResetUserPasswordCommandTests()
+  public ResetUserPasswordCommandTests() : base()
   {
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }

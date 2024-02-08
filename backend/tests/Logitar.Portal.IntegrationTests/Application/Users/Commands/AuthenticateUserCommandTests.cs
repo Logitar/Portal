@@ -9,7 +9,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 {
   private readonly IUserRepository _userRepository;
 
-  public AuthenticateUserCommandTests()
+  public AuthenticateUserCommandTests() : base()
   {
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }

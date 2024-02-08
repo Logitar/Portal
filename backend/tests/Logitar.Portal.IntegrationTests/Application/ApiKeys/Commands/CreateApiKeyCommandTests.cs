@@ -16,7 +16,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  public CreateApiKeyCommandTests()
+  public CreateApiKeyCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
   }

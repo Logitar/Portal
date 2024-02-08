@@ -16,7 +16,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
 
   private readonly RealmAggregate _realm;
 
-  public ReplaceRealmCommandTests()
+  public ReplaceRealmCommandTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 

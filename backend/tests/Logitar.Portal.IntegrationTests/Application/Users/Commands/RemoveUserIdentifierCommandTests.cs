@@ -11,7 +11,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
 
   private readonly IUserRepository _userRepository;
 
-  public RemoveUserIdentifierCommandTests()
+  public RemoveUserIdentifierCommandTests() : base()
   {
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }

@@ -12,7 +12,7 @@ public class ReadUserQueryTests : IntegrationTests
 {
   private readonly IUserRepository _userRepository;
 
-  public ReadUserQueryTests()
+  public ReadUserQueryTests() : base()
   {
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }

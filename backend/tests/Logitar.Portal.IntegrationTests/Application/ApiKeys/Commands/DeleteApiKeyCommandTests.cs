@@ -16,7 +16,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IPasswordManager _passwordManager;
 
-  public DeleteApiKeyCommandTests()
+  public DeleteApiKeyCommandTests() : base()
   {
     _apiKeyRepository = ServiceProvider.GetRequiredService<IApiKeyRepository>();
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();

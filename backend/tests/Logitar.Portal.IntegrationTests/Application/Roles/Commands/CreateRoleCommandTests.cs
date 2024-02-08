@@ -15,7 +15,7 @@ public class CreateRoleCommandTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  public CreateRoleCommandTests()
+  public CreateRoleCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
   }
