@@ -11,7 +11,7 @@ public class DeleteUserCommandTests : IntegrationTests
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
-  public DeleteUserCommandTests()
+  public DeleteUserCommandTests() : base()
   {
     _sessionRepository = ServiceProvider.GetRequiredService<ISessionRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();

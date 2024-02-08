@@ -15,7 +15,7 @@ public class ReadRealmQueryTests : IntegrationTests
 
   private readonly RealmAggregate _realm;
 
-  public ReadRealmQueryTests()
+  public ReadRealmQueryTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 

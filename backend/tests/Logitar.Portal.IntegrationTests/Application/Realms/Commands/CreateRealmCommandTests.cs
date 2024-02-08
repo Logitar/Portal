@@ -13,7 +13,7 @@ public class CreateRealmCommandTests : IntegrationTests
 {
   private readonly IRealmRepository _realmRepository;
 
-  public CreateRealmCommandTests()
+  public CreateRealmCommandTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
   }

@@ -18,7 +18,7 @@ public class SearchRolesQueryTests : IntegrationTests
 
   private readonly RoleAggregate _role;
 
-  public SearchRolesQueryTests()
+  public SearchRolesQueryTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 

@@ -4,6 +4,7 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Sessions;
@@ -75,6 +76,27 @@ internal class Mapper
       RequireUniqueEmail = source.RequireUniqueEmail,
       LoggingSettings = new LoggingSettings(source.LoggingSettings)
     };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public OneTimePassword ToOneTimePassword(OneTimePasswordEntity source, Realm? realm)
+  {
+    OneTimePassword destination = new()
+    {
+      ExpiresOn = AsUniversalTime(source.ExpiresOn),
+      MaximumAttempts = source.MaximumAttempts,
+      AttemptCount = source.AttemptCount,
+      HasValidationSucceeded = source.HasValidationSucceeded,
+      Realm = realm
+    };
+
+    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    {
+      destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
+    }
 
     MapAggregate(source, destination);
 

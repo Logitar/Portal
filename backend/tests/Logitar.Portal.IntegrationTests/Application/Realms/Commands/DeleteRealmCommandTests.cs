@@ -19,7 +19,7 @@ public class DeleteRealmCommandTests : IntegrationTests
 
   private readonly RealmAggregate _realm;
 
-  public DeleteRealmCommandTests()
+  public DeleteRealmCommandTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();

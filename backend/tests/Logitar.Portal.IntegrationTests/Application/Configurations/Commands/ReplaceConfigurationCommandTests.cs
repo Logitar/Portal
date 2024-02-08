@@ -11,7 +11,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
 {
   private readonly IConfigurationRepository _configurationRepository;
 
-  public ReplaceConfigurationCommandTests()
+  public ReplaceConfigurationCommandTests() : base()
   {
     _configurationRepository = ServiceProvider.GetRequiredService<IConfigurationRepository>();
   }

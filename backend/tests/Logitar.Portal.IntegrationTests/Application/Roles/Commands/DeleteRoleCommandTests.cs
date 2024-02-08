@@ -19,7 +19,7 @@ public class DeleteRoleCommandTests : IntegrationTests
 
   private readonly RoleAggregate _role;
 
-  public DeleteRoleCommandTests()
+  public DeleteRoleCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();

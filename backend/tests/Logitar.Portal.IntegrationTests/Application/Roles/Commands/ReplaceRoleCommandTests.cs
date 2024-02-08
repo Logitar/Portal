@@ -17,7 +17,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
 
   private readonly RoleAggregate _role;
 
-  public ReplaceRoleCommandTests()
+  public ReplaceRoleCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 

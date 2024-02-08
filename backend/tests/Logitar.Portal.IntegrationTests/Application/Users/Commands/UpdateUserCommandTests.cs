@@ -20,7 +20,7 @@ public class UpdateUserCommandTests : IntegrationTests
   private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
-  public UpdateUserCommandTests()
+  public UpdateUserCommandTests() : base()
   {
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();

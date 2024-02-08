@@ -27,7 +27,7 @@ internal record XApiKey
     string[] values = value.Split(Separator);
     if (values.Length != 3 || values.First() != Prefix)
     {
-      throw new ArgumentException($"The value '{value}' is not a valid refresh token.", nameof(value));
+      throw new ArgumentException($"The value '{value}' is not a valid X-API-Key.", nameof(value));
     }
 
     ApiKeyId id = new(values[1]);

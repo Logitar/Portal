@@ -17,7 +17,7 @@ public class ReadRoleQueryTests : IntegrationTests
 
   private readonly RoleAggregate _role;
 
-  public ReadRoleQueryTests()
+  public ReadRoleQueryTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 
