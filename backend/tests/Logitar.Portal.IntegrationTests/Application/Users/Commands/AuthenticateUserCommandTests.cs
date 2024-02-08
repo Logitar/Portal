@@ -37,6 +37,37 @@ public class AuthenticateUserCommandTests : IntegrationTests
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
 
+  [Fact(DisplayName = "It should throw UserHasNoPasswordException when the user has no password.")]
+  public async Task It_should_throw_UserHasNoPasswordException_when_the_user_has_no_password()
+  {
+    SetRealm();
+
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    UserAggregate other = new(user.UniqueName, TenantId);
+    await _userRepository.SaveAsync(other);
+
+    AuthenticateUserPayload payload = new(other.UniqueName.Value, PasswordString);
+    AuthenticateUserCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<UserHasNoPasswordException>(async () => await Mediator.Send(command));
+    Assert.Equal(other.Id, exception.UserId);
+  }
+
+  [Fact(DisplayName = "It should throw UserIsDisabledException when the user is disabled.")]
+  public async Task It_should_throw_UserIsDisabledException_when_the_user_is_disabled()
+  {
+    SetRealm();
+
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    UserAggregate disabled = new(user.UniqueName, TenantId);
+    disabled.Disable();
+    await _userRepository.SaveAsync(disabled);
+
+    AuthenticateUserPayload payload = new(disabled.UniqueName.Value, PasswordString);
+    AuthenticateUserCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<UserIsDisabledException>(async () => await Mediator.Send(command));
+    Assert.Equal(disabled.Id, exception.UserId);
+  }
+
   [Fact(DisplayName = "It should throw UserNotFoundException when the user cannot be found.")]
   public async Task It_should_throw_UserNotFoundException_when_the_user_cannot_be_found()
   {

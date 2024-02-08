@@ -90,6 +90,23 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Equal(actorId, result.UpdatedBy.Id);
   }
 
+  [Fact(DisplayName = "It should throw IncorrectSessionSecretException when the secret is not correct.")]
+  public async Task It_should_throw_IncorrectSessionSecretException_when_the_secret_is_not_correct()
+  {
+    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out _);
+    SessionAggregate session = user.SignIn(secret);
+    await _userRepository.SaveAsync(user);
+    await _sessionRepository.SaveAsync(session);
+
+    _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
+    RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
+    RenewSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IncorrectSessionSecretException>(async () => await Mediator.Send(command));
+    Assert.Equal(session.Id, exception.SessionId);
+    Assert.Equal(secretString, exception.AttemptedSecret);
+  }
+
   [Fact(DisplayName = "It should throw InvalidRefreshTokenException when the refresh token is not valid.")]
   public async Task It_should_throw_InvalidRefreshTokenException_when_the_refresh_token_is_not_valid()
   {
@@ -99,6 +116,37 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Equal(payload.RefreshToken, exception.RefreshToken);
     Assert.Equal("RefreshToken", exception.PropertyName);
     Assert.NotNull(exception.InnerException);
+  }
+
+  [Fact(DisplayName = "It should throw SessionIsNotActiveException when the session is not active.")]
+  public async Task It_should_throw_SessionIsNotActiveException_when_the_session_is_not_active()
+  {
+    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
+    SessionAggregate session = user.SignIn(secret);
+    session.SignOut();
+    await _userRepository.SaveAsync(user);
+    await _sessionRepository.SaveAsync(session);
+
+    RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
+    RenewSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<SessionIsNotActiveException>(async () => await Mediator.Send(command));
+    Assert.Equal(session.Id, exception.SessionId);
+  }
+
+  [Fact(DisplayName = "It should throw SessionIsNotPersistentException when the session is not persistent.")]
+  public async Task It_should_throw_SessionIsNotPersistentException_when_the_session_is_not_persistent()
+  {
+    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    SessionAggregate session = user.SignIn();
+    await _userRepository.SaveAsync(user);
+    await _sessionRepository.SaveAsync(session);
+
+    _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
+    RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
+    RenewSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<SessionIsNotPersistentException>(async () => await Mediator.Send(command));
+    Assert.Equal(session.Id, exception.SessionId);
   }
 
   [Fact(DisplayName = "It should throw SessionNotFoundException when the session could not be found.")]

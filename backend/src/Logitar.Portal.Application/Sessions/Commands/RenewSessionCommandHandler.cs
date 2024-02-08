@@ -49,7 +49,7 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
     UserAggregate user = await _userRepository.LoadAsync(session, cancellationToken);
     if (user.TenantId != _applicationContext.TenantId)
     {
-      throw new SessionNotFoundException(refreshToken.Id, nameof(payload.RefreshToken));
+      throw new SessionNotFoundException(session.Id, nameof(payload.RefreshToken));
     }
 
     ActorId actorId = _applicationContext.Actor.Type == ActorType.System

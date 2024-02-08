@@ -17,6 +17,12 @@ public class ApiKeyController : ControllerBase
     _apiKeyService = apiKeyService;
   }
 
+  [HttpPatch("authenticate")]
+  public async Task<ActionResult<ApiKey>> AuthenticateAsync([FromBody] AuthenticateApiKeyPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _apiKeyService.AuthenticateAsync(payload, cancellationToken));
+  }
+
   [HttpPost]
   public async Task<ActionResult<ApiKey>> CreateAsync([FromBody] CreateApiKeyPayload payload, CancellationToken cancellationToken)
   {
