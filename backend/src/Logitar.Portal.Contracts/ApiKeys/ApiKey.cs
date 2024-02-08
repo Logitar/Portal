@@ -7,8 +7,6 @@ public class ApiKey : Aggregate
 {
   public string? XApiKey { get; set; }
 
-  public string SecretHash { get; set; } = string.Empty;
-
   public string DisplayName { get; set; }
   public string? Description { get; set; }
   public DateTime? ExpiresOn { get; set; }

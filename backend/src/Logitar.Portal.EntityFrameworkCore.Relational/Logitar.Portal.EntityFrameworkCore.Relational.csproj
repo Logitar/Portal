@@ -15,10 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="0.11.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj" />
   </ItemGroup>
 
@@ -28,6 +24,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Logitar.Portal.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="0.11.4" />
   </ItemGroup>
 
 </Project>
