@@ -25,7 +25,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
   {
     await base.InitializeAsync();
 
-    TableId[] tables = [IdentityDb.ApiKeys.Table];
+    TableId[] tables = [IdentityDb.ApiKeys.Table, IdentityDb.Roles.Table];
     foreach (TableId table in tables)
     {
       ICommand command = SqlServerDeleteBuilder.From(table).Build();

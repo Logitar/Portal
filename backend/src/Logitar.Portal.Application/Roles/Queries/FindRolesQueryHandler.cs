@@ -31,15 +31,18 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IEnumerab
 
     foreach (RoleModification modification in query.Roles)
     {
-      string trimmed = modification.Role.Trim();
-      if (Guid.TryParse(trimmed, out Guid id) && rolesById.TryGetValue(id, out RoleAggregate? role)
-        || rolesByUniqueName.TryGetValue(trimmed.ToUpper(), out role))
+      if (!string.IsNullOrWhiteSpace(modification.Role))
       {
-        foundRoles[role.Id] = new FoundRole(role, modification.Action);
-      }
-      else
-      {
-        missingRoles.Add(modification.Role);
+        string trimmed = modification.Role.Trim();
+        if (Guid.TryParse(trimmed, out Guid id) && rolesById.TryGetValue(id, out RoleAggregate? role)
+          || rolesByUniqueName.TryGetValue(trimmed.ToUpper(), out role))
+        {
+          foundRoles[role.Id] = new FoundRole(role, modification.Action);
+        }
+        else
+        {
+          missingRoles.Add(modification.Role);
+        }
       }
     }
 

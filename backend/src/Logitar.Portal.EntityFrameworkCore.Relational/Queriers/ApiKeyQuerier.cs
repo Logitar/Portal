@@ -1,4 +1,5 @@
-﻿using Logitar.EventSourcing;
+﻿using Logitar.Data;
+using Logitar.EventSourcing;
 using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -7,6 +8,7 @@ using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +54,58 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     }
 
     return await MapAsync(apiKey, realm, cancellationToken);
+  }
+
+  public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
+  {
+    Realm? realm = _applicationContext.Realm;
+
+    IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.ApiKeys.Table).SelectAll(IdentityDb.ApiKeys.Table)
+      .ApplyRealmFilter(IdentityDb.ApiKeys.TenantId, realm)
+      .ApplyIdFilter(IdentityDb.ApiKeys.AggregateId, payload.Ids);
+    _searchHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.ApiKeys.DisplayName);
+
+    if (payload.IsExpired.HasValue)
+    {
+      DateTime now = DateTime.UtcNow;
+      builder.Where(IdentityDb.ApiKeys.ExpiresOn, payload.IsExpired.Value ? Operators.IsLessThanOrEqualTo(now) : Operators.IsGreaterThan(now));
+    }
+
+    IQueryable<ApiKeyEntity> query = _apiKeys.FromQuery(builder).AsNoTracking()
+      .Include(x => x.Roles);
+
+    long total = await query.LongCountAsync(cancellationToken);
+
+    IOrderedQueryable<ApiKeyEntity>? ordered = null;
+    foreach (ApiKeySortOption sort in payload.Sort)
+    {
+      switch (sort.Field)
+      {
+        case ApiKeySort.DisplayName:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.DisplayName) : ordered.ThenBy(x => x.DisplayName));
+          break;
+        case ApiKeySort.ExpiresOn:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.ExpiresOn) : query.OrderBy(x => x.ExpiresOn))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.ExpiresOn) : ordered.ThenBy(x => x.ExpiresOn));
+          break;
+        case ApiKeySort.UpdatedOn:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.UpdatedOn) : query.OrderBy(x => x.UpdatedOn))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.UpdatedOn) : ordered.ThenBy(x => x.UpdatedOn));
+          break;
+      }
+    }
+    query = ordered ?? query;
+
+    query = query.ApplyPaging(payload);
+
+    ApiKeyEntity[] apiKeys = await query.ToArrayAsync(cancellationToken);
+    IEnumerable<ApiKey> items = await MapAsync(apiKeys, realm, cancellationToken);
+
+    return new SearchResults<ApiKey>(items, total);
   }
 
   private async Task<ApiKey> MapAsync(ApiKeyEntity apiKey, Realm? realm, CancellationToken cancellationToken = default)
