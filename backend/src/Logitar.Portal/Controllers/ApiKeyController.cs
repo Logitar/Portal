@@ -1,5 +1,7 @@
 ﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Extensions;
+using Logitar.Portal.Models.ApiKeys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,17 +46,24 @@ public class ApiKeyController : ControllerBase
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
-  [HttpPatch("{id}")]
-  public async Task<ActionResult<ApiKey>> UpdateAsync(Guid id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
-  {
-    ApiKey? apiKey = await _apiKeyService.UpdateAsync(id, payload, cancellationToken);
-    return apiKey == null ? NotFound() : Ok(apiKey);
-  }
-
   [HttpPut("{id}")]
   public async Task<ActionResult<ApiKey>> ReplaceAsync(Guid id, [FromBody] ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
   {
     ApiKey? apiKey = await _apiKeyService.ReplaceAsync(id, payload, version, cancellationToken);
+    return apiKey == null ? NotFound() : Ok(apiKey);
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<SearchResults<ApiKey>>> SearchAsync([FromQuery] SearchApiKeysModel model, CancellationToken cancellationToken)
+  {
+    SearchApiKeysPayload payload = model.ToPayload();
+    return Ok(await _apiKeyService.SearchAsync(payload, cancellationToken));
+  }
+
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<ApiKey>> UpdateAsync(Guid id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
+  {
+    ApiKey? apiKey = await _apiKeyService.UpdateAsync(id, payload, cancellationToken);
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
