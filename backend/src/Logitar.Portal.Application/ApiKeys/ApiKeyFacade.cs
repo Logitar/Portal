@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.ApiKeys.Commands;
 using Logitar.Portal.Application.ApiKeys.Queries;
 using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Search;
 using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys;
@@ -37,6 +38,11 @@ internal class ApiKeyFacade : IApiKeyService
   public async Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _mediator.Send(new ReplaceApiKeyCommand(id, payload, version), cancellationToken);
+  }
+
+  public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new SearchApiKeysQuery(payload), cancellationToken);
   }
 
   public async Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
