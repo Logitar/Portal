@@ -5,8 +5,6 @@ using Logitar.Portal.Domain.Settings;
 using Logitar.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Logitar.Portal.Application.Tokens.Commands;
 
