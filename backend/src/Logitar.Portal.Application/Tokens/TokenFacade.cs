@@ -17,4 +17,9 @@ internal class TokenFacade : ITokenService
   {
     return await _mediator.Send(new CreateTokenCommand(payload), cancellationToken);
   }
+
+  public async Task<ValidatedToken> ValidateAsync(ValidateTokenPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new ValidateTokenCommand(payload), cancellationToken);
+  }
 }

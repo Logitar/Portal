@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts.Tokens;
+using Logitar.Portal.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,8 +20,15 @@ public class TokenController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<CreatedToken>> CreateAsync([FromBody] CreateTokenPayload payload, CancellationToken cancellationToken)
   {
-    return Ok(await _tokenService.CreateAsync(payload, cancellationToken)); // TODO(fpion): Created with validation URL
+    CreatedToken createdToken = await _tokenService.CreateAsync(payload, cancellationToken);
+    return Created(BuildLocation(), createdToken);
   }
 
-  //private Uri BuildLocation(User user) => HttpContext.BuildLocation("users/{id}", new Dictionary<string, string> { ["id"] = user.Id.ToString() });
+  [HttpPut]
+  public async Task<ActionResult<ValidatedToken>> ValidateAsync([FromBody] ValidateTokenPayload payload, CancellationToken cancellationToken)
+  {
+    return Ok(await _tokenService.ValidateAsync(payload, cancellationToken));
+  }
+
+  private Uri BuildLocation() => HttpContext.BuildLocation("tokens");
 }
