@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Logitar.Portal.Application.Roles;
+﻿namespace Logitar.Portal.Application.Roles;
 
 public class RolesNotFoundException : Exception
 {

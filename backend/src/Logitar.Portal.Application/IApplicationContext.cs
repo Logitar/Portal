@@ -12,6 +12,9 @@ public interface IApplicationContext
   public Actor Actor { get; }
   ActorId ActorId { get; }
 
+  public Uri BaseUri { get; }
+  public string BaseUrl { get; }
+
   public Configuration Configuration { get; }
   public Realm? Realm { get; }
   public TenantId? TenantId { get; }
