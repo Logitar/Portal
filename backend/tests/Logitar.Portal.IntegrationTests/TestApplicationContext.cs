@@ -17,6 +17,9 @@ internal class TestApplicationContext : IApplicationContext
   public Actor Actor { get; set; } = Actor.System;
   public ActorId ActorId => new(Actor.Id);
 
+  public Uri BaseUri { get; } = new("https://portal:443");
+  public string BaseUrl => BaseUri.ToString();
+
   public Configuration Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration was not found in the cache.");
   public Realm? Realm { get; set; }

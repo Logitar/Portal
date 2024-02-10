@@ -1,7 +1,6 @@
 ﻿using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Domain.Realms.Events;
-using System.Text.Json;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 

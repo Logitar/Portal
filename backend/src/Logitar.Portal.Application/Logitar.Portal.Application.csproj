@@ -24,6 +24,8 @@
 
   <ItemGroup>
     <Using Include="System.Reflection" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Text" />
   </ItemGroup>
 
   <ItemGroup>

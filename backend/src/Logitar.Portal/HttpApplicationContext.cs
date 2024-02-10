@@ -51,6 +51,9 @@ internal class HttpApplicationContext : IApplicationContext
   }
   public ActorId ActorId => new(Actor.Id);
 
+  public Uri BaseUri => Context.GetBaseUri();
+  public string BaseUrl => BaseUri.ToString();
+
   public Configuration Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration was not found in the cache.");
   public Realm? Realm => Context.GetRealm();

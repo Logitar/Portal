@@ -37,6 +37,8 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
+  protected Uri BaseUri => ApplicationContext.BaseUri;
+
   protected Realm Realm { get; }
   protected TenantId TenantId => new(new AggregateId(Realm.Id).Value);
 
