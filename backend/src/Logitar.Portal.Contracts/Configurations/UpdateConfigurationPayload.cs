@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Settings;
+﻿using Logitar.Identity.Contracts;
+using Logitar.Portal.Contracts.Settings;
 
 namespace Logitar.Portal.Contracts.Configurations;
 

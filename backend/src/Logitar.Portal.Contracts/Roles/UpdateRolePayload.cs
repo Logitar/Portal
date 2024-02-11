@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Identity.Contracts;
+
+namespace Logitar.Portal.Contracts.Roles;
 
 public record UpdateRolePayload
 {
