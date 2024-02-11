@@ -38,5 +38,12 @@ public class OneTimePasswordController : ControllerBase
     return oneTimePassword == null ? NotFound() : Ok(oneTimePassword);
   }
 
+  [HttpPatch("{id}")]
+  public async Task<ActionResult<OneTimePassword>> ValidateAsync(Guid id, [FromBody] ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  {
+    OneTimePassword? oneTimePassword = await _oneTimePasswordService.ValidateAsync(id, payload, cancellationToken);
+    return oneTimePassword == null ? NotFound() : Ok(oneTimePassword);
+  }
+
   private Uri BuildLocation(OneTimePassword oneTimePassword) => HttpContext.BuildLocation("one-time-passwords/{id}", new Dictionary<string, string> { ["id"] = oneTimePassword.Id.ToString() });
 }

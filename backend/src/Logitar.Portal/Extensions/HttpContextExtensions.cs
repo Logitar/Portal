@@ -22,7 +22,6 @@ internal static class HttpContextExtensions
     .SetScheme(context.Request.Scheme, inferPort: true)
     .SetHost(context.Request.Host.Value)
     .BuildUri();
-  public static Uri BuildLocation(this HttpContext context, string path) => context.BuildLocation(path, []);
   public static Uri BuildLocation(this HttpContext context, string path, IEnumerable<KeyValuePair<string, string>> parameters)
   {
     UrlBuilder builder = new(context.GetBaseUri());

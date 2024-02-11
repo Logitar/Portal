@@ -8,7 +8,7 @@ public class CreateOneTimePasswordPayload
   public DateTime? ExpiresOn { get; set; }
   public int? MaximumAttempts { get; set; }
 
-  public List<CustomAttribute> CustomAttributes { get; set; } = [];
+  public List<CustomAttribute> CustomAttributes { get; set; }
 
   public CreateOneTimePasswordPayload() : this(string.Empty, 0)
   {
@@ -18,5 +18,6 @@ public class CreateOneTimePasswordPayload
   {
     Characters = characters;
     Length = length;
+    CustomAttributes = [];
   }
 }

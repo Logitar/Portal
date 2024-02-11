@@ -28,4 +28,9 @@ internal class OneTimePasswordFacade : IOneTimePasswordService
   {
     return await _mediator.Send(new ReadOneTimePasswordQuery(id), cancellationToken);
   }
+
+  public async Task<OneTimePassword?> ValidateAsync(Guid id, ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  {
+    return await _mediator.Send(new ValidateOneTimePasswordCommand(id, payload), cancellationToken);
+  }
 }
