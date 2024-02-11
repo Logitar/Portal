@@ -51,7 +51,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.Contracts" Version="0.11.3" />
+    <PackageReference Include="Logitar.Identity.Contracts" Version="0.11.4" />
   </ItemGroup>
 
   <ItemGroup>

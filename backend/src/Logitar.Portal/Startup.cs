@@ -18,11 +18,13 @@ namespace Logitar.Portal;
 internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
+  private readonly bool _enableBasicAuthentication;
   private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
+    _enableBasicAuthentication = configuration.GetValue<bool>("EnableBasicAuthentication");
     _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
   }
 
@@ -37,17 +39,23 @@ internal class Startup : StartupBase
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
+    string[] authenticationSchemes = GetAuthenticationSchemes();
     AuthenticationBuilder authenticationBuilder = services.AddAuthentication()
+      .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
+    if (_enableBasicAuthentication)
+    {
+      authenticationBuilder.AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { });
+    }
 
-    AuthorizationPolicy portalActorPolicy = new AuthorizationPolicyBuilder(Schemes.All.ToArray())
+    AuthorizationPolicy portalActorPolicy = new AuthorizationPolicyBuilder(authenticationSchemes)
       .RequireAuthenticatedUser()
       .AddRequirements(new PortalActorAuthorizationRequirement())
       .Build();
     services.AddAuthorizationBuilder()
       .SetDefaultPolicy(portalActorPolicy)
       .AddPolicy(Policies.PortalActor, portalActorPolicy)
-      .AddPolicy(Policies.PortalUser, new AuthorizationPolicyBuilder(Schemes.All.ToArray())
+      .AddPolicy(Policies.PortalUser, new AuthorizationPolicyBuilder(authenticationSchemes)
         .RequireAuthenticatedUser()
         .AddRequirements(new PortalUserAuthorizationRequirement())
         .Build()
@@ -87,6 +95,19 @@ internal class Startup : StartupBase
     services.AddSingleton<IApplicationContext, HttpApplicationContext>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
+  }
+  private string[] GetAuthenticationSchemes()
+  {
+    List<string> authenticationSchemes = new(capacity: 3)
+    {
+      Schemes.ApiKey,
+      Schemes.Session
+    };
+    if (_enableBasicAuthentication)
+    {
+      authenticationSchemes.Add(Schemes.Basic);
+    }
+    return [.. authenticationSchemes];
   }
 
   public override void Configure(IApplicationBuilder builder)

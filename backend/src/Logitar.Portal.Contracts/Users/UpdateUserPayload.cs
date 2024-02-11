@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Identity.Contracts;
+using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.Users;
 

@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Passwords;
+﻿using Logitar.Identity.Contracts;
+using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
@@ -139,7 +140,7 @@ public class UpdateUserCommandTests : IntegrationTests
       Locale = new Modification<string>("fr-CA"),
       TimeZone = new Modification<string>("America/Montreal"),
       Picture = new Modification<string>(Faker.Person.Avatar),
-      Profile = new Modification<string>(),
+      Profile = new Modification<string>(value: null),
       Website = new Modification<string>($"https://www.{Faker.Person.Website}/")
     };
     payload.CustomAttributes.Add(new("BaseSalary", "90000"));
