@@ -80,7 +80,7 @@ public class UserController : ControllerBase
   public async Task<ActionResult<User>> ResetPasswordAsync(Guid id, [FromBody] ResetUserPasswordPayload payload, CancellationToken cancellationToken)
   {
     User? user = await _userService.ResetPasswordAsync(id, payload, cancellationToken);
-    return user == null ? NotFound() : Ok();
+    return user == null ? NotFound() : Ok(user);
   }
 
   [HttpPut("{id}/identifiers/key:{key}")]
