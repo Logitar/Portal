@@ -18,13 +18,11 @@ namespace Logitar.Portal;
 internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
-  private readonly bool _enableBasicAuthentication;
   private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
-    _enableBasicAuthentication = configuration.GetValue<bool>("EnableBasicAuthentication");
     _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
   }
 
@@ -39,11 +37,11 @@ internal class Startup : StartupBase
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
-    string[] authenticationSchemes = GetAuthenticationSchemes();
+    string[] authenticationSchemes = Schemes.GetEnabled(_configuration);
     AuthenticationBuilder authenticationBuilder = services.AddAuthentication()
       .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
-    if (_enableBasicAuthentication)
+    if (authenticationSchemes.Contains(Schemes.Basic))
     {
       authenticationBuilder.AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { });
     }
@@ -96,19 +94,6 @@ internal class Startup : StartupBase
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
   }
-  private string[] GetAuthenticationSchemes()
-  {
-    List<string> authenticationSchemes = new(capacity: 3)
-    {
-      Schemes.ApiKey,
-      Schemes.Session
-    };
-    if (_enableBasicAuthentication)
-    {
-      authenticationSchemes.Add(Schemes.Basic);
-    }
-    return [.. authenticationSchemes];
-  }
 
   public override void Configure(IApplicationBuilder builder)
   {
@@ -123,6 +108,8 @@ internal class Startup : StartupBase
     builder.UseMiddleware<RenewSession>();
     builder.UseAuthentication();
     builder.UseAuthorization();
+    builder.UseMiddleware<ResolveRealm>();
+    builder.UseMiddleware<ResolveUser>();
 
     if (builder is WebApplication application)
     {

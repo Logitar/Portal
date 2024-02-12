@@ -18,10 +18,16 @@ internal static class HttpContextExtensions
   private const string SessionIdKey = "SessionId";
   private const string UserKey = nameof(User);
 
-  public static Uri GetBaseUri(this HttpContext context) => new UrlBuilder()
-    .SetScheme(context.Request.Scheme, inferPort: true)
-    .SetHost(context.Request.Host.Value)
-    .BuildUri();
+  public static Uri GetBaseUri(this HttpContext context)
+  {
+    string host = context.Request.Host.Value;
+    int index = host.IndexOf(':');
+
+    return new UrlBuilder()
+      .SetScheme(context.Request.Scheme, inferPort: true)
+      .SetHost(index < 0 ? host : host[..index])
+      .BuildUri();
+  }
   public static Uri BuildLocation(this HttpContext context, string path, IEnumerable<KeyValuePair<string, string>> parameters)
   {
     UrlBuilder builder = new(context.GetBaseUri());
@@ -119,5 +125,19 @@ internal static class HttpContextExtensions
     context.Session.Clear();
 
     context.Response.Cookies.Delete(Cookies.RefreshToken);
+  }
+
+  public static void SetResponse(this HttpContext context, int statusCode)
+  {
+    context.Response.StatusCode = statusCode;
+  }
+  public static async Task SetResponseAsync<T>(this HttpContext context, int statusCode, T? value = default, CancellationToken cancellationToken = default)
+  {
+    context.SetResponse(statusCode);
+
+    if (value != null)
+    {
+      await context.Response.WriteAsJsonAsync<T>(value, cancellationToken);
+    }
   }
 }
