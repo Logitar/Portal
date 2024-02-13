@@ -32,6 +32,7 @@ public static class DependencyInjectionExtensions
     converters.AddRange(identityConverters);
 
     converters.Add(new ConfigurationIdConverter());
+    converters.Add(new DictionaryIdConverter());
     converters.Add(new JwtSecretConverter());
     converters.Add(new RealmIdConverter());
     converters.Add(new UniqueSlugConverter());
