@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Realms;
+﻿using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Infrastructure.Converters;
 
@@ -9,8 +9,8 @@ internal class RealmIdConverter : JsonConverter<RealmId>
     return RealmId.TryCreate(reader.GetString());
   }
 
-  public override void Write(Utf8JsonWriter writer, RealmId configurationId, JsonSerializerOptions options)
+  public override void Write(Utf8JsonWriter writer, RealmId realmId, JsonSerializerOptions options)
   {
-    writer.WriteStringValue(configurationId.AggregateId.Value);
+    writer.WriteStringValue(realmId.AggregateId.Value);
   }
 }

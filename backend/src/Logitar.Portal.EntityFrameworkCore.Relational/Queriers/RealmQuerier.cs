@@ -1,6 +1,5 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Realms;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Actors;

@@ -2,7 +2,6 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
-using Logitar.Identity.Domain.Realms;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Domain.Realms;
 using Microsoft.EntityFrameworkCore;

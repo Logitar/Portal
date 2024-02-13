@@ -1,6 +1,7 @@
 ﻿using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Errors;
@@ -67,7 +68,9 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   }
   private static bool IsConflictError(Exception exception)
   {
-    return exception is ConfigurationAlreadyInitializedException || exception is UniqueSlugAlreadyUsedException;
+    return exception is ConfigurationAlreadyInitializedException
+      || exception is DictionaryAlreadyExistsException
+      || exception is UniqueSlugAlreadyUsedException;
   }
   private static bool IsNotFoundError(Exception exception)
   {

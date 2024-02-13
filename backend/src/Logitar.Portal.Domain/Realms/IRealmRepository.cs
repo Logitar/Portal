@@ -1,6 +1,4 @@
-﻿using Logitar.Identity.Domain.Realms;
-
-namespace Logitar.Portal.Domain.Realms;
+﻿namespace Logitar.Portal.Domain.Realms;
 
 public interface IRealmRepository
 {

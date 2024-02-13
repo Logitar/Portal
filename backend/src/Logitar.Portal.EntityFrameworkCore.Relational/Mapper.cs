@@ -4,6 +4,7 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
@@ -76,6 +77,24 @@ internal class Mapper
       RequireUniqueEmail = source.RequireUniqueEmail,
       LoggingSettings = new LoggingSettings(source.LoggingSettings)
     };
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
+  {
+    Dictionary destination = new(source.Locale)
+    {
+      EntryCount = source.EntryCount,
+      Realm = realm
+    };
+
+    foreach (KeyValuePair<string, string> entry in source.Entries)
+    {
+      destination.Entries.Add(new DictionaryEntry(entry));
+    }
 
     MapAggregate(source, destination);
 

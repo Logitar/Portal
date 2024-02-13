@@ -2,7 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
 
-namespace Logitar.Identity.Domain.Realms;
+namespace Logitar.Portal.Domain.Realms;
 
 public record RealmId
 {
