@@ -70,6 +70,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   {
     return exception is ConfigurationAlreadyInitializedException
       || exception is DictionaryAlreadyExistsException
+      || exception is UniqueKeyAlreadyUsedException
       || exception is UniqueSlugAlreadyUsedException;
   }
   private static bool IsNotFoundError(Exception exception)
