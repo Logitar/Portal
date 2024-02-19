@@ -120,6 +120,11 @@ internal class UserQuerier : IUserQuerier
 
     if (payload.HasPassword.HasValue)
     {
+      NullOperator @operator = payload.HasPassword.Value ? Operators.IsNotNull() : Operators.IsNull();
+      builder.Where(IdentityDb.Users.AuthenticatedOn, @operator);
+    }
+    if (payload.HasPassword.HasValue)
+    {
       builder.Where(IdentityDb.Users.HasPassword, Operators.IsEqualTo(payload.HasPassword.Value));
     }
     if (payload.IsDisabled.HasValue)
