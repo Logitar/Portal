@@ -27,10 +27,10 @@ internal class TemplateManager : ITemplateManager
 
     if (hasUniqueKeyChanged)
     {
-      TemplateAggregate? other = await _templateRepository.LoadAsync(template.UniqueKey, cancellationToken);
+      TemplateAggregate? other = await _templateRepository.LoadAsync(template.TenantId, template.UniqueKey, cancellationToken);
       if (other?.Equals(template) == false)
       {
-        throw new UniqueKeyAlreadyUsedException(template.UniqueKey);
+        throw new UniqueKeyAlreadyUsedException(template.TenantId, template.UniqueKey);
       }
     }
 

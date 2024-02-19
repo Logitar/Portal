@@ -50,12 +50,13 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
     return Load<TemplateAggregate>(events.Select(EventSerializer.Deserialize));
   }
 
-  public async Task<TemplateAggregate?> LoadAsync(UniqueKeyUnit uniqueKey, CancellationToken cancellationToken)
+  public async Task<TemplateAggregate?> LoadAsync(TenantId? tenantId, UniqueKeyUnit uniqueKey, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
         new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
+      .Where(PortalDb.Templates.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
       .Where(PortalDb.Templates.UniqueKeyNormalized, Operators.IsEqualTo(uniqueKey.Value.ToUpper()))
       .SelectAll(EventDb.Events.Table)
       .Build();

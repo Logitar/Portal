@@ -13,6 +13,7 @@ public record ContentUnit : IContent
   {
   }
 
+  [JsonConstructor]
   private ContentUnit(string type, string text)
   {
     Type = type.Trim();
