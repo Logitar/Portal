@@ -2,7 +2,7 @@
 
 public record ReplaceTemplatePayload
 {
-  public string UniqueName { get; set; }
+  public string UniqueKey { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
@@ -13,9 +13,9 @@ public record ReplaceTemplatePayload
   {
   }
 
-  public ReplaceTemplatePayload(string uniqueName, string subject, Content content)
+  public ReplaceTemplatePayload(string uniqueKey, string subject, Content content)
   {
-    UniqueName = uniqueName;
+    UniqueKey = uniqueKey;
     Subject = subject;
     Content = content;
   }

@@ -40,10 +40,10 @@ public class TemplateController : ControllerBase
     return template == null ? NotFound() : Ok(template);
   }
 
-  [HttpGet("unique-name:{uniqueName}")]
-  public async Task<ActionResult<Template>> ReadByUniqueNameAsync(string uniqueName, CancellationToken cancellationToken)
+  [HttpGet("unique-key:{uniqueKey}")]
+  public async Task<ActionResult<Template>> ReadByUniqueKeyAsync(string uniqueKey, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.ReadAsync(uniqueName: uniqueName, cancellationToken: cancellationToken);
+    Template? template = await _templateService.ReadAsync(uniqueKey: uniqueKey, cancellationToken: cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 

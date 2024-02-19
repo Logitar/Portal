@@ -1,21 +1,25 @@
-﻿namespace Logitar.Portal.Contracts.Templates;
+﻿using Logitar.Portal.Contracts.Realms;
+
+namespace Logitar.Portal.Contracts.Templates;
 
 public class Template : Aggregate
 {
-  public string UniqueName { get; set; } // TODO(fpion): rename
+  public string UniqueKey { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
   public string Subject { get; set; }
   public Content Content { get; set; }
 
+  public Realm? Realm { get; set; }
+
   public Template() : this(string.Empty, string.Empty, new Content())
   {
   }
 
-  public Template(string uniqueName, string subject, Content content)
+  public Template(string uniqueKey, string subject, Content content)
   {
-    UniqueName = uniqueName;
+    UniqueKey = uniqueKey;
     Subject = subject;
     Content = content;
   }

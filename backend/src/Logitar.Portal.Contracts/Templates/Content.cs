@@ -1,6 +1,6 @@
 ﻿namespace Logitar.Portal.Contracts.Templates;
 
-public record Content
+public record Content : IContent
 {
   public string Type { get; set; }
   public string Text { get; set; }

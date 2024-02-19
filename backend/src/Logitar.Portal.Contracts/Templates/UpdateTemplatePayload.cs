@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Templates;
 
 public record UpdateTemplatePayload
 {
-  public string? UniqueName { get; set; }
+  public string? UniqueKey { get; set; }
   public Modification<string>? DisplayName { get; set; }
   public Modification<string>? Description { get; set; }
 

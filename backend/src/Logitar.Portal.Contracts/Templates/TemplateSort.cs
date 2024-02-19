@@ -3,7 +3,7 @@
 public enum TemplateSort
 {
   DisplayName,
-  UniqueName,
   Subject,
+  UniqueKey,
   UpdatedOn
 }
