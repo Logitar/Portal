@@ -10,6 +10,7 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -185,6 +186,21 @@ internal class Mapper
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Template ToTemplate(TemplateEntity source, Realm? realm)
+  {
+    Content content = new(source.ContentType, source.ContentText);
+    Template destination = new(source.UniqueKey, source.Subject, content)
+    {
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      Realm = realm
+    };
 
     MapAggregate(source, destination);
 

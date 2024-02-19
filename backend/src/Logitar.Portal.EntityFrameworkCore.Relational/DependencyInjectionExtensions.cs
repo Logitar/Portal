@@ -6,10 +6,12 @@ using Logitar.Portal.Application.OneTimePasswords;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
@@ -41,6 +43,7 @@ public static class DependencyInjectionExtensions
       .AddTransient<IRealmQuerier, RealmQuerier>()
       .AddTransient<IRoleQuerier, RoleQuerier>()
       .AddTransient<ISessionQuerier, SessionQuerier>()
+      .AddTransient<ITemplateQuerier, TemplateQuerier>()
       .AddTransient<IUserQuerier, UserQuerier>();
   }
 
@@ -49,6 +52,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IConfigurationRepository, ConfigurationRepository>()
       .AddTransient<IDictionaryRepository, DictionaryRepository>()
-      .AddTransient<IRealmRepository, RealmRepository>();
+      .AddTransient<IRealmRepository, RealmRepository>()
+      .AddTransient<ITemplateRepository, TemplateRepository>();
   }
 }
