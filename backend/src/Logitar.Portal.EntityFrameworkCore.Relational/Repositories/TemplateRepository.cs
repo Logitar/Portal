@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +21,6 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<IEnumerable<TemplateAggregate>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<TemplateAggregate>(cancellationToken);
-
   public async Task<TemplateAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await LoadAsync<TemplateAggregate>(new AggregateId(id), cancellationToken);
 
@@ -30,6 +28,27 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
     => await LoadAsync(id, version: null, cancellationToken);
   public async Task<TemplateAggregate?> LoadAsync(TemplateId id, long? version, CancellationToken cancellationToken)
     => await LoadAsync<TemplateAggregate>(id.AggregateId, version, cancellationToken);
+
+  public async Task<IEnumerable<TemplateAggregate>> LoadAsync(CancellationToken cancellationToken)
+    => await LoadAsync<TemplateAggregate>(cancellationToken);
+
+  public async Task<IEnumerable<TemplateAggregate>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  {
+    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
+      .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
+        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
+      )
+      .Where(PortalDb.Templates.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
+      .SelectAll(EventDb.Events.Table)
+      .Build();
+
+    EventEntity[] events = await EventContext.Events.FromQuery(query)
+      .AsNoTracking()
+      .OrderBy(e => e.Version)
+      .ToArrayAsync(cancellationToken);
+
+    return Load<TemplateAggregate>(events.Select(EventSerializer.Deserialize));
+  }
 
   public async Task<TemplateAggregate?> LoadAsync(UniqueKeyUnit uniqueKey, CancellationToken cancellationToken)
   {
