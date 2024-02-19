@@ -24,7 +24,7 @@ public class DictionaryAlreadyExistsException : Exception
   }
 
   private static string BuildMessage(TenantId? tenantId, LocaleUnit locale) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value)
+    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
     .AddData(nameof(Locale), locale.Code)
     .Build();
 }

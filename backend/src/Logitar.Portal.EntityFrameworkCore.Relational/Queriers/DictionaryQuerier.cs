@@ -80,6 +80,12 @@ internal class DictionaryQuerier : IDictionaryQuerier
       .ApplyIdFilter(PortalDb.Dictionaries.AggregateId, payload.Ids);
     _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Dictionaries.Locale);
 
+    if (payload.IsEmpty.HasValue)
+    {
+      ComparisonOperator @operator = payload.IsEmpty.Value ? Operators.IsEqualTo(0) : Operators.IsGreaterThan(0);
+      builder.Where(PortalDb.Dictionaries.EntryCount, @operator);
+    }
+
     IQueryable<DictionaryEntity> query = _dictionaries.FromQuery(builder).AsNoTracking();
 
     long total = await query.LongCountAsync(cancellationToken);

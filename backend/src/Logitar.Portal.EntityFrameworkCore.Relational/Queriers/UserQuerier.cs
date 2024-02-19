@@ -118,6 +118,11 @@ internal class UserQuerier : IUserQuerier
     _searchHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.Users.UniqueName, IdentityDb.Users.AddressFormatted, IdentityDb.Users.EmailAddress,
       IdentityDb.Users.PhoneE164Formatted, IdentityDb.Users.FirstName, IdentityDb.Users.MiddleName, IdentityDb.Users.LastName, IdentityDb.Users.Nickname);
 
+    if (payload.HasAuthenticated.HasValue)
+    {
+      NullOperator @operator = payload.HasAuthenticated.Value ? Operators.IsNotNull() : Operators.IsNull();
+      builder.Where(IdentityDb.Users.AuthenticatedOn, @operator);
+    }
     if (payload.HasPassword.HasValue)
     {
       builder.Where(IdentityDb.Users.HasPassword, Operators.IsEqualTo(payload.HasPassword.Value));

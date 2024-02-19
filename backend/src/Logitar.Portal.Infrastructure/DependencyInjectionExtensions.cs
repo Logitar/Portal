@@ -35,6 +35,9 @@ public static class DependencyInjectionExtensions
     converters.Add(new DictionaryIdConverter());
     converters.Add(new JwtSecretConverter());
     converters.Add(new RealmIdConverter());
+    converters.Add(new SubjectConverter());
+    converters.Add(new TemplateIdConverter());
+    converters.Add(new UniqueKeyConverter());
     converters.Add(new UniqueSlugConverter());
 
     return converters;

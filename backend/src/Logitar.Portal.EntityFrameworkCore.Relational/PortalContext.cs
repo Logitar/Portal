@@ -11,6 +11,7 @@ public class PortalContext : DbContext
 
   internal DbSet<DictionaryEntity> Dictionaries { get; private set; }
   internal DbSet<RealmEntity> Realms { get; private set; }
+  internal DbSet<TemplateEntity> Templates { get; private set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

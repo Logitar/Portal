@@ -65,6 +65,11 @@ internal class ApiKeyQuerier : IApiKeyQuerier
       .ApplyIdFilter(IdentityDb.ApiKeys.AggregateId, payload.Ids);
     _searchHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.ApiKeys.DisplayName);
 
+    if (payload.HasAuthenticated.HasValue)
+    {
+      NullOperator @operator = payload.HasAuthenticated.Value ? Operators.IsNotNull() : Operators.IsNull();
+      builder.Where(IdentityDb.ApiKeys.AuthenticatedOn, @operator);
+    }
     if (payload.IsExpired.HasValue)
     {
       DateTime now = DateTime.UtcNow;
@@ -81,6 +86,11 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     {
       switch (sort.Field)
       {
+        case ApiKeySort.AuthenticatedOn:
+          ordered = (ordered == null)
+            ? (sort.IsDescending ? query.OrderByDescending(x => x.AuthenticatedOn) : query.OrderBy(x => x.AuthenticatedOn))
+            : (sort.IsDescending ? ordered.ThenByDescending(x => x.AuthenticatedOn) : ordered.ThenBy(x => x.AuthenticatedOn));
+          break;
         case ApiKeySort.DisplayName:
           ordered = (ordered == null)
             ? (sort.IsDescending ? query.OrderByDescending(x => x.DisplayName) : query.OrderBy(x => x.DisplayName))
