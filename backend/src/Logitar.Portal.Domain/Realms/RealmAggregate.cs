@@ -13,7 +13,7 @@ public class RealmAggregate : AggregateRoot
   public new RealmId Id => new(base.Id);
 
   private UniqueSlugUnit? _uniqueSlug = null;
-  public UniqueSlugUnit UniqueSlug => _uniqueSlug ?? throw new InvalidOperationException($"The {nameof(UniqueSlug)} have not been initialized yet.");
+  public UniqueSlugUnit UniqueSlug => _uniqueSlug ?? throw new InvalidOperationException($"The {nameof(UniqueSlug)} has not been initialized yet.");
   private DisplayNameUnit? _displayName = null;
   public DisplayNameUnit? DisplayName
   {
@@ -57,7 +57,7 @@ public class RealmAggregate : AggregateRoot
   private JwtSecretUnit? _secret = null;
   public JwtSecretUnit Secret
   {
-    get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} have not been initialized yet.");
+    get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
     {
       if (value != _secret)

@@ -14,7 +14,7 @@ public class DictionaryAggregate : AggregateRoot
   public TenantId? TenantId { get; private set; }
 
   private LocaleUnit? _locale = null;
-  public LocaleUnit Locale => _locale ?? throw new InvalidOperationException($"The {nameof(Locale)} have not been initialized yet.");
+  public LocaleUnit Locale => _locale ?? throw new InvalidOperationException($"The {nameof(Locale)} has not been initialized yet.");
 
   private readonly Dictionary<string, string> _entries = [];
   public IReadOnlyDictionary<string, string> Entries => _entries.AsReadOnly();

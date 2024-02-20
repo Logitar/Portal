@@ -14,7 +14,7 @@ public class TemplateAggregate : AggregateRoot
   public TenantId? TenantId { get; private set; }
 
   private UniqueKeyUnit? _uniqueKey = null;
-  public UniqueKeyUnit UniqueKey => _uniqueKey ?? throw new InvalidOperationException($"The {nameof(UniqueKey)} have not been initialized yet.");
+  public UniqueKeyUnit UniqueKey => _uniqueKey ?? throw new InvalidOperationException($"The {nameof(UniqueKey)} has not been initialized yet.");
   private DisplayNameUnit? _displayName = null;
   public DisplayNameUnit? DisplayName
   {
@@ -45,7 +45,7 @@ public class TemplateAggregate : AggregateRoot
   private SubjectUnit? _subject = null;
   public SubjectUnit Subject
   {
-    get => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} have not been initialized yet.");
+    get => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
     set
     {
       if (value != _subject)
@@ -58,7 +58,7 @@ public class TemplateAggregate : AggregateRoot
   private ContentUnit? _content = null;
   public ContentUnit Content
   {
-    get => _content ?? throw new InvalidOperationException($"The {nameof(Content)} have not been initialized yet.");
+    get => _content ?? throw new InvalidOperationException($"The {nameof(Content)} has not been initialized yet.");
     set
     {
       if (value != _content)
