@@ -23,4 +23,6 @@ public record ContentUnit : IContent
 
   public static ContentUnit Html(string text) => new(MediaTypeNames.Text.Html, text);
   public static ContentUnit PlainText(string text) => new(MediaTypeNames.Text.Plain, text);
+
+  public ContentUnit Create(string text) => new(Type, text);
 }
