@@ -9,8 +9,8 @@ public class Message : Aggregate
   public string Subject { get; set; }
   public string Body { get; set; }
 
-  public List<Recipient> Recipients { get; set; }
   public int RecipientCount { get; set; }
+  public List<Recipient> Recipients { get; set; }
 
   public Sender Sender { get; set; }
   public Template Template { get; set; }
