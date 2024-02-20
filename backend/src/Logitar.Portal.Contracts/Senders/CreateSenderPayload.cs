@@ -8,15 +8,14 @@ public record CreateSenderPayload
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
-  public SendGridSettings SendGrid { get; set; }
+  public SendGridSettings SendGrid { get; set; } = new();
 
-  public CreateSenderPayload() : this(email: new(), sendGrid: new())
+  public CreateSenderPayload() : this(new EmailPayload())
   {
   }
 
-  public CreateSenderPayload(EmailPayload email, SendGridSettings sendGrid)
+  public CreateSenderPayload(EmailPayload email)
   {
     Email = email;
-    SendGrid = sendGrid;
   }
 }

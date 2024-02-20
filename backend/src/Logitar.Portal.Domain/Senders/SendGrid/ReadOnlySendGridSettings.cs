@@ -10,17 +10,14 @@ public record ReadOnlySendGridSettings : SenderSettings, ISendGridSettings
 
   public string ApiKey { get; }
 
-  public ReadOnlySendGridSettings() : this(string.Empty)
-  {
-  }
-
   public ReadOnlySendGridSettings(ISendGridSettings sendGrid) : this(sendGrid.ApiKey)
   {
   }
 
+  [JsonConstructor]
   public ReadOnlySendGridSettings(string apiKey)
   {
-    ApiKey = apiKey;
+    ApiKey = apiKey.Trim();
     new SendGridSettingsValidator().ValidateAndThrow(this);
   }
 }

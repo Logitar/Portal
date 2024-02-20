@@ -49,7 +49,6 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     await _templateRepository.SaveAsync(_template);
     long version = _template.Version;
 
-
     DisplayNameUnit displayName = new("Password Recovery");
     _template.DisplayName = displayName;
     _template.Update();

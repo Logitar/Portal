@@ -195,7 +195,8 @@ internal class Mapper
 
   public Sender ToSender(SenderEntity source, Realm? realm)
   {
-    Sender destination = new(source.EmailAddress)
+    Email email = new(source.EmailAddress);
+    Sender destination = new(email)
     {
       IsDefault = source.IsDefault,
       DisplayName = source.DisplayName,

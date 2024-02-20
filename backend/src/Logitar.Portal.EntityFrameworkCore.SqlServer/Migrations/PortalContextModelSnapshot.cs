@@ -298,9 +298,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "IsDefault")
-                        .IsUnique()
-                        .HasFilter("[IsDefault] = true");
+                    b.HasIndex("TenantId", "IsDefault");
 
                     b.ToTable("Senders", (string)null);
                 });

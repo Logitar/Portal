@@ -19,7 +19,7 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.ToTable(nameof(PortalContext.Senders));
     builder.HasKey(x => x.SenderId);
 
-    builder.HasIndex(x => new { x.TenantId, x.IsDefault }).IsUnique().HasFilter($@"[{nameof(SenderEntity.IsDefault)}] = true");
+    builder.HasIndex(x => new { x.TenantId, x.IsDefault });
     builder.HasIndex(x => x.EmailAddress);
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Provider);

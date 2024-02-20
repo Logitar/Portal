@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20240220024408_CreateSenderTable")]
+    [Migration("20240220030742_CreateSenderTable")]
     partial class CreateSenderTable
     {
         /// <inheritdoc />
@@ -301,9 +301,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "IsDefault")
-                        .IsUnique()
-                        .HasFilter("[IsDefault] = true");
+                    b.HasIndex("TenantId", "IsDefault");
 
                     b.ToTable("Senders", (string)null);
                 });

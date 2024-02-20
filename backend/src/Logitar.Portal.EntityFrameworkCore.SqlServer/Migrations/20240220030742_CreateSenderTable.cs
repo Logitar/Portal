@@ -70,9 +70,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Senders_TenantId_IsDefault",
                 table: "Senders",
-                columns: new[] { "TenantId", "IsDefault" },
-                unique: true,
-                filter: "[IsDefault] = true");
+                columns: new[] { "TenantId", "IsDefault" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Senders_UpdatedBy",

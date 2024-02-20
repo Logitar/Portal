@@ -81,7 +81,7 @@ internal class SenderQuerier : ISenderQuerier
 
     if (payload.Provider.HasValue)
     {
-      builder.Where(PortalDb.Senders.Provider, Operators.IsEqualTo(payload.Provider.Value));
+      builder.Where(PortalDb.Senders.Provider, Operators.IsEqualTo(payload.Provider.Value.ToString()));
     }
 
     IQueryable<SenderEntity> query = _senders.FromQuery(builder).AsNoTracking();
