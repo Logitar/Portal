@@ -26,7 +26,7 @@ public class ConfigurationAggregate : AggregateRoot
   private JwtSecretUnit? _secret = null;
   public JwtSecretUnit Secret
   {
-    get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} have not been initialized yet.");
+    get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
     {
       if (value != _secret)

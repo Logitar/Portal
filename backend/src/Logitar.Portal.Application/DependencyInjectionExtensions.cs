@@ -6,6 +6,7 @@ using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.OneTimePasswords;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Application.Templates;
@@ -17,6 +18,7 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Tokens;
@@ -49,6 +51,7 @@ public static class DependencyInjectionExtensions
       .AddTransient<IOneTimePasswordService, OneTimePasswordFacade>()
       .AddTransient<IRealmService, RealmFacade>()
       .AddTransient<IRoleService, RoleFacade>()
+      .AddTransient<ISenderService, SenderFacade>()
       .AddTransient<ISessionService, SessionFacade>()
       .AddTransient<ITemplateService, TemplateFacade>()
       .AddTransient<ITokenService, TokenFacade>()

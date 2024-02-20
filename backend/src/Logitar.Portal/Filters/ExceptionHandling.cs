@@ -4,7 +4,9 @@ using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -64,7 +66,11 @@ internal class ExceptionHandling : ExceptionFilterAttribute
 
   private static bool IsBadRequestError(Exception exception)
   {
-    return exception is InvalidCredentialsException || exception is TooManyResultsException;
+    return exception is CannotDeleteDefaultSenderException
+      || exception is InvalidCredentialsException
+      || exception is SenderProviderMismatchException
+      || exception is SenderProviderNotSupportedException
+      || exception is TooManyResultsException;
   }
   private static bool IsConflictError(Exception exception)
   {

@@ -1,0 +1,21 @@
+﻿using Logitar.Portal.Contracts.Users;
+
+namespace Logitar.Portal.Contracts.Senders;
+
+public record ReplaceSenderPayload
+{
+  public EmailPayload Email { get; set; }
+  public string? DisplayName { get; set; }
+  public string? Description { get; set; }
+
+  public SendGridSettings SendGrid { get; set; } = new();
+
+  public ReplaceSenderPayload() : this(new EmailPayload())
+  {
+  }
+
+  public ReplaceSenderPayload(EmailPayload email)
+  {
+    Email = email;
+  }
+}
