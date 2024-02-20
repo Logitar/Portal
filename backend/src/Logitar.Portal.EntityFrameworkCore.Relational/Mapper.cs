@@ -8,6 +8,7 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Templates;
@@ -185,6 +186,29 @@ internal class Mapper
     foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
+    }
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public Sender ToSender(SenderEntity source, Realm? realm)
+  {
+    Sender destination = new(source.EmailAddress)
+    {
+      IsDefault = source.IsDefault,
+      DisplayName = source.DisplayName,
+      Description = source.Description,
+      Provider = source.Provider,
+      Realm = realm
+    };
+
+    switch (source.Provider)
+    {
+      case SenderProvider.SendGrid:
+        destination.SendGrid = new SendGridSettings(source.Settings[nameof(ISendGridSettings.ApiKey)]);
+        break;
     }
 
     MapAggregate(source, destination);
