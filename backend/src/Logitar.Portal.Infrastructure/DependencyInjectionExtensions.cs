@@ -4,6 +4,8 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Converters;
+using Logitar.Portal.Infrastructure.Messages.Providers;
+using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 using Logitar.Portal.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,10 +19,17 @@ public static class DependencyInjectionExtensions
     return services
       .AddLogitarIdentityInfrastructure()
       .AddLogitarPortalApplication()
+      .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddMemoryCache()
+      .AddSenderProviders()
       .AddSingleton(InitializeCachingSettings)
       .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(serviceProvider.GetLogitarPortalJsonConverters()));
+  }
+
+  private static IServiceCollection AddSenderProviders(this IServiceCollection services)
+  {
+    return services.AddSingleton<IProviderStrategy, SendGridStrategy>();
   }
 
   public static IEnumerable<JsonConverter> GetLogitarPortalJsonConverters(this IServiceProvider serviceProvider)
