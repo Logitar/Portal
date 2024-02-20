@@ -36,8 +36,8 @@ public class MessageAggregate : AggregateRoot
   public bool IsDemo { get; private set; }
 
   public MessageStatus Status { get; private set; }
-  private readonly Dictionary<string, string> _result = [];
-  public IReadOnlyDictionary<string, string> Result => _result.AsReadOnly();
+  private readonly Dictionary<string, string> _resultData = [];
+  public IReadOnlyDictionary<string, string> ResultData => _resultData.AsReadOnly();
 
   public MessageAggregate(AggregateId id) : base(id)
   {
@@ -89,6 +89,7 @@ public class MessageAggregate : AggregateRoot
     _subject = @event.Subject;
     _body = @event.Body;
 
+    _recipients.Clear();
     _recipients.AddRange(@event.Recipients);
     _sender = @event.Sender;
     _template = @event.Template;
@@ -96,7 +97,11 @@ public class MessageAggregate : AggregateRoot
     IgnoreUserLocale = @event.IgnoreUserLocale;
     Locale = @event.Locale;
 
-    _variables.AddRange(@event.Variables);
+    _variables.Clear();
+    foreach (KeyValuePair<string, string> variable in @event.Variables)
+    {
+      _variables[variable.Key] = variable.Value;
+    }
 
     IsDemo = @event.IsDemo;
 
@@ -109,6 +114,74 @@ public class MessageAggregate : AggregateRoot
     {
       Raise(new MessageDeletedEvent(actorId));
     }
+  }
+
+  public void Fail(ActorId actorId = default) => Fail(new Dictionary<string, string>(), actorId);
+  public void Fail(IReadOnlyDictionary<string, string> resultData, ActorId actorId = default)
+  {
+    if (Status == MessageStatus.Unsent)
+    {
+      Raise(new MessageFailedEvent(actorId, resultData));
+    }
+  }
+  protected virtual void Apply(MessageFailedEvent @event)
+  {
+    Status = MessageStatus.Failed;
+
+    _resultData.Clear();
+    foreach (KeyValuePair<string, string> resultData in @event.ResultData)
+    {
+      _resultData[resultData.Key] = resultData.Value;
+    }
+  }
+
+  public void Succeed(ActorId actorId = default) => Succeed(new Dictionary<string, string>(), actorId);
+  public void Succeed(IReadOnlyDictionary<string, string> resultData, ActorId actorId = default)
+  {
+    if (Status == MessageStatus.Unsent)
+    {
+      Raise(new MessageSucceededEvent(actorId, resultData));
+    }
+  }
+  protected virtual void Apply(MessageSucceededEvent @event)
+  {
+    Status = MessageStatus.Succeeded;
+
+    _resultData.Clear();
+    foreach (KeyValuePair<string, string> resultData in @event.ResultData)
+    {
+      _resultData[resultData.Key] = resultData.Value;
+    }
+  }
+
+  public MailMessage ToMailMessage()
+  {
+    MailMessage message = new()
+    {
+      From = Sender.ToMailAddress(),
+      Subject = Subject.Value,
+      Body = Body.Text,
+      IsBodyHtml = Body.Type == MediaTypeNames.Text.Html
+    };
+
+    foreach (RecipientUnit recipient in Recipients)
+    {
+      MailAddress address = recipient.ToMailAddress();
+      switch (recipient.Type)
+      {
+        case RecipientType.Bcc:
+          message.Bcc.Add(address);
+          break;
+        case RecipientType.CC:
+          message.CC.Add(address);
+          break;
+        case RecipientType.To:
+          message.To.Add(address);
+          break;
+      }
+    }
+
+    return message;
   }
 
   public override string ToString() => $"{Subject.Value} | {base.ToString()}";

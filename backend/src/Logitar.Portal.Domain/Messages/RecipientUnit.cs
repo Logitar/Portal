@@ -39,4 +39,6 @@ public record RecipientUnit
     UserId = user.Id;
     User = user;
   }
+
+  public MailAddress ToMailAddress() => new(Address, DisplayName);
 }

@@ -26,4 +26,6 @@ public record SenderSummary
   public SenderSummary(SenderAggregate sender) : this(sender.Id, sender.IsDefault, sender.Email, sender.DisplayName, sender.Provider)
   {
   }
+
+  public MailAddress ToMailAddress() => new(Email.Address, DisplayName?.Value);
 }
