@@ -59,7 +59,10 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     }
 
     ReadOnlySendGridSettings settings = new(payload.SendGrid);
-    sender.SetSettings(settings, actorId);
+    if (reference == null || settings != reference.Settings)
+    {
+      sender.SetSettings(settings, actorId);
+    }
 
     sender.Update(actorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);

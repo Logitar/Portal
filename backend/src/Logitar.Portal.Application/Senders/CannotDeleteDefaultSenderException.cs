@@ -4,7 +4,7 @@ namespace Logitar.Portal.Application.Senders;
 
 public class CannotDeleteDefaultSenderException : Exception
 {
-  public const string ErrorMessage = "The default sender cannot deleted, unless its the only sender in its Realm.";
+  public const string ErrorMessage = "The default sender cannot be deleted, unless its the only sender in its Realm.";
 
   public SenderId SenderId
   {

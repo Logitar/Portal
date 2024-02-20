@@ -116,8 +116,10 @@ public class SenderAggregate : AggregateRoot
     {
       throw new SenderProviderMismatchException(this, settings.Provider);
     }
-
-    Raise(new SenderSendGridSettingsChangedEvent(actorId, settings));
+    else if (settings != _settings)
+    {
+      Raise(new SenderSendGridSettingsChangedEvent(actorId, settings));
+    }
   }
   protected virtual void Apply(SenderSendGridSettingsChangedEvent @event)
   {
