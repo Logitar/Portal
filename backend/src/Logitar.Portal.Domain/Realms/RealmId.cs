@@ -30,4 +30,6 @@ public record RealmId
   {
     return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
   }
+
+  public Guid ToGuid() => AggregateId.ToGuid();
 }

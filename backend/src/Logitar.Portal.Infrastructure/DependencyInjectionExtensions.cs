@@ -34,6 +34,7 @@ public static class DependencyInjectionExtensions
     converters.Add(new ConfigurationIdConverter());
     converters.Add(new DictionaryIdConverter());
     converters.Add(new JwtSecretConverter());
+    converters.Add(new MessageIdConverter());
     converters.Add(new RealmIdConverter());
     converters.Add(new SenderIdConverter());
     converters.Add(new SubjectConverter());
