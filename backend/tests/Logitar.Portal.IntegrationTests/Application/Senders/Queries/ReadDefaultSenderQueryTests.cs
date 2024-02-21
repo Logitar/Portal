@@ -57,6 +57,6 @@ public class ReadDefaultSenderQueryTests : IntegrationTests
     ReadDefaultSenderQuery query = new();
     Sender? sender = await Mediator.Send(query);
     Assert.NotNull(sender);
-    Assert.Equal(_sender.Id.AggregateId.ToGuid(), sender.Id);
+    Assert.Equal(_sender.Id.ToGuid(), sender.Id);
   }
 }

@@ -37,7 +37,7 @@ public class CreateSessionCommandTests : IntegrationTests
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Null(user.TenantId);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), session.User.Id);
+    Assert.Equal(user.Id.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should create a realm session.")]
@@ -60,7 +60,7 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), session.User.Id);
+    Assert.Equal(user.Id.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should throw UserNotFoundException when the user could not be found.")]

@@ -9,6 +9,10 @@ public record TemplateId
   public AggregateId AggregateId { get; }
   public string Value => AggregateId.Value;
 
+  public TemplateId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  {
+  }
+
   public TemplateId(AggregateId aggregateId, string? propertyName = null)
   {
     new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);

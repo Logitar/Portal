@@ -59,7 +59,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     SetRealm();
 
     UpdateApiKeyPayload payload = new();
-    UpdateApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
     ApiKey? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -71,7 +71,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     UpdateApiKeyPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
-    UpdateApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
@@ -118,7 +118,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("UserId", value: null));
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
-    UpdateApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
     ApiKey? result = await Mediator.Send(command);
     Assert.NotNull(result);
 
@@ -131,8 +131,8 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "SubSystem" && c.Value == nameof(IntegrationTests));
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == editor.Id.AggregateId.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.AggregateId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == editor.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
   }
 
   private async Task<ApiKeyAggregate> CreateApiKeyAsync()

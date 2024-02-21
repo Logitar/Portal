@@ -62,7 +62,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sender.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, version);
     Sender? sender = await Mediator.Send(command);
     Assert.NotNull(sender);
 
@@ -93,7 +93,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sender.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, Version: null);
     Sender? result = await Mediator.Send(command);
     Assert.Null(result);
   }

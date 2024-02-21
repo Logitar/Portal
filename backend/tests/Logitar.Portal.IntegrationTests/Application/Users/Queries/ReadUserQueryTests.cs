@@ -24,7 +24,7 @@ public class ReadUserQueryTests : IntegrationTests
 
     SetRealm();
 
-    ReadUserQuery query = new(user.Id.AggregateId.ToGuid(), UniqueName: null, Identifier: null);
+    ReadUserQuery query = new(user.Id.ToGuid(), UniqueName: null, Identifier: null);
     User? found = await Mediator.Send(query);
     Assert.Null(found);
   }
@@ -34,10 +34,10 @@ public class ReadUserQueryTests : IntegrationTests
   {
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
-    ReadUserQuery query = new(user.Id.AggregateId.ToGuid(), user.UniqueName.Value, Identifier: null);
+    ReadUserQuery query = new(user.Id.ToGuid(), user.UniqueName.Value, Identifier: null);
     User? found = await Mediator.Send(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), found.Id);
+    Assert.Equal(user.Id.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by custom identifier.")]
@@ -53,7 +53,7 @@ public class ReadUserQueryTests : IntegrationTests
     ReadUserQuery query = new(Id: null, UniqueName: null, Identifier: new CustomIdentifier($" {key} ", $"  {healthInsuranceNumber}  "));
     User? found = await Mediator.Send(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), found.Id);
+    Assert.Equal(user.Id.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by email address.")]
@@ -65,7 +65,7 @@ public class ReadUserQueryTests : IntegrationTests
     ReadUserQuery query = new(Id: null, user.Email.Address, Identifier: null);
     User? found = await Mediator.Send(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), found.Id);
+    Assert.Equal(user.Id.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by unique name.")]
@@ -76,7 +76,7 @@ public class ReadUserQueryTests : IntegrationTests
     ReadUserQuery query = new(Id: null, user.UniqueName.Value, Identifier: null);
     User? found = await Mediator.Send(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), found.Id);
+    Assert.Equal(user.Id.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -87,7 +87,7 @@ public class ReadUserQueryTests : IntegrationTests
     UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(other);
 
-    ReadUserQuery query = new(user.Id.AggregateId.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);
+    ReadUserQuery query = new(user.Id.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);
     var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

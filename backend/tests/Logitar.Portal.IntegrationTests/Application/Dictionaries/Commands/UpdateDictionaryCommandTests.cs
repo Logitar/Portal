@@ -52,7 +52,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     UpdateDictionaryPayload payload = new();
-    UpdateDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
     Dictionary? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -67,7 +67,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     {
       Locale = Faker.Locale
     };
-    UpdateDictionaryCommand command = new(dictionary.Id.AggregateId.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(dictionary.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Locale, exception.Locale.Code);
@@ -101,7 +101,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("jaune", "yellow"));
     payload.Entries.Add(new("rouge", "scarlet"));
     payload.Entries.Add(new("vert", value: null));
-    UpdateDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
     Dictionary? dictionary = await Mediator.Send(command);
     Assert.NotNull(dictionary);
 

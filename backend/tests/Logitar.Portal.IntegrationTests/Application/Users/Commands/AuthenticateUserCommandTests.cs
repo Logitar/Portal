@@ -22,7 +22,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
     User result = await Mediator.Send(command);
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    Assert.Equal(user.Id.AggregateId.ToGuid(), result.Id);
+    Assert.Equal(user.Id.ToGuid(), result.Id);
   }
 
   [Fact(DisplayName = "It should throw IncorrectUserPasswordException when the password is incorrect.")]

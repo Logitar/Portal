@@ -9,6 +9,10 @@ public record MessageId
   public AggregateId AggregateId { get; }
   public string Value => AggregateId.Value;
 
+  public MessageId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  {
+  }
+
   public MessageId(AggregateId aggregateId, string? propertyName = null)
   {
     new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);

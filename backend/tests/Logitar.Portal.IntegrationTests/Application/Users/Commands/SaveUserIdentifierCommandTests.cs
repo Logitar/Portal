@@ -29,7 +29,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.AggregateId.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
     User? result = await Mediator.Send(command);
     Assert.NotNull(result);
     Assert.Contains(result.CustomIdentifiers, id => id.Key == command.Key && id.Value == payload.Value);
@@ -52,7 +52,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
     SetRealm();
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.AggregateId.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
     User? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -67,7 +67,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
     await _userRepository.SaveAsync(other);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.AggregateId.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
     var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(command.Key, exception.Key);

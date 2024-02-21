@@ -45,7 +45,7 @@ public class ReadOneTimePasswordQueryTests : IntegrationTests
   {
     OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
 
-    ReadOneTimePasswordQuery query = new(oneTimePassword.Id.AggregateId.ToGuid());
+    ReadOneTimePasswordQuery query = new(oneTimePassword.Id.ToGuid());
     OneTimePassword? result = await Mediator.Send(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);

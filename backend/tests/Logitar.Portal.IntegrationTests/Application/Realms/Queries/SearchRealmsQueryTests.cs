@@ -56,10 +56,10 @@ public class SearchRealmsQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> realmIds = (await _realmRepository.LoadAsync()).Select(realm => realm.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> realmIds = (await _realmRepository.LoadAsync()).Select(realm => realm.Id.ToGuid());
     payload.Ids.AddRange(realmIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("real%"));
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new RealmSortOption(RealmSort.DisplayName, isDescending: false));
@@ -68,6 +68,6 @@ public class SearchRealmsQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Realm realm = Assert.Single(results.Items);
-    Assert.Equal(realm2.Id.AggregateId.ToGuid(), realm.Id);
+    Assert.Equal(realm2.Id.ToGuid(), realm.Id);
   }
 }

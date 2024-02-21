@@ -91,7 +91,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     {
       if (recipient.UserId.HasValue)
       {
-        userIds.Add(new UserId(new AggregateId(recipient.UserId.Value)));
+        userIds.Add(new UserId(recipient.UserId.Value));
       }
     }
 
@@ -101,7 +101,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       IEnumerable<UserAggregate> allUsers = await _userRepository.LoadAsync(userIds, cancellationToken);
       foreach (UserAggregate user in allUsers)
       {
-        users[user.Id.AggregateId.ToGuid()] = user;
+        users[user.Id.ToGuid()] = user;
       }
     }
 

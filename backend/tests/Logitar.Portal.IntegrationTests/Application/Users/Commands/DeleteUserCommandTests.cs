@@ -22,7 +22,7 @@ public class DeleteUserCommandTests : IntegrationTests
   {
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
-    DeleteUserCommand command = new(user.Id.AggregateId.ToGuid());
+    DeleteUserCommand command = new(user.Id.ToGuid());
     User? deleted = await Mediator.Send(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -45,7 +45,7 @@ public class DeleteUserCommandTests : IntegrationTests
 
     SetRealm();
 
-    DeleteUserCommand command = new(user.Id.AggregateId.ToGuid());
+    DeleteUserCommand command = new(user.Id.ToGuid());
     User? result = await Mediator.Send(command);
     Assert.Null(result);
   }

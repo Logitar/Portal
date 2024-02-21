@@ -68,10 +68,10 @@ public class SearchRolesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> roleIds = (await _roleRepository.LoadAsync()).Select(role => role.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> roleIds = (await _roleRepository.LoadAsync()).Select(role => role.Id.ToGuid());
     payload.Ids.AddRange(roleIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(minister.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(minister.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%min%"));
     payload.Search.Terms.Add(new SearchTerm("gues%"));
     payload.Search.Operator = SearchOperator.Or;
@@ -81,6 +81,6 @@ public class SearchRolesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Role role = Assert.Single(results.Items);
-    Assert.Equal(guest.Id.AggregateId.ToGuid(), role.Id);
+    Assert.Equal(guest.Id.ToGuid(), role.Id);
   }
 }

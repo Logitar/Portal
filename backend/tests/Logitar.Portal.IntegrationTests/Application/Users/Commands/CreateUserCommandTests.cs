@@ -61,7 +61,7 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.Same(Realm, user.Realm);
 
     Role userRole = Assert.Single(user.Roles);
-    Assert.Equal(role.Id.AggregateId.ToGuid(), userRole.Id);
+    Assert.Equal(role.Id.ToGuid(), userRole.Id);
   }
 
   [Fact(DisplayName = "It should throw CustomIdentifierAlreadyUsedException when a custom identifier is already used.")]

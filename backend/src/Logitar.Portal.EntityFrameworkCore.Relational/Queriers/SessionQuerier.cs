@@ -39,7 +39,7 @@ internal class SessionQuerier : ISessionQuerier
       ?? throw new InvalidOperationException($"The session entity 'AggregateId={session.Id.Value}' could not be found.");
   }
   public async Task<Session?> ReadAsync(SessionId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

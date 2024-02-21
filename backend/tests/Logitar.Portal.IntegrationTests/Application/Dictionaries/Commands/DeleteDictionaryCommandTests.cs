@@ -40,7 +40,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing dictionary.")]
   public async Task It_should_delete_an_existing_dictionary()
   {
-    DeleteDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid());
+    DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
     Dictionary? dictionary = await Mediator.Send(command);
     Assert.NotNull(dictionary);
     Assert.Equal(command.Id, dictionary.Id);
@@ -59,7 +59,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid());
+    DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
     Dictionary? result = await Mediator.Send(command);
     Assert.Null(result);
   }

@@ -42,7 +42,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadDictionaryQuery query = new(_dictionary.Id.AggregateId.ToGuid(), Locale: null);
+    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), Locale: null);
     Dictionary? dictionary = await Mediator.Send(query);
     Assert.Null(dictionary);
   }
@@ -50,10 +50,10 @@ public class ReadDictionaryQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the dictionary found by ID.")]
   public async Task It_should_return_the_dictionary_found_by_Id()
   {
-    ReadDictionaryQuery query = new(_dictionary.Id.AggregateId.ToGuid(), _dictionary.Locale.Code);
+    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), _dictionary.Locale.Code);
     Dictionary? dictionary = await Mediator.Send(query);
     Assert.NotNull(dictionary);
-    Assert.Equal(_dictionary.Id.AggregateId.ToGuid(), dictionary.Id);
+    Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
   }
 
   [Fact(DisplayName = "It should return the dictionary found by locale.")]
@@ -62,7 +62,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     ReadDictionaryQuery query = new(Id: null, _dictionary.Locale.Code);
     Dictionary? dictionary = await Mediator.Send(query);
     Assert.NotNull(dictionary);
-    Assert.Equal(_dictionary.Id.AggregateId.ToGuid(), dictionary.Id);
+    Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -71,7 +71,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     DictionaryAggregate dictionary = new(new LocaleUnit("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
-    ReadDictionaryQuery query = new(_dictionary.Id.AggregateId.ToGuid(), "  FR  ");
+    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), "  FR  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<Dictionary>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

@@ -45,7 +45,7 @@ public class ReadRoleQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadRoleQuery query = new(_role.Id.AggregateId.ToGuid(), UniqueName: null);
+    ReadRoleQuery query = new(_role.Id.ToGuid(), UniqueName: null);
     Role? role = await Mediator.Send(query);
     Assert.Null(role);
   }
@@ -53,10 +53,10 @@ public class ReadRoleQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the role found by ID.")]
   public async Task It_should_return_the_role_found_by_Id()
   {
-    ReadRoleQuery query = new(_role.Id.AggregateId.ToGuid(), _role.UniqueName.Value);
+    ReadRoleQuery query = new(_role.Id.ToGuid(), _role.UniqueName.Value);
     Role? role = await Mediator.Send(query);
     Assert.NotNull(role);
-    Assert.Equal(_role.Id.AggregateId.ToGuid(), role.Id);
+    Assert.Equal(_role.Id.ToGuid(), role.Id);
   }
 
   [Fact(DisplayName = "It should return the role found by unique name.")]
@@ -65,7 +65,7 @@ public class ReadRoleQueryTests : IntegrationTests
     ReadRoleQuery query = new(Id: null, _role.UniqueName.Value);
     Role? role = await Mediator.Send(query);
     Assert.NotNull(role);
-    Assert.Equal(_role.Id.AggregateId.ToGuid(), role.Id);
+    Assert.Equal(_role.Id.ToGuid(), role.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -74,7 +74,7 @@ public class ReadRoleQueryTests : IntegrationTests
     RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
-    ReadRoleQuery query = new(_role.Id.AggregateId.ToGuid(), "  GueST  ");
+    ReadRoleQuery query = new(_role.Id.ToGuid(), "  GueST  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<Role>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

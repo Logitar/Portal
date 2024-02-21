@@ -106,7 +106,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
   {
     Actor actor = new(user.FullName ?? user.UniqueName.Value)
     {
-      Id = user.Id.AggregateId.ToGuid(),
+      Id = user.Id.ToGuid(),
       Type = ActorType.User,
       EmailAddress = user.Email?.Address,
       PictureUrl = user.Picture?.Value

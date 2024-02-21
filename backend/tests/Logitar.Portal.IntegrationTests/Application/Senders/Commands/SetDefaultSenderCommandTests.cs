@@ -54,7 +54,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   {
     SetRealm();
 
-    SetDefaultSenderCommand command = new(_sender.Id.AggregateId.ToGuid());
+    SetDefaultSenderCommand command = new(_sender.Id.ToGuid());
     Sender? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -65,7 +65,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
     SenderAggregate sender = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(sender);
 
-    SetDefaultSenderCommand command = new(sender.Id.AggregateId.ToGuid());
+    SetDefaultSenderCommand command = new(sender.Id.ToGuid());
     Sender? result = await Mediator.Send(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);

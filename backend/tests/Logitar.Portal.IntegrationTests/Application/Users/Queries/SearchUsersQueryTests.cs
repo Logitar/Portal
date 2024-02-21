@@ -81,10 +81,10 @@ public class SearchUsersQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> userIds = (await _userRepository.LoadAsync()).Select(user => user.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> userIds = (await _userRepository.LoadAsync()).Select(user => user.Id.ToGuid());
     payload.Ids.AddRange(userIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm(nickname.Value));
     payload.Sort.Add(new UserSortOption(UserSort.Birthdate, isDescending: false));
     SearchUsersQuery query = new(payload);
@@ -92,6 +92,6 @@ public class SearchUsersQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     User result = Assert.Single(results.Items);
-    Assert.Equal(youngest.Id.AggregateId.ToGuid(), result.Id);
+    Assert.Equal(youngest.Id.ToGuid(), result.Id);
   }
 }
