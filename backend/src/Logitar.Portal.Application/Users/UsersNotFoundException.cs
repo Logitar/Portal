@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Application.Userss;
+﻿namespace Logitar.Portal.Application.Users;
 
 public class UsersNotFoundException : Exception
 {

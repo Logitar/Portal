@@ -5,7 +5,7 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Messages.Validators;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Templates;
-using Logitar.Portal.Application.Userss;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Messages;

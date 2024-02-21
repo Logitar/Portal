@@ -12,12 +12,17 @@ namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
 internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
 {
+  private readonly JsonSerializerOptions _serializerOptions;
+
   private readonly IApplicationContext _applicationContext;
   private readonly Dictionary<SenderProvider, IProviderStrategy> _strategies = [];
 
-  public SendEmailCommandHandler(IApplicationContext applicationContext, IEnumerable<IProviderStrategy> strategies)
+  public SendEmailCommandHandler(IApplicationContext applicationContext, IServiceProvider serviceProvider, IEnumerable<IProviderStrategy> strategies)
   {
     _applicationContext = applicationContext;
+
+    _serializerOptions = new();
+    _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
 
     foreach (IProviderStrategy strategy in strategies)
     {
@@ -43,18 +48,12 @@ internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
     {
       result = await messageHandler.SendAsync(message, cancellationToken);
     }
-    catch (Exception)
+    catch (Exception exception)
     {
-      // TODO(fpion): ExceptionDetail?
-      result = SendMailResult.Failure(); // TODO(fpion): data
+      result = ToResult(exception);
     }
 
-    Dictionary<string, string> resultData = new(capacity: result.Data.Count);
-    foreach (KeyValuePair<string, object?> data in result.Data)
-    {
-      resultData[data.Key] = data.Value?.ToString() ?? string.Empty; // TODO(fpion): serialize
-    }
-
+    IReadOnlyDictionary<string, string> resultData = SerializeData(result);
     if (result.Succeeded)
     {
       message.Succeed(resultData, actorId);
@@ -63,5 +62,35 @@ internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
     {
       message.Fail(resultData, actorId);
     }
+  }
+
+  private Dictionary<string, string> SerializeData(SendMailResult result)
+  {
+    Dictionary<string, string> resultData = new(capacity: result.Data.Count);
+    foreach (KeyValuePair<string, object?> data in result.Data)
+    {
+      if (data.Value != null)
+      {
+        resultData[data.Key] = JsonSerializer.Serialize(data.Value, data.Value.GetType(), _serializerOptions).Trim('"');
+      }
+    }
+    return resultData;
+  }
+
+  private static SendMailResult ToResult(Exception exception)
+  {
+    ExceptionDetail detail = ExceptionDetail.From(exception);
+    return SendMailResult.Failure(new Dictionary<string, object?>
+    {
+      [nameof(ExceptionDetail.Type)] = detail.Type,
+      [nameof(ExceptionDetail.Message)] = detail.Message,
+      [nameof(ExceptionDetail.InnerException)] = detail.InnerException,
+      [nameof(ExceptionDetail.HResult)] = detail.HResult,
+      [nameof(ExceptionDetail.HelpLink)] = detail.HelpLink,
+      [nameof(ExceptionDetail.Source)] = detail.Source,
+      [nameof(ExceptionDetail.StackTrace)] = detail.StackTrace,
+      [nameof(ExceptionDetail.TargetSite)] = detail.TargetSite,
+      [nameof(ExceptionDetail.Data)] = detail.Data
+    });
   }
 }
