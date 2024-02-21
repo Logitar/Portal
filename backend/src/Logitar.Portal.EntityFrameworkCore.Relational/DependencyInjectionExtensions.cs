@@ -2,6 +2,7 @@
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.OneTimePasswords;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
@@ -11,6 +12,7 @@ using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
@@ -41,6 +43,7 @@ public static class DependencyInjectionExtensions
       .AddTransient<IApiKeyQuerier, ApiKeyQuerier>()
       .AddTransient<IConfigurationQuerier, ConfigurationQuerier>()
       .AddTransient<IDictionaryQuerier, DictionaryQuerier>()
+      .AddTransient<IMessageQuerier, MessageQuerier>()
       .AddTransient<IOneTimePasswordQuerier, OneTimePasswordQuerier>()
       .AddTransient<IRealmQuerier, RealmQuerier>()
       .AddTransient<IRoleQuerier, RoleQuerier>()
@@ -55,6 +58,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IConfigurationRepository, ConfigurationRepository>()
       .AddTransient<IDictionaryRepository, DictionaryRepository>()
+      .AddTransient<IMessageRepository, MessageRepository>()
       .AddTransient<IRealmRepository, RealmRepository>()
       .AddTransient<ISenderRepository, SenderRepository>()
       .AddTransient<ITemplateRepository, TemplateRepository>();

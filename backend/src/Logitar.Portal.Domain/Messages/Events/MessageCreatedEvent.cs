@@ -21,7 +21,7 @@ public record MessageCreatedEvent : DomainEvent, INotification
 
   public IReadOnlyDictionary<string, string> Variables { get; }
 
-  public bool IsDemo { get; set; }
+  public bool IsDemo { get; }
 
   public MessageCreatedEvent(ActorId actorId, TenantId? tenantId, SubjectUnit subject, ContentUnit body, IReadOnlyCollection<RecipientUnit> recipients,
     SenderSummary sender, TemplateSummary template, bool ignoreUserLocale, LocaleUnit? locale, IReadOnlyDictionary<string, string> variables, bool isDemo)

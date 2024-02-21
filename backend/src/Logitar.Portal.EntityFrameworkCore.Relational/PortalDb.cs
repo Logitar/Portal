@@ -22,6 +22,37 @@ internal static class PortalDb
     public static readonly ColumnId Version = new(nameof(DictionaryEntity.Version), Table);
   }
 
+  public static class Messages
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Messages));
+
+    public static readonly ColumnId AggregateId = new(nameof(MessageEntity.AggregateId), Table);
+    public static readonly ColumnId BodyText = new(nameof(MessageEntity.BodyText), Table);
+    public static readonly ColumnId BodyType = new(nameof(MessageEntity.BodyType), Table);
+    public static readonly ColumnId CreatedBy = new(nameof(MessageEntity.CreatedBy), Table);
+    public static readonly ColumnId CreatedOn = new(nameof(MessageEntity.CreatedOn), Table);
+    public static readonly ColumnId IgnoreUserLocale = new(nameof(MessageEntity.IgnoreUserLocale), Table);
+    public static readonly ColumnId IsDemo = new(nameof(MessageEntity.IsDemo), Table);
+    public static readonly ColumnId Locale = new(nameof(MessageEntity.Locale), Table);
+    public static readonly ColumnId MessageId = new(nameof(MessageEntity.MessageId), Table);
+    public static readonly ColumnId ResultData = new(nameof(MessageEntity.ResultData), Table);
+    public static readonly ColumnId SenderAddress = new(nameof(MessageEntity.SenderAddress), Table);
+    public static readonly ColumnId SenderDisplayName = new(nameof(MessageEntity.SenderDisplayName), Table);
+    public static readonly ColumnId SenderId = new(nameof(MessageEntity.SenderId), Table);
+    public static readonly ColumnId SenderIsDefault = new(nameof(MessageEntity.SenderIsDefault), Table);
+    public static readonly ColumnId SenderProvider = new(nameof(MessageEntity.SenderProvider), Table);
+    public static readonly ColumnId Status = new(nameof(MessageEntity.Status), Table);
+    public static readonly ColumnId Subject = new(nameof(MessageEntity.Subject), Table);
+    public static readonly ColumnId TemplateDisplayName = new(nameof(MessageEntity.TemplateDisplayName), Table);
+    public static readonly ColumnId TemplateId = new(nameof(MessageEntity.TemplateId), Table);
+    public static readonly ColumnId TemplateUniqueKey = new(nameof(MessageEntity.TemplateUniqueKey), Table);
+    public static readonly ColumnId TenantId = new(nameof(MessageEntity.TenantId), Table);
+    public static readonly ColumnId UpdatedBy = new(nameof(MessageEntity.UpdatedBy), Table);
+    public static readonly ColumnId UpdatedOn = new(nameof(MessageEntity.UpdatedOn), Table);
+    public static readonly ColumnId Variables = new(nameof(MessageEntity.Variables), Table);
+    public static readonly ColumnId Version = new(nameof(MessageEntity.Version), Table);
+  }
+
   public static class Realms
   {
     public static readonly TableId Table = new(nameof(PortalContext.Realms));
@@ -50,6 +81,18 @@ internal static class PortalDb
     public static readonly ColumnId UpdatedOn = new(nameof(RealmEntity.UpdatedOn), Table);
     public static readonly ColumnId Url = new(nameof(RealmEntity.Url), Table);
     public static readonly ColumnId Version = new(nameof(RealmEntity.Version), Table);
+  }
+
+  public static class Recipients
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Recipients));
+
+    public static readonly ColumnId Address = new(nameof(RecipientEntity.Address), Table);
+    public static readonly ColumnId DisplayName = new(nameof(RecipientEntity.DisplayName), Table);
+    public static readonly ColumnId MessageId = new(nameof(RecipientEntity.MessageId), Table);
+    public static readonly ColumnId RecipientId = new(nameof(RecipientEntity.RecipientId), Table);
+    public static readonly ColumnId Type = new(nameof(RecipientEntity.Type), Table);
+    public static readonly ColumnId UserId = new(nameof(RecipientEntity.UserId), Table);
   }
 
   public static class Senders

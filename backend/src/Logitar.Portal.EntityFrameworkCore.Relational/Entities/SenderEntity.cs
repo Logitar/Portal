@@ -34,6 +34,8 @@ internal class SenderEntity : AggregateEntity
     }
   }
 
+  public List<MessageEntity> Messages { get; private set; } = [];
+
   public SenderEntity(SenderCreatedEvent @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;

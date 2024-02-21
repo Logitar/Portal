@@ -10,7 +10,9 @@ public class PortalContext : DbContext
   }
 
   internal DbSet<DictionaryEntity> Dictionaries { get; private set; }
+  internal DbSet<MessageEntity> Messages { get; private set; }
   internal DbSet<RealmEntity> Realms { get; private set; }
+  internal DbSet<RecipientEntity> Recipients { get; private set; }
   internal DbSet<SenderEntity> Senders { get; private set; }
   internal DbSet<TemplateEntity> Templates { get; private set; }
 

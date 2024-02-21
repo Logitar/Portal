@@ -10,7 +10,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Configurations;
 
 internal class TemplateConfiguration : AggregateConfiguration<TemplateEntity>, IEntityTypeConfiguration<TemplateEntity>
 {
-  private const int ContentTypeMaximumLength = 10; // NOTE(fpion): length of 'text/plain'
+  public const int ContentTypeMaximumLength = 10; // NOTE(fpion): length of 'text/plain'
 
   public override void Configure(EntityTypeBuilder<TemplateEntity> builder)
   {

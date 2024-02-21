@@ -7,7 +7,7 @@ namespace Logitar.Portal.Contracts.Messages;
 public class Message : Aggregate
 {
   public string Subject { get; set; }
-  public string Body { get; set; }
+  public Content Body { get; set; }
 
   public int RecipientCount { get; set; }
   public List<Recipient> Recipients { get; set; }
@@ -23,15 +23,15 @@ public class Message : Aggregate
   public bool IsDemo { get; set; }
 
   public MessageStatus Status { get; set; }
-  public List<ResultData> Result { get; set; }
+  public List<ResultData> ResultData { get; set; }
 
   public Realm? Realm { get; set; }
 
-  public Message() : this(string.Empty, string.Empty, new Sender(), new Template())
+  public Message() : this(string.Empty, new Content(), new Sender(), new Template())
   {
   }
 
-  public Message(string subject, string body, Sender sender, Template template)
+  public Message(string subject, Content body, Sender sender, Template template)
   {
     Subject = subject;
     Body = body;
@@ -39,6 +39,6 @@ public class Message : Aggregate
     Sender = sender;
     Template = template;
     Variables = [];
-    Result = [];
+    ResultData = [];
   }
 }

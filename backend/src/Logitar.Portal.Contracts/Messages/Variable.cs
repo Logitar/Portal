@@ -9,6 +9,10 @@ public record Variable
   {
   }
 
+  public Variable(KeyValuePair<string, string> variable) : this(variable.Key, variable.Value)
+  {
+  }
+
   public Variable(string key, string value)
   {
     Key = key;

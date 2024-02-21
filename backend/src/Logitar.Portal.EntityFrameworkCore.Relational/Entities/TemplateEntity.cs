@@ -23,6 +23,8 @@ internal class TemplateEntity : AggregateEntity
   public string ContentType { get; private set; } = string.Empty;
   public string ContentText { get; private set; } = string.Empty;
 
+  public List<MessageEntity> Messages { get; private set; } = [];
+
   public TemplateEntity(TemplateCreatedEvent @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;

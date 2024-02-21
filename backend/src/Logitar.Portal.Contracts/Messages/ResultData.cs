@@ -9,6 +9,10 @@ public record ResultData
   {
   }
 
+  public ResultData(KeyValuePair<string, string> data) : this(data.Key, data.Value)
+  {
+  }
+
   public ResultData(string key, string value)
   {
     Key = key;

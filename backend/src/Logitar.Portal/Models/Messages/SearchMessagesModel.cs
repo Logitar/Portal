@@ -6,8 +6,8 @@ namespace Logitar.Portal.Models.Messages;
 
 public record SearchMessagesModel : SearchModel
 {
-  [FromQuery(Name = "template")]
-  public string? Template { get; set; }
+  [FromQuery(Name = "template_id")]
+  public Guid? TemplateId { get; set; }
 
   [FromQuery(Name = "demo")]
   public bool? IsDemo { get; set; }
@@ -19,7 +19,7 @@ public record SearchMessagesModel : SearchModel
   {
     SearchMessagesPayload payload = new()
     {
-      Template = Template,
+      TemplateId = TemplateId,
       IsDemo = IsDemo,
       Status = Status
     };
