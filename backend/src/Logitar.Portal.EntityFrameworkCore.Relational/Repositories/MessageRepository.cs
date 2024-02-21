@@ -1,4 +1,5 @@
 ﻿using Logitar.Data;
+using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.EventSourcing.Infrastructure;
 using Logitar.Identity.Domain.Shared;
@@ -19,6 +20,9 @@ internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.
   {
     _sqlHelper = sqlHelper;
   }
+
+  public async Task<MessageAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
+    => await base.LoadAsync<MessageAggregate>(new AggregateId(id), cancellationToken);
 
   public async Task<IEnumerable<MessageAggregate>> LoadAsync(CancellationToken cancellationToken)
     => await base.LoadAsync<MessageAggregate>(cancellationToken);

@@ -68,9 +68,9 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
         ? defaultDictionaries : new(allDictionaries, recipient.User.Locale, defaultLocale);
 
       SubjectUnit subject = new(defaultDictionaries.Translate(template.Subject.Value));
-      ContentUnit body = await _mediator.Send(new CompileTemplateCommand(id, template, defaultDictionaries, recipient.User, variables), cancellationToken);
-      IReadOnlyCollection<RecipientUnit> recipients = new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc).ToList();
       LocaleUnit? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
+      ContentUnit body = await _mediator.Send(new CompileTemplateCommand(id, template, defaultDictionaries, locale, recipient.User, variables), cancellationToken);
+      IReadOnlyCollection<RecipientUnit> recipients = new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc).ToList();
 
       MessageAggregate message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
       messages.Add(message);

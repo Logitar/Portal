@@ -14,6 +14,10 @@ public record SendMessagePayload
 
   public bool IsDemo { get; set; }
 
+  public SendMessagePayload() : this(string.Empty)
+  {
+  }
+
   public SendMessagePayload(string template)
   {
     Template = template;

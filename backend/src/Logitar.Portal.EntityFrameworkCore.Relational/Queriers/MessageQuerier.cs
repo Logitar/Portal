@@ -66,7 +66,7 @@ internal class MessageQuerier : IMessageQuerier
     Realm? realm = _applicationContext.Realm;
 
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
-      .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.MessageId)
+      .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.TemplateId)
       .ApplyRealmFilter(PortalDb.Messages.TenantId, realm)
       .ApplyIdFilter(PortalDb.Messages.AggregateId, payload.Ids);
     _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Messages.Subject);

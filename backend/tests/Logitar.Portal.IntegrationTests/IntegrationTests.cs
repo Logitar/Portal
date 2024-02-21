@@ -50,6 +50,7 @@ public abstract class IntegrationTests : IAsyncLifetime
 
     IConfiguration configuration = new ConfigurationBuilder()
       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+      .AddUserSecrets("f5e49206-87cc-4c7a-8962-e79ebd5c850c")
       .Build();
 
     string connectionString = configuration.GetValue<string>("SQLCONNSTR_Portal")
