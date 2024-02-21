@@ -112,6 +112,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       {
         if (users.TryGetValue(recipient.UserId.Value, out UserAggregate? user))
         {
+          // TODO(fpion): error if user has no email
           recipients.Add(new RecipientUnit(user, recipient.Type));
         }
         else
