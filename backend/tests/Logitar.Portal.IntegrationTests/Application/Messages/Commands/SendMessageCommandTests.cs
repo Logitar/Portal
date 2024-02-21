@@ -163,6 +163,26 @@ public class SendMessageCommandTests : IntegrationTests
     Assert.Equal(createdToken.Token, variable.Value);
   }
 
+  [Fact(DisplayName = "It should throw MissingRecipientAddressesException when an user is missing an email.")]
+  public async Task It_should_throw_MissingRecipientAddressesException_when_an_user_is_missing_an_email()
+  {
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    await _userRepository.SaveAsync(user);
+
+    SetRealm();
+
+    SendMessagePayload payload = new("PasswordRecovery");
+    payload.Recipients.Add(new RecipientPayload
+    {
+      Type = RecipientType.To,
+      UserId = user.Id.ToGuid()
+    });
+    SendMessageCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await Mediator.Send(command));
+    Assert.Equal(new[] { user.Id.ToGuid() }, exception.UserIds);
+    Assert.Equal("Recipients", exception.PropertyName);
+  }
+
   [Fact(DisplayName = "It should throw NoDefaultSenderException when the realm has no sender.")]
   public async Task It_should_throw_NoDefaultSenderException_when_the_realm_has_no_sender()
   {

@@ -3,6 +3,7 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
@@ -74,6 +75,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static readonly HashSet<Type> _badRequestExceptions = new(new[]
   {
     typeof(CannotDeleteDefaultSenderException),
+    typeof(MissingRecipientAddressesException),
     typeof(NoDefaultSenderException),
     typeof(SenderNotInTenantException),
     typeof(SenderProviderMismatchException),

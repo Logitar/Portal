@@ -106,14 +106,21 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     }
 
     List<Guid> missingUsers = new(recipients.Capacity);
+    List<Guid> missingEmails = new(recipients.Capacity);
     foreach (RecipientPayload recipient in payload.Recipients)
     {
       if (recipient.UserId.HasValue)
       {
         if (users.TryGetValue(recipient.UserId.Value, out UserAggregate? user))
         {
-          // TODO(fpion): error if user has no email
-          recipients.Add(new RecipientUnit(user, recipient.Type));
+          if (user.Email == null)
+          {
+            missingEmails.Add(recipient.UserId.Value);
+          }
+          else
+          {
+            recipients.Add(new RecipientUnit(user, recipient.Type));
+          }
         }
         else
         {
@@ -128,6 +135,10 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     if (missingUsers.Count > 0)
     {
       throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
+    }
+    else if (missingEmails.Count > 0)
+    {
+      throw new MissingRecipientAddressesException(missingEmails, nameof(payload.Recipients));
     }
 
     return new Recipients(recipients);
