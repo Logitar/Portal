@@ -71,10 +71,10 @@ public class SearchTemplatesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> templateIds = (await _templateRepository.LoadAsync()).Select(template => template.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> templateIds = (await _templateRepository.LoadAsync()).Select(template => template.Id.ToGuid());
     payload.Ids.AddRange(templateIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("reset%"));
     payload.Sort.Add(new TemplateSortOption(TemplateSort.Subject, isDescending: false));
     SearchTemplatesQuery query = new(payload);
@@ -82,6 +82,6 @@ public class SearchTemplatesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Template template = Assert.Single(results.Items);
-    Assert.Equal(template1.Id.AggregateId.ToGuid(), template.Id);
+    Assert.Equal(template1.Id.ToGuid(), template.Id);
   }
 }

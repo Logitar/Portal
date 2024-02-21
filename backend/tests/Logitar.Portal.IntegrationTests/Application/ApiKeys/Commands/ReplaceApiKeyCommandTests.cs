@@ -74,7 +74,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("AccessControl", bool.FalseString));
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(sendMessages.UniqueName.Value);
-    ReplaceApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, version);
     ApiKey? result = await Mediator.Send(command);
     Assert.NotNull(result);
 
@@ -88,8 +88,8 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "UserId" && c.Value == userId);
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == manageUsers.Id.AggregateId.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == sendMessages.Id.AggregateId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == manageUsers.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == sendMessages.Id.ToGuid());
   }
 
   [Fact(DisplayName = "It should return null when the API key cannot be found.")]
@@ -109,7 +109,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceApiKeyPayload payload = new("admin");
-    ReplaceApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
     ApiKey? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -121,7 +121,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
 
     ReplaceApiKeyPayload payload = new(apiKey.DisplayName.Value);
     payload.Roles.Add("admin");
-    ReplaceApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);

@@ -61,7 +61,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("manage_users", bool.FalseString));
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
-    ReplaceRoleCommand command = new(_role.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, version);
     Role? role = await Mediator.Send(command);
     Assert.NotNull(role);
 
@@ -90,7 +90,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceRolePayload payload = new("admin");
-    ReplaceRoleCommand command = new(_role.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, Version: null);
     Role? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -102,7 +102,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     await _roleRepository.SaveAsync(role);
 
     ReplaceRolePayload payload = new("AdmIn");
-    ReplaceRoleCommand command = new(role.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceRoleCommand command = new(role.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);

@@ -87,10 +87,10 @@ public class SearchSendersQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> senderIds = (await _senderRepository.LoadAsync()).Select(sender => sender.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> senderIds = (await _senderRepository.LoadAsync()).Select(sender => sender.Id.ToGuid());
     payload.Ids.AddRange(senderIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%sender%"));
     payload.Sort.Add(new SenderSortOption(SenderSort.EmailAddress, isDescending: false));
     SearchSendersQuery query = new(payload);
@@ -99,6 +99,6 @@ public class SearchSendersQueryTests : IntegrationTests
     Assert.Equal(2, results.Total);
     Sender sender = Assert.Single(results.Items);
     SenderAggregate expected = new[] { sender1, sender2 }.OrderBy(s => s.Email.Address).Skip(1).Single();
-    Assert.Equal(expected.Id.AggregateId.ToGuid(), sender.Id);
+    Assert.Equal(expected.Id.ToGuid(), sender.Id);
   }
 }

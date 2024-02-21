@@ -39,7 +39,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   {
     ApiKeyAggregate apiKey = await CreateApiKeyAsync();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
     ApiKey? deleted = await Mediator.Send(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -60,7 +60,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
 
     SetRealm();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.AggregateId.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
     ApiKey? result = await Mediator.Send(command);
     Assert.Null(result);
   }

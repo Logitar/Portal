@@ -37,7 +37,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
   {
     OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
 
-    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.AggregateId.ToGuid());
+    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
     OneTimePassword? deleted = await Mediator.Send(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -58,7 +58,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
 
     SetRealm();
 
-    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.AggregateId.ToGuid());
+    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
     OneTimePassword? result = await Mediator.Send(command);
     Assert.Null(result);
   }

@@ -79,6 +79,8 @@ public class DictionaryAggregate : AggregateRoot
     _locale = @event.Locale;
   }
 
+  public string? Translate(string key) => _entries.TryGetValue(key.Trim(), out string? value) ? value : null;
+
   public void Update(ActorId actorId = default)
   {
     if (_updatedEvent.HasChanges)

@@ -56,16 +56,16 @@ public class SearchSessionsQueryTests : IntegrationTests
 
     SearchSessionsPayload payload = new()
     {
-      UserId = user1.Id.AggregateId.ToGuid(),
+      UserId = user1.Id.ToGuid(),
       IsActive = true,
       IsPersistent = false,
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> sessionIds = (await _sessionRepository.LoadAsync()).Select(session => session.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> sessionIds = (await _sessionRepository.LoadAsync()).Select(session => session.Id.ToGuid());
     payload.Ids.AddRange(sessionIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("Hello World!"));
     payload.Sort.Add(new SessionSortOption(SessionSort.UpdatedOn, isDescending: true));
     SearchSessionsQuery query = new(payload);
@@ -73,6 +73,6 @@ public class SearchSessionsQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Session session = Assert.Single(results.Items);
-    Assert.Equal(session1.Id.AggregateId.ToGuid(), session.Id);
+    Assert.Equal(session1.Id.ToGuid(), session.Id);
   }
 }

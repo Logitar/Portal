@@ -44,7 +44,7 @@ public class ReadTemplateQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadTemplateQuery query = new(_template.Id.AggregateId.ToGuid(), UniqueKey: null);
+    ReadTemplateQuery query = new(_template.Id.ToGuid(), UniqueKey: null);
     Template? template = await Mediator.Send(query);
     Assert.Null(template);
   }
@@ -52,10 +52,10 @@ public class ReadTemplateQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the template found by ID.")]
   public async Task It_should_return_the_template_found_by_Id()
   {
-    ReadTemplateQuery query = new(_template.Id.AggregateId.ToGuid(), _template.UniqueKey.Value);
+    ReadTemplateQuery query = new(_template.Id.ToGuid(), _template.UniqueKey.Value);
     Template? template = await Mediator.Send(query);
     Assert.NotNull(template);
-    Assert.Equal(_template.Id.AggregateId.ToGuid(), template.Id);
+    Assert.Equal(_template.Id.ToGuid(), template.Id);
   }
 
   [Fact(DisplayName = "It should return the template found by unique key.")]
@@ -64,7 +64,7 @@ public class ReadTemplateQueryTests : IntegrationTests
     ReadTemplateQuery query = new(Id: null, _template.UniqueKey.Value);
     Template? template = await Mediator.Send(query);
     Assert.NotNull(template);
-    Assert.Equal(_template.Id.AggregateId.ToGuid(), template.Id);
+    Assert.Equal(_template.Id.ToGuid(), template.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -75,7 +75,7 @@ public class ReadTemplateQueryTests : IntegrationTests
     TemplateAggregate template = new(uniqueKey, subject, _template.Content);
     await _templateRepository.SaveAsync(template);
 
-    ReadTemplateQuery query = new(_template.Id.AggregateId.ToGuid(), "  CoNFiRMaCCouNT  ");
+    ReadTemplateQuery query = new(_template.Id.ToGuid(), "  CoNFiRMaCCouNT  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<Template>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

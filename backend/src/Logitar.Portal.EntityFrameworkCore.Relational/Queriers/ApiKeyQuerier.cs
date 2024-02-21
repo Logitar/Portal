@@ -38,7 +38,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
       ?? throw new InvalidOperationException($"The API key entity 'AggregateId={apiKey.Id.Value}' could not be found.");
   }
   public async Task<ApiKey?> ReadAsync(ApiKeyId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

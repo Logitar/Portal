@@ -22,7 +22,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
     ResetUserPasswordPayload payload = new(newPassword);
-    ResetUserPasswordCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
     User? result = await Mediator.Send(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
@@ -45,7 +45,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
     SetRealm();
 
     ResetUserPasswordPayload payload = new(PasswordString);
-    ResetUserPasswordCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
     User? result = await Mediator.Send(command);
     Assert.Null(result);
   }

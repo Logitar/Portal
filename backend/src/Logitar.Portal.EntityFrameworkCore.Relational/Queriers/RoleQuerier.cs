@@ -38,7 +38,7 @@ internal class RoleQuerier : IRoleQuerier
       ?? throw new InvalidOperationException($"The role entity 'AggregateId={role.Id.Value}' could not be found.");
   }
   public async Task<Role?> ReadAsync(RoleId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Role?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

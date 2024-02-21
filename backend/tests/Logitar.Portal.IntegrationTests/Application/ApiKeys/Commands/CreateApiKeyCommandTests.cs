@@ -58,11 +58,11 @@ public class CreateApiKeyCommandTests : IntegrationTests
     Assert.Same(Realm, apiKey.Realm);
 
     Role apiKeyRole = Assert.Single(apiKey.Roles);
-    Assert.Equal(role.Id.AggregateId.ToGuid(), apiKeyRole.Id);
+    Assert.Equal(role.Id.ToGuid(), apiKeyRole.Id);
 
     Assert.NotNull(apiKey.XApiKey);
     XApiKey xApiKey = XApiKey.Decode(apiKey.XApiKey);
-    Assert.Equal(apiKey.Id, xApiKey.Id.AggregateId.ToGuid());
+    Assert.Equal(apiKey.Id, xApiKey.Id.ToGuid());
     Assert.Equal(XApiKey.SecretLength, Convert.FromBase64String(xApiKey.Secret).Length);
   }
 

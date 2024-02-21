@@ -39,7 +39,7 @@ public class SignOutUserCommandTests : IntegrationTests
   public async Task It_should_sign_out_the_specified_user()
   {
     UserAggregate aggregate = (await _userRepository.LoadAsync()).Single();
-    SignOutUserCommand command = new(aggregate.Id.AggregateId.ToGuid());
+    SignOutUserCommand command = new(aggregate.Id.ToGuid());
 
     User? user = await Mediator.Send(command);
     Assert.NotNull(user);

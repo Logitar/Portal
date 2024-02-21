@@ -36,7 +36,7 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
       ?? throw new InvalidOperationException($"The One-Time Password entity 'AggregateId={oneTimePassword.Id.Value}' could not be found.");
   }
   public async Task<OneTimePassword?> ReadAsync(OneTimePasswordId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<OneTimePassword?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

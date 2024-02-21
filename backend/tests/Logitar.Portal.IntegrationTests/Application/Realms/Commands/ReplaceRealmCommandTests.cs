@@ -59,7 +59,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
       Url = $"https://www.{Faker.Internet.DomainName()}/"
     };
     payload.CustomAttributes.Add(new("Guid", Guid.NewGuid().ToString()));
-    ReplaceRealmCommand command = new(_realm.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceRealmCommand command = new(_realm.Id.ToGuid(), payload, version);
     Realm? realm = await Mediator.Send(command);
     Assert.NotNull(realm);
 
@@ -88,7 +88,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     await _realmRepository.SaveAsync(realm);
 
     ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpper(), secret: string.Empty);
-    ReplaceRealmCommand command = new(realm.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceRealmCommand command = new(realm.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug.Value, ignoreCase: true);
   }

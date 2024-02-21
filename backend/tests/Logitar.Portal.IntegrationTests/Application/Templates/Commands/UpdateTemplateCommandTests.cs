@@ -56,7 +56,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
     SetRealm();
 
     UpdateTemplatePayload payload = new();
-    UpdateTemplateCommand command = new(_template.Id.AggregateId.ToGuid(), payload);
+    UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
     Template? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -71,7 +71,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
     {
       UniqueKey = "PaSSWoRDReCoVeRy"
     };
-    UpdateTemplateCommand command = new(template.Id.AggregateId.ToGuid(), payload);
+    UpdateTemplateCommand command = new(template.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);
@@ -97,7 +97,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
       DisplayName = new Modification<string>("  ConfirmAccount  "),
       Description = new Modification<string>("  ")
     };
-    UpdateTemplateCommand command = new(_template.Id.AggregateId.ToGuid(), payload);
+    UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
     Template? template = await Mediator.Send(command);
     Assert.NotNull(template);
 

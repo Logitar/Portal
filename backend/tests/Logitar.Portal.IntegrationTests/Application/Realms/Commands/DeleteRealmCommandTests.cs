@@ -49,10 +49,10 @@ public class DeleteRealmCommandTests : IntegrationTests
     UserAggregate user = new(uniqueName, tenantId);
     await _userRepository.SaveAsync(user);
 
-    DeleteRealmCommand command = new(_realm.Id.AggregateId.ToGuid());
+    DeleteRealmCommand command = new(_realm.Id.ToGuid());
     Realm? realm = await Mediator.Send(command);
     Assert.NotNull(realm);
-    Assert.Equal(_realm.Id.AggregateId.ToGuid(), realm.Id);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
     Assert.Empty(await _userRepository.LoadAsync(tenantId));
   }

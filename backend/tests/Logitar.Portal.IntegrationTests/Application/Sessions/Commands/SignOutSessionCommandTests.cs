@@ -36,12 +36,12 @@ public class SignOutSessionCommandTests : IntegrationTests
   public async Task It_should_sign_out_the_specified_session()
   {
     SessionAggregate aggregate = (await _sessionRepository.LoadAsync()).Single();
-    SignOutSessionCommand command = new(aggregate.Id.AggregateId.ToGuid());
+    SignOutSessionCommand command = new(aggregate.Id.ToGuid());
 
     Session? session = await Mediator.Send(command);
     Assert.NotNull(session);
     Assert.False(session.IsActive);
-    Assert.Equal(aggregate.Id.AggregateId.ToGuid(), session.Id);
+    Assert.Equal(aggregate.Id.ToGuid(), session.Id);
     Assert.NotNull(session.SignedOutBy);
     Assert.NotNull(session.SignedOutOn);
   }

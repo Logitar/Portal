@@ -56,7 +56,7 @@ public class UpdateRealmCommandTests : IntegrationTests
     {
       UniqueSlug = _realm.UniqueSlug.Value
     };
-    UpdateRealmCommand command = new(realm.Id.AggregateId.ToGuid(), payload);
+    UpdateRealmCommand command = new(realm.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Equal(_realm.UniqueSlug, exception.UniqueSlug);
   }
@@ -83,7 +83,7 @@ public class UpdateRealmCommandTests : IntegrationTests
       DefaultLocale = new Modification<string>("fr"),
       Url = new Modification<string>($"https://www.{Faker.Internet.DomainName()}/")
     };
-    UpdateRealmCommand command = new(_realm.Id.AggregateId.ToGuid(), payload);
+    UpdateRealmCommand command = new(_realm.Id.ToGuid(), payload);
     Realm? realm = await Mediator.Send(command);
     Assert.NotNull(realm);
 

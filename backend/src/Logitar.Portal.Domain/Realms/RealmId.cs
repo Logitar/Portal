@@ -9,6 +9,10 @@ public record RealmId
   public AggregateId AggregateId { get; }
   public string Value => AggregateId.Value;
 
+  public RealmId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  {
+  }
+
   public RealmId(AggregateId aggregateId, string? propertyName = null)
   {
     new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
@@ -30,4 +34,6 @@ public record RealmId
   {
     return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
   }
+
+  public Guid ToGuid() => AggregateId.ToGuid();
 }

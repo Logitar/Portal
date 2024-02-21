@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Logitar.Portal.Application.Senders;
+﻿namespace Logitar.Portal.Application.Senders;
 
 internal static class SendGridHelper
 {

@@ -25,7 +25,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
     user.SetCustomIdentifier(Key, healthInsuranceNumber);
     await _userRepository.SaveAsync(user);
 
-    RemoveUserIdentifierCommand command = new(user.Id.AggregateId.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
     User? result = await Mediator.Send(command);
     Assert.NotNull(result);
     Assert.DoesNotContain(result.CustomIdentifiers, id => id.Key == Key);
@@ -46,7 +46,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
 
     SetRealm();
 
-    RemoveUserIdentifierCommand command = new(user.Id.AggregateId.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
     User? result = await Mediator.Send(command);
     Assert.Null(result);
   }

@@ -39,7 +39,7 @@ internal class UserQuerier : IUserQuerier
       ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id.Value}' could not be found.");
   }
   public async Task<User?> ReadAsync(UserId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

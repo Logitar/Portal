@@ -38,7 +38,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
       ?? throw new InvalidOperationException($"The dictionary entity 'AggregateId={dictionary.Id.Value}' could not be found.");
   }
   public async Task<Dictionary?> ReadAsync(DictionaryId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Dictionary?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

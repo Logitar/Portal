@@ -42,7 +42,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing template.")]
   public async Task It_should_delete_an_existing_template()
   {
-    DeleteTemplateCommand command = new(_template.Id.AggregateId.ToGuid());
+    DeleteTemplateCommand command = new(_template.Id.ToGuid());
     Template? template = await Mediator.Send(command);
     Assert.NotNull(template);
     Assert.Equal(command.Id, template.Id);
@@ -61,7 +61,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteTemplateCommand command = new(_template.Id.AggregateId.ToGuid());
+    DeleteTemplateCommand command = new(_template.Id.ToGuid());
     Template? result = await Mediator.Send(command);
     Assert.Null(result);
   }

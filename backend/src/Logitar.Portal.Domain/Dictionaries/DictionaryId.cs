@@ -9,6 +9,10 @@ public record DictionaryId
   public AggregateId AggregateId { get; }
   public string Value => AggregateId.Value;
 
+  public DictionaryId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  {
+  }
+
   public DictionaryId(AggregateId aggregateId, string? propertyName = null)
   {
     new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
@@ -30,4 +34,6 @@ public record DictionaryId
   {
     return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
   }
+
+  public Guid ToGuid() => AggregateId.ToGuid();
 }

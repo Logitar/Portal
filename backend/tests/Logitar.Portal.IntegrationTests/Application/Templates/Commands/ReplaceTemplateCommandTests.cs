@@ -59,7 +59,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
       DisplayName = "  Reset Password  ",
       Description = " This is the password recovery message template. "
     };
-    ReplaceTemplateCommand command = new(_template.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, version);
     Template? template = await Mediator.Send(command);
     Assert.NotNull(template);
 
@@ -85,7 +85,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new Content(_template.Content));
-    ReplaceTemplateCommand command = new(_template.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, Version: null);
     Template? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -97,7 +97,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     await _templateRepository.SaveAsync(template);
 
     ReplaceTemplatePayload payload = new("PaSSWoRDReCoVeRy", _template.Subject.Value, new Content(_template.Content));
-    ReplaceTemplateCommand command = new(template.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceTemplateCommand command = new(template.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);

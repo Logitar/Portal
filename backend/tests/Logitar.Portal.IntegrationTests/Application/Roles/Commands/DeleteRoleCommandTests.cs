@@ -50,7 +50,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     user.AddRole(_role);
     await _userRepository.SaveAsync(user);
 
-    DeleteRoleCommand command = new(_role.Id.AggregateId.ToGuid());
+    DeleteRoleCommand command = new(_role.Id.ToGuid());
     Role? role = await Mediator.Send(command);
     Assert.NotNull(role);
     Assert.Equal(command.Id, role.Id);
@@ -72,7 +72,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteRoleCommand command = new(_role.Id.AggregateId.ToGuid());
+    DeleteRoleCommand command = new(_role.Id.ToGuid());
     Role? result = await Mediator.Send(command);
     Assert.Null(result);
   }

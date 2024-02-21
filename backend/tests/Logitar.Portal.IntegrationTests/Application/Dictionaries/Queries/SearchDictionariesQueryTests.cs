@@ -67,10 +67,10 @@ public class SearchDictionariesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> dictionaryIds = (await _dictionaryRepository.LoadAsync()).Select(dictionary => dictionary.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> dictionaryIds = (await _dictionaryRepository.LoadAsync()).Select(dictionary => dictionary.Id.ToGuid());
     payload.Ids.AddRange(dictionaryIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("fr"));
     payload.Search.Terms.Add(new SearchTerm("fr___"));
     payload.Search.Operator = SearchOperator.Or;
@@ -80,6 +80,6 @@ public class SearchDictionariesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Dictionary dictionary = Assert.Single(results.Items);
-    Assert.Equal(notEmpty.Id.AggregateId.ToGuid(), dictionary.Id);
+    Assert.Equal(notEmpty.Id.ToGuid(), dictionary.Id);
   }
 }

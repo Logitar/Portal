@@ -44,7 +44,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing sender.")]
   public async Task It_should_delete_an_existing_sender()
   {
-    DeleteSenderCommand command = new(_sender.Id.AggregateId.ToGuid());
+    DeleteSenderCommand command = new(_sender.Id.ToGuid());
     Sender? sender = await Mediator.Send(command);
     Assert.NotNull(sender);
     Assert.Equal(command.Id, sender.Id);
@@ -63,7 +63,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteSenderCommand command = new(_sender.Id.AggregateId.ToGuid());
+    DeleteSenderCommand command = new(_sender.Id.ToGuid());
     Sender? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -74,7 +74,7 @@ public class DeleteSenderCommandTests : IntegrationTests
     SenderAggregate other = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(other);
 
-    DeleteSenderCommand command = new(_sender.Id.AggregateId.ToGuid());
+    DeleteSenderCommand command = new(_sender.Id.ToGuid());
     var exception = await Assert.ThrowsAsync<CannotDeleteDefaultSenderException>(async () => await Mediator.Send(command));
     Assert.Equal(_sender.Id, exception.SenderId);
   }

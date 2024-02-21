@@ -9,6 +9,10 @@ public record SenderId
   public AggregateId AggregateId { get; }
   public string Value => AggregateId.Value;
 
+  public SenderId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  {
+  }
+
   public SenderId(AggregateId aggregateId, string? propertyName = null)
   {
     new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
@@ -30,4 +34,6 @@ public record SenderId
   {
     return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
   }
+
+  public Guid ToGuid() => AggregateId.ToGuid();
 }

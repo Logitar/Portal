@@ -33,7 +33,7 @@ internal class RealmQuerier : IRealmQuerier
       ?? throw new InvalidOperationException($"The realm entity 'AggregateId={realm.Id.Value}' could not be found.");
   }
   public async Task<Realm?> ReadAsync(RealmId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Realm?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

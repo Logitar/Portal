@@ -38,7 +38,7 @@ internal class SenderQuerier : ISenderQuerier
       ?? throw new InvalidOperationException($"The sender entity 'AggregateId={sender.Id.Value}' could not be found.");
   }
   public async Task<Sender?> ReadAsync(SenderId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Sender?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

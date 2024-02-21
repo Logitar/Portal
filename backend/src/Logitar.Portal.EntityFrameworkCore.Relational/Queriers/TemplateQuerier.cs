@@ -38,7 +38,7 @@ internal class TemplateQuerier : ITemplateQuerier
       ?? throw new InvalidOperationException($"The template entity 'AggregateId={template.Id.Value}' could not be found.");
   }
   public async Task<Template?> ReadAsync(TemplateId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.AggregateId.ToGuid(), cancellationToken);
+    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<Template?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;

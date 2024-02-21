@@ -47,10 +47,10 @@ public class ReadRealmQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the realm found by ID.")]
   public async Task It_should_return_the_realm_found_by_Id()
   {
-    ReadRealmQuery query = new(_realm.Id.AggregateId.ToGuid(), _realm.UniqueSlug.Value);
+    ReadRealmQuery query = new(_realm.Id.ToGuid(), _realm.UniqueSlug.Value);
     Realm? realm = await Mediator.Send(query);
     Assert.NotNull(realm);
-    Assert.Equal(_realm.Id.AggregateId.ToGuid(), realm.Id);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
 
   [Fact(DisplayName = "It should return the realm found by unique slug.")]
@@ -59,7 +59,7 @@ public class ReadRealmQueryTests : IntegrationTests
     ReadRealmQuery query = new(Id: null, _realm.UniqueSlug.Value);
     Realm? realm = await Mediator.Send(query);
     Assert.NotNull(realm);
-    Assert.Equal(_realm.Id.AggregateId.ToGuid(), realm.Id);
+    Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -68,7 +68,7 @@ public class ReadRealmQueryTests : IntegrationTests
     RealmAggregate realm = new(new UniqueSlugUnit("other"));
     await _realmRepository.SaveAsync(realm);
 
-    ReadRealmQuery query = new(_realm.Id.AggregateId.ToGuid(), "  OthEr  ");
+    ReadRealmQuery query = new(_realm.Id.ToGuid(), "  OthEr  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

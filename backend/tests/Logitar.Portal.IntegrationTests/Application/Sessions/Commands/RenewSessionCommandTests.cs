@@ -36,7 +36,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     Actor actor = new(apiKey.DisplayName.Value)
     {
-      Id = apiKey.Id.AggregateId.ToGuid(),
+      Id = apiKey.Id.ToGuid(),
       Type = ActorType.ApiKey
     };
     SetActor(actor);
@@ -65,8 +65,8 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Null(result.SignedOutBy);
     Assert.Null(result.SignedOutOn);
     Assert.Equal(customAttributes, result.CustomAttributes);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), result.User.Id);
-    Assert.Equal(session.Id.AggregateId.ToGuid(), result.Id);
+    Assert.Equal(user.Id.ToGuid(), result.User.Id);
+    Assert.Equal(session.Id.ToGuid(), result.Id);
     Assert.Equal(actorId.ToGuid(), result.CreatedBy.Id);
     Assert.Equal(actorId.ToGuid(), result.UpdatedBy.Id);
   }
@@ -85,7 +85,7 @@ public class RenewSessionCommandTests : IntegrationTests
     Session result = await Mediator.Send(command);
 
     Guid actorId = new ActorId(user.Id.Value).ToGuid();
-    Assert.Equal(session.Id.AggregateId.ToGuid(), result.Id);
+    Assert.Equal(session.Id.ToGuid(), result.Id);
     Assert.Equal(actorId, result.CreatedBy.Id);
     Assert.Equal(actorId, result.UpdatedBy.Id);
   }

@@ -45,7 +45,7 @@ public class UpdateUserCommandTests : IntegrationTests
     SetRealm();
 
     UpdateUserPayload payload = new();
-    UpdateUserCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     User? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -60,7 +60,7 @@ public class UpdateUserCommandTests : IntegrationTests
     {
       Email = new Modification<EmailPayload>(new EmailPayload(Faker.Person.Email, isVerified: true))
     };
-    UpdateUserCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.NotNull(payload.Email.Value);
@@ -74,7 +74,7 @@ public class UpdateUserCommandTests : IntegrationTests
 
     UpdateUserPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
-    UpdateUserCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
@@ -90,7 +90,7 @@ public class UpdateUserCommandTests : IntegrationTests
     {
       UniqueName = Faker.Person.UserName
     };
-    UpdateUserCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
@@ -148,12 +148,12 @@ public class UpdateUserCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("HourlyRate", value: null));
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
-    UpdateUserCommand command = new(user.Id.AggregateId.ToGuid(), payload);
+    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     User? result = await Mediator.Send(command);
     Assert.NotNull(result);
 
     Assert.NotNull(result.PasswordChangedBy);
-    Assert.Equal(user.Id.AggregateId.ToGuid(), result.PasswordChangedBy.Id);
+    Assert.Equal(user.Id.ToGuid(), result.PasswordChangedBy.Id);
     Assert.Equal(payload.IsDisabled.Value, result.IsDisabled);
     Assert.Equal(payload.Birthdate.Value?.ToUniversalTime(), result.Birthdate);
     Assert.Equal(payload.Gender.Value?.ToLower(), result.Gender);
@@ -168,8 +168,8 @@ public class UpdateUserCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "JobTitle" && c.Value == "Sales Manager");
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == editor.Id.AggregateId.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.AggregateId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == editor.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
 
     UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value);
     Assert.NotNull(entity);

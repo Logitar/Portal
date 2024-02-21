@@ -54,7 +54,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     payload.Entries.Add(new("cyan", "cyan"));
     payload.Entries.Add(new("or", "golden"));
-    ReplaceDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid(), payload, version);
+    ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, version);
     Dictionary? dictionary = await Mediator.Send(command);
     Assert.NotNull(dictionary);
 
@@ -82,7 +82,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceDictionaryPayload payload = new(Faker.Locale);
-    ReplaceDictionaryCommand command = new(_dictionary.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, Version: null);
     Dictionary? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -94,7 +94,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     await _dictionaryRepository.SaveAsync(dictionary);
 
     ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());
-    ReplaceDictionaryCommand command = new(dictionary.Id.AggregateId.ToGuid(), payload, Version: null);
+    ReplaceDictionaryCommand command = new(dictionary.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Locale, exception.Locale.Code, ignoreCase: true);

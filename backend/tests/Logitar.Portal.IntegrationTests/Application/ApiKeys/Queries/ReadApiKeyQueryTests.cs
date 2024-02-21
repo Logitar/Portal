@@ -47,7 +47,7 @@ public class ReadApiKeyQueryTests : IntegrationTests
   {
     ApiKeyAggregate apiKey = await CreateApiKeyAsync();
 
-    ReadApiKeyQuery query = new(apiKey.Id.AggregateId.ToGuid());
+    ReadApiKeyQuery query = new(apiKey.Id.ToGuid());
     ApiKey? result = await Mediator.Send(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);

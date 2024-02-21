@@ -25,7 +25,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IEnumerab
     Dictionary<string, RoleAggregate> rolesByUniqueName = new(capacity);
     foreach (RoleAggregate role in roles)
     {
-      rolesById[role.Id.AggregateId.ToGuid()] = role;
+      rolesById[role.Id.ToGuid()] = role;
       rolesByUniqueName[role.UniqueName.Value.ToUpper()] = role;
     }
 

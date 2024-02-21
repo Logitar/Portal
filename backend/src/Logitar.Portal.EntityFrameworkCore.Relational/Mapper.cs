@@ -5,6 +5,7 @@ using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
@@ -103,6 +104,80 @@ internal class Mapper
     return destination;
   }
 
+  public Message ToMessage(MessageEntity source, Realm? realm, IEnumerable<UserEntity> users)
+  {
+    Content body = new(source.BodyType, source.BodyText);
+
+    Sender sender;
+    if (source.Sender == null)
+    {
+      sender = new(new Email(source.SenderAddress))
+      {
+        IsDefault = source.SenderIsDefault,
+        DisplayName = source.SenderDisplayName,
+        Provider = source.SenderProvider
+      };
+    }
+    else
+    {
+      sender = ToSender(source.Sender, realm);
+    }
+
+    Template template;
+    if (source.Template == null)
+    {
+      template = new()
+      {
+        UniqueKey = source.TemplateUniqueKey,
+        DisplayName = source.TemplateDisplayName
+      };
+    }
+    else
+    {
+      template = ToTemplate(source.Template, realm);
+    }
+
+    Message destination = new(source.Subject, body, sender, template)
+    {
+      RecipientCount = source.RecipientCount,
+      IgnoreUserLocale = source.IgnoreUserLocale,
+      Locale = source.Locale,
+      IsDemo = source.IsDemo,
+      Status = source.Status,
+      Realm = realm
+    };
+
+    Dictionary<int, User> usersById = new(capacity: users.Count());
+    foreach (UserEntity user in users)
+    {
+      usersById[user.UserId] = ToUser(user, realm);
+    }
+    foreach (RecipientEntity recipient in source.Recipients)
+    {
+      User? user = null;
+      if (recipient.UserId.HasValue)
+      {
+        _ = usersById.TryGetValue(recipient.UserId.Value, out user);
+      }
+
+      destination.Recipients.Add(ToRecipient(recipient, user));
+    }
+
+    foreach (KeyValuePair<string, string> variable in source.Variables)
+    {
+      destination.Variables.Add(new Variable(variable));
+    }
+
+    foreach (KeyValuePair<string, string> data in source.ResultData)
+    {
+      destination.ResultData.Add(new ResultData(data));
+    }
+
+    MapAggregate(source, destination);
+
+    return destination;
+  }
+
   public OneTimePassword ToOneTimePassword(OneTimePasswordEntity source, Realm? realm)
   {
     OneTimePassword destination = new()
@@ -144,6 +219,34 @@ internal class Mapper
     }
 
     MapAggregate(source, destination);
+
+    return destination;
+  }
+
+  public static Recipient ToRecipient(RecipientEntity source, User? user)
+  {
+    Recipient destination = new(source.Address)
+    {
+      Type = source.Type,
+      DisplayName = source.DisplayName
+    };
+
+    if (user != null)
+    {
+      destination.User = user;
+    }
+    else if (source.UserUniqueName != null)
+    {
+      destination.User = new(source.UserUniqueName)
+      {
+        FullName = source.UserFullName,
+        Picture = source.UserPicture
+      };
+      if (source.UserEmailAddress != null)
+      {
+        destination.User.Email = new Email(source.UserEmailAddress);
+      }
+    }
 
     return destination;
   }

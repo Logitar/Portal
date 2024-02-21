@@ -76,10 +76,10 @@ public class SearchApiKeysQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> apiKeyIds = (await _apiKeyRepository.LoadAsync()).Select(apiKey => apiKey.Id.AggregateId.ToGuid());
+    IEnumerable<Guid> apiKeyIds = (await _apiKeyRepository.LoadAsync()).Select(apiKey => apiKey.Id.ToGuid());
     payload.Ids.AddRange(apiKeyIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.AggregateId.ToGuid());
+    payload.Ids.Remove(notInIds.Id.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%key"));
     payload.Sort.Add(new ApiKeySortOption(ApiKeySort.ExpiresOn, isDescending: false));
     SearchApiKeysQuery query = new(payload);
@@ -87,6 +87,6 @@ public class SearchApiKeysQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     ApiKey apiKey = Assert.Single(results.Items);
-    Assert.Equal(apiKey2.Id.AggregateId.ToGuid(), apiKey.Id);
+    Assert.Equal(apiKey2.Id.ToGuid(), apiKey.Id);
   }
 }

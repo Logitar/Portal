@@ -58,7 +58,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     SetRealm();
 
     UpdateSenderPayload payload = new();
-    UpdateSenderCommand command = new(_sender.Id.AggregateId.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
     Sender? result = await Mediator.Send(command);
     Assert.Null(result);
   }
@@ -83,7 +83,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       DisplayName = new Modification<string>("  Default Sender  "),
       Description = new Modification<string>("  ")
     };
-    UpdateSenderCommand command = new(_sender.Id.AggregateId.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
     Sender? sender = await Mediator.Send(command);
     Assert.NotNull(sender);
 
