@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using Logitar.Portal.GraphQL.Configurations;
 using Logitar.Portal.GraphQL.Realms;
+using Logitar.Portal.GraphQL.Roles;
 
 namespace Logitar.Portal.GraphQL;
 
@@ -15,7 +16,7 @@ internal class RootQuery : ObjectGraphType
     //DictionaryQueries.Register(this); // TODO(fpion): implement
     //MessageQueries.Register(this); // TODO(fpion): implement
     RealmQueries.Register(this);
-    //RoleQueries.Register(this); // TODO(fpion): implement
+    RoleQueries.Register(this);
     //SenderQueries.Register(this); // TODO(fpion): implement
     //SessionQueries.Register(this); // TODO(fpion): implement
     //TemplateQueries.Register(this); // TODO(fpion): implement
