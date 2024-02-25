@@ -1,6 +1,6 @@
-﻿using Logitar.Portal.Constants;
-using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Extensions;
+﻿using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal.Middlewares;
 

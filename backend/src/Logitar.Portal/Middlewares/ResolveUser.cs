@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Extensions;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Middlewares;

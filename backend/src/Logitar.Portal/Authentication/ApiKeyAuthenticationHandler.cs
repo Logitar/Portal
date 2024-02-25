@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Constants;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Extensions;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
