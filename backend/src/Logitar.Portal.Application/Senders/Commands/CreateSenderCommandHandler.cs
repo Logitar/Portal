@@ -6,6 +6,7 @@ using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using MediatR;
 
@@ -32,8 +33,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     ActorId actorId = _applicationContext.ActorId;
 
     EmailUnit email = payload.Email.ToEmailUnit();
-    ReadOnlySendGridSettings settings = new(payload.SendGrid);
-    SenderAggregate sender = new(email, settings, _applicationContext.TenantId, actorId)
+    SenderAggregate sender = new(email, GetSettings(payload), _applicationContext.TenantId, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
       Description = DescriptionUnit.TryCreate(payload.Description)
@@ -49,5 +49,19 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
     return await _senderQuerier.ReadAsync(sender, cancellationToken);
+  }
+
+  private static SenderSettings GetSettings(CreateSenderPayload payload)
+  {
+    if (payload.SendGrid != null)
+    {
+      return new ReadOnlySendGridSettings(payload.SendGrid);
+    }
+    else if (payload.Mailgun != null)
+    {
+      return new ReadOnlyMailgunSettings(payload.Mailgun);
+    }
+
+    throw new ArgumentException("No sender provider settings have been specified.", nameof(payload));
   }
 }

@@ -5,6 +5,7 @@ using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using MediatR;
 
@@ -49,15 +50,25 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
       sender.Description = DescriptionUnit.TryCreate(payload.Description.Value);
     }
 
-    if (payload.SendGrid != null)
-    {
-      ReadOnlySendGridSettings settings = new(payload.SendGrid);
-      sender.SetSettings(settings, actorId);
-    }
+    SetSettings(payload, sender, actorId);
 
     sender.Update(actorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
     return await _senderQuerier.ReadAsync(sender, cancellationToken);
+  }
+
+  private static void SetSettings(UpdateSenderPayload payload, SenderAggregate sender, ActorId actorId)
+  {
+    if (payload.SendGrid != null)
+    {
+      ReadOnlySendGridSettings settings = new(payload.SendGrid);
+      sender.SetSettings(settings, actorId);
+    }
+    if (payload.Mailgun != null)
+    {
+      ReadOnlyMailgunSettings settings = new(payload.Mailgun);
+      sender.SetSettings(settings, actorId);
+    }
   }
 }

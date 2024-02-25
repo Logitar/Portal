@@ -5,6 +5,7 @@ using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Infrastructure.Messages.Providers;
+using Logitar.Portal.Infrastructure.Messages.Providers.Mailgun;
 using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
 using Logitar.Portal.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +30,9 @@ public static class DependencyInjectionExtensions
 
   private static IServiceCollection AddSenderProviders(this IServiceCollection services)
   {
-    return services.AddSingleton<IProviderStrategy, SendGridStrategy>();
+    return services
+      .AddSingleton<IProviderStrategy, MailgunStrategy>()
+      .AddSingleton<IProviderStrategy, SendGridStrategy>();
   }
 
   public static IEnumerable<JsonConverter> GetLogitarPortalJsonConverters(this IServiceProvider serviceProvider)

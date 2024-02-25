@@ -56,6 +56,12 @@ internal class SenderEntity : AggregateEntity
     IsDefault = @event.IsDefault;
   }
 
+  public void SetMailgunSettings(SenderMailgunSettingsChangedEvent @event)
+  {
+    Settings.Clear();
+    Settings[nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey;
+    Settings[nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName;
+  }
   public void SetSendGridSettings(SenderSendGridSettingsChangedEvent @event)
   {
     Settings.Clear();
