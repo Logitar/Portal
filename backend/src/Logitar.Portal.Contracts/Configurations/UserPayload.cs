@@ -7,7 +7,7 @@ public record UserPayload
   public string UniqueName { get; set; }
   public string Password { get; set; }
 
-  public EmailPayload? Email { get; set; }
+  public EmailPayload? Email { get; set; } // TODO(fpion): EmailAddress
 
   public string? FirstName { get; set; }
   public string? LastName { get; set; }

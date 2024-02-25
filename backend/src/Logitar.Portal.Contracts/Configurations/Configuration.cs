@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Configurations;
 
 public class Configuration : Aggregate
 {
-  public string? DefaultLocale { get; set; }
+  public string? DefaultLocale { get; set; } // TODO(fpion): Locale
   public string Secret { get; set; }
 
   public UniqueNameSettings UniqueNameSettings { get; set; } = new();

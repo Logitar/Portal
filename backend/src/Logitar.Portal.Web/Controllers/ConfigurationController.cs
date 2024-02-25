@@ -38,7 +38,7 @@ public class ConfigurationController : ControllerBase
 
   [Authorize]
   [HttpGet]
-  public async Task<ActionResult<IsConfigurationInitialized>> ReadAsync(CancellationToken cancellationToken)
+  public async Task<ActionResult<Configuration>> ReadAsync(CancellationToken cancellationToken)
   {
     Configuration configuration = await _configurationService.ReadAsync(cancellationToken)
       ?? throw new InvalidOperationException("The configuration cannot be null if an actor is authenticated.");

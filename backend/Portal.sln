@@ -29,7 +29,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0B519DB7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.IntegrationTests", "tests\Logitar.Portal.IntegrationTests\Logitar.Portal.IntegrationTests.csproj", "{833795B6-5B6D-40F5-A649-FEAF29C87BA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{EB96F94A-4740-46BE-9036-9249E538C246}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{EB96F94A-4740-46BE-9036-9249E538C246}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.GraphQL", "src\Logitar.Portal.GraphQL\Logitar.Portal.GraphQL.csproj", "{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{EB96F94A-4740-46BE-9036-9249E538C246}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB96F94A-4740-46BE-9036-9249E538C246}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB96F94A-4740-46BE-9036-9249E538C246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
