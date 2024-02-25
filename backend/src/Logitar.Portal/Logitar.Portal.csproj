@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj" />
+    <ProjectReference Include="..\Logitar.Portal.GraphQL\Logitar.Portal.GraphQL.csproj" />
     <ProjectReference Include="..\Logitar.Portal.Web\Logitar.Portal.Web.csproj" />
   </ItemGroup>
 

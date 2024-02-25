@@ -25,6 +25,8 @@
 
   <ItemGroup>
     <Folder Include="Actors\" />
+    <Folder Include="Search\" />
+    <Folder Include="Realms\" />
     <Folder Include="Settings\" />
   </ItemGroup>
 
