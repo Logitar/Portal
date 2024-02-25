@@ -9,7 +9,7 @@ using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Extensions;
+using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal;
 

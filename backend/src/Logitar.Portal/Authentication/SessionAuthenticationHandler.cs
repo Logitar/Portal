@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Extensions;
+using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 

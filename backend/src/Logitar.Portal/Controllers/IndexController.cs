@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Models.Index;
+﻿using Logitar.Portal.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Controllers;

@@ -10,6 +10,8 @@ using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
 using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;
+using Logitar.Portal.Web.Constants;
+using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
@@ -102,14 +104,36 @@ internal class Startup : StartupBase
       builder.UseOpenApi();
     }
 
+    //if (_configuration.GetValue<bool>("UseGraphQLAltair"))
+    //{
+    //  builder.UseGraphQLAltair();
+    //}
+    //if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
+    //{
+    //  builder.UseGraphQLGraphiQL();
+    //}
+    //if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
+    //{
+    //  builder.UseGraphQLPlayground();
+    //}
+    //if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
+    //{
+    //  builder.UseGraphQLVoyager();
+    //}
+
     builder.UseHttpsRedirection();
     builder.UseCors();
+    builder.UseStaticFiles();
     builder.UseSession();
+    //builder.UseMiddleware<Logging>();
     builder.UseMiddleware<RenewSession>();
+    //builder.UseMiddleware<RedirectNotFound>();
     builder.UseAuthentication();
     builder.UseAuthorization();
     builder.UseMiddleware<ResolveRealm>();
     builder.UseMiddleware<ResolveUser>();
+
+    //builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(Schemes.All));
 
     if (builder is WebApplication application)
     {
