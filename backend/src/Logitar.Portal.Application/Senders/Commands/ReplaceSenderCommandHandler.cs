@@ -6,6 +6,7 @@ using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using MediatR;
 
@@ -58,15 +59,31 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
       sender.Description = description;
     }
 
-    ReadOnlySendGridSettings settings = new(payload.SendGrid);
-    if (reference == null || settings != reference.Settings)
-    {
-      sender.SetSettings(settings, actorId);
-    }
+    SetSettings(payload, sender, reference, actorId);
 
     sender.Update(actorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
     return await _senderQuerier.ReadAsync(sender, cancellationToken);
+  }
+
+  private static void SetSettings(ReplaceSenderPayload payload, SenderAggregate sender, SenderAggregate? reference, ActorId actorId)
+  {
+    if (payload.SendGrid != null)
+    {
+      ReadOnlySendGridSettings settings = new(payload.SendGrid);
+      if (reference == null || settings != reference.Settings)
+      {
+        sender.SetSettings(settings, actorId);
+      }
+    }
+    if (payload.Mailgun != null)
+    {
+      ReadOnlyMailgunSettings settings = new(payload.Mailgun);
+      if (reference == null || settings != reference.Settings)
+      {
+        sender.SetSettings(settings, actorId);
+      }
+    }
   }
 }

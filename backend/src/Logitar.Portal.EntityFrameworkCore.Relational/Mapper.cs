@@ -310,6 +310,9 @@ internal class Mapper
 
     switch (source.Provider)
     {
+      case SenderProvider.Mailgun:
+        destination.Mailgun = new MailgunSettings(source.Settings[nameof(IMailgunSettings.ApiKey)], source.Settings[nameof(IMailgunSettings.DomainName)]);
+        break;
       case SenderProvider.SendGrid:
         destination.SendGrid = new SendGridSettings(source.Settings[nameof(ISendGridSettings.ApiKey)]);
         break;

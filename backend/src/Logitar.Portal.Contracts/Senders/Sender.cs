@@ -12,7 +12,8 @@ public class Sender : Aggregate
   public string? Description { get; set; }
 
   public SenderProvider Provider { get; set; }
-  public SendGridSettings SendGrid { get; set; } = new();
+  public MailgunSettings? Mailgun { get; set; }
+  public SendGridSettings? SendGrid { get; set; }
 
   public Realm? Realm { get; set; }
 

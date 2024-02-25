@@ -4,6 +4,7 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders.Events;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 
 namespace Logitar.Portal.Domain.Senders;
@@ -73,6 +74,9 @@ public class SenderAggregate : AggregateRoot
 
     switch (settings.Provider)
     {
+      case SenderProvider.Mailgun:
+        SetSettings((ReadOnlyMailgunSettings)settings);
+        break;
       case SenderProvider.SendGrid:
         SetSettings((ReadOnlySendGridSettings)settings);
         break;
@@ -108,6 +112,22 @@ public class SenderAggregate : AggregateRoot
   protected virtual void Apply(SenderSetDefaultEvent @event)
   {
     IsDefault = @event.IsDefault;
+  }
+
+  public void SetSettings(ReadOnlyMailgunSettings settings, ActorId actorId = default)
+  {
+    if (Provider != SenderProvider.Mailgun)
+    {
+      throw new SenderProviderMismatchException(this, settings.Provider);
+    }
+    else if (settings != _settings)
+    {
+      Raise(new SenderMailgunSettingsChangedEvent(actorId, settings));
+    }
+  }
+  protected virtual void Apply(SenderMailgunSettingsChangedEvent @event)
+  {
+    _settings = @event.Settings;
   }
 
   public void SetSettings(ReadOnlySendGridSettings settings, ActorId actorId = default)

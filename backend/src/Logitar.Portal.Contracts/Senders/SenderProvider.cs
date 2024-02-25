@@ -2,5 +2,6 @@
 
 public enum SenderProvider
 {
-  SendGrid
+  Mailgun = 1,
+  SendGrid = 0
 }

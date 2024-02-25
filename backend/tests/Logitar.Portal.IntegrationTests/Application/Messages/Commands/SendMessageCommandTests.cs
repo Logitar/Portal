@@ -3,15 +3,18 @@ using Logitar.Data;
 using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application.Messages.Settings;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens.Commands;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Tokens;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
@@ -31,7 +34,7 @@ public class SendMessageCommandTests : IntegrationTests
   private readonly ITemplateRepository _templateRepository;
   private readonly IUserRepository _userRepository;
 
-  private readonly RecipientSettings _recipientSettings;
+  private readonly EmailSettings _recipientSettings;
   private readonly SenderSettings _senderSettings;
 
   private SenderAggregate? _sender = null;
@@ -45,7 +48,7 @@ public class SendMessageCommandTests : IntegrationTests
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 
-    _recipientSettings = ServiceProvider.GetRequiredService<IConfiguration>().GetSection("Recipient").Get<RecipientSettings>() ?? new();
+    _recipientSettings = ServiceProvider.GetRequiredService<IConfiguration>().GetSection("Recipient").Get<EmailSettings>() ?? new();
     _senderSettings = ServiceProvider.GetRequiredService<IConfiguration>().GetSection("Sender").Get<SenderSettings>() ?? new();
   }
 
@@ -61,36 +64,28 @@ public class SendMessageCommandTests : IntegrationTests
     }
   }
 
-  [Fact(DisplayName = "It should send a message successfully.")]
-  public async Task It_should_send_a_message_successfully()
+  [Fact(DisplayName = "It should send a message with Mailgun.")]
+  public async Task It_should_send_a_message_with_Mailgun()
   {
+    await It_should_send_a_message_with_a_provider(SenderProvider.Mailgun);
+  }
+  [Fact(DisplayName = "It should send a message with SendGrid.")]
+  public async Task It_should_send_a_message_with_SendGrid()
+  {
+    await It_should_send_a_message_with_a_provider(SenderProvider.SendGrid);
+  }
+  private async Task It_should_send_a_message_with_a_provider(SenderProvider provider)
+  {
+    Assert.NotNull(Realm.DefaultLocale);
     SetRealm();
 
-    await CreateDefaultSenderAsync(TenantId);
+    LocaleUnit locale = await CreateDictionariesAsync(TenantId);
+
+    await CreateSenderAsync(TenantId, provider);
     Assert.NotNull(_sender);
 
     await CreateTemplateAsync(TenantId);
     Assert.NotNull(_template);
-
-    LocaleUnit locale = new("fr-CA");
-    DictionaryAggregate canadianFrench = new(locale, TenantId);
-    canadianFrench.SetEntry("Hello", "Bonjour {name} !");
-    canadianFrench.Update();
-
-    DictionaryAggregate french = new(new LocaleUnit("fr"), TenantId);
-    french.SetEntry("Team", "L'équipe Logitar");
-    french.Update();
-
-    Assert.NotNull(Realm.DefaultLocale);
-    DictionaryAggregate @default = new(new LocaleUnit(Realm.DefaultLocale), TenantId);
-    @default.SetEntry("Cordially", "Cordially,");
-    @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
-    @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");
-    @default.SetEntry("PasswordRecovery_Otherwise", "If we've been mistaken, we suggest you to delete this message.");
-    @default.SetEntry("PasswordRecovery_Subject", "Reset your password");
-    @default.Update();
-
-    await _dictionaryRepository.SaveAsync([canadianFrench, french, @default]);
 
     UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, _recipientSettings.Address);
     UserAggregate user = new(uniqueName, TenantId);
@@ -179,7 +174,7 @@ public class SendMessageCommandTests : IntegrationTests
     });
     SendMessageCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await Mediator.Send(command));
-    Assert.Equal(new[] { user.Id.ToGuid() }, exception.UserIds);
+    Assert.Equal([user.Id.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
 
@@ -220,7 +215,7 @@ public class SendMessageCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw SenderNotInTenantException when the sender is in another realm.")]
   public async Task It_should_throw_SenderNotInTenantException_when_the_sender_is_in_another_realm()
   {
-    await CreateDefaultSenderAsync();
+    await CreateSenderAsync();
     Assert.NotNull(_sender);
 
     SetRealm();
@@ -246,7 +241,7 @@ public class SendMessageCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw TemplateNotFoundException when the template could not be found.")]
   public async Task It_should_throw_TemplateNotFoundException_when_the_template_could_not_be_found()
   {
-    await CreateDefaultSenderAsync();
+    await CreateSenderAsync();
 
     SendMessagePayload payload = new("PasswordRecovery");
     payload.Recipients.Add(new RecipientPayload
@@ -264,7 +259,7 @@ public class SendMessageCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw TemplateNotInTenantException when the template is in another realm.")]
   public async Task It_should_throw_TemplateNotInTenantException_when_the_template_is_in_another_realm()
   {
-    await CreateDefaultSenderAsync();
+    await CreateSenderAsync();
     Assert.NotNull(_sender);
 
     await CreateTemplateAsync(TenantId);
@@ -313,7 +308,7 @@ public class SendMessageCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UsersNotInTenantException when some users are in another realm.")]
   public async Task It_should_throw_UsersNotInTenantException_when_some_users_are_in_another_realm()
   {
-    await CreateDefaultSenderAsync(TenantId);
+    await CreateSenderAsync(TenantId);
     Assert.NotNull(_sender);
 
     await CreateTemplateAsync(TenantId);
@@ -344,16 +339,58 @@ public class SendMessageCommandTests : IntegrationTests
     Assert.Equal("RecipientsValidator", exception.Errors.Single().ErrorCode);
   }
 
-  private async Task CreateDefaultSenderAsync(TenantId? tenantId = null)
+  private async Task<LocaleUnit> CreateDictionariesAsync(TenantId? tenantId = null)
   {
-    EmailUnit email = new(_senderSettings.Address, isVerified: false);
-    ReadOnlySendGridSettings settings = new(_senderSettings.SendGridApiKey);
+    LocaleUnit locale = new("fr-CA");
+    DictionaryAggregate canadianFrench = new(locale, tenantId);
+    canadianFrench.SetEntry("Hello", "Bonjour {name} !");
+    canadianFrench.Update();
+
+    DictionaryAggregate french = new(new LocaleUnit("fr"), tenantId);
+    french.SetEntry("Team", "L'équipe Logitar");
+    french.Update();
+
+    Assert.NotNull(Realm.DefaultLocale);
+    DictionaryAggregate @default = new(new LocaleUnit(Realm.DefaultLocale), tenantId);
+    @default.SetEntry("Cordially", "Cordially,");
+    @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
+    @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");
+    @default.SetEntry("PasswordRecovery_Otherwise", "If we've been mistaken, we suggest you to delete this message.");
+    @default.SetEntry("PasswordRecovery_Subject", "Reset your password");
+    @default.Update();
+
+    await _dictionaryRepository.SaveAsync([canadianFrench, french, @default]);
+
+    return locale;
+  }
+
+  private async Task CreateSenderAsync(TenantId? tenantId = null, SenderProvider provider = SenderProvider.SendGrid, bool isDefault = true)
+  {
+    EmailUnit email;
+    Domain.Senders.SenderSettings settings;
+    switch (provider)
+    {
+      case SenderProvider.Mailgun:
+        email = new(_senderSettings.Mailgun.Address, isVerified: false);
+        settings = new ReadOnlyMailgunSettings(_senderSettings.Mailgun.ApiKey, _senderSettings.Mailgun.DomainName);
+        break;
+      case SenderProvider.SendGrid:
+        email = new(_senderSettings.SendGrid.Address, isVerified: false);
+        settings = new ReadOnlySendGridSettings(_senderSettings.SendGrid.ApiKey);
+        break;
+      default:
+        throw new SenderProviderNotSupportedException(provider);
+    }
+
     _sender = new SenderAggregate(email, settings, tenantId)
     {
       DisplayName = DisplayNameUnit.TryCreate(_senderSettings.DisplayName)
     };
-    _sender.SetDefault();
     _sender.Update();
+    if (isDefault)
+    {
+      _sender.SetDefault();
+    }
     await _senderRepository.SaveAsync(_sender);
   }
 

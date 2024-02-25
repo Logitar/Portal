@@ -2,23 +2,14 @@
 using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class CreateSenderCommandTests : IntegrationTests
 {
-  private readonly ISenderRepository _senderRepository;
-
-  public CreateSenderCommandTests() : base()
-  {
-    _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
-  }
-
   public override async Task InitializeAsync()
   {
     await base.InitializeAsync();
