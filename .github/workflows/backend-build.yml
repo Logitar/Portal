@@ -1,0 +1,27 @@
+name: Build Portal Backend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./backend
+
+jobs:
+  build:
+    name: Build Portal Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build . -t francispion.azurecr.io/portal_backend:${{ github.sha }} -f src/Logitar.Portal/Dockerfile

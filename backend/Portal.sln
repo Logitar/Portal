@@ -1,0 +1,93 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{87156E3F-709E-4F66-BED4-B51C17939018}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal", "src\Logitar.Portal\Logitar.Portal.csproj", "{AA049B00-94BA-4CF6-9BE3-F531E6FF0A68}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Contracts", "src\Logitar.Portal.Contracts\Logitar.Portal.Contracts.csproj", "{C774C0CB-F62A-4151-80B2-C4F017C1483C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Application", "src\Logitar.Portal.Application\Logitar.Portal.Application.csproj", "{6330FB11-EC54-4C84-A560-951A7D14C835}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Domain", "src\Logitar.Portal.Domain\Logitar.Portal.Domain.csproj", "{02280855-C33D-45EC-9237-9EFABB8A9EAC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Infrastructure", "src\Logitar.Portal.Infrastructure\Logitar.Portal.Infrastructure.csproj", "{B2D6E481-7AAB-4932-9AEF-18A8A0FB70F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.EntityFrameworkCore.Relational", "src\Logitar.Portal.EntityFrameworkCore.Relational\Logitar.Portal.EntityFrameworkCore.Relational.csproj", "{355B0408-E35C-412E-B5A3-B7E981B72B8A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.EntityFrameworkCore.SqlServer", "src\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj", "{07589971-0CB7-4BB2-A0E4-7AF20A5228EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0B519DB7-C200-4B7D-856F-85D559302616}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.IntegrationTests", "tests\Logitar.Portal.IntegrationTests\Logitar.Portal.IntegrationTests.csproj", "{833795B6-5B6D-40F5-A649-FEAF29C87BA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Web", "src\Logitar.Portal.Web\Logitar.Portal.Web.csproj", "{EB96F94A-4740-46BE-9036-9249E538C246}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.GraphQL", "src\Logitar.Portal.GraphQL\Logitar.Portal.GraphQL.csproj", "{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA049B00-94BA-4CF6-9BE3-F531E6FF0A68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA049B00-94BA-4CF6-9BE3-F531E6FF0A68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA049B00-94BA-4CF6-9BE3-F531E6FF0A68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA049B00-94BA-4CF6-9BE3-F531E6FF0A68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C774C0CB-F62A-4151-80B2-C4F017C1483C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C774C0CB-F62A-4151-80B2-C4F017C1483C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C774C0CB-F62A-4151-80B2-C4F017C1483C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C774C0CB-F62A-4151-80B2-C4F017C1483C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6330FB11-EC54-4C84-A560-951A7D14C835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6330FB11-EC54-4C84-A560-951A7D14C835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6330FB11-EC54-4C84-A560-951A7D14C835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6330FB11-EC54-4C84-A560-951A7D14C835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02280855-C33D-45EC-9237-9EFABB8A9EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02280855-C33D-45EC-9237-9EFABB8A9EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02280855-C33D-45EC-9237-9EFABB8A9EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02280855-C33D-45EC-9237-9EFABB8A9EAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D6E481-7AAB-4932-9AEF-18A8A0FB70F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D6E481-7AAB-4932-9AEF-18A8A0FB70F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D6E481-7AAB-4932-9AEF-18A8A0FB70F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D6E481-7AAB-4932-9AEF-18A8A0FB70F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{355B0408-E35C-412E-B5A3-B7E981B72B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355B0408-E35C-412E-B5A3-B7E981B72B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355B0408-E35C-412E-B5A3-B7E981B72B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355B0408-E35C-412E-B5A3-B7E981B72B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07589971-0CB7-4BB2-A0E4-7AF20A5228EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07589971-0CB7-4BB2-A0E4-7AF20A5228EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07589971-0CB7-4BB2-A0E4-7AF20A5228EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07589971-0CB7-4BB2-A0E4-7AF20A5228EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{833795B6-5B6D-40F5-A649-FEAF29C87BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{833795B6-5B6D-40F5-A649-FEAF29C87BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{833795B6-5B6D-40F5-A649-FEAF29C87BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{833795B6-5B6D-40F5-A649-FEAF29C87BA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB96F94A-4740-46BE-9036-9249E538C246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB96F94A-4740-46BE-9036-9249E538C246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB96F94A-4740-46BE-9036-9249E538C246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB96F94A-4740-46BE-9036-9249E538C246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FEF7069-3818-477A-8EA0-2B5A63F2FC74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{833795B6-5B6D-40F5-A649-FEAF29C87BA8} = {0B519DB7-C200-4B7D-856F-85D559302616}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF426AD4-45F8-45AE-86AA-674D42D51581}
+	EndGlobalSection
+EndGlobal
