@@ -8,7 +8,7 @@ internal class VariableGraphType : ObjectGraphType<Variable>
   public VariableGraphType()
   {
     Name = nameof(Variable);
-    Description = "Represents a message variable used to inject values in a compiled body.";
+    Description = "Represents a message variable used to inject a value in a compiled body.";
 
     Field(x => x.Key)
       .Description("The unique key of the variable.");

@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Dictionaries;
 
 public class Dictionary : Aggregate
 {
-  public string Locale { get; set; }
+  public string Locale { get; set; } // TODO(fpion): Locale
 
   public int EntryCount { get; set; }
   public List<DictionaryEntry> Entries { get; set; }

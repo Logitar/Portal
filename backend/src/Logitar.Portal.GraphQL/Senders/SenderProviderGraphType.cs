@@ -3,9 +3,9 @@ using Logitar.Portal.Contracts.Senders;
 
 namespace Logitar.Portal.GraphQL.Senders;
 
-internal class ProviderTypeGraphType : EnumerationGraphType<SenderProvider>
+internal class SenderProviderGraphType : EnumerationGraphType<SenderProvider>
 {
-  public ProviderTypeGraphType()
+  public SenderProviderGraphType()
   {
     Name = nameof(SenderProvider);
     Description = "Represents the available sender providers.";
