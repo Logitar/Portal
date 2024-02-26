@@ -20,8 +20,10 @@ internal class SenderGraphType : AggregateGraphType<Sender>
 
     Field(x => x.Provider, type: typeof(NonNullGraphType<SenderProviderGraphType>))
       .Description("The provider type of the sender.");
-    // TODO(fpion): Mailgun
-    // TODO(fpion): SendGrid
+    Field(x => x.Mailgun, type: typeof(MailgunSettingsGraphType))
+      .Description("The Mailgun provider settings.");
+    Field(x => x.SendGrid, type: typeof(SendGridSettingsGraphType))
+      .Description("The SendGrid provider settings.");
 
     Field(x => x.Realm, type: typeof(RealmGraphType))
       .Description("The realm in which the sender resides.");

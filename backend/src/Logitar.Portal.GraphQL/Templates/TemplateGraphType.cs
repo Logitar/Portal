@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Templates;
+﻿using GraphQL.Types;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Templates;
@@ -16,11 +17,8 @@ internal class TemplateGraphType : AggregateGraphType<Template>
 
     Field(x => x.Subject)
       .Description("The subject of the messages sent using this template.");
-    //Field(x => x.ContentType)
-    //  .Description("The type of the contents of the template.");
-    //Field(x => x.Contents)
-    //  .Description("The contents of the template.");
-    // TODO(fpion): Content
+    Field(x => x.Content, type: typeof(NonNullGraphType<ContentGraphType>))
+      .Description("The contents of the template.");
 
     Field(x => x.Realm, type: typeof(RealmGraphType))
       .Description("The realm in which the template resides.");
