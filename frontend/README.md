@@ -1,6 +1,6 @@
 # Portal
 
-This is the frontend for the Logitar Portal identity provider.
+This is the frontend of the Logitar Portal identity provider.
 
 ## Recommended IDE Setup
 

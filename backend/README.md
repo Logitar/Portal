@@ -1,3 +1,3 @@
 # Portal Backend
 
-This is the backend for the Logitar Portal identity provider.
+This is the backend of the Logitar Portal identity provider.
