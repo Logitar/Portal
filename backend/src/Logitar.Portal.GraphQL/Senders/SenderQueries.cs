@@ -11,9 +11,6 @@ internal static class SenderQueries
     root.Field<SenderGraphType>("defaultSender")
       .Authorize()
       .Description("Retrieves a default sender.")
-      .Arguments(
-        new QueryArgument<StringGraphType>() { Name = "realm", Description = "The unique identifier or unique name of the realm in which the sender resides." }
-      )
       .ResolveAsync(async context => await context.GetQueryService<ISenderService, object?>().ReadDefaultAsync(
         context.CancellationToken
       ));
