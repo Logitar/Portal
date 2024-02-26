@@ -19,6 +19,6 @@ public static class DependencyInjectionExtensions
           });
           config.ConfigureEndpoints(context);
         });
-      });
+      }); // TODO(fpion): configuration
   }
 }
