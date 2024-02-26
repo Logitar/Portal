@@ -3,7 +3,6 @@ using Logitar.Data.SqlServer;
 using Logitar.Identity.Contracts;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -68,7 +67,7 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     UpdateSenderPayload payload = new()
     {
-      Email = new EmailPayload("aa@@bb..cc", isVerified: false)
+      EmailAddress = "aa@@bb..cc"
     };
     UpdateSenderCommand command = new(Guid.NewGuid(), payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
@@ -87,7 +86,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     Sender? sender = await Mediator.Send(command);
     Assert.NotNull(sender);
 
-    Assert.Equal(_sender.Email.Address, sender.Email.Address);
+    Assert.Equal(_sender.Email.Address, sender.EmailAddress);
     Assert.NotNull(payload.DisplayName.Value);
     Assert.Equal(payload.DisplayName.Value.Trim(), sender.DisplayName);
     Assert.Null(sender.Description);

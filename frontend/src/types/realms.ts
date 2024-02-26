@@ -9,10 +9,10 @@ export type CreateRealmPayload = {
   displayName?: string;
   description?: string;
   defaultLocale?: string;
-  secret?: string;
+  secret: string;
   url?: string;
-  uniqueNameSettings?: UniqueNameSettings;
-  passwordSettings?: PasswordSettings;
+  uniqueNameSettings: UniqueNameSettings;
+  passwordSettings: PasswordSettings;
   requireUniqueEmail: boolean;
   customAttributes: CustomAttribute[];
 };

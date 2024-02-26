@@ -11,8 +11,8 @@ internal class SenderGraphType : AggregateGraphType<Sender>
     Field(x => x.IsDefault)
       .Description("A value indicating whether or not the sender is the default in its realm.");
 
-    //Field(x => x.EmailAddress)
-    //  .Description("The email address of the sender."); // TODO(fpion): EmailAddress
+    Field(x => x.EmailAddress)
+      .Description("The email address of the sender.");
     Field(x => x.DisplayName, nullable: true)
       .Description("The display name of the sender.");
     Field(x => x.Description, nullable: true)

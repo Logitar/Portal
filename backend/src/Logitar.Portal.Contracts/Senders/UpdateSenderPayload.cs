@@ -1,11 +1,10 @@
 ﻿using Logitar.Identity.Contracts;
-using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Contracts.Senders;
 
 public record UpdateSenderPayload
 {
-  public EmailPayload? Email { get; set; } // TODO(fpion): EmailAddress
+  public string? EmailAddress { get; set; }
   public Modification<string>? DisplayName { get; set; }
   public Modification<string>? Description { get; set; }
 

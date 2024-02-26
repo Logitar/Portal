@@ -3,7 +3,6 @@ using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Senders.Validators;
-using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
@@ -43,7 +42,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
 
     ActorId actorId = _applicationContext.ActorId;
 
-    EmailUnit email = payload.Email.ToEmailUnit();
+    EmailUnit email = new(payload.EmailAddress, isVerified: false);
     if (reference == null || email != reference.Email)
     {
       sender.Email = email;

@@ -111,7 +111,7 @@ internal class Mapper
     Sender sender;
     if (source.Sender == null)
     {
-      sender = new(new Email(source.SenderAddress))
+      sender = new(source.SenderAddress)
       {
         IsDefault = source.SenderIsDefault,
         DisplayName = source.SenderDisplayName,
@@ -298,8 +298,7 @@ internal class Mapper
 
   public Sender ToSender(SenderEntity source, Realm? realm)
   {
-    Email email = new(source.EmailAddress);
-    Sender destination = new(email)
+    Sender destination = new(source.EmailAddress)
     {
       IsDefault = source.IsDefault,
       DisplayName = source.DisplayName,
@@ -433,7 +432,6 @@ internal class Mapper
   }
 
   private Actor? TryFindActor(string? id) => id == null ? null : FindActor(id);
-  private Actor? TryFindActor(ActorId? id) => id.HasValue ? FindActor(id.Value) : null;
   private Actor FindActor(string id) => FindActor(new ActorId(id));
   private Actor FindActor(ActorId id) => _actors.TryGetValue(id, out Actor? actor) ? actor : Actor.System;
 
