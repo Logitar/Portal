@@ -36,10 +36,6 @@ export type RealmSortOption = SortOption & {
   field: RealmSort;
 };
 
-export type SearchRealmsPayload = SearchPayload & {
-  sort?: RealmSortOption[];
-};
-
 export type ReplaceRealmPayload = {
   uniqueSlug: string;
   displayName?: string;
@@ -51,4 +47,8 @@ export type ReplaceRealmPayload = {
   passwordSettings: PasswordSettings;
   requireUniqueEmail: boolean;
   customAttributes: CustomAttribute[];
+};
+
+export type SearchRealmsPayload = SearchPayload & {
+  sort?: RealmSortOption[];
 };

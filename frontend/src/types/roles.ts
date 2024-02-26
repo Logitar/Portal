@@ -10,6 +10,13 @@ export type CreateRolePayload = {
   customAttributes: CustomAttribute[];
 };
 
+export type ReplaceRolePayload = {
+  uniqueName: string;
+  displayName?: string;
+  description?: string;
+  customAttributes: CustomAttribute[];
+};
+
 export type Role = Aggregate & {
   uniqueName: string;
   displayName?: string;
@@ -26,11 +33,4 @@ export type RoleSortOption = SortOption & {
 
 export type SearchRolesPayload = SearchPayload & {
   sort?: RoleSortOption[];
-};
-
-export type ReplaceRolePayload = {
-  uniqueName: string;
-  displayName?: string;
-  description?: string;
-  customAttributes: CustomAttribute[];
 };
