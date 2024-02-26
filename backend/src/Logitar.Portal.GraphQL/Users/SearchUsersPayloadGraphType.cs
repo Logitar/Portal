@@ -8,7 +8,8 @@ internal class SearchUsersPayloadGraphType : SearchPayloadInputGraphType<SearchU
 {
   public SearchUsersPayloadGraphType() : base()
   {
-    // TODO(fpion): HasAuthenticated
+    Field(x => x.HasAuthenticated, nullable: true)
+      .Description("When specified, will filter API keys that have or do not have been authenticated.");
     Field(x => x.HasPassword, nullable: true)
       .Description("When specified, will filter users who have or do not have a password.");
     Field(x => x.IsDisabled, nullable: true)

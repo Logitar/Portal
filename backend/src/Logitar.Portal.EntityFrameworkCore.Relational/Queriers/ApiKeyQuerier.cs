@@ -70,10 +70,10 @@ internal class ApiKeyQuerier : IApiKeyQuerier
       NullOperator @operator = payload.HasAuthenticated.Value ? Operators.IsNotNull() : Operators.IsNull();
       builder.Where(IdentityDb.ApiKeys.AuthenticatedOn, @operator);
     }
-    if (payload.IsExpired.HasValue)
+    if (payload.Status != null)
     {
-      DateTime now = DateTime.UtcNow;
-      builder.Where(IdentityDb.ApiKeys.ExpiresOn, payload.IsExpired.Value ? Operators.IsLessThanOrEqualTo(now) : Operators.IsGreaterThan(now));
+      DateTime moment = payload.Status.Moment?.ToUniversalTime() ?? DateTime.UtcNow;
+      builder.Where(IdentityDb.ApiKeys.ExpiresOn, payload.Status.IsExpired ? Operators.IsLessThanOrEqualTo(moment) : Operators.IsGreaterThan(moment));
     }
 
     IQueryable<ApiKeyEntity> query = _apiKeys.FromQuery(builder).AsNoTracking()

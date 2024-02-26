@@ -8,10 +8,10 @@ internal class SearchApiKeysPayloadGraphType : SearchPayloadInputGraphType<Searc
 {
   public SearchApiKeysPayloadGraphType() : base()
   {
-    // TODO(fpion): HasAuthenticated
-    // TODO(fpion): IsExpired
-    //Field(x => x.Status, type: typeof(ApiKeyStatusGraphType))
-    //  .Description("The filter to apply to the search."); // TODO(fpion): Status
+    Field(x => x.HasAuthenticated, nullable: true)
+      .Description("When specified, will filter API keys that have or do not have been authenticated.");
+    Field(x => x.Status, type: typeof(ApiKeyStatusGraphType))
+      .Description("The filter to apply to the search.");
 
     Field(x => x.Sort, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<ApiKeySortOptionGraphType>>>))
       .DefaultValue([])

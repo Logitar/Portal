@@ -72,7 +72,7 @@ public class SearchApiKeysQueryTests : IntegrationTests
 
     SearchApiKeysPayload payload = new()
     {
-      IsExpired = false,
+      Status = new ApiKeyStatus(isExpired: false),
       Skip = 1,
       Limit = 1
     };
