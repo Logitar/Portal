@@ -71,7 +71,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     };
     UpdateSenderCommand command = new(Guid.NewGuid(), payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
-    Assert.Equal("Email.Address", exception.Errors.Single().PropertyName);
+    Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 
   [Fact(DisplayName = "It should update an existing sender.")]

@@ -12,7 +12,7 @@ internal class MessageGraphType : AggregateGraphType<Message>
   {
     Field(x => x.Subject)
       .Description("The subject of the message.");
-    Field(x => x.Body, type: typeof(ContentGraphType))
+    Field(x => x.Body, type: typeof(NonNullGraphType<ContentGraphType>))
       .Description("The body of the message.");
 
     Field(x => x.RecipientCount)

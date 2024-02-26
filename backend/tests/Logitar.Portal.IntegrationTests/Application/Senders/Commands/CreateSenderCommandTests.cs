@@ -61,6 +61,6 @@ public class CreateSenderCommandTests : IntegrationTests
     };
     CreateSenderCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
-    Assert.Equal("Email.Address", exception.Errors.Single().PropertyName);
+    Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 }
