@@ -8,7 +8,7 @@ public class Locale
   public string EnglishName { get; set; }
   public string NativeName { get; set; }
 
-  public Locale() : this(0, string.Empty, string.Empty, string.Empty, string.Empty)
+  public Locale() : this(string.Empty)
   {
   }
 
