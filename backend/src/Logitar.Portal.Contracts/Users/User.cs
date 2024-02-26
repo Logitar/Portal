@@ -29,7 +29,7 @@ public class User : Aggregate
 
   public DateTime? Birthdate { get; set; }
   public string? Gender { get; set; }
-  public string? Locale { get; set; }
+  public string? Locale { get; set; } // TODO(fpion): Locale
   public string? TimeZone { get; set; }
 
   public string? Picture { get; set; }

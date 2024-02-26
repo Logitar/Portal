@@ -7,7 +7,7 @@ internal class CustomAttributeGraphType : ObjectGraphType<CustomAttribute>
   public CustomAttributeGraphType()
   {
     Name = nameof(CustomAttribute);
-    Description = "Represents a user-defined attribute of an object.";
+    Description = "Represents an user-defined attribute of a resource.";
 
     Field(x => x.Key)
       .Description("The unique key of the custom attribute.");
