@@ -15,7 +15,7 @@ internal static class UserQueries
       .Arguments(
         new QueryArgument<IdGraphType>() { Name = "id", Description = "The unique identifier of the user." },
         new QueryArgument<StringGraphType>() { Name = "uniqueName", Description = "The unique name of the user." },
-        new QueryArgument<CustomIdentifierGraphType>() { Name = "identifier", Description = "A custom identifier of the user." }
+        new QueryArgument<CustomIdentifierInputGraphType>() { Name = "identifier", Description = "A custom identifier of the user." }
       )
       .ResolveAsync(async context => await context.GetQueryService<IUserService, object?>().ReadAsync(
         context.GetArgument<Guid?>("id"),
