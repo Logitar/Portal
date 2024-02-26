@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Net.Mail;
-using Logitar.Portal.Application;
 using Logitar.Portal.Application.Messages.Commands;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Messages;
@@ -14,13 +13,10 @@ internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
 {
   private readonly JsonSerializerOptions _serializerOptions;
 
-  private readonly IApplicationContext _applicationContext;
   private readonly Dictionary<SenderProvider, IProviderStrategy> _strategies = [];
 
-  public SendEmailCommandHandler(IApplicationContext applicationContext, IServiceProvider serviceProvider, IEnumerable<IProviderStrategy> strategies)
+  public SendEmailCommandHandler(IServiceProvider serviceProvider, IEnumerable<IProviderStrategy> strategies)
   {
-    _applicationContext = applicationContext;
-
     _serializerOptions = new();
     _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
 
@@ -32,6 +28,7 @@ internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
 
   public async Task Handle(SendEmailCommand command, CancellationToken cancellationToken)
   {
+    ActorId actorId = command.ActorId;
     MessageAggregate message = command.Message;
     SenderAggregate sender = command.Sender;
 
@@ -42,7 +39,6 @@ internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
 
     IMessageHandler messageHandler = strategy.Execute(sender.Settings);
 
-    ActorId actorId = _applicationContext.ActorId;
     SendMailResult result;
     try
     {
