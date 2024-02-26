@@ -39,7 +39,7 @@ export type ReplaceConfigurationPayload = {
 export type UserPayload = {
   uniqueName: string;
   password: string;
-  emailAddress?: string; // TODO(fpion): nullable
-  firstName?: string; // TODO(fpion): nullable
-  lastName?: string; // TODO(fpion): nullable
+  emailAddress?: string;
+  firstName?: string;
+  lastName?: string;
 };

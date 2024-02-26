@@ -6,16 +6,21 @@ export type CreateSenderPayload = {
   emailAddress: string;
   displayName?: string;
   description?: string;
-  // TODO(fpion): Mailgun
-  // TODO(fpion): SendGrid
+  mailgun?: MailgunSettings;
+  sendGrid?: SendGridSettings;
+};
+
+export type MailgunSettings = {
+  apiKey: string;
+  domainName: string;
 };
 
 export type ReplaceSenderPayload = {
   emailAddress: string;
   displayName?: string;
   description?: string;
-  // TODO(fpion): Mailgun
-  // TODO(fpion): SendGrid
+  mailgun?: MailgunSettings;
+  sendGrid?: SendGridSettings;
 };
 
 export type SearchSendersPayload = SearchPayload & {
@@ -31,8 +36,8 @@ export type Sender = Aggregate & {
   displayName?: string;
   description?: string;
   provider: SenderProvider;
-  // TODO(fpion): Mailgun
-  // TODO(fpion): SendGrid
+  mailgun?: MailgunSettings;
+  sendGrid?: SendGridSettings;
   realm?: Realm;
 };
 
@@ -40,4 +45,8 @@ export type SenderSort = "DisplayName" | "EmailAddress" | "UpdatedOn";
 
 export type SenderSortOption = SortOption & {
   field: SenderSort;
+};
+
+export type SendGridSettings = {
+  apiKey: string;
 };
