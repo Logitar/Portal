@@ -11,7 +11,6 @@ using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
@@ -93,7 +92,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     {
       UserPayload user = new(Faker.Person.UserName, PasswordString)
       {
-        Email = new EmailPayload(Faker.Person.Email, isVerified: false),
+        EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       };

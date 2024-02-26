@@ -8,7 +8,6 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations.Validators;
 using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
@@ -79,8 +78,10 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       Password password = _passwordManager.ValidateAndCreate(userPayload.Password);
       user.SetPassword(password, actorId);
 
-      EmailUnit? email = userPayload.Email?.ToEmailUnit();
-      user.SetEmail(email, actorId);
+      if (!string.IsNullOrWhiteSpace(userPayload.EmailAddress))
+      {
+        user.SetEmail(new EmailUnit(userPayload.EmailAddress, isVerified: false), actorId);
+      }
 
       SessionAggregate session = user.SignIn();
       foreach (CustomAttribute customAttribute in payload.Session.CustomAttributes)

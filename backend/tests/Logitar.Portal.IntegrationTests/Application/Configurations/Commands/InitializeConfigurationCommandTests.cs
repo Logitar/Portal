@@ -8,7 +8,6 @@ using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +42,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
       DefaultLocale = Faker.Locale,
       User = new UserPayload(Faker.Person.UserName, PasswordString)
       {
-        Email = new EmailPayload(Faker.Person.Email, isVerified: false),
+        EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       },
@@ -67,7 +66,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     Assert.True(session.User.HasPassword);
     Assert.False(session.User.IsDisabled);
     Assert.NotNull(session.User.Email);
-    Assert.Equal(payload.User.Email.Address, session.User.Email.Address);
+    Assert.Equal(payload.User.EmailAddress, session.User.Email.Address);
     Assert.False(session.User.IsConfirmed);
     Assert.Equal(payload.User.FirstName, session.User.FirstName);
     Assert.Equal(payload.User.LastName, session.User.LastName);
