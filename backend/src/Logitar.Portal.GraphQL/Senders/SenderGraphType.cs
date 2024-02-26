@@ -18,7 +18,7 @@ internal class SenderGraphType : AggregateGraphType<Sender>
     Field(x => x.Description, nullable: true)
       .Description("The description of the sender.");
 
-    Field(x => x.Provider, type: typeof(NonNullGraphType<ProviderTypeGraphType>))
+    Field(x => x.Provider, type: typeof(NonNullGraphType<SenderProviderGraphType>))
       .Description("The provider type of the sender.");
     // TODO(fpion): Mailgun
     // TODO(fpion): SendGrid
