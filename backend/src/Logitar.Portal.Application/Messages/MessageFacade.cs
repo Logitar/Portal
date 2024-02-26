@@ -27,6 +27,6 @@ internal class MessageFacade : IMessageService
 
   public async Task<SentMessages> SendAsync(SendMessagePayload payload, CancellationToken cancellationToken)
   {
-    return await _mediator.Send(new SendMessageCommand(payload), cancellationToken);
+    return await _mediator.Send(new SendMessageInternalCommand(payload), cancellationToken);
   }
 }

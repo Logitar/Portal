@@ -7,10 +7,11 @@ using Logitar.Portal.Constants;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
-using Logitar.Portal.Filters;
 using Logitar.Portal.GraphQL;
+using Logitar.Portal.MassTransit;
 using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;
+using Logitar.Portal.Web;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authentication;
@@ -35,9 +36,9 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllersWithViews(options => options.Filters.Add<ExceptionHandling>())
-      .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     services.AddLogitarPortalGraphQL(_configuration);
+    services.AddLogitarPortalMassTransit();
+    services.AddLogitarPortalWeb();
 
     CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
     services.AddSingleton(corsSettings);

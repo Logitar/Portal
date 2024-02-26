@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Logitar.Portal.Filters;
+namespace Logitar.Portal.Web.Filters;
 
 internal class ExceptionHandling : ExceptionFilterAttribute
 {
@@ -72,8 +72,8 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     return error;
   }
 
-  private static readonly HashSet<Type> _badRequestExceptions = new(new[]
-  {
+  private static readonly HashSet<Type> _badRequestExceptions = new(
+  [
     typeof(CannotDeleteDefaultSenderException),
     typeof(MissingRecipientAddressesException),
     typeof(NoDefaultSenderException),
@@ -83,28 +83,28 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     typeof(TemplateNotInTenantException),
     typeof(ToRecipientMissingException),
     typeof(UsersNotInTenantException)
-  });
+  ]);
   private static bool IsBadRequestError(Exception exception) => _badRequestExceptions.Contains(exception.GetType())
     || exception is InvalidCredentialsException || exception is SecurityTokenException || exception is TooManyResultsException;
 
-  private static readonly HashSet<Type> _conflictExceptions = new(new[]
-  {
+  private static readonly HashSet<Type> _conflictExceptions = new(
+  [
     typeof(ConfigurationAlreadyInitializedException),
     typeof(DictionaryAlreadyExistsException),
     typeof(EmailAddressAlreadyUsedException),
     typeof(UniqueKeyAlreadyUsedException),
     typeof(UniqueSlugAlreadyUsedException)
-  });
+  ]);
   private static bool IsConflictError(Exception exception) => _conflictExceptions.Contains(exception.GetType())
     || exception is CustomIdentifierAlreadyUsedException || exception is UniqueNameAlreadyUsedException;
 
-  private static readonly HashSet<Type> _notFoundExceptions = new(new[]
-  {
+  private static readonly HashSet<Type> _notFoundExceptions = new(
+  [
     typeof(RolesNotFoundException),
     typeof(SenderNotFoundException),
     typeof(TemplateNotFoundException),
     typeof(UsersNotFoundException)
-  });
+  ]);
   private static bool IsNotFoundError(Exception exception) => _notFoundExceptions.Contains(exception.GetType());
 
   private static string GetErrorMessage(Exception exception) => exception.Message.Remove("\r").Split('\n').First();
