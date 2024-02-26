@@ -76,7 +76,6 @@ export type PhonePayload = ContactPayload & {
   countryCode?: string;
   number: string;
   extension?: string;
-  isVerified: boolean;
 };
 
 export type ReplaceUserPayload = {
