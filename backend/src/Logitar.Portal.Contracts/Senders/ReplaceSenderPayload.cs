@@ -1,22 +1,20 @@
-﻿using Logitar.Portal.Contracts.Users;
-
-namespace Logitar.Portal.Contracts.Senders;
+﻿namespace Logitar.Portal.Contracts.Senders;
 
 public record ReplaceSenderPayload
 {
-  public EmailPayload Email { get; set; }
+  public string EmailAddress { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
   public MailgunSettings? Mailgun { get; set; }
   public SendGridSettings? SendGrid { get; set; }
 
-  public ReplaceSenderPayload() : this(new EmailPayload())
+  public ReplaceSenderPayload() : this(string.Empty)
   {
   }
 
-  public ReplaceSenderPayload(EmailPayload email)
+  public ReplaceSenderPayload(string emailAddress)
   {
-    Email = email;
+    EmailAddress = emailAddress;
   }
 }

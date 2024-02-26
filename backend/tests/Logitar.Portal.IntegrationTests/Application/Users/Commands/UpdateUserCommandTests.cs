@@ -157,7 +157,7 @@ public class UpdateUserCommandTests : IntegrationTests
     Assert.Equal(payload.IsDisabled.Value, result.IsDisabled);
     Assert.Equal(payload.Birthdate.Value?.ToUniversalTime(), result.Birthdate);
     Assert.Equal(payload.Gender.Value?.ToLower(), result.Gender);
-    Assert.Equal(payload.Locale.Value, result.Locale);
+    Assert.Equal(payload.Locale.Value, result.Locale?.Code);
     Assert.Equal(payload.TimeZone.Value, result.TimeZone);
     Assert.Equal(payload.Picture.Value, result.Picture);
     Assert.Null(result.Profile);

@@ -4,18 +4,18 @@ namespace Logitar.Portal.Contracts.Dictionaries;
 
 public class Dictionary : Aggregate
 {
-  public string Locale { get; set; }
+  public Locale Locale { get; set; }
 
   public int EntryCount { get; set; }
   public List<DictionaryEntry> Entries { get; set; }
 
   public Realm? Realm { get; set; }
 
-  public Dictionary() : this(string.Empty)
+  public Dictionary() : this(new Locale())
   {
   }
 
-  public Dictionary(string locale)
+  public Dictionary(Locale locale)
   {
     Locale = locale;
     Entries = [];

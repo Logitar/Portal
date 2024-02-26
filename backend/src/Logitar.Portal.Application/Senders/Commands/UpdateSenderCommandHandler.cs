@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Senders.Validators;
-using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
@@ -37,9 +37,9 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
 
     ActorId actorId = _applicationContext.ActorId;
 
-    if (payload.Email != null)
+    if (!string.IsNullOrWhiteSpace(payload.EmailAddress))
     {
-      sender.Email = payload.Email.ToEmailUnit();
+      sender.Email = new EmailUnit(payload.EmailAddress);
     }
     if (payload.DisplayName != null)
     {

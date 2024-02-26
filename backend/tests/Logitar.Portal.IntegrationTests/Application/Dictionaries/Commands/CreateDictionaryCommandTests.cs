@@ -46,7 +46,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
     CreateDictionaryCommand command = new(payload);
     Dictionary dictionary = await Mediator.Send(command);
 
-    Assert.Equal(payload.Locale, dictionary.Locale);
+    Assert.Equal(payload.Locale, dictionary.Locale.Code);
     Assert.Equal(0, dictionary.EntryCount);
     Assert.Empty(dictionary.Entries);
     Assert.Same(Realm, dictionary.Realm);

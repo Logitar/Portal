@@ -67,7 +67,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     Assert.Equal(_realm.UniqueSlug.Value, realm.UniqueSlug);
     Assert.Equal(payload.DisplayName, realm.DisplayName);
     Assert.Equal(payload.Description.Trim(), realm.Description);
-    Assert.Equal("fr-CA", realm.DefaultLocale);
+    Assert.Equal("fr-CA", realm.DefaultLocale?.Code);
     Assert.NotEqual(oldSecret, realm.Secret);
     Assert.Equal(payload.Url, realm.Url);
   }

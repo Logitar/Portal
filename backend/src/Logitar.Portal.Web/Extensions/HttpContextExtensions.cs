@@ -7,7 +7,6 @@ using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
 using Microsoft.Extensions.Primitives;
-using System.Text.Json;
 
 namespace Logitar.Portal.Web.Extensions;
 

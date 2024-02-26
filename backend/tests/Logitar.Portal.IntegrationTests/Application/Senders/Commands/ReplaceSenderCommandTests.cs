@@ -3,7 +3,6 @@ using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -56,7 +55,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     _sender.Update();
     await _senderRepository.SaveAsync(_sender);
 
-    ReplaceSenderPayload payload = new(new EmailPayload(Faker.Internet.Email(), isVerified: false))
+    ReplaceSenderPayload payload = new(Faker.Internet.Email())
     {
       DisplayName = " Default Sender ",
       Description = "                ",
@@ -66,7 +65,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     Sender? sender = await Mediator.Send(command);
     Assert.NotNull(sender);
 
-    Assert.Equal(payload.Email.Address, sender.Email.Address);
+    Assert.Equal(payload.EmailAddress, sender.EmailAddress);
     Assert.Equal(payload.DisplayName.Trim(), sender.DisplayName);
     Assert.Null(sender.Description);
     Assert.Equal(payload.SendGrid, sender.SendGrid);
@@ -75,7 +74,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the sender cannot be found.")]
   public async Task It_should_return_null_when_the_sender_cannot_be_found()
   {
-    ReplaceSenderPayload payload = new(new EmailPayload(Faker.Internet.Email(), isVerified: false))
+    ReplaceSenderPayload payload = new(Faker.Internet.Email())
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
@@ -89,7 +88,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
   {
     SetRealm();
 
-    ReplaceSenderPayload payload = new(new EmailPayload(Faker.Internet.Email(), isVerified: false))
+    ReplaceSenderPayload payload = new(Faker.Internet.Email())
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
@@ -101,12 +100,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    ReplaceSenderPayload payload = new(new EmailPayload("aa@@bb..cc", isVerified: false))
+    ReplaceSenderPayload payload = new("aa@@bb..cc")
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(Guid.NewGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
-    Assert.Equal("Email.Address", exception.Errors.Single().PropertyName);
+    Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 }

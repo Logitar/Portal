@@ -8,7 +8,7 @@ public class Realm : Aggregate
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
-  public string? DefaultLocale { get; set; }
+  public Locale? DefaultLocale { get; set; }
   public string Secret { get; set; }
   public string? Url { get; set; }
 

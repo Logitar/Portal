@@ -9,12 +9,16 @@ public record SearchApiKeysModel : SearchModel
   [FromQuery(Name = "expired")]
   public bool? IsExpired { get; set; }
 
+  [FromQuery(Name = "moment")]
+  public DateTime? Moment { get; set; }
+
   public SearchApiKeysPayload ToPayload()
   {
-    SearchApiKeysPayload payload = new()
+    SearchApiKeysPayload payload = new();
+    if (IsExpired.HasValue)
     {
-      IsExpired = IsExpired
-    };
+      payload.Status = new ApiKeyStatus(IsExpired.Value, Moment);
+    }
     Fill(payload);
 
     foreach (string sort in Sort)

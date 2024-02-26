@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Contracts.Senders;
 
@@ -7,7 +6,7 @@ public class Sender : Aggregate
 {
   public bool IsDefault { get; set; }
 
-  public Email Email { get; set; }
+  public string EmailAddress { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
@@ -17,12 +16,12 @@ public class Sender : Aggregate
 
   public Realm? Realm { get; set; }
 
-  public Sender() : this(new Email())
+  public Sender() : this(string.Empty)
   {
   }
 
-  public Sender(Email email)
+  public Sender(string emailAddress)
   {
-    Email = email;
+    EmailAddress = emailAddress;
   }
 }

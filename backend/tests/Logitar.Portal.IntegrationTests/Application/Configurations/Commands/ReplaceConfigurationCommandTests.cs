@@ -40,7 +40,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
     ReplaceConfigurationCommand command = new(payload, version);
     Configuration result = await Mediator.Send(command);
 
-    Assert.Equal(payload.DefaultLocale, result.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, result.DefaultLocale?.Code);
     Assert.Equal(newSecret, result.Secret);
     Assert.Equal(payload.UniqueNameSettings, result.UniqueNameSettings);
     Assert.Equal(payload.PasswordSettings, result.PasswordSettings);

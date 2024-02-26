@@ -8,6 +8,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Filters;
+using Logitar.Portal.GraphQL;
 using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;
 using Logitar.Portal.Web.Constants;
@@ -20,11 +21,13 @@ namespace Logitar.Portal;
 internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
+  private readonly string[] _authenticationSchemes;
   private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
+    _authenticationSchemes = Schemes.GetEnabled(configuration);
     _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
   }
 
@@ -32,30 +35,30 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
-    services.AddControllers(options => options.Filters.Add<ExceptionHandling>())
+    services.AddControllersWithViews(options => options.Filters.Add<ExceptionHandling>())
       .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    services.AddLogitarPortalGraphQL(_configuration);
 
     CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
-    string[] authenticationSchemes = Schemes.GetEnabled(_configuration);
     AuthenticationBuilder authenticationBuilder = services.AddAuthentication()
       .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, options => { })
       .AddScheme<SessionAuthenticationOptions, SessionAuthenticationHandler>(Schemes.Session, options => { });
-    if (authenticationSchemes.Contains(Schemes.Basic))
+    if (_authenticationSchemes.Contains(Schemes.Basic))
     {
       authenticationBuilder.AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(Schemes.Basic, options => { });
     }
 
-    AuthorizationPolicy portalActorPolicy = new AuthorizationPolicyBuilder(authenticationSchemes)
+    AuthorizationPolicy portalActorPolicy = new AuthorizationPolicyBuilder(_authenticationSchemes)
       .RequireAuthenticatedUser()
       .AddRequirements(new PortalActorAuthorizationRequirement())
       .Build();
     services.AddAuthorizationBuilder()
       .SetDefaultPolicy(portalActorPolicy)
       .AddPolicy(Policies.PortalActor, portalActorPolicy)
-      .AddPolicy(Policies.PortalUser, new AuthorizationPolicyBuilder(authenticationSchemes)
+      .AddPolicy(Policies.PortalUser, new AuthorizationPolicyBuilder(_authenticationSchemes)
         .RequireAuthenticatedUser()
         .AddRequirements(new PortalUserAuthorizationRequirement())
         .Build()
@@ -104,22 +107,22 @@ internal class Startup : StartupBase
       builder.UseOpenApi();
     }
 
-    //if (_configuration.GetValue<bool>("UseGraphQLAltair"))
-    //{
-    //  builder.UseGraphQLAltair();
-    //}
-    //if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
-    //{
-    //  builder.UseGraphQLGraphiQL();
-    //}
-    //if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
-    //{
-    //  builder.UseGraphQLPlayground();
-    //}
-    //if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
-    //{
-    //  builder.UseGraphQLVoyager();
-    //}
+    if (_configuration.GetValue<bool>("UseGraphQLAltair"))
+    {
+      builder.UseGraphQLAltair();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
+    {
+      builder.UseGraphQLGraphiQL();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
+    {
+      builder.UseGraphQLPlayground();
+    }
+    if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
+    {
+      builder.UseGraphQLVoyager();
+    }
 
     builder.UseHttpsRedirection();
     builder.UseCors();
@@ -127,13 +130,13 @@ internal class Startup : StartupBase
     builder.UseSession();
     //builder.UseMiddleware<Logging>();
     builder.UseMiddleware<RenewSession>();
-    //builder.UseMiddleware<RedirectNotFound>();
+    builder.UseMiddleware<RedirectNotFound>();
     builder.UseAuthentication();
     builder.UseAuthorization();
     builder.UseMiddleware<ResolveRealm>();
     builder.UseMiddleware<ResolveUser>();
 
-    //builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(Schemes.All));
+    builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(_authenticationSchemes));
 
     if (builder is WebApplication application)
     {

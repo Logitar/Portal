@@ -1,7 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,8 +24,7 @@ public class CreateSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a new sender.")]
   public async Task It_should_create_a_new_sender()
   {
-    EmailPayload email = new(Faker.Internet.Email(), isVerified: false);
-    CreateSenderPayload payload = new(email)
+    CreateSenderPayload payload = new(Faker.Internet.Email())
     {
       DisplayName = "Default Sender",
       Description = "    ",
@@ -36,7 +34,7 @@ public class CreateSenderCommandTests : IntegrationTests
     Sender sender = await Mediator.Send(command);
 
     Assert.True(sender.IsDefault);
-    Assert.Equal(payload.Email.Address, sender.Email.Address);
+    Assert.Equal(payload.EmailAddress, sender.EmailAddress);
     Assert.Equal(payload.DisplayName, sender.DisplayName);
     Assert.Null(sender.Description);
     Assert.Equal(SenderProvider.SendGrid, sender.Provider);
@@ -57,12 +55,12 @@ public class CreateSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    CreateSenderPayload payload = new(new EmailPayload("aa@@bb..cc", isVerified: false))
+    CreateSenderPayload payload = new("aa@@bb..cc")
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     CreateSenderCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
-    Assert.Equal("Email.Address", exception.Errors.Single().PropertyName);
+    Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 }

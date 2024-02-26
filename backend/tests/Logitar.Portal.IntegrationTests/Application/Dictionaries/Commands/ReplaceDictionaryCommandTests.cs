@@ -58,7 +58,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     Dictionary? dictionary = await Mediator.Send(command);
     Assert.NotNull(dictionary);
 
-    Assert.Equal(payload.Locale, dictionary.Locale);
+    Assert.Equal(payload.Locale, dictionary.Locale.Code);
 
     Assert.Equal(3, dictionary.EntryCount);
     Assert.Equal(3, dictionary.Entries.Count);

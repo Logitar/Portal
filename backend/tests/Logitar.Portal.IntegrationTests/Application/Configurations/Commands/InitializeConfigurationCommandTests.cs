@@ -8,7 +8,6 @@ using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +42,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
       DefaultLocale = Faker.Locale,
       User = new UserPayload(Faker.Person.UserName, PasswordString)
       {
-        Email = new EmailPayload(Faker.Person.Email, isVerified: false),
+        EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       },
@@ -53,7 +52,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     Session session = await Mediator.Send(command);
 
     Assert.NotNull(_cacheService.Configuration);
-    Assert.Equal(payload.DefaultLocale, _cacheService.Configuration.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, _cacheService.Configuration.DefaultLocale?.Code);
     Assert.Equal(session.User.Id, _cacheService.Configuration.CreatedBy.Id);
     Assert.Equal(session.User.Id, _cacheService.Configuration.UpdatedBy.Id);
 
@@ -67,12 +66,12 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     Assert.True(session.User.HasPassword);
     Assert.False(session.User.IsDisabled);
     Assert.NotNull(session.User.Email);
-    Assert.Equal(payload.User.Email.Address, session.User.Email.Address);
+    Assert.Equal(payload.User.EmailAddress, session.User.Email.Address);
     Assert.False(session.User.IsConfirmed);
     Assert.Equal(payload.User.FirstName, session.User.FirstName);
     Assert.Equal(payload.User.LastName, session.User.LastName);
     Assert.Equal(Faker.Person.FullName, session.User.FullName);
-    Assert.Equal(payload.DefaultLocale, session.User.Locale);
+    Assert.Equal(payload.DefaultLocale, session.User.Locale?.Code);
     Assert.NotNull(session.User.AuthenticatedOn);
     Assert.Null(session.User.Realm);
     Assert.Equal(session.User.Id, session.User.CreatedBy.Id);
