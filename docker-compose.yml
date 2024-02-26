@@ -23,3 +23,10 @@ services:
       SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
     ports:
       - 8087:8080
+
+  portal_rabbitmq:
+    image: masstransit/rabbitmq
+    container_name: Logitar.Portal_rabbitmq
+    ports:
+      - 5677:5672
+      - 15677:15672

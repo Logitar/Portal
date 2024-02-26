@@ -15,7 +15,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
-internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SentMessages>
+internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageInternalCommand, SentMessages>
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryRepository _dictionaryRepository;
@@ -25,7 +25,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
   private readonly ITemplateRepository _templateRepository;
   private readonly IUserRepository _userRepository;
 
-  public SendMessageCommandHandler(IApplicationContext applicationContext, IDictionaryRepository dictionaryRepository, IMediator mediator,
+  public SendMessageInternalCommandHandler(IApplicationContext applicationContext, IDictionaryRepository dictionaryRepository, IMediator mediator,
     IMessageRepository messageRepository, ISenderRepository senderRepository, ITemplateRepository templateRepository, IUserRepository userRepository)
   {
     _applicationContext = applicationContext;
@@ -37,7 +37,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     _userRepository = userRepository;
   }
 
-  public async Task<SentMessages> Handle(SendMessageCommand command, CancellationToken cancellationToken)
+  public async Task<SentMessages> Handle(SendMessageInternalCommand command, CancellationToken cancellationToken)
   {
     SendMessagePayload payload = command.Payload;
     new SendMessageValidator().ValidateAndThrow(payload);

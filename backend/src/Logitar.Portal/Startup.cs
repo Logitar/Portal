@@ -8,6 +8,8 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.GraphQL;
+using Logitar.Portal.Infrastructure;
+using Logitar.Portal.MassTransit;
 using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;
 using Logitar.Portal.Web;
@@ -36,6 +38,7 @@ internal class Startup : StartupBase
     base.ConfigureServices(services);
 
     services.AddLogitarPortalGraphQL(_configuration);
+    services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
 
     CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();

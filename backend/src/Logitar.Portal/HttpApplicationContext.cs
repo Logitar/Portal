@@ -103,6 +103,7 @@ internal class HttpApplicationContext : IApplicationContext
       };
     }
   }
+
   public HttpApplicationContext(ICacheService cacheService, IHttpContextAccessor httpContextAccessor)
   {
     _cacheService = cacheService;
