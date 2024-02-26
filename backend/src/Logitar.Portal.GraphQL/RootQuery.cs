@@ -1,4 +1,5 @@
 ﻿using GraphQL.Types;
+using Logitar.Portal.GraphQL.ApiKeys;
 using Logitar.Portal.GraphQL.Configurations;
 using Logitar.Portal.GraphQL.Realms;
 using Logitar.Portal.GraphQL.Roles;
@@ -11,7 +12,7 @@ internal class RootQuery : ObjectGraphType
   {
     Name = nameof(RootQuery);
 
-    //ApiKeyQueries.Register(this); // TODO(fpion): implement
+    ApiKeyQueries.Register(this);
     ConfigurationQueries.Register(this);
     //DictionaryQueries.Register(this); // TODO(fpion): implement
     //MessageQueries.Register(this); // TODO(fpion): implement
