@@ -1,24 +1,53 @@
-﻿using MassTransit;
+﻿using Logitar.Portal.MassTransit.Settings;
+using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.MassTransit;
 
 public static class DependencyInjectionExtensions
 {
-  public static IServiceCollection AddLogitarPortalMassTransit(this IServiceCollection services)
+  public static IServiceCollection AddLogitarPortalMassTransit(this IServiceCollection services, IConfiguration configuration)
   {
-    return services
-      .AddMassTransit(x =>
-      {
-        x.UsingRabbitMq((context, config) =>
+    MassTransitSettings settings = configuration.GetSection("MassTransit").Get<MassTransitSettings>() ?? new();
+    return services.AddLogitarPortalMassTransit(settings);
+  }
+  public static IServiceCollection AddLogitarPortalMassTransit(this IServiceCollection services, MassTransitSettings settings)
+  {
+    if (settings.TransportBroker.HasValue)
+    {
+      services
+        .AddMassTransit(configurator =>
         {
-          config.Host(host: "localhost", port: 5677, virtualHost: "/", h =>
+          switch (settings.TransportBroker.Value)
           {
-            h.Username(username: "guest");
-            h.Password(password: "guest");
-          });
-          config.ConfigureEndpoints(context);
+            case TransportBroker.RabbitMQ:
+              if (settings.RabbitMQ == null)
+              {
+                throw new ArgumentException($"The {nameof(settings.RabbitMQ)} is required.", nameof(settings));
+              }
+              configurator.AddMassTransitRabbitMq(settings.RabbitMQ);
+              break;
+            default:
+              throw new TransportBrokerNotSupportedException(settings.TransportBroker.Value);
+          }
+          configurator.AddConsumers(Assembly.GetExecutingAssembly().GetTypes().Where(type => typeof(IConsumer).IsAssignableFrom(type)).ToArray());
         });
-      }); // TODO(fpion): configuration
+    }
+
+    return services;
+  }
+
+  private static void AddMassTransitRabbitMq(this IBusRegistrationConfigurator configurator, RabbitMqSettings settings)
+  {
+    configurator.UsingRabbitMq((context, config) =>
+    {
+      config.Host(settings.Host, settings.Port, settings.VirtualHost, h =>
+      {
+        h.Username(settings.Username);
+        h.Password(settings.Password);
+      });
+      config.ConfigureEndpoints(context);
+    });
   }
 }

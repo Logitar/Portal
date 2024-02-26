@@ -37,7 +37,7 @@ internal class Startup : StartupBase
     base.ConfigureServices(services);
 
     services.AddLogitarPortalGraphQL(_configuration);
-    services.AddLogitarPortalMassTransit();
+    services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
 
     CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
