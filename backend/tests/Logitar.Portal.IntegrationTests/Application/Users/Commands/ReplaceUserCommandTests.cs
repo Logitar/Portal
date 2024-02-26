@@ -130,7 +130,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     Assert.Equal(payload.Nickname.Trim(), result.Nickname);
     Assert.Equal(payload.Birthdate?.ToUniversalTime(), result.Birthdate);
     Assert.Equal(payload.Gender, result.Gender, ignoreCase: true);
-    Assert.Equal(payload.Locale, result.Locale);
+    Assert.Equal(payload.Locale, result.Locale?.Code);
     Assert.Equal(payload.TimeZone, result.TimeZone);
     Assert.Equal(payload.Picture, result.Picture);
     Assert.Equal(payload.Profile, result.Profile);

@@ -53,7 +53,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       .ToDictionary(x => x.Locale, x => x);
     bool ignoreUserLocale = payload.IgnoreUserLocale;
     LocaleUnit? targetLocale = LocaleUnit.TryCreate(payload.Locale);
-    LocaleUnit? defaultLocale = LocaleUnit.TryCreate(_applicationContext.Realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale);
+    LocaleUnit? defaultLocale = LocaleUnit.TryCreate((_applicationContext.Realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale)?.Code);
     Dictionaries defaultDictionaries = new(allDictionaries, targetLocale, defaultLocale);
 
     Variables variables = new(payload.Variables);
@@ -70,7 +70,7 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       SubjectUnit subject = new(defaultDictionaries.Translate(template.Subject.Value));
       LocaleUnit? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
       ContentUnit body = await _mediator.Send(new CompileTemplateCommand(id, template, defaultDictionaries, locale, recipient.User, variables), cancellationToken);
-      IReadOnlyCollection<RecipientUnit> recipients = new[] { recipient }.Concat(allRecipients.CC).Concat(allRecipients.Bcc).ToList();
+      IReadOnlyCollection<RecipientUnit> recipients = [recipient, .. allRecipients.CC, .. allRecipients.Bcc];
 
       MessageAggregate message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
       messages.Add(message);

@@ -53,7 +53,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     Session session = await Mediator.Send(command);
 
     Assert.NotNull(_cacheService.Configuration);
-    Assert.Equal(payload.DefaultLocale, _cacheService.Configuration.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale, _cacheService.Configuration.DefaultLocale?.Code);
     Assert.Equal(session.User.Id, _cacheService.Configuration.CreatedBy.Id);
     Assert.Equal(session.User.Id, _cacheService.Configuration.UpdatedBy.Id);
 
@@ -72,7 +72,7 @@ public class InitializeConfigurationCommandTests : IntegrationTests
     Assert.Equal(payload.User.FirstName, session.User.FirstName);
     Assert.Equal(payload.User.LastName, session.User.LastName);
     Assert.Equal(Faker.Person.FullName, session.User.FullName);
-    Assert.Equal(payload.DefaultLocale, session.User.Locale);
+    Assert.Equal(payload.DefaultLocale, session.User.Locale?.Code);
     Assert.NotNull(session.User.AuthenticatedOn);
     Assert.Null(session.User.Realm);
     Assert.Equal(session.User.Id, session.User.CreatedBy.Id);

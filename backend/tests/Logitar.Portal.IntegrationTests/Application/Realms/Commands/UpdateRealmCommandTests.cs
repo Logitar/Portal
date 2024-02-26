@@ -90,7 +90,7 @@ public class UpdateRealmCommandTests : IntegrationTests
     Assert.Equal(command.Id, realm.Id);
     Assert.Equal(payload.DisplayName.Value, realm.DisplayName);
     Assert.Equal(payload.Description.Value?.Trim(), realm.Description);
-    Assert.Equal(payload.DefaultLocale.Value, realm.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale.Value, realm.DefaultLocale?.Code);
     Assert.Equal(payload.Url.Value, realm.Url);
   }
 }

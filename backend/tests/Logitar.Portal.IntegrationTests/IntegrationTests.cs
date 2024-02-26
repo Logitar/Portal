@@ -71,7 +71,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",
-      DefaultLocale = Faker.Locale,
+      DefaultLocale = new Locale(Faker.Locale),
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };

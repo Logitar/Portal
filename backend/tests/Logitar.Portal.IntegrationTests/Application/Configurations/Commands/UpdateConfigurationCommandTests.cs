@@ -47,7 +47,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
     UpdateConfigurationCommand command = new(payload);
     Configuration result = await Mediator.Send(command);
 
-    Assert.Equal(payload.DefaultLocale.Value, result.DefaultLocale);
+    Assert.Equal(payload.DefaultLocale.Value, result.DefaultLocale?.Code);
     Assert.NotEqual(secret, result.Secret);
     Assert.Equal(payload.UniqueNameSettings, result.UniqueNameSettings);
     Assert.Equal(payload.PasswordSettings, result.PasswordSettings);

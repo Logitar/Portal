@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Logitar.Portal.Contracts;
+﻿namespace Logitar.Portal.Contracts;
 
 public class Locale
 {
@@ -11,6 +9,10 @@ public class Locale
   public string NativeName { get; set; }
 
   public Locale() : this(0, string.Empty, string.Empty, string.Empty, string.Empty)
+  {
+  }
+
+  public Locale(string cultureName) : this(CultureInfo.GetCultureInfo(cultureName.Trim()))
   {
   }
 
@@ -26,6 +28,8 @@ public class Locale
     EnglishName = englishName;
     NativeName = nativeName;
   }
+
+  public static Locale? TryCreate(string? code) => string.IsNullOrWhiteSpace(code) ? null : new(code);
 
   public override bool Equals(object? obj) => obj is Locale locale && locale.Id == Id;
   public override int GetHashCode() => HashCode.Combine(GetType(), Id);

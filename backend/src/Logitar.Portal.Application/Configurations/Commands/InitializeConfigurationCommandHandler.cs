@@ -119,7 +119,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       CreatedOn = configuration.CreatedOn.ToUniversalTime(),
       UpdatedBy = actor,
       UpdatedOn = configuration.UpdatedOn.ToUniversalTime(),
-      DefaultLocale = configuration.DefaultLocale?.Code,
+      DefaultLocale = Locale.TryCreate(configuration.DefaultLocale?.Code),
       UniqueNameSettings = new Contracts.Settings.UniqueNameSettings(configuration.UniqueNameSettings),
       PasswordSettings = new Contracts.Settings.PasswordSettings(configuration.PasswordSettings),
       RequireUniqueEmail = configuration.RequireUniqueEmail,

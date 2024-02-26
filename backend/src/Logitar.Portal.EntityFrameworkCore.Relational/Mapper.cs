@@ -74,7 +74,7 @@ internal class Mapper
   {
     Configuration destination = new(source.Secret.Value)
     {
-      DefaultLocale = source.DefaultLocale?.Code,
+      DefaultLocale = Locale.TryCreate(source.DefaultLocale?.Code),
       UniqueNameSettings = new UniqueNameSettings(source.UniqueNameSettings),
       PasswordSettings = new PasswordSettings(source.PasswordSettings),
       RequireUniqueEmail = source.RequireUniqueEmail,
@@ -88,7 +88,7 @@ internal class Mapper
 
   public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
   {
-    Dictionary destination = new(source.Locale)
+    Dictionary destination = new(new Locale(source.Locale))
     {
       EntryCount = source.EntryCount,
       Realm = realm
@@ -141,7 +141,7 @@ internal class Mapper
     {
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
-      Locale = source.Locale,
+      Locale = Locale.TryCreate(source.Locale),
       IsDemo = source.IsDemo,
       Status = source.Status,
       Realm = realm
@@ -205,7 +205,7 @@ internal class Mapper
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
-      DefaultLocale = source.DefaultLocale,
+      DefaultLocale = Locale.TryCreate(source.DefaultLocale),
       Url = source.Url,
       UniqueNameSettings = new UniqueNameSettings(source.AllowedUniqueNameCharacters),
       PasswordSettings = new PasswordSettings(source.RequiredPasswordLength, source.RequiredPasswordUniqueChars, source.PasswordsRequireNonAlphanumeric,
@@ -356,7 +356,7 @@ internal class Mapper
       Nickname = source.Nickname,
       Birthdate = AsUniversalTime(source.Birthdate),
       Gender = source.Gender,
-      Locale = source.Locale,
+      Locale = Locale.TryCreate(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,

@@ -103,7 +103,7 @@ public class SendMessageCommandTests : IntegrationTests
     {
       user.MiddleName = new PersonNameUnit(string.Join(' ', names.Skip(1).Take(names.Length - 2)));
     }
-    user.Locale = new LocaleUnit(Realm.DefaultLocale);
+    user.Locale = new LocaleUnit(Realm.DefaultLocale.Code);
     user.Update();
     await _userRepository.SaveAsync(user);
 
@@ -351,7 +351,7 @@ public class SendMessageCommandTests : IntegrationTests
     french.Update();
 
     Assert.NotNull(Realm.DefaultLocale);
-    DictionaryAggregate @default = new(new LocaleUnit(Realm.DefaultLocale), tenantId);
+    DictionaryAggregate @default = new(new LocaleUnit(Realm.DefaultLocale.Code), tenantId);
     @default.SetEntry("Cordially", "Cordially,");
     @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
     @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");
