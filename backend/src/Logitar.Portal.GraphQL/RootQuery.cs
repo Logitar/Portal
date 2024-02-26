@@ -1,9 +1,11 @@
 ﻿using GraphQL.Types;
 using Logitar.Portal.GraphQL.ApiKeys;
 using Logitar.Portal.GraphQL.Configurations;
+using Logitar.Portal.GraphQL.Dictionaries;
 using Logitar.Portal.GraphQL.Passwords;
 using Logitar.Portal.GraphQL.Realms;
 using Logitar.Portal.GraphQL.Roles;
+using Logitar.Portal.GraphQL.Senders;
 using Logitar.Portal.GraphQL.Sessions;
 using Logitar.Portal.GraphQL.Users;
 
@@ -17,12 +19,12 @@ internal class RootQuery : ObjectGraphType
 
     ApiKeyQueries.Register(this);
     ConfigurationQueries.Register(this);
-    //DictionaryQueries.Register(this); // TODO(fpion): implement
+    DictionaryQueries.Register(this);
     //MessageQueries.Register(this); // TODO(fpion): implement
     OneTimePasswordQueries.Register(this);
     RealmQueries.Register(this);
     RoleQueries.Register(this);
-    //SenderQueries.Register(this); // TODO(fpion): implement
+    SenderQueries.Register(this);
     SessionQueries.Register(this);
     //TemplateQueries.Register(this); // TODO(fpion): implement
     UserQueries.Register(this);

@@ -7,7 +7,7 @@ public class Sender : Aggregate
 {
   public bool IsDefault { get; set; }
 
-  public Email Email { get; set; }
+  public Email Email { get; set; } // TODO(fpion): EmailAddress
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 

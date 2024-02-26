@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Senders;
 
 public record CreateSenderPayload
 {
-  public EmailPayload Email { get; set; }
+  public EmailPayload Email { get; set; } // TODO(fpion): EmailAddress
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
