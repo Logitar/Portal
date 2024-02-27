@@ -75,7 +75,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       MessageAggregate message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
       messages.Add(message);
 
-      await _mediator.Publish(new SendEmailCommand(message, sender), cancellationToken);
+      await _mediator.Publish(new SendEmailCommand(actorId, message, sender), cancellationToken);
     }
     await _messageRepository.SaveAsync(messages, cancellationToken);
 
