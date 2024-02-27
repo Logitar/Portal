@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Dictionaries;
+﻿using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Dictionaries;

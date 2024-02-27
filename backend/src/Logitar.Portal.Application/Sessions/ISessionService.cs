@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Contracts.Sessions;
 
-namespace Logitar.Portal.Contracts.Sessions;
+namespace Logitar.Portal.Application.Sessions;
 
 public interface ISessionService
 {

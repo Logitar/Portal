@@ -1,5 +1,5 @@
 ﻿using GraphQL;
-using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Application.Configurations;
 
 namespace Logitar.Portal.GraphQL.Configurations;
 

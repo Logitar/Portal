@@ -1,4 +1,6 @@
 ﻿using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;

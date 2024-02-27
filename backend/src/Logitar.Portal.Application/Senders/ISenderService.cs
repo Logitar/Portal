@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Contracts.Senders;
 
-namespace Logitar.Portal.Contracts.Senders;
+namespace Logitar.Portal.Application.Senders;
 
 public interface ISenderService
 {

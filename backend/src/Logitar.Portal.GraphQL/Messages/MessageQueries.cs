@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Contracts.Messages;
 
 namespace Logitar.Portal.GraphQL.Messages;

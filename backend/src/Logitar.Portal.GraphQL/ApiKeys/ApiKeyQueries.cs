@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Contracts.ApiKeys;
 
 namespace Logitar.Portal.GraphQL.ApiKeys;

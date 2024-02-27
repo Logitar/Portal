@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Contracts.Search;
 
-namespace Logitar.Portal.Contracts.Messages;
+namespace Logitar.Portal.Application.Messages;
 
 public interface IMessageService
 {

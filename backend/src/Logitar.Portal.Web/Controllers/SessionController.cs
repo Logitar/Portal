@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Sessions;

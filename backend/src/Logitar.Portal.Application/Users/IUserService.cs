@@ -1,6 +1,8 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Contracts.Users;
 
-namespace Logitar.Portal.Contracts.Users;
+namespace Logitar.Portal.Application.Users;
 
 public interface IUserService
 {

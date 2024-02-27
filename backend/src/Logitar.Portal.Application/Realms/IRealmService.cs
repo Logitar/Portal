@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Search;
 
-namespace Logitar.Portal.Contracts.Realms;
+namespace Logitar.Portal.Application.Realms;
 
 public interface IRealmService
 {

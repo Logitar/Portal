@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.GraphQL.Roles;

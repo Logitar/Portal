@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Search;
 
-namespace Logitar.Portal.Contracts.ApiKeys;
+namespace Logitar.Portal.Application.ApiKeys;
 
 public interface IApiKeyService
 {

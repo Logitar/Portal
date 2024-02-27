@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.GraphQL.Sessions;

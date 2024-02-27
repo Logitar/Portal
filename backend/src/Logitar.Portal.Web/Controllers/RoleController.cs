@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Portal.Application.Roles;
+using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Roles;

@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Contracts.Dictionaries;
 
 namespace Logitar.Portal.GraphQL.Dictionaries;

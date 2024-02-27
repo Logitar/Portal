@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Contracts.Search;
+using Logitar.Portal.Contracts.Templates;
 
-namespace Logitar.Portal.Contracts.Templates;
+namespace Logitar.Portal.Application.Templates;
 
 public interface ITemplateService
 {

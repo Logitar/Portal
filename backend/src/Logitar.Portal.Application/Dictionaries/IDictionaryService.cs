@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts.Dictionaries;
+using Logitar.Portal.Contracts.Search;
 
-namespace Logitar.Portal.Contracts.Dictionaries;
+namespace Logitar.Portal.Application.Dictionaries;
 
 public interface IDictionaryService
 {
