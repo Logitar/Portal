@@ -9,6 +9,7 @@ using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
+using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Web.Extensions;
 
 namespace Logitar.Portal;
@@ -57,7 +58,7 @@ internal class HttpApplicationContext : IApplicationContext
   public Configuration Configuration => _cacheService.Configuration
     ?? throw new InvalidOperationException("The configuration was not found in the cache.");
   public Realm? Realm => Context.GetRealm();
-  public TenantId? TenantId => Realm == null ? null : new(new AggregateId(Realm.Id).Value);
+  public TenantId? TenantId => Realm == null ? null : new(new RealmId(Realm.Id).Value);
 
   public IRoleSettings RoleSettings
   {
