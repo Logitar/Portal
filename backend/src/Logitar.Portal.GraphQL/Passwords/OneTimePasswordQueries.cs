@@ -1,6 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Logitar.Portal.Contracts.Passwords;
+using Logitar.Portal.Application.OneTimePasswords;
 
 namespace Logitar.Portal.GraphQL.Passwords;
 

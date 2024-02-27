@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Search;
 
-namespace Logitar.Portal.Contracts.Roles;
+namespace Logitar.Portal.Application.Roles;
 
 public interface IRoleService
 {

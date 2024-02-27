@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Application.Templates;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Templates;

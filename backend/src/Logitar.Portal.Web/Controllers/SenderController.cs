@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Search;
+﻿using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Senders;

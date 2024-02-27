@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Passwords;
+﻿using Logitar.Portal.Contracts.Passwords;
+
+namespace Logitar.Portal.Application.OneTimePasswords;
 
 public interface IOneTimePasswordService
 {

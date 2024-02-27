@@ -1,6 +1,7 @@
-﻿using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Contracts.Configurations;
+using Logitar.Portal.Contracts.Sessions;
 
-namespace Logitar.Portal.Contracts.Configurations;
+namespace Logitar.Portal.Application.Configurations;
 
 public interface IConfigurationService
 {

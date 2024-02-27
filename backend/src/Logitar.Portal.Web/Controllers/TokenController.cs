@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Tokens;
+﻿using Logitar.Portal.Application.Tokens;
+using Logitar.Portal.Contracts.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

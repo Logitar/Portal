@@ -13,18 +13,6 @@ using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
-using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Dictionaries;
-using Logitar.Portal.Contracts.Messages;
-using Logitar.Portal.Contracts.Passwords;
-using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Roles;
-using Logitar.Portal.Contracts.Senders;
-using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Contracts.Templates;
-using Logitar.Portal.Contracts.Tokens;
-using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application;

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Messages;
+﻿using Logitar.Portal.Application.Messages;
+using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Web.Models.Messages;
 using Microsoft.AspNetCore.Authorization;

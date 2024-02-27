@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts;
+﻿using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;

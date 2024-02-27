@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Senders;
 
 namespace Logitar.Portal.GraphQL.Senders;

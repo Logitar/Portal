@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.GraphQL.Realms;

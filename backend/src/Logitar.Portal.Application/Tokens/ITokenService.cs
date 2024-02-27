@@ -1,4 +1,6 @@
-﻿namespace Logitar.Portal.Contracts.Tokens;
+﻿using Logitar.Portal.Contracts.Tokens;
+
+namespace Logitar.Portal.Application.Tokens;
 
 public interface ITokenService
 {

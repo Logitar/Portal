@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Sessions;
+﻿using Logitar.Portal.Application.Sessions;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
 
