@@ -38,9 +38,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Client", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Client.E2ETests", "tests\Logitar.Portal.Client.E2ETests\Logitar.Portal.Client.E2ETests.csproj", "{4AB7DC31-DA4C-489E-A502-B7FF6F3B125F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Application.UnitTests", "tests\Logitar.Portal.Application.UnitTests\Logitar.Portal.Application.UnitTests.csproj", "{F2AEEE3B-D179-40B0-9A87-3E40666A2FF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Application.UnitTests", "tests\Logitar.Portal.Application.UnitTests\Logitar.Portal.Application.UnitTests.csproj", "{F2AEEE3B-D179-40B0-9A87-3E40666A2FF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{0356CE9D-9BCD-40E1-AD96-44911F5F973D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{0356CE9D-9BCD-40E1-AD96-44911F5F973D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.MassTransit", "src\Logitar.Portal.MassTransit\Logitar.Portal.MassTransit.csproj", "{B724814A-5FF8-449F-9F10-614732D1B516}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,6 +106,10 @@ Global
 		{0356CE9D-9BCD-40E1-AD96-44911F5F973D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0356CE9D-9BCD-40E1-AD96-44911F5F973D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0356CE9D-9BCD-40E1-AD96-44911F5F973D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B724814A-5FF8-449F-9F10-614732D1B516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B724814A-5FF8-449F-9F10-614732D1B516}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B724814A-5FF8-449F-9F10-614732D1B516}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B724814A-5FF8-449F-9F10-614732D1B516}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
