@@ -3,8 +3,6 @@ using Logitar.Portal.Client;
 using Logitar.Portal.Client.Configurations;
 using Logitar.Portal.Contracts.Configurations;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.Configurations;
 

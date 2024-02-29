@@ -2,7 +2,6 @@
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Errors;
-using System.Net;
 
 namespace Logitar.Portal.Client;
 

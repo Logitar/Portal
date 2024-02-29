@@ -44,6 +44,8 @@
 
   <ItemGroup>
     <Using Include="System.Net.Mime" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
   </ItemGroup>
 
 </Project>
