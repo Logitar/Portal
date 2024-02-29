@@ -26,7 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Logitar.Portal.Application.Messages.Commands;
 
 [Trait(Traits.Category, Categories.Integration)]
-public class SendMessageCommandTests : IntegrationTests
+public class SendMessageInternalCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IMessageRepository _messageRepository;
@@ -40,7 +40,7 @@ public class SendMessageCommandTests : IntegrationTests
   private SenderAggregate? _sender = null;
   private TemplateAggregate? _template = null;
 
-  public SendMessageCommandTests() : base()
+  public SendMessageInternalCommandTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
     _messageRepository = ServiceProvider.GetRequiredService<IMessageRepository>();
@@ -113,7 +113,7 @@ public class SendMessageCommandTests : IntegrationTests
       Type = "reset_password+jwt",
       Subject = user.Id.ToGuid().ToString()
     };
-    CreatedToken createdToken = await Mediator.Send(new CreateTokenCommand(createToken));
+    CreatedToken createdToken = await Pipeline.ExecuteAsync(new CreateTokenCommand(createToken));
 
     SendMessagePayload payload = new("PasswordRecovery")
     {
@@ -127,8 +127,8 @@ public class SendMessageCommandTests : IntegrationTests
       UserId = user.Id.ToGuid()
     });
     payload.Variables.Add(new Variable("Token", createdToken.Token));
-    SendMessageCommand command = new(payload);
-    SentMessages sentMessages = await Mediator.Send(command);
+    SendMessageInternalCommand command = new(payload);
+    SentMessages sentMessages = await Pipeline.ExecuteAsync(command);
 
     Guid id = Assert.Single(sentMessages.Ids);
     MessageAggregate? message = await _messageRepository.LoadAsync(id);
@@ -172,8 +172,8 @@ public class SendMessageCommandTests : IntegrationTests
       Type = RecipientType.To,
       UserId = user.Id.ToGuid()
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal([user.Id.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
@@ -188,8 +188,8 @@ public class SendMessageCommandTests : IntegrationTests
       Address = Faker.Person.Email,
       DisplayName = Faker.Person.FullName
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<NoDefaultSenderException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<NoDefaultSenderException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
   }
 
@@ -206,8 +206,8 @@ public class SendMessageCommandTests : IntegrationTests
       Address = Faker.Person.Email,
       DisplayName = Faker.Person.FullName
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(payload.SenderId, exception.Id);
     Assert.Equal("SenderId", exception.PropertyName);
   }
@@ -231,8 +231,8 @@ public class SendMessageCommandTests : IntegrationTests
       Address = Faker.Person.Email,
       DisplayName = Faker.Person.FullName
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SenderNotInTenantException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<SenderNotInTenantException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(_sender.Id, exception.SenderId);
     Assert.Equal(TenantId, exception.ExpectedTenantId);
     Assert.Equal(_sender.TenantId, exception.ActualTenantId);
@@ -250,8 +250,8 @@ public class SendMessageCommandTests : IntegrationTests
       Address = Faker.Person.Email,
       DisplayName = Faker.Person.FullName
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TemplateNotFoundException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<TemplateNotFoundException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(payload.Template, exception.Identifier);
     Assert.Equal("Template", exception.PropertyName);
   }
@@ -272,8 +272,8 @@ public class SendMessageCommandTests : IntegrationTests
       Address = Faker.Person.Email,
       DisplayName = Faker.Person.FullName
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TemplateNotInTenantException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<TemplateNotInTenantException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(_template.Id, exception.TemplateId);
     Assert.Null(exception.ExpectedTenantId);
     Assert.Equal(_template.TenantId, exception.ActualTenantId);
@@ -299,8 +299,8 @@ public class SendMessageCommandTests : IntegrationTests
     {
       Address = Faker.Person.Email
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(userIds, exception.Ids);
     Assert.Equal("Recipients", exception.PropertyName);
   }
@@ -324,8 +324,8 @@ public class SendMessageCommandTests : IntegrationTests
       Type = RecipientType.To,
       UserId = userId.ToGuid()
     });
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UsersNotInTenantException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<UsersNotInTenantException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal(userId, exception.UserIds.Single());
     Assert.Equal(TenantId, exception.ExpectedTenantId);
   }
@@ -334,8 +334,8 @@ public class SendMessageCommandTests : IntegrationTests
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
     SendMessagePayload payload = new("PasswordRecovery");
-    SendMessageCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<ValidationException>(async () => await Pipeline.ExecuteAsync(command));
     Assert.Equal("RecipientsValidator", exception.Errors.Single().ErrorCode);
   }
 
@@ -406,4 +406,6 @@ public class SendMessageCommandTests : IntegrationTests
     };
     await _templateRepository.SaveAsync(_template);
   }
+
+  // TODO(fpion): ApplicationCommand
 }
