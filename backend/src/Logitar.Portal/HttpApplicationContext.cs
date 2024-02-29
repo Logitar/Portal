@@ -27,23 +27,13 @@ internal class HttpApplicationContext : IApplicationContext
       User? user = Context.GetUser();
       if (user != null)
       {
-        return new Actor(user.FullName ?? user.UniqueName)
-        {
-          Id = user.Id,
-          Type = ActorType.User,
-          EmailAddress = user.Email?.Address,
-          PictureUrl = user.Picture
-        };
+        return new Actor(user);
       }
 
       ApiKey? apiKey = Context.GetApiKey();
       if (apiKey != null)
       {
-        return new Actor(apiKey.DisplayName)
-        {
-          Id = apiKey.Id,
-          Type = ActorType.ApiKey
-        };
+        return new Actor(apiKey);
       }
 
       return Actor.System;

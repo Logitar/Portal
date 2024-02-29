@@ -1,4 +1,7 @@
-﻿namespace Logitar.Portal.Contracts.Actors;
+﻿using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Users;
+
+namespace Logitar.Portal.Contracts.Actors;
 
 public class Actor
 {
@@ -19,6 +22,20 @@ public class Actor
   public Actor(string displayName)
   {
     DisplayName = displayName;
+  }
+
+  public Actor(ApiKey apiKey) : this(apiKey.DisplayName)
+  {
+    Id = apiKey.Id;
+    Type = ActorType.ApiKey;
+  }
+
+  public Actor(User user) : this(user.FullName ?? user.UniqueName)
+  {
+    Id = user.Id;
+    Type = ActorType.User;
+    EmailAddress = user.Email?.Address;
+    PictureUrl = user.Picture;
   }
 
   public override bool Equals(object? obj) => obj is Actor actor && actor.Id == Id;
