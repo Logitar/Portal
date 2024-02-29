@@ -7,6 +7,7 @@ using Logitar.Portal.OneTimePasswords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
 using Logitar.Portal.Sessions;
+using Logitar.Portal.Templates;
 using Logitar.Portal.Tokens;
 using Logitar.Portal.Users;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +40,7 @@ internal class Startup
     services.AddTransient<RealmClientTests>();
     services.AddTransient<RoleClientTests>();
     services.AddTransient<SessionClientTests>();
+    services.AddTransient<TemplateClientTests>();
     services.AddTransient<TokenClientTests>();
     services.AddTransient<UserClientTests>();
   }

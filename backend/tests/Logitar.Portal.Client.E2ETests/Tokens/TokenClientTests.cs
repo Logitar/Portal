@@ -17,10 +17,6 @@ internal class TokenClientTests : IClientTests
     try
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
-      if (context.User == null)
-      {
-        throw new InvalidOperationException("The user should not be null in the context.");
-      }
       CreateTokenPayload create = new()
       {
         IsConsumable = true,
@@ -28,7 +24,7 @@ internal class TokenClientTests : IClientTests
         Subject = context.User.Id.ToString()
       };
       CreatedToken createdToken = await _client.CreateAsync(create, context.Request);
-      context.Token = createdToken.Token;
+      context.SetToken(createdToken.Token);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ValidateAsync));

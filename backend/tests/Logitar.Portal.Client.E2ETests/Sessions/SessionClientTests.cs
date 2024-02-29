@@ -56,10 +56,6 @@ internal class SessionClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.SearchAsync));
-      if (context.User == null)
-      {
-        throw new InvalidOperationException("The user should not be null in the context.");
-      }
       SearchSessionsPayload search = new()
       {
         UserId = context.User.Id,

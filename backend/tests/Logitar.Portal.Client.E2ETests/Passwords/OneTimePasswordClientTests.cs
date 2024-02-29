@@ -17,10 +17,6 @@ internal class OneTimePasswordClientTests : IClientTests
     try
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
-      if (context.User == null)
-      {
-        throw new InvalidOperationException("The user should not be null in the context.");
-      }
       CreateOneTimePasswordPayload create = new("1234567890", 6)
       {
         ExpiresOn = DateTime.Now.AddHours(1),

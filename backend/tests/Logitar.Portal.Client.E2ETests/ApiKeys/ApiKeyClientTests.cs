@@ -70,10 +70,6 @@ internal class ApiKeyClientTests : IClientTests
       {
         ExpiresOn = DateTime.Now.AddMonths(6)
       };
-      if (context.Role == null)
-      {
-        throw new InvalidOperationException("The role should not be null in the context.");
-      }
       update.Roles.Add(new RoleModification(context.Role.UniqueName));
       apiKey = await _client.UpdateAsync(apiKey.Id, update, context.Request)
         ?? throw new InvalidOperationException("The API key should not be null.");

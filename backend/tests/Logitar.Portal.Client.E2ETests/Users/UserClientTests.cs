@@ -45,7 +45,7 @@ internal class UserClientTests : IClientTests
       user = await _client.DeleteAsync(user.Id, context.Request)
         ?? throw new InvalidOperationException("The user should not be null.");
       user = await _client.CreateAsync(create, context.Request);
-      context.User = user;
+      context.SetUser(user);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ResetPasswordAsync));
@@ -97,10 +97,6 @@ internal class UserClientTests : IClientTests
         FirstName = new Modification<string>(_faker.Person.FirstName),
         LastName = new Modification<string>(_faker.Person.LastName)
       };
-      if (context.Role == null)
-      {
-        throw new InvalidOperationException("The role should not be null in the context.");
-      }
       update.Roles.Add(new RoleModification(context.Role.UniqueName));
       user = await _client.UpdateAsync(user.Id, update, context.Request)
         ?? throw new InvalidOperationException("The user should not be null.");

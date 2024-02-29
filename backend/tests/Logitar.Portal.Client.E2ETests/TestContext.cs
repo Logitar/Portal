@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal;
@@ -25,11 +26,39 @@ internal class TestContext
     _name = string.Join('.', clientType.Name, methodName);
   }
 
-  public IRequestContext Request => new RequestContext(User?.UniqueName, CancellationToken);
+  public IRequestContext Request => new RequestContext(_user?.UniqueName, CancellationToken);
 
-  public Role? Role { get; set; }
-  public User? User { get; set; }
-  public string? Token { get; set; }
+  private Role? _role = null;
+  public Role Role => _role ?? throw new InvalidOperationException($"The {nameof(Role)} has not been initialized yet.");
+  public void SetRole(Role role)
+  {
+    AssertHasNotEnded();
+    _role = role;
+  }
+
+  private User? _user = null;
+  public User User => _user ?? throw new InvalidOperationException($"The {nameof(User)} has not been initialized yet.");
+  public void SetUser(User user)
+  {
+    AssertHasNotEnded();
+    _user = user;
+  }
+
+  private string? _token = null;
+  public string? Token => _token ?? throw new InvalidOperationException($"The {nameof(Token)} has not been initialized yet.");
+  public void SetToken(string token)
+  {
+    AssertHasNotEnded();
+    _token = token;
+  }
+
+  private Template? _template = null;
+  public Template Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
+  public void SetTemplate(Template template)
+  {
+    AssertHasNotEnded();
+    _template = template;
+  }
 
   public static TestContext Start(int count, CancellationToken cancellationToken = default)
   {
