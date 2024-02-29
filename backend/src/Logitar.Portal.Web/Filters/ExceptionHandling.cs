@@ -1,6 +1,5 @@
 ﻿using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
-using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Messages;
@@ -9,6 +8,7 @@ using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Senders;

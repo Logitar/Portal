@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Constants;
+using Logitar.Portal.Contracts.Constants;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -12,6 +13,11 @@ internal static class OpenApiExtensions
     services.AddSwaggerGen(config =>
     {
       config.AddSecurity();
+      config.OperationFilterDescriptors.Add(new FilterDescriptor
+      {
+        Arguments = [],
+        Type = typeof(AddHeaderParameters)
+      });
       config.SwaggerDoc(name: $"v{Api.Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact

@@ -6,6 +6,9 @@ namespace Logitar.Portal.Web.Models.Users;
 
 public record SearchUsersModel : SearchModel
 {
+  [FromQuery(Name = "has_authenticated")]
+  public bool? HasAuthenticated { get; set; }
+
   [FromQuery(Name = "has_password")]
   public bool? HasPassword { get; set; }
 
@@ -19,6 +22,7 @@ public record SearchUsersModel : SearchModel
   {
     SearchUsersPayload payload = new()
     {
+      HasAuthenticated = HasAuthenticated,
       HasPassword = HasPassword,
       IsDisabled = IsDisabled,
       IsConfirmed = isConfirmed

@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Application;
+﻿namespace Logitar.Portal.Contracts;
 
 public class TooManyResultsException : Exception
 {
@@ -34,7 +34,7 @@ public class TooManyResultsException : Exception
     .Build();
 }
 
-internal class TooManyResultsException<T> : TooManyResultsException
+public class TooManyResultsException<T> : TooManyResultsException
 {
   public TooManyResultsException(int expectedCount, int actualCount) : base(typeof(T), expectedCount, actualCount)
   {

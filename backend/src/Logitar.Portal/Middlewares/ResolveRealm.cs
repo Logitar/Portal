@@ -1,5 +1,6 @@
 ﻿using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Constants;
+using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Extensions;

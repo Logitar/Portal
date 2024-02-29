@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal;
 
-internal static class PersonExtensions
+public static class PersonExtensions
 {
   private static readonly Random _random = new();
 

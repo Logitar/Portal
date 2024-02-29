@@ -6,6 +6,9 @@ namespace Logitar.Portal.Web.Models.ApiKeys;
 
 public record SearchApiKeysModel : SearchModel
 {
+  [FromQuery(Name = "has_authenticated")]
+  public bool? HasAuthenticated { get; set; }
+
   [FromQuery(Name = "expired")]
   public bool? IsExpired { get; set; }
 
@@ -14,7 +17,10 @@ public record SearchApiKeysModel : SearchModel
 
   public SearchApiKeysPayload ToPayload()
   {
-    SearchApiKeysPayload payload = new();
+    SearchApiKeysPayload payload = new()
+    {
+      HasAuthenticated = HasAuthenticated
+    };
     if (IsExpired.HasValue)
     {
       payload.Status = new ApiKeyStatus(IsExpired.Value, Moment);

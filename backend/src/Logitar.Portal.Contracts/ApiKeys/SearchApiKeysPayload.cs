@@ -6,7 +6,6 @@ public record SearchApiKeysPayload : SearchPayload
 {
   public bool? HasAuthenticated { get; set; }
   public ApiKeyStatus? Status { get; set; }
-  // TODO(fpion): RoleId
 
   public new List<ApiKeySortOption> Sort { get; set; } = [];
 }

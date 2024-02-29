@@ -1,6 +1,6 @@
-﻿namespace Logitar.Portal.Constants;
+﻿namespace Logitar.Portal.Contracts.Constants;
 
-internal static class Headers
+public static class Headers
 {
   public const string Authorization = nameof(Authorization);
   public const string ApiKey = "X-API-Key";
