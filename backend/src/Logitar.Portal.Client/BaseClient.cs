@@ -67,13 +67,12 @@ internal abstract class BaseClient
 
     return result.Deserialize<T>(SerializerOptions);
   }
+  protected virtual bool IsNullOrEmpty(Error? error) => error == null
+    || (string.IsNullOrWhiteSpace(error.Code) && string.IsNullOrWhiteSpace(error.Message) && error.Data.Count == 0);
 
   protected virtual InvalidApiResponseException CreateInvalidApiResponseException(string methodName, HttpMethod httpMethod, Uri uri, object? content, IRequestContext? context)
   {
     string? serializedContent = content == null ? null : JsonSerializer.Serialize(content, content.GetType(), SerializerOptions);
     return new InvalidApiResponseException(GetType(), methodName, httpMethod, uri, serializedContent, context);
   }
-
-  protected virtual bool IsNullOrEmpty(Error? error) => error == null
-    || (string.IsNullOrWhiteSpace(error.Code) && string.IsNullOrWhiteSpace(error.Message) && error.Data.Count == 0);
 }

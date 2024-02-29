@@ -5,6 +5,7 @@ using Logitar.Portal.Configurations;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
+using Logitar.Portal.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,5 +33,6 @@ internal class Startup
     services.AddTransient<InitializeConfigurationTests>();
     services.AddTransient<RealmClientTests>();
     services.AddTransient<RoleClientTests>();
+    services.AddTransient<UserClientTests>();
   }
 }

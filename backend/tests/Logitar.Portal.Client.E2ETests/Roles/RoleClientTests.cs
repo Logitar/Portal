@@ -26,6 +26,7 @@ internal class RoleClientTests : IClientTests
       role = await _client.DeleteAsync(role.Id, context.Request)
         ?? throw new InvalidOperationException("The role should not be null.");
       role = await _client.CreateAsync(create, context.Request);
+      context.Role = role;
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
@@ -66,8 +67,6 @@ internal class RoleClientTests : IClientTests
       role = await _client.ReplaceAsync(role.Id, replace, version, context.Request)
         ?? throw new InvalidOperationException("The role should not be null.");
       context.Succeed();
-
-      context.Role = role;
     }
     catch (Exception exception)
     {

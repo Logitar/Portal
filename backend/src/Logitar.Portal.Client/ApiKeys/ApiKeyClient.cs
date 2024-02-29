@@ -47,7 +47,22 @@ internal class ApiKeyClient : BaseClient, IApiKeyClient
 
   public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, IRequestContext? context)
   {
-    Uri uri = new UrlBuilder().SetPath(Path).SetQuery(payload).BuildUri(UriKind.Relative);
+    IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
+    if (payload.HasAuthenticated.HasValue)
+    {
+      builder.SetQuery("has_authenticated", payload.HasAuthenticated.Value.ToString());
+    }
+    if (payload.Status != null)
+    {
+      builder.SetQuery("expired", payload.Status.IsExpired.ToString());
+
+      if (payload.Status.Moment.HasValue)
+      {
+        builder.SetQuery("moment", payload.Status.Moment.Value.ToString());
+      }
+    }
+    Uri uri = builder.BuildUri(UriKind.Relative);
+
     return await GetAsync<SearchResults<ApiKey>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }

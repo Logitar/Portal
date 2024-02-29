@@ -64,7 +64,8 @@ internal class RealmClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateRealmPayload update = new()
       {
-        DisplayName = new Modification<string>("Test Realm")
+        DisplayName = new Modification<string>("Test Realm"),
+        DefaultLocale = new Modification<string>("en")
       };
       realm = await _client.UpdateAsync(realm.Id, update, context.Request)
         ?? throw new InvalidOperationException("The realm should not be null.");

@@ -1,6 +1,7 @@
 ﻿using Bogus;
+using System.Text;
 
-namespace Logitar.Portal;
+namespace Logitar.Portal.Client;
 
 internal static class PersonExtensions // TODO(fpion): refactor
 {
