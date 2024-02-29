@@ -1,8 +1,10 @@
 ﻿using Logitar.Portal.ApiKeys;
 using Logitar.Portal.Configurations;
+using Logitar.Portal.OneTimePasswords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
 using Logitar.Portal.Sessions;
+using Logitar.Portal.Tokens;
 using Logitar.Portal.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +27,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6);
+    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2);
 
     InitializeConfigurationTests initializeTests = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
     if (!await initializeTests.ExecuteAsync(context)) // 1 test
@@ -78,6 +80,20 @@ internal class Program
 
     SessionClientTests sessionTests = serviceProvider.GetRequiredService<SessionClientTests>();
     if (!await sessionTests.ExecuteAsync(context)) // 6 tests
+    {
+      context.End();
+      return;
+    }
+
+    OneTimePasswordClientTests oneTimePasswordTests = serviceProvider.GetRequiredService<OneTimePasswordClientTests>();
+    if (!await oneTimePasswordTests.ExecuteAsync(context)) // 4 tests
+    {
+      context.End();
+      return;
+    }
+
+    TokenClientTests tokenTests = serviceProvider.GetRequiredService<TokenClientTests>();
+    if (!await tokenTests.ExecuteAsync(context)) // 2 tests
     {
       context.End();
       return;

@@ -18,7 +18,7 @@ internal class ApiKeyClient : BaseClient, IApiKeyClient
   {
     Uri uri = new($"{Path}/authenticate", UriKind.Relative);
     return await PatchAsync<ApiKey>(uri, payload, context)
-      ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Patch, uri, payload, context);
+      ?? throw CreateInvalidApiResponseException(nameof(AuthenticateAsync), HttpMethod.Patch, uri, payload, context);
   }
 
   public async Task<ApiKey> CreateAsync(CreateApiKeyPayload payload, IRequestContext? context)

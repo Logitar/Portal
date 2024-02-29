@@ -29,6 +29,7 @@ internal class TestContext
 
   public Role? Role { get; set; }
   public User? User { get; set; }
+  public string? Token { get; set; }
 
   public static TestContext Start(int count, CancellationToken cancellationToken = default)
   {

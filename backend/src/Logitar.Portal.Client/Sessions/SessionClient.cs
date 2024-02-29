@@ -36,7 +36,7 @@ internal class SessionClient : BaseClient, ISessionClient
   {
     Uri uri = new($"{Path}/renew", UriKind.Relative);
     return await PutAsync<Session>(uri, payload, context)
-      ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Put, uri, payload, context);
+      ?? throw CreateInvalidApiResponseException(nameof(RenewAsync), HttpMethod.Put, uri, payload, context);
   }
 
   public async Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, IRequestContext? context)
@@ -64,7 +64,7 @@ internal class SessionClient : BaseClient, ISessionClient
   {
     Uri uri = new($"{Path}/sign/in", UriKind.Relative);
     return await PostAsync<Session>(uri, payload, context)
-      ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, uri, payload, context);
+      ?? throw CreateInvalidApiResponseException(nameof(SignInAsync), HttpMethod.Post, uri, payload, context);
   }
 
   public async Task<Session?> SignOutAsync(Guid id, IRequestContext? context)

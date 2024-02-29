@@ -18,7 +18,7 @@ internal class UserClient : BaseClient, IUserClient
   {
     Uri uri = new($"{Path}/authenticate", UriKind.Relative);
     return await PatchAsync<User>(uri, payload, context)
-      ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Patch, uri, payload, context);
+      ?? throw CreateInvalidApiResponseException(nameof(AuthenticateAsync), HttpMethod.Patch, uri, payload, context);
   }
 
   public async Task<User> CreateAsync(CreateUserPayload payload, IRequestContext? context)
