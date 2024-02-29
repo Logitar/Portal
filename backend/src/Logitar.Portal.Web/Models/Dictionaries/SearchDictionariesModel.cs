@@ -1,13 +1,20 @@
 ﻿using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Web.Models.Search;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Models.Dictionaries;
 
 public record SearchDictionariesModel : SearchModel
 {
+  [FromQuery(Name = "empty")]
+  public bool? IsEmpty { get; set; }
+
   public SearchDictionariesPayload ToPayload()
   {
-    SearchDictionariesPayload payload = new();
+    SearchDictionariesPayload payload = new()
+    {
+      IsEmpty = IsEmpty
+    };
     Fill(payload);
 
     foreach (string sort in Sort)

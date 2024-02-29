@@ -3,6 +3,7 @@ using Logitar.Portal.Client;
 using Logitar.Portal.Client.ApiKeys;
 using Logitar.Portal.Configurations;
 using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Dictionaries;
 using Logitar.Portal.OneTimePasswords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
@@ -36,6 +37,7 @@ internal class Startup
 
     services.AddTransient<ApiKeyClientTests>();
     services.AddTransient<ConfigurationClientTests>();
+    services.AddTransient<DictionaryClientTests>();
     services.AddTransient<OneTimePasswordClientTests>();
     services.AddTransient<RealmClientTests>();
     services.AddTransient<RoleClientTests>();

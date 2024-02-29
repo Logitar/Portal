@@ -20,7 +20,7 @@ internal class TemplateClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
       string text = await File.ReadAllTextAsync("Templates/PasswordRecovery.html");
       Content content = Content.Html(text);
-      CreateTemplatePayload create = new("PasswordRecovery", "Reset your password", content);
+      CreateTemplatePayload create = new("PasswordRecovery", "PasswordRecovery_Subject", content);
       Template template = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
@@ -46,7 +46,7 @@ internal class TemplateClientTests : IClientTests
       {
         ContentType = MediaTypeNames.Text.Html
       };
-      search.Search.Terms.Add(new SearchTerm("Password%"));
+      search.Search.Terms.Add(new SearchTerm("%_Subject"));
       SearchResults<Template> results = await _client.SearchAsync(search, context.Request);
       template = results.Items.Single();
       context.Succeed();

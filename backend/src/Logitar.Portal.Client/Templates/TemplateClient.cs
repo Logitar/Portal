@@ -66,7 +66,13 @@ internal class TemplateClient : BaseClient, ITemplateClient
 
   public async Task<SearchResults<Template>> SearchAsync(SearchTemplatesPayload payload, IRequestContext? context)
   {
-    Uri uri = new UrlBuilder().SetPath(Path).SetQuery(payload).BuildUri(UriKind.Relative);
+    IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
+    if (!string.IsNullOrWhiteSpace(payload.ContentType))
+    {
+      builder.SetQuery("type", payload.ContentType);
+    }
+    Uri uri = builder.BuildUri(UriKind.Relative);
+
     return await GetAsync<SearchResults<Template>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
