@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
-internal record SendMessageCommand(SendMessagePayload Payload) : IRequest<SentMessages>;
+public record SendMessageInternalCommand(SendMessagePayload Payload) : ApplicationRequest, IRequest<SentMessages>;

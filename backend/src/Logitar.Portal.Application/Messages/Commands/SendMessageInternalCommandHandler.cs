@@ -15,9 +15,8 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
-internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SentMessages>
+internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageInternalCommand, SentMessages>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IMediator _mediator;
   private readonly IMessageRepository _messageRepository;
@@ -25,10 +24,9 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
   private readonly ITemplateRepository _templateRepository;
   private readonly IUserRepository _userRepository;
 
-  public SendMessageCommandHandler(IApplicationContext applicationContext, IDictionaryRepository dictionaryRepository, IMediator mediator,
-    IMessageRepository messageRepository, ISenderRepository senderRepository, ITemplateRepository templateRepository, IUserRepository userRepository)
+  public SendMessageInternalCommandHandler(IDictionaryRepository dictionaryRepository, IMediator mediator, IMessageRepository messageRepository,
+    ISenderRepository senderRepository, ITemplateRepository templateRepository, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _dictionaryRepository = dictionaryRepository;
     _mediator = mediator;
     _messageRepository = messageRepository;
@@ -37,13 +35,14 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
     _userRepository = userRepository;
   }
 
-  public async Task<SentMessages> Handle(SendMessageCommand command, CancellationToken cancellationToken)
+  public async Task<SentMessages> Handle(SendMessageInternalCommand command, CancellationToken cancellationToken)
   {
     SendMessagePayload payload = command.Payload;
     new SendMessageValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
-    TenantId? tenantId = _applicationContext.TenantId;
+    ActorId actorId = command.ActorId;
+    LocaleUnit? defaultLocale = command.DefaultLocale;
+    TenantId? tenantId = command.TenantId;
 
     Recipients allRecipients = await ResolveRecipientsAsync(payload, cancellationToken);
     SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
@@ -53,7 +52,6 @@ internal class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, S
       .ToDictionary(x => x.Locale, x => x);
     bool ignoreUserLocale = payload.IgnoreUserLocale;
     LocaleUnit? targetLocale = LocaleUnit.TryCreate(payload.Locale);
-    LocaleUnit? defaultLocale = LocaleUnit.TryCreate((_applicationContext.Realm?.DefaultLocale ?? _applicationContext.Configuration.DefaultLocale)?.Code);
     Dictionaries defaultDictionaries = new(allDictionaries, targetLocale, defaultLocale);
 
     Variables variables = new(payload.Variables);
