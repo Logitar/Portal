@@ -28,6 +28,8 @@ internal class TestContext
   public static TestContext Start(int count, CancellationToken cancellationToken = default)
   {
     Console.WriteLine("Test run starting.");
+    Console.WriteLine();
+
     return new TestContext(count, cancellationToken);
   }
   private TestContext(int count, CancellationToken cancellationToken)
