@@ -21,6 +21,8 @@ internal class ConfigurationClientTests : IClientTests
         ?? throw new InvalidOperationException("The configuration should not be null.");
       context.Succeed();
 
+      long version = configuration.Version;
+
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateConfigurationPayload update = new()
       {
@@ -38,7 +40,7 @@ internal class ConfigurationClientTests : IClientTests
         RequireUniqueEmail = configuration.RequireUniqueEmail,
         LoggingSettings = new LoggingSettings(LoggingExtent.Full, onlyErrors: true)
       };
-      configuration = await _client.ReplaceAsync(replace, configuration.Version - 1, context.Request);
+      configuration = await _client.ReplaceAsync(replace, version, context.Request);
       context.Succeed();
     }
     catch (Exception exception)
