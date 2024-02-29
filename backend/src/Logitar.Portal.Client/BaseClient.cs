@@ -15,6 +15,7 @@ internal abstract class BaseClient
 
     SerializerOptions = new();
     SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
   }
 
   protected virtual async Task<T?> DeleteAsync<T>(Uri uri, IRequestContext? context)
