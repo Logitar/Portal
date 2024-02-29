@@ -2,6 +2,7 @@
 using Logitar.Portal.Client;
 using Logitar.Portal.Client.Configurations;
 using Logitar.Portal.Contracts.Configurations;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -16,8 +17,10 @@ internal class InitializeConfigurationTests : IClientTests
   private readonly BasicCredentials _credentials;
   private readonly JsonSerializerOptions _serializerOptions;
 
-  public InitializeConfigurationTests(HttpClient client, IPortalSettings portalSettings)
+  public InitializeConfigurationTests(HttpClient client, IConfiguration configuration)
   {
+    PortalSettings portalSettings = configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
+
     HttpApiSettings apiSettings = new();
     if (!string.IsNullOrWhiteSpace(portalSettings.BaseUrl))
     {
@@ -25,7 +28,7 @@ internal class InitializeConfigurationTests : IClientTests
     }
     _client = new JsonApiClient(client, apiSettings);
 
-    _credentials = portalSettings.Basic ?? throw new ArgumentException($"The basic credentials '{nameof(portalSettings.Basic)}' are required.", nameof(portalSettings));
+    _credentials = portalSettings.Basic ?? throw new ArgumentException("The configuration 'Portal.Basic' is required.", nameof(configuration));
 
     _serializerOptions = new();
     _serializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -47,6 +50,7 @@ internal class InitializeConfigurationTests : IClientTests
         SerializerOptions = _serializerOptions
       };
       _ = await _client.PostAsync<CurrentUser>(UriPath, options, context.CancellationToken);
+      StaticPortalSettings.Instance.Basic = _credentials;
       context.Succeed();
     }
     catch (Exception exception)

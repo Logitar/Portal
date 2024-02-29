@@ -1,6 +1,8 @@
 ﻿using Logitar.Net.Http;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Constants;
+using Logitar.Portal.Contracts.Errors;
+using System.Net;
 
 namespace Logitar.Portal.Client;
 
@@ -43,7 +45,26 @@ internal abstract class BaseClient
       }
     }
 
-    JsonApiResult result = await Client.SendAsync(parameters, context?.CancellationToken ?? default);
+    JsonApiResult result;
+    try
+    {
+      result = await Client.SendAsync(parameters, context?.CancellationToken ?? default);
+    }
+    catch (HttpFailureException<JsonApiResult> exception)
+    {
+      result = exception.Result;
+      if (result.Status.Code == (int)HttpStatusCode.NotFound)
+      {
+        Error? error = result.Deserialize<Error>(SerializerOptions);
+        if (IsNullOrEmpty(error))
+        {
+          return default;
+        }
+      }
+
+      throw;
+    }
+
     return result.Deserialize<T>(SerializerOptions);
   }
 
@@ -52,4 +73,7 @@ internal abstract class BaseClient
     string? serializedContent = content == null ? null : JsonSerializer.Serialize(content, content.GetType(), SerializerOptions);
     return new InvalidApiResponseException(GetType(), methodName, httpMethod, uri, serializedContent, context);
   }
+
+  protected virtual bool IsNullOrEmpty(Error? error) => error == null
+    || (string.IsNullOrWhiteSpace(error.Code) && string.IsNullOrWhiteSpace(error.Message) && error.Data.Count == 0);
 }

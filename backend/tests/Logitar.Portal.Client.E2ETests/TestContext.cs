@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal;
 
@@ -24,6 +25,8 @@ internal class TestContext
   }
 
   public IRequestContext Request => new RequestContext(user: null, CancellationToken); // TODO(fpion): User
+
+  public Role? Role { get; set; }
 
   public static TestContext Start(int count, CancellationToken cancellationToken = default)
   {
