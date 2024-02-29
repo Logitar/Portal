@@ -2,6 +2,7 @@
 using Logitar.Portal.Configurations;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
+using Logitar.Portal.Sessions;
 using Logitar.Portal.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11);
+    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6);
 
     InitializeConfigurationTests initializeTests = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
     if (!await initializeTests.ExecuteAsync(context)) // 1 test
@@ -70,6 +71,13 @@ internal class Program
 
     UserClientTests userTests = serviceProvider.GetRequiredService<UserClientTests>();
     if (!await userTests.ExecuteAsync(context)) // 11 tests
+    {
+      context.End();
+      return;
+    }
+
+    SessionClientTests sessionTests = serviceProvider.GetRequiredService<SessionClientTests>();
+    if (!await sessionTests.ExecuteAsync(context)) // 6 tests
     {
       context.End();
       return;

@@ -2,11 +2,13 @@
 using Logitar.Portal.Client.Configurations;
 using Logitar.Portal.Client.Realms;
 using Logitar.Portal.Client.Roles;
+using Logitar.Portal.Client.Sessions;
 using Logitar.Portal.Client.Users;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton<IConfigurationClient, ConfigurationClient>()
       .AddSingleton<IRealmClient, RealmClient>()
       .AddSingleton<IRoleClient, RoleClient>()
+      .AddSingleton<ISessionClient, SessionClient>()
       .AddSingleton<IUserClient, UserClient>();
   }
 }
