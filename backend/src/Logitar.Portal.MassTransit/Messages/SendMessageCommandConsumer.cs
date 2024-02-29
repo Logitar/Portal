@@ -9,11 +9,13 @@ internal class SendMessageCommandConsumer : IConsumer<SendMessageCommand>
 {
   private readonly IBus _bus;
   private readonly IMediator _mediator;
+  private readonly IPopulateRequest _populateRequest;
 
-  public SendMessageCommandConsumer(IBus bus, IMediator mediator)
+  public SendMessageCommandConsumer(IBus bus, IMediator mediator, IPopulateRequest populateRequest)
   {
     _bus = bus;
     _mediator = mediator;
+    _populateRequest = populateRequest;
   }
 
   public async Task Consume(ConsumeContext<SendMessageCommand> context)
@@ -22,7 +24,7 @@ internal class SendMessageCommandConsumer : IConsumer<SendMessageCommand>
     CancellationToken cancellationToken = context.CancellationToken;
 
     SendMessageInternalCommand request = new(command.Payload);
-    //request.Populate(actor, configuration, realm); // TODO(fpion): populate request
+    await _populateRequest.ExecuteAsync(context, request);
 
     SentMessages sentMessages = await _mediator.Send(request, cancellationToken);
     MessagesSentEvent @event = new(sentMessages);

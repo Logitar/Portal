@@ -42,7 +42,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Tests", "tests\Logitar.Portal.Tests\Logitar.Portal.Tests.csproj", "{0356CE9D-9BCD-40E1-AD96-44911F5F973D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.MassTransit", "src\Logitar.Portal.MassTransit\Logitar.Portal.MassTransit.csproj", "{B724814A-5FF8-449F-9F10-614732D1B516}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.MassTransit", "src\Logitar.Portal.MassTransit\Logitar.Portal.MassTransit.csproj", "{B724814A-5FF8-449F-9F10-614732D1B516}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.MassTransit.E2ETests", "tests\Logitar.Portal.MassTransit.E2ETests\Logitar.Portal.MassTransit.E2ETests.csproj", "{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +112,10 @@ Global
 		{B724814A-5FF8-449F-9F10-614732D1B516}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B724814A-5FF8-449F-9F10-614732D1B516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B724814A-5FF8-449F-9F10-614732D1B516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +125,7 @@ Global
 		{4AB7DC31-DA4C-489E-A502-B7FF6F3B125F} = {0B519DB7-C200-4B7D-856F-85D559302616}
 		{F2AEEE3B-D179-40B0-9A87-3E40666A2FF5} = {0B519DB7-C200-4B7D-856F-85D559302616}
 		{0356CE9D-9BCD-40E1-AD96-44911F5F973D} = {0B519DB7-C200-4B7D-856F-85D559302616}
+		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B} = {0B519DB7-C200-4B7D-856F-85D559302616}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF426AD4-45F8-45AE-86AA-674D42D51581}
