@@ -4,6 +4,7 @@ using Logitar.Portal.Client.Dictionaries;
 using Logitar.Portal.Client.Passwords;
 using Logitar.Portal.Client.Realms;
 using Logitar.Portal.Client.Roles;
+using Logitar.Portal.Client.Senders;
 using Logitar.Portal.Client.Sessions;
 using Logitar.Portal.Client.Templates;
 using Logitar.Portal.Client.Tokens;
@@ -14,6 +15,7 @@ using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
+using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Tokens;
@@ -41,6 +43,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton<IOneTimePasswordClient, OneTimePasswordClient>()
       .AddSingleton<IRealmClient, RealmClient>()
       .AddSingleton<IRoleClient, RoleClient>()
+      .AddSingleton<ISenderClient, SenderClient>()
       .AddSingleton<ISessionClient, SessionClient>()
       .AddSingleton<ITemplateClient, TemplateClient>()
       .AddSingleton<ITokenClient, TokenClient>()

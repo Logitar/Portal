@@ -4,6 +4,7 @@ using Logitar.Portal.Dictionaries;
 using Logitar.Portal.OneTimePasswords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
+using Logitar.Portal.Senders;
 using Logitar.Portal.Sessions;
 using Logitar.Portal.Templates;
 using Logitar.Portal.Tokens;
@@ -29,7 +30,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 6);
+    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6);
 
     InitializeConfigurationTests initializeTests = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
     if (!await initializeTests.ExecuteAsync(context)) // 1 test
@@ -103,6 +104,13 @@ internal class Program
 
     DictionaryClientTests dictionaryTests = serviceProvider.GetRequiredService<DictionaryClientTests>();
     if (!await dictionaryTests.ExecuteAsync(context)) // 6 tests
+    {
+      context.End();
+      return;
+    }
+
+    SenderClientTests senderTests = serviceProvider.GetRequiredService<SenderClientTests>();
+    if (!await senderTests.ExecuteAsync(context)) // 8 tests
     {
       context.End();
       return;
