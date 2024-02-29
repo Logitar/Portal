@@ -67,14 +67,14 @@ public class SendMessageCommandTests : IntegrationTests
   [Fact(DisplayName = "It should send a message with Mailgun.")]
   public async Task It_should_send_a_message_with_Mailgun()
   {
-    await It_should_send_a_message_with_a_provider(SenderProvider.Mailgun);
+    await It_should_send_a_message_with_a_provider(SenderProvider.Mailgun, ignoreUserLocale: false);
   }
   [Fact(DisplayName = "It should send a message with SendGrid.")]
   public async Task It_should_send_a_message_with_SendGrid()
   {
     await It_should_send_a_message_with_a_provider(SenderProvider.SendGrid);
   }
-  private async Task It_should_send_a_message_with_a_provider(SenderProvider provider)
+  private async Task It_should_send_a_message_with_a_provider(SenderProvider provider, bool ignoreUserLocale = true)
   {
     Assert.NotNull(Realm.DefaultLocale);
     SetRealm();
@@ -103,7 +103,7 @@ public class SendMessageCommandTests : IntegrationTests
     {
       user.MiddleName = new PersonNameUnit(string.Join(' ', names.Skip(1).Take(names.Length - 2)));
     }
-    user.Locale = new LocaleUnit(Realm.DefaultLocale.Code);
+    user.Locale = ignoreUserLocale ? new LocaleUnit(Realm.DefaultLocale.Code) : locale;
     user.Update();
     await _userRepository.SaveAsync(user);
 
@@ -117,7 +117,7 @@ public class SendMessageCommandTests : IntegrationTests
 
     SendMessagePayload payload = new("PasswordRecovery")
     {
-      IgnoreUserLocale = true,
+      IgnoreUserLocale = ignoreUserLocale,
       Locale = locale.Code,
       IsDemo = true
     };
@@ -142,7 +142,7 @@ public class SendMessageCommandTests : IntegrationTests
     Assert.Contains("L&#39;&#233;quipe Logitar", message.Body.Text);
     Assert.Equal(_sender.Id, message.Sender.Id);
     Assert.Equal(_template.Id, message.Template.Id);
-    Assert.True(message.IgnoreUserLocale);
+    Assert.Equal(ignoreUserLocale, message.IgnoreUserLocale);
     Assert.Equal(locale, message.Locale);
     Assert.True(message.IsDemo);
     Assert.Equal(MessageStatus.Succeeded, message.Status);

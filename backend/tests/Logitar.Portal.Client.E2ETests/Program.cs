@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.ApiKeys;
 using Logitar.Portal.Configurations;
 using Logitar.Portal.Dictionaries;
+using Logitar.Portal.Messages;
 using Logitar.Portal.OneTimePasswords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
@@ -25,15 +26,15 @@ internal class Program
       .Build();
     IServiceProvider serviceProvider = CreateServiceProvider(configuration);
 
-    Console.Write("Press a key to start the end-to-end tests.");
+    Console.Write("Press a key to start the end-to-end test sequence.");
     Console.ReadKey(intercept: true);
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6);
+    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
 
-    InitializeConfigurationTests initializeTests = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
-    if (!await initializeTests.ExecuteAsync(context)) // 1 test
+    InitializeConfigurationTests initializeConfiguration = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
+    if (!await initializeConfiguration.ExecuteAsync(context)) // 1 test
     {
       context.End();
       return;
@@ -46,8 +47,8 @@ internal class Program
       return;
     }
 
-    CreateApiKeyTests createApiKeyTests = serviceProvider.GetRequiredService<CreateApiKeyTests>();
-    if (!await createApiKeyTests.ExecuteAsync(context)) // 1 test
+    CreateApiKeyTests createApiKey = serviceProvider.GetRequiredService<CreateApiKeyTests>();
+    if (!await createApiKey.ExecuteAsync(context)) // 1 test
     {
       context.End();
       return;
@@ -123,7 +124,22 @@ internal class Program
       return;
     }
 
-    // TODO(fpion): implement
+    MessageClientTests messageTests = serviceProvider.GetRequiredService<MessageClientTests>();
+    if (!await messageTests.ExecuteAsync(context)) // 3 tests
+    {
+      context.End();
+      return;
+    }
+
+    DeleteRealmTests deleteRealm = serviceProvider.GetRequiredService<DeleteRealmTests>();
+    if (!await deleteRealm.ExecuteAsync(context)) // 1 test
+    {
+      context.End();
+      return;
+    }
+
+    DeleteApiKeyTests deleteApiKey = serviceProvider.GetRequiredService<DeleteApiKeyTests>();
+    await deleteApiKey.ExecuteAsync(context); // 1 test
 
     context.End();
 

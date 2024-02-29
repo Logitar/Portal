@@ -38,7 +38,7 @@ internal class RealmClientTests : IClientTests
       realm = await _client.DeleteAsync(realm.Id, context.Request)
         ?? throw new InvalidOperationException("The realm should not be null.");
       realm = await _client.CreateAsync(create, context.Request);
-      StaticPortalSettings.Instance.Realm = realm.UniqueSlug;
+      context.SetRealm(realm);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));

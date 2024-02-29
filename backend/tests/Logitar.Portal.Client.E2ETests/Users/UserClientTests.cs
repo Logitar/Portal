@@ -15,6 +15,7 @@ internal class UserClientTests : IClientTests
 
   private readonly IUserClient _client;
   private readonly BasicCredentials _credentials;
+  private readonly RecipientSettings _recipient;
 
   public UserClientTests(IUserClient client, IConfiguration configuration)
   {
@@ -22,6 +23,8 @@ internal class UserClientTests : IClientTests
 
     PortalSettings portalSettings = configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
     _credentials = portalSettings.Basic ?? throw new ArgumentException("The configuration 'Portal.Basic' is required.", nameof(configuration));
+
+    _recipient = configuration.GetSection("Recipient").Get<RecipientSettings>() ?? new();
   }
 
   public async Task<bool> ExecuteAsync(TestContext context)
@@ -87,15 +90,32 @@ internal class UserClientTests : IClientTests
       long version = user.Version;
 
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
+      string firstName = _faker.Person.FirstName;
+      string? middleName = null;
+      string lastName = _faker.Person.LastName;
+      if (!string.IsNullOrWhiteSpace(_recipient.DisplayName))
+      {
+        string[] names = _recipient.DisplayName.Split().Where(name => !string.IsNullOrEmpty(name)).ToArray();
+        firstName = names.First();
+        if (names.Length > 1)
+        {
+          lastName = names.Last();
+        }
+        if (names.Length > 2)
+        {
+          middleName = string.Join(' ', names.Skip(1).Take(names.Length - 2));
+        }
+      }
       UpdateUserPayload update = new()
       {
         Password = new ChangePasswordPayload(_credentials.Password)
         {
           Current = _credentials.Password
         },
-        Email = new Modification<EmailPayload>(new EmailPayload(_faker.Person.Email, isVerified: true)),
-        FirstName = new Modification<string>(_faker.Person.FirstName),
-        LastName = new Modification<string>(_faker.Person.LastName)
+        Email = new Modification<EmailPayload>(new EmailPayload(_recipient.Address, isVerified: true)),
+        FirstName = new Modification<string>(firstName),
+        MiddleName = new Modification<string>(middleName),
+        LastName = new Modification<string>(lastName)
       };
       update.Roles.Add(new RoleModification(context.Role.UniqueName));
       user = await _client.UpdateAsync(user.Id, update, context.Request)
@@ -110,8 +130,8 @@ internal class UserClientTests : IClientTests
         IsDisabled = false,
         IsConfirmed = true
       };
-      search.Search.Terms.Add(new SearchTerm(_faker.Person.FirstName));
-      search.Search.Terms.Add(new SearchTerm(_faker.Person.LastName));
+      search.Search.Terms.Add(new SearchTerm(firstName));
+      search.Search.Terms.Add(new SearchTerm(lastName));
       SearchResults<User> results = await _client.SearchAsync(search, context.Request);
       user = results.Items.Single();
       context.Succeed();

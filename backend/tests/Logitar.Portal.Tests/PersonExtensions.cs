@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal;
 
-internal static class PersonExtensions // TODO(fpion): refactor
+public static class PersonExtensions
 {
   private static readonly Random _random = new();
 

@@ -8,7 +8,6 @@ public record SearchUsersPayload : SearchPayload
   public bool? HasPassword { get; set; }
   public bool? IsDisabled { get; set; }
   public bool? IsConfirmed { get; set; }
-  // TODO(fpion): RoleId
 
   public new List<UserSortOption> Sort { get; set; } = [];
 }

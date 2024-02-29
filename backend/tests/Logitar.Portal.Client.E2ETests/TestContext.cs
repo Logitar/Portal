@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
@@ -28,6 +29,15 @@ internal class TestContext
 
   public IRequestContext Request => new RequestContext(_user?.UniqueName, CancellationToken);
 
+  private Realm? _realm = null;
+  public Realm Realm => _realm ?? throw new InvalidOperationException($"The {nameof(Realm)} has not been initialized yet.");
+  public void SetRealm(Realm realm)
+  {
+    AssertHasNotEnded();
+    _realm = realm;
+    StaticPortalSettings.Instance.Realm = realm.UniqueSlug;
+  }
+
   private Role? _role = null;
   public Role Role => _role ?? throw new InvalidOperationException($"The {nameof(Role)} has not been initialized yet.");
   public void SetRole(Role role)
@@ -45,7 +55,7 @@ internal class TestContext
   }
 
   private string? _token = null;
-  public string? Token => _token ?? throw new InvalidOperationException($"The {nameof(Token)} has not been initialized yet.");
+  public string Token => _token ?? throw new InvalidOperationException($"The {nameof(Token)} has not been initialized yet.");
   public void SetToken(string token)
   {
     AssertHasNotEnded();
@@ -58,6 +68,17 @@ internal class TestContext
   {
     AssertHasNotEnded();
     _template = template;
+  }
+
+  public void Reset()
+  {
+    AssertHasNotEnded();
+    _realm = null;
+    _role = null;
+    _user = null;
+    _token = null;
+    _template = null;
+    StaticPortalSettings.Instance.Realm = null;
   }
 
   public static TestContext Start(int count, CancellationToken cancellationToken = default)

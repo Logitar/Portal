@@ -13,7 +13,11 @@ internal static class OpenApiExtensions
     services.AddSwaggerGen(config =>
     {
       config.AddSecurity();
-      // TODO(fpion): X-Realm, X-User
+      config.OperationFilterDescriptors.Add(new FilterDescriptor
+      {
+        Arguments = [],
+        Type = typeof(AddHeaderParameters)
+      });
       config.SwaggerDoc(name: $"v{Api.Version.Major}", new OpenApiInfo
       {
         Contact = new OpenApiContact

@@ -1,0 +1,14 @@
+﻿DELETE FROM [Messages];
+DELETE FROM [Templates];
+DELETE FROM [Senders];
+DELETE FROM [Dictionaries];
+DELETE FROM [TokenBlacklist];
+DELETE FROM [OneTimePasswords];
+DELETE FROM [Roles];
+DELETE FROM [ApiKeys];
+DELETE FROM [Sessions];
+DELETE FROM [Users];
+DELETE FROM [Realms];
+DELETE FROM [CustomAttributes];
+DELETE FROM [Actors];
+DELETE FROM [Events];
