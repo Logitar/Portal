@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Roles;
 using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;

@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.Data.SqlServer;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;

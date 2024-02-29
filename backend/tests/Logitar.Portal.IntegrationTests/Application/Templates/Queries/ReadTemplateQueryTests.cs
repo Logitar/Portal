@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.Data.SqlServer;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;

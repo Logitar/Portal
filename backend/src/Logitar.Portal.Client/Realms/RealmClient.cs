@@ -52,7 +52,7 @@ internal class RealmClient : BaseClient, IRealmClient
 
     if (realms.Count > 1)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new TooManyResultsException<Realm>(expectedCount: 1, actualCount: realms.Count);
     }
 
     return realms.Values.SingleOrDefault();

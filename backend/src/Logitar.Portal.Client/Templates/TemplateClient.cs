@@ -52,7 +52,7 @@ internal class TemplateClient : BaseClient, ITemplateClient
 
     if (templates.Count > 1)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new TooManyResultsException<Template>(expectedCount: 1, actualCount: templates.Count);
     }
 
     return templates.Values.SingleOrDefault();

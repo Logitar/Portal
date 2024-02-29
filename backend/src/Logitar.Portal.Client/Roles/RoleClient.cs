@@ -52,7 +52,7 @@ internal class RoleClient : BaseClient, IRoleClient
 
     if (roles.Count > 1)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new TooManyResultsException<Role>(expectedCount: 1, actualCount: roles.Count);
     }
 
     return roles.Values.SingleOrDefault();

@@ -52,7 +52,7 @@ internal class DictionaryClient : BaseClient, IDictionaryClient
 
     if (dictionaries.Count > 1)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new TooManyResultsException<Dictionary>(expectedCount: 1, actualCount: dictionaries.Count);
     }
 
     return dictionaries.Values.SingleOrDefault();

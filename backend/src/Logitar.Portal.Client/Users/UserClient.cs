@@ -69,7 +69,7 @@ internal class UserClient : BaseClient, IUserClient
 
     if (users.Count > 1)
     {
-      throw new NotImplementedException(); // TODO(fpion): implement
+      throw new TooManyResultsException<User>(expectedCount: 1, actualCount: users.Count);
     }
 
     return users.Values.SingleOrDefault();

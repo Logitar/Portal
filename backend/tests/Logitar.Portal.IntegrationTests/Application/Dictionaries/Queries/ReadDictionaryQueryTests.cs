@@ -1,6 +1,7 @@
 ﻿using Logitar.Data;
 using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;

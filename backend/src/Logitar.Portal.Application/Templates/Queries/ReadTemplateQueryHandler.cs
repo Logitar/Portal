@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Templates;
+﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Templates;
 using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Queries;
