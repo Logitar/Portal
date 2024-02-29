@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Logitar.Portal.Client.E2ETests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="System.Net.Http.Json" />
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Serialization" />
