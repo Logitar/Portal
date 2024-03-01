@@ -18,26 +18,12 @@ internal class SendMessageCommandTests : ITests
 
   public async Task ExecuteAsync(CancellationToken cancellationToken)
   {
-    string? realm = _configuration.GetValue<string>("Realm");
-    string? user = _configuration.GetValue<string>("User");
-
     SendMessagePayload payload = _configuration.GetSection("SendMessagePayload").Get<SendMessagePayload>() ?? new();
     payload.IsDemo = true;
 
     SendMessageCommand command = new(payload);
     Guid correlationId = NewId.NextGuid();
-    await _bus.Publish(command, context =>
-    {
-      context.CorrelationId = correlationId;
-      if (!string.IsNullOrWhiteSpace(realm))
-      {
-        context.Headers.Set(Contracts.Constants.Headers.Realm, realm.Trim());
-      }
-      if (!string.IsNullOrWhiteSpace(user))
-      {
-        context.Headers.Set(Contracts.Constants.Headers.User, user.Trim());
-      }
-    }, cancellationToken);
+    await _bus.Publish(command, context => context.Populate(correlationId, _configuration), cancellationToken);
     _logger.LogInformation("{CommandType} sent from correlation ID '{CorrelationId}'.", command.GetType().Name, correlationId);
   }
 }
