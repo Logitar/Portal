@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Queries;
 
-internal record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifier? Identifier) : IRequest<User?>;
+public record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifier? Identifier) : ApplicationRequest, IRequest<User?>;

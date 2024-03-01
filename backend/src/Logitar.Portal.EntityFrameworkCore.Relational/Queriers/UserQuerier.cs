@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Users;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -39,8 +40,8 @@ internal class UserQuerier : IUserQuerier
       ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id.Value}' could not be found.");
   }
   public async Task<User?> ReadAsync(UserId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<User?> ReadAsync(Guid id, CancellationToken cancellationToken)
+    => await ReadAsync(_applicationContext.Realm, id.ToGuid(), cancellationToken);
+  public async Task<User?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -49,8 +50,8 @@ internal class UserQuerier : IUserQuerier
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (user == null || user.TenantId != _applicationContext.TenantId?.Value)
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    if (user == null || user.TenantId != tenantId)
     {
       return null;
     }
@@ -58,9 +59,9 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(string uniqueName, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken)
   {
-    string? tenantId = _applicationContext.TenantId?.Value;
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
@@ -68,19 +69,6 @@ internal class UserQuerier : IUserQuerier
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (user == null && (realm?.RequireUniqueEmail ?? _applicationContext.Configuration.RequireUniqueEmail))
-    {
-      UserEntity[] users = await _users.AsNoTracking()
-        .Include(x => x.Identifiers)
-        .Include(x => x.Roles)
-        .Where(x => x.TenantId == tenantId && x.EmailAddressNormalized == uniqueNameNormalized)
-        .ToArrayAsync(cancellationToken);
-      if (users.Length == 1)
-      {
-        user = users.Single();
-      }
-    }
     if (user == null)
     {
       return null;
@@ -89,9 +77,23 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(CustomIdentifier identifier, CancellationToken cancellationToken)
+  public async Task<IEnumerable<User>> ReadAsync(Realm? realm, IEmail email, CancellationToken cancellationToken)
   {
-    string? tenantId = _applicationContext.TenantId?.Value;
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string emailAddressNormalized = email.Address.Trim().ToUpper();
+
+    UserEntity[] users = await _users.AsNoTracking()
+      .Include(x => x.Identifiers)
+      .Include(x => x.Roles)
+      .Where(x => x.TenantId == tenantId && x.EmailAddressNormalized == emailAddressNormalized)
+      .ToArrayAsync(cancellationToken);
+
+    return await MapAsync(users, realm, cancellationToken);
+  }
+
+  public async Task<User?> ReadAsync(Realm? realm, CustomIdentifier identifier, CancellationToken cancellationToken)
+  {
+    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
     string key = identifier.Key.Trim();
     string value = identifier.Value.Trim();
 
@@ -105,7 +107,7 @@ internal class UserQuerier : IUserQuerier
       return null;
     }
 
-    return await MapAsync(user, _applicationContext.Realm, cancellationToken);
+    return await MapAsync(user, realm, cancellationToken);
   }
 
   public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)

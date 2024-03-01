@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.Contracts.Users;
+﻿using Logitar.Identity.Contracts.Users;
 
-public record Email : Contact
+namespace Logitar.Portal.Contracts.Users;
+
+public record Email : Contact, IEmail
 {
   public string Address { get; set; }
 

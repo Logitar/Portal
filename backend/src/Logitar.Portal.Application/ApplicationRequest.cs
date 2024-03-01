@@ -16,6 +16,7 @@ public abstract record ApplicationRequest
   public Configuration Configuration => _configuration ?? throw new InvalidOperationException($"The {nameof(Configuration)} has not been initialized yet.");
   public Realm? Realm { get; private set; }
   public LocaleUnit? DefaultLocale => LocaleUnit.TryCreate((Realm?.DefaultLocale ?? Configuration.DefaultLocale)?.Code);
+  public bool RequireUniqueEmail => Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail;
   public TenantId? TenantId => Realm == null ? null : new(new RealmId(Realm.Id).Value);
 
   protected ApplicationRequest()

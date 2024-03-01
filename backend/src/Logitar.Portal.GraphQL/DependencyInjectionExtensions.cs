@@ -12,7 +12,7 @@ public static class DependencyInjectionExtensions
     GraphQLSettings settings = configuration.GetSection("GraphQL").Get<GraphQLSettings>() ?? new();
     return services.AddLogitarPortalGraphQL(settings);
   }
-  public static IServiceCollection AddLogitarPortalGraphQL(this IServiceCollection services, GraphQLSettings settings)
+  public static IServiceCollection AddLogitarPortalGraphQL(this IServiceCollection services, IGraphQLSettings settings)
   {
     return services.AddGraphQL(builder => builder
       .AddAuthorizationRule()

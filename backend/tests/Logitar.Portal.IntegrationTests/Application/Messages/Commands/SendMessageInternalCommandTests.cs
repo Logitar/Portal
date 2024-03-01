@@ -406,6 +406,4 @@ public class SendMessageInternalCommandTests : IntegrationTests
     };
     await _templateRepository.SaveAsync(_template);
   }
-
-  // TODO(fpion): ApplicationCommand
 }

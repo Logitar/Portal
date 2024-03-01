@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.Contracts.Users;
+﻿using Logitar.Identity.Contracts.Users;
 
-public record Address : Contact
+namespace Logitar.Portal.Contracts.Users;
+
+public record Address : Contact, IAddress
 {
   public string Street { get; set; }
   public string Locality { get; set; }

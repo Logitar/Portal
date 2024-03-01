@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.Contracts.Users;
+﻿using Logitar.Identity.Contracts.Users;
 
-public record Phone : Contact
+namespace Logitar.Portal.Contracts.Users;
+
+public record Phone : Contact, IPhone
 {
   public string? CountryCode { get; set; }
   public string Number { get; set; }
