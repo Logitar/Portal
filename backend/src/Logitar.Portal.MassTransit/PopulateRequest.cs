@@ -29,8 +29,8 @@ internal class PopulateRequest : IPopulateRequest
     if (request is ApplicationRequest applicationRequest)
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration was not found in the cache.");
-      Actor actor = await ResolveActorAsync(context);
       Realm? realm = await ResolveRealmAsync(context);
+      Actor actor = await ResolveActorAsync(context);
 
       applicationRequest.Populate(actor, configuration, realm);
     }

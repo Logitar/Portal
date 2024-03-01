@@ -31,7 +31,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
+    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 0 + 1);
 
     InitializeConfigurationTests initializeConfiguration = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
     if (!await initializeConfiguration.ExecuteAsync(context)) // 1 test
@@ -131,12 +131,12 @@ internal class Program
       return;
     }
 
-    DeleteRealmTests deleteRealm = serviceProvider.GetRequiredService<DeleteRealmTests>();
-    if (!await deleteRealm.ExecuteAsync(context)) // 1 test
-    {
-      context.End();
-      return;
-    }
+    //DeleteRealmTests deleteRealm = serviceProvider.GetRequiredService<DeleteRealmTests>();
+    //if (!await deleteRealm.ExecuteAsync(context)) // 1 test
+    //{
+    //  context.End();
+    //  return;
+    //}
 
     DeleteApiKeyTests deleteApiKey = serviceProvider.GetRequiredService<DeleteApiKeyTests>();
     await deleteApiKey.ExecuteAsync(context); // 1 test

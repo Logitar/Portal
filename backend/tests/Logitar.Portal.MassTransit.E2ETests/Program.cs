@@ -1,18 +1,13 @@
 ﻿using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.MassTransit.Caching;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 
 namespace Logitar.Portal.MassTransit;
 
 internal class Program
 {
-  static readonly JsonSerializerOptions _serializerOptions = new()
-  {
-    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-  };
-
   static async Task Main(string[] args)
   {
     IConfiguration configuration = new ConfigurationBuilder()
@@ -20,68 +15,67 @@ internal class Program
       .AddUserSecrets("2575b63b-34ec-4ba4-b347-1c8829f50bb3")
       .AddCommandLine(args)
       .Build();
+    IServiceProvider serviceProvider = CreateServiceProvider(configuration);
 
-    IServiceProvider serviceProvider = new ServiceCollection()
-      .AddSingleton(configuration)
-      .BuildServiceProvider();
+    Console.Write("Press a key to start the end-to-end test sequence.");
+    Console.ReadKey(intercept: true);
+    Console.WriteLine();
+    Console.WriteLine();
 
-    Console.Write("Enter your realm ID or unique slug (or leave blank): ");
-    string? realm = Console.ReadLine()?.CleanTrim();
+    string? realm = configuration.GetValue<string>("Realm");
+    string? user = configuration.GetValue<string>("User");
+    SendMessagePayload payload = configuration.GetSection("SendMessagePayload").Get<SendMessagePayload>() ?? new();
+    payload.IsDemo = true;
 
-    Console.Write("Enter your user ID: ");
-    Guid userId = Guid.Parse(Console.ReadLine()?.Trim() ?? string.Empty);
-
-    Console.Write("Enter your template ID or unique key: ");
-    string template = Console.ReadLine()?.Trim() ?? string.Empty;
-
-    Console.Write("Enter your sender ID (or leave blank): ");
-    string? senderIdInput = Console.ReadLine()?.CleanTrim();
-
-    Console.Write("Ignore user locale? (true/false)");
-    string ignoreUserLocale = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
-
-    Console.Write("Enter your locale code (or leave blank): ");
-    string? locale = Console.ReadLine()?.Trim();
-
-    Console.Write("Paste your variables as JSON '[{key:string,value:string}]' (or leave blank): ");
-    string? variablesInput = Console.ReadLine()?.Trim();
-
-    SendMessagePayload payload = new(template)
-    {
-      IgnoreUserLocale = ignoreUserLocale == "true",
-      Locale = locale,
-      IsDemo = true
-    };
-    if (Guid.TryParse(senderIdInput, out Guid senderId))
-    {
-      payload.SenderId = senderId;
-    }
-    payload.Recipients.Add(new RecipientPayload
-    {
-      Type = RecipientType.To,
-      UserId = userId
-    });
-    if (variablesInput != null)
-    {
-      IEnumerable<Variable>? variables = JsonSerializer.Deserialize<IEnumerable<Variable>>(variablesInput, _serializerOptions);
-      if (variables != null)
-      {
-        payload.Variables.AddRange(variables);
-      }
-    }
     SendMessageCommand command = new(payload);
-
     IBus bus = serviceProvider.GetRequiredService<IBus>();
     Guid correlationId = NewId.NextGuid();
     await bus.Publish(command, c =>
     {
       c.CorrelationId = correlationId;
 
-      if (realm != null)
+      if (!string.IsNullOrWhiteSpace(realm))
       {
-        c.Headers.Set(Contracts.Constants.Headers.Realm, realm);
+        c.Headers.Set(Contracts.Constants.Headers.Realm, realm.Trim());
       }
-      c.Headers.Set(Contracts.Constants.Headers.User, userId.ToString());
+      if (!string.IsNullOrWhiteSpace(user))
+      {
+        c.Headers.Set(Contracts.Constants.Headers.User, user.Trim());
+      }
     });
+    Console.WriteLine("{0} sent for correlation ID '{1}'.", nameof(SendMessageCommand), correlationId);
+
+    ICacheService cacheService = serviceProvider.GetRequiredService<ICacheService>();
+    int totalDelay = 0;
+    for (int i = 0; i < 10; i++)
+    {
+      int millisecondsDelay = (int)Math.Pow(2, i) * 100;
+      await Task.Delay(millisecondsDelay);
+      totalDelay += millisecondsDelay;
+
+      SentMessages? sentMessages = cacheService.GetSentMessages(correlationId);
+      if (sentMessages == null)
+      {
+        Console.WriteLine("No sent messages yet.");
+      }
+      else
+      {
+        Console.WriteLine("SUCCESS: {0} message(s) sent after {1}ms.", sentMessages.Ids.Count, totalDelay);
+        return;
+      }
+    }
+
+    Console.WriteLine("ERROR: no sent messages after {0}ms.", totalDelay);
+  }
+
+  static ServiceProvider CreateServiceProvider(IConfiguration configuration)
+  {
+    ServiceCollection services = new();
+    services.AddSingleton(configuration);
+
+    Startup startup = new(configuration);
+    startup.ConfigureServices(services);
+
+    return services.BuildServiceProvider();
   }
 }

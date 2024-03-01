@@ -44,7 +44,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.Tests", "tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.MassTransit", "src\Logitar.Portal.MassTransit\Logitar.Portal.MassTransit.csproj", "{B724814A-5FF8-449F-9F10-614732D1B516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.MassTransit.E2ETests", "tests\Logitar.Portal.MassTransit.E2ETests\Logitar.Portal.MassTransit.E2ETests.csproj", "{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logitar.Portal.MassTransit.E2ETests", "tests\Logitar.Portal.MassTransit.E2ETests\Logitar.Portal.MassTransit.E2ETests.csproj", "{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Worker", "src\Logitar.Portal.Worker\Logitar.Portal.Worker.csproj", "{9E1CC469-2E70-494D-BB8C-8A562E8850F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +118,10 @@ Global
 		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C7819CC-BFEB-4AA8-8184-B4BD31734F2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E1CC469-2E70-494D-BB8C-8A562E8850F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E1CC469-2E70-494D-BB8C-8A562E8850F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E1CC469-2E70-494D-BB8C-8A562E8850F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E1CC469-2E70-494D-BB8C-8A562E8850F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
