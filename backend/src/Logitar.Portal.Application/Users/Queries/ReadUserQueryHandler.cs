@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Contracts;
+using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
@@ -15,11 +16,13 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, User?>
 
   public async Task<User?> Handle(ReadUserQuery query, CancellationToken cancellationToken)
   {
+    Realm? realm = query.Realm;
+
     Dictionary<Guid, User> users = new(capacity: 3);
 
     if (query.Id.HasValue)
     {
-      User? user = await _userQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      User? user = await _userQuerier.ReadAsync(realm, query.Id.Value, cancellationToken);
       if (user != null)
       {
         users[user.Id] = user;
@@ -28,16 +31,26 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, User?>
 
     if (!string.IsNullOrWhiteSpace(query.UniqueName))
     {
-      User? user = await _userQuerier.ReadAsync(query.UniqueName, cancellationToken);
+      User? user = await _userQuerier.ReadAsync(realm, query.UniqueName, cancellationToken);
       if (user != null)
       {
         users[user.Id] = user;
+      }
+      else if (query.RequireUniqueEmail)
+      {
+        Email email = new(query.UniqueName);
+        IEnumerable<User> usersByEmail = await _userQuerier.ReadAsync(realm, email, cancellationToken);
+        if (usersByEmail.Count() == 1)
+        {
+          user = usersByEmail.Single();
+          users[user.Id] = user;
+        }
       }
     }
 
     if (query.Identifier != null)
     {
-      User? user = await _userQuerier.ReadAsync(query.Identifier, cancellationToken);
+      User? user = await _userQuerier.ReadAsync(realm, query.Identifier, cancellationToken);
       if (user != null)
       {
         users[user.Id] = user;
