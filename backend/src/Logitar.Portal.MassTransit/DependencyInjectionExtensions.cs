@@ -21,11 +21,7 @@ public static class DependencyInjectionExtensions
         switch (settings.TransportBroker.Value)
         {
           case TransportBroker.RabbitMQ:
-            if (settings.RabbitMQ == null)
-            {
-              throw new ArgumentException($"The {nameof(settings.RabbitMQ)} is required.", nameof(settings));
-            }
-            configurator.AddMassTransitRabbitMQ(settings.RabbitMQ);
+            configurator.AddMassTransitRabbitMQ(settings.RabbitMQ ?? new());
             break;
           default:
             throw new TransportBrokerNotSupportedException(settings.TransportBroker.Value);
