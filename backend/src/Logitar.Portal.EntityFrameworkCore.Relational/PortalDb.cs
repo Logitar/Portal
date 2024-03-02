@@ -22,6 +22,24 @@ internal static class PortalDb
     public static readonly ColumnId Version = new(nameof(DictionaryEntity.Version), Table);
   }
 
+  public static class Logs
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Logs));
+
+    public static readonly ColumnId CorrelationId = new(nameof(LogEntity.CorrelationId), Table);
+    public static readonly ColumnId LogId = new(nameof(LogEntity.LogId), Table);
+    public static readonly ColumnId UniqueId = new(nameof(LogEntity.UniqueId), Table);
+    // TODO(fpion): complete
+  }
+
+  public static class LogEvents
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.LogEvents));
+
+    public static readonly ColumnId EventId = new(nameof(LogEventEntity.EventId), Table);
+    public static readonly ColumnId LogId = new(nameof(LogEventEntity.LogId), Table);
+  }
+
   public static class Messages
   {
     public static readonly TableId Table = new(nameof(PortalContext.Messages));
