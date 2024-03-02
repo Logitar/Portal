@@ -27,7 +27,12 @@ internal static class PortalDb
     public static readonly TableId Table = new(nameof(PortalContext.Logs));
 
     public static readonly ColumnId CorrelationId = new(nameof(LogEntity.CorrelationId), Table);
+    public static readonly ColumnId Duration = new(nameof(LogEntity.Duration), Table);
+    public static readonly ColumnId EndedOn = new(nameof(LogEntity.EndedOn), Table);
+    public static readonly ColumnId IsCompleted = new(nameof(LogEntity.IsCompleted), Table);
     public static readonly ColumnId LogId = new(nameof(LogEntity.LogId), Table);
+    public static readonly ColumnId StartedOn = new(nameof(LogEntity.StartedOn), Table);
+    public static readonly ColumnId StatusCode = new(nameof(LogEntity.StatusCode), Table);
     public static readonly ColumnId UniqueId = new(nameof(LogEntity.UniqueId), Table);
     // TODO(fpion): complete
   }

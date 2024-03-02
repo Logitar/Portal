@@ -13,5 +13,10 @@ internal class LogConfiguration : IEntityTypeConfiguration<LogEntity>
 
     builder.HasIndex(x => x.UniqueId).IsUnique();
     builder.HasIndex(x => x.CorrelationId);
+    builder.HasIndex(x => x.StatusCode);
+    builder.HasIndex(x => x.IsCompleted);
+    builder.HasIndex(x => x.StartedOn);
+    builder.HasIndex(x => x.EndedOn);
+    builder.HasIndex(x => x.Duration);
   }
 }
