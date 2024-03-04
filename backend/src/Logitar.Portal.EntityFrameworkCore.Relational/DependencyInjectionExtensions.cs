@@ -3,6 +3,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.OneTimePasswords;
 using Logitar.Portal.Application.Realms;
@@ -18,6 +19,7 @@ using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
+using Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 using Logitar.Portal.Infrastructure;
@@ -35,6 +37,7 @@ public static class DependencyInjectionExtensions
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddQueriers()
       .AddRepositories()
+      .AddScoped<ILoggingService, LoggingService>()
       .AddTransient<IActorService, ActorService>()
       .AddTransient<IEventBus, PortalEventBus>();
   }

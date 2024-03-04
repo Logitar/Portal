@@ -17,5 +17,5 @@ public interface ILoggingService
   void SetApiKey(ApiKey apiKey);
   void SetSession(Session session);
   void SetUser(User user);
-  Task CloseAndSaveAsync(int statusCode);
+  Task CloseAndSaveAsync(int statusCode, CancellationToken cancellationToken = default);
 }

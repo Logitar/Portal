@@ -7,8 +7,8 @@ internal class LogExceptionEntity
   public LogEntity? Log { get; private set; }
   public long LogId { get; private set; }
 
-  public string Type { get; private set; }
-  public string Message { get; private set; }
+  public string Type { get; private set; } = string.Empty;
+  public string Message { get; private set; } = string.Empty;
 
   public int HResult { get; private set; }
   public string? HelpLink { get; private set; }
