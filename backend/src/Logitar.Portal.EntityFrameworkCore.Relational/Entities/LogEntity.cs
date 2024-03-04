@@ -51,7 +51,11 @@ internal class LogEntity
     get => HasErrors ? LogLevel.Error : LogLevel.Information;
     private set { }
   }
-  public bool HasErrors => Exceptions.Count > 0;
+  public bool HasErrors
+  {
+    get => Exceptions.Count > 0;
+    private set { }
+  }
 
   public DateTime StartedOn { get; private set; }
   public DateTime? EndedOn { get; private set; }
