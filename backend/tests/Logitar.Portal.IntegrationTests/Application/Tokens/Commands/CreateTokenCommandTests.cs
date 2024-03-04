@@ -13,12 +13,14 @@ public class CreateTokenCommandTests : IntegrationTests
 {
   private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
+  private readonly IBaseUrl _baseUrl;
   private readonly IConfigurationRepository _configurationRepository;
 
   public CreateTokenCommandTests() : base()
   {
     _tokenHandler.InboundClaimTypeMap.Clear();
 
+    _baseUrl = ServiceProvider.GetRequiredService<IBaseUrl>();
     _configurationRepository = ServiceProvider.GetRequiredService<IConfigurationRepository>();
   }
 
@@ -44,7 +46,7 @@ public class CreateTokenCommandTests : IntegrationTests
     {
       IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret.Value)),
       ValidAudience = Realm.Url,
-      ValidIssuer = $"{BaseUri.ToString().TrimEnd('/')}/realms/{Realm.Id}",
+      ValidIssuer = $"{_baseUrl.Value.TrimEnd('/')}/realms/{Realm.Id}",
       ValidTypes = [payload.Type],
       ValidateAudience = true,
       ValidateIssuer = true,
@@ -70,7 +72,7 @@ public class CreateTokenCommandTests : IntegrationTests
     CreateTokenCommand command = new(payload);
     CreatedToken createdToken = await Mediator.Send(command);
 
-    string baseUrl = BaseUri.ToString().TrimEnd('/');
+    string baseUrl = _baseUrl.Value.TrimEnd('/');
     TokenValidationParameters validationParameters = new()
     {
       IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.Secret.Value)),
@@ -106,7 +108,7 @@ public class CreateTokenCommandTests : IntegrationTests
     {
       IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Realm.Secret)),
       ValidAudience = Realm.UniqueSlug,
-      ValidIssuer = $"{BaseUri.ToString().TrimEnd('/')}/realms/unique-slug:{Realm.UniqueSlug}",
+      ValidIssuer = $"{_baseUrl.Value.TrimEnd('/')}/realms/unique-slug:{Realm.UniqueSlug}",
       ValidateAudience = true,
       ValidateIssuer = true,
       ValidateIssuerSigningKey = true

@@ -7,9 +7,10 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
@@ -25,6 +26,7 @@ public abstract class IntegrationTests : IAsyncLifetime
 {
   protected const string PasswordString = "P@s$W0rD";
 
+  private readonly TestContext _context = new();
   private readonly bool _initializeConfiguration;
 
   protected Faker Faker { get; } = new();
@@ -34,8 +36,6 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected EventContext EventContext { get; }
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
-
-  public Uri BaseUri { get; } = new(string.Empty); // TODO(fpion): implement
 
   protected Realm Realm { get; }
   protected TenantId TenantId => Realm.GetTenantId();
@@ -55,6 +55,8 @@ public abstract class IntegrationTests : IAsyncLifetime
     ServiceProvider = new ServiceCollection()
       .AddSingleton(configuration)
       .AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString)
+      .AddScoped<TestContext>()
+      .AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>))
       .BuildServiceProvider();
 
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
@@ -86,32 +88,29 @@ public abstract class IntegrationTests : IAsyncLifetime
 
     if (_initializeConfiguration)
     {
-      UserPayload user = new(Faker.Person.UserName, PasswordString)
+      UserPayload userPayload = new(Faker.Person.UserName, PasswordString)
       {
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       };
-      SessionPayload session = new();
-      session.CustomAttributes.Add(new CustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
-      session.CustomAttributes.Add(new CustomAttribute("IpAddress", Faker.Internet.Ip()));
-      InitializeConfigurationPayload payload = new(user, session)
+      SessionPayload sessionPayload = new();
+      sessionPayload.CustomAttributes.Add(new CustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
+      sessionPayload.CustomAttributes.Add(new CustomAttribute("IpAddress", Faker.Internet.Ip()));
+      InitializeConfigurationPayload payload = new(userPayload, sessionPayload)
       {
         DefaultLocale = Faker.Locale
       };
       InitializeConfigurationCommand command = new(payload);
-      await Mediator.Send(command);
+      Session session = await Mediator.Send(command);
+
+      _context.User = session.User;
+      _context.Session = session;
     }
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
-  protected void SetActor(Actor actor)
-  {
-    // TODO(fpion): implement
-  }
-  protected void SetRealm()
-  {
-    // TODO(fpion): implement
-  }
+  protected void SetApiKey(ApiKey apiKey) => _context.ApiKey = apiKey;
+  protected void SetRealm() => _context.Realm = Realm;
 }

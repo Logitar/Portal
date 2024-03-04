@@ -12,7 +12,7 @@ using Logitar.Portal.Infrastructure;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 
-internal class LoggingService : ILoggingService
+internal class LoggingService : ILoggingService // TODO(fpion): should be in the Infrastructure layer!
 {
   private readonly JsonSerializerOptions _serializerOptions = new();
 

@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Portal.Application;
 using Logitar.Portal.Authentication;
 using Logitar.Portal.Authorization;
 using Logitar.Portal.Constants;
@@ -98,6 +99,7 @@ internal class Startup : StartupBase
     services.AddDistributedMemoryCache();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
+    services.AddSingleton<IBaseUrl, BaseUrl>();
     services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualizationBehavior<,>));
   }
 

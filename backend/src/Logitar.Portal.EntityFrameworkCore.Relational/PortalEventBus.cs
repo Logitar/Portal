@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
-internal class PortalEventBus : EventBus
+internal class PortalEventBus : EventBus // TODO(fpion): should be in the Infrastructure layer!
 {
   private readonly ILoggingService _loggingService;
 
