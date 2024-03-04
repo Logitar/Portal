@@ -99,7 +99,7 @@ internal class Startup : StartupBase
     services.AddDistributedMemoryCache();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
-    services.AddSingleton<IBaseUrl, BaseUrl>();
+    services.AddSingleton<IBaseUrl, HttpBaseUrl>();
     services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualizationBehavior<,>));
   }
 

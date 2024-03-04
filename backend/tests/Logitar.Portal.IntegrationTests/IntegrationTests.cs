@@ -6,6 +6,7 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
@@ -26,7 +27,7 @@ public abstract class IntegrationTests : IAsyncLifetime
 {
   protected const string PasswordString = "P@s$W0rD";
 
-  private readonly TestContext _context = new();
+  private readonly TestContext _context;
   private readonly bool _initializeConfiguration;
 
   protected Faker Faker { get; } = new();
@@ -55,9 +56,12 @@ public abstract class IntegrationTests : IAsyncLifetime
     ServiceProvider = new ServiceCollection()
       .AddSingleton(configuration)
       .AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString)
+      .AddScoped<IBaseUrl, TestBaseUrl>()
       .AddScoped<TestContext>()
       .AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>))
       .BuildServiceProvider();
+
+    _context = ServiceProvider.GetRequiredService<TestContext>();
 
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
@@ -72,6 +76,9 @@ public abstract class IntegrationTests : IAsyncLifetime
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };
+
+    ILoggingService loggingService = ServiceProvider.GetRequiredService<ILoggingService>();
+    loggingService.Open(); // TODO(fpion): refactor
   }
 
   public virtual async Task InitializeAsync()
