@@ -21,6 +21,4 @@ public interface IApplicationContext
 
   public IRoleSettings RoleSettings { get; }
   public IUserSettings UserSettings { get; }
-
-  void Contextualize(ApplicationRequest request);
 }

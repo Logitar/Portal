@@ -74,10 +74,4 @@ internal class TestApplicationContext : IApplicationContext
   {
     _cacheService = cacheService;
   }
-
-  public void Contextualize(ApplicationRequest request)
-  {
-    ApplicationContext context = new(Configuration, Realm, ApiKey: null, User: null, Session: null);
-    request.Contextualize(context);
-  }
 }

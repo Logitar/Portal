@@ -7,7 +7,6 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
-using Logitar.Portal.Application.Pipeline;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
@@ -33,7 +32,6 @@ public abstract class IntegrationTests : IAsyncLifetime
 
   protected IServiceProvider ServiceProvider { get; }
   protected IMediator Mediator { get; }
-  protected IRequestPipeline Pipeline { get; }
   protected EventContext EventContext { get; }
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
@@ -64,7 +62,6 @@ public abstract class IntegrationTests : IAsyncLifetime
       .BuildServiceProvider();
 
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
-    Pipeline = ServiceProvider.GetRequiredService<IRequestPipeline>();
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();

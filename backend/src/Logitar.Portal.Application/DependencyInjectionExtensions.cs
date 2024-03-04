@@ -6,7 +6,6 @@ using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.OneTimePasswords;
-using Logitar.Portal.Application.Pipeline;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
@@ -30,7 +29,6 @@ public static class DependencyInjectionExtensions
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddSingleton<IRoleSettingsResolver, PortalRoleSettingsResolver>()
       .AddSingleton<IUserSettingsResolver, PortalUserSettingsResolver>()
-      .AddScoped<IRequestPipeline, RequestPipeline>()
       .AddTransient(typeof(IPipelineBehavior<,>), typeof(ActivityLoggingBehavior<,>))
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()
