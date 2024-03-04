@@ -42,6 +42,7 @@ public class RenewSessionCommandTests : IntegrationTests
       UpdatedOn = apiKeyAggregate.UpdatedOn.ToUniversalTime()
     };
     SetApiKey(apiKey);
+    SetUser(user: null);
 
     SetRealm();
 
@@ -69,8 +70,8 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Equal(customAttributes, result.CustomAttributes);
     Assert.Equal(user.Id.ToGuid(), result.User.Id);
     Assert.Equal(session.Id.ToGuid(), result.Id);
-    Assert.Equal(actorId.ToGuid(), result.CreatedBy.Id);
-    Assert.Equal(actorId.ToGuid(), result.UpdatedBy.Id);
+    Assert.Equal(apiKey.Id, result.CreatedBy.Id);
+    Assert.Equal(apiKey.Id, result.UpdatedBy.Id);
   }
 
   [Fact(DisplayName = "It should renew the session using the user ID when no actor.")]

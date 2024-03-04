@@ -12,6 +12,7 @@ using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
@@ -110,14 +111,25 @@ public abstract class IntegrationTests : IAsyncLifetime
       };
       InitializeConfigurationCommand command = new(payload);
       Session session = await Mediator.Send(command);
-
-      _context.User = session.User;
-      _context.Session = session;
+      SetSession(session);
     }
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
-  protected void SetApiKey(ApiKey apiKey) => _context.ApiKey = apiKey;
   protected void SetRealm() => _context.Realm = Realm;
+  protected void SetApiKey(ApiKey? apiKey)
+  {
+    _context.ApiKey = apiKey;
+  }
+  protected void SetUser(User? user)
+  {
+    _context.User = user;
+    _context.Session = null;
+  }
+  protected void SetSession(Session? session)
+  {
+    _context.User = session?.User;
+    _context.Session = session;
+  }
 }
