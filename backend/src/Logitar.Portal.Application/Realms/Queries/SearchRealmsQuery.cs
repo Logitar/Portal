@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
-internal record SearchRealmsQuery(SearchRealmsPayload Payload) : IRequest<SearchResults<Realm>>;
+internal record SearchRealmsQuery(SearchRealmsPayload Payload) : ApplicationRequest, IRequest<SearchResults<Realm>>;

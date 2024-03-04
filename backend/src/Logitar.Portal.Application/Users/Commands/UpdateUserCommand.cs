@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : IRequest<User?>;
+internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : ApplicationRequest, IRequest<User?>;

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal record InitializeConfigurationCommand(InitializeConfigurationPayload Payload) : IRequest<Session>;
+internal record InitializeConfigurationCommand(InitializeConfigurationPayload Payload) : ApplicationRequest, IRequest<Session>;

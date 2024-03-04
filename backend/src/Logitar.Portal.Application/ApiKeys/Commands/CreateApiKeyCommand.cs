@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal record CreateApiKeyCommand(CreateApiKeyPayload Payload) : IRequest<ApiKey>;
+internal record CreateApiKeyCommand(CreateApiKeyPayload Payload) : ApplicationRequest, IRequest<ApiKey>;

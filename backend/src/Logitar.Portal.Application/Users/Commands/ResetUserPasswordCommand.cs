@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record ResetUserPasswordCommand(Guid Id, ResetUserPasswordPayload Payload) : IRequest<User?>;
+internal record ResetUserPasswordCommand(Guid Id, ResetUserPasswordPayload Payload) : ApplicationRequest, IRequest<User?>;

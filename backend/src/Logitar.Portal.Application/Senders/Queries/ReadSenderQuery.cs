@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Queries;
 
-internal record ReadSenderQuery(Guid Id) : IRequest<Sender?>;
+internal record ReadSenderQuery(Guid Id) : ApplicationRequest, IRequest<Sender?>;
