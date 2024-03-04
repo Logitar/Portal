@@ -3,6 +3,7 @@ using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Messages;
 using Logitar.Portal.Application.OneTimePasswords;
 using Logitar.Portal.Application.Pipeline;
@@ -14,6 +15,7 @@ using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application;
@@ -29,6 +31,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton<IRoleSettingsResolver, PortalRoleSettingsResolver>()
       .AddSingleton<IUserSettingsResolver, PortalUserSettingsResolver>()
       .AddScoped<IRequestPipeline, RequestPipeline>()
+      .AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()
       .AddTransient<ITemplateManager, TemplateManager>();

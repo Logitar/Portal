@@ -129,7 +129,7 @@ internal class Startup : StartupBase
     builder.UseCors();
     builder.UseStaticFiles();
     builder.UseSession();
-    //builder.UseMiddleware<Logging>();
+    builder.UseMiddleware<Logging>();
     builder.UseMiddleware<RenewSession>();
     builder.UseMiddleware<RedirectNotFound>();
     builder.UseAuthentication();

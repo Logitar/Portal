@@ -1,4 +1,5 @@
 ﻿using GraphQL;
+using Logitar.Portal.Application.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.GraphQL;
@@ -26,8 +27,8 @@ internal static class ResolveFieldContextExtensions
   {
     if (context.RequestServices != null)
     {
-      //ILoggingService loggingService = context.RequestServices.GetRequiredService<ILoggingService>();
-      //loggingService.SetOperation(new Operation(type, context.FieldDefinition.Name)); // TODO(fpion): logging
+      ILoggingService loggingService = context.RequestServices.GetRequiredService<ILoggingService>();
+      loggingService.SetOperation(new Operation(type, context.FieldDefinition.Name));
     }
   }
 }

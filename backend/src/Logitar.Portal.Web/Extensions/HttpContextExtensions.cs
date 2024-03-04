@@ -54,11 +54,11 @@ public static class HttpContextExtensions
 
     return customAttributes;
   }
-  private static string GetAdditionalInformation(this HttpContext context)
+  public static string GetAdditionalInformation(this HttpContext context)
   {
     return JsonSerializer.Serialize(context.Request.Headers);
   }
-  private static string? GetClientIpAddress(this HttpContext context)
+  public static string? GetClientIpAddress(this HttpContext context)
   {
     string? ipAddress = null;
 

@@ -22,6 +22,59 @@ internal static class PortalDb
     public static readonly ColumnId Version = new(nameof(DictionaryEntity.Version), Table);
   }
 
+  public static class LogEvents
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.LogEvents));
+
+    public static readonly ColumnId EventId = new(nameof(LogEventEntity.EventId));
+    public static readonly ColumnId LogId = new(nameof(LogEventEntity.LogId));
+  }
+
+  public static class LogExceptions
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.LogExceptions));
+
+    public static readonly ColumnId Data = new(nameof(LogExceptionEntity.Data));
+    public static readonly ColumnId HResult = new(nameof(LogExceptionEntity.HResult));
+    public static readonly ColumnId HelpLink = new(nameof(LogExceptionEntity.HelpLink));
+    public static readonly ColumnId LogExceptionId = new(nameof(LogExceptionEntity.LogExceptionId));
+    public static readonly ColumnId LogId = new(nameof(LogExceptionEntity.LogId));
+    public static readonly ColumnId Message = new(nameof(LogExceptionEntity.Message));
+    public static readonly ColumnId Source = new(nameof(LogExceptionEntity.Source));
+    public static readonly ColumnId StackTrace = new(nameof(LogExceptionEntity.StackTrace));
+    public static readonly ColumnId TargetSite = new(nameof(LogExceptionEntity.TargetSite));
+    public static readonly ColumnId Type = new(nameof(LogExceptionEntity.Type));
+  }
+
+  public static class Logs
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.Logs));
+
+    public static readonly ColumnId ActivityData = new(nameof(LogEntity.ActivityData));
+    public static readonly ColumnId ActivityType = new(nameof(LogEntity.ActivityType));
+    public static readonly ColumnId ActorId = new(nameof(LogEntity.ActorId));
+    public static readonly ColumnId AdditionalInformation = new(nameof(LogEntity.AdditionalInformation));
+    public static readonly ColumnId ApiKeyId = new(nameof(LogEntity.ApiKeyId));
+    public static readonly ColumnId CorrelationId = new(nameof(LogEntity.CorrelationId));
+    public static readonly ColumnId Destination = new(nameof(LogEntity.Destination));
+    public static readonly ColumnId Duration = new(nameof(LogEntity.Duration));
+    public static readonly ColumnId EndedOn = new(nameof(LogEntity.EndedOn));
+    public static readonly ColumnId HasErrors = new(nameof(LogEntity.HasErrors));
+    public static readonly ColumnId IsCompleted = new(nameof(LogEntity.IsCompleted));
+    public static readonly ColumnId Level = new(nameof(LogEntity.Level));
+    public static readonly ColumnId LogId = new(nameof(LogEntity.LogId));
+    public static readonly ColumnId Method = new(nameof(LogEntity.Method));
+    public static readonly ColumnId OperationName = new(nameof(LogEntity.OperationName));
+    public static readonly ColumnId OperationType = new(nameof(LogEntity.OperationType));
+    public static readonly ColumnId SessionId = new(nameof(LogEntity.SessionId));
+    public static readonly ColumnId Source = new(nameof(LogEntity.Source));
+    public static readonly ColumnId StartedOn = new(nameof(LogEntity.StartedOn));
+    public static readonly ColumnId StatusCode = new(nameof(LogEntity.StatusCode));
+    public static readonly ColumnId TenantId = new(nameof(LogEntity.TenantId));
+    public static readonly ColumnId UniqueId = new(nameof(LogEntity.UniqueId));
+    public static readonly ColumnId UserId = new(nameof(LogEntity.UserId));
+  }
+
   public static class Messages
   {
     public static readonly TableId Table = new(nameof(PortalContext.Messages));
