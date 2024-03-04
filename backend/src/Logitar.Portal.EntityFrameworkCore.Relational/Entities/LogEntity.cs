@@ -78,9 +78,9 @@ internal class LogEntity
   }
 
   public List<LogExceptionEntity> Exceptions { get; private set; } = [];
-  public void Report(Exception exception)
+  public void Report(Exception exception, JsonSerializerOptions? serializerOptions = null)
   {
-    Exceptions.Add(new LogExceptionEntity(this, exception));
+    Exceptions.Add(new LogExceptionEntity(this, exception, serializerOptions));
   }
 
   public LogEntity(string? correlationId, string? method, string? destination, string? source, string? additionalInformation, Guid? uniqueId = null, DateTime? startedOn = null)

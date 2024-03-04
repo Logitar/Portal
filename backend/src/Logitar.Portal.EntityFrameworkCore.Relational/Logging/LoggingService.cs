@@ -47,13 +47,13 @@ internal class LoggingService : ILoggingService
   public void Report(Exception exception)
   {
     AssertLogIsOpen();
-    _log!.Report(exception);
+    _log!.Report(exception, _serializerOptions);
   }
 
   public void SetActivity(object activity)
   {
     AssertLogIsOpen();
-    _log!.SetActivity(activity);
+    _log!.SetActivity(activity, _serializerOptions);
   }
 
   public void SetOperation(Operation operation)
@@ -94,7 +94,6 @@ internal class LoggingService : ILoggingService
     if (ShouldSaveLog())
     {
       _context.Logs.Add(_log);
-
       await _context.SaveChangesAsync(cancellationToken);
     }
 

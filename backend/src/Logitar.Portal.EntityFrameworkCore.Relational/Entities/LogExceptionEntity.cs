@@ -35,7 +35,7 @@ internal class LogExceptionEntity
     }
   }
 
-  public LogExceptionEntity(LogEntity log, Exception exception)
+  public LogExceptionEntity(LogEntity log, Exception exception, JsonSerializerOptions? serializerOptions = null)
   {
     Log = log;
     LogId = log.LogId;
@@ -48,6 +48,23 @@ internal class LogExceptionEntity
     Source = exception.Source;
     StackTrace = exception.StackTrace;
     TargetSite = exception.TargetSite?.ToString();
+
+    foreach (object key in exception.Data.Keys)
+    {
+      try
+      {
+        object? value = exception.Data[key];
+        if (value != null)
+        {
+          string serializedKey = JsonSerializer.Serialize(key, key.GetType(), serializerOptions);
+          string serializedValue = JsonSerializer.Serialize(value, value.GetType(), serializerOptions);
+          Data[serializedKey] = serializedValue;
+        }
+      }
+      catch (Exception)
+      {
+      }
+    }
   }
 
   private LogExceptionEntity()
