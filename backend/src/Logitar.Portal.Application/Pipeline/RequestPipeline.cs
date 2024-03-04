@@ -17,7 +17,7 @@ internal class RequestPipeline : IRequestPipeline
   {
     if (request is ApplicationRequest applicationRequest)
     {
-      applicationRequest.Populate(_applicationContext.Actor, _applicationContext.Configuration, _applicationContext.Realm);
+      _applicationContext.Contextualize(applicationRequest);
     }
 
     return await _mediator.Send(request, cancellationToken);

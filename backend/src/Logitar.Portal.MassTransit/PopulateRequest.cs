@@ -2,7 +2,6 @@
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Realms.Queries;
 using Logitar.Portal.Application.Users.Queries;
-using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Users;
@@ -28,27 +27,11 @@ internal class PopulateRequest : IPopulateRequest
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration was not found in the cache.");
       Realm? realm = await ResolveRealmAsync(context);
-      Actor actor = await ResolveActorAsync(context, configuration, realm);
+      User? user = await ResolveUserAsync(context, configuration, realm);
 
-      applicationRequest.Populate(actor, configuration, realm);
+      ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, user, Session: null);
+      applicationRequest.Contextualize(applicationContext);
     }
-  }
-
-  private async Task<Actor> ResolveActorAsync(ConsumeContext context, Configuration configuration, Realm? realm)
-  {
-    Actor actor = Actor.System;
-
-    if (context.TryGetHeader(Contracts.Constants.Headers.User, out string? idOrUniqueName))
-    {
-      bool parsed = Guid.TryParse(idOrUniqueName.Trim(), out Guid id);
-      ReadUserQuery query = new(parsed ? id : null, idOrUniqueName, Identifier: null);
-      query.Populate(actor, configuration, realm);
-      User user = await _mediator.Send(query, context.CancellationToken)
-        ?? throw new InvalidOperationException($"The user '{idOrUniqueName}' could not be found.");
-      actor = new Actor(user);
-    }
-
-    return actor;
   }
 
   private async Task<Realm?> ResolveRealmAsync(ConsumeContext context)
@@ -63,5 +46,24 @@ internal class PopulateRequest : IPopulateRequest
     }
 
     return realm;
+  }
+
+  private async Task<User?> ResolveUserAsync(ConsumeContext context, Configuration configuration, Realm? realm)
+  {
+    User? user = null;
+
+    if (context.TryGetHeader(Contracts.Constants.Headers.User, out string? idOrUniqueName))
+    {
+      bool parsed = Guid.TryParse(idOrUniqueName.Trim(), out Guid id);
+
+      ReadUserQuery query = new(parsed ? id : null, idOrUniqueName, Identifier: null);
+      ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, User: null, Session: null);
+      query.Contextualize(applicationContext);
+
+      user = await _mediator.Send(query, context.CancellationToken)
+        ?? throw new InvalidOperationException($"The user '{idOrUniqueName}' could not be found");
+    }
+
+    return user;
   }
 }

@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
-using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 
@@ -10,31 +10,49 @@ namespace Logitar.Portal.Application;
 public abstract record ApplicationRequest
 {
   [JsonIgnore]
-  public Actor Actor { get; private set; }
+  private ApplicationContext? _context = null;
+  [JsonIgnore]
+  protected ApplicationContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
+
+  [JsonIgnore]
+  public Actor Actor
+  {
+    get
+    {
+      if (Context.User != null)
+      {
+        return new Actor(Context.User);
+      }
+      else if (Context.ApiKey != null)
+      {
+        return new Actor(Context.ApiKey);
+      }
+      return Actor.System;
+    }
+  }
   [JsonIgnore]
   public ActorId ActorId => new(Actor.Id);
 
-  private Configuration? _configuration = null;
   [JsonIgnore]
-  public Configuration Configuration => _configuration ?? throw new InvalidOperationException($"The {nameof(Configuration)} has not been initialized yet.");
+  public Realm? Realm => Context.Realm;
   [JsonIgnore]
-  public Realm? Realm { get; private set; }
-  [JsonIgnore]
-  public LocaleUnit? DefaultLocale => LocaleUnit.TryCreate((Realm?.DefaultLocale ?? Configuration.DefaultLocale)?.Code);
-  [JsonIgnore]
-  public bool RequireUniqueEmail => Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail;
-  [JsonIgnore]
-  public TenantId? TenantId => Realm == null ? null : new(new RealmId(Realm.Id).Value);
+  public TenantId? TenantId => Context.Realm == null ? null : new(new RealmId(Context.Realm.Id).Value);
 
-  protected ApplicationRequest()
+  [JsonIgnore]
+  public LocaleUnit? DefaultLocale
   {
-    Actor = Actor.System;
+    get
+    {
+      Locale? defaultLocale = Context.Realm?.DefaultLocale ?? Context.Configuration.DefaultLocale;
+      return defaultLocale == null ? null : new LocaleUnit(defaultLocale.Code);
+    }
   }
 
-  public void Populate(Actor actor, Configuration configuration, Realm? realm)
+  [JsonIgnore]
+  public bool RequireUniqueEmail => Context.Realm?.RequireUniqueEmail ?? Context.Configuration.RequireUniqueEmail;
+
+  public void Contextualize(ApplicationContext context)
   {
-    Actor = actor;
-    _configuration = configuration;
-    Realm = realm;
+    _context = context;
   }
 }

@@ -93,9 +93,16 @@ internal class HttpApplicationContext : IApplicationContext
       };
     }
   }
+
   public HttpApplicationContext(ICacheService cacheService, IHttpContextAccessor httpContextAccessor)
   {
     _cacheService = cacheService;
     _httpContextAccessor = httpContextAccessor;
+  }
+
+  public void Contextualize(ApplicationRequest request)
+  {
+    ApplicationContext context = new(Configuration, Realm, Context.GetApiKey(), Context.GetUser(), Context.GetSession());
+    request.Contextualize(context);
   }
 }
