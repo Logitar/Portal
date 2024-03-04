@@ -37,6 +37,9 @@ public class RenewSessionCommandTests : IntegrationTests
     ApiKey apiKey = new(apiKeyAggregate.DisplayName.Value)
     {
       Id = apiKeyAggregate.Id.ToGuid(),
+      Version = apiKeyAggregate.Version,
+      CreatedOn = apiKeyAggregate.CreatedOn.ToUniversalTime(),
+      UpdatedOn = apiKeyAggregate.UpdatedOn.ToUniversalTime()
     };
     SetApiKey(apiKey);
 
