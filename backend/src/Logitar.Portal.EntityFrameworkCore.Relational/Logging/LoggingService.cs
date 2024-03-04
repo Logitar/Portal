@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts.ApiKeys;
@@ -65,7 +66,7 @@ internal class LoggingService : ILoggingService
   public void SetRealm(Realm realm)
   {
     AssertLogIsOpen();
-    _log!.TenantId = new AggregateId(realm.Id).Value;
+    _log!.TenantId = realm.GetTenantId().Value;
   }
 
   public void SetApiKey(ApiKey apiKey)

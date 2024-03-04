@@ -17,37 +17,33 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class TemplateQuerier : ITemplateQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly ISearchHelper _searchHelper;
   private readonly ISqlHelper _sqlHelper;
   private readonly DbSet<TemplateEntity> _templates;
 
-  public TemplateQuerier(IActorService actorService, IApplicationContext applicationContext,
-    PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public TemplateQuerier(IActorService actorService, PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
     _templates = context.Templates;
   }
 
-  public async Task<Template> ReadAsync(TemplateAggregate template, CancellationToken cancellationToken)
+  public async Task<Template> ReadAsync(Realm? realm, TemplateAggregate template, CancellationToken cancellationToken)
   {
-    return await ReadAsync(template.Id, cancellationToken)
+    return await ReadAsync(realm, template.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The template entity 'AggregateId={template.Id.Value}' could not be found.");
   }
-  public async Task<Template?> ReadAsync(TemplateId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Template?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Template?> ReadAsync(Realm? realm, TemplateId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<Template?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (template == null || template.TenantId != _applicationContext.TenantId?.Value)
+    if (template == null || template.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -55,9 +51,9 @@ internal class TemplateQuerier : ITemplateQuerier
     return await MapAsync(template, realm, cancellationToken);
   }
 
-  public async Task<Template?> ReadAsync(string uniqueKey, CancellationToken cancellationToken)
+  public async Task<Template?> ReadAsync(Realm? realm, string uniqueKey, CancellationToken cancellationToken)
   {
-    string? tenantId = _applicationContext.TenantId?.Value;
+    string? tenantId = realm?.GetTenantId().Value;
     string uniqueKeyNormalized = uniqueKey.Trim().ToUpper();
 
     TemplateEntity? template = await _templates.AsNoTracking()
@@ -68,13 +64,11 @@ internal class TemplateQuerier : ITemplateQuerier
       return null;
     }
 
-    return await MapAsync(template, _applicationContext.Realm, cancellationToken);
+    return await MapAsync(template, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Template>> SearchAsync(SearchTemplatesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Template>> SearchAsync(Realm? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
       .ApplyRealmFilter(PortalDb.Templates.TenantId, realm)
       .ApplyIdFilter(PortalDb.Templates.AggregateId, payload.Ids);

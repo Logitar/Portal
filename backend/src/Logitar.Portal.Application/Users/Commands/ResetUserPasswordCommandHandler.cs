@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ResetUserPasswordCommandHandler(IApplicationContext applicationContext,
-    IPasswordManager passwordManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public ResetUserPasswordCommandHandler(IPasswordManager passwordManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _passwordManager = passwordManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -27,10 +24,10 @@ internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswo
   public async Task<User?> Handle(ResetUserPasswordCommand command, CancellationToken cancellationToken)
   {
     ResetUserPasswordPayload payload = command.Payload;
-    new ResetUserPasswordValidator(_applicationContext.UserSettings).ValidateAndThrow(payload);
+    new ResetUserPasswordValidator(command.UserSettings).ValidateAndThrow(payload);
 
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
@@ -41,6 +38,6 @@ internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswo
 
     await _userRepository.SaveAsync(user, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 }

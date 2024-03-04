@@ -7,13 +7,11 @@ namespace Logitar.Portal.Application.Senders.Commands;
 
 internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSenderCommand, Sender?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
 
-  public SetDefaultSenderCommandHandler(IApplicationContext applicationContext, ISenderQuerier senderQuerier, ISenderRepository senderRepository)
+  public SetDefaultSenderCommandHandler(ISenderQuerier senderQuerier, ISenderRepository senderRepository)
   {
-    _applicationContext = applicationContext;
     _senderQuerier = senderQuerier;
     _senderRepository = senderRepository;
   }
@@ -21,7 +19,7 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
   public async Task<Sender?> Handle(SetDefaultSenderCommand command, CancellationToken cancellationToken)
   {
     SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
-    if (sender == null || sender.TenantId != _applicationContext.TenantId)
+    if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
@@ -30,7 +28,7 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
     {
       List<SenderAggregate> senders = new(capacity: 2);
 
-      ActorId actorId = _applicationContext.ActorId;
+      ActorId actorId = command.ActorId;
 
       SenderAggregate? @default = await _senderRepository.LoadDefaultAsync(sender.TenantId, cancellationToken);
       if (@default != null)
@@ -45,6 +43,6 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
       await _senderRepository.SaveAsync(senders, cancellationToken);
     }
 
-    return await _senderQuerier.ReadAsync(sender, cancellationToken);
+    return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 }

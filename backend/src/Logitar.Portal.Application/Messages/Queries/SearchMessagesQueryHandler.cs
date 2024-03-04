@@ -15,6 +15,6 @@ internal class SearchMessagesQueryHandler : IRequestHandler<SearchMessagesQuery,
 
   public async Task<SearchResults<Message>> Handle(SearchMessagesQuery query, CancellationToken cancellationToken)
   {
-    return await _messageQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _messageQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

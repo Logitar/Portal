@@ -13,13 +13,11 @@ namespace Logitar.Portal.Application.Senders.Commands;
 
 internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand, Sender>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
 
-  public CreateSenderCommandHandler(IApplicationContext applicationContext, ISenderQuerier senderQuerier, ISenderRepository senderRepository)
+  public CreateSenderCommandHandler(ISenderQuerier senderQuerier, ISenderRepository senderRepository)
   {
-    _applicationContext = applicationContext;
     _senderQuerier = senderQuerier;
     _senderRepository = senderRepository;
   }
@@ -29,10 +27,10 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     CreateSenderPayload payload = command.Payload;
     new CreateSenderValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     EmailUnit email = new(payload.EmailAddress, isVerified: false);
-    SenderAggregate sender = new(email, GetSettings(payload), _applicationContext.TenantId, actorId)
+    SenderAggregate sender = new(email, GetSettings(payload), command.TenantId, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
       Description = DescriptionUnit.TryCreate(payload.Description)
@@ -47,7 +45,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
 
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
-    return await _senderQuerier.ReadAsync(sender, cancellationToken);
+    return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 
   private static SenderSettings GetSettings(CreateSenderPayload payload)

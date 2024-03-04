@@ -13,13 +13,11 @@ namespace Logitar.Portal.Application.Senders.Commands;
 
 internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderCommand, Sender?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
 
-  public ReplaceSenderCommandHandler(IApplicationContext applicationContext, ISenderQuerier senderQuerier, ISenderRepository senderRepository)
+  public ReplaceSenderCommandHandler(ISenderQuerier senderQuerier, ISenderRepository senderRepository)
   {
-    _applicationContext = applicationContext;
     _senderQuerier = senderQuerier;
     _senderRepository = senderRepository;
   }
@@ -30,7 +28,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     new ReplaceSenderValidator().ValidateAndThrow(payload);
 
     SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
-    if (sender == null || sender.TenantId != _applicationContext.TenantId)
+    if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
@@ -40,7 +38,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
       reference = await _senderRepository.LoadAsync(sender.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     EmailUnit email = new(payload.EmailAddress, isVerified: false);
     if (reference == null || email != reference.Email)
@@ -63,7 +61,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     sender.Update(actorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
-    return await _senderQuerier.ReadAsync(sender, cancellationToken);
+    return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 
   private static void SetSettings(ReplaceSenderPayload payload, SenderAggregate sender, SenderAggregate? reference, ActorId actorId)

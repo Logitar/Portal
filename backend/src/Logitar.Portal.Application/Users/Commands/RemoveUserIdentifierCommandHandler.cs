@@ -6,13 +6,11 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserIdentifierCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public RemoveUserIdentifierCommandHandler(IApplicationContext applicationContext, IUserQuerier userQuerier, IUserRepository userRepository)
+  public RemoveUserIdentifierCommandHandler(IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -20,15 +18,15 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
   public async Task<User?> Handle(RemoveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
 
-    user.RemoveCustomIdentifier(command.Key, _applicationContext.ActorId);
+    user.RemoveCustomIdentifier(command.Key, command.ActorId);
 
     await _userRepository.SaveAsync(user, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 }

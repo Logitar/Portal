@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.Data.SqlServer;
-using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
@@ -36,12 +35,10 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
-  protected Uri BaseUri => ApplicationContext.BaseUri;
+  public Uri BaseUri { get; } = new(string.Empty); // TODO(fpion): implement
 
   protected Realm Realm { get; }
-  protected TenantId TenantId => new(new AggregateId(Realm.Id).Value);
-
-  private TestApplicationContext ApplicationContext => (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
+  protected TenantId TenantId => Realm.GetTenantId();
 
   protected IntegrationTests(bool initializeConfiguration = true)
   {
@@ -58,7 +55,6 @@ public abstract class IntegrationTests : IAsyncLifetime
     ServiceProvider = new ServiceCollection()
       .AddSingleton(configuration)
       .AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString)
-      .AddSingleton<IApplicationContext, TestApplicationContext>()
       .BuildServiceProvider();
 
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
@@ -110,8 +106,12 @@ public abstract class IntegrationTests : IAsyncLifetime
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
-  protected void SetActor(Actor actor) => ApplicationContext.Actor = actor;
-
-  protected void SetRealm() => SetRealm(Realm);
-  protected void SetRealm(Realm? realm) => ApplicationContext.Realm = realm;
+  protected void SetActor(Actor actor)
+  {
+    // TODO(fpion): implement
+  }
+  protected void SetRealm()
+  {
+    // TODO(fpion): implement
+  }
 }

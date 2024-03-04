@@ -11,12 +11,10 @@ namespace Logitar.Portal.Application.Tokens.Commands;
 
 internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenCommand, Contracts.Tokens.ValidatedToken>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ITokenManager _tokenManager;
 
-  public ValidateTokenCommandHandler(IApplicationContext applicationContext, ITokenManager tokenManager)
+  public ValidateTokenCommandHandler(ITokenManager tokenManager)
   {
-    _applicationContext = applicationContext;
     _tokenManager = tokenManager;
   }
 
@@ -25,10 +23,10 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
     ValidateTokenPayload payload = command.Payload;
     new ValidateTokenValidator().ValidateAndThrow(payload);
 
-    Realm? realm = _applicationContext.Realm;
-    string baseUrl = _applicationContext.BaseUrl.TrimEnd('/');
+    Realm? realm = command.Realm;
+    string baseUrl = string.Empty; // TODO(fpion): implement
 
-    string secret = payload.Secret?.CleanTrim() ?? realm?.Secret ?? _applicationContext.Configuration.Secret;
+    string secret = payload.Secret?.CleanTrim() ?? command.Secret;
     ValidateTokenParameters parameters = new(payload.Token, secret)
     {
       ValidAudiences = [TokenHelper.ResolveAudience(payload.Audience, realm, baseUrl)],

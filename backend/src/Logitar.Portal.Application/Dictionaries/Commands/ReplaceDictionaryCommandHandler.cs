@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Dictionaries.Commands;
 
 internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictionaryCommand, Dictionary?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
-  public ReplaceDictionaryCommandHandler(IApplicationContext applicationContext,
-    IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
+  public ReplaceDictionaryCommandHandler(IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
   {
-    _applicationContext = applicationContext;
     _dictionaryManager = dictionaryManager;
     _dictionaryRepository = dictionaryRepository;
     _dictionaryQuerier = dictionaryQuerier;
@@ -30,7 +27,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
     new ReplaceDictionaryValidator().ValidateAndThrow(payload);
 
     DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
-    if (dictionary == null || dictionary.TenantId != _applicationContext.TenantId)
+    if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
     }
@@ -40,7 +37,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
       reference = await _dictionaryRepository.LoadAsync(dictionary.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     LocaleUnit locale = new(payload.Locale);
     if (reference == null || locale != reference.Locale)
@@ -53,7 +50,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);
 
-    return await _dictionaryQuerier.ReadAsync(dictionary, cancellationToken);
+    return await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
   }
 
   private static void ReplaceDictionaryEntries(ReplaceDictionaryPayload payload, DictionaryAggregate dictionary, DictionaryAggregate? reference)

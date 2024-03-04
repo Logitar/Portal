@@ -14,6 +14,6 @@ internal class ReadSenderQueryHandler : IRequestHandler<ReadSenderQuery, Sender?
 
   public async Task<Sender?> Handle(ReadSenderQuery query, CancellationToken cancellationToken)
   {
-    return await _senderQuerier.ReadAsync(query.Id, cancellationToken);
+    return await _senderQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }
 }

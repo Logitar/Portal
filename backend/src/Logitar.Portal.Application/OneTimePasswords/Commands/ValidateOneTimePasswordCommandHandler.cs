@@ -10,14 +10,11 @@ namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
 internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateOneTimePasswordCommand, OneTimePassword?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IOneTimePasswordQuerier _oneTimePasswordQuerier;
   private readonly IOneTimePasswordRepository _oneTimePasswordRepository;
 
-  public ValidateOneTimePasswordCommandHandler(IApplicationContext applicationContext,
-    IOneTimePasswordQuerier oneTimePasswordQuerier, IOneTimePasswordRepository oneTimePasswordRepository)
+  public ValidateOneTimePasswordCommandHandler(IOneTimePasswordQuerier oneTimePasswordQuerier, IOneTimePasswordRepository oneTimePasswordRepository)
   {
-    _applicationContext = applicationContext;
     _oneTimePasswordQuerier = oneTimePasswordQuerier;
     _oneTimePasswordRepository = oneTimePasswordRepository;
   }
@@ -28,16 +25,16 @@ internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateO
     new ValidateOneTimePasswordValidator().ValidateAndThrow(payload);
 
     OneTimePasswordAggregate? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(command.Id, cancellationToken);
-    if (oneTimePassword == null || oneTimePassword.TenantId != _applicationContext.TenantId)
+    if (oneTimePassword == null || oneTimePassword.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     try
     {
-      oneTimePassword.Validate(payload.Password, _applicationContext.ActorId);
+      oneTimePassword.Validate(payload.Password, command.ActorId);
     }
     catch (IncorrectOneTimePasswordPasswordException)
     {
@@ -53,6 +50,6 @@ internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateO
 
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword, cancellationToken);
 
-    return await _oneTimePasswordQuerier.ReadAsync(oneTimePassword, cancellationToken);
+    return await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
   }
 }

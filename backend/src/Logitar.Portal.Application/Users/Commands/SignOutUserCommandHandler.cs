@@ -8,15 +8,12 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class SignOutUserCommandHandler : IRequestHandler<SignOutUserCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public SignOutUserCommandHandler(IApplicationContext applicationContext, ISessionRepository sessionRepository,
-    IUserQuerier userQuerier, IUserRepository userRepository)
+  public SignOutUserCommandHandler(ISessionRepository sessionRepository, IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _sessionRepository = sessionRepository;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -25,12 +22,12 @@ internal class SignOutUserCommandHandler : IRequestHandler<SignOutUserCommand, U
   public async Task<User?> Handle(SignOutUserCommand command, CancellationToken cancellationToken)
   {
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
     IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadActiveAsync(user, cancellationToken);
     foreach (SessionAggregate session in sessions)
     {
@@ -39,6 +36,6 @@ internal class SignOutUserCommandHandler : IRequestHandler<SignOutUserCommand, U
 
     await _sessionRepository.SaveAsync(sessions, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 }

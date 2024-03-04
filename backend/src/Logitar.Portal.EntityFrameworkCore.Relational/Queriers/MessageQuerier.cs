@@ -18,31 +18,28 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class MessageQuerier : IMessageQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly DbSet<MessageEntity> _messages;
   private readonly ISearchHelper _searchHelper;
   private readonly ISqlHelper _sqlHelper;
   private readonly DbSet<UserEntity> _users;
 
-  public MessageQuerier(IActorService actorService, IApplicationContext applicationContext,
-    IdentityContext identityContext, PortalContext portalContext, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public MessageQuerier(IActorService actorService, IdentityContext identityContext, PortalContext portalContext, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _messages = portalContext.Messages;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
     _users = identityContext.Users;
   }
 
-  public async Task<Message> ReadAsync(MessageAggregate message, CancellationToken cancellationToken)
+  public async Task<Message> ReadAsync(Realm? realm, MessageAggregate message, CancellationToken cancellationToken)
   {
-    return await ReadAsync(message.Id, cancellationToken)
+    return await ReadAsync(realm, message.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The message entity 'AggregateId={message.Id.Value}' could not be found.");
   }
-  public async Task<Message?> ReadAsync(MessageId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Message?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Message?> ReadAsync(Realm? realm, MessageId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<Message?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -52,8 +49,7 @@ internal class MessageQuerier : IMessageQuerier
       .Include(x => x.Template)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (message == null || message.TenantId != _applicationContext.TenantId?.Value)
+    if (message == null || message.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -61,10 +57,8 @@ internal class MessageQuerier : IMessageQuerier
     return await MapAsync(message, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Message>> SearchAsync(Realm? realm, SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
       .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.TemplateId)
       .ApplyRealmFilter(PortalDb.Messages.TenantId, realm)

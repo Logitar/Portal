@@ -94,7 +94,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       await _sessionRepository.SaveAsync(session, cancellationToken);
       await _configurationRepository.SaveAsync(configuration, cancellationToken);
 
-      return await _sessionQuerier.ReadAsync(session, cancellationToken);
+      return await _sessionQuerier.ReadAsync(realm: null, session, cancellationToken);
     }
     catch (Exception)
     {

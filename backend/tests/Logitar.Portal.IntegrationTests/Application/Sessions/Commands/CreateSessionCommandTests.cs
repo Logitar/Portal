@@ -9,12 +9,10 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 [Trait(Traits.Category, Categories.Integration)]
 public class CreateSessionCommandTests : IntegrationTests
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IUserRepository _userRepository;
 
   public CreateSessionCommandTests() : base()
   {
-    _applicationContext = ServiceProvider.GetRequiredService<IApplicationContext>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
@@ -71,7 +69,7 @@ public class CreateSessionCommandTests : IntegrationTests
     CreateSessionPayload payload = new(Faker.Person.UserName);
     CreateSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
-    Assert.Equal(_applicationContext.TenantId, exception.TenantId);
+    Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(payload.User, exception.User);
     Assert.Equal("User", exception.PropertyName);
   }

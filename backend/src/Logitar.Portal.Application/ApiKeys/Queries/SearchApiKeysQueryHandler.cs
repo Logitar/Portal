@@ -15,6 +15,6 @@ internal class SearchApiKeysQueryHandler : IRequestHandler<SearchApiKeysQuery, S
 
   public async Task<SearchResults<ApiKey>> Handle(SearchApiKeysQuery query, CancellationToken cancellationToken)
   {
-    return await _apiKeyQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _apiKeyQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

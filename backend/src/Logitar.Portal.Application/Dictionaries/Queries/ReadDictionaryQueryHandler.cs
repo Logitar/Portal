@@ -19,7 +19,7 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
 
     if (query.Id.HasValue)
     {
-      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;
@@ -28,7 +28,7 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
 
     if (!string.IsNullOrWhiteSpace(query.Locale))
     {
-      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Locale, cancellationToken);
+      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Locale, cancellationToken);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;

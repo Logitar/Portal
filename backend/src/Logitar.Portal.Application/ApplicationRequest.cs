@@ -1,10 +1,12 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Settings;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application;
 
@@ -35,22 +37,45 @@ public abstract record ApplicationRequest : IActivity
   public ActorId ActorId => new(Actor.Id);
 
   [JsonIgnore]
+  private Configuration Configuration => Context.Configuration;
+
+  [JsonIgnore]
   public Realm? Realm => Context.Realm;
   [JsonIgnore]
-  public TenantId? TenantId => Context.Realm == null ? null : new(new RealmId(Context.Realm.Id).Value);
+  public TenantId? TenantId => Realm?.GetTenantId();
 
   [JsonIgnore]
   public LocaleUnit? DefaultLocale
   {
     get
     {
-      Locale? defaultLocale = Context.Realm?.DefaultLocale ?? Context.Configuration.DefaultLocale;
+      Locale? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
       return defaultLocale == null ? null : new LocaleUnit(defaultLocale.Code);
     }
   }
+  [JsonIgnore]
+  public string Secret => Realm?.Secret ?? Configuration.Secret;
 
   [JsonIgnore]
-  public bool RequireUniqueEmail => Context.Realm?.RequireUniqueEmail ?? Context.Configuration.RequireUniqueEmail;
+  public IRoleSettings RoleSettings => new RoleSettings
+  {
+    UniqueName = Realm?.UniqueNameSettings ?? Configuration.UniqueNameSettings
+  };
+  [JsonIgnore]
+  public IUserSettings UserSettings
+  {
+    get
+    {
+      return new UserSettings
+      {
+        UniqueName = Realm?.UniqueNameSettings ?? Configuration.UniqueNameSettings,
+        Password = Realm?.PasswordSettings ?? Configuration.PasswordSettings,
+        RequireUniqueEmail = Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail
+      };
+    }
+  }
+  [JsonIgnore]
+  public bool RequireUniqueEmail => Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail;
 
   public virtual void Contextualize(ApplicationContext context)
   {

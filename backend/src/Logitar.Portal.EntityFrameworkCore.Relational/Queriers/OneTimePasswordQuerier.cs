@@ -15,37 +15,33 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly DbSet<OneTimePasswordEntity> _oneTimePasswords;
   private readonly ISearchHelper _searchHelper;
   private readonly ISqlHelper _sqlHelper;
 
-  public OneTimePasswordQuerier(IActorService actorService, IApplicationContext applicationContext,
-    IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public OneTimePasswordQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _oneTimePasswords = context.OneTimePasswords;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<OneTimePassword> ReadAsync(OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
+  public async Task<OneTimePassword> ReadAsync(Realm? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
   {
-    return await ReadAsync(oneTimePassword.Id, cancellationToken)
+    return await ReadAsync(realm, oneTimePassword.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The One-Time Password entity 'AggregateId={oneTimePassword.Id.Value}' could not be found.");
   }
-  public async Task<OneTimePassword?> ReadAsync(OneTimePasswordId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<OneTimePassword?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<OneTimePassword?> ReadAsync(Realm? realm, OneTimePasswordId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<OneTimePassword?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
     OneTimePasswordEntity? oneTimePassword = await _oneTimePasswords.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (oneTimePassword == null || oneTimePassword.TenantId != _applicationContext.TenantId?.Value)
+    if (oneTimePassword == null || oneTimePassword.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }

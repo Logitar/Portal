@@ -14,6 +14,6 @@ internal class ReadApiKeyQueryHandler : IRequestHandler<ReadApiKeyQuery, ApiKey?
 
   public async Task<ApiKey?> Handle(ReadApiKeyQuery query, CancellationToken cancellationToken)
   {
-    return await _apiKeyQuerier.ReadAsync(query.Id, cancellationToken);
+    return await _apiKeyQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }
 }

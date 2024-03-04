@@ -15,6 +15,6 @@ internal class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, Searc
 
   public async Task<SearchResults<User>> Handle(SearchUsersQuery query, CancellationToken cancellationToken)
   {
-    return await _sessionQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _sessionQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

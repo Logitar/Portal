@@ -14,16 +14,14 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 
 internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, Session>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IPasswordManager _passwordManager;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserManager _userManager;
 
-  public CreateSessionCommandHandler(IApplicationContext applicationContext, IPasswordManager passwordManager,
+  public CreateSessionCommandHandler(IPasswordManager passwordManager,
     ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserManager userManager)
   {
-    _applicationContext = applicationContext;
     _passwordManager = passwordManager;
     _sessionQuerier = sessionQuerier;
     _sessionRepository = sessionRepository;
@@ -35,7 +33,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     CreateSessionPayload payload = command.Payload;
     new CreateSessionValidator().ValidateAndThrow(payload);
 
-    TenantId? tenantId = _applicationContext.TenantId;
+    TenantId? tenantId = command.TenantId;
     FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.User, cancellationToken);
     UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.User, nameof(payload.User));
 
@@ -46,7 +44,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
       secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out secretString);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
     SessionAggregate session = user.SignIn(secret, actorId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
@@ -57,7 +55,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     await _userManager.SaveAsync(user, actorId, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
-    Session result = await _sessionQuerier.ReadAsync(session, cancellationToken);
+    Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
     if (secretString != null)
     {
       result.RefreshToken = RefreshToken.Encode(session.Id, secretString);

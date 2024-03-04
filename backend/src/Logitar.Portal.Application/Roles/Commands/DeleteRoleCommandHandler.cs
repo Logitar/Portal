@@ -7,15 +7,12 @@ namespace Logitar.Portal.Application.Roles.Commands;
 
 internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Role?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
   private readonly IRoleRepository _roleRepository;
 
-  public DeleteRoleCommandHandler(IApplicationContext applicationContext,
-    IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
+  public DeleteRoleCommandHandler(IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
   {
-    _applicationContext = applicationContext;
     _roleManager = roleManager;
     _roleQuerier = roleQuerier;
     _roleRepository = roleRepository;
@@ -24,13 +21,13 @@ internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Rol
   public async Task<Role?> Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
   {
     RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
-    if (role == null || role.TenantId != _applicationContext.TenantId)
+    if (role == null || role.TenantId != command.TenantId)
     {
       return null;
     }
-    Role result = await _roleQuerier.ReadAsync(role, cancellationToken);
+    Role result = await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
     role.Delete(actorId);
     await _roleManager.SaveAsync(role, actorId, cancellationToken);
 

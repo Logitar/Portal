@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Dictionaries.Commands;
 
 internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionaryCommand, Dictionary?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
-  public UpdateDictionaryCommandHandler(IApplicationContext applicationContext,
-    IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
+  public UpdateDictionaryCommandHandler(IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
   {
-    _applicationContext = applicationContext;
     _dictionaryManager = dictionaryManager;
     _dictionaryRepository = dictionaryRepository;
     _dictionaryQuerier = dictionaryQuerier;
@@ -30,12 +27,12 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
     new UpdateDictionaryValidator().ValidateAndThrow(payload);
 
     DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
-    if (dictionary == null || dictionary.TenantId != _applicationContext.TenantId)
+    if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     LocaleUnit? locale = LocaleUnit.TryCreate(payload.Locale);
     if (locale != null)
@@ -58,6 +55,6 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);
 
-    return await _dictionaryQuerier.ReadAsync(dictionary, cancellationToken);
+    return await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
   }
 }

@@ -19,7 +19,7 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
 
     if (query.Id.HasValue)
     {
-      Role? role = await _roleQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      Role? role = await _roleQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (role != null)
       {
         roles[role.Id] = role;
@@ -28,7 +28,7 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
 
     if (!string.IsNullOrWhiteSpace(query.UniqueName))
     {
-      Role? role = await _roleQuerier.ReadAsync(query.UniqueName, cancellationToken);
+      Role? role = await _roleQuerier.ReadAsync(query.Realm, query.UniqueName, cancellationToken);
       if (role != null)
       {
         roles[role.Id] = role;

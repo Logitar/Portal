@@ -7,15 +7,12 @@ namespace Logitar.Portal.Application.Realms.Commands;
 
 internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, Realm?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
 
-  public DeleteRealmCommandHandler(IApplicationContext applicationContext,
-    IRealmManager realmManager, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
+  public DeleteRealmCommandHandler(IRealmManager realmManager, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
   {
-    _applicationContext = applicationContext;
     _realmManager = realmManager;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
@@ -30,7 +27,7 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     }
     Realm result = await _realmQuerier.ReadAsync(realm, cancellationToken);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
     realm.Delete(actorId);
     await _realmManager.SaveAsync(realm, actorId, cancellationToken);
 

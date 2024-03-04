@@ -17,37 +17,33 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class RoleQuerier : IRoleQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly DbSet<RoleEntity> _roles;
   private readonly ISearchHelper _searchHelper;
   private readonly ISqlHelper _sqlHelper;
 
-  public RoleQuerier(IActorService actorService, IApplicationContext applicationContext,
-    IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public RoleQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _roles = context.Roles;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Role> ReadAsync(RoleAggregate role, CancellationToken cancellationToken)
+  public async Task<Role> ReadAsync(Realm? realm, RoleAggregate role, CancellationToken cancellationToken)
   {
-    return await ReadAsync(role.Id, cancellationToken)
+    return await ReadAsync(realm, role.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The role entity 'AggregateId={role.Id.Value}' could not be found.");
   }
-  public async Task<Role?> ReadAsync(RoleId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Role?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Role?> ReadAsync(Realm? realm, RoleId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<Role?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
     RoleEntity? role = await _roles.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (role == null || role.TenantId != _applicationContext.TenantId?.Value)
+    if (role == null || role.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -55,9 +51,9 @@ internal class RoleQuerier : IRoleQuerier
     return await MapAsync(role, realm, cancellationToken);
   }
 
-  public async Task<Role?> ReadAsync(string uniqueName, CancellationToken cancellationToken)
+  public async Task<Role?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken)
   {
-    string? tenantId = _applicationContext.TenantId?.Value;
+    string? tenantId = realm?.GetTenantId().Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     RoleEntity? role = await _roles.AsNoTracking()
@@ -68,13 +64,11 @@ internal class RoleQuerier : IRoleQuerier
       return null;
     }
 
-    return await MapAsync(role, _applicationContext.Realm, cancellationToken);
+    return await MapAsync(role, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Role>> SearchAsync(SearchRolesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Role>> SearchAsync(Realm? realm, SearchRolesPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Roles.Table).SelectAll(IdentityDb.Roles.Table)
       .ApplyRealmFilter(IdentityDb.Roles.TenantId, realm)
       .ApplyIdFilter(IdentityDb.Roles.AggregateId, payload.Ids);

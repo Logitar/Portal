@@ -14,15 +14,12 @@ namespace Logitar.Portal.Application.ApiKeys.Commands;
 
 internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyCommand, ApiKey?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IMediator _mediator;
 
-  public ReplaceApiKeyCommandHandler(IApplicationContext applicationContext,
-    IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator)
+  public ReplaceApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator)
   {
-    _applicationContext = applicationContext;
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
     _mediator = mediator;
@@ -34,7 +31,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     new ReplaceApiKeyValidator().ValidateAndThrow(payload);
 
     ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
-    if (apiKey == null || apiKey.TenantId != _applicationContext.TenantId)
+    if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;
     }
@@ -44,7 +41,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
       reference = await _apiKeyRepository.LoadAsync(apiKey.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     DisplayNameUnit displayName = new(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
@@ -67,7 +64,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     apiKey.Update(actorId);
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    return await _apiKeyQuerier.ReadAsync(apiKey, cancellationToken);
+    return await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
   }
 
   private static void ReplaceCustomAttributes(ReplaceApiKeyPayload payload, ApiKeyAggregate apiKey, ApiKeyAggregate? reference)

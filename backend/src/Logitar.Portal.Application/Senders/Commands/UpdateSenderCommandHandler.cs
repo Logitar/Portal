@@ -13,13 +13,11 @@ namespace Logitar.Portal.Application.Senders.Commands;
 
 internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand, Sender?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
 
-  public UpdateSenderCommandHandler(IApplicationContext applicationContext, ISenderQuerier senderQuerier, ISenderRepository senderRepository)
+  public UpdateSenderCommandHandler(ISenderQuerier senderQuerier, ISenderRepository senderRepository)
   {
-    _applicationContext = applicationContext;
     _senderQuerier = senderQuerier;
     _senderRepository = senderRepository;
   }
@@ -30,12 +28,12 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     new UpdateSenderValidator().ValidateAndThrow(payload);
 
     SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
-    if (sender == null || sender.TenantId != _applicationContext.TenantId)
+    if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     if (!string.IsNullOrWhiteSpace(payload.EmailAddress))
     {
@@ -55,7 +53,7 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     sender.Update(actorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);
 
-    return await _senderQuerier.ReadAsync(sender, cancellationToken);
+    return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 
   private static void SetSettings(UpdateSenderPayload payload, SenderAggregate sender, ActorId actorId)

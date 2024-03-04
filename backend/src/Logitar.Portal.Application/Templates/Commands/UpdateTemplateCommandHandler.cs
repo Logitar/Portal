@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Templates.Commands;
 
 internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateCommand, Template?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
   private readonly ITemplateRepository _templateRepository;
 
-  public UpdateTemplateCommandHandler(IApplicationContext applicationContext,
-    ITemplateManager templateManager, ITemplateQuerier templateQuerier, ITemplateRepository templateRepository)
+  public UpdateTemplateCommandHandler(ITemplateManager templateManager, ITemplateQuerier templateQuerier, ITemplateRepository templateRepository)
   {
-    _applicationContext = applicationContext;
     _templateManager = templateManager;
     _templateQuerier = templateQuerier;
     _templateRepository = templateRepository;
@@ -30,12 +27,12 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
     new UpdateTemplateValidator().ValidateAndThrow(payload);
 
     TemplateAggregate? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
-    if (template == null || template.TenantId != _applicationContext.TenantId)
+    if (template == null || template.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueKeyUnit? uniqueKey = UniqueKeyUnit.TryCreate(payload.UniqueKey);
     if (uniqueKey != null)
@@ -64,6 +61,6 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
     template.Update(actorId);
     await _templateManager.SaveAsync(template, actorId, cancellationToken);
 
-    return await _templateQuerier.ReadAsync(template, cancellationToken);
+    return await _templateQuerier.ReadAsync(command.Realm, template, cancellationToken);
   }
 }

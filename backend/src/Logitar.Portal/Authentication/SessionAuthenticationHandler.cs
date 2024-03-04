@@ -22,7 +22,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     Guid? sessionId = Context.GetSessionId();
     if (sessionId.HasValue)
     {
-      Session? session = await _sessionQuerier.ReadAsync(sessionId.Value);
+      Session? session = await _sessionQuerier.ReadAsync(realm: null, sessionId.Value);
       if (session == null)
       {
         return Fail($"The session 'Id={sessionId}' could not be found.");

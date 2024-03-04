@@ -1,5 +1,4 @@
 ﻿using Logitar.Identity.Domain;
-using Logitar.Identity.Domain.Settings;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
@@ -10,7 +9,6 @@ using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Application.Settings;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
@@ -27,8 +25,6 @@ public static class DependencyInjectionExtensions
       .AddFacades()
       .AddLogitarIdentityDomain()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
-      .AddSingleton<IRoleSettingsResolver, PortalRoleSettingsResolver>()
-      .AddSingleton<IUserSettingsResolver, PortalUserSettingsResolver>()
       .AddTransient(typeof(IPipelineBehavior<,>), typeof(ActivityLoggingBehavior<,>))
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()

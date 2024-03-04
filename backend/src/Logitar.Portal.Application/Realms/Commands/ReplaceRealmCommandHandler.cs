@@ -12,15 +12,12 @@ namespace Logitar.Portal.Application.Realms.Commands;
 
 internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand, Realm?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
   private readonly IRealmRepository _realmRepository;
 
-  public ReplaceRealmCommandHandler(IApplicationContext applicationContext,
-    IRealmManager realmManager, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
+  public ReplaceRealmCommandHandler(IRealmManager realmManager, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
   {
-    _applicationContext = applicationContext;
     _realmManager = realmManager;
     _realmQuerier = realmQuerier;
     _realmRepository = realmRepository;
@@ -42,7 +39,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
       reference = await _realmRepository.LoadAsync(realm.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueSlugUnit uniqueSlug = new(payload.UniqueSlug);
     if (reference == null || uniqueSlug != reference.UniqueSlug)
