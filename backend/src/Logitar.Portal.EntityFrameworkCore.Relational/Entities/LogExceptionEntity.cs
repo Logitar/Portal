@@ -56,8 +56,8 @@ internal class LogExceptionEntity
         object? value = exception.Data[key];
         if (value != null)
         {
-          string serializedKey = JsonSerializer.Serialize(key, key.GetType(), serializerOptions);
-          string serializedValue = JsonSerializer.Serialize(value, value.GetType(), serializerOptions);
+          string serializedKey = JsonSerializer.Serialize(key, key.GetType(), serializerOptions).Trim('"');
+          string serializedValue = JsonSerializer.Serialize(value, value.GetType(), serializerOptions).Trim('"');
           Data[serializedKey] = serializedValue;
         }
       }
