@@ -31,7 +31,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton<IRoleSettingsResolver, PortalRoleSettingsResolver>()
       .AddSingleton<IUserSettingsResolver, PortalUserSettingsResolver>()
       .AddScoped<IRequestPipeline, RequestPipeline>()
-      .AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
+      .AddTransient(typeof(IPipelineBehavior<,>), typeof(ActivityLoggingBehavior<,>))
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()
       .AddTransient<ITemplateManager, TemplateManager>();

@@ -40,7 +40,7 @@ internal class SendMessageCommandConsumer : IConsumer<SendMessageCommand>
     string? additionalInformation = JsonSerializer.Serialize(context.Headers, context.Headers.GetType());
     _loggingService.Open(correlationId?.ToString(), method: null, destination, source, additionalInformation);
 
-    Operation operation = new(nameof(MassTransit), GetType().Name); // TODO(fpion): gets overriden by CompileTemplateCommand
+    Operation operation = new(nameof(MassTransit), GetType().Name);
     _loggingService.SetOperation(operation);
 
     try

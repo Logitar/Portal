@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
@@ -7,7 +8,7 @@ using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application;
 
-public abstract record ApplicationRequest
+public abstract record ApplicationRequest : IActivity
 {
   [JsonIgnore]
   private ApplicationContext? _context = null;
@@ -51,8 +52,13 @@ public abstract record ApplicationRequest
   [JsonIgnore]
   public bool RequireUniqueEmail => Context.Realm?.RequireUniqueEmail ?? Context.Configuration.RequireUniqueEmail;
 
-  public void Contextualize(ApplicationContext context)
+  public virtual void Contextualize(ApplicationContext context)
   {
     _context = context;
+  }
+
+  public virtual IActivity GetActivity()
+  {
+    return this;
   }
 }
