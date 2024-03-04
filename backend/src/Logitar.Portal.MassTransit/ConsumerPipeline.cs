@@ -73,19 +73,18 @@ internal class ConsumerPipeline : IConsumerPipeline
   {
     Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
     Realm? realm = await ResolveRealmAsync(context);
-    User? user = await ResolveUserAsync(context, configuration, realm);
-
-    ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, user, Session: null);
-    request.Contextualize(applicationContext);
-
     if (realm != null)
     {
       _loggingService.SetRealm(realm);
     }
+    User? user = await ResolveUserAsync(context, configuration, realm);
     if (user != null)
     {
       _loggingService.SetUser(user);
     }
+
+    ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, user, Session: null);
+    request.Contextualize(applicationContext);
   }
   private async Task<Realm?> ResolveRealmAsync(ConsumeContext context)
   {
