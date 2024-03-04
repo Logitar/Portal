@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Portal.Application.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
@@ -45,6 +46,13 @@ internal class LogEntity
     EndedOn = (endedOn ?? DateTime.Now).ToUniversalTime();
   }
 
+  public LogLevel Level
+  {
+    get => HasErrors ? LogLevel.Error : LogLevel.Information;
+    private set { }
+  }
+  public bool HasErrors => Exceptions.Count > 0;
+
   public DateTime StartedOn { get; private set; }
   public DateTime? EndedOn { get; private set; }
   public TimeSpan? Duration
@@ -69,7 +77,11 @@ internal class LogEntity
     Events.Add(new LogEventEntity(this, @event));
   }
 
-  // TODO(fpion): Level, HasErrors, Errors(Serialized)
+  public List<LogExceptionEntity> Exceptions { get; private set; } = [];
+  public void Report(Exception exception)
+  {
+    Exceptions.Add(new LogExceptionEntity(this, exception));
+  }
 
   public LogEntity(string? correlationId, string? method, string? destination, string? source, string? additionalInformation, Guid? uniqueId = null, DateTime? startedOn = null)
   {

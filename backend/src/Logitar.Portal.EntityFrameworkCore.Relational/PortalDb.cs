@@ -30,6 +30,22 @@ internal static class PortalDb
     public static readonly ColumnId LogId = new(nameof(LogEventEntity.LogId));
   }
 
+  public static class LogExceptions
+  {
+    public static readonly TableId Table = new(nameof(PortalContext.LogExceptions));
+
+    public static readonly ColumnId Data = new(nameof(LogExceptionEntity.Data));
+    public static readonly ColumnId HResult = new(nameof(LogExceptionEntity.HResult));
+    public static readonly ColumnId HelpLink = new(nameof(LogExceptionEntity.HelpLink));
+    public static readonly ColumnId LogExceptionId = new(nameof(LogExceptionEntity.LogExceptionId));
+    public static readonly ColumnId LogId = new(nameof(LogExceptionEntity.LogId));
+    public static readonly ColumnId Message = new(nameof(LogExceptionEntity.Message));
+    public static readonly ColumnId Source = new(nameof(LogExceptionEntity.Source));
+    public static readonly ColumnId StackTrace = new(nameof(LogExceptionEntity.StackTrace));
+    public static readonly ColumnId TargetSite = new(nameof(LogExceptionEntity.TargetSite));
+    public static readonly ColumnId Type = new(nameof(LogExceptionEntity.Type));
+  }
+
   public static class Logs
   {
     public static readonly TableId Table = new(nameof(PortalContext.Logs));
@@ -43,7 +59,9 @@ internal static class PortalDb
     public static readonly ColumnId Destination = new(nameof(LogEntity.Destination));
     public static readonly ColumnId Duration = new(nameof(LogEntity.Duration));
     public static readonly ColumnId EndedOn = new(nameof(LogEntity.EndedOn));
+    public static readonly ColumnId HasErrors = new(nameof(LogEntity.HasErrors));
     public static readonly ColumnId IsCompleted = new(nameof(LogEntity.IsCompleted));
+    public static readonly ColumnId Level = new(nameof(LogEntity.Level));
     public static readonly ColumnId LogId = new(nameof(LogEntity.LogId));
     public static readonly ColumnId Method = new(nameof(LogEntity.Method));
     public static readonly ColumnId OperationName = new(nameof(LogEntity.OperationName));
@@ -55,7 +73,6 @@ internal static class PortalDb
     public static readonly ColumnId TenantId = new(nameof(LogEntity.TenantId));
     public static readonly ColumnId UniqueId = new(nameof(LogEntity.UniqueId));
     public static readonly ColumnId UserId = new(nameof(LogEntity.UserId));
-    // TODO(fpion): complete
   }
 
   public static class Messages

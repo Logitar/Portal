@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Configurations;
 
-internal class LogEventEntityConfiguration : IEntityTypeConfiguration<LogEventEntity>
+internal class LogEventConfiguration : IEntityTypeConfiguration<LogEventEntity>
 {
   public void Configure(EntityTypeBuilder<LogEventEntity> builder)
   {

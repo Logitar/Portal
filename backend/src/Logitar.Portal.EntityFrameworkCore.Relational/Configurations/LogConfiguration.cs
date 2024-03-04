@@ -3,6 +3,8 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Logging;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Configurations;
 
@@ -20,6 +22,8 @@ internal class LogConfiguration : IEntityTypeConfiguration<LogEntity>
     builder.HasIndex(x => x.ActivityType);
     builder.HasIndex(x => x.StatusCode);
     builder.HasIndex(x => x.IsCompleted);
+    builder.HasIndex(x => x.Level);
+    builder.HasIndex(x => x.HasErrors);
     builder.HasIndex(x => x.StartedOn);
     builder.HasIndex(x => x.EndedOn);
     builder.HasIndex(x => x.Duration);
@@ -36,12 +40,11 @@ internal class LogConfiguration : IEntityTypeConfiguration<LogEntity>
     builder.Property(x => x.OperationType).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.OperationName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.ActivityType).HasMaxLength(byte.MaxValue);
+    builder.Property(x => x.Level).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<LogLevel>());
     builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.ActorId).HasMaxLength(ActorId.MaximumLength);
     builder.Property(x => x.ApiKeyId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.UserId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.SessionId).HasMaxLength(AggregateId.MaximumLength);
-
-    // TODO(fpion): complete
   }
 }
