@@ -28,7 +28,7 @@ public static class DependencyInjectionExtensions
         }
         configurator.AddConsumers(Assembly.GetExecutingAssembly().GetTypes().Where(type => typeof(IConsumer).IsAssignableFrom(type)).ToArray());
       });
-      services.AddScoped<IPopulateRequest, PopulateRequest>();
+      services.AddScoped<IConsumerPipeline, ConsumerPipeline>();
     }
 
     return services;
