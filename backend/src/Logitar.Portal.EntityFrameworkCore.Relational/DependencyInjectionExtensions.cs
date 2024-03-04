@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.EventSourcing.Infrastructure;
+using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
@@ -34,7 +35,8 @@ public static class DependencyInjectionExtensions
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddQueriers()
       .AddRepositories()
-      .AddTransient<IActorService, ActorService>();
+      .AddTransient<IActorService, ActorService>()
+      .AddTransient<IEventBus, PortalEventBus>();
   }
 
   private static IServiceCollection AddQueriers(this IServiceCollection services)
