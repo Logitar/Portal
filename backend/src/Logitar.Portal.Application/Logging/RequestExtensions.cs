@@ -5,7 +5,7 @@ using Logitar.Portal.Application.Users.Commands;
 
 namespace Logitar.Portal.Application.Logging;
 
-internal static class RequestExtensions
+internal static class RequestExtensions // TODO(fpion): refactor using ApplicationRequest
 {
   private static readonly JsonSerializerOptions _serializerOptions = new();
   static RequestExtensions()
