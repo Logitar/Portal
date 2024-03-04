@@ -1,5 +1,8 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Logging;
+﻿using Logitar.Portal.Application.Logging;
+using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -7,12 +10,10 @@ namespace Logitar.Portal.Middlewares;
 
 internal class Logging
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly RequestDelegate _next;
 
-  public Logging(IApplicationContext applicationContext, RequestDelegate next)
+  public Logging(RequestDelegate next)
   {
-    _applicationContext = applicationContext;
     _next = next;
   }
 
@@ -33,7 +34,26 @@ internal class Logging
     }
     finally
     {
-      //loggingService.SetActors(_applicationContext.ActorId.ToGuid(), context.GetUser()?.Id, context.GetSessionId()); // TODO(fpion): implement
+      Realm? realm = context.GetRealm();
+      if (realm != null)
+      {
+        loggingService.SetRealm(realm);
+      }
+      ApiKey? apiKey = context.GetApiKey();
+      if (apiKey != null)
+      {
+        loggingService.SetApiKey(apiKey);
+      }
+      User? user = context.GetUser();
+      if (user != null)
+      {
+        loggingService.SetUser(user);
+      }
+      Session? session = context.GetSession();
+      if (session != null)
+      {
+        loggingService.SetSession(session);
+      }
 
       HttpResponse response = context.Response;
       await loggingService.CloseAndSaveAsync(response.StatusCode);

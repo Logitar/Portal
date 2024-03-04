@@ -53,7 +53,15 @@ internal class LogEntity
     private set { }
   }
 
-  // TODO(fpion): Actors
+  public string? TenantId { get; set; }
+  public string ActorId
+  {
+    get => UserId ?? ApiKeyId ?? EventSourcing.ActorId.DefaultValue;
+    private set { }
+  }
+  public string? ApiKeyId { get; set; }
+  public string? UserId { get; set; }
+  public string? SessionId { get; set; }
 
   public List<LogEventEntity> Events { get; private set; } = [];
   public void Report(DomainEvent @event)

@@ -1,4 +1,8 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Contracts.ApiKeys;
+using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Logging;
 
@@ -9,5 +13,9 @@ public interface ILoggingService
   void Report(Exception exception);
   void SetActivity(object activity);
   void SetOperation(Operation operation);
+  void SetRealm(Realm realm);
+  void SetApiKey(ApiKey apiKey);
+  void SetSession(Session session);
+  void SetUser(User user);
   Task CloseAndSaveAsync(int statusCode);
 }
