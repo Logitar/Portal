@@ -6,7 +6,6 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
-using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
@@ -77,9 +76,6 @@ public abstract class IntegrationTests : IAsyncLifetime
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };
-
-    ILoggingService loggingService = ServiceProvider.GetRequiredService<ILoggingService>();
-    loggingService.Open(); // TODO(fpion): refactor
   }
 
   public virtual async Task InitializeAsync()
