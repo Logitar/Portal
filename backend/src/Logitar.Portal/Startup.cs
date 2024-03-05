@@ -8,6 +8,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.GraphQL;
+using Logitar.Portal.Infrastructure;
 using Logitar.Portal.MassTransit;
 using Logitar.Portal.Middlewares;
 using Logitar.Portal.Settings;

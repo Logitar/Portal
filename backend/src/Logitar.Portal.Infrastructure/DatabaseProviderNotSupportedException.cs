@@ -1,6 +1,6 @@
-﻿namespace Logitar.Portal;
+﻿namespace Logitar.Portal.Infrastructure;
 
-internal class DatabaseProviderNotSupportedException : NotSupportedException
+public class DatabaseProviderNotSupportedException : NotSupportedException
 {
   public const string ErrorMessage = "The specified database provider is not supported.";
 

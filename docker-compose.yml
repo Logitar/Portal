@@ -3,11 +3,18 @@ services:
   portal_mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: Logitar.Portal_mssql
-    ports:
-      - 1437:1433
     environment:
       ACCEPT_EULA: 'Y'
       SA_PASSWORD: w8x6pF9H5QEJL7sN
+    ports:
+      - 1437:1433
+
+  portal_rabbitmq:
+    image: masstransit/rabbitmq
+    container_name: Logitar.Portal_rabbitmq
+    ports:
+      - 5677:5672
+      - 15677:15672
 
   portal_backend:
     build:
@@ -24,9 +31,15 @@ services:
     ports:
       - 8087:8080
 
-  portal_rabbitmq:
-    image: masstransit/rabbitmq
-    container_name: Logitar.Portal_rabbitmq
-    ports:
-      - 5677:5672
-      - 15677:15672
+  portal_worker:
+    build:
+      context: ./backend
+      dockerfile: /src/Logitar.Portal.Worker/Dockerfile
+    image: portal_worker
+    container_name: Logitar.Portal_worker
+    depends_on:
+      - portal_mssql
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_Environment: Development
+      SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
