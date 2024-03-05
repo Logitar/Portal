@@ -6,5 +6,5 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 
 internal class PostgresSearchHelper : SearchHelper
 {
-  protected override ConditionalOperator CreateOperator(string pattern) => PostgresOperators.IsNotLikeInsensitive(pattern);
+  protected override ConditionalOperator CreateOperator(string pattern) => PostgresOperators.IsLikeInsensitive(pattern);
 }
