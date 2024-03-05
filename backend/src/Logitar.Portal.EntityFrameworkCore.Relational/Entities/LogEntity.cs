@@ -69,8 +69,8 @@ internal class LogEntity
     Level = log.Level;
     HasErrors = log.HasErrors;
 
-    StartedOn = log.StartedOn;
-    EndedOn = log.EndedOn;
+    StartedOn = log.StartedOn.ToUniversalTime();
+    EndedOn = log.EndedOn?.ToUniversalTime();
     Duration = log.Duration;
 
     TenantId = log.TenantId?.Value;
