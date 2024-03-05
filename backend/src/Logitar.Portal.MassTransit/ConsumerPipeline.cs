@@ -21,9 +21,9 @@ internal class ConsumerPipeline : IConsumerPipeline
   private readonly ICacheService _cacheService;
   private readonly ILoggingService _loggingService;
   private readonly IMediator _mediator;
-  private readonly MassTransitSettings _settings;
+  private readonly IMassTransitSettings _settings;
 
-  public ConsumerPipeline(ICacheService cacheService, ILoggingService loggingService, IMediator mediator, MassTransitSettings settings)
+  public ConsumerPipeline(ICacheService cacheService, ILoggingService loggingService, IMediator mediator, IMassTransitSettings settings)
   {
     _cacheService = cacheService;
     _loggingService = loggingService;

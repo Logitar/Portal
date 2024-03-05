@@ -31,7 +31,7 @@ public static class DependencyInjectionExtensions
       services.AddScoped<IConsumerPipeline, ConsumerPipeline>();
     }
 
-    return services;
+    return services.AddSingleton(settings);
   }
 
   private static void AddMassTransitRabbitMQ(this IBusRegistrationConfigurator configurator, RabbitMqSettings settings)
