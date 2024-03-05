@@ -90,21 +90,21 @@ public abstract class IntegrationTests : IAsyncLifetime
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
-    await publisher.Publish(new InitializeConfigurationCommand());
+    await publisher.Publish(new InitializeConfigurationCommand(UsernameString, PasswordString));
 
     IUserRepository userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
-    UserAggregate user = (await userRepository.LoadAsync()).Single();
-    ActorId actorId = new(user.Id.Value);
-    user.FirstName = new PersonNameUnit(Faker.Person.FirstName);
-    user.LastName = new PersonNameUnit(Faker.Person.LastName);
-    user.Update(actorId);
+    UserAggregate userAggregate = Assert.Single(await userRepository.LoadAsync());
+    ActorId actorId = new(userAggregate.Id.Value);
+    userAggregate.FirstName = new PersonNameUnit(Faker.Person.FirstName);
+    userAggregate.LastName = new PersonNameUnit(Faker.Person.LastName);
+    userAggregate.Update(actorId);
     EmailUnit email = new(Faker.Person.Email, isVerified: false);
-    user.SetEmail(email, actorId);
-    await userRepository.SaveAsync(user);
+    userAggregate.SetEmail(email, actorId);
+    await userRepository.SaveAsync(userAggregate);
 
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    User? userModel = await userQuerier.ReadAsync(realm: null, user.Id.ToGuid());
-    SetUser(userModel);
+    User? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    SetUser(user);
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;

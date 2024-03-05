@@ -2,4 +2,4 @@
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-public record InitializeConfigurationCommand : INotification;
+public record InitializeConfigurationCommand(string UniqueName, string Password) : INotification;

@@ -27,7 +27,7 @@ internal class InitializeConfigurationCommandHandler : INotificationHandler<Init
     _userManager = userManager;
   }
 
-  public async Task Handle(InitializeConfigurationCommand _, CancellationToken cancellationToken)
+  public async Task Handle(InitializeConfigurationCommand command, CancellationToken cancellationToken)
   {
     ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
     if (configuration == null)
@@ -43,10 +43,10 @@ internal class InitializeConfigurationCommandHandler : INotificationHandler<Init
         RequireUniqueEmail = configuration.RequireUniqueEmail
       };
 
-      UniqueNameUnit uniqueName = new(userSettings.UniqueName, "portal");
+      UniqueNameUnit uniqueName = new(userSettings.UniqueName, command.UniqueName);
       UserAggregate user = new(uniqueName, tenantId: null, actorId, userId);
 
-      Password password = _passwordManager.ValidateAndCreate("P@s$W0rD", userSettings.Password);
+      Password password = _passwordManager.ValidateAndCreate(command.Password, userSettings.Password);
       user.SetPassword(password, actorId);
 
       await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
