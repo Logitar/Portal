@@ -12,15 +12,12 @@ namespace Logitar.Portal.Application.Roles.Commands;
 
 internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Role?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
   private readonly IRoleRepository _roleRepository;
 
-  public UpdateRoleCommandHandler(IApplicationContext applicationContext,
-    IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
+  public UpdateRoleCommandHandler(IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
   {
-    _applicationContext = applicationContext;
     _roleManager = roleManager;
     _roleQuerier = roleQuerier;
     _roleRepository = roleRepository;
@@ -28,18 +25,18 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
 
   public async Task<Role?> Handle(UpdateRoleCommand command, CancellationToken cancellationToken)
   {
-    IRoleSettings roleSettings = _applicationContext.RoleSettings;
+    IRoleSettings roleSettings = command.RoleSettings;
 
     UpdateRolePayload payload = command.Payload;
     new UpdateRoleValidator(roleSettings).ValidateAndThrow(payload);
 
     RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
-    if (role == null || role.TenantId != _applicationContext.TenantId)
+    if (role == null || role.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueNameUnit? uniqueName = UniqueNameUnit.TryCreate(roleSettings.UniqueName, payload.UniqueName);
     if (uniqueName != null)
@@ -70,6 +67,6 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
     role.Update(actorId);
     await _roleManager.SaveAsync(role, actorId, cancellationToken);
 
-    return await _roleQuerier.ReadAsync(role, cancellationToken);
+    return await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
   }
 }

@@ -14,16 +14,14 @@ namespace Logitar.Portal.Application.ApiKeys.Commands;
 
 internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand, ApiKey>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
 
-  public CreateApiKeyCommandHandler(IApplicationContext applicationContext, IApiKeyQuerier apiKeyQuerier,
+  public CreateApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier,
     IApiKeyRepository apiKeyRepository, IMediator mediator, IPasswordManager passwordManager)
   {
-    _applicationContext = applicationContext;
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
     _mediator = mediator;
@@ -35,11 +33,11 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     CreateApiKeyPayload payload = command.Payload;
     new CreateApiKeyValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     DisplayNameUnit displayName = new(payload.DisplayName);
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secretString);
-    ApiKeyAggregate apiKey = new(displayName, secret, _applicationContext.TenantId, actorId)
+    ApiKeyAggregate apiKey = new(displayName, secret, command.TenantId, actorId)
     {
       Description = DescriptionUnit.TryCreate(payload.Description)
     };
@@ -62,7 +60,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     apiKey.Update(actorId);
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    ApiKey result = await _apiKeyQuerier.ReadAsync(apiKey, cancellationToken);
+    ApiKey result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
     result.XApiKey = XApiKey.Encode(apiKey.Id, secretString);
     return result;
   }

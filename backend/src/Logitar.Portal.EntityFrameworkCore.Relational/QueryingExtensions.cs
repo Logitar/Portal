@@ -1,6 +1,7 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application;
 using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -26,7 +27,7 @@ internal static class QueryingExtensions
       return builder.Where(column, Operators.IsNull());
     }
 
-    TenantId tenantId = new(new AggregateId(realm.Id).Value);
+    TenantId tenantId = realm.GetTenantId();
     return builder.Where(column, Operators.IsEqualTo(tenantId.Value));
   }
 }

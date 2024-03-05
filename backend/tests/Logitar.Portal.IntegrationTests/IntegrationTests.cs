@@ -1,17 +1,18 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.Data.SqlServer;
-using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
-using Logitar.Portal.Application.Pipeline;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
+using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
@@ -27,23 +28,19 @@ public abstract class IntegrationTests : IAsyncLifetime
 {
   protected const string PasswordString = "P@s$W0rD";
 
+  private readonly TestContext _context;
   private readonly bool _initializeConfiguration;
 
   protected Faker Faker { get; } = new();
 
   protected IServiceProvider ServiceProvider { get; }
   protected IMediator Mediator { get; }
-  protected IRequestPipeline Pipeline { get; }
   protected EventContext EventContext { get; }
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
-  protected Uri BaseUri => ApplicationContext.BaseUri;
-
   protected Realm Realm { get; }
-  protected TenantId TenantId => new(new AggregateId(Realm.Id).Value);
-
-  private TestApplicationContext ApplicationContext => (TestApplicationContext)ServiceProvider.GetRequiredService<IApplicationContext>();
+  protected TenantId TenantId => Realm.GetTenantId();
 
   protected IntegrationTests(bool initializeConfiguration = true)
   {
@@ -60,11 +57,14 @@ public abstract class IntegrationTests : IAsyncLifetime
     ServiceProvider = new ServiceCollection()
       .AddSingleton(configuration)
       .AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString)
-      .AddSingleton<IApplicationContext, TestApplicationContext>()
+      .AddScoped<IBaseUrl, TestBaseUrl>()
+      .AddScoped<TestContext>()
+      .AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>))
       .BuildServiceProvider();
 
+    _context = ServiceProvider.GetRequiredService<TestContext>();
+
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
-    Pipeline = ServiceProvider.GetRequiredService<IRequestPipeline>();
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
@@ -77,6 +77,9 @@ public abstract class IntegrationTests : IAsyncLifetime
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };
+
+    ILoggingService loggingService = ServiceProvider.GetRequiredService<ILoggingService>();
+    loggingService.Open(); // TODO(fpion): refactor
   }
 
   public virtual async Task InitializeAsync()
@@ -93,28 +96,40 @@ public abstract class IntegrationTests : IAsyncLifetime
 
     if (_initializeConfiguration)
     {
-      UserPayload user = new(Faker.Person.UserName, PasswordString)
+      UserPayload userPayload = new(Faker.Person.UserName, PasswordString)
       {
         EmailAddress = Faker.Person.Email,
         FirstName = Faker.Person.FirstName,
         LastName = Faker.Person.LastName
       };
-      SessionPayload session = new();
-      session.CustomAttributes.Add(new CustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
-      session.CustomAttributes.Add(new CustomAttribute("IpAddress", Faker.Internet.Ip()));
-      InitializeConfigurationPayload payload = new(user, session)
+      SessionPayload sessionPayload = new();
+      sessionPayload.CustomAttributes.Add(new CustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
+      sessionPayload.CustomAttributes.Add(new CustomAttribute("IpAddress", Faker.Internet.Ip()));
+      InitializeConfigurationPayload payload = new(userPayload, sessionPayload)
       {
         DefaultLocale = Faker.Locale
       };
       InitializeConfigurationCommand command = new(payload);
-      await Mediator.Send(command);
+      Session session = await Mediator.Send(command);
+      SetSession(session);
     }
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
-  protected void SetActor(Actor actor) => ApplicationContext.Actor = actor;
-
-  protected void SetRealm() => SetRealm(Realm);
-  protected void SetRealm(Realm? realm) => ApplicationContext.Realm = realm;
+  protected void SetRealm() => _context.Realm = Realm;
+  protected void SetApiKey(ApiKey? apiKey)
+  {
+    _context.ApiKey = apiKey;
+  }
+  protected void SetUser(User? user)
+  {
+    _context.User = user;
+    _context.Session = null;
+  }
+  protected void SetSession(Session? session)
+  {
+    _context.User = session?.User;
+    _context.Session = session;
+  }
 }

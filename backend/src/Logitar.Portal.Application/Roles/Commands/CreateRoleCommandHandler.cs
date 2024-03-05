@@ -12,28 +12,26 @@ namespace Logitar.Portal.Application.Roles.Commands;
 
 internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Role>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
 
-  public CreateRoleCommandHandler(IApplicationContext applicationContext, IRoleManager roleManager, IRoleQuerier roleQuerier)
+  public CreateRoleCommandHandler(IRoleManager roleManager, IRoleQuerier roleQuerier)
   {
-    _applicationContext = applicationContext;
     _roleManager = roleManager;
     _roleQuerier = roleQuerier;
   }
 
   public async Task<Role> Handle(CreateRoleCommand command, CancellationToken cancellationToken)
   {
-    IRoleSettings roleSettings = _applicationContext.RoleSettings;
+    IRoleSettings roleSettings = command.RoleSettings;
 
     CreateRolePayload payload = command.Payload;
     new CreateRoleValidator(roleSettings).ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
-    RoleAggregate role = new(uniqueName, _applicationContext.TenantId, actorId)
+    RoleAggregate role = new(uniqueName, command.TenantId, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
       Description = DescriptionUnit.TryCreate(payload.Description)
@@ -46,6 +44,6 @@ internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Rol
 
     await _roleManager.SaveAsync(role, actorId, cancellationToken);
 
-    return await _roleQuerier.ReadAsync(role, cancellationToken);
+    return await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
   }
 }

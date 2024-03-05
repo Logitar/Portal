@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Queries;
 
-internal record ReadOneTimePasswordQuery(Guid Id) : IRequest<OneTimePassword?>;
+internal record ReadOneTimePasswordQuery(Guid Id) : ApplicationRequest, IRequest<OneTimePassword?>;

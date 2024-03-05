@@ -18,29 +18,26 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class SessionQuerier : ISessionQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly ISearchHelper _searchHelper;
   private readonly DbSet<SessionEntity> _sessions;
   private readonly ISqlHelper _sqlHelper;
 
-  public SessionQuerier(IActorService actorService, IApplicationContext applicationContext,
-    IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public SessionQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _sessions = context.Sessions;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Session> ReadAsync(SessionAggregate session, CancellationToken cancellationToken)
+  public async Task<Session> ReadAsync(Realm? realm, SessionAggregate session, CancellationToken cancellationToken)
   {
-    return await ReadAsync(session.Id, cancellationToken)
+    return await ReadAsync(realm, session.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The session entity 'AggregateId={session.Id.Value}' could not be found.");
   }
-  public async Task<Session?> ReadAsync(SessionId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Session?> ReadAsync(Realm? realm, SessionId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<Session?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -49,8 +46,7 @@ internal class SessionQuerier : ISessionQuerier
       .Include(x => x.User).ThenInclude(x => x!.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (session == null || session.User == null || session.User.TenantId != _applicationContext.TenantId?.Value)
+    if (session == null || session.User == null || session.User.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -58,10 +54,8 @@ internal class SessionQuerier : ISessionQuerier
     return await MapAsync(session, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Session>> SearchAsync(Realm? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Sessions.Table).SelectAll(IdentityDb.Sessions.Table)
       .Join(IdentityDb.Users.UserId, IdentityDb.Sessions.UserId)
       .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)

@@ -12,14 +12,11 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
 {
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
-  private readonly IApplicationContext _applicationContext;
 
-  public AuthenticateApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier,
-    IApiKeyRepository apiKeyRepository, IApplicationContext applicationContext)
+  public AuthenticateApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository)
   {
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
-    _applicationContext = applicationContext;
   }
 
   public async Task<ApiKey> Handle(AuthenticateApiKeyCommand command, CancellationToken cancellationToken)
@@ -39,16 +36,16 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
 
     ApiKeyAggregate apiKey = await _apiKeyRepository.LoadAsync(xApiKey.Id, cancellationToken)
       ?? throw new ApiKeyNotFoundException(xApiKey.Id, nameof(payload.XApiKey));
-    if (apiKey.TenantId != _applicationContext.TenantId)
+    if (apiKey.TenantId != command.TenantId)
     {
       throw new ApiKeyNotFoundException(apiKey.Id, nameof(payload.XApiKey));
     }
 
-    ActorId? actorId = _applicationContext.Actor.Type == ActorType.System ? null : _applicationContext.ActorId;
+    ActorId? actorId = command.Actor.Type == ActorType.System ? null : command.ActorId;
     apiKey.Authenticate(xApiKey.Secret, actorId);
 
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    return await _apiKeyQuerier.ReadAsync(apiKey, cancellationToken);
+    return await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
   }
 }

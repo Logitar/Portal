@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Templates.Commands;
 
 internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCommand, Template?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
   private readonly ITemplateRepository _templateRepository;
 
-  public ReplaceTemplateCommandHandler(IApplicationContext applicationContext,
-    ITemplateManager templateManager, ITemplateQuerier templateQuerier, ITemplateRepository templateRepository)
+  public ReplaceTemplateCommandHandler(ITemplateManager templateManager, ITemplateQuerier templateQuerier, ITemplateRepository templateRepository)
   {
-    _applicationContext = applicationContext;
     _templateManager = templateManager;
     _templateQuerier = templateQuerier;
     _templateRepository = templateRepository;
@@ -30,7 +27,7 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     new ReplaceTemplateValidator().ValidateAndThrow(payload);
 
     TemplateAggregate? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
-    if (template == null || template.TenantId != _applicationContext.TenantId)
+    if (template == null || template.TenantId != command.TenantId)
     {
       return null;
     }
@@ -40,7 +37,7 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
       reference = await _templateRepository.LoadAsync(template.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueKeyUnit uniqueKey = new(payload.UniqueKey);
     if (reference == null || uniqueKey != reference.UniqueKey)
@@ -72,6 +69,6 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     template.Update(actorId);
     await _templateManager.SaveAsync(template, actorId, cancellationToken);
 
-    return await _templateQuerier.ReadAsync(template, cancellationToken);
+    return await _templateQuerier.ReadAsync(command.Realm, template, cancellationToken);
   }
 }

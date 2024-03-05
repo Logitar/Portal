@@ -10,15 +10,12 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdentifierCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public SaveUserIdentifierCommandHandler(IApplicationContext applicationContext,
-    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public SaveUserIdentifierCommandHandler(IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _userManager = userManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
@@ -30,16 +27,16 @@ internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdenti
     new CustomIdentifierContractValidator().ValidateAndThrow(identifier);
 
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     user.SetCustomIdentifier(identifier.Key, identifier.Value, actorId);
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 }

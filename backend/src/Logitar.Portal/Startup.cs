@@ -14,6 +14,7 @@ using Logitar.Portal.Settings;
 using Logitar.Portal.Web;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
@@ -96,9 +97,10 @@ internal class Startup : StartupBase
     }
 
     services.AddDistributedMemoryCache();
-    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
+    services.AddSingleton<IBaseUrl, HttpBaseUrl>();
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualizationBehavior<,>));
   }
 
   public override void Configure(IApplicationBuilder builder)

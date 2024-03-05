@@ -15,6 +15,6 @@ internal class SearchTemplatesQueryHandler : IRequestHandler<SearchTemplatesQuer
 
   public async Task<SearchResults<Template>> Handle(SearchTemplatesQuery query, CancellationToken cancellationToken)
   {
-    return await _templateQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _templateQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

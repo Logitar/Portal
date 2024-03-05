@@ -13,15 +13,12 @@ namespace Logitar.Portal.Application.ApiKeys.Commands;
 
 internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand, ApiKey?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IMediator _mediator;
 
-  public UpdateApiKeyCommandHandler(IApplicationContext applicationContext,
-    IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator)
+  public UpdateApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator)
   {
-    _applicationContext = applicationContext;
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
     _mediator = mediator;
@@ -33,12 +30,12 @@ internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand,
     new UpdateApiKeyValidator().ValidateAndThrow(payload);
 
     ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
-    if (apiKey == null || apiKey.TenantId != _applicationContext.TenantId)
+    if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
     if (displayName != null)
@@ -83,6 +80,6 @@ internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand,
     apiKey.Update(actorId);
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    return await _apiKeyQuerier.ReadAsync(apiKey, cancellationToken);
+    return await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
   }
 }

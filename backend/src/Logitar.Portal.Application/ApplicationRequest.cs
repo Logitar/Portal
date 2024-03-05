@@ -1,40 +1,89 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Settings;
+using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application.Logging;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Domain.Realms;
 
 namespace Logitar.Portal.Application;
 
-public abstract record ApplicationRequest
+public abstract record ApplicationRequest : IActivity
 {
   [JsonIgnore]
-  public Actor Actor { get; private set; }
+  private ApplicationContext? _context = null;
+  [JsonIgnore]
+  protected ApplicationContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
+
+  [JsonIgnore]
+  public Actor Actor
+  {
+    get
+    {
+      if (Context.User != null)
+      {
+        return new Actor(Context.User);
+      }
+      else if (Context.ApiKey != null)
+      {
+        return new Actor(Context.ApiKey);
+      }
+      return Actor.System;
+    }
+  }
   [JsonIgnore]
   public ActorId ActorId => new(Actor.Id);
 
-  private Configuration? _configuration = null;
   [JsonIgnore]
-  public Configuration Configuration => _configuration ?? throw new InvalidOperationException($"The {nameof(Configuration)} has not been initialized yet.");
+  private Configuration Configuration => Context.Configuration;
+
   [JsonIgnore]
-  public Realm? Realm { get; private set; }
+  public Realm? Realm => Context.Realm;
   [JsonIgnore]
-  public LocaleUnit? DefaultLocale => LocaleUnit.TryCreate((Realm?.DefaultLocale ?? Configuration.DefaultLocale)?.Code);
+  public TenantId? TenantId => Realm?.GetTenantId();
+
+  [JsonIgnore]
+  public LocaleUnit? DefaultLocale
+  {
+    get
+    {
+      Locale? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
+      return defaultLocale == null ? null : new LocaleUnit(defaultLocale.Code);
+    }
+  }
+  [JsonIgnore]
+  public string Secret => Realm?.Secret ?? Configuration.Secret;
+
+  [JsonIgnore]
+  public IRoleSettings RoleSettings => new RoleSettings
+  {
+    UniqueName = Realm?.UniqueNameSettings ?? Configuration.UniqueNameSettings
+  };
+  [JsonIgnore]
+  public IUserSettings UserSettings
+  {
+    get
+    {
+      return new UserSettings
+      {
+        UniqueName = Realm?.UniqueNameSettings ?? Configuration.UniqueNameSettings,
+        Password = Realm?.PasswordSettings ?? Configuration.PasswordSettings,
+        RequireUniqueEmail = Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail
+      };
+    }
+  }
   [JsonIgnore]
   public bool RequireUniqueEmail => Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail;
-  [JsonIgnore]
-  public TenantId? TenantId => Realm == null ? null : new(new RealmId(Realm.Id).Value);
 
-  protected ApplicationRequest()
+  public virtual void Contextualize(ApplicationContext context)
   {
-    Actor = Actor.System;
+    _context = context;
   }
 
-  public void Populate(Actor actor, Configuration configuration, Realm? realm)
+  public virtual IActivity GetActivity()
   {
-    Actor = actor;
-    _configuration = configuration;
-    Realm = realm;
+    return this;
   }
 }

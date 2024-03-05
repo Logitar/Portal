@@ -15,6 +15,6 @@ internal class SearchSessionsQueryHandler : IRequestHandler<SearchSessionsQuery,
 
   public async Task<SearchResults<Session>> Handle(SearchSessionsQuery query, CancellationToken cancellationToken)
   {
-    return await _sessionQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _sessionQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

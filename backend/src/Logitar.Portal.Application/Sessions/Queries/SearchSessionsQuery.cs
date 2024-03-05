@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Queries;
 
-internal record SearchSessionsQuery(SearchSessionsPayload Payload) : IRequest<SearchResults<Session>>;
+internal record SearchSessionsQuery(SearchSessionsPayload Payload) : ApplicationRequest, IRequest<SearchResults<Session>>;

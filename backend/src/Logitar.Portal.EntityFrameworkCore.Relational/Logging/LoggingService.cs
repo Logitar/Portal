@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts.ApiKeys;
@@ -11,7 +12,7 @@ using Logitar.Portal.Infrastructure;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 
-internal class LoggingService : ILoggingService
+internal class LoggingService : ILoggingService // TODO(fpion): should be in the Infrastructure layer!
 {
   private readonly JsonSerializerOptions _serializerOptions = new();
 
@@ -65,7 +66,7 @@ internal class LoggingService : ILoggingService
   public void SetRealm(Realm realm)
   {
     AssertLogIsOpen();
-    _log!.TenantId = new AggregateId(realm.Id).Value;
+    _log!.TenantId = realm.GetTenantId().Value;
   }
 
   public void SetApiKey(ApiKey apiKey)

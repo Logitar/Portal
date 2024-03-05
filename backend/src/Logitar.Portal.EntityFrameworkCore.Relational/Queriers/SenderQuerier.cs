@@ -17,37 +17,33 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class SenderQuerier : ISenderQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly ISearchHelper _searchHelper;
   private readonly DbSet<SenderEntity> _senders;
   private readonly ISqlHelper _sqlHelper;
 
-  public SenderQuerier(IActorService actorService, IApplicationContext applicationContext,
-    PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public SenderQuerier(IActorService actorService, PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _searchHelper = searchHelper;
     _senders = context.Senders;
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Sender> ReadAsync(SenderAggregate sender, CancellationToken cancellationToken)
+  public async Task<Sender> ReadAsync(Realm? realm, SenderAggregate sender, CancellationToken cancellationToken)
   {
-    return await ReadAsync(sender.Id, cancellationToken)
+    return await ReadAsync(realm, sender.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The sender entity 'AggregateId={sender.Id.Value}' could not be found.");
   }
-  public async Task<Sender?> ReadAsync(SenderId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Sender?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<Sender?> ReadAsync(Realm? realm, SenderId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+  public async Task<Sender?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    Realm? realm = _applicationContext.Realm;
-    if (sender == null || sender.TenantId != _applicationContext.TenantId?.Value)
+    if (sender == null || sender.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -55,9 +51,9 @@ internal class SenderQuerier : ISenderQuerier
     return await MapAsync(sender, realm, cancellationToken);
   }
 
-  public async Task<Sender?> ReadDefaultAsync(CancellationToken cancellationToken)
+  public async Task<Sender?> ReadDefaultAsync(Realm? realm, CancellationToken cancellationToken)
   {
-    string? tenantId = _applicationContext.TenantId?.Value;
+    string? tenantId = realm?.GetTenantId().Value;
 
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.IsDefault, cancellationToken);
@@ -67,13 +63,11 @@ internal class SenderQuerier : ISenderQuerier
       return null;
     }
 
-    return await MapAsync(sender, _applicationContext.Realm, cancellationToken);
+    return await MapAsync(sender, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Sender>> SearchAsync(SearchSendersPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Sender>> SearchAsync(Realm? realm, SearchSendersPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Senders.Table).SelectAll(PortalDb.Senders.Table)
       .ApplyRealmFilter(PortalDb.Senders.TenantId, realm)
       .ApplyIdFilter(PortalDb.Senders.AggregateId, payload.Ids);

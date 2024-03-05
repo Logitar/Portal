@@ -28,10 +28,10 @@ public static class DependencyInjectionExtensions
         }
         configurator.AddConsumers(Assembly.GetExecutingAssembly().GetTypes().Where(type => typeof(IConsumer).IsAssignableFrom(type)).ToArray());
       });
-      services.AddScoped<IPopulateRequest, PopulateRequest>();
+      services.AddScoped<IConsumerPipeline, ConsumerPipeline>();
     }
 
-    return services;
+    return services.AddSingleton(settings);
   }
 
   private static void AddMassTransitRabbitMQ(this IBusRegistrationConfigurator configurator, RabbitMqSettings settings)

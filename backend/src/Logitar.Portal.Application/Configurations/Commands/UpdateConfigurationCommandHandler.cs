@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations.Validators;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations;
@@ -10,12 +11,12 @@ namespace Logitar.Portal.Application.Configurations.Commands;
 
 internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, Configuration>
 {
-  private readonly IApplicationContext _applicationContext;
+  private readonly ICacheService _cacheService;
   private readonly IConfigurationRepository _configurationRepository;
 
-  public UpdateConfigurationCommandHandler(IApplicationContext applicationContext, IConfigurationRepository configurationRepository)
+  public UpdateConfigurationCommandHandler(ICacheService cacheService, IConfigurationRepository configurationRepository)
   {
-    _applicationContext = applicationContext;
+    _cacheService = cacheService;
     _configurationRepository = configurationRepository;
   }
 
@@ -54,9 +55,9 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
       configuration.LoggingSettings = new ReadOnlyLoggingSettings(payload.LoggingSettings);
     }
 
-    configuration.Update(_applicationContext.ActorId);
+    configuration.Update(command.ActorId);
     await _configurationRepository.SaveAsync(configuration, cancellationToken);
 
-    return _applicationContext.Configuration;
+    return _cacheService.Configuration ?? throw new InvalidOperationException("The configuration should be in the cache.");
   }
 }

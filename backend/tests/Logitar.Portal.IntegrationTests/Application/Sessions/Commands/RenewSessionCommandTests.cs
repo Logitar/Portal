@@ -5,7 +5,7 @@ using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts;
-using Logitar.Portal.Contracts.Actors;
+using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,21 +31,24 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should renew the session using the provided actor ID.")]
   public async Task It_should_renew_the_session_using_the_provided_actor_Id()
   {
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
-    await _apiKeyRepository.SaveAsync(apiKey);
+    ApiKeyAggregate apiKeyAggregate = new(new DisplayNameUnit("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
+    await _apiKeyRepository.SaveAsync(apiKeyAggregate);
 
-    Actor actor = new(apiKey.DisplayName.Value)
+    ApiKey apiKey = new(apiKeyAggregate.DisplayName.Value)
     {
-      Id = apiKey.Id.ToGuid(),
-      Type = ActorType.ApiKey
+      Id = apiKeyAggregate.Id.ToGuid(),
+      Version = apiKeyAggregate.Version,
+      CreatedOn = apiKeyAggregate.CreatedOn.ToUniversalTime(),
+      UpdatedOn = apiKeyAggregate.UpdatedOn.ToUniversalTime()
     };
-    SetActor(actor);
+    SetApiKey(apiKey);
+    SetUser(user: null);
 
     SetRealm();
 
     UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
-    ActorId actorId = new(actor.Id);
+    ActorId actorId = new(apiKey.Id);
     SessionAggregate session = user.SignIn(secret, actorId);
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
@@ -67,8 +70,8 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Equal(customAttributes, result.CustomAttributes);
     Assert.Equal(user.Id.ToGuid(), result.User.Id);
     Assert.Equal(session.Id.ToGuid(), result.Id);
-    Assert.Equal(actorId.ToGuid(), result.CreatedBy.Id);
-    Assert.Equal(actorId.ToGuid(), result.UpdatedBy.Id);
+    Assert.Equal(apiKey.Id, result.CreatedBy.Id);
+    Assert.Equal(apiKey.Id, result.UpdatedBy.Id);
   }
 
   [Fact(DisplayName = "It should renew the session using the user ID when no actor.")]

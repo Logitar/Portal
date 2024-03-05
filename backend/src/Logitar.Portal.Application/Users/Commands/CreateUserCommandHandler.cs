@@ -15,16 +15,13 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
 
-  public CreateUserCommandHandler(IApplicationContext applicationContext, IMediator mediator,
-    IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier)
+  public CreateUserCommandHandler(IMediator mediator, IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier)
   {
-    _applicationContext = applicationContext;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -33,15 +30,15 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
   public async Task<User> Handle(CreateUserCommand command, CancellationToken cancellationToken)
   {
-    IUserSettings userSettings = _applicationContext.UserSettings;
+    IUserSettings userSettings = command.UserSettings;
 
     CreateUserPayload payload = command.Payload;
     new CreateUserValidator(userSettings).ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
-    UserAggregate user = new(uniqueName, _applicationContext.TenantId, actorId)
+    UserAggregate user = new(uniqueName, command.TenantId, actorId)
     {
       FirstName = PersonNameUnit.TryCreate(payload.FirstName),
       MiddleName = PersonNameUnit.TryCreate(payload.MiddleName),
@@ -58,7 +55,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
     if (payload.Password != null)
     {
-      Password password = _passwordManager.ValidateAndCreate(payload.Password);
+      Password password = _passwordManager.ValidateAndCreate(payload.Password, userSettings.Password);
       user.SetPassword(password, actorId);
     }
     if (payload.IsDisabled)
@@ -99,8 +96,8 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     }
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 }

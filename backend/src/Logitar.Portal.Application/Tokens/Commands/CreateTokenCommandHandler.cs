@@ -12,12 +12,12 @@ namespace Logitar.Portal.Application.Tokens.Commands;
 
 internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, Contracts.Tokens.CreatedToken>
 {
-  private readonly IApplicationContext _applicationContext;
+  private readonly IBaseUrl _baseUrl;
   private readonly ITokenManager _tokenManager;
 
-  public CreateTokenCommandHandler(IApplicationContext applicationContext, ITokenManager tokenManager)
+  public CreateTokenCommandHandler(IBaseUrl baseUrl, ITokenManager tokenManager)
   {
-    _applicationContext = applicationContext;
+    _baseUrl = baseUrl;
     _tokenManager = tokenManager;
   }
 
@@ -26,11 +26,11 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     CreateTokenPayload payload = command.Payload;
     new CreateTokenValidator().ValidateAndThrow(payload);
 
-    Realm? realm = _applicationContext.Realm;
-    string baseUrl = _applicationContext.BaseUrl.TrimEnd('/');
+    Realm? realm = command.Realm;
+    string baseUrl = _baseUrl.Value;
 
     ClaimsIdentity subject = CreateSubject(payload);
-    string? secret = payload.Secret?.CleanTrim() ?? realm?.Secret ?? _applicationContext.Configuration.Secret;
+    string? secret = payload.Secret?.CleanTrim() ?? command.Secret;
     CreateTokenParameters parameters = new(subject, secret)
     {
       Audience = TokenHelper.ResolveAudience(payload.Audience, realm, baseUrl),

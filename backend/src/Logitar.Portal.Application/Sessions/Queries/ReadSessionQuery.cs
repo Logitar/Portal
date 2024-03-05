@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Queries;
 
-internal record ReadSessionQuery(Guid Id) : IRequest<Session?>;
+internal record ReadSessionQuery(Guid Id) : ApplicationRequest, IRequest<Session?>;

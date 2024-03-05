@@ -15,17 +15,15 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public UpdateUserCommandHandler(IApplicationContext applicationContext, IMediator mediator,
+  public UpdateUserCommandHandler(IMediator mediator,
     IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -35,18 +33,18 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
   public async Task<User?> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
   {
-    IUserSettings userSettings = _applicationContext.UserSettings;
+    IUserSettings userSettings = command.UserSettings;
 
     UpdateUserPayload payload = command.Payload;
     new UpdateUserValidator(userSettings).ValidateAndThrow(payload);
 
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UpdateAuthenticationInformation(userSettings, payload, user, actorId);
     UpdateContactInformation(payload, user, actorId);
@@ -79,9 +77,9 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 
   private void UpdateAuthenticationInformation(IUserSettings userSettings, UpdateUserPayload payload, UserAggregate user, ActorId actorId)
@@ -94,7 +92,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
     if (payload.Password != null)
     {
-      Password newPassword = _passwordManager.ValidateAndCreate(payload.Password.New);
+      Password newPassword = _passwordManager.ValidateAndCreate(payload.Password.New, userSettings.Password);
       if (payload.Password.Current == null)
       {
         user.SetPassword(newPassword, actorId);

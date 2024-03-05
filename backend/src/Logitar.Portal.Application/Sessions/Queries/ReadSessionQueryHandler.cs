@@ -14,6 +14,6 @@ internal class ReadSessionQueryHandler : IRequestHandler<ReadSessionQuery, Sessi
 
   public async Task<Session?> Handle(ReadSessionQuery query, CancellationToken cancellationToken)
   {
-    return await _sessionQuerier.ReadAsync(query.Id, cancellationToken);
+    return await _sessionQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }
 }

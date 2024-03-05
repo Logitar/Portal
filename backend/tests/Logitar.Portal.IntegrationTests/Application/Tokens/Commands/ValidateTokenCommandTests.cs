@@ -17,12 +17,14 @@ public class ValidateTokenCommandTests : IntegrationTests
 {
   private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
+  private readonly IBaseUrl _baseUrl;
   private readonly IConfigurationRepository _configurationRepository;
 
   public ValidateTokenCommandTests() : base()
   {
     _tokenHandler.InboundClaimTypeMap.Clear();
 
+    _baseUrl = ServiceProvider.GetRequiredService<IBaseUrl>();
     _configurationRepository = ServiceProvider.GetRequiredService<IConfigurationRepository>();
   }
 
@@ -59,7 +61,7 @@ public class ValidateTokenCommandTests : IntegrationTests
     SecurityTokenDescriptor tokenDescriptor = new()
     {
       Audience = $"urn:logitar:portal:realm:unique-slug:{Realm.UniqueSlug}",
-      Issuer = $"{BaseUri.ToString().TrimEnd('/')}/realms/{Realm.Id}",
+      Issuer = $"{_baseUrl.Value.TrimEnd('/')}/realms/{Realm.Id}",
       SigningCredentials = CreateSigningCredentials(secret.Value),
       Subject = new ClaimsIdentity([new Claim(Rfc7519ClaimNames.TokenId, tokenId), new Claim(Rfc7519ClaimNames.Username, Faker.Person.UserName)]),
       TokenType = tokenType
@@ -90,7 +92,7 @@ public class ValidateTokenCommandTests : IntegrationTests
     ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
 
-    string baseUrl = BaseUri.ToString().TrimEnd('/');
+    string baseUrl = _baseUrl.Value.TrimEnd('/');
     string subject = Guid.NewGuid().ToString();
     SecurityTokenDescriptor tokenDescriptor = new()
     {

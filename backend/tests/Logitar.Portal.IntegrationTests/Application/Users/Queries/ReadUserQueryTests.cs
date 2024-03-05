@@ -25,7 +25,7 @@ public class ReadUserQueryTests : IntegrationTests
     SetRealm();
 
     ReadUserQuery query = new(user.Id.ToGuid(), UniqueName: null, Identifier: null);
-    User? found = await Pipeline.ExecuteAsync(query);
+    User? found = await Mediator.Send(query);
     Assert.Null(found);
   }
 
@@ -35,7 +35,7 @@ public class ReadUserQueryTests : IntegrationTests
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
     ReadUserQuery query = new(user.Id.ToGuid(), user.UniqueName.Value, Identifier: null);
-    User? found = await Pipeline.ExecuteAsync(query);
+    User? found = await Mediator.Send(query);
     Assert.NotNull(found);
     Assert.Equal(user.Id.ToGuid(), found.Id);
   }
@@ -51,7 +51,7 @@ public class ReadUserQueryTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     ReadUserQuery query = new(Id: null, UniqueName: null, Identifier: new CustomIdentifier($" {key} ", $"  {healthInsuranceNumber}  "));
-    User? found = await Pipeline.ExecuteAsync(query);
+    User? found = await Mediator.Send(query);
     Assert.NotNull(found);
     Assert.Equal(user.Id.ToGuid(), found.Id);
   }
@@ -63,7 +63,7 @@ public class ReadUserQueryTests : IntegrationTests
     Assert.NotNull(user.Email);
 
     ReadUserQuery query = new(Id: null, user.Email.Address, Identifier: null);
-    User? found = await Pipeline.ExecuteAsync(query);
+    User? found = await Mediator.Send(query);
     Assert.NotNull(found);
     Assert.Equal(user.Id.ToGuid(), found.Id);
   }
@@ -74,7 +74,7 @@ public class ReadUserQueryTests : IntegrationTests
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
     ReadUserQuery query = new(Id: null, user.UniqueName.Value, Identifier: null);
-    User? found = await Pipeline.ExecuteAsync(query);
+    User? found = await Mediator.Send(query);
     Assert.NotNull(found);
     Assert.Equal(user.Id.ToGuid(), found.Id);
   }
@@ -88,7 +88,7 @@ public class ReadUserQueryTests : IntegrationTests
     await _userRepository.SaveAsync(other);
 
     ReadUserQuery query = new(user.Id.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await Pipeline.ExecuteAsync(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await Mediator.Send(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

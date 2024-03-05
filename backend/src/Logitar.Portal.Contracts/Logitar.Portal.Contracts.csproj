@@ -52,7 +52,7 @@
 
   <ItemGroup>
     <PackageReference Include="Logitar" Version="6.1.0" />
-    <PackageReference Include="Logitar.Identity.Contracts" Version="0.11.4" />
+    <PackageReference Include="Logitar.Identity.Contracts" Version="0.12.0" />
   </ItemGroup>
 
   <ItemGroup>

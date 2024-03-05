@@ -10,13 +10,11 @@ namespace Logitar.Portal.Application.Dictionaries.Commands;
 
 internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionaryCommand, Dictionary>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
-  public CreateDictionaryCommandHandler(IApplicationContext applicationContext, IDictionaryManager dictionaryManager, IDictionaryQuerier dictionaryQuerier)
+  public CreateDictionaryCommandHandler(IDictionaryManager dictionaryManager, IDictionaryQuerier dictionaryQuerier)
   {
-    _applicationContext = applicationContext;
     _dictionaryManager = dictionaryManager;
     _dictionaryQuerier = dictionaryQuerier;
   }
@@ -26,13 +24,13 @@ internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionary
     CreateDictionaryPayload payload = command.Payload;
     new CreateDictionaryValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     LocaleUnit locale = new(payload.Locale);
-    DictionaryAggregate dictionary = new(locale, _applicationContext.TenantId, actorId);
+    DictionaryAggregate dictionary = new(locale, command.TenantId, actorId);
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);
 
-    return await _dictionaryQuerier.ReadAsync(dictionary, cancellationToken);
+    return await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
   }
 }

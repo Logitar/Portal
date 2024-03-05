@@ -12,15 +12,12 @@ namespace Logitar.Portal.Application.Roles.Commands;
 
 internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, Role?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
   private readonly IRoleRepository _roleRepository;
 
-  public ReplaceRoleCommandHandler(IApplicationContext applicationContext,
-    IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
+  public ReplaceRoleCommandHandler(IRoleManager roleManager, IRoleQuerier roleQuerier, IRoleRepository roleRepository)
   {
-    _applicationContext = applicationContext;
     _roleManager = roleManager;
     _roleQuerier = roleQuerier;
     _roleRepository = roleRepository;
@@ -28,13 +25,13 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
 
   public async Task<Role?> Handle(ReplaceRoleCommand command, CancellationToken cancellationToken)
   {
-    IRoleSettings roleSettings = _applicationContext.RoleSettings;
+    IRoleSettings roleSettings = command.RoleSettings;
 
     ReplaceRolePayload payload = command.Payload;
     new ReplaceRoleValidator(roleSettings).ValidateAndThrow(payload);
 
     RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
-    if (role == null || role.TenantId != _applicationContext.TenantId)
+    if (role == null || role.TenantId != command.TenantId)
     {
       return null;
     }
@@ -44,7 +41,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
       reference = await _roleRepository.LoadAsync(role.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
@@ -67,7 +64,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     role.Update(actorId);
     await _roleManager.SaveAsync(role, actorId, cancellationToken);
 
-    return await _roleQuerier.ReadAsync(role, cancellationToken);
+    return await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
   }
 
   private static void ReplaceCustomAttributes(ReplaceRolePayload payload, RoleAggregate role, RoleAggregate? reference)

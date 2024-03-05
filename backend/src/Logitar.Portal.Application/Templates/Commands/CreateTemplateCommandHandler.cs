@@ -10,13 +10,11 @@ namespace Logitar.Portal.Application.Templates.Commands;
 
 internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateCommand, Template>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
 
-  public CreateTemplateCommandHandler(IApplicationContext applicationContext, ITemplateManager templateManager, ITemplateQuerier templateQuerier)
+  public CreateTemplateCommandHandler(ITemplateManager templateManager, ITemplateQuerier templateQuerier)
   {
-    _applicationContext = applicationContext;
     _templateManager = templateManager;
     _templateQuerier = templateQuerier;
   }
@@ -26,12 +24,12 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
     CreateTemplatePayload payload = command.Payload;
     new CreateTemplateValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueKeyUnit uniqueKey = new(payload.UniqueKey);
     SubjectUnit subject = new(payload.Subject);
     ContentUnit content = new(payload.Content);
-    TemplateAggregate template = new(uniqueKey, subject, content, _applicationContext.TenantId, actorId)
+    TemplateAggregate template = new(uniqueKey, subject, content, command.TenantId, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
       Description = DescriptionUnit.TryCreate(payload.Description)
@@ -40,6 +38,6 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
 
     await _templateManager.SaveAsync(template, actorId, cancellationToken);
 
-    return await _templateQuerier.ReadAsync(template, cancellationToken);
+    return await _templateQuerier.ReadAsync(command.Realm, template, cancellationToken);
   }
 }

@@ -19,28 +19,25 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class UserQuerier : IUserQuerier
 {
   private readonly IActorService _actorService;
-  private readonly IApplicationContext _applicationContext;
   private readonly ISearchHelper _searchHelper;
   private readonly ISqlHelper _sqlHelper;
   private readonly DbSet<UserEntity> _users;
 
-  public UserQuerier(IActorService actorService, IApplicationContext applicationContext,
-    IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public UserQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
   {
     _actorService = actorService;
-    _applicationContext = applicationContext;
     _searchHelper = searchHelper;
     _sqlHelper = sqlHelper;
     _users = context.Users;
   }
 
-  public async Task<User> ReadAsync(UserAggregate user, CancellationToken cancellationToken)
+  public async Task<User> ReadAsync(Realm? realm, UserAggregate user, CancellationToken cancellationToken)
   {
-    return await ReadAsync(user.Id, cancellationToken)
+    return await ReadAsync(realm, user.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id.Value}' could not be found.");
   }
-  public async Task<User?> ReadAsync(UserId id, CancellationToken cancellationToken)
-    => await ReadAsync(_applicationContext.Realm, id.ToGuid(), cancellationToken);
+  public async Task<User?> ReadAsync(Realm? realm, UserId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<User?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
@@ -50,7 +47,7 @@ internal class UserQuerier : IUserQuerier
       .Include(x => x.Roles)
       .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
 
-    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string? tenantId = realm?.GetTenantId().Value;
     if (user == null || user.TenantId != tenantId)
     {
       return null;
@@ -61,7 +58,7 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken)
   {
-    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string? tenantId = realm?.GetTenantId().Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
 
     UserEntity? user = await _users.AsNoTracking()
@@ -79,7 +76,7 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<IEnumerable<User>> ReadAsync(Realm? realm, IEmail email, CancellationToken cancellationToken)
   {
-    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string? tenantId = realm?.GetTenantId().Value;
     string emailAddressNormalized = email.Address.Trim().ToUpper();
 
     UserEntity[] users = await _users.AsNoTracking()
@@ -93,7 +90,7 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<User?> ReadAsync(Realm? realm, CustomIdentifier identifier, CancellationToken cancellationToken)
   {
-    string? tenantId = realm == null ? null : new AggregateId(realm.Id).Value;
+    string? tenantId = realm?.GetTenantId().Value;
     string key = identifier.Key.Trim();
     string value = identifier.Value.Trim();
 
@@ -110,10 +107,8 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<User>> SearchAsync(SearchUsersPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<User>> SearchAsync(Realm? realm, SearchUsersPayload payload, CancellationToken cancellationToken)
   {
-    Realm? realm = _applicationContext.Realm;
-
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Users.Table).SelectAll(IdentityDb.Users.Table)
       .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)
       .ApplyIdFilter(IdentityDb.Users.AggregateId, payload.Ids);

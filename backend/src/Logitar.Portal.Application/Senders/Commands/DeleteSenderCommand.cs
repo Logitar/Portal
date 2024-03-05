@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal record DeleteSenderCommand(Guid Id) : IRequest<Sender?>;
+internal record DeleteSenderCommand(Guid Id) : ApplicationRequest, IRequest<Sender?>;

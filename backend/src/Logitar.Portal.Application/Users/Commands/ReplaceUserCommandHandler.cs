@@ -16,17 +16,15 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, User?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ReplaceUserCommandHandler(IApplicationContext applicationContext, IMediator mediator,
-    IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public ReplaceUserCommandHandler(IMediator mediator, IPasswordManager passwordManager,
+    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
-    _applicationContext = applicationContext;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -36,13 +34,13 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
   public async Task<User?> Handle(ReplaceUserCommand command, CancellationToken cancellationToken)
   {
-    IUserSettings userSettings = _applicationContext.UserSettings;
+    IUserSettings userSettings = command.UserSettings;
 
     ReplaceUserPayload payload = command.Payload;
     new ReplaceUserValidator(userSettings).ValidateAndThrow(payload);
 
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
-    if (user == null || user.TenantId != _applicationContext.TenantId)
+    if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
@@ -52,7 +50,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
       reference = await _userRepository.LoadAsync(user.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     ReplaceAuthenticationInformation(userSettings, payload, user, reference, actorId);
     ReplaceContactInformation(payload, user, reference, actorId);
@@ -61,9 +59,9 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     await ReplaceRolesAsync(payload, user, reference, actorId, cancellationToken);
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
-    return await _userQuerier.ReadAsync(user, cancellationToken);
+    return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 
   private void ReplaceAuthenticationInformation(IUserSettings userSettings, ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId)
@@ -76,7 +74,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
     if (payload.Password != null)
     {
-      Password password = _passwordManager.ValidateAndCreate(payload.Password);
+      Password password = _passwordManager.ValidateAndCreate(payload.Password, userSettings.Password);
       user.SetPassword(password, actorId);
     }
 

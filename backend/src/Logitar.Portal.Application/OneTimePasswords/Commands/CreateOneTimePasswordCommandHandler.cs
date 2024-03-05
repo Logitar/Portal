@@ -10,15 +10,13 @@ namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
 internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTimePasswordCommand, OneTimePassword>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IOneTimePasswordQuerier _oneTimePasswordQuerier;
   private readonly IOneTimePasswordRepository _oneTimePasswordRepository;
   private readonly IPasswordManager _passwordManager;
 
-  public CreateOneTimePasswordCommandHandler(IApplicationContext applicationContext,
-    IOneTimePasswordQuerier oneTimePasswordQuerier, IOneTimePasswordRepository oneTimePasswordRepository, IPasswordManager passwordManager)
+  public CreateOneTimePasswordCommandHandler(IOneTimePasswordQuerier oneTimePasswordQuerier,
+    IOneTimePasswordRepository oneTimePasswordRepository, IPasswordManager passwordManager)
   {
-    _applicationContext = applicationContext;
     _oneTimePasswordQuerier = oneTimePasswordQuerier;
     _oneTimePasswordRepository = oneTimePasswordRepository;
     _passwordManager = passwordManager;
@@ -29,10 +27,10 @@ internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTi
     CreateOneTimePasswordPayload payload = command.Payload;
     new CreateOneTimePasswordValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     Password password = _passwordManager.Generate(payload.Characters, payload.Length, out string passwordString);
-    OneTimePasswordAggregate oneTimePassword = new(password, _applicationContext.TenantId, payload.ExpiresOn, payload.MaximumAttempts, actorId);
+    OneTimePasswordAggregate oneTimePassword = new(password, command.TenantId, payload.ExpiresOn, payload.MaximumAttempts, actorId);
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
@@ -42,7 +40,7 @@ internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTi
     oneTimePassword.Update(actorId);
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword, cancellationToken);
 
-    OneTimePassword result = await _oneTimePasswordQuerier.ReadAsync(oneTimePassword, cancellationToken);
+    OneTimePassword result = await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
     result.Password = passwordString;
     return result;
   }

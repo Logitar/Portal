@@ -19,7 +19,7 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
 
     if (query.Id.HasValue)
     {
-      Template? template = await _templateQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      Template? template = await _templateQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (template != null)
       {
         templates[template.Id] = template;
@@ -28,7 +28,7 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
 
     if (!string.IsNullOrWhiteSpace(query.UniqueKey))
     {
-      Template? template = await _templateQuerier.ReadAsync(query.UniqueKey, cancellationToken);
+      Template? template = await _templateQuerier.ReadAsync(query.Realm, query.UniqueKey, cancellationToken);
       if (template != null)
       {
         templates[template.Id] = template;

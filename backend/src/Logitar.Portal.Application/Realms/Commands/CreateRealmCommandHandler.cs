@@ -12,13 +12,11 @@ namespace Logitar.Portal.Application.Realms.Commands;
 
 internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, Realm>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
 
-  public CreateRealmCommandHandler(IApplicationContext applicationContext, IRealmManager realmManager, IRealmQuerier realmQuerier)
+  public CreateRealmCommandHandler(IRealmManager realmManager, IRealmQuerier realmQuerier)
   {
-    _applicationContext = applicationContext;
     _realmManager = realmManager;
     _realmQuerier = realmQuerier;
   }
@@ -28,7 +26,7 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     CreateRealmPayload payload = command.Payload;
     new CreateRealmValidator().ValidateAndThrow(payload);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
 
     UniqueSlugUnit uniqueSlug = new(payload.UniqueSlug);
     RealmAggregate realm = new(uniqueSlug, actorId)

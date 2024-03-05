@@ -40,6 +40,8 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should authenticate the API key.")]
   public async Task It_should_authenticate_the_Api_key()
   {
+    SetUser(user: null);
+
     ApiKeyAggregate apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 

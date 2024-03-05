@@ -15,6 +15,6 @@ internal class SearchDictionariesQueryHandler : IRequestHandler<SearchDictionari
 
   public async Task<SearchResults<Dictionary>> Handle(SearchDictionariesQuery query, CancellationToken cancellationToken)
   {
-    return await _dictionaryQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _dictionaryQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

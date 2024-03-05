@@ -75,7 +75,7 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
     _cacheService.Configuration = BuildConfiguration(configuration, user);
     try
     {
-      Password password = _passwordManager.ValidateAndCreate(userPayload.Password);
+      Password password = _passwordManager.ValidateAndCreate(userPayload.Password, userSettings.Password);
       user.SetPassword(password, actorId);
 
       if (!string.IsNullOrWhiteSpace(userPayload.EmailAddress))
@@ -90,11 +90,11 @@ internal class InitializeConfigurationCommandHandler : IRequestHandler<Initializ
       }
       session.Update(actorId);
 
-      await _userManager.SaveAsync(user, actorId, cancellationToken);
+      await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
       await _sessionRepository.SaveAsync(session, cancellationToken);
       await _configurationRepository.SaveAsync(configuration, cancellationToken);
 
-      return await _sessionQuerier.ReadAsync(session, cancellationToken);
+      return await _sessionQuerier.ReadAsync(realm: null, session, cancellationToken);
     }
     catch (Exception)
     {

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
-internal record ReadRoleQuery(Guid? Id, string? UniqueName) : IRequest<Role?>;
+internal record ReadRoleQuery(Guid? Id, string? UniqueName) : ApplicationRequest, IRequest<Role?>;

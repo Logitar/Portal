@@ -14,6 +14,6 @@ internal class ReadOneTimePasswordQueryHandler : IRequestHandler<ReadOneTimePass
 
   public async Task<OneTimePassword?> Handle(ReadOneTimePasswordQuery query, CancellationToken cancellationToken)
   {
-    return await _oneTimePasswordQuerier.ReadAsync(query.Id, cancellationToken);
+    return await _oneTimePasswordQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }
 }

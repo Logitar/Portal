@@ -14,6 +14,6 @@ internal class ReadMessageQueryHandler : IRequestHandler<ReadMessageQuery, Messa
 
   public async Task<Message?> Handle(ReadMessageQuery query, CancellationToken cancellationToken)
   {
-    return await _messageQuerier.ReadAsync(query.Id, cancellationToken);
+    return await _messageQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }
 }

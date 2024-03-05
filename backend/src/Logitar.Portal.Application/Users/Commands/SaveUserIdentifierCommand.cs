@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record SaveUserIdentifierCommand(Guid Id, string Key, SaveUserIdentifierPayload Payload) : IRequest<User?>;
+internal record SaveUserIdentifierCommand(Guid Id, string Key, SaveUserIdentifierPayload Payload) : ApplicationRequest, IRequest<User?>;

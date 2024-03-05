@@ -15,6 +15,6 @@ internal class SearchRolesQueryHandler : IRequestHandler<SearchRolesQuery, Searc
 
   public async Task<SearchResults<Role>> Handle(SearchRolesQuery query, CancellationToken cancellationToken)
   {
-    return await _roleQuerier.SearchAsync(query.Payload, cancellationToken);
+    return await _roleQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }
 }

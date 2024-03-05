@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal record ReplaceConfigurationCommand(ReplaceConfigurationPayload Payload, long? Version) : IRequest<Configuration>;
+internal record ReplaceConfigurationCommand(ReplaceConfigurationPayload Payload, long? Version) : ApplicationRequest, IRequest<Configuration>;

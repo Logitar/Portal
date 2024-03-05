@@ -7,15 +7,12 @@ namespace Logitar.Portal.Application.Dictionaries.Commands;
 
 internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionaryCommand, Dictionary?>
 {
-  private readonly IApplicationContext _applicationContext;
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
-  public DeleteDictionaryCommandHandler(IApplicationContext applicationContext,
-    IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
+  public DeleteDictionaryCommandHandler(IDictionaryManager dictionaryManager, IDictionaryRepository dictionaryRepository, IDictionaryQuerier dictionaryQuerier)
   {
-    _applicationContext = applicationContext;
     _dictionaryManager = dictionaryManager;
     _dictionaryRepository = dictionaryRepository;
     _dictionaryQuerier = dictionaryQuerier;
@@ -24,13 +21,13 @@ internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionary
   public async Task<Dictionary?> Handle(DeleteDictionaryCommand command, CancellationToken cancellationToken)
   {
     DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
-    if (dictionary == null || dictionary.TenantId != _applicationContext.TenantId)
+    if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
     }
-    Dictionary result = await _dictionaryQuerier.ReadAsync(dictionary, cancellationToken);
+    Dictionary result = await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
 
-    ActorId actorId = _applicationContext.ActorId;
+    ActorId actorId = command.ActorId;
     dictionary.Delete(actorId);
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);
 
