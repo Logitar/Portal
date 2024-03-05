@@ -9,8 +9,6 @@ using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.MassTransit.Settings;
 using MassTransit;
 using MediatR;
-using System.Net;
-using System.Text.Json;
 
 namespace Logitar.Portal.MassTransit;
 

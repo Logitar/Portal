@@ -1,7 +1,6 @@
 ﻿using Logitar.Net.Http;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Sessions;
 
 namespace Logitar.Portal.Client.Configurations;
 
@@ -14,14 +13,10 @@ internal class ConfigurationClient : BaseClient, IConfigurationClient
   {
   }
 
-  public Task<Session> InitializeAsync(InitializeConfigurationPayload payload, IRequestContext? context)
+  public async Task<Configuration> ReadAsync(IRequestContext? context)
   {
-    throw new NotSupportedException($"The operation '{nameof(ConfigurationClient)}.{nameof(InitializeAsync)}' is not supported.");
-  }
-
-  public async Task<Configuration?> ReadAsync(IRequestContext? context)
-  {
-    return await GetAsync<Configuration>(UriPath, context);
+    return await GetAsync<Configuration>(UriPath, context)
+      ?? throw CreateInvalidApiResponseException(nameof(ReadAsync), HttpMethod.Get, UriPath, content: null, context);
   }
 
   public async Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, IRequestContext? context)

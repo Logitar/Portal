@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.Caching.Commands;
+﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
@@ -20,7 +20,7 @@ public class Program
     IServiceScope scope = application.Services.CreateScope();
     IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
-    await publisher.Publish(new InitializeCachingCommand());
+    await publisher.Publish(new InitializeConfigurationCommand());
 
     application.Run();
   }
