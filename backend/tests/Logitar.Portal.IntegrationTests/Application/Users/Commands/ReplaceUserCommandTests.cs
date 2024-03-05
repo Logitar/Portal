@@ -209,7 +209,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
-    ReplaceUserPayload payload = new(Faker.Person.UserName.ToUpper());
+    ReplaceUserPayload payload = new(UsernameString.ToUpper());
     ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);

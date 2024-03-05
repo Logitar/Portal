@@ -29,7 +29,7 @@ public class SignInSessionCommandTests : IntegrationTests
       new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"),
       new("IpAddress", Faker.Internet.Ip())
     ];
-    SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString, isPersistent: true, customAttributes);
+    SignInSessionPayload payload = new(UsernameString, PasswordString, isPersistent: true, customAttributes);
     SignInSessionCommand command = new(payload);
     Session session = await Mediator.Send(command);
 
@@ -38,7 +38,7 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Equal(customAttributes, session.CustomAttributes);
-    Assert.Equal(Faker.Person.UserName, session.User.UniqueName);
+    Assert.Equal(UsernameString, session.User.UniqueName);
 
     Assert.NotNull(session.RefreshToken);
     RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
@@ -53,7 +53,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     UserId userId = UserId.NewId();
     ActorId actorId = new(userId.Value);
-    UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, Faker.Person.UserName);
+    UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, UsernameString);
     UserAggregate user = new(uniqueName, TenantId, actorId, userId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
     await _userRepository.SaveAsync(user);
@@ -75,7 +75,7 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create an ephemereal session.")]
   public async Task It_should_create_an_ephemereal_session()
   {
-    SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString);
+    SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
     Session session = await Mediator.Send(command);
 
@@ -85,13 +85,13 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Empty(session.CustomAttributes);
-    Assert.Equal(Faker.Person.UserName, session.User.UniqueName);
+    Assert.Equal(UsernameString, session.User.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw IncorrectUserPasswordException when the password is incorrect.")]
   public async Task It_should_throw_IncorrectUserPasswordException_when_the_password_is_incorrect()
   {
-    SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString[..^1]);
+    SignInSessionPayload payload = new(UsernameString, PasswordString[..^1]);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await Mediator.Send(command));
     Assert.Equal(payload.Password, exception.AttemptedPassword);
@@ -102,7 +102,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    SignInSessionPayload payload = new(Faker.Person.UserName, PasswordString);
+    SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(TenantId, exception.TenantId);
@@ -113,7 +113,7 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    SignInSessionPayload payload = new(Faker.Person.UserName, password: string.Empty);
+    SignInSessionPayload payload = new(UsernameString, password: string.Empty);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
     Assert.Equal("Password", exception.Errors.Single().PropertyName);

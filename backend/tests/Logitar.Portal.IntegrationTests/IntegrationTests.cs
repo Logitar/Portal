@@ -1,8 +1,10 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.Data.SqlServer;
+using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
@@ -10,7 +12,6 @@ using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
@@ -26,6 +27,7 @@ namespace Logitar.Portal;
 
 public abstract class IntegrationTests : IAsyncLifetime
 {
+  protected const string UsernameString = "portal";
   protected const string PasswordString = "P@s$W0rD";
 
   private readonly TestContext _context;
@@ -90,9 +92,19 @@ public abstract class IntegrationTests : IAsyncLifetime
 
     await publisher.Publish(new InitializeConfigurationCommand());
 
+    IUserRepository userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
+    UserAggregate user = (await userRepository.LoadAsync()).Single();
+    ActorId actorId = new(user.Id.Value);
+    user.FirstName = new PersonNameUnit(Faker.Person.FirstName);
+    user.LastName = new PersonNameUnit(Faker.Person.LastName);
+    user.Update(actorId);
+    EmailUnit email = new(Faker.Person.Email, isVerified: false);
+    user.SetEmail(email, actorId);
+    await userRepository.SaveAsync(user);
+
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    SearchResults<User> users = await userQuerier.SearchAsync(realm: null, new SearchUsersPayload());
-    SetUser(users.Items.Single());
+    User? userModel = await userQuerier.ReadAsync(realm: null, user.Id.ToGuid());
+    SetUser(userModel);
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;

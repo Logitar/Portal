@@ -128,7 +128,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     Assert.NotNull(_password);
 
     ValidateOneTimePasswordPayload payload = new(_password);
-    payload.CustomAttributes.Add(new("ValidatedBy", Faker.Person.UserName));
+    payload.CustomAttributes.Add(new("ValidatedBy", UsernameString));
     payload.CustomAttributes.Add(new("ValidatedOn", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
     OneTimePassword? result = await Mediator.Send(command);

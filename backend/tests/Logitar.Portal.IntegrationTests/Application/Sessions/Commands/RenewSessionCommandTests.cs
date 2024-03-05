@@ -46,7 +46,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
     ActorId actorId = new(apiKey.Id);
     SessionAggregate session = user.SignIn(secret, actorId);
@@ -166,10 +166,12 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw SessionNotFoundException when the session is in another realm.")]
   public async Task It_should_throw_SessionNotFoundException_when_the_session_is_in_another_realm()
   {
-    SetRealm();
-
-    SessionAggregate? session = Assert.Single(await _sessionRepository.LoadAsync());
+    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    SessionAggregate session = new(user);
+    await _sessionRepository.SaveAsync(session);
     _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
+
+    SetRealm();
 
     string refreshToken = RefreshToken.Encode(session.Id, secret);
     RenewSessionPayload payload = new(refreshToken);

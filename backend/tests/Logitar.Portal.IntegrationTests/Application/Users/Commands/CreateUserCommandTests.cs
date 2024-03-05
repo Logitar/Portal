@@ -28,7 +28,7 @@ public class CreateUserCommandTests : IntegrationTests
     RoleAggregate role = new(new UniqueNameUnit(Realm.UniqueNameSettings, "manage_sales"), TenantId);
     await _roleRepository.SaveAsync(role);
 
-    CreateUserPayload payload = new(Faker.Person.UserName)
+    CreateUserPayload payload = new(UsernameString)
     {
       Password = PasswordString,
       IsDisabled = true,
@@ -98,7 +98,7 @@ public class CreateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    CreateUserPayload payload = new(Faker.Person.UserName);
+    CreateUserPayload payload = new(UsernameString);
     payload.Roles.Add("admin");
     CreateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
@@ -109,7 +109,7 @@ public class CreateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsed when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsed_when_the_unique_name_is_already_used()
   {
-    CreateUserPayload payload = new(Faker.Person.UserName);
+    CreateUserPayload payload = new(UsernameString);
     CreateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
     Assert.Null(exception.TenantId);

@@ -161,7 +161,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw MissingRecipientAddressesException when an user is missing an email.")]
   public async Task It_should_throw_MissingRecipientAddressesException_when_an_user_is_missing_an_email()
   {
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
     SetRealm();
