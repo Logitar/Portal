@@ -9,6 +9,15 @@ services:
     ports:
       - 1437:1433
 
+  portal_mongo:
+    image: mongo
+    container_name: Logitar.Portal_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: portal
+      MONGO_INITDB_ROOT_PASSWORD: LB6SAj52nU73ZxFz
+    ports:
+      - 27027:27017
+
   portal_rabbitmq:
     image: masstransit/rabbitmq
     container_name: Logitar.Portal_rabbitmq
@@ -42,4 +51,6 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_Environment: Development
+      MongoDB:ConnectionString: mongodb://portal:LB6SAj52nU73ZxFz@portal_mongo:27017/
+      MongoDB:DatabaseName: Portal
       SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
