@@ -31,7 +31,7 @@ internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUser
 
     user.Authenticate(payload.Password, actorId);
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }

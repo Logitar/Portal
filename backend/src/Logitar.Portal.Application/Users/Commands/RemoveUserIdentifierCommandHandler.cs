@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
@@ -6,11 +7,13 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserIdentifierCommand, User?>
 {
+  private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public RemoveUserIdentifierCommandHandler(IUserQuerier userQuerier, IUserRepository userRepository)
+  public RemoveUserIdentifierCommandHandler(IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
+    _userManager = userManager;
     _userQuerier = userQuerier;
     _userRepository = userRepository;
   }
@@ -23,9 +26,9 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
       return null;
     }
 
-    user.RemoveCustomIdentifier(command.Key, command.ActorId);
-
-    await _userRepository.SaveAsync(user, cancellationToken);
+    ActorId actorId = command.ActorId;
+    user.RemoveCustomIdentifier(command.Key, actorId);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }

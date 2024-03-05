@@ -77,7 +77,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
@@ -92,7 +92,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
     if (payload.Password != null)
     {
-      Password newPassword = _passwordManager.ValidateAndCreate(payload.Password.New);
+      Password newPassword = _passwordManager.ValidateAndCreate(payload.Password.New, userSettings.Password);
       if (payload.Password.Current == null)
       {
         user.SetPassword(newPassword, actorId);

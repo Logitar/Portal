@@ -55,7 +55,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
     if (payload.Password != null)
     {
-      Password password = _passwordManager.ValidateAndCreate(payload.Password);
+      Password password = _passwordManager.ValidateAndCreate(payload.Password, userSettings.Password);
       user.SetPassword(password, actorId);
     }
     if (payload.IsDisabled)
@@ -96,7 +96,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     }
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }

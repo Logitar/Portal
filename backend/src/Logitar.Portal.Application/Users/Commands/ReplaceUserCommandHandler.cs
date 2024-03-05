@@ -22,8 +22,8 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ReplaceUserCommandHandler(IMediator mediator,
-    IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public ReplaceUserCommandHandler(IMediator mediator, IPasswordManager passwordManager,
+    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
   {
     _mediator = mediator;
     _passwordManager = passwordManager;
@@ -59,7 +59,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     await ReplaceRolesAsync(payload, user, reference, actorId, cancellationToken);
 
     user.Update(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
@@ -74,7 +74,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
     if (payload.Password != null)
     {
-      Password password = _passwordManager.ValidateAndCreate(payload.Password);
+      Password password = _passwordManager.ValidateAndCreate(payload.Password, userSettings.Password);
       user.SetPassword(password, actorId);
     }
 

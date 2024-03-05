@@ -35,7 +35,7 @@ internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdenti
 
     user.SetCustomIdentifier(identifier.Key, identifier.Value, actorId);
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }

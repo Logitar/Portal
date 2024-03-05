@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Shared;
@@ -30,11 +31,13 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
 
   public async Task<Session> Handle(SignInSessionCommand command, CancellationToken cancellationToken)
   {
+    IUserSettings userSettings = command.UserSettings;
+
     SignInSessionPayload payload = command.Payload;
     new SignInSessionValidator().ValidateAndThrow(payload);
 
     TenantId? tenantId = command.TenantId;
-    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.UniqueName, cancellationToken);
+    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.UniqueName, userSettings, cancellationToken);
     UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.UniqueName, nameof(payload.UniqueName));
     ActorId actorId = new(user.Id.Value);
 
@@ -52,7 +55,7 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
     }
     session.Update(actorId);
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
     Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);

@@ -52,7 +52,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     }
     session.Update(actorId);
 
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
     Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);

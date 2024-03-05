@@ -29,7 +29,7 @@ internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Use
 
     ActorId actorId = command.ActorId;
     user.Delete(actorId);
-    await _userManager.SaveAsync(user, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
     return result;
   }
