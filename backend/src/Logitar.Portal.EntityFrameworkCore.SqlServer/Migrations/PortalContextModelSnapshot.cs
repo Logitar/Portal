@@ -54,6 +54,11 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<string>("LocaleNormalized")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -88,7 +93,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "Locale")
+                    b.HasIndex("TenantId", "LocaleNormalized")
                         .IsUnique()
                         .HasFilter("[TenantId] IS NOT NULL");
 

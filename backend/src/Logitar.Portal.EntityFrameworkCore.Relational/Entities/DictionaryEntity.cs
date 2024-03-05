@@ -10,6 +10,11 @@ internal class DictionaryEntity : AggregateEntity
   public string? TenantId { get; private set; }
 
   public string Locale { get; private set; } = string.Empty;
+  public string LocaleNormalized
+  {
+    get => Locale.ToUpper();
+    private set { }
+  }
 
   public int EntryCount
   {

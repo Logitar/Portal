@@ -17,13 +17,14 @@ internal class DictionaryConfiguration : AggregateConfiguration<DictionaryEntity
     builder.HasKey(x => x.DictionaryId);
 
     builder.HasIndex(x => x.Locale);
-    builder.HasIndex(x => new { x.TenantId, x.Locale }).IsUnique();
+    builder.HasIndex(x => new { x.TenantId, x.LocaleNormalized }).IsUnique();
     builder.HasIndex(x => x.EntryCount);
 
     builder.Ignore(x => x.Entries);
 
     builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.Locale).HasMaxLength(LocaleUnit.MaximumLength);
+    builder.Property(x => x.LocaleNormalized).HasMaxLength(LocaleUnit.MaximumLength);
     builder.Property(x => x.EntriesSerialized).HasColumnName(nameof(DictionaryEntity.Entries));
   }
 }

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20240305190747_LogitarPortal_4_0_0")]
+    [Migration("20240305193513_LogitarPortal_4_0_0")]
     partial class LogitarPortal_4_0_0
     {
         /// <inheritdoc />
@@ -57,6 +57,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
+                    b.Property<string>("LocaleNormalized")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -91,7 +96,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "Locale")
+                    b.HasIndex("TenantId", "LocaleNormalized")
                         .IsUnique();
 
                     b.ToTable("Dictionaries", (string)null);

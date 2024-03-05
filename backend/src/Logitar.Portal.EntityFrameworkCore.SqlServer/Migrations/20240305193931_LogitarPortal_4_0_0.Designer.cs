@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    [Migration("20240305185706_LogitarPortal_4_0_0")]
+    [Migration("20240305193931_LogitarPortal_4_0_0")]
     partial class LogitarPortal_4_0_0
     {
         /// <inheritdoc />
@@ -57,6 +57,11 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<string>("LocaleNormalized")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -91,7 +96,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "Locale")
+                    b.HasIndex("TenantId", "LocaleNormalized")
                         .IsUnique()
                         .HasFilter("[TenantId] IS NOT NULL");
 

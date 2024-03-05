@@ -54,6 +54,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
+                    b.Property<string>("LocaleNormalized")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -88,7 +93,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.HasIndex("Version");
 
-                    b.HasIndex("TenantId", "Locale")
+                    b.HasIndex("TenantId", "LocaleNormalized")
                         .IsUnique();
 
                     b.ToTable("Dictionaries", (string)null);
