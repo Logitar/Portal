@@ -95,7 +95,7 @@ public class ConfigurationAggregate : AggregateRoot
   {
   }
 
-  public static ConfigurationAggregate Initialize(LocaleUnit? defaultLocale, ActorId actorId)
+  public static ConfigurationAggregate Initialize(ActorId actorId)
   {
     ConfigurationId id = new();
     ConfigurationAggregate configuration = new(id.AggregateId);
@@ -105,7 +105,7 @@ public class ConfigurationAggregate : AggregateRoot
     ReadOnlyPasswordSettings passordSettings = new();
     bool requireUniqueEmail = true;
     ReadOnlyLoggingSettings loggingSettings = new();
-    configuration.Raise(new ConfigurationInitializedEvent(actorId, defaultLocale, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings));
+    configuration.Raise(new ConfigurationInitializedEvent(actorId, defaultLocale: null, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings));
 
     return configuration;
   }

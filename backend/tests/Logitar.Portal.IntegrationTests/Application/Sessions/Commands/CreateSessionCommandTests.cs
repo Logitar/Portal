@@ -19,7 +19,7 @@ public class CreateSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a persistent session.")]
   public async Task It_should_create_a_persistent_session()
   {
-    CreateSessionPayload payload = new(Faker.Person.UserName)
+    CreateSessionPayload payload = new(UsernameString)
     {
       IsPersistent = true
     };
@@ -43,10 +43,10 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
-    CreateSessionPayload payload = new(Faker.Person.UserName);
+    CreateSessionPayload payload = new(UsernameString);
     payload.CustomAttributes.Add(new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
     payload.CustomAttributes.Add(new("IpAddress", Faker.Internet.Ip()));
     CreateSessionCommand command = new(payload);
@@ -66,7 +66,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    CreateSessionPayload payload = new(Faker.Person.UserName);
+    CreateSessionPayload payload = new(UsernameString);
     CreateSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(TenantId, exception.TenantId);

@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.Caching.Commands;
+﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 
@@ -6,11 +6,15 @@ namespace Logitar.Portal;
 
 public class Program
 {
+  private const string DefaultUniqueName = "portal";
+  private const string DefaultPassword = "P@s$W0rD";
+
   public static async Task Main(string[] args)
   {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    IConfiguration configuration = builder.Configuration;
 
-    Startup startup = new(builder.Configuration);
+    Startup startup = new(configuration);
     startup.ConfigureServices(builder.Services);
 
     WebApplication application = builder.Build();
@@ -20,7 +24,10 @@ public class Program
     IServiceScope scope = application.Services.CreateScope();
     IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
-    await publisher.Publish(new InitializeCachingCommand());
+
+    string uniqueName = configuration.GetValue<string>("PORTAL_USERNAME") ?? DefaultUniqueName;
+    string password = configuration.GetValue<string>("PORTAL_PASSWORD") ?? DefaultPassword;
+    await publisher.Publish(new InitializeConfigurationCommand(uniqueName, password));
 
     application.Run();
   }

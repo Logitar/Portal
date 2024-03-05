@@ -31,14 +31,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 1 + 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
-
-    InitializeConfigurationTests initializeConfiguration = serviceProvider.GetRequiredService<InitializeConfigurationTests>();
-    if (!await initializeConfiguration.ExecuteAsync(context)) // 1 test
-    {
-      context.End();
-      return;
-    }
+    TestContext context = TestContext.Start(count: 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
 
     ConfigurationClientTests configurationTests = serviceProvider.GetRequiredService<ConfigurationClientTests>();
     if (!await configurationTests.ExecuteAsync(context)) // 3 tests

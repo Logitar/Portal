@@ -17,7 +17,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should authenticate the user.")]
   public async Task It_should_authenticate_the_user()
   {
-    AuthenticateUserPayload payload = new(Faker.Person.UserName, PasswordString);
+    AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
     User result = await Mediator.Send(command);
 
@@ -30,7 +30,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
-    AuthenticateUserPayload payload = new(Faker.Person.UserName, PasswordString[..^1]);
+    AuthenticateUserPayload payload = new(UsernameString, PasswordString[..^1]);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await Mediator.Send(command));
     Assert.Equal(user.Id, exception.UserId);
@@ -73,7 +73,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    AuthenticateUserPayload payload = new(Faker.Person.UserName, PasswordString);
+    AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
     Assert.Equal(TenantId, exception.TenantId);
@@ -84,7 +84,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    AuthenticateUserPayload payload = new(Faker.Person.UserName, password: string.Empty);
+    AuthenticateUserPayload payload = new(UsernameString, password: string.Empty);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
     Assert.Equal("Password", exception.Errors.Single().PropertyName);

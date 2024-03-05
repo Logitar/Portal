@@ -34,7 +34,6 @@ internal class Startup
     services.AddLogitarPortalClient(StaticPortalSettings.Instance);
     services.AddTransient<IApiKeyClient, ApiKeyClient>(); // NOTE(fpion): required since we inject it two times to create a Portal API key.
 
-    services.AddTransient<InitializeConfigurationTests>();
     services.AddTransient<CreateApiKeyTests>();
     services.AddTransient<DeleteApiKeyTests>();
     services.AddTransient<DeleteRealmTests>();

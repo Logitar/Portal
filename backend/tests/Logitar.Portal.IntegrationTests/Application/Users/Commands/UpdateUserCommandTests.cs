@@ -88,7 +88,7 @@ public class UpdateUserCommandTests : IntegrationTests
 
     UpdateUserPayload payload = new()
     {
-      UniqueName = Faker.Person.UserName
+      UniqueName = UsernameString
     };
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));

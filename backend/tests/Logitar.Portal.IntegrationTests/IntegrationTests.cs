@@ -1,14 +1,16 @@
 ﻿using Bogus;
 using Logitar.Data;
 using Logitar.Data.SqlServer;
+using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations.Commands;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
@@ -25,10 +27,10 @@ namespace Logitar.Portal;
 
 public abstract class IntegrationTests : IAsyncLifetime
 {
+  protected const string UsernameString = "portal";
   protected const string PasswordString = "P@s$W0rD";
 
   private readonly TestContext _context;
-  private readonly bool _initializeConfiguration;
 
   protected Faker Faker { get; } = new();
 
@@ -41,10 +43,8 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected Realm Realm { get; }
   protected TenantId TenantId => Realm.GetTenantId();
 
-  protected IntegrationTests(bool initializeConfiguration = true)
+  protected IntegrationTests()
   {
-    _initializeConfiguration = initializeConfiguration;
-
     IConfiguration configuration = new ConfigurationBuilder()
       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
       .AddUserSecrets("f5e49206-87cc-4c7a-8962-e79ebd5c850c")
@@ -90,25 +90,21 @@ public abstract class IntegrationTests : IAsyncLifetime
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
-    if (_initializeConfiguration)
-    {
-      UserPayload userPayload = new(Faker.Person.UserName, PasswordString)
-      {
-        EmailAddress = Faker.Person.Email,
-        FirstName = Faker.Person.FirstName,
-        LastName = Faker.Person.LastName
-      };
-      SessionPayload sessionPayload = new();
-      sessionPayload.CustomAttributes.Add(new CustomAttribute("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
-      sessionPayload.CustomAttributes.Add(new CustomAttribute("IpAddress", Faker.Internet.Ip()));
-      InitializeConfigurationPayload payload = new(userPayload, sessionPayload)
-      {
-        DefaultLocale = Faker.Locale
-      };
-      InitializeConfigurationCommand command = new(payload);
-      Session session = await Mediator.Send(command);
-      SetSession(session);
-    }
+    await publisher.Publish(new InitializeConfigurationCommand(UsernameString, PasswordString));
+
+    IUserRepository userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
+    UserAggregate userAggregate = Assert.Single(await userRepository.LoadAsync());
+    ActorId actorId = new(userAggregate.Id.Value);
+    userAggregate.FirstName = new PersonNameUnit(Faker.Person.FirstName);
+    userAggregate.LastName = new PersonNameUnit(Faker.Person.LastName);
+    userAggregate.Update(actorId);
+    EmailUnit email = new(Faker.Person.Email, isVerified: false);
+    userAggregate.SetEmail(email, actorId);
+    await userRepository.SaveAsync(userAggregate);
+
+    IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
+    User? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    SetUser(user);
   }
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
