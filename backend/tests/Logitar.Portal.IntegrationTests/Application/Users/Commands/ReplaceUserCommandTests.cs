@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;
@@ -35,7 +34,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     TableId[] tables = [IdentityDb.Roles.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
   }
@@ -128,7 +127,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     Assert.Null(result.MiddleName);
     Assert.Equal(payload.LastName, result.LastName);
     Assert.Equal(payload.Nickname.Trim(), result.Nickname);
-    Assert.Equal(payload.Birthdate?.ToUniversalTime(), result.Birthdate);
+    Assertions.Equal(payload.Birthdate, result.Birthdate, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.Gender, result.Gender, ignoreCase: true);
     Assert.Equal(payload.Locale, result.Locale?.Code);
     Assert.Equal(payload.TimeZone, result.TimeZone);

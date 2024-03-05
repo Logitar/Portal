@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.EntityFrameworkCore.Relational;
@@ -28,7 +27,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     TableId[] tables = [IdentityDb.ApiKeys.Table, IdentityDb.Roles.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
   }
@@ -53,7 +52,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
 
     Assert.Equal(payload.DisplayName, apiKey.DisplayName);
     Assert.Equal(payload.Description.Trim(), apiKey.Description);
-    Assert.Equal(payload.ExpiresOn?.ToUniversalTime(), apiKey.ExpiresOn);
+    Assertions.Equal(payload.ExpiresOn, apiKey.ExpiresOn, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.CustomAttributes, apiKey.CustomAttributes);
     Assert.Same(Realm, apiKey.Realm);
 

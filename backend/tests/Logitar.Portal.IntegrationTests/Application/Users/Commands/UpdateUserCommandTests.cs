@@ -155,7 +155,7 @@ public class UpdateUserCommandTests : IntegrationTests
     Assert.NotNull(result.PasswordChangedBy);
     Assert.Equal(user.Id.ToGuid(), result.PasswordChangedBy.Id);
     Assert.Equal(payload.IsDisabled.Value, result.IsDisabled);
-    Assert.Equal(payload.Birthdate.Value?.ToUniversalTime(), result.Birthdate);
+    Assertions.Equal(payload.Birthdate.Value, result.Birthdate, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.Gender.Value?.ToLower(), result.Gender);
     Assert.Equal(payload.Locale.Value, result.Locale?.Code);
     Assert.Equal(payload.TimeZone.Value, result.TimeZone);

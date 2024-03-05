@@ -53,7 +53,7 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.True(user.IsConfirmed);
     Assert.Equal(payload.FirstName, user.FirstName);
     Assert.Equal(payload.LastName, user.LastName);
-    Assert.Equal(payload.Birthdate?.ToUniversalTime(), user.Birthdate);
+    Assertions.Equal(payload.Birthdate, user.Birthdate, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.Gender, user.Gender, ignoreCase: true);
     Assert.Equal(payload.Picture, user.Picture);
     Assert.Equal(payload.CustomAttributes, user.CustomAttributes);

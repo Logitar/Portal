@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.Worker", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.MongoDB", "src\Logitar.Portal.MongoDB\Logitar.Portal.MongoDB.csproj", "{9A231E2D-5B3C-49CA-9CC3-C07FF62E6F95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logitar.Portal.EntityFrameworkCore.PostgreSQL", "src\Logitar.Portal.EntityFrameworkCore.PostgreSQL\Logitar.Portal.EntityFrameworkCore.PostgreSQL.csproj", "{D60E05F4-9FD4-46AB-A9C0-DAED0D43CB1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{9A231E2D-5B3C-49CA-9CC3-C07FF62E6F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A231E2D-5B3C-49CA-9CC3-C07FF62E6F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A231E2D-5B3C-49CA-9CC3-C07FF62E6F95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60E05F4-9FD4-46AB-A9C0-DAED0D43CB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60E05F4-9FD4-46AB-A9C0-DAED0D43CB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60E05F4-9FD4-46AB-A9C0-DAED0D43CB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60E05F4-9FD4-46AB-A9C0-DAED0D43CB1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

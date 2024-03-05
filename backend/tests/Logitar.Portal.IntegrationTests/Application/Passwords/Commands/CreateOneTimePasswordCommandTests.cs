@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +15,7 @@ public class CreateOneTimePasswordCommandTests : IntegrationTests
     TableId[] tables = [IdentityDb.OneTimePasswords.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
   }
@@ -35,7 +34,7 @@ public class CreateOneTimePasswordCommandTests : IntegrationTests
     CreateOneTimePasswordCommand command = new(payload);
     OneTimePassword oneTimePassword = await Mediator.Send(command);
 
-    Assert.Equal(payload.ExpiresOn?.ToUniversalTime(), oneTimePassword.ExpiresOn);
+    Assertions.Equal(payload.ExpiresOn, oneTimePassword.ExpiresOn, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.MaximumAttempts, oneTimePassword.MaximumAttempts);
     Assert.Equal(0, oneTimePassword.AttemptCount);
     Assert.False(oneTimePassword.HasValidationSucceeded);
