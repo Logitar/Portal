@@ -38,6 +38,8 @@ internal class PurgeTokenBlacklist : BackgroundService
 
   private async Task DoWorkAsync(CancellationToken cancellationToken)
   {
+    _logger.LogInformation("{TaskName} executing.", GetType().Name);
+
     using IServiceScope scope = _serviceProvider.CreateScope();
     ITokenBlacklist tokenBlacklist = scope.ServiceProvider.GetRequiredService<ITokenBlacklist>();
     await tokenBlacklist.PurgeAsync(cancellationToken);

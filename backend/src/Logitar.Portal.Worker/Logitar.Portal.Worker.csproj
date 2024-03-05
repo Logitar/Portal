@@ -25,6 +25,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logitar.Portal.EntityFrameworkCore.SqlServer\Logitar.Portal.EntityFrameworkCore.SqlServer.csproj" />
-    <ProjectReference Include="..\Logitar.Portal.MassTransit\Logitar.Portal.MassTransit.csproj" />
   </ItemGroup>
 </Project>

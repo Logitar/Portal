@@ -3,11 +3,11 @@ services:
   portal_mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: Logitar.Portal_mssql
-    ports:
-      - 1437:1433
     environment:
       ACCEPT_EULA: 'Y'
       SA_PASSWORD: w8x6pF9H5QEJL7sN
+    ports:
+      - 1437:1433
 
   portal_rabbitmq:
     image: masstransit/rabbitmq

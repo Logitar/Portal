@@ -1,7 +1,6 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure;
-using Logitar.Portal.MassTransit;
 using Logitar.Portal.Worker.Settings;
 using Logitar.Portal.Worker.Tasks;
 
@@ -18,8 +17,6 @@ internal class Startup
 
   public virtual void ConfigureServices(IServiceCollection services)
   {
-    services.AddLogitarPortalMassTransit(_configuration);
-
     services.AddApplicationInsightsTelemetryWorkerService();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
