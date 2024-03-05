@@ -18,7 +18,6 @@ using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
-using Logitar.Portal.EntityFrameworkCore.Relational.Logging;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 using Logitar.Portal.Infrastructure;
@@ -36,7 +35,6 @@ public static class DependencyInjectionExtensions
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddQueriers()
       .AddRepositories()
-      .AddScoped<ILoggingService, LoggingService>()
       .AddTransient<IActorService, ActorService>();
   }
 
@@ -61,6 +59,7 @@ public static class DependencyInjectionExtensions
     return services
       .AddTransient<IConfigurationRepository, ConfigurationRepository>()
       .AddTransient<IDictionaryRepository, DictionaryRepository>()
+      .AddTransient<ILogRepository, LogRepository>()
       .AddTransient<IMessageRepository, MessageRepository>()
       .AddTransient<IRealmRepository, RealmRepository>()
       .AddTransient<ISenderRepository, SenderRepository>()

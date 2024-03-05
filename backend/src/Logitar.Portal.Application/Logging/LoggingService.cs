@@ -1,32 +1,27 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Portal.Application;
+using Logitar.Identity.Domain.ApiKeys;
+using Logitar.Identity.Domain.Sessions;
+using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Caching;
-using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
-using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
-using Logitar.Portal.Infrastructure;
 
-namespace Logitar.Portal.EntityFrameworkCore.Relational.Logging;
+namespace Logitar.Portal.Application.Logging;
 
-internal class LoggingService : ILoggingService // TODO(fpion): should be in the Infrastructure layer!
+internal class LoggingService : ILoggingService
 {
-  private readonly JsonSerializerOptions _serializerOptions = new();
+  private Log? _log = null;
 
   private readonly ICacheService _cacheService;
-  private readonly PortalContext _context;
+  private readonly ILogRepository _logRepository;
 
-  private LogEntity? _log = null;
-
-  public LoggingService(ICacheService cacheService, PortalContext context, IServiceProvider serviceProvider)
+  public LoggingService(ICacheService cacheService, ILogRepository logRepository)
   {
     _cacheService = cacheService;
-    _context = context;
-
-    _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
+    _logRepository = logRepository;
   }
 
   public void Open(string? correlationId, string? method, string? destination, string? source, string? additionalInformation, DateTime? startedOn)
@@ -36,7 +31,7 @@ internal class LoggingService : ILoggingService // TODO(fpion): should be in the
       throw new InvalidOperationException($"You must close the current log by calling one of the '{nameof(CloseAndSaveAsync)}' methods before opening a new log.");
     }
 
-    _log = new(correlationId, method, destination, source, additionalInformation);
+    _log = Log.Open(correlationId, method, destination, source, additionalInformation);
   }
 
   public void Report(DomainEvent @event)
@@ -48,13 +43,13 @@ internal class LoggingService : ILoggingService // TODO(fpion): should be in the
   public void Report(Exception exception)
   {
     AssertLogIsOpen();
-    _log!.Report(exception, _serializerOptions);
+    _log!.Report(exception);
   }
 
   public void SetActivity(object activity)
   {
     AssertLogIsOpen();
-    _log!.SetActivity(activity, _serializerOptions);
+    _log!.SetActivity(activity);
   }
 
   public void SetOperation(Operation operation)
@@ -66,25 +61,25 @@ internal class LoggingService : ILoggingService // TODO(fpion): should be in the
   public void SetRealm(Realm realm)
   {
     AssertLogIsOpen();
-    _log!.TenantId = realm.GetTenantId().Value;
+    _log!.TenantId = realm.GetTenantId();
   }
 
   public void SetApiKey(ApiKey apiKey)
   {
     AssertLogIsOpen();
-    _log!.ApiKeyId = new AggregateId(apiKey.Id).Value;
+    _log!.ApiKeyId = new ApiKeyId(apiKey.Id);
   }
 
   public void SetSession(Session session)
   {
     AssertLogIsOpen();
-    _log!.SessionId = new AggregateId(session.Id).Value;
+    _log!.SessionId = new SessionId(session.Id);
   }
 
   public void SetUser(User user)
   {
     AssertLogIsOpen();
-    _log!.UserId = new AggregateId(user.Id).Value;
+    _log!.UserId = new UserId(user.Id);
   }
 
   public async Task CloseAndSaveAsync(int statusCode, CancellationToken cancellationToken)
@@ -94,8 +89,7 @@ internal class LoggingService : ILoggingService // TODO(fpion): should be in the
 
     if (ShouldSaveLog())
     {
-      _context.Logs.Add(_log);
-      await _context.SaveChangesAsync(cancellationToken);
+      await _logRepository.SaveAsync(_log, cancellationToken);
     }
 
     _log = null;
@@ -119,7 +113,7 @@ internal class LoggingService : ILoggingService // TODO(fpion): should be in the
         switch (loggingSettings.Extent)
         {
           case LoggingExtent.ActivityOnly:
-            return _log.ActivityType != null;
+            return _log.Activity != null;
           case LoggingExtent.Full:
             return true;
         }
