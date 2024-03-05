@@ -1,16 +1,12 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.EntityFrameworkCore.Relational;
-using Logitar.Identity.EntityFrameworkCore.Relational.Handlers.ApiKeys;
-using Logitar.Identity.EntityFrameworkCore.Relational.Handlers.Passwords;
-using Logitar.Identity.EntityFrameworkCore.Relational.Handlers.Roles;
-using Logitar.Identity.EntityFrameworkCore.Relational.Handlers.Sessions;
-using Logitar.Identity.EntityFrameworkCore.Relational.Handlers.Users;
+using Logitar.Identity.Infrastructure;
+using Logitar.Identity.Infrastructure.Handlers;
 using Logitar.Portal.Application.Logging;
 using MediatR;
 
-namespace Logitar.Portal.EntityFrameworkCore.Relational;
+namespace Logitar.Portal.Infrastructure;
 
-internal class PortalEventBus : EventBus // TODO(fpion): should be in the Infrastructure layer!
+internal class PortalEventBus : EventBus
 {
   private readonly ILoggingService _loggingService;
 

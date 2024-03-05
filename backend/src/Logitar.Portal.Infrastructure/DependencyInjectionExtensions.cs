@@ -25,7 +25,8 @@ public static class DependencyInjectionExtensions
       .AddSenderProviders()
       .AddSingleton(InitializeCachingSettings)
       .AddSingleton<ICacheService, CacheService>()
-      .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(serviceProvider.GetLogitarPortalJsonConverters()));
+      .AddSingleton<IEventSerializer>(serviceProvider => new EventSerializer(serviceProvider.GetLogitarPortalJsonConverters()))
+      .AddTransient<IEventBus, PortalEventBus>();
   }
 
   private static IServiceCollection AddSenderProviders(this IServiceCollection services)
