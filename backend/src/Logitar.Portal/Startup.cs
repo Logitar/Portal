@@ -4,6 +4,7 @@ using Logitar.Portal.Application;
 using Logitar.Portal.Authentication;
 using Logitar.Portal.Authorization;
 using Logitar.Portal.Constants;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Extensions;
@@ -88,6 +89,12 @@ internal class Startup : StartupBase
      ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
+      case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(_configuration);
+        healthChecks.AddDbContextCheck<EventContext>();
+        healthChecks.AddDbContextCheck<IdentityContext>();
+        healthChecks.AddDbContextCheck<PortalContext>();
+        break;
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
         services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
         healthChecks.AddDbContextCheck<EventContext>();
