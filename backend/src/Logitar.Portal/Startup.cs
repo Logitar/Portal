@@ -85,8 +85,7 @@ internal class Startup : StartupBase
       services.AddOpenApi();
     }
 
-    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-     ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:

@@ -19,8 +19,7 @@ internal class Startup
   {
     services.AddApplicationInsightsTelemetryWorkerService();
 
-    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider")
-     ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+    DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
