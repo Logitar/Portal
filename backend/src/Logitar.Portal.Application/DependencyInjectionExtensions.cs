@@ -28,7 +28,8 @@ public static class DependencyInjectionExtensions
       .AddTransient(typeof(IPipelineBehavior<,>), typeof(ActivityLoggingBehavior<,>))
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()
-      .AddTransient<ITemplateManager, TemplateManager>();
+      .AddTransient<ITemplateManager, TemplateManager>()
+      .AddScoped<ILoggingService, LoggingService>();
   }
 
   private static IServiceCollection AddFacades(this IServiceCollection services)
