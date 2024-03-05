@@ -54,10 +54,10 @@ internal class DictionaryQuerier : IDictionaryQuerier
   public async Task<Dictionary?> ReadAsync(Realm? realm, string locale, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    locale = locale.Trim();
+    string localeNormalized = locale.Trim().ToUpper();
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.Locale == locale, cancellationToken);
+      .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.LocaleNormalized == localeNormalized, cancellationToken);
 
     if (dictionary == null)
     {

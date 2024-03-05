@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Shared;
@@ -32,7 +31,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     TableId[] tables = [IdentityDb.ApiKeys.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
   }

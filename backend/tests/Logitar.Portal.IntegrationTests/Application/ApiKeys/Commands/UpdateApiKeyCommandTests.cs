@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Contracts;
 using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.Domain.Passwords;
@@ -37,7 +36,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     TableId[] tables = [IdentityDb.ApiKeys.Table, IdentityDb.Roles.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
   }
@@ -124,7 +123,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
     Assert.Equal(payload.Description.Value?.Trim(), result.Description);
-    Assert.Equal(payload.ExpiresOn?.ToUniversalTime(), result.ExpiresOn);
+    Assertions.Equal(payload.ExpiresOn, result.ExpiresOn, TimeSpan.FromSeconds(1));
 
     Assert.Equal(2, result.CustomAttributes.Count);
     Assert.Contains(result.CustomAttributes, c => c.Key == "Confidentiality" && c.Value == "Private");

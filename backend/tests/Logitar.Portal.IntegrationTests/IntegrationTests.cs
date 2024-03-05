@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Logitar.Data;
+using Logitar.Data.PostgreSQL;
 using Logitar.Data.SqlServer;
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
@@ -15,8 +16,10 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
+using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +34,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected const string PasswordString = "P@s$W0rD";
 
   private readonly TestContext _context;
+  private readonly DatabaseProvider _databaseProvider;
 
   protected Faker Faker { get; } = new();
 
@@ -50,17 +54,29 @@ public abstract class IntegrationTests : IAsyncLifetime
       .AddUserSecrets("f5e49206-87cc-4c7a-8962-e79ebd5c850c")
       .Build();
 
-    string connectionString = configuration.GetValue<string>("SQLCONNSTR_Portal")
-      ?.Replace("{Database}", GetType().Name) ?? string.Empty;
+    ServiceCollection services = new();
+    services.AddSingleton(configuration);
+    services.AddScoped<IBaseUrl, TestBaseUrl>();
+    services.AddScoped<TestContext>();
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>));
 
-    ServiceProvider = new ServiceCollection()
-      .AddSingleton(configuration)
-      .AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString)
-      .AddScoped<IBaseUrl, TestBaseUrl>()
-      .AddScoped<TestContext>()
-      .AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>))
-      .BuildServiceProvider();
+    string connectionString;
+    _databaseProvider = configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
+    switch (_databaseProvider)
+    {
+      case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+        connectionString = configuration.GetValue<string>("POSTGRESQLCONNSTR_Portal")?.Replace("{Database}", GetType().Name) ?? string.Empty;
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        break;
+      case DatabaseProvider.EntityFrameworkCoreSqlServer:
+        connectionString = configuration.GetValue<string>("SQLCONNSTR_Portal")?.Replace("{Database}", GetType().Name) ?? string.Empty;
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
+        break;
+      default:
+        throw new DatabaseProviderNotSupportedException(_databaseProvider);
+    }
 
+    ServiceProvider = services.BuildServiceProvider();
     _context = ServiceProvider.GetRequiredService<TestContext>();
 
     Mediator = ServiceProvider.GetRequiredService<IMediator>();
@@ -86,7 +102,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     TableId[] tables = [EventDb.Events.Table, IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
@@ -106,6 +122,12 @@ public abstract class IntegrationTests : IAsyncLifetime
     User? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
     SetUser(user);
   }
+  protected IDeleteBuilder CreateDeleteBuilder(TableId table) => _databaseProvider switch
+  {
+    DatabaseProvider.EntityFrameworkCorePostgreSQL => PostgresDeleteBuilder.From(table),
+    DatabaseProvider.EntityFrameworkCoreSqlServer => SqlServerDeleteBuilder.From(table),
+    _ => throw new DatabaseProviderNotSupportedException(_databaseProvider),
+  };
 
   public virtual Task DisposeAsync() => Task.CompletedTask;
 

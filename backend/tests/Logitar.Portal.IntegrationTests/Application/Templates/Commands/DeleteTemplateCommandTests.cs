@@ -32,7 +32,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
     TableId[] tables = [PortalDb.Templates.Table];
     foreach (TableId table in tables)
     {
-      ICommand command = SqlServerDeleteBuilder.From(table).Build();
+      ICommand command = CreateDeleteBuilder(table).Build();
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
