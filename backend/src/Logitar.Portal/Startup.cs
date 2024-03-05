@@ -11,6 +11,7 @@ using Logitar.Portal.GraphQL;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.MassTransit;
 using Logitar.Portal.Middlewares;
+using Logitar.Portal.MongoDB;
 using Logitar.Portal.Settings;
 using Logitar.Portal.Web;
 using Logitar.Portal.Web.Constants;
@@ -96,6 +97,7 @@ internal class Startup : StartupBase
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
     }
+    services.AddLogitarPortalMongoDB(_configuration); // NOTE(fpion): needs to be placed after the relational database to override the LogRepository if MongoDB settings are provided.
 
     services.AddDistributedMemoryCache();
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();

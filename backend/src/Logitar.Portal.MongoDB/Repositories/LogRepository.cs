@@ -1,17 +1,18 @@
 ﻿using Logitar.Portal.Application.Logging;
-using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.MongoDB.Entities;
+using MongoDB.Driver;
 
-namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
+namespace Logitar.Portal.MongoDB.Repositories;
 
 internal class LogRepository : ILogRepository
 {
-  private readonly PortalContext _context;
+  private readonly IMongoCollection<LogEntity> _logs;
   private readonly JsonSerializerOptions _serializerOptions = new();
 
-  public LogRepository(PortalContext context, IServiceProvider serviceProvider)
+  public LogRepository(IMongoDatabase database, IServiceProvider serviceProvider)
   {
-    _context = context;
+    _logs = database.GetCollection<LogEntity>("logs");
     _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
   }
 
@@ -19,8 +20,6 @@ internal class LogRepository : ILogRepository
   {
     LogEntity entity = new(log, _serializerOptions);
 
-    _context.Logs.Add(entity);
-
-    await _context.SaveChangesAsync(cancellationToken);
+    await _logs.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken);
   }
 }
