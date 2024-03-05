@@ -36,56 +36,64 @@ internal class LoggingService : ILoggingService
 
   public void Report(DomainEvent @event)
   {
-    AssertLogIsOpen();
-    _log!.Report(@event);
+    _log?.Report(@event);
   }
 
   public void Report(Exception exception)
   {
-    AssertLogIsOpen();
-    _log!.Report(exception);
+    _log?.Report(exception);
   }
 
   public void SetActivity(object activity)
   {
-    AssertLogIsOpen();
-    _log!.SetActivity(activity);
+    _log?.SetActivity(activity);
   }
 
   public void SetOperation(Operation operation)
   {
-    AssertLogIsOpen();
-    _log!.SetOperation(operation);
+    _log?.SetOperation(operation);
   }
 
   public void SetRealm(Realm realm)
   {
-    AssertLogIsOpen();
-    _log!.TenantId = realm.GetTenantId();
+    if (_log != null)
+    {
+      _log.TenantId = realm.GetTenantId();
+    }
   }
 
   public void SetApiKey(ApiKey apiKey)
   {
-    AssertLogIsOpen();
-    _log!.ApiKeyId = new ApiKeyId(apiKey.Id);
+    if (_log != null)
+    {
+      _log.ApiKeyId = new ApiKeyId(apiKey.Id);
+    }
   }
 
   public void SetSession(Session session)
   {
-    AssertLogIsOpen();
-    _log!.SessionId = new SessionId(session.Id);
+    if (_log != null)
+    {
+      _log.SessionId = new SessionId(session.Id);
+    }
   }
 
   public void SetUser(User user)
   {
-    AssertLogIsOpen();
-    _log!.UserId = new UserId(user.Id);
+    if (_log != null)
+    {
+      _log.UserId = new UserId(user.Id);
+    }
   }
 
   public async Task CloseAndSaveAsync(int statusCode, CancellationToken cancellationToken)
   {
-    AssertLogIsOpen();
-    _log!.Close(statusCode);
+    if (_log == null)
+    {
+      throw new InvalidOperationException($"You must open a new log by calling one of the '{nameof(Open)}' methods before calling the current method.");
+    }
+
+    _log.Close(statusCode);
 
     if (ShouldSaveLog())
     {
@@ -93,14 +101,6 @@ internal class LoggingService : ILoggingService
     }
 
     _log = null;
-  }
-
-  private void AssertLogIsOpen()
-  {
-    if (_log == null)
-    {
-      throw new InvalidOperationException($"You must open a new log by calling one of the '{nameof(Open)}' methods before calling the current method.");
-    }
   }
 
   private bool ShouldSaveLog()
