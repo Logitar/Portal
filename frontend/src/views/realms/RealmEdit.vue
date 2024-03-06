@@ -43,7 +43,7 @@ const defaults = {
     requireLowercase: true,
     requireUppercase: true,
     requireDigit: true,
-    strategy: "PBKDF2",
+    hashingStrategy: "PBKDF2",
   },
   secret: "",
   claimMappings: [],

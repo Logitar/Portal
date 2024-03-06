@@ -30,7 +30,7 @@ const props = withDefaults(
       requireLowercase: true,
       requireUppercase: true,
       requireDigit: true,
-      strategy: "PBKDF2",
+      hashingStrategy: "PBKDF2",
     }),
     uniqueNameSettings: () => ({ allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" }),
   },

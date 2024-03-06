@@ -7,11 +7,11 @@ import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import LoggingSettingsEdit from "@/components/configuration/LoggingSettingsEdit.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
-import type { Configuration, LoggingSettings } from "@/types/configuration";
+import type { Configuration, LoggingExtent, LoggingSettings } from "@/types/configuration";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
 import { handleErrorKey, toastsKey } from "@/inject/App";
-import { readConfiguration, updateConfiguration } from "@/api/configuration";
+import { readConfiguration, replaceConfiguration } from "@/api/configuration";
 import { useConfigurationStore } from "@/stores/configuration";
 
 const configurationStore = useConfigurationStore();
@@ -21,7 +21,7 @@ const { t } = useI18n();
 
 const defaults = {
   loggingSettings: {
-    extent: "ActivityOnly",
+    extent: "ActivityOnly" as LoggingExtent,
     onlyErrors: false,
   },
   uniqueNameSettings: { allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" },
@@ -32,49 +32,56 @@ const defaults = {
     requireLowercase: true,
     requireUppercase: true,
     requireDigit: true,
-    strategy: "PBKDF2",
+    hashingStrategy: "PBKDF2",
   },
+  requireUniqueEmail: false,
   secret: "",
 };
 
 const configuration = ref<Configuration>();
-const defaultLocale = ref<string>("");
+const defaultLocale = ref<string>();
 const loggingSettings = ref<LoggingSettings>(defaults.loggingSettings);
 const passwordSettings = ref<PasswordSettings>(defaults.passwordSettings);
+const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
 
 const hasChanges = computed<boolean>(() => {
   const model = configuration.value ?? defaults;
   return (
-    defaultLocale.value !== configuration.value?.defaultLocale.code ||
+    (defaultLocale.value ?? "") !== (configuration.value?.defaultLocale?.code ?? "") ||
     JSON.stringify(loggingSettings.value) !== JSON.stringify(model.loggingSettings) ||
-    JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings) ||
     JSON.stringify(passwordSettings.value) !== JSON.stringify(model.passwordSettings) ||
-    secret.value !== model.secret
+    requireUniqueEmail.value !== model.requireUniqueEmail ||
+    secret.value !== model.secret ||
+    JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings)
   );
 });
 
 function setModel(model: Configuration): void {
   configuration.value = model;
-  defaultLocale.value = model.defaultLocale.code;
+  defaultLocale.value = model.defaultLocale?.code;
   loggingSettings.value = model.loggingSettings;
-  uniqueNameSettings.value = model.uniqueNameSettings;
   passwordSettings.value = model.passwordSettings;
+  requireUniqueEmail.value = model.requireUniqueEmail;
   secret.value = model.secret;
+  uniqueNameSettings.value = model.uniqueNameSettings;
 }
 
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
-    const updatedConfiguration = await updateConfiguration({
-      defaultLocale: defaultLocale.value !== configuration.value?.defaultLocale.code ? defaultLocale.value : undefined,
-      secret: secret.value !== configuration.value?.secret ? secret.value : undefined,
-      uniqueNameSettings:
-        JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(configuration.value?.uniqueNameSettings) ? uniqueNameSettings.value : undefined,
-      passwordSettings: JSON.stringify(passwordSettings.value) !== JSON.stringify(configuration.value?.passwordSettings) ? passwordSettings.value : undefined,
-      loggingSettings: JSON.stringify(loggingSettings.value) !== JSON.stringify(configuration.value?.loggingSettings) ? loggingSettings.value : undefined,
-    });
+    const updatedConfiguration = await replaceConfiguration(
+      {
+        defaultLocale: defaultLocale.value,
+        secret: secret.value,
+        uniqueNameSettings: uniqueNameSettings.value,
+        passwordSettings: passwordSettings.value,
+        requireUniqueEmail: requireUniqueEmail.value,
+        loggingSettings: loggingSettings.value,
+      },
+      configuration.value?.version,
+    );
     setModel(updatedConfiguration);
     toasts.success("configuration.updated");
   } catch (e: unknown) {

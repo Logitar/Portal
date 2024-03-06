@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import { isConfigurationInitialized } from "./api/configuration";
 import { useAccountStore } from "@/stores/account";
-import { useConfigurationStore } from "@/stores/configuration";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.MODE === "development" ? import.meta.env.BASE_URL : "/app"),
@@ -20,12 +18,6 @@ const router = createRouter({
       name: "ConfigurationEdit",
       path: "/configuration",
       component: () => import("./views/configuration/ConfigurationEdit.vue"),
-    },
-    {
-      name: "Setup",
-      path: "/setup",
-      component: () => import("./views/configuration/ConfigurationInit.vue"),
-      meta: { isPublic: true },
     },
     // Account
     {
@@ -195,17 +187,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const configuration = useConfigurationStore();
-  if (typeof configuration.isInitialized === "undefined") {
-    const result = await isConfigurationInitialized();
-    configuration.isInitialized = result.isInitialized;
-  }
-  if (configuration.isInitialized === false && to.name !== "Setup") {
-    return { name: "Setup" };
-  } else if (configuration.isInitialized === true && to.name === "Setup") {
-    return { name: "Dashboard" };
-  }
-
   const account = useAccountStore();
   if (!to.meta.isPublic && !account.authenticated) {
     return { name: "SignIn", query: { redirect: to.fullPath } };

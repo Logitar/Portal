@@ -32,7 +32,7 @@ const props = withDefaults(
       requireLowercase: true,
       requireUppercase: true,
       requireDigit: true,
-      strategy: "PBKDF2",
+      hashingStrategy: "PBKDF2",
     }),
     validate: false,
   },
