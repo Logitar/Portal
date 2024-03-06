@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 
-import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { User } from "@/types/users";
 import { formatUser } from "@/helpers/displayUtils";
@@ -11,14 +10,13 @@ import { searchUsers } from "@/api/users";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disabled?: boolean;
     id?: string;
     label?: string;
     modelValue?: string;
     placeholder?: string;
-    realm?: Realm;
     required?: boolean;
   }>(),
   {
@@ -50,27 +48,21 @@ const emit = defineEmits<{
   (e: "user-selected", value: User | undefined): void;
 }>();
 
-watch(
-  () => props.realm,
-  async (realm) => {
-    try {
-      const search = await searchUsers({
-        realm: realm?.id,
-      });
-      users.value = search.results;
-    } catch (e: unknown) {
-      handleError(e);
-    }
-  },
-  { immediate: true },
-);
-
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
   const selectedUser = id ? users.value.find((user) => user.id === id) : undefined;
   emit("user-selected", selectedUser);
 }
+
+onMounted(async () => {
+  try {
+    const results = await searchUsers({});
+    users.value = results.results;
+  } catch (e: unknown) {
+    handleError(e);
+  }
+});
 </script>
 
 <template>

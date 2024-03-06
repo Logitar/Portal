@@ -1,12 +1,11 @@
 import type { Actor } from "@/types/actor";
 import type { Aggregate } from "@/types/aggregate";
 import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
-import type { Identifier } from "@/types/identifier";
+import type { CustomIdentifier } from "@/types/customIdentifiers";
 import type { Locale } from "@/types/i18n";
 import type { Modification } from "@/types/modifications";
 import type { Realm } from "@/types/realms";
-import type { Role } from "@/types/roles";
-import type { RoleModification } from "@/types/roles";
+import type { Role, RoleModification } from "@/types/roles";
 import type { SearchPayload, SortOption } from "@/types/search";
 
 export type Address = Contact & {
@@ -18,13 +17,12 @@ export type Address = Contact & {
   formatted: string;
 };
 
-export type AddressPayload = {
+export type AddressPayload = ContactPayload & {
   street: string;
   locality: string;
   region?: string;
   postalCode?: string;
   country: string;
-  isVerified: boolean;
 };
 
 export type AuthenticatedUser = {
@@ -34,15 +32,14 @@ export type AuthenticatedUser = {
 };
 
 export type ChangePasswordPayload = {
-  currentPassword?: string;
-  newPassword: string;
+  current?: string;
+  new: string;
 };
 
 export type CreateUserPayload = {
-  realm?: string;
   uniqueName: string;
   password?: string;
-  isDisabled?: boolean;
+  isDisabled: boolean;
   address?: AddressPayload;
   email?: EmailPayload;
   phone?: PhonePayload;
@@ -57,14 +54,19 @@ export type CreateUserPayload = {
   picture?: string;
   profile?: string;
   website?: string;
-  customAttributes?: CustomAttribute[];
-  roles?: string[];
+  customAttributes: CustomAttribute[];
+  customIdentifiers: CustomIdentifier[];
+  roles: string[];
 };
 
 export type Contact = {
   isVerified: boolean;
   verifiedBy?: Actor;
   verifiedOn?: string;
+};
+
+export type ContactPayload = {
+  isVerified: boolean;
 };
 
 export type CountrySettings = {
@@ -77,9 +79,8 @@ export type Email = Contact & {
   address: string;
 };
 
-export type EmailPayload = {
+export type EmailPayload = ContactPayload & {
   address: string;
-  isVerified: boolean;
 };
 
 export type PersonNameType = "first" | "last" | "middle" | "nick";
@@ -91,15 +92,14 @@ export type Phone = Contact & {
   e164Formatted: string;
 };
 
-export type PhonePayload = {
+export type PhonePayload = ContactPayload & {
   countryCode?: string;
   number: string;
   extension?: string;
-  isVerified: boolean;
 };
 
 export type SearchUsersPayload = SearchPayload & {
-  realm?: string;
+  hasAuthenticated?: boolean;
   hasPassword?: boolean;
   isConfirmed?: boolean;
   isDisabled?: boolean;
@@ -129,7 +129,6 @@ export type UpdateUserPayload = {
 };
 
 export type User = Aggregate & {
-  id: string;
   uniqueName: string;
   hasPassword: boolean;
   passwordChangedBy?: Actor;
@@ -137,7 +136,6 @@ export type User = Aggregate & {
   disabledBy?: Actor;
   disabledOn?: string;
   isDisabled: boolean;
-  authenticatedOn?: string;
   address?: Address;
   email?: Email;
   phone?: Phone;
@@ -154,8 +152,9 @@ export type User = Aggregate & {
   picture?: string;
   profile?: string;
   website?: string;
+  authenticatedOn?: string;
   customAttributes: CustomAttribute[];
-  identifiers: Identifier[];
+  customIdentifiers: CustomIdentifier[];
   roles: Role[];
   realm?: Realm;
 };

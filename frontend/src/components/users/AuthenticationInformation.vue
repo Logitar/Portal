@@ -4,6 +4,7 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 
 import PasswordInput from "./PasswordInput.vue";
+import type { UpdateProfilePayload } from "@/types/account";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { User, UpdateUserPayload, UserUpdatedEvent } from "@/types/users";
@@ -69,10 +70,10 @@ const onSubmit = handleSubmit(async () => {
   uniqueNameAlreadyUsed.value = false;
   try {
     if (props.isProfile) {
-      const payload: UpdateUserPayload = {
+      const payload: UpdateProfilePayload = {
         password: {
-          currentPassword: current.value,
-          newPassword: password.value,
+          current: current.value,
+          new: password.value,
         },
       };
       const user = await saveProfile(payload);
@@ -80,7 +81,7 @@ const onSubmit = handleSubmit(async () => {
     } else {
       const payload: UpdateUserPayload = {
         uniqueName: uniqueName.value !== props.user.uniqueName ? uniqueName.value : undefined,
-        password: password.value ? { newPassword: password.value } : undefined,
+        password: password.value ? { new: password.value } : undefined,
       };
       const user = await updateUser(props.user.id, payload);
       emit("user-updated", { user, toast: payload.uniqueName ? undefined : "users.password.changed" });

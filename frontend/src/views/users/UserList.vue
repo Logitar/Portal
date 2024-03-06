@@ -3,7 +3,6 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import type { SearchUsersPayload, User, UserSort } from "@/types/users";
 import type { SelectOption, ToastUtils } from "@/types/components";
@@ -31,7 +30,6 @@ const isConfirmed = computed<boolean | undefined>(() => (route.query.isConfirmed
 const isDescending = computed<boolean>(() => route.query.isDescending === "true");
 const isDisabled = computed<boolean | undefined>(() => (route.query.isDisabled ? route.query.isDisabled === "true" : undefined));
 const page = computed<number>(() => Number(route.query.page) || 1);
-const realm = computed<string>(() => route.query.realm?.toString() ?? "");
 const search = computed<string>(() => route.query.search?.toString() ?? "");
 const sort = computed<string>(() => route.query.sort?.toString() ?? "");
 
@@ -44,7 +42,6 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchUsersPayload = {
-    realm: realm.value || undefined,
     isConfirmed: isConfirmed.value,
     isDisabled: isDisabled.value,
     search: {
@@ -105,7 +102,6 @@ function setQuery(key: string, value: string): void {
   switch (key) {
     case "isConfirmed":
     case "isDisabled":
-    case "realm":
     case "search":
     case "count":
       query.page = "1";
@@ -126,7 +122,6 @@ watch(
             ? {
                 isConfirmed: "",
                 isDisabled: "",
-                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -154,18 +149,11 @@ watch(
       <h1>{{ t("users.title.list") }}</h1>
       <div class="my-2">
         <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-        <icon-button
-          class="ms-1"
-          icon="fas fa-plus"
-          text="actions.create"
-          :to="{ name: 'CreateUser', query: { realm: realm || undefined } }"
-          variant="success"
-        />
+        <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateUser' }" variant="success" />
       </div>
       <div class="row">
-        <RealmSelect class="col-lg-4" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
         <yes-no-select
-          class="col-lg-4"
+          class="col-lg-6"
           id="isConfirmed"
           label="users.isConfirmed.label"
           placeholder="users.isConfirmed.placeholder"
@@ -173,7 +161,7 @@ watch(
           @update:model-value="setQuery('isConfirmed', $event)"
         />
         <yes-no-select
-          class="col-lg-4"
+          class="col-lg-6"
           id="isDisabled"
           label="users.isDisabled.label"
           placeholder="users.isDisabled.placeholder"

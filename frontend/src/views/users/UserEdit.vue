@@ -9,7 +9,6 @@ import ContactInformation from "@/components/users/ContactInformation.vue";
 import ManageRoles from "@/components/roles/ManageRoles.vue";
 import PasswordInput from "@/components/users/PasswordInput.vue";
 import PersonalInformation from "@/components/users/PersonalInformation.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
@@ -18,7 +17,6 @@ import type { CollectionAction } from "@/types/modifications";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
-import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { ToastUtils } from "@/types/components";
 import type { User, UserUpdatedEvent } from "@/types/users";
@@ -26,7 +24,6 @@ import { createUser, readUser, updateUser } from "@/api/users";
 import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
-import { readRealm } from "@/api/realms";
 import { useAccountStore } from "@/stores/account";
 
 const account = useAccountStore();
@@ -42,23 +39,19 @@ const customAttributes = ref<CustomAttribute[]>([]);
 const hasLoaded = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const password = ref<string>("");
-const realm = ref<Realm>();
-const realmId = ref<string>();
 const uniqueName = ref<string>("");
 const uniqueNameAlreadyUsed = ref<boolean>(false);
 const user = ref<User>();
 
-const hasChanges = computed<boolean>(() => !user.value && (Boolean(realm) || Boolean(uniqueName) || Boolean(password) || Boolean(confirm)));
+const hasChanges = computed<boolean>(() => !user.value && (Boolean(uniqueName) || Boolean(password) || Boolean(confirm)));
 const isPasswordRequired = computed<boolean>(() => Boolean(password.value) || Boolean(confirm.value));
-const passwordSettings = computed<PasswordSettings | undefined>(() => realm.value?.passwordSettings ?? configuration.value?.passwordSettings);
+const passwordSettings = computed<PasswordSettings | undefined>(() => configuration.value?.passwordSettings); // TODO(fpion): current realm
 const title = computed<string>(() => user.value?.fullName ?? user.value?.uniqueName ?? t("users.title.new"));
-const uniqueNameSettings = computed<UniqueNameSettings | undefined>(() => realm.value?.uniqueNameSettings ?? configuration.value?.uniqueNameSettings);
+const uniqueNameSettings = computed<UniqueNameSettings | undefined>(() => configuration.value?.uniqueNameSettings); // TODO(fpion): current realm
 
 function setModel(model: User): void {
   user.value = model;
   customAttributes.value = model.customAttributes.map((item) => ({ ...item }));
-  realm.value = model.realm;
-  realmId.value = model.realm?.id;
   uniqueName.value = model.uniqueName;
 }
 
@@ -67,9 +60,12 @@ const onCreate = handleSubmit(async () => {
   uniqueNameAlreadyUsed.value = false;
   try {
     const user = await createUser({
-      realm: realmId.value,
       uniqueName: uniqueName.value,
       password: password.value || undefined,
+      isDisabled: false,
+      customAttributes: [],
+      customIdentifiers: [],
+      roles: [],
     });
     setModel(user);
     toasts.success("users.created");
@@ -102,11 +98,6 @@ const onSaveCustomAttributes = handleSubmit(async () => {
     }
   }
 });
-
-function onRealmSelected(selected?: Realm): void {
-  realm.value = selected;
-  realmId.value = selected?.id;
-}
 
 async function onRoleToggled(role: Role, action: CollectionAction): Promise<void> {
   if (user.value && !isLoading.value) {
@@ -153,14 +144,9 @@ onMounted(async () => {
   try {
     configuration.value = await readConfiguration();
     const id = route.params.id?.toString();
-    const realmIdQuery = route.query.realm?.toString();
     if (id) {
       const user = await readUser(id);
       setModel(user);
-    } else if (realmIdQuery) {
-      const foundRealm = await readRealm(realmIdQuery);
-      realm.value = foundRealm;
-      realmId.value = foundRealm.id;
     }
   } catch (e: unknown) {
     const { status } = e as ApiError;
@@ -196,7 +182,6 @@ onMounted(async () => {
           <ToggleUserStatus class="mx-1" :user="user" @user-updated="onStatusToggled" />
           <SignOutUser class="ms-1" :user="user" @signed-out="onUserSignedOut" />
         </div>
-        <RealmSelect disabled :model-value="realmId" />
         <app-tabs>
           <app-tab active title="users.tabs.authentication">
             <AuthenticationInformation
@@ -218,16 +203,10 @@ onMounted(async () => {
             </form>
           </app-tab>
           <app-tab title="identifiers.title">
-            <identifier-list :identifiers="user.identifiers" />
+            <identifier-list :identifiers="user.customIdentifiers" />
           </app-tab>
           <app-tab title="roles.title.list">
-            <ManageRoles
-              :loading="isLoading"
-              :realm="realm"
-              :roles="user.roles"
-              @role-added="onRoleToggled($event, 'Add')"
-              @role-removed="onRoleToggled($event, 'Remove')"
-            />
+            <ManageRoles :loading="isLoading" :roles="user.roles" @role-added="onRoleToggled($event, 'Add')" @role-removed="onRoleToggled($event, 'Remove')" />
           </app-tab>
         </app-tabs>
       </template>
@@ -243,7 +222,6 @@ onMounted(async () => {
           />
           <icon-button class="ms-1" icon="chevron-left" text="actions.back" :variant="hasChanges ? 'danger' : 'secondary'" @click="router.back()" />
         </div>
-        <RealmSelect :model-value="realmId" @realm-selected="onRealmSelected" />
         <unique-name-input required :settings="uniqueNameSettings" validate v-model="uniqueName" />
         <div class="row">
           <PasswordInput
