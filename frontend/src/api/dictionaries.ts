@@ -22,7 +22,7 @@ export async function replaceDictionary(id: string, payload: ReplaceDictionaryPa
 const searchDictionariesQuery = `
 query($payload: SearchDictionariesPayload!) {
   dictionaries(payload: $payload) {
-    results {
+    items {
       id
       realm {
         uniqueSlug

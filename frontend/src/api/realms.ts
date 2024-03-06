@@ -26,7 +26,7 @@ export async function replaceRealm(id: string, payload: ReplaceRealmPayload, ver
 const searchRealmsQuery = `
 query($payload: SearchRealmsPayload!) {
   realms(payload: $payload) {
-    results {
+    items {
       id
       uniqueSlug
       displayName
@@ -40,7 +40,7 @@ query($payload: SearchRealmsPayload!) {
         requireLowercase
         requireUppercase
         requireDigit
-        strategy
+        hashingStrategy
       }
       updatedBy {
         id

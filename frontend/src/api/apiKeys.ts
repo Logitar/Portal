@@ -22,7 +22,7 @@ export async function replaceApiKey(id: string, payload: ReplaceApiKeyPayload, v
 const searchApiKeysQuery = `
 query($payload: SearchApiKeysPayload!) {
   apiKeys(payload: $payload) {
-    results {
+    items {
       id
       displayName
       expiresOn

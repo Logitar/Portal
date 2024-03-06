@@ -22,11 +22,14 @@ export async function replaceTemplate(id: string, payload: ReplaceTemplatePayloa
 const searchTemplatesQuery = `
 query($payload: SearchTemplatesPayload!) {
   templates(payload: $payload) {
-    results {
+    items {
       id
-      uniqueName
+      uniqueKey
       displayName
-      contentType
+      content {
+        type
+        text
+      }
       updatedBy {
         id
         type

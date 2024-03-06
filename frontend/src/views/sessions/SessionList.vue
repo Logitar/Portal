@@ -170,8 +170,6 @@ onMounted(async () => {
         :model-value="isPersistent?.toString()"
         @update:model-value="setQuery('isPersistent', $event)"
       />
-    </div>
-    <div class="row">
       <yes-no-select
         class="col-lg-4"
         id="isActive"
@@ -180,15 +178,17 @@ onMounted(async () => {
         :model-value="isActive?.toString()"
         @update:model-value="setQuery('isActive', $event)"
       />
+    </div>
+    <div class="row">
       <sort-select
-        class="col-lg-4"
+        class="col-lg-6"
         :descending="isDescending"
         :model-value="sort"
         :options="sortOptions"
         @descending="setQuery('isDescending', $event)"
         @update:model-value="setQuery('sort', $event)"
       />
-      <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
+      <count-select class="col-lg-6" :model-value="count" @update:model-value="setQuery('count', $event)" />
     </div>
     <template v-if="sessions.length">
       <table class="table table-striped">

@@ -8,10 +8,21 @@ export type ApiResult<T> = {
   status: number;
 };
 
+export type Error = {
+  code: string;
+  message: string;
+  data: ErrorData[];
+};
+
+export type ErrorData = {
+  key: string;
+  value?: string;
+};
+
 export type ErrorDetail = {
   errorCode: string;
   errorMessage: string;
-}; // TODO(fpion): refactor
+}; // TODO(fpion): remove
 
 export type GraphQLError = {
   extensions?: GraphQLErrorExtensions;
@@ -38,4 +49,20 @@ export type GraphQLRequest<T> = {
 export type GraphQLResponse<T> = {
   data?: T;
   errors?: GraphQLError[];
+};
+
+export type Severity = "Error" | "Info" | "Warning";
+
+export type ValidationError = Error & {
+  errors: ValidationFailure[];
+};
+
+export type ValidationFailure = {
+  propertyName?: string;
+  errorMessage?: string;
+  attemptedValue?: unknown;
+  customState?: unknown;
+  severity?: Severity;
+  errorCode?: string;
+  formattedMessagePlaceholderValues?: Map<string, unknown>;
 };

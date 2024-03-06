@@ -16,13 +16,13 @@ export async function readRole(id: string): Promise<Role> {
 
 export async function replaceRole(id: string, payload: ReplaceRolePayload, version?: number): Promise<Role> {
   const query: string = version ? `?version=${version}` : "";
-  return (await put<ReplaceRolePayload, Role>(`/api/roles/${id}${query}`)).data;
+  return (await put<ReplaceRolePayload, Role>(`/api/roles/${id}${query}`, payload)).data;
 }
 
 const searchRolesQuery = `
 query($payload: SearchRolesPayload!) {
   roles(payload: $payload) {
-    results {
+    items {
       id
       uniqueName
       displayName

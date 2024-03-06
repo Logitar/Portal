@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 
 import EmailAddressInput from "../users/EmailAddressInput.vue";
 import FormInput from "@/components/shared/FormInput.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Claim, ValidatedToken } from "@/types/tokens";
 import { registerTooltipsKey } from "@/inject/App";
 import { validateToken } from "@/api/tokens";
@@ -15,7 +15,7 @@ const { d, t } = useI18n();
 
 const audience = ref<string>("");
 const consume = ref<boolean>(false);
-const error = ref<ErrorDetail>();
+const error = ref<Error>();
 const issuer = ref<string>("");
 const secret = ref<string>("");
 const showError = ref<boolean>(false);
@@ -54,8 +54,8 @@ const onSubmit = handleSubmit(async () => {
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
     if (status === 400) {
-      const detail = data as ErrorDetail;
-      if (detail.errorCode && detail.errorMessage) {
+      const detail = data as Error;
+      if (detail.code && detail.message) {
         error.value = detail;
         showError.value = true;
       }
@@ -93,11 +93,11 @@ onUpdated(() => registerTooltips());
         <tbody>
           <tr>
             <th scope="row">{{ t("tokens.validated.error.code") }}</th>
-            <td>{{ error.errorCode }}</td>
+            <td>{{ error.code }}</td>
           </tr>
           <tr>
             <th scope="row">{{ t("tokens.validated.error.message") }}</th>
-            <td>{{ error.errorMessage }}</td>
+            <td>{{ error.message }}</td>
           </tr>
         </tbody>
       </table>

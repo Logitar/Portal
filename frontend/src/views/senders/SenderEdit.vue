@@ -116,6 +116,8 @@ onMounted(async () => {
     if (id) {
       const sender = await readSender(id);
       setModel(sender);
+    } else {
+      provider.value = (route.query.provider?.toString() as SenderProvider) || undefined;
     }
   } catch (e: unknown) {
     const { status } = e as ApiError;

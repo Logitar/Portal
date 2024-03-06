@@ -28,6 +28,7 @@
       "settings": "Mailgun Settings"
     },
     "options": {
+      "Mailgun": "Mailgun",
       "SendGrid": "SendGrid"
     },
     "placeholder": "Select a provider",

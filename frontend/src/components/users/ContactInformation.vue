@@ -30,9 +30,9 @@ const props = withDefaults(
   },
 );
 
-const address = ref<AddressPayload>({ street: "", locality: "", region: "", postalCode: "", country: "", isVerified: false });
+const address = ref<AddressPayload>({ street: "", locality: "", region: "", postalCode: "", country: "", isVerified: false }); // TODO(fpion): will throw ValidationException if an optional field is empty instead of null
 const email = ref<EmailPayload>({ address: "", isVerified: false });
-const phone = ref<PhonePayload>({ countryCode: "", number: "", extension: "", isVerified: false });
+const phone = ref<PhonePayload>({ countryCode: "", number: "", extension: "", isVerified: false }); // TODO(fpion): will throw ValidationException if an optional field is empty instead of null
 const phoneNumberRef = ref<InstanceType<typeof PhoneNumberInput> | null>(null);
 const selectedCountry = ref<CountrySettings>();
 

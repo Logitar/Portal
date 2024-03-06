@@ -22,7 +22,7 @@ export async function replaceSender(id: string, payload: ReplaceSenderPayload, v
 const searchSendersQuery = `
 query($payload: SearchSendersPayload!) {
   senders(payload: $payload) {
-    results {
+    items {
       id
       isDefault
       emailAddress

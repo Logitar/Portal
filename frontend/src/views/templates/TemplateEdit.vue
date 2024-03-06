@@ -151,6 +151,7 @@ onMounted(async () => {
           <app-tab active title="general">
             <ContentTypeSelect required v-model="contentType" />
             <div class="row">
+              <!-- TODO(fpion): implement UniqueKeyInput.vue -->
               <unique-key-input class="col-lg-6" required validate v-model="uniqueKey" />
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>

@@ -137,9 +137,7 @@ watch(
       <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
       <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateTemplate' }" variant="success" />
     </div>
-    <div class="row">
-      <ContentTypeSelect class="col-lg-6" :model-value="contentType" @update:model-value="setQuery('contentType', $event)" />
-    </div>
+    <ContentTypeSelect :model-value="contentType" @update:model-value="setQuery('contentType', $event)" />
     <div class="row">
       <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select

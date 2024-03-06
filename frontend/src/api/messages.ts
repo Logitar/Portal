@@ -9,7 +9,7 @@ export async function readMessage(id: string): Promise<Message> {
 const searchMessagesQuery = `
 query($payload: SearchMessagesPayload!) {
   messages(payload: $payload) {
-    results {
+    items {
       id
       subject
       recipientCount
@@ -22,7 +22,7 @@ query($payload: SearchMessagesPayload!) {
       }
       template {
         id
-        uniqueName
+        uniqueKey
         displayName
         version
       }
