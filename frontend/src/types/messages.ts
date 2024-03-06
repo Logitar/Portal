@@ -1,4 +1,5 @@
 import type { Aggregate } from "@/types/aggregate";
+import type { Content } from "@/types/templates";
 import type { Locale } from "@/types/i18n";
 import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
@@ -7,20 +8,19 @@ import type { Template } from "@/types/templates";
 import type { User } from "@/types/users";
 
 export type Message = Aggregate & {
-  id: string;
   subject: string;
-  body: string;
-  recipients: Recipient[];
+  body: Content;
   recipientCount: number;
-  realm?: Realm;
+  recipients: Recipient[];
   sender: Sender;
   template: Template;
   ignoreUserLocale: boolean;
   locale?: Locale;
   variables: Variable[];
   isDemo: boolean;
-  result: ResultData[];
   status: MessageStatus;
+  resultData: ResultData[];
+  realm?: Realm;
 };
 
 export type MessageSort = "RecipientCount" | "Subject" | "UpdatedOn";
@@ -33,8 +33,15 @@ export type MessageStatus = "Failed" | "Succeeded" | "Unsent";
 
 export type Recipient = {
   type: RecipientType;
-  user?: User;
   address: string;
+  displayName?: string;
+  user?: User;
+};
+
+export type RecipientPayload = {
+  type: RecipientType;
+  userId?: string;
+  address?: string;
   displayName?: string;
 };
 
@@ -46,18 +53,20 @@ export type ResultData = {
 };
 
 export type SearchMessagesPayload = SearchPayload & {
-  realm?: string;
+  templateId?: string;
   isDemo?: boolean;
   status?: MessageStatus;
-  template?: string;
   sort?: MessageSortOption[];
 };
 
-export type SendDemoMessagePayload = {
+export type SendMessagePayload = {
   senderId?: string;
-  templateId: string;
+  template: string;
+  recipients: RecipientPayload[];
+  ignoreUserLocale: boolean;
   locale?: string;
   variables: Variable[];
+  isDemo: boolean;
 };
 
 export type Variable = {

@@ -11,7 +11,7 @@ import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Message, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
-import { sendDemoMessage } from "@/api/messages";
+import { sendMessage } from "@/api/messages";
 import { useAccountStore } from "@/stores/account";
 
 const account = useAccountStore();
@@ -25,6 +25,7 @@ if ((!props.sender && !props.template) || (props.sender && props.template)) {
   throw new Error("Only one of the following properties must be specified: sender, template.");
 }
 
+const ignoreUserLocale = ref<boolean>(false);
 const locale = ref<string | undefined>(account.authenticated?.locale?.code);
 const message = ref<Message>();
 const realmHasNoDefaultSender = ref<boolean>(false);
@@ -54,11 +55,14 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   realmHasNoDefaultSender.value = false;
   try {
-    message.value = await sendDemoMessage({
+    message.value = await sendMessage({
       senderId: props.sender?.id ?? selectedSender.value?.id,
-      templateId: props.template?.id ?? selectedTemplate.value?.id ?? "",
+      template: props.template?.id ?? selectedTemplate.value?.id ?? "",
+      recipients: [], // TODO(fpion): implement
+      ignoreUserLocale: ignoreUserLocale.value,
       locale: locale.value,
       variables: variables.value,
+      isDemo: true,
     });
     showStatus.value = true;
   } catch (e: unknown) {
