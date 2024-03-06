@@ -3,7 +3,6 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { ApiKey, ApiKeySort, SearchApiKeysPayload } from "@/types/apiKeys";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteApiKey, searchApiKeys } from "@/api/apiKeys";
@@ -26,7 +25,6 @@ const count = computed<number>(() => Number(route.query.count) || 10);
 const isDescending = computed<boolean>(() => route.query.isDescending === "true");
 const isExpired = computed<boolean | undefined>(() => (route.query.isExpired ? route.query.isExpired === "true" : undefined));
 const page = computed<number>(() => Number(route.query.page) || 1);
-const realm = computed<string>(() => route.query.realm?.toString() ?? "");
 const search = computed<string>(() => route.query.search?.toString() ?? "");
 const sort = computed<string>(() => route.query.sort?.toString() ?? "");
 
@@ -43,7 +41,6 @@ function isApiKeyExpired(apiKey: ApiKey): boolean {
 
 async function refresh(): Promise<void> {
   const parameters: SearchApiKeysPayload = {
-    realm: realm.value || undefined,
     status: typeof isExpired.value === "boolean" ? { isExpired: isExpired.value } : undefined,
     search: {
       terms: search.value
@@ -95,7 +92,6 @@ function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
     case "isExpired":
-    case "realm":
     case "search":
     case "count":
       query.page = "1";
@@ -115,7 +111,6 @@ watch(
           query: isEmpty(query)
             ? {
                 isExpired: "",
-                realm: "",
                 search: "",
                 status: "",
                 sort: "UpdatedOn",
@@ -143,25 +138,15 @@ watch(
     <h1>{{ t("apiKeys.title.list") }}</h1>
     <div class="my-2">
       <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-      <icon-button
-        class="ms-1"
-        icon="fas fa-plus"
-        text="actions.create"
-        :to="{ name: 'CreateApiKey', query: { realm: realm || undefined } }"
-        variant="success"
-      />
+      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateApiKey' }" variant="success" />
     </div>
-    <div class="row">
-      <RealmSelect class="col-lg-6" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
-      <yes-no-select
-        class="col-lg-6"
-        id="isExpired"
-        label="apiKeys.isExpired.label"
-        placeholder="apiKeys.isExpired.placeholder"
-        :model-value="isExpired?.toString()"
-        @update:model-value="setQuery('isExpired', $event)"
-      />
-    </div>
+    <yes-no-select
+      id="isExpired"
+      label="apiKeys.isExpired.label"
+      placeholder="apiKeys.isExpired.placeholder"
+      :model-value="isExpired?.toString()"
+      @update:model-value="setQuery('isExpired', $event)"
+    />
     <div class="row">
       <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select
