@@ -57,7 +57,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchTemplates(parameters);
     if (now === timestamp.value) {
-      templates.value = data.results;
+      templates.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

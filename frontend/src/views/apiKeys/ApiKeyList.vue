@@ -59,7 +59,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchApiKeys(parameters);
     if (now === timestamp.value) {
-      apiKeys.value = data.results;
+      apiKeys.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

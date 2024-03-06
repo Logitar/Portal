@@ -50,8 +50,8 @@ const emit = defineEmits<{
 
 onMounted(async () => {
   try {
-    const search = await searchRealms({});
-    realms.value = search.results;
+    const results = await searchRealms({});
+    realms.value = results.items;
   } catch (e: unknown) {
     handleError(e);
   }

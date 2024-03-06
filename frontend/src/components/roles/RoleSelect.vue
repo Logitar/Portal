@@ -65,8 +65,8 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const search = await searchRoles({});
-    roles.value = search.results;
+    const results = await searchRoles({});
+    roles.value = results.items;
   } catch (e: unknown) {
     handleError(e);
   }

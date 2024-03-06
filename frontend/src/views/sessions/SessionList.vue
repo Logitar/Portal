@@ -67,7 +67,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchSessions(parameters);
     if (now === timestamp.value) {
-      sessions.value = data.results;
+      sessions.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

@@ -57,8 +57,8 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const search = await searchTemplates({});
-    templates.value = search.results;
+    const results = await searchTemplates({});
+    templates.value = results.items;
   } catch (e: unknown) {
     handleError(e);
   }

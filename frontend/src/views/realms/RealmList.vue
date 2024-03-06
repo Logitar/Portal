@@ -54,7 +54,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchRealms(parameters);
     if (now === timestamp.value) {
-      realms.value = data.results;
+      realms.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

@@ -54,7 +54,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchDictionaries(parameters);
     if (now === timestamp.value) {
-      dictionaries.value = data.results;
+      dictionaries.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

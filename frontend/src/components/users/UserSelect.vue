@@ -58,7 +58,7 @@ function onModelValueUpdate(id: string): void {
 onMounted(async () => {
   try {
     const results = await searchUsers({});
-    users.value = results.results;
+    users.value = results.items;
   } catch (e: unknown) {
     handleError(e);
   }

@@ -54,7 +54,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchRoles(parameters);
     if (now === timestamp.value) {
-      roles.value = data.results;
+      roles.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {

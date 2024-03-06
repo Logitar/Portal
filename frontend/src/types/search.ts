@@ -9,7 +9,7 @@ export type SearchPayload = {
 };
 
 export type SearchResults<T> = {
-  results: T[]; // TODO(fpion): rename to items
+  items: T[];
   total: number;
 };
 
