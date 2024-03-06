@@ -1,6 +1,6 @@
-import type { CreateDictionaryPayload, Dictionary, SearchDictionariesPayload, UpdateDictionaryPayload } from "@/types/dictionaries";
+import type { CreateDictionaryPayload, Dictionary, ReplaceDictionaryPayload, SearchDictionariesPayload } from "@/types/dictionaries";
 import type { SearchResults } from "@/types/search";
-import { _delete, get, graphQL, patch, post } from ".";
+import { _delete, get, graphQL, post, put } from ".";
 
 export async function createDictionary(payload: CreateDictionaryPayload): Promise<Dictionary> {
   return (await post<CreateDictionaryPayload, Dictionary>("/api/dictionaries", payload)).data;
@@ -12,6 +12,11 @@ export async function deleteDictionary(id: string): Promise<Dictionary> {
 
 export async function readDictionary(id: string): Promise<Dictionary> {
   return (await get<Dictionary>(`/api/dictionaries/${id}`)).data;
+}
+
+export async function replaceDictionary(id: string, payload: ReplaceDictionaryPayload, version?: number): Promise<Dictionary> {
+  const query: string = version ? `?version=${version}` : "";
+  return (await put<ReplaceDictionaryPayload, Dictionary>(`/api/dictionaries/${id}${query}`, payload)).data;
 }
 
 const searchDictionariesQuery = `
@@ -49,8 +54,4 @@ type SearchDictionariesResponse = {
 };
 export async function searchDictionaries(payload: SearchDictionariesPayload): Promise<SearchResults<Dictionary>> {
   return (await graphQL<SearchDictionariesRequest, SearchDictionariesResponse>(searchDictionariesQuery, { payload })).data.dictionaries;
-}
-
-export async function updateDictionary(id: string, payload: UpdateDictionaryPayload): Promise<Dictionary> {
-  return (await patch<UpdateDictionaryPayload, Dictionary>(`/api/dictionaries/${id}`, payload)).data;
 }
