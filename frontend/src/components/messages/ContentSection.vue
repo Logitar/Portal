@@ -12,7 +12,7 @@ const props = defineProps<{
   message: Message;
 }>();
 
-const viewAsHtml = ref<boolean>(props.message.template.contentType === "text/html");
+const viewAsHtml = ref<boolean>(props.message.template.content.type === "text/html");
 
 const variables = computed<object>(() => Object.fromEntries(props.message.variables.map(({ key, value }) => [key, value])));
 </script>
@@ -33,7 +33,7 @@ const variables = computed<object>(() => Object.fromEntries(props.message.variab
       <i class="text-warning">{{ t("messages.contents.warning") }}</i>
     </p>
     <app-accordion>
-      <app-accordion-item :title="`messages.contents.type.options.${message.template.contentType}`">
+      <app-accordion-item :title="`messages.contents.type.options.${message.template.content.type}`">
         <div class="mb-3">
           <form-checkbox id="viewAsHtml" label="messages.contents.viewAsHtml" switch v-model="viewAsHtml" />
         </div>

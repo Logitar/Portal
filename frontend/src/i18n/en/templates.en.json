@@ -25,7 +25,8 @@
   "sort": {
     "options": {
       "DisplayName": "Display name",
-      "UniqueName": "Unique name",
+      "Subject": "Subject",
+      "UniqueKey": "Unique key",
       "UpdatedOn": "Updated on"
     }
   },
@@ -36,6 +37,10 @@
   "title": {
     "list": "Templates",
     "new": "New template"
+  },
+  "uniqueKeyAlreadyUsed": {
+    "help": "TODO",
+    "lead": "TODO"
   },
   "updated": "The template has been updated."
 }

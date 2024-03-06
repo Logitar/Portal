@@ -4,7 +4,6 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import ContentTypeSelect from "@/components/templates/ContentTypeSelect.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import type { Template, TemplateSort, SearchTemplatesPayload } from "@/types/templates";
 import { deleteTemplate, searchTemplates } from "@/api/templates";
@@ -28,7 +27,6 @@ const contentType = computed<string>(() => route.query.contentType?.toString() ?
 const count = computed<number>(() => Number(route.query.count) || 10);
 const isDescending = computed<boolean>(() => route.query.isDescending === "true");
 const page = computed<number>(() => Number(route.query.page) || 1);
-const realm = computed<string>(() => route.query.realm?.toString() ?? "");
 const search = computed<string>(() => route.query.search?.toString() ?? "");
 const sort = computed<string>(() => route.query.sort?.toString() ?? "");
 
@@ -41,7 +39,6 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchTemplatesPayload = {
-    realm: realm.value || undefined,
     contentType: contentType.value || undefined,
     search: {
       terms: search.value
@@ -93,7 +90,6 @@ function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
     case "contentType":
-    case "realm":
     case "search":
     case "count":
       query.page = "1";
@@ -113,7 +109,6 @@ watch(
           query: isEmpty(query)
             ? {
                 contentType: "",
-                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -140,16 +135,9 @@ watch(
     <h1>{{ t("templates.title.list") }}</h1>
     <div class="my-2">
       <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-      <icon-button
-        class="ms-1"
-        icon="fas fa-plus"
-        text="actions.create"
-        :to="{ name: 'CreateTemplate', query: { realm: realm || undefined, contentType: contentType || undefined } }"
-        variant="success"
-      />
+      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateTemplate' }" variant="success" />
     </div>
     <div class="row">
-      <RealmSelect class="col-lg-6" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
       <ContentTypeSelect class="col-lg-6" :model-value="contentType" @update:model-value="setQuery('contentType', $event)" />
     </div>
     <div class="row">
@@ -168,7 +156,7 @@ watch(
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ t("templates.sort.options.UniqueName") }}</th>
+            <th scope="col">{{ t("templates.sort.options.UniqueKey") }}</th>
             <th scope="col">{{ t("templates.sort.options.DisplayName") }}</th>
             <th scope="col">{{ t("templates.contentType.label") }}</th>
             <th scope="col">{{ t("templates.sort.options.UpdatedOn") }}</th>
@@ -179,11 +167,11 @@ watch(
           <tr v-for="template in templates" :key="template.id">
             <td>
               <RouterLink :to="{ name: 'TemplateEdit', params: { id: template.id } }">
-                <font-awesome-icon icon="fas fa-edit" />{{ template.uniqueName }}
+                <font-awesome-icon icon="fas fa-edit" />{{ template.uniqueKey }}
               </RouterLink>
             </td>
             <td>{{ template.displayName ?? "—" }}</td>
-            <td>{{ t(`templates.contentType.options.${template.contentType}`) }}</td>
+            <td>{{ t(`templates.contentType.options.${template.content.type}`) }}</td>
             <td><status-block :actor="template.updatedBy" :date="template.updatedOn" /></td>
             <td>
               <icon-button

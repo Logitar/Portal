@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 
-import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Template } from "@/types/templates";
 import { formatTemplate } from "@/helpers/displayUtils";
@@ -11,14 +10,13 @@ import { searchTemplates } from "@/api/templates";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disabled?: boolean;
     id?: string;
     label?: string;
     modelValue?: string;
     placeholder?: string;
-    realm?: Realm;
     required?: boolean;
   }>(),
   {
@@ -50,27 +48,21 @@ const emit = defineEmits<{
   (e: "template-selected", value: Template | undefined): void;
 }>();
 
-watch(
-  () => props.realm,
-  async (realm) => {
-    try {
-      const search = await searchTemplates({
-        realm: realm?.id,
-      });
-      templates.value = search.results;
-    } catch (e: unknown) {
-      handleError(e);
-    }
-  },
-  { immediate: true },
-);
-
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
   const selectedTemplate = id ? templates.value.find((template) => template.id === id) : undefined;
   emit("template-selected", selectedTemplate);
 }
+
+onMounted(async () => {
+  try {
+    const search = await searchTemplates({});
+    templates.value = search.results;
+  } catch (e: unknown) {
+    handleError(e);
+  }
+});
 </script>
 
 <template>

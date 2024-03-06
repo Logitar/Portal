@@ -25,7 +25,8 @@
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",
-      "UniqueName": "Nom unique",
+      "Subject": "Sujet",
+      "UniqueKey": "Clé unique",
       "UpdatedOn": "Dernière modification"
     }
   },
@@ -36,6 +37,10 @@
   "title": {
     "list": "Gabarits",
     "new": "Nouveau gabarit"
+  },
+  "uniqueKeyAlreadyUsed": {
+    "help": "TODO",
+    "lead": "TODO"
   },
   "updated": "Le gabarit a été enregistré."
 }

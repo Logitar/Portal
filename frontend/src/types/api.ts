@@ -11,7 +11,7 @@ export type ApiResult<T> = {
 export type ErrorDetail = {
   errorCode: string;
   errorMessage: string;
-};
+}; // TODO(fpion): refactor
 
 export type GraphQLError = {
   extensions?: GraphQLErrorExtensions;

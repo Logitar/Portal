@@ -1,46 +1,44 @@
 import type { Aggregate } from "@/types/aggregate";
-import type { Modification } from "@/types/modifications";
 import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 
+export type Content = {
+  type: string;
+  text: string;
+};
+
 export type CreateTemplatePayload = {
-  realm?: string;
-  uniqueName: string;
+  uniqueKey: string;
   displayName?: string;
   description?: string;
   subject: string;
-  contentType: string;
-  contents: string;
+  content: Content;
+};
+
+export type ReplaceTemplatePayload = {
+  uniqueKey: string;
+  displayName?: string;
+  description?: string;
+  subject: string;
+  content: Content;
 };
 
 export type SearchTemplatesPayload = SearchPayload & {
-  realm?: string;
   contentType?: String;
   sort?: TemplateSortOption[];
 };
 
 export type Template = Aggregate & {
-  id: string;
-  uniqueName: string;
+  uniqueKey: string;
   displayName?: string;
   description?: string;
   subject: string;
-  contentType: string;
-  contents: string;
+  content: Content;
   realm?: Realm;
 };
 
-export type TemplateSort = "DisplayName" | "UniqueName" | "UpdatedOn";
+export type TemplateSort = "DisplayName" | "Subject" | "UniqueKey" | "UpdatedOn";
 
 export type TemplateSortOption = SortOption & {
   field: TemplateSort;
-};
-
-export type UpdateTemplatePayload = {
-  uniqueName?: string;
-  displayName?: Modification<string>;
-  description?: Modification<string>;
-  subject?: string;
-  contentType?: String;
-  contents?: String;
 };
