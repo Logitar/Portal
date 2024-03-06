@@ -5,6 +5,8 @@ import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "node:url";
 // import { resolve, dirname } from "node:path";
 
+import packageJson from "./package.json";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -15,6 +17,9 @@ export default defineConfig({
     //   jitCompilation: true,
     // }), // TODO(fpion): complete
   ],
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(packageJson.version),
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
