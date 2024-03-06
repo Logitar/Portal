@@ -1,17 +1,20 @@
-import type { Aggregate } from "./aggregate";
-import type { Locale } from "./i18n";
-import type { Realm } from "./realms";
-import type { SearchPayload, SortOption } from "./search";
+import type { Aggregate } from "@/types/aggregate";
+import type { Locale } from "@/types/i18n";
+import type { Realm } from "@/types/realms";
+import type { SearchPayload, SortOption } from "@/types/search";
 
 export type CreateDictionaryPayload = {
+  realm?: string;
   locale: string;
+  entries?: DictionaryEntry[];
 };
 
 export type Dictionary = Aggregate & {
-  locale: Locale;
-  entryCount: number;
-  entries: DictionaryEntry[];
+  id: string;
   realm?: Realm;
+  locale: Locale;
+  entries: DictionaryEntry[];
+  entryCount: number;
 };
 
 export type DictionaryEntry = {
@@ -19,18 +22,22 @@ export type DictionaryEntry = {
   value: string;
 };
 
-export type DictionarySort = "EntryCount" | "Locale" | "UpdatedOn";
+export type DictionaryEntryModification = {
+  key: string;
+  value?: string;
+};
+
+export type DictionarySort = "Locale" | "UpdatedOn";
 
 export type DictionarySortOption = SortOption & {
   field: DictionarySort;
 };
 
-export type ReplaceDictionaryPayload = {
-  locale: string;
-  entries: DictionaryEntry[];
+export type SearchDictionariesPayload = SearchPayload & {
+  realm?: string;
+  sort?: DictionarySortOption[];
 };
 
-export type SearchDictionariesPayload = SearchPayload & {
-  isEmpty?: boolean;
-  sort?: DictionarySortOption[];
+export type UpdateDictionaryPayload = {
+  entries: DictionaryEntryModification[];
 };

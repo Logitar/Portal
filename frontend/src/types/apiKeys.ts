@@ -1,10 +1,13 @@
-import type { Aggregate } from "./aggregate";
-import type { CustomAttribute } from "./customAttributes";
-import type { Realm } from "./realms";
-import type { Role } from "./roles";
-import type { SearchPayload, SortOption } from "./search";
+import type { Aggregate } from "@/types/aggregate";
+import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
+import type { Modification } from "@/types/modifications";
+import type { Realm } from "@/types/realms";
+import type { Role } from "@/types/roles";
+import type { RoleModification } from "@/types/roles";
+import type { SearchPayload, SortOption } from "@/types/search";
 
 export type ApiKey = Aggregate & {
+  id: string;
   xApiKey?: string;
   displayName: string;
   description?: string;
@@ -27,11 +30,12 @@ export type ApiKeyStatus = {
 };
 
 export type CreateApiKeyPayload = {
+  realm?: string;
   displayName: string;
   description?: string;
   expiresOn?: Date;
-  customAttributes: CustomAttribute[];
-  roles: string[];
+  customAttributes?: CustomAttribute[];
+  roles?: Role[];
 };
 
 export type SearchApiKeysPayload = SearchPayload & {
@@ -40,10 +44,10 @@ export type SearchApiKeysPayload = SearchPayload & {
   sort?: ApiKeySortOption[];
 };
 
-export type ReplaceApiKeyPayload = {
-  displayName: string;
-  description?: string;
+export type UpdateApiKeyPayload = {
+  displayName?: string;
+  description?: Modification<string>;
   expiresOn?: Date;
-  customAttributes: CustomAttribute[];
-  roles: string[];
+  customAttributes?: CustomAttributeModification[];
+  roles?: RoleModification[];
 };

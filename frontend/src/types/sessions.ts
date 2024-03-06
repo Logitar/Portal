@@ -1,10 +1,11 @@
-import type { Actor } from "./actor";
-import type { Aggregate } from "./aggregate";
-import type { CustomAttribute } from "./customAttributes";
-import type { SearchPayload, SortOption } from "./search";
-import type { User } from "./users";
+import type { Actor } from "@/types/actor";
+import type { Aggregate } from "@/types/aggregate";
+import type { CustomAttribute } from "@/types/customAttributes";
+import type { SearchPayload, SortOption } from "@/types/search";
+import type { User } from "@/types/users";
 
 export type SearchSessionsPayload = SearchPayload & {
+  realm?: string;
   userId?: string;
   isActive?: boolean;
   isPersistent?: boolean;
@@ -12,6 +13,7 @@ export type SearchSessionsPayload = SearchPayload & {
 };
 
 export type Session = Aggregate & {
+  id: string;
   isPersistent: boolean;
   refreshToken?: string;
   isActive: boolean;
@@ -25,4 +27,12 @@ export type SessionSort = "SignedOutOn" | "UpdatedOn";
 
 export type SessionSortOption = SortOption & {
   field: SessionSort;
+};
+
+export type SignInPayload = {
+  realm?: string;
+  uniqueName: string;
+  password: string;
+  isPersistent?: boolean;
+  customAttributes?: CustomAttribute[];
 };

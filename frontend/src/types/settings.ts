@@ -5,7 +5,7 @@ export type PasswordSettings = {
   requireLowercase: boolean;
   requireUppercase: boolean;
   requireDigit: boolean;
-  hashingStrategy: string;
+  strategy: string;
 };
 
 export type UniqueNameSettings = {

@@ -1,10 +1,8 @@
 export type Actor = {
   id: string;
-  type: ActorType;
+  type: string;
   isDeleted: boolean;
   displayName: string;
   emailAddress?: string;
   pictureUrl?: string;
 };
-
-export type ActorType = "ApiKey" | "System" | "User";

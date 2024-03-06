@@ -1,45 +1,54 @@
-import type { Aggregate } from "./aggregate";
-import type { Locale } from "./i18n";
-import type { PasswordSettings, UniqueNameSettings } from "./settings";
+import type { Aggregate } from "@/types/aggregate";
+import type { CustomAttribute } from "@/types/customAttributes";
+import type { Locale } from "@/types/i18n";
+import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
+import type { Session } from "@/types/sessions";
 
 export type Configuration = Aggregate & {
-  defaultLocale?: Locale;
+  defaultLocale: Locale;
   secret: string;
   uniqueNameSettings: UniqueNameSettings;
   passwordSettings: PasswordSettings;
-  requireUniqueEmail: boolean;
   loggingSettings: LoggingSettings;
 };
 
 export type InitializeConfigurationPayload = {
-  defaultLocale: string;
+  locale: string;
   user: UserPayload;
+  session?: SessionPayload;
 };
 
-export type IsConfigurationInitialized = {
+export type InitializeConfigurationResult = {
+  configuration: Configuration;
+  session: Session;
+};
+
+export type IsConfigurationInitializedResult = {
   isInitialized: boolean;
 };
 
-export type LoggingExtent = "ActivityOnly" | "None" | "Full";
-
 export type LoggingSettings = {
-  extent: LoggingExtent;
+  extent: string;
   onlyErrors: boolean;
 };
 
-export type ReplaceConfigurationPayload = {
+export type SessionPayload = {
+  isPersistent: boolean;
+  customAttributes: CustomAttribute[];
+};
+
+export type UpdateConfigurationPayload = {
   defaultLocale?: string;
-  secret: string;
-  uniqueNameSettings: UniqueNameSettings;
-  passwordSettings: PasswordSettings;
-  requireUniqueEmail: boolean;
-  loggingSettings: LoggingSettings;
+  secret?: string;
+  uniqueNameSettings?: UniqueNameSettings;
+  passwordSettings?: PasswordSettings;
+  loggingSettings?: LoggingSettings;
 };
 
 export type UserPayload = {
   uniqueName: string;
   password: string;
-  emailAddress?: string;
-  firstName?: string;
-  lastName?: string;
+  emailAddress: string;
+  firstName: string;
+  lastName: string;
 };

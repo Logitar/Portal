@@ -1,0 +1,32 @@
+{
+  "created": "La clé d’API a été créée.",
+  "delete": {
+    "confirm": "Désirez-vous vraiment supprimer la clé d’API suivante ?",
+    "success": "La clé d’API a été supprimée.",
+    "title": "Supprimer la clé d’API"
+  },
+  "empty": "Il n’y a aucun résultat.",
+  "expired": "Expirée",
+  "expiresOn": "Date d’expiration",
+  "isExpired": {
+    "label": "Expirée",
+    "placeholder": "Sélectionnez une option"
+  },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Dernière utilisation",
+      "DisplayName": "Nom d’affichage",
+      "ExpiresOn": "Date d’expiration",
+      "UpdatedOn": "Dernière modification"
+    }
+  },
+  "string": {
+    "heading": "Votre nouvelle clé d’API",
+    "warning": "Assurez-vous de la sauvegarder — vous ne pourrez plus y accéder."
+  },
+  "title": {
+    "list": "Clés d’API",
+    "new": "Nouvelle clé d’API"
+  },
+  "updated": "La clé d’API a été enregistrée."
+}

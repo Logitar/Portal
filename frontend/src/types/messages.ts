@@ -1,25 +1,26 @@
-import type { Aggregate } from "./aggregate";
-import type { Locale } from "./i18n";
-import type { Realm } from "./realms";
-import type { SearchPayload, SortOption } from "./search";
-import type { Sender } from "./senders";
-import type { Content, Template } from "./templates";
-import type { User } from "./users";
+import type { Aggregate } from "@/types/aggregate";
+import type { Locale } from "@/types/i18n";
+import type { Realm } from "@/types/realms";
+import type { SearchPayload, SortOption } from "@/types/search";
+import type { Sender } from "@/types/senders";
+import type { Template } from "@/types/templates";
+import type { User } from "@/types/users";
 
 export type Message = Aggregate & {
+  id: string;
   subject: string;
-  body: Content;
-  recipientCount: number;
+  body: string;
   recipients: Recipient[];
+  recipientCount: number;
+  realm?: Realm;
   sender: Sender;
   template: Template;
   ignoreUserLocale: boolean;
   locale?: Locale;
   variables: Variable[];
   isDemo: boolean;
+  result: ResultData[];
   status: MessageStatus;
-  resultData: ResultData[];
-  realm?: Realm;
 };
 
 export type MessageSort = "RecipientCount" | "Subject" | "UpdatedOn";
@@ -32,15 +33,8 @@ export type MessageStatus = "Failed" | "Succeeded" | "Unsent";
 
 export type Recipient = {
   type: RecipientType;
-  address: string;
-  displayName?: string;
   user?: User;
-};
-
-export type RecipientPayload = {
-  type: RecipientType;
-  userId?: string;
-  address?: string;
+  address: string;
   displayName?: string;
 };
 
@@ -52,20 +46,18 @@ export type ResultData = {
 };
 
 export type SearchMessagesPayload = SearchPayload & {
-  templateId?: string;
+  realm?: string;
   isDemo?: boolean;
   status?: MessageStatus;
+  template?: string;
   sort?: MessageSortOption[];
 };
 
-export type SendMessagePayload = {
+export type SendDemoMessagePayload = {
   senderId?: string;
-  template: string;
-  recipients: RecipientPayload[];
-  ignoreUserLocale: boolean;
+  templateId: string;
   locale?: string;
   variables: Variable[];
-  isDemo: boolean;
 };
 
 export type Variable = {

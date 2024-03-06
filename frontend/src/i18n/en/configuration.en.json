@@ -1,0 +1,32 @@
+{
+  "defaultLocale": "Default Locale",
+  "initialization": {
+    "initialize": "Initialize",
+    "title": "Initialization",
+    "user": {
+      "help": "Fill the form below to create the first administrator account.",
+      "label": "User"
+    }
+  },
+  "initialized": "Your administrator account has been created, and the configuration has been initialized.",
+  "jwt": {
+    "secret": {
+      "warning": "Changing the secret will invalidate all active tokens of the Portal. Press the button below to revert the change."
+    }
+  },
+  "logging": {
+    "extent": {
+      "label": "Extent",
+      "onlyErrors": "Only log requests with errors",
+      "options": {
+        "ActivityOnly": "Log only requests with activities",
+        "Full": "Log all requests",
+        "None": "Never log requests"
+      },
+      "placeholder": "Select a logging extent"
+    },
+    "title": "Logging"
+  },
+  "title": "Configuration",
+  "updated": "The configuration has been updated."
+}

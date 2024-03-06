@@ -1,0 +1,61 @@
+{
+  "audience": {
+    "label": "Audience",
+    "placeholder": "Spécifiez une audience ou laissez vide pour utiliser la valeur par défaut"
+  },
+  "claims": {
+    "empty": "Il n’y a aucune revendication.",
+    "name": {
+      "label": "Nom",
+      "placeholder": "Entrez le nom de la revendication"
+    },
+    "title": "Revendications",
+    "type": {
+      "label": "Type",
+      "placeholder": "Sélectionnez un type de revendication"
+    },
+    "value": {
+      "label": "Valeur",
+      "placeholder": "Entrez la valeur de la revendication"
+    }
+  },
+  "consume": "Consommer",
+  "created": {
+    "decoder": "Allez au décodeur",
+    "heading": "Votre nouveau jeton",
+    "title": "Jeton"
+  },
+  "emailAddressPlaceholder": "Entrez une adresse courriel",
+  "input": {
+    "label": "Jeton",
+    "placeholder": "Collez votre jeton"
+  },
+  "isConsumable": "Est consommable",
+  "issuer": {
+    "label": "Émetteur",
+    "placeholder": "Spécifiez un émetteur ou laissez vide pour utiliser la valeur par défaut"
+  },
+  "lifetime": "Durée de vie (secondes)",
+  "secret": {
+    "label": "Secret",
+    "placeholder": "Collez un secret de jeton ou laissez vide pour utiliser la valeur par défaut"
+  },
+  "subject": {
+    "label": "Sujet",
+    "placeholder": "Entrez un sujet de revendication, par un exemple un identifiant"
+  },
+  "title": "Jetons",
+  "type": {
+    "label": "Type",
+    "placeholder": "Entrez un type de jeton, par exemple jwt"
+  },
+  "validated": {
+    "error": {
+      "code": "Code",
+      "help": "Veuillez examiner les détails ci-dessous.",
+      "lead": "Une erreur est survenue.",
+      "message": "Message"
+    },
+    "title": "Résultat"
+  }
+}

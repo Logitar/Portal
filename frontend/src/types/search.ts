@@ -1,15 +1,15 @@
 export type SearchOperator = "And" | "Or";
 
 export type SearchPayload = {
-  ids?: string[];
   search?: TextSearch;
+  idIn?: string[];
   sort?: SortOption[];
   skip?: number;
   limit?: number;
 };
 
 export type SearchResults<T> = {
-  items: T[];
+  results: T[];
   total: number;
 };
 

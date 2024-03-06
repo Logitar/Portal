@@ -1,0 +1,48 @@
+{
+  "cannotDeleteDefaultSender": {
+    "help": "A default sender can only be deleted once its alone in its realm.",
+    "lead": "The sender could not be deleted!"
+  },
+  "created": "The sender has been created.",
+  "default": {
+    "submit": "Default",
+    "success": "The sender has been set default."
+  },
+  "delete": {
+    "confirm": "Do you really want to delete the following sender?",
+    "success": "The sender has been deleted.",
+    "title": "Delete sender"
+  },
+  "empty": "There are no results.",
+  "providers": {
+    "label": "Provider",
+    "options": {
+      "SendGrid": "SendGrid"
+    },
+    "placeholder": "Select a provider",
+    "sendGrid": {
+      "apiKey": {
+        "label": "API Key",
+        "placeholder": "Paste your SendGrid API key"
+      },
+      "settings": "SendGrid Settings"
+    }
+  },
+  "select": {
+    "label": "Sender",
+    "placeholder": "Select a sender",
+    "useDefault": "Use default sender"
+  },
+  "sort": {
+    "options": {
+      "DisplayName": "Display name",
+      "EmailAddress": "Email address",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Senders",
+    "new": "New sender"
+  },
+  "updated": "The sender has been updated."
+}

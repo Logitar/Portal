@@ -1,0 +1,33 @@
+{
+  "created": "The dictionary has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following dictionary?",
+    "success": "The dictionary has been deleted.",
+    "title": "Delete dictionary"
+  },
+  "empty": "There are no results.",
+  "entries": {
+    "empty": "There are no entries.",
+    "key": {
+      "label": "Key",
+      "placeholder": "Enter the key of the entry"
+    },
+    "title": "Entries",
+    "value": {
+      "label": "Value",
+      "placeholder": "Enter the value of the entry"
+    }
+  },
+  "sort": {
+    "options": {
+      "EntryCount": "Entries",
+      "Locale": "Locale",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "title": {
+    "list": "Dictionaries",
+    "new": "New dictionary"
+  },
+  "updated": "The dictionary has been updated."
+}

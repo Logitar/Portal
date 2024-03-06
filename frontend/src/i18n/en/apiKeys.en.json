@@ -1,0 +1,32 @@
+{
+  "created": "The API key has been created.",
+  "delete": {
+    "confirm": "Do you really want to delete the following API key?",
+    "success": "The API key has been deleted.",
+    "title": "Delete API key"
+  },
+  "empty": "There are no results.",
+  "expired": "Expired",
+  "expiresOn": "Expires on",
+  "isExpired": {
+    "label": "Is expired",
+    "placeholder": "Select an option"
+  },
+  "sort": {
+    "options": {
+      "AuthenticatedOn": "Last used",
+      "DisplayName": "Display name",
+      "ExpiresOn": "Expires on",
+      "UpdatedOn": "Updated on"
+    }
+  },
+  "string": {
+    "heading": "Your new API key",
+    "warning": "Make sure you save it — you won't be able to access it again."
+  },
+  "title": {
+    "list": "API Keys",
+    "new": "New API Key"
+  },
+  "updated": "The API key has been updated."
+}
