@@ -14,7 +14,7 @@ import { useAccountStore } from "@/stores/account";
 import { useI18nStore } from "@/stores/i18n";
 
 const account = useAccountStore();
-const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
+const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL ?? "";
 const environment = import.meta.env.MODE.toLowerCase();
 const i18n = useI18nStore();
 const { availableLocales, locale, t } = useI18n();

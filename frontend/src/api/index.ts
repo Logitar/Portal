@@ -1,7 +1,7 @@
 import type { ApiError, ApiResult, GraphQLRequest, GraphQLResponse } from "@/types/api";
 import { combineURL } from "@/helpers/stringUtils";
 
-const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
+const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL ?? "";
 const contentType: string = "Content-Type";
 
 async function execute<TData, TResult>(method: string, url: string, data?: TData): Promise<ApiResult<TResult>> {

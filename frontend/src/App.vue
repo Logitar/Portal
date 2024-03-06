@@ -20,7 +20,8 @@ const containerRef = ref<InstanceType<typeof ToastContainer> | null>(null);
 function handleError(e: unknown): void {
   if (e) {
     const { data, status } = e as ApiError;
-    if (status === 401 || (data as GraphQLError[])?.some((error) => error.extensions?.code === "ACCESS_DENIED") === true) {
+    const errors = data as GraphQLError[];
+    if (status === 401 || (typeof errors?.some === "function" && errors.some((error) => error.extensions?.code === "ACCESS_DENIED") === true)) {
       account.signOut();
       toasts.warning("toasts.warning.signedOut");
       router.push({ name: "SignIn", query: { redirect: route.fullPath } });
