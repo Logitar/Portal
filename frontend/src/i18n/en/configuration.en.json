@@ -8,7 +8,6 @@
       "label": "User"
     }
   },
-  "initialized": "Your administrator account has been created, and the configuration has been initialized.",
   "jwt": {
     "secret": {
       "warning": "Changing the secret will invalidate all active tokens of the Portal. Press the button below to revert the change."

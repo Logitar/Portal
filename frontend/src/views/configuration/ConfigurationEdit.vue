@@ -12,9 +12,7 @@ import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { ToastUtils } from "@/types/components";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration, replaceConfiguration } from "@/api/configuration";
-import { useConfigurationStore } from "@/stores/configuration";
 
-const configurationStore = useConfigurationStore();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const toasts = inject(toastsKey) as ToastUtils;
 const { t } = useI18n();
@@ -90,13 +88,8 @@ const onSubmit = handleSubmit(async () => {
 });
 
 onMounted(async () => {
-  if (configurationStore.toast) {
-    toasts.success(configurationStore.toast);
-    configurationStore.toast = undefined;
-  }
   try {
-    const configuration = configurationStore.configuration ?? (await readConfiguration());
-    configurationStore.configuration = undefined;
+    const configuration = await readConfiguration();
     setModel(configuration);
   } catch (e: unknown) {
     handleError(e);

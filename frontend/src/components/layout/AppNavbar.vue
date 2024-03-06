@@ -11,12 +11,10 @@ import type { Locale } from "@/types/i18n";
 import { combineURL } from "@/helpers/stringUtils";
 import { orderBy } from "@/helpers/arrayUtils";
 import { useAccountStore } from "@/stores/account";
-import { useConfigurationStore } from "@/stores/configuration";
 import { useI18nStore } from "@/stores/i18n";
 
 const account = useAccountStore();
 const apiBaseUrl: string = import.meta.env.VITE_APP_API_BASE_URL;
-const configuration = useConfigurationStore();
 const environment = import.meta.env.MODE.toLowerCase();
 const i18n = useI18nStore();
 const { availableLocales, locale, t } = useI18n();
@@ -182,7 +180,7 @@ watchEffect(() => {
               </ul>
             </li>
           </template>
-          <template v-else-if="configuration.isInitialized">
+          <template v-else>
             <li class="nav-item">
               <RouterLink :to="{ name: 'SignIn' }" class="nav-link">
                 <font-awesome-icon icon="fas fa-arrow-right-to-bracket" /> {{ t("users.signIn.title") }}

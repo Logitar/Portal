@@ -19,6 +19,7 @@ export const useAccountStore = defineStore(
     }
     function signOut(): void {
       authenticated.value = undefined;
+      currentSession.value = undefined;
     }
 
     return { authenticated, currentSession, setUser, signIn, signOut };
