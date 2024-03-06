@@ -39,6 +39,7 @@ withDefaults(
 //   }
 //   emit("update:model-value", settings);
 // }
+// TODO(fpion): implement
 </script>
 
 <template>

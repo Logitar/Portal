@@ -39,8 +39,8 @@
     "new": "New template"
   },
   "uniqueKeyAlreadyUsed": {
-    "help": "TODO",
-    "lead": "TODO"
+    "help": "Please enter a different unique key.",
+    "lead": "The unique key is already used."
   },
   "updated": "The template has been updated."
 }

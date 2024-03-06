@@ -39,8 +39,8 @@
     "new": "Nouveau gabarit"
   },
   "uniqueKeyAlreadyUsed": {
-    "help": "TODO",
-    "lead": "TODO"
+    "help": "Veuillez entrer une clé unique différente.",
+    "lead": "La clé unique est déjà utilisée."
   },
   "updated": "Le gabarit a été enregistré."
 }

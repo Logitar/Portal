@@ -8,9 +8,10 @@ import StatusBadge from "./StatusBadge.vue";
 import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import VariableList from "./VariableList.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
-import type { Message, Variable } from "@/types/messages";
+import type { Message, RecipientPayload, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
+import type { User } from "@/types/users";
 import { sendMessage } from "@/api/messages";
 import { useAccountStore } from "@/stores/account";
 
@@ -54,11 +55,19 @@ const emit = defineEmits<{
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   realmHasNoDefaultSender.value = false;
+  const user: User | undefined = account.authenticated;
+  const recipient: RecipientPayload = { type: "To" };
+  if (user?.realm?.id === props.template?.id) {
+    recipient.userId = user?.id;
+  } else {
+    recipient.address = user?.email?.address;
+    recipient.displayName = user?.fullName;
+  }
   try {
     message.value = await sendMessage({
       senderId: props.sender?.id ?? selectedSender.value?.id,
       template: props.template?.id ?? selectedTemplate.value?.id ?? "",
-      recipients: [], // TODO(fpion): implement
+      recipients: [recipient],
       ignoreUserLocale: ignoreUserLocale.value,
       locale: locale.value,
       variables: variables.value,
