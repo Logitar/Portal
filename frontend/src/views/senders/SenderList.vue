@@ -3,7 +3,7 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import ProviderTypeSelect from "./ProviderTypeSelect.vue";
+import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
 import type { ApiError, ErrorDetail } from "@/types/api";
 import type { Sender, SenderProvider, SenderSort, SearchSendersPayload } from "@/types/senders";
@@ -161,7 +161,7 @@ watch(
         variant="success"
       />
     </div>
-    <ProviderTypeSelect :model-value="provider" @update:model-value="setQuery('provider', $event)" />
+    <SenderProviderSelect :model-value="provider" @update:model-value="setQuery('provider', $event)" />
     <div class="row">
       <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// TODO(fpion): rename
-
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 

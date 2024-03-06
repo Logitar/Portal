@@ -6,9 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import DemoMessage from "@/components/messages/DemoMessage.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
-// import MailgunSettingsEdit from "./MailgunSettingsEdit.vue";
-import ProviderTypeSelect from "./ProviderTypeSelect.vue";
-// import SendGridSettingsEdit from "./SendGridSettingsEdit.vue";
+import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
 import type { ApiError } from "@/types/api";
 import type { MailgunSettings, Sender, SenderProvider, SendGridSettings } from "@/types/senders";
@@ -153,7 +151,7 @@ onMounted(async () => {
               />
               <SetDefaultSender v-if="sender" class="ms-1" :sender="sender" @error="handleError" @success="onSetDefault" />
             </div>
-            <ProviderTypeSelect :disabled="Boolean(sender)" required v-model="provider" />
+            <SenderProviderSelect :disabled="Boolean(sender)" required v-model="provider" />
             <div class="row">
               <EmailAddressInput class="col-lg-6" required validate v-model="emailAddress" />
               <display-name-input class="col-lg-6" validate v-model="displayName" />
