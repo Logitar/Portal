@@ -19,11 +19,6 @@ export type ErrorData = {
   value?: string;
 };
 
-export type ErrorDetail = {
-  errorCode: string;
-  errorMessage: string;
-}; // TODO(fpion): remove
-
 export type GraphQLError = {
   extensions?: GraphQLErrorExtensions;
   locations?: GraphQLLocation[];

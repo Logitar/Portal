@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import ContentTypeSelect from "@/components/templates/ContentTypeSelect.vue";
 import DemoMessage from "@/components/messages/DemoMessage.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Template } from "@/types/templates";
 import type { ToastUtils } from "@/types/components";
 import { createTemplate, readTemplate, replaceTemplate } from "@/api/templates";
@@ -100,7 +100,7 @@ const onSubmit = handleSubmit(async () => {
     }
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueKeyAlreadyUsed") {
+    if (status === 409 && (data as Error)?.code === "UniqueKeyAlreadyUsed") {
       uniqueKeyAlreadyUsed.value = true;
     } else {
       handleError(e);

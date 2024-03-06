@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Sender, SenderProvider, SenderSort, SearchSendersPayload } from "@/types/senders";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteSender, searchSenders } from "@/api/senders";
@@ -82,7 +82,7 @@ async function onDelete(sender: Sender, hideModal: () => void): Promise<void> {
       toasts.success("senders.delete.success");
     } catch (e: unknown) {
       const { data, status } = e as ApiError;
-      if (status === 400 && (data as ErrorDetail).errorCode === "CannotDeleteDefaultSender") {
+      if (status === 400 && (data as Error).code === "CannotDeleteDefaultSender") {
         cannotDeleteDefaultSender.value = true;
         hideModal();
       } else {

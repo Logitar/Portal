@@ -7,7 +7,7 @@ import { useRoute, useRouter } from "vue-router";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
@@ -130,7 +130,7 @@ const onSubmit = handleSubmit(async () => {
     }
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueSlugAlreadyUsed") {
+    if (status === 409 && (data as Error)?.code === "UniqueSlugAlreadyUsed") {
       uniqueSlugAlreadyUsed.value = true;
     } else {
       handleError(e);

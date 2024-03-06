@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 
 import PasswordInput from "./PasswordInput.vue";
 import type { UpdateProfilePayload } from "@/types/account";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { User, UpdateUserPayload, UserUpdatedEvent } from "@/types/users";
 import { handleErrorKey } from "@/inject/App";
@@ -89,9 +89,9 @@ const onSubmit = handleSubmit(async () => {
   } catch (e: unknown) {
     currentRef.value?.focus();
     const { data, status } = e as ApiError;
-    if (status === 400 && (data as ErrorDetail)?.errorCode === "InvalidCredentials") {
+    if (status === 400 && (data as Error)?.code === "InvalidCredentials") {
       invalidCredentials.value = true;
-    } else if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueNameAlreadyUsed") {
+    } else if (status === 409 && (data as Error)?.code === "UniqueNameAlreadyUsed") {
       uniqueNameAlreadyUsed.value = true;
     } else {
       handleError(e);

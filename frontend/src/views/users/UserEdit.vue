@@ -12,7 +12,7 @@ import PersonalInformation from "@/components/users/PersonalInformation.vue";
 import SignOutUser from "@/components/sessions/SignOutUser.vue";
 import ToggleUserStatus from "@/components/users/ToggleUserStatus.vue";
 import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { CollectionAction } from "@/types/modifications";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
@@ -72,7 +72,7 @@ const onCreate = handleSubmit(async () => {
     router.replace({ name: "UserEdit", params: { id: user.id } }); // TODO(fpion): the realm is not set correctly (#303)
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueNameAlreadyUsed") {
+    if (status === 409 && (data as Error)?.code === "UniqueNameAlreadyUsed") {
       uniqueNameAlreadyUsed.value = true;
     } else {
       handleError(e);

@@ -7,7 +7,7 @@ import SenderSelect from "@/components/senders/SenderSelect.vue";
 import StatusBadge from "./StatusBadge.vue";
 import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import VariableList from "./VariableList.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Message, RecipientPayload, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
@@ -76,7 +76,7 @@ const onSubmit = handleSubmit(async () => {
     showStatus.value = true;
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 400 && (data as ErrorDetail)?.errorCode === "RealmHasNoDefaultSender") {
+    if (status === 400 && (data as Error)?.code === "NoDefaultSender") {
       realmHasNoDefaultSender.value = true;
     } else {
       emit("error", e);

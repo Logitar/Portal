@@ -4,7 +4,7 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { Role } from "@/types/roles";
@@ -88,7 +88,7 @@ const onSubmit = handleSubmit(async () => {
     }
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueNameAlreadyUsed") {
+    if (status === 409 && (data as Error)?.code === "UniqueNameAlreadyUsed") {
       uniqueNameAlreadyUsed.value = true;
     } else {
       handleError(e);
