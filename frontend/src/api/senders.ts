@@ -1,6 +1,6 @@
-import type { CreateSenderPayload, Sender, SearchSendersPayload, UpdateSenderPayload } from "@/types/senders";
+import type { CreateSenderPayload, ReplaceSenderPayload, Sender, SearchSendersPayload } from "@/types/senders";
 import type { SearchResults } from "@/types/search";
-import { _delete, get, graphQL, patch, post } from ".";
+import { _delete, get, graphQL, patch, post, put } from ".";
 
 export async function createSender(payload: CreateSenderPayload): Promise<Sender> {
   return (await post<CreateSenderPayload, Sender>("/api/senders", payload)).data;
@@ -12,6 +12,11 @@ export async function deleteSender(id: string): Promise<Sender> {
 
 export async function readSender(id: string): Promise<Sender> {
   return (await get<Sender>(`/api/senders/${id}`)).data;
+}
+
+export async function replaceSender(id: string, payload: ReplaceSenderPayload, version?: number): Promise<Sender> {
+  const query: string = version ? `?version=${version}` : "";
+  return (await put<ReplaceSenderPayload, Sender>(`/api/senders/${id}${query}`, payload)).data;
 }
 
 const searchSendersQuery = `
@@ -49,8 +54,4 @@ export async function searchSenders(payload: SearchSendersPayload): Promise<Sear
 
 export async function setDefaultSender(id: string): Promise<Sender> {
   return (await patch<void, Sender>(`/api/senders/${id}/default`)).data;
-}
-
-export async function updateSender(id: string, payload: UpdateSenderPayload): Promise<Sender> {
-  return (await patch<UpdateSenderPayload, Sender>(`/api/senders/${id}`, payload)).data;
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 
-import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import type { Sender } from "@/types/senders";
 import { formatSender } from "@/helpers/displayUtils";
@@ -11,14 +10,13 @@ import { searchSenders } from "@/api/senders";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disabled?: boolean;
     id?: string;
     label?: string;
     modelValue?: string;
     placeholder?: string;
-    realm?: Realm;
     required?: boolean;
   }>(),
   {
@@ -50,27 +48,21 @@ const emit = defineEmits<{
   (e: "sender-selected", value: Sender | undefined): void;
 }>();
 
-watch(
-  () => props.realm,
-  async (realm) => {
-    try {
-      const search = await searchSenders({
-        realm: realm?.id,
-      });
-      senders.value = search.results;
-    } catch (e: unknown) {
-      handleError(e);
-    }
-  },
-  { immediate: true },
-);
-
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
   const selectedSender = id ? senders.value.find((sender) => sender.id === id) : undefined;
   emit("sender-selected", selectedSender);
 }
+
+onMounted(async () => {
+  try {
+    const search = await searchSenders({});
+    senders.value = search.results;
+  } catch (e: unknown) {
+    handleError(e);
+  }
+});
 </script>
 
 <template>

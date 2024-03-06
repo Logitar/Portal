@@ -6,20 +6,16 @@ import { useRoute, useRouter } from "vue-router";
 
 import DemoMessage from "@/components/messages/DemoMessage.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
+// import MailgunSettingsEdit from "./MailgunSettingsEdit.vue";
 import ProviderTypeSelect from "./ProviderTypeSelect.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
-import SendGridSettings from "./SendGridSettings.vue";
+// import SendGridSettingsEdit from "./SendGridSettingsEdit.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
 import type { ApiError } from "@/types/api";
-import type { Configuration } from "@/types/configuration";
-import type { ProviderSetting, ProviderSettingModification, ProviderType, Sender } from "@/types/senders";
-import type { Realm } from "@/types/realms";
+import type { MailgunSettings, Sender, SenderProvider, SendGridSettings } from "@/types/senders";
 import type { ToastUtils } from "@/types/components";
-import { createSender, readSender, updateSender } from "@/api/senders";
+import { createSender, readSender, replaceSender } from "@/api/senders";
 import { formatSender } from "@/helpers/displayUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
-import { readConfiguration } from "@/api/configuration";
-import { readRealm } from "@/api/realms";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
@@ -31,85 +27,71 @@ const defaults = {
   emailAddress: "",
   displayName: "",
   description: "",
-  settings: [],
+  mailgun: {
+    apiKey: "",
+    domainName: "",
+  },
+  sendGrid: {
+    apiKey: "",
+  },
 };
 
-const configuration = ref<Configuration>();
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const emailAddress = ref<string>(defaults.emailAddress);
 const hasLoaded = ref<boolean>(false);
-const provider = ref<ProviderType>();
-const realm = ref<Realm>();
-const realmId = ref<string>();
+const mailgun = ref<MailgunSettings>(defaults.mailgun);
+const provider = ref<SenderProvider>();
 const sender = ref<Sender>();
-const settings = ref<ProviderSetting[]>(defaults.settings);
+const sendGrid = ref<SendGridSettings>(defaults.sendGrid);
 
 const hasChanges = computed<boolean>(() => {
   const model = sender.value ?? defaults;
   return (
-    realm.value?.id !== sender.value?.realm?.id ||
     emailAddress.value !== model.emailAddress ||
     displayName.value !== (model.displayName ?? "") ||
     description.value !== (model.description ?? "") ||
-    JSON.stringify(settings.value) !== JSON.stringify(sender.value?.settings ?? [])
+    (provider.value === "Mailgun" &&
+      (mailgun.value.apiKey !== (model.mailgun?.apiKey ?? "") || mailgun.value.domainName !== (model.mailgun?.domainName ?? ""))) ||
+    (provider.value === "SendGrid" && sendGrid.value.apiKey !== (model.sendGrid?.apiKey ?? ""))
   );
 });
 const title = computed<string>(() => (sender.value ? formatSender(sender.value) : t("senders.title.new")));
 
 function setModel(model: Sender): void {
   sender.value = model;
-  description.value = model.description ?? "";
-  displayName.value = model.displayName ?? "";
   emailAddress.value = model.emailAddress;
+  displayName.value = model.displayName ?? "";
+  description.value = model.description ?? "";
   provider.value = model.provider;
-  realm.value = model.realm;
-  realmId.value = model.realm?.id;
-  settings.value = model.settings.map((item) => ({ ...item }));
-}
-
-function getSettingModifications(source: ProviderSetting[], destination: ProviderSetting[]): ProviderSettingModification[] {
-  const modifications: ProviderSettingModification[] = [];
-
-  const destinationKeys = new Set(destination.map(({ key }) => key));
-  for (const setting of source) {
-    const key = setting.key;
-    if (!destinationKeys.has(key)) {
-      modifications.push({ key });
-    }
-  }
-
-  const sourceMap = new Map(source.map(({ key, value }) => [key, value]));
-  for (const setting of destination) {
-    if (sourceMap.get(setting.key) !== setting.value) {
-      modifications.push(setting);
-    }
-  }
-
-  return modifications;
+  mailgun.value = model.mailgun ?? defaults.mailgun;
+  sendGrid.value = model.sendGrid ?? defaults.sendGrid;
 }
 
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     if (sender.value) {
-      const settingModifications = getSettingModifications(sender.value.settings, settings.value);
-      const updatedSender = await updateSender(sender.value.id, {
-        emailAddress: emailAddress.value !== sender.value.emailAddress ? emailAddress.value : undefined,
-        displayName: displayName.value !== (sender.value.displayName ?? "") ? { value: displayName.value } : undefined,
-        description: description.value !== (sender.value.description ?? "") ? { value: description.value } : undefined,
-        settings: settingModifications.length ? settingModifications : undefined,
-      });
+      const updatedSender = await replaceSender(
+        sender.value.id,
+        {
+          emailAddress: emailAddress.value,
+          displayName: displayName.value,
+          description: description.value,
+          mailgun: provider.value === "Mailgun" ? mailgun.value : undefined,
+          sendGrid: provider.value === "SendGrid" ? sendGrid.value : undefined,
+        },
+        sender.value.version,
+      );
       setModel(updatedSender);
       toasts.success("senders.updated");
     } else {
       const createdSender = await createSender({
-        realm: realmId.value,
         emailAddress: emailAddress.value,
         displayName: displayName.value,
         description: description.value,
-        provider: provider.value as ProviderType,
-        settings: settings.value,
+        mailgun: provider.value === "Mailgun" ? mailgun.value : undefined,
+        sendGrid: provider.value === "SendGrid" ? sendGrid.value : undefined,
       });
       setModel(createdSender);
       toasts.success("senders.created");
@@ -119,11 +101,6 @@ const onSubmit = handleSubmit(async () => {
     handleError(e);
   }
 });
-
-function onRealmSelected(selected?: Realm) {
-  realm.value = selected;
-  realmId.value = selected?.id;
-}
 
 function onSetDefault(model: Sender): void {
   if (sender.value) {
@@ -137,17 +114,10 @@ function onSetDefault(model: Sender): void {
 
 onMounted(async () => {
   try {
-    configuration.value = await readConfiguration();
     const id = route.params.id?.toString();
-    const realmIdQuery = route.query.realm?.toString();
     if (id) {
       const sender = await readSender(id);
       setModel(sender);
-    } else if (realmIdQuery) {
-      const foundRealm = await readRealm(realmIdQuery);
-      realm.value = foundRealm;
-      realmId.value = foundRealm.id;
-      provider.value = (route.query.provider?.toString() as ProviderType) || undefined;
     }
   } catch (e: unknown) {
     const { status } = e as ApiError;
@@ -183,16 +153,14 @@ onMounted(async () => {
               />
               <SetDefaultSender v-if="sender" class="ms-1" :sender="sender" @error="handleError" @success="onSetDefault" />
             </div>
-            <div class="row">
-              <RealmSelect class="col-lg-6" :disabled="Boolean(sender)" :model-value="realmId" @realm-selected="onRealmSelected" />
-              <ProviderTypeSelect class="col-lg-6" :disabled="Boolean(sender)" required v-model="provider" />
-            </div>
+            <ProviderTypeSelect :disabled="Boolean(sender)" required v-model="provider" />
             <div class="row">
               <EmailAddressInput class="col-lg-6" required validate v-model="emailAddress" />
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>
             <description-textarea v-model="description" />
-            <SendGridSettings v-if="provider === 'SendGrid'" v-model="settings" />
+            <!-- <MailgunSettingsEdit v-if="provider === 'Mailgun'" v-model="mailgun" /> -->
+            <!-- <SendGridSettingsEdit v-else-if="provider === 'SendGrid'" v-model="sendGrid" /> -->
           </form>
         </app-tab>
         <app-tab :disabled="!sender" title="messages.demo.label">
