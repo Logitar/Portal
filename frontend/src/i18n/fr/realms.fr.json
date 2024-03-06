@@ -1,8 +1,4 @@
 {
-  "claimMappings": {
-    "empty": "Il n’y a aucune association de revendication.",
-    "title": "Associations de revendications"
-  },
   "created": "Le royaume a été créé.",
   "defaultLocale": "Langue par défaut",
   "delete": {
@@ -15,11 +11,6 @@
     "secret": {
       "warning": "Changer le secret invalidera tous les jetons actifs dans ce royaume. Appuyez sur le bouton ci-dessous afin d’annuler le changement."
     }
-  },
-  "passwordRecovery": "Récupération du mot de passe",
-  "requireConfirmedAccount": {
-    "info": "En activant ce paramètre, une coordonnée confirmée sera nécessaire afin de permettre à un utilisateur de se connecter et de gérer son compte.",
-    "label": "Exiger un compte confirmé"
   },
   "requireUniqueEmail": {
     "info": "En activant ce paramètre, l’unicité des adresses courriel sera forcée lors de la création et de la modification d’un utilisateur.",
