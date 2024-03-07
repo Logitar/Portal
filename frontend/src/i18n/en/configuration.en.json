@@ -1,13 +1,5 @@
 {
   "defaultLocale": "Default Locale",
-  "initialization": {
-    "initialize": "Initialize",
-    "title": "Initialization",
-    "user": {
-      "help": "Fill the form below to create the first administrator account.",
-      "label": "User"
-    }
-  },
   "jwt": {
     "secret": {
       "warning": "Changing the secret will invalidate all active tokens of the Portal. Press the button below to revert the change."

@@ -3,6 +3,7 @@ import { setActivePinia, createPinia } from "pinia";
 
 import { useAccountStore } from "../account";
 import type { Actor } from "@/types/actor";
+import type { Realm } from "@/types/realms";
 import type { Session } from "@/types/sessions";
 import type { User } from "@/types/users";
 
@@ -28,6 +29,30 @@ const user: User = {
   customIdentifiers: [],
   roles: [],
 };
+const realm: Realm = {
+  id: "5459a420-31c5-4d70-958b-728341098dd9",
+  version: 1,
+  createdBy: actor,
+  createdOn: now,
+  updatedBy: actor,
+  updatedOn: now,
+  uniqueSlug: "test",
+  secret: `uk{p:'"8dmj!?(4CVf37L;ys>n[A,2TD`,
+  uniqueNameSettings: {
+    allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+",
+  },
+  passwordSettings: {
+    requiredLength: 8,
+    requiredUniqueChars: 8,
+    requireNonAlphanumeric: true,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireDigit: true,
+    hashingStrategy: "PBKDF2",
+  },
+  requireUniqueEmail: true,
+  customAttributes: [],
+};
 const session: Session = {
   id: "6c9eddce-48ea-4608-b475-d1b9c712060d",
   version: 1,
@@ -52,6 +77,14 @@ describe("accountStore", () => {
     expect(account.currentSession).toBeUndefined();
   });
 
+  it.concurrent("should set the current realm", () => {
+    const account = useAccountStore();
+    account.setRealm(realm);
+    expect(realm.id).toBe(account.currentRealm?.id);
+    account.setRealm();
+    expect(account.currentRealm).toBeUndefined();
+  });
+
   it.concurrent("should set the current user", () => {
     const account = useAccountStore();
     account.setUser(user);
@@ -68,8 +101,10 @@ describe("accountStore", () => {
   it.concurrent("should sign-out the authenticated user", () => {
     const account = useAccountStore();
     account.signIn(session);
+    account.setRealm(realm);
     account.signOut();
     expect(account.authenticated).toBeUndefined();
+    expect(account.currentRealm).toBeUndefined();
     expect(account.currentSession).toBeUndefined();
   });
 });

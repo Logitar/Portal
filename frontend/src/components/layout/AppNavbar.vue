@@ -9,6 +9,7 @@ import type { AuthenticatedUser } from "@/types/users";
 import type { Hyperlink } from "@/types/components";
 import type { Locale } from "@/types/i18n";
 import { combineURL } from "@/helpers/stringUtils";
+import { formatRealm } from "@/helpers/displayUtils";
 import { orderBy } from "@/helpers/arrayUtils";
 import { useAccountStore } from "@/stores/account";
 import { useI18nStore } from "@/stores/i18n";
@@ -19,6 +20,7 @@ const environment = import.meta.env.MODE.toLowerCase();
 const i18n = useI18nStore();
 const { availableLocales, locale, t } = useI18n();
 
+const currentRealm = computed<string>(() => (account.currentRealm ? formatRealm(account.currentRealm) : t("realms.select.placeholder")));
 const otherLocales = computed<Locale[]>(() => {
   const otherLocales = new Set<string>(availableLocales.filter((item) => item !== locale.value));
   return orderBy(
@@ -132,6 +134,8 @@ watchEffect(() => {
             </li>
           </template>
         </ul>
+
+        <icon-button v-if="account.authenticated" icon="fas fa-chess-rook" :to="{ name: 'SelectRealm' }">&nbsp;{{ currentRealm }}</icon-button>
 
         <ul class="navbar-nav mb-2 mb-lg-0">
           <template v-if="i18n.locale">

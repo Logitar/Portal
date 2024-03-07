@@ -1,5 +1,10 @@
 {
   "created": "The realm has been created.",
+  "current": {
+    "help": "Data you see and manage are in your current realm or Portal. Change realm to browse and manage its data.",
+    "submit": "Change",
+    "title": "Change Realm"
+  },
   "defaultLocale": "Default Locale",
   "delete": {
     "confirm": "Do you really want to delete the following realm?",
