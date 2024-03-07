@@ -12,7 +12,7 @@ export const useAccountStore = defineStore(
     const currentRealm = ref<Realm>();
     const currentSession = ref<Session>();
 
-    function setRealm(realm: Realm): void {
+    function setRealm(realm?: Realm): void {
       currentRealm.value = realm;
     }
     function setUser(user: User): void {

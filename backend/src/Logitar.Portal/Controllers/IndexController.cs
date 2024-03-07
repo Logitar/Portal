@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Logitar.Portal.Controllers;
 
 [ApiController]
-[Route("")]
+[Route("api")]
 public class IndexController : ControllerBase
 {
   [HttpGet]

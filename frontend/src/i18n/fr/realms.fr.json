@@ -1,5 +1,10 @@
 {
   "created": "Le royaume a été créé.",
+  "current": {
+    "help": "Les données que vous voyez et gérez sont dans votre royaume actuel ou dans le Portal. Changez de royaume pour naviguer et gérer ses données.",
+    "submit": "Changer",
+    "title": "Changer de royaume"
+  },
   "defaultLocale": "Langue par défaut",
   "delete": {
     "confirm": "Désirez-vous vraiment supprimer le royaume suivant ?",

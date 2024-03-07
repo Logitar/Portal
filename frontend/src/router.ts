@@ -95,6 +95,11 @@ const router = createRouter({
       path: "/create-realm",
       component: () => import("./views/realms/RealmEdit.vue"),
     },
+    {
+      name: "SelectRealm",
+      path: "/select-realm",
+      component: () => import("./views/realms/SelectRealm.vue"),
+    },
     // Roles
     {
       name: "RoleList",

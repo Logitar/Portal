@@ -81,6 +81,8 @@ describe("accountStore", () => {
     const account = useAccountStore();
     account.setRealm(realm);
     expect(realm.id).toBe(account.currentRealm?.id);
+    account.setRealm();
+    expect(account.currentRealm).toBeUndefined();
   });
 
   it.concurrent("should set the current user", () => {
