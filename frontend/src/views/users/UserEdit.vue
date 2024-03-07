@@ -15,13 +15,12 @@ import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { ApiError, Error } from "@/types/api";
 import type { CollectionAction } from "@/types/modifications";
 import type { Configuration } from "@/types/configuration";
-import type { CustomAttribute } from "@/types/customAttributes";
+import type { CustomAttribute, CustomAttributeModification } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
 import type { Role } from "@/types/roles";
 import type { ToastUtils } from "@/types/components";
 import type { User, UserUpdatedEvent } from "@/types/users";
 import { createUser, readUser, updateUser } from "@/api/users";
-import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 import { readConfiguration } from "@/api/configuration";
 import { useAccountStore } from "@/stores/account";
@@ -79,6 +78,27 @@ const onCreate = handleSubmit(async () => {
     }
   }
 });
+
+function getCustomAttributeModifications(source: CustomAttribute[], destination: CustomAttribute[]): CustomAttributeModification[] {
+  const modifications: CustomAttributeModification[] = [];
+
+  const destinationKeys = new Set(destination.map(({ key }) => key));
+  for (const customAttribute of source) {
+    const key = customAttribute.key;
+    if (!destinationKeys.has(key)) {
+      modifications.push({ key });
+    }
+  }
+
+  const sourceMap = new Map(source.map(({ key, value }) => [key, value]));
+  for (const customAttribute of destination) {
+    if (sourceMap.get(customAttribute.key) !== customAttribute.value) {
+      modifications.push(customAttribute);
+    }
+  }
+
+  return modifications;
+}
 const onSaveCustomAttributes = handleSubmit(async () => {
   if (user.value && !isLoading.value) {
     isLoading.value = true;
