@@ -1,4 +1,4 @@
-import type { ApiError, ApiResult, GraphQLRequest, GraphQLResponse } from "@/types/api";
+import type { ApiError, ApiResult, Error, GraphQLError, GraphQLRequest, GraphQLResponse } from "@/types/api";
 import { combineURL } from "@/helpers/stringUtils";
 import { useAccountStore } from "@/stores/account";
 
@@ -69,9 +69,14 @@ export async function graphQL<TVariables, TResult>(query: string, variables?: TV
     data = response.data;
     status = response.status;
   } catch (e: unknown) {
-    const error = e as ApiError;
-    data = error.data as GraphQLResponse<TResult>;
-    status = error.status;
+    const response = e as ApiError;
+    const error = response.data as Error;
+    if (error?.code) {
+      data = { errors: [toGraphQLError(error)] };
+    } else {
+      data = response.data as GraphQLResponse<TResult>;
+    }
+    status = response.status;
   }
 
   if (!data.data) {
@@ -81,4 +86,14 @@ export async function graphQL<TVariables, TResult>(query: string, variables?: TV
 
   const result: ApiResult<TResult> = { data: data.data, status };
   return result;
+}
+function toGraphQLError(error: Error): GraphQLError {
+  return {
+    extensions: {
+      code: error.code,
+      codes: [error.code],
+      details: JSON.stringify(error.data),
+    },
+    message: error.message,
+  };
 }
