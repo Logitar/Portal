@@ -104,5 +104,32 @@ internal static class OpenApiExtensions
         new List<string>()
       }
     });
+
+    options.AddSecurityDefinition(Schemes.Bearer, new OpenApiSecurityScheme
+    {
+      Description = "Enter your access token in the input below:",
+      In = ParameterLocation.Header,
+      Name = Headers.Authorization,
+      Scheme = Schemes.Bearer,
+      Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Name =  Headers.Authorization,
+          Reference = new OpenApiReference
+          {
+            Id = Schemes.Bearer,
+            Type = ReferenceType.SecurityScheme
+          },
+          Scheme = Schemes.Bearer,
+          Type = SecuritySchemeType.Http
+        },
+        new List<string>()
+      }
+    });
   }
 }
