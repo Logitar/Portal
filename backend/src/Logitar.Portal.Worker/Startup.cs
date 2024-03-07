@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application;
+using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Worker.Settings;
@@ -19,11 +20,31 @@ internal class Startup
   {
     services.AddApplicationInsightsTelemetryWorkerService();
 
+    string? connectionString;
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
+      case DatabaseProvider.EntityFrameworkCorePostgreSQL:
+        connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_Portal");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+          services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(_configuration);
+        }
+        else
+        {
+          services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
+        }
+        break;
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
-        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
+        connectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_Portal");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+          services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
+        }
+        else
+        {
+          services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
+        }
         break;
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
