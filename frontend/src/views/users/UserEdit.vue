@@ -68,7 +68,7 @@ const onCreate = handleSubmit(async () => {
     });
     setModel(user);
     toasts.success("users.created");
-    router.replace({ name: "UserEdit", params: { id: user.id } }); // TODO(fpion): the realm is not set correctly (#303)
+    router.replace({ name: "UserEdit", params: { id: user.id } });
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
     if (status === 409 && (data as Error)?.code === "UniqueNameAlreadyUsed") {
