@@ -7,7 +7,6 @@ import type { RoleModification } from "@/types/roles";
 import type { SearchPayload, SortOption } from "@/types/search";
 
 export type ApiKey = Aggregate & {
-  id: string;
   xApiKey?: string;
   displayName: string;
   description?: string;
@@ -30,16 +29,23 @@ export type ApiKeyStatus = {
 };
 
 export type CreateApiKeyPayload = {
-  realm?: string;
   displayName: string;
   description?: string;
   expiresOn?: Date;
-  customAttributes?: CustomAttribute[];
-  roles?: Role[];
+  customAttributes: CustomAttribute[];
+  roles: string[];
+};
+
+export type ReplaceApiKeyPayload = {
+  displayName: string;
+  description?: string;
+  expiresOn?: Date;
+  customAttributes: CustomAttribute[];
+  roles: string[];
 };
 
 export type SearchApiKeysPayload = SearchPayload & {
-  realm?: string;
+  hasAuthenticated?: boolean;
   status?: ApiKeyStatus;
   sort?: ApiKeySortOption[];
 };

@@ -1,6 +1,6 @@
-import type { CreateRealmPayload, Realm, SearchRealmsPayload, UpdateRealmPayload } from "@/types/realms";
+import type { CreateRealmPayload, Realm, ReplaceRealmPayload, SearchRealmsPayload } from "@/types/realms";
 import type { SearchResults } from "@/types/search";
-import { _delete, get, graphQL, patch, post } from ".";
+import { _delete, get, graphQL, post, put } from ".";
 
 export async function createRealm(payload: CreateRealmPayload): Promise<Realm> {
   return (await post<CreateRealmPayload, Realm>("/api/realms", payload)).data;
@@ -18,10 +18,15 @@ export async function readRealmByUniqueSlug(uniqueSlug: string): Promise<Realm> 
   return (await get<Realm>(`/api/realms/unique-slug:${uniqueSlug}`)).data;
 }
 
+export async function replaceRealm(id: string, payload: ReplaceRealmPayload, version?: number): Promise<Realm> {
+  const query: string = version ? `?version=${version}` : "";
+  return (await put<ReplaceRealmPayload, Realm>(`/api/realms/${id}${query}`, payload)).data;
+}
+
 const searchRealmsQuery = `
 query($payload: SearchRealmsPayload!) {
   realms(payload: $payload) {
-    results {
+    items {
       id
       uniqueSlug
       displayName
@@ -35,7 +40,7 @@ query($payload: SearchRealmsPayload!) {
         requireLowercase
         requireUppercase
         requireDigit
-        strategy
+        hashingStrategy
       }
       updatedBy {
         id
@@ -59,8 +64,4 @@ type SearchRealmsResponse = {
 };
 export async function searchRealms(payload: SearchRealmsPayload): Promise<SearchResults<Realm>> {
   return (await graphQL<SearchRealmsRequest, SearchRealmsResponse>(searchRealmsQuery, { payload })).data.realms;
-}
-
-export async function updateRealm(id: string, payload: UpdateRealmPayload): Promise<Realm> {
-  return (await patch<UpdateRealmPayload, Realm>(`/api/realms/${id}`, payload)).data;
 }

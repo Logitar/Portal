@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 
-import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { SelectOption } from "@/types/components";
 import { formatRole } from "@/helpers/displayUtils";
@@ -21,7 +20,6 @@ const props = withDefaults(
     modelValue?: string;
     noLabel?: boolean;
     placeholder?: string;
-    realm?: Realm;
     required?: boolean;
   }>(),
   {
@@ -58,27 +56,21 @@ const emit = defineEmits<{
   (e: "role-selected", value: Role | undefined): void;
 }>();
 
-watch(
-  () => props.realm,
-  async (realm) => {
-    try {
-      const search = await searchRoles({
-        realm: realm?.id,
-      });
-      roles.value = search.results;
-    } catch (e: unknown) {
-      handleError(e);
-    }
-  },
-  { immediate: true },
-);
-
 function onModelValueUpdate(id: string): void {
   emit("update:model-value", id);
 
   const selectedRole = id ? roles.value.find((role) => role.id === id) : undefined;
   emit("role-selected", selectedRole);
 }
+
+onMounted(async () => {
+  try {
+    const results = await searchRoles({});
+    roles.value = results.items;
+  } catch (e: unknown) {
+    handleError(e);
+  }
+});
 </script>
 
 <template>

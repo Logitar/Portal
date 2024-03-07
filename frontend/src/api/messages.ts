@@ -1,4 +1,4 @@
-import type { Message, SearchMessagesPayload, SendDemoMessagePayload } from "@/types/messages";
+import type { Message, SearchMessagesPayload, SendMessagePayload, SentMessages } from "@/types/messages";
 import type { SearchResults } from "@/types/search";
 import { get, graphQL, post } from ".";
 
@@ -9,7 +9,7 @@ export async function readMessage(id: string): Promise<Message> {
 const searchMessagesQuery = `
 query($payload: SearchMessagesPayload!) {
   messages(payload: $payload) {
-    results {
+    items {
       id
       subject
       recipientCount
@@ -22,7 +22,7 @@ query($payload: SearchMessagesPayload!) {
       }
       template {
         id
-        uniqueName
+        uniqueKey
         displayName
         version
       }
@@ -51,6 +51,6 @@ export async function searchMessages(payload: SearchMessagesPayload): Promise<Se
   return (await graphQL<SearchMessagesRequest, SearchMessagesResponse>(searchMessagesQuery, { payload })).data.messages;
 }
 
-export async function sendDemoMessage(payload: SendDemoMessagePayload): Promise<Message> {
-  return (await post<SendDemoMessagePayload, Message>("/api/messages/send/demo", payload)).data;
+export async function sendMessage(payload: SendMessagePayload): Promise<SentMessages> {
+  return (await post<SendMessagePayload, SentMessages>("/api/messages", payload)).data;
 }

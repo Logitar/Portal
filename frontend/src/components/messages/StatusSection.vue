@@ -13,7 +13,7 @@ const props = defineProps<{
 }>();
 
 const resultData = computed<object | undefined>(() =>
-  props.message?.result.length ? Object.fromEntries(props.message.result.map(({ key, value }) => [key, value])) : undefined,
+  props.message?.resultData.length ? Object.fromEntries(props.message.resultData.map(({ key, value }) => [key, value])) : undefined,
 );
 </script>
 

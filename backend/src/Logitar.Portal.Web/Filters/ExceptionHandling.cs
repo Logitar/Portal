@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using FluentValidation;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
@@ -15,6 +16,7 @@ using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
 using Logitar.Portal.Infrastructure;
+using Logitar.Portal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
@@ -34,7 +36,12 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   public override void OnException(ExceptionContext context)
   {
     Exception exception = context.Exception;
-    if (IsBadRequestError(exception))
+    if (exception is ValidationException validationException)
+    {
+      context.Result = new BadRequestObjectResult(new ValidationError(validationException));
+      context.ExceptionHandled = true;
+    }
+    else if (IsBadRequestError(exception))
     {
       context.Result = new BadRequestObjectResult(BuildError(exception));
       context.ExceptionHandled = true;

@@ -3,7 +3,6 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { Role, RoleSort, SearchRolesPayload } from "@/types/roles";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteRole, searchRoles } from "@/api/roles";
@@ -26,7 +25,6 @@ const total = ref<number>(0);
 const count = computed<number>(() => Number(route.query.count) || 10);
 const isDescending = computed<boolean>(() => route.query.isDescending === "true");
 const page = computed<number>(() => Number(route.query.page) || 1);
-const realm = computed<string>(() => route.query.realm?.toString() ?? "");
 const search = computed<string>(() => route.query.search?.toString() ?? "");
 const sort = computed<string>(() => route.query.sort?.toString() ?? "");
 
@@ -39,7 +37,6 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchRolesPayload = {
-    realm: realm.value || undefined,
     search: {
       terms: search.value
         .split(" ")
@@ -57,7 +54,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchRoles(parameters);
     if (now === timestamp.value) {
-      roles.value = data.results;
+      roles.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {
@@ -89,7 +86,6 @@ async function onDelete(role: Role, hideModal: () => void): Promise<void> {
 function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
-    case "realm":
     case "search":
     case "count":
       query.page = "1";
@@ -108,7 +104,6 @@ watch(
           ...route,
           query: isEmpty(query)
             ? {
-                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -135,9 +130,8 @@ watch(
     <h1>{{ t("roles.title.list") }}</h1>
     <div class="my-2">
       <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateRole', query: { realm: realm || undefined } }" variant="success" />
+      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateRole' }" variant="success" />
     </div>
-    <RealmSelect :model-value="realm" @update:model-value="setQuery('realm', $event)" />
     <div class="row">
       <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select

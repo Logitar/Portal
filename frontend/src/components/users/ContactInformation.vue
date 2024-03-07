@@ -96,9 +96,29 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     const payload: UpdateUserPayload = {
-      address: hasAddressChanged.value ? { value: address.value.street ? address.value : undefined } : undefined,
+      address: hasAddressChanged.value
+        ? {
+            value: address.value.street
+              ? {
+                  ...address.value,
+                  region: address.value.region || undefined,
+                  postalCode: address.value.postalCode || undefined,
+                }
+              : undefined,
+          }
+        : undefined,
       email: hasEmailChanged.value ? { value: email.value.address ? email.value : undefined } : undefined,
-      phone: hasPhoneChanged.value ? { value: phone.value.number ? phone.value : undefined } : undefined,
+      phone: hasPhoneChanged.value
+        ? {
+            value: phone.value.number
+              ? {
+                  ...phone.value,
+                  countryCode: phone.value.countryCode || undefined,
+                  extension: phone.value.extension || undefined,
+                }
+              : undefined,
+          }
+        : undefined,
     };
     const user = props.isProfile ? await saveProfile(payload) : await updateUser(props.user.id, payload);
     emit("user-updated", { user });
@@ -113,6 +133,7 @@ function clearAddress(): void {
   address.value.postalCode = undefined;
   address.value.country = "";
   address.value.region = undefined;
+  selectedCountry.value = undefined;
 }
 </script>
 
@@ -150,7 +171,14 @@ function clearAddress(): void {
         validate
         v-model="address.locality"
       />
-      <PostalCodeInput class="col-lg-6" :country="selectedCountry" :disabled="isProfile && user.address?.isVerified" validate v-model="address.postalCode" />
+      <PostalCodeInput
+        class="col-lg-6"
+        :country="selectedCountry"
+        :disabled="isProfile && user.address?.isVerified"
+        :required="Boolean(selectedCountry?.postalCode)"
+        validate
+        v-model="address.postalCode"
+      />
     </div>
     <div class="row">
       <CountrySelect
@@ -160,7 +188,13 @@ function clearAddress(): void {
         v-model="address.country"
         @country-selected="selectedCountry = $event"
       />
-      <RegionSelect class="col-lg-6" :country="selectedCountry" :disabled="isProfile && user.address?.isVerified" v-model="address.region" />
+      <RegionSelect
+        class="col-lg-6"
+        :country="selectedCountry"
+        :disabled="isProfile && user.address?.isVerified"
+        :required="(selectedCountry?.regions.length ?? 0) > 0"
+        v-model="address.region"
+      />
     </div>
     <icon-button
       v-if="user.address?.isVerified !== true"

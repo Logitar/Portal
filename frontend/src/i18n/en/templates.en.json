@@ -25,7 +25,8 @@
   "sort": {
     "options": {
       "DisplayName": "Display name",
-      "UniqueName": "Unique name",
+      "Subject": "Subject",
+      "UniqueKey": "Unique key",
       "UpdatedOn": "Updated on"
     }
   },
@@ -36,6 +37,14 @@
   "title": {
     "list": "Templates",
     "new": "New template"
+  },
+  "uniqueKey": {
+    "alreadyUsed": {
+      "help": "Please enter a different unique key.",
+      "lead": "The unique key is already used."
+    },
+    "label": "Unique Key",
+    "placeholder": "Enter an unique key"
   },
   "updated": "The template has been updated."
 }

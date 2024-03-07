@@ -1,3 +1,5 @@
+import type { Email, EmailPayload } from "./users";
+
 export type Claim = {
   name: string;
   value: string;
@@ -6,15 +8,14 @@ export type Claim = {
 
 export type CreateTokenPayload = {
   isConsumable: boolean;
-  realm?: string;
   algorithm?: string;
   audience?: string;
   issuer?: string;
-  lifetime: number;
+  lifetimeSeconds?: number;
   secret?: string;
   type?: string;
   subject?: string;
-  emailAddress?: string;
+  email?: EmailPayload;
   claims: Claim[];
 };
 
@@ -25,7 +26,6 @@ export type CreatedToken = {
 export type ValidateTokenPayload = {
   token: string;
   consume: boolean;
-  realm?: string;
   audience?: string;
   issuer?: string;
   secret?: string;
@@ -34,6 +34,6 @@ export type ValidateTokenPayload = {
 
 export type ValidatedToken = {
   subject?: string;
-  emailAddress?: string;
+  email?: Email;
   claims: Claim[];
 };

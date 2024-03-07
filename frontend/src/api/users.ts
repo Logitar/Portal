@@ -1,6 +1,6 @@
 import type { CreateUserPayload, SearchUsersPayload, UpdateUserPayload, User } from "@/types/users";
 import type { SearchResults } from "@/types/search";
-import { _delete, get, graphQL, patch, post } from ".";
+import { _delete, get, graphQL, patch, post, put } from ".";
 
 export async function createUser(payload: CreateUserPayload): Promise<User> {
   return (await post<CreateUserPayload, User>("/api/users", payload)).data;
@@ -17,7 +17,7 @@ export async function readUser(id: string): Promise<User> {
 const searchUsersQuery = `
 query($payload: SearchUsersPayload!) {
   users(payload: $payload) {
-    results {
+    items {
       id
       uniqueName
       isDisabled
@@ -60,7 +60,7 @@ export async function searchUsers(payload: SearchUsersPayload): Promise<SearchRe
 }
 
 export async function signOut(id: string): Promise<User> {
-  return (await patch<void, User>(`/api/users/${id}/sign/out`)).data;
+  return (await put<void, User>(`/api/users/${id}/sign/out`)).data;
 }
 
 export async function updateUser(id: string, payload: UpdateUserPayload): Promise<User> {

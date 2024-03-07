@@ -3,7 +3,6 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import RoleSelect from "./RoleSelect.vue";
-import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 
 const { t } = useI18n();
@@ -11,7 +10,6 @@ const { t } = useI18n();
 withDefaults(
   defineProps<{
     loading?: boolean;
-    realm?: Realm;
     roles: Role[];
   }>(),
   {
@@ -45,7 +43,6 @@ function removeRole(role: Role): void {
       :model-value="selectedRole?.id"
       no-label
       placeholder="roles.manage.add"
-      :realm="realm"
       @role-selected="selectedRole = $event"
     >
       <template #append>

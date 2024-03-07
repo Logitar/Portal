@@ -25,7 +25,8 @@
   "sort": {
     "options": {
       "DisplayName": "Nom d’affichage",
-      "UniqueName": "Nom unique",
+      "Subject": "Sujet",
+      "UniqueKey": "Clé unique",
       "UpdatedOn": "Dernière modification"
     }
   },
@@ -36,6 +37,14 @@
   "title": {
     "list": "Gabarits",
     "new": "Nouveau gabarit"
+  },
+  "uniqueKey": {
+    "alreadyUsed": {
+      "help": "Veuillez entrer une clé unique différente.",
+      "lead": "La clé unique est déjà utilisée."
+    },
+    "label": "Clé unique",
+    "placeholder": "Entrez une clé unique"
   },
   "updated": "Le gabarit a été enregistré."
 }

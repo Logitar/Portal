@@ -7,20 +7,14 @@ import { useRoute, useRouter } from "vue-router";
 import ExpiresOnInput from "@/components/apiKeys/ExpiresOnInput.vue";
 import FormInput from "@/components/shared/FormInput.vue";
 import ManageRoles from "@/components/roles/ManageRoles.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { ApiError } from "@/types/api";
 import type { ApiKey } from "@/types/apiKeys";
 import type { CollectionAction } from "@/types/modifications";
-import type { Configuration } from "@/types/configuration";
 import type { CustomAttribute } from "@/types/customAttributes";
-import type { Realm } from "@/types/realms";
 import type { Role } from "@/types/roles";
 import type { ToastUtils } from "@/types/components";
-import { createApiKey, readApiKey, updateApiKey } from "@/api/apiKeys";
-import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
+import { createApiKey, readApiKey, replaceApiKey, updateApiKey } from "@/api/apiKeys";
 import { handleErrorKey, toastsKey } from "@/inject/App";
-import { readConfiguration } from "@/api/configuration";
-import { readRealm } from "@/api/realms";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const route = useRoute();
@@ -36,22 +30,18 @@ const defaults = {
 
 const apiKey = ref<ApiKey>();
 const clipboardRef = ref<InstanceType<typeof FormInput> | null>(null);
-const configuration = ref<Configuration>();
 const customAttributes = ref<CustomAttribute[]>(defaults.customAttributes);
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const expiresOn = ref<Date>();
 const hasLoaded = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
-const realm = ref<Realm>();
-const realmId = ref<string>();
 const showString = ref<boolean>(false);
 const xApiKey = ref<string>();
 
 const hasChanges = computed<boolean>(() => {
   const model = apiKey.value ?? defaults;
   return (
-    realm.value?.id !== apiKey.value?.realm?.id ||
     displayName.value !== (model.displayName ?? "") ||
     description.value !== (model.description ?? "") ||
     expiresOn.value?.getTime() !== (apiKey.value?.expiresOn ? new Date(apiKey.value.expiresOn) : undefined)?.getTime() ||
@@ -68,8 +58,6 @@ function setModel(model: ApiKey): void {
   description.value = model.description ?? "";
   displayName.value = model.displayName ?? "";
   expiresOn.value = model.expiresOn ? new Date(model.expiresOn) : undefined;
-  realm.value = model.realm;
-  realmId.value = model.realm?.id;
   xApiKey.value = model.xApiKey;
   showString.value = Boolean(model.xApiKey);
 }
@@ -78,23 +66,26 @@ const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   try {
     if (apiKey.value) {
-      const customAttributeModifications = getCustomAttributeModifications(apiKey.value.customAttributes, customAttributes.value);
-      const updatedApiKey = await updateApiKey(apiKey.value.id, {
-        displayName: displayName.value !== (apiKey.value.displayName ?? "") ? displayName.value : undefined,
-        description: description.value !== (apiKey.value.description ?? "") ? { value: description.value } : undefined,
-        expiresOn:
-          expiresOn.value?.getTime() !== (apiKey.value.expiresOn ? new Date(apiKey.value.expiresOn) : undefined)?.getTime() ? expiresOn.value : undefined,
-        customAttributes: customAttributeModifications.length ? customAttributeModifications : undefined,
-      });
+      const updatedApiKey = await replaceApiKey(
+        apiKey.value.id,
+        {
+          displayName: displayName.value,
+          description: description.value,
+          expiresOn: expiresOn.value,
+          customAttributes: customAttributes.value,
+          roles: apiKey.value.roles.map(({ id }) => id),
+        },
+        apiKey.value.version,
+      );
       setModel(updatedApiKey);
       toasts.success("apiKeys.updated");
     } else {
       const createdApiKey = await createApiKey({
-        realm: realmId.value,
         displayName: displayName.value,
         description: description.value,
         expiresOn: expiresOn.value,
         customAttributes: customAttributes.value,
+        roles: [],
       });
       setModel(createdApiKey);
       toasts.success("apiKeys.created");
@@ -110,11 +101,6 @@ function copyToClipboard(): void {
     clipboardRef.value.focus();
     navigator.clipboard.writeText(xApiKey.value);
   }
-}
-
-function onRealmSelected(selected?: Realm) {
-  realm.value = selected;
-  realmId.value = selected?.id;
 }
 
 async function onRoleToggled(role: Role, action: CollectionAction): Promise<void> {
@@ -136,16 +122,10 @@ async function onRoleToggled(role: Role, action: CollectionAction): Promise<void
 
 onMounted(async () => {
   try {
-    configuration.value = await readConfiguration();
     const id = route.params.id?.toString();
-    const realmIdQuery = route.query.realm?.toString();
     if (id) {
       const apiKey = await readApiKey(id);
       setModel(apiKey);
-    } else if (realmIdQuery) {
-      const foundRealm = await readRealm(realmIdQuery);
-      realm.value = foundRealm;
-      realmId.value = foundRealm.id;
     }
   } catch (e: unknown) {
     const { status } = e as ApiError;
@@ -191,7 +171,6 @@ onMounted(async () => {
         </div>
         <app-tabs>
           <app-tab active title="general">
-            <RealmSelect :disabled="Boolean(apiKey)" :model-value="realmId" @realm-selected="onRealmSelected" />
             <div class="row">
               <display-name-input class="col-lg-6" required validate v-model="displayName" />
               <ExpiresOnInput class="col-lg-6" :disabled="isExpired" :max-value="maxExpiration" :validate="!isExpired" v-model="expiresOn" />
@@ -204,7 +183,6 @@ onMounted(async () => {
           <app-tab v-if="apiKey" title="roles.title.list">
             <ManageRoles
               :loading="isLoading"
-              :realm="realm"
               :roles="apiKey.roles"
               @role-added="onRoleToggled($event, 'Add')"
               @role-removed="onRoleToggled($event, 'Remove')"

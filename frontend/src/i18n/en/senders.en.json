@@ -16,7 +16,19 @@
   "empty": "There are no results.",
   "providers": {
     "label": "Provider",
+    "mailgun": {
+      "apiKey": {
+        "label": "API Key",
+        "placeholder": "Paste your Mailgun API key"
+      },
+      "domainName": {
+        "label": "Domain Name",
+        "placeholder": "Enter your Mailgun domain name"
+      },
+      "settings": "Mailgun Settings"
+    },
     "options": {
+      "Mailgun": "Mailgun",
       "SendGrid": "SendGrid"
     },
     "placeholder": "Select a provider",

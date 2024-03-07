@@ -8,7 +8,6 @@
       "label": "Utilisateur"
     }
   },
-  "initialized": "Votre compte administrateur a été créé, et la configuration a été initialisée.",
   "jwt": {
     "secret": {
       "warning": "Changer le secret invalidera tous les jetons actifs du Portail. Appuyez sur le bouton ci-dessous afin d’annuler le changement."

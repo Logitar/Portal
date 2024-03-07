@@ -5,7 +5,6 @@ import type { SearchPayload, SortOption } from "@/types/search";
 import type { User } from "@/types/users";
 
 export type SearchSessionsPayload = SearchPayload & {
-  realm?: string;
   userId?: string;
   isActive?: boolean;
   isPersistent?: boolean;
@@ -13,7 +12,6 @@ export type SearchSessionsPayload = SearchPayload & {
 };
 
 export type Session = Aggregate & {
-  id: string;
   isPersistent: boolean;
   refreshToken?: string;
   isActive: boolean;
@@ -27,12 +25,4 @@ export type SessionSort = "SignedOutOn" | "UpdatedOn";
 
 export type SessionSortOption = SortOption & {
   field: SessionSort;
-};
-
-export type SignInPayload = {
-  realm?: string;
-  uniqueName: string;
-  password: string;
-  isPersistent?: boolean;
-  customAttributes?: CustomAttribute[];
 };

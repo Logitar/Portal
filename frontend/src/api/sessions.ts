@@ -9,7 +9,7 @@ export async function readSession(id: string): Promise<Session> {
 const searchSessionsQuery = `
 query($payload: SearchSessionsPayload!) {
   sessions(payload: $payload) {
-    results {
+    items {
       id
       isPersistent
       isActive

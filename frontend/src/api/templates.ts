@@ -1,6 +1,6 @@
-import type { CreateTemplatePayload, Template, SearchTemplatesPayload, UpdateTemplatePayload } from "@/types/templates";
+import type { CreateTemplatePayload, ReplaceTemplatePayload, Template, SearchTemplatesPayload } from "@/types/templates";
 import type { SearchResults } from "@/types/search";
-import { _delete, get, graphQL, patch, post } from ".";
+import { _delete, get, graphQL, post, put } from ".";
 
 export async function createTemplate(payload: CreateTemplatePayload): Promise<Template> {
   return (await post<CreateTemplatePayload, Template>("/api/templates", payload)).data;
@@ -14,14 +14,22 @@ export async function readTemplate(id: string): Promise<Template> {
   return (await get<Template>(`/api/templates/${id}`)).data;
 }
 
+export async function replaceTemplate(id: string, payload: ReplaceTemplatePayload, version?: number): Promise<Template> {
+  const query: string = version ? `?version=${version}` : "";
+  return (await put<ReplaceTemplatePayload, Template>(`/api/templates/${id}${query}`, payload)).data;
+}
+
 const searchTemplatesQuery = `
 query($payload: SearchTemplatesPayload!) {
   templates(payload: $payload) {
-    results {
+    items {
       id
-      uniqueName
+      uniqueKey
       displayName
-      contentType
+      content {
+        type
+        text
+      }
       updatedBy {
         id
         type
@@ -44,8 +52,4 @@ type SearchTemplatesResponse = {
 };
 export async function searchTemplates(payload: SearchTemplatesPayload): Promise<SearchResults<Template>> {
   return (await graphQL<SearchTemplatesRequest, SearchTemplatesResponse>(searchTemplatesQuery, { payload })).data.templates;
-}
-
-export async function updateTemplate(id: string, payload: UpdateTemplatePayload): Promise<Template> {
-  return (await patch<UpdateTemplatePayload, Template>(`/api/templates/${id}`, payload)).data;
 }

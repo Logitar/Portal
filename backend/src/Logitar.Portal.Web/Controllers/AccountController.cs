@@ -41,7 +41,7 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<CurrentUser>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
   {
     try
     {
@@ -49,7 +49,7 @@ public class AccountController : ControllerBase
       Session session = await _sessionService.SignInAsync(payload, cancellationToken);
       HttpContext.SignIn(session);
 
-      return Ok(new CurrentUser(session));
+      return Ok(session);
     }
     catch (InvalidCredentialsException)
     {

@@ -4,17 +4,14 @@ import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 
 export type CreateDictionaryPayload = {
-  realm?: string;
   locale: string;
-  entries?: DictionaryEntry[];
 };
 
 export type Dictionary = Aggregate & {
-  id: string;
-  realm?: Realm;
   locale: Locale;
-  entries: DictionaryEntry[];
   entryCount: number;
+  entries: DictionaryEntry[];
+  realm?: Realm;
 };
 
 export type DictionaryEntry = {
@@ -22,22 +19,18 @@ export type DictionaryEntry = {
   value: string;
 };
 
-export type DictionaryEntryModification = {
-  key: string;
-  value?: string;
-};
-
-export type DictionarySort = "Locale" | "UpdatedOn";
+export type DictionarySort = "EntryCount" | "Locale" | "UpdatedOn";
 
 export type DictionarySortOption = SortOption & {
   field: DictionarySort;
 };
 
-export type SearchDictionariesPayload = SearchPayload & {
-  realm?: string;
-  sort?: DictionarySortOption[];
+export type ReplaceDictionaryPayload = {
+  locale: string;
+  entries: DictionaryEntry[];
 };
 
-export type UpdateDictionaryPayload = {
-  entries: DictionaryEntryModification[];
+export type SearchDictionariesPayload = SearchPayload & {
+  isEmpty?: boolean;
+  sort?: DictionarySortOption[];
 };

@@ -6,9 +6,7 @@ import { useI18n } from "vue-i18n";
 import ClaimList from "./ClaimList.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import FormInput from "../shared/FormInput.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
 import type { Claim, CreatedToken } from "@/types/tokens";
-import type { Realm } from "@/types/realms";
 import { createToken } from "@/api/tokens";
 
 const { t } = useI18n();
@@ -19,9 +17,9 @@ const clipboardRef = ref<InstanceType<typeof FormInput> | null>(null);
 const createdToken = ref<CreatedToken>();
 const emailAddress = ref<string>("");
 const isConsumable = ref<boolean>(false);
+const isEmailVerified = ref<boolean>(false);
 const issuer = ref<string>("");
 const lifetime = ref<number>(0);
-const realm = ref<Realm>();
 const secret = ref<string>("");
 const subject = ref<string>("");
 const type = ref<string>("");
@@ -42,14 +40,18 @@ const onSubmit = handleSubmit(async () => {
   try {
     createdToken.value = await createToken({
       isConsumable: isConsumable.value,
-      realm: realm.value?.id,
       audience: audience.value,
       issuer: issuer.value,
-      lifetime: lifetime.value,
+      lifetimeSeconds: lifetime.value,
       secret: secret.value,
       type: type.value,
       subject: subject.value,
-      emailAddress: emailAddress.value,
+      email: emailAddress.value
+        ? {
+            address: emailAddress.value,
+            isVerified: isEmailVerified.value,
+          }
+        : undefined,
       claims: claims.value,
     });
   } catch (e: unknown) {
@@ -64,18 +66,7 @@ const onSubmit = handleSubmit(async () => {
       <div class="mb-3">
         <icon-submit :disabled="isSubmitting" icon="fas fa-id-card" :loading="isSubmitting" text="actions.create" />
       </div>
-      <div class="row">
-        <RealmSelect class="col-lg-6" :model-value="realm?.id" @realm-selected="realm = $event" />
-        <FormInput
-          class="col-lg-6"
-          id="secret"
-          label="tokens.secret.label"
-          :min-length="32"
-          :max-length="64"
-          placeholder="tokens.secret.placeholder"
-          v-model="secret"
-        />
-      </div>
+      <FormInput id="secret" label="tokens.secret.label" :min-length="32" :max-length="64" placeholder="tokens.secret.placeholder" v-model="secret" />
       <form-checkbox class="mb-2" id="isConsumable" label="tokens.isConsumable" v-model="isConsumable" />
       <div class="row">
         <FormInput

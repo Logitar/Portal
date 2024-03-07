@@ -1,24 +1,11 @@
-import type {
-  Configuration,
-  InitializeConfigurationPayload,
-  InitializeConfigurationResult,
-  IsConfigurationInitializedResult,
-  UpdateConfigurationPayload,
-} from "@/types/configuration";
-import { get, patch, post } from ".";
-
-export async function initializeConfiguration(payload: InitializeConfigurationPayload): Promise<InitializeConfigurationResult> {
-  return (await post<InitializeConfigurationPayload, InitializeConfigurationResult>("/api/configuration", payload)).data;
-}
-
-export async function isConfigurationInitialized(): Promise<IsConfigurationInitializedResult> {
-  return (await get<IsConfigurationInitializedResult>("/api/configuration/initialized")).data;
-}
+import type { Configuration, ReplaceConfigurationPayload } from "@/types/configuration";
+import { get, put } from ".";
 
 export async function readConfiguration(): Promise<Configuration> {
   return (await get<Configuration>("/api/configuration")).data;
 }
 
-export async function updateConfiguration(payload: UpdateConfigurationPayload): Promise<Configuration> {
-  return (await patch<UpdateConfigurationPayload, Configuration>("/api/configuration", payload)).data;
+export async function replaceConfiguration(payload: ReplaceConfigurationPayload, version?: number): Promise<Configuration> {
+  const query: string = version ? `?version=${version}` : "";
+  return (await put<ReplaceConfigurationPayload, Configuration>(`/api/configuration${query}`, payload)).data;
 }

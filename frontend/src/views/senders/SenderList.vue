@@ -3,11 +3,10 @@ import { computed, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import ProviderTypeSelect from "./ProviderTypeSelect.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
+import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
-import type { ProviderType, Sender, SenderSort, SearchSendersPayload } from "@/types/senders";
+import type { ApiError, Error } from "@/types/api";
+import type { Sender, SenderProvider, SenderSort, SearchSendersPayload } from "@/types/senders";
 import type { SelectOption, ToastUtils } from "@/types/components";
 import { deleteSender, searchSenders } from "@/api/senders";
 import { formatSender } from "@/helpers/displayUtils";
@@ -31,7 +30,6 @@ const count = computed<number>(() => Number(route.query.count) || 10);
 const isDescending = computed<boolean>(() => route.query.isDescending === "true");
 const page = computed<number>(() => Number(route.query.page) || 1);
 const provider = computed<string>(() => route.query.provider?.toString() ?? "");
-const realm = computed<string>(() => route.query.realm?.toString() ?? "");
 const search = computed<string>(() => route.query.search?.toString() ?? "");
 const sort = computed<string>(() => route.query.sort?.toString() ?? "");
 
@@ -44,8 +42,7 @@ const sortOptions = computed<SelectOption[]>(() =>
 
 async function refresh(): Promise<void> {
   const parameters: SearchSendersPayload = {
-    realm: realm.value || undefined,
-    provider: (provider.value as ProviderType) || undefined,
+    provider: (provider.value as SenderProvider) || undefined,
     search: {
       terms: search.value
         .split(" ")
@@ -63,7 +60,7 @@ async function refresh(): Promise<void> {
   try {
     const data = await searchSenders(parameters);
     if (now === timestamp.value) {
-      senders.value = data.results;
+      senders.value = data.items;
       total.value = data.total;
     }
   } catch (e: unknown) {
@@ -85,7 +82,7 @@ async function onDelete(sender: Sender, hideModal: () => void): Promise<void> {
       toasts.success("senders.delete.success");
     } catch (e: unknown) {
       const { data, status } = e as ApiError;
-      if (status === 400 && (data as ErrorDetail).errorCode === "CannotDeleteDefaultSender") {
+      if (status === 400 && (data as Error).code === "CannotDeleteDefaultSender") {
         cannotDeleteDefaultSender.value = true;
         hideModal();
       } else {
@@ -108,7 +105,6 @@ function setQuery(key: string, value: string): void {
   const query = { ...route.query, [key]: value };
   switch (key) {
     case "provider":
-    case "realm":
     case "search":
     case "count":
       query.page = "1";
@@ -128,7 +124,6 @@ watch(
           query: isEmpty(query)
             ? {
                 provider: "",
-                realm: "",
                 search: "",
                 sort: "UpdatedOn",
                 isDescending: "true",
@@ -162,14 +157,11 @@ watch(
         class="ms-1"
         icon="fas fa-plus"
         text="actions.create"
-        :to="{ name: 'CreateSender', query: { realm: realm || undefined, provider: provider || undefined } }"
+        :to="{ name: 'CreateSender', query: { provider: provider || undefined } }"
         variant="success"
       />
     </div>
-    <div class="row">
-      <RealmSelect class="col-lg-6" :model-value="realm" @update:model-value="setQuery('realm', $event)" />
-      <ProviderTypeSelect class="col-lg-6" :model-value="provider" @update:model-value="setQuery('provider', $event)" />
-    </div>
+    <SenderProviderSelect :model-value="provider" @update:model-value="setQuery('provider', $event)" />
     <div class="row">
       <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
       <sort-select

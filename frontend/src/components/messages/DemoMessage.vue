@@ -7,11 +7,12 @@ import SenderSelect from "@/components/senders/SenderSelect.vue";
 import StatusBadge from "./StatusBadge.vue";
 import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import VariableList from "./VariableList.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
-import type { Message, Variable } from "@/types/messages";
+import type { ApiError, Error } from "@/types/api";
+import type { Message, RecipientPayload, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
-import { sendDemoMessage } from "@/api/messages";
+import type { User } from "@/types/users";
+import { readMessage, sendMessage } from "@/api/messages";
 import { useAccountStore } from "@/stores/account";
 
 const account = useAccountStore();
@@ -25,6 +26,7 @@ if ((!props.sender && !props.template) || (props.sender && props.template)) {
   throw new Error("Only one of the following properties must be specified: sender, template.");
 }
 
+const ignoreUserLocale = ref<boolean>(false);
 const locale = ref<string | undefined>(account.authenticated?.locale?.code);
 const message = ref<Message>();
 const realmHasNoDefaultSender = ref<boolean>(false);
@@ -52,18 +54,32 @@ const emit = defineEmits<{
 }>();
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  showStatus.value = false;
   realmHasNoDefaultSender.value = false;
+  const user: User | undefined = account.authenticated;
+  const realmId: string | undefined = props.sender?.realm?.id ?? props.template?.realm?.id;
+  const recipient: RecipientPayload = { type: "To" };
+  if (user?.realm?.id === realmId) {
+    recipient.userId = user?.id;
+  } else {
+    recipient.address = user?.email?.address;
+    recipient.displayName = user?.fullName;
+  }
   try {
-    message.value = await sendDemoMessage({
+    const sentMessages = await sendMessage({
       senderId: props.sender?.id ?? selectedSender.value?.id,
-      templateId: props.template?.id ?? selectedTemplate.value?.id ?? "",
+      template: props.template?.id ?? selectedTemplate.value?.id ?? "",
+      recipients: [recipient],
+      ignoreUserLocale: ignoreUserLocale.value,
       locale: locale.value,
       variables: variables.value,
+      isDemo: true,
     });
+    message.value = await readMessage(sentMessages.ids[0]);
     showStatus.value = true;
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 400 && (data as ErrorDetail)?.errorCode === "RealmHasNoDefaultSender") {
+    if (status === 400 && (data as Error)?.code === "NoDefaultSender") {
       realmHasNoDefaultSender.value = true;
     } else {
       emit("error", e);

@@ -5,10 +5,8 @@ import { useI18n } from "vue-i18n";
 
 import EmailAddressInput from "../users/EmailAddressInput.vue";
 import FormInput from "@/components/shared/FormInput.vue";
-import RealmSelect from "@/components/realms/RealmSelect.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
+import type { ApiError, Error } from "@/types/api";
 import type { Claim, ValidatedToken } from "@/types/tokens";
-import type { Realm } from "@/types/realms";
 import { registerTooltipsKey } from "@/inject/App";
 import { validateToken } from "@/api/tokens";
 
@@ -17,9 +15,8 @@ const { d, t } = useI18n();
 
 const audience = ref<string>("");
 const consume = ref<boolean>(false);
-const error = ref<ErrorDetail>();
+const error = ref<Error>();
 const issuer = ref<string>("");
-const realm = ref<Realm>();
 const secret = ref<string>("");
 const showError = ref<boolean>(false);
 const token = ref<string>("");
@@ -49,7 +46,6 @@ const onSubmit = handleSubmit(async () => {
     validatedToken.value = await validateToken({
       token: token.value,
       consume: consume.value,
-      realm: realm.value?.id,
       audience: audience.value,
       issuer: issuer.value,
       secret: secret.value,
@@ -58,8 +54,8 @@ const onSubmit = handleSubmit(async () => {
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
     if (status === 400) {
-      const detail = data as ErrorDetail;
-      if (detail.errorCode && detail.errorMessage) {
+      const detail = data as Error;
+      if (detail.code && detail.message) {
         error.value = detail;
         showError.value = true;
       }
@@ -80,18 +76,7 @@ onUpdated(() => registerTooltips());
         <icon-submit :disabled="isSubmitting" icon="fas fa-id-card" :loading="isSubmitting" text="actions.validate" />
       </div>
       <FormInput id="token" label="tokens.input.label" placeholder="tokens.input.placeholder" required v-model="token" />
-      <div class="row">
-        <RealmSelect class="col-lg-6" :model-value="realm?.id" @realm-selected="realm = $event" />
-        <FormInput
-          class="col-lg-6"
-          id="secret"
-          label="tokens.secret.label"
-          :min-length="32"
-          :max-length="64"
-          placeholder="tokens.secret.placeholder"
-          v-model="secret"
-        />
-      </div>
+      <FormInput id="secret" label="tokens.secret.label" :min-length="32" :max-length="64" placeholder="tokens.secret.placeholder" v-model="secret" />
       <form-checkbox class="mb-2" id="consume" label="tokens.consume" v-model="consume" />
       <FormInput id="type" label="tokens.type.label" placeholder="tokens.type.placeholder" v-model="type" />
       <div class="row">
@@ -108,18 +93,18 @@ onUpdated(() => registerTooltips());
         <tbody>
           <tr>
             <th scope="row">{{ t("tokens.validated.error.code") }}</th>
-            <td>{{ error.errorCode }}</td>
+            <td>{{ error.code }}</td>
           </tr>
           <tr>
             <th scope="row">{{ t("tokens.validated.error.message") }}</th>
-            <td>{{ error.errorMessage }}</td>
+            <td>{{ error.message }}</td>
           </tr>
         </tbody>
       </table>
     </template>
     <template v-if="validatedToken">
       <div class="row">
-        <EmailAddressInput class="col-lg-6" disabled :model-value="validatedToken.emailAddress" />
+        <EmailAddressInput class="col-lg-6" disabled :model-value="validatedToken.email?.address" />
         <FormInput class="col-lg-6" id="subject" label="tokens.subject.label" placeholder="tokens.subject.placeholder" :model-value="validatedToken.subject" />
       </div>
       <h5>{{ t("tokens.claims.title") }}</h5>

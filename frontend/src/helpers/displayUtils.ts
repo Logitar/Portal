@@ -25,7 +25,7 @@ export function formatSender(sender: Sender): string {
 }
 
 export function formatTemplate(template: Template): string {
-  return template.displayName ? `${template.displayName} (${template.uniqueName})` : template.uniqueName;
+  return template.displayName ? `${template.displayName} (${template.uniqueKey})` : template.uniqueKey;
 }
 
 export function formatUser(user: User): string {

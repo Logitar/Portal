@@ -4,21 +4,15 @@ import { useForm } from "vee-validate";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import ClaimMappingList from "@/components/realms/ClaimMappingList.vue";
 import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
-import SenderSelect from "@/components/senders/SenderSelect.vue";
-import TemplateSelect from "@/components/templates/TemplateSelect.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
-import type { ApiError, ErrorDetail } from "@/types/api";
-import type { ClaimMapping, ClaimMappingModification, Realm } from "@/types/realms";
+import type { ApiError, Error } from "@/types/api";
+import type { Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
-import type { Sender } from "@/types/senders";
-import type { Template } from "@/types/templates";
 import type { ToastUtils } from "@/types/components";
-import { createRealm, readRealmByUniqueSlug, updateRealm } from "@/api/realms";
-import { getCustomAttributeModifications } from "@/helpers/customAttributeUtils";
+import { createRealm, readRealmByUniqueSlug, replaceRealm } from "@/api/realms";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
@@ -31,10 +25,9 @@ const { t } = useI18n();
 const defaults = {
   uniqueSlug: "",
   displayName: "",
-  url: "",
   description: "",
-  requireConfirmedAccount: true,
-  requireUniqueEmail: true,
+  secret: "",
+  url: "",
   uniqueNameSettings: { allowedCharacters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" },
   passwordSettings: {
     requiredLength: 8,
@@ -43,24 +36,19 @@ const defaults = {
     requireLowercase: true,
     requireUppercase: true,
     requireDigit: true,
-    strategy: "PBKDF2",
+    hashingStrategy: "PBKDF2",
   },
-  secret: "",
-  claimMappings: [],
+  requireUniqueEmail: true,
   customAttributes: [],
 };
 
-const claimMappings = ref<ClaimMapping[]>(defaults.claimMappings);
 const customAttributes = ref<CustomAttribute[]>(defaults.customAttributes);
 const defaultLocale = ref<string>("");
 const description = ref<string>(defaults.description);
 const displayName = ref<string>(defaults.displayName);
 const hasLoaded = ref<boolean>(false);
-const passwordRecoverySender = ref<Sender>();
-const passwordRecoveryTemplate = ref<Template>();
 const passwordSettings = ref<PasswordSettings>(defaults.passwordSettings);
 const realm = ref<Realm>();
-const requireConfirmedAccount = ref<boolean>(defaults.requireConfirmedAccount);
 const requireUniqueEmail = ref<boolean>(defaults.requireUniqueEmail);
 const secret = ref<string>(defaults.secret);
 const uniqueNameSettings = ref<UniqueNameSettings>(defaults.uniqueNameSettings);
@@ -71,19 +59,15 @@ const url = ref<string>(defaults.url);
 const hasChanges = computed<boolean>(() => {
   const model = realm.value ?? defaults;
   return (
-    displayName.value !== (model.displayName ?? "") ||
     uniqueSlug.value !== model.uniqueSlug ||
-    defaultLocale.value !== (realm.value?.defaultLocale?.code ?? "") ||
-    url.value !== (model.url ?? "") ||
+    displayName.value !== (model.displayName ?? "") ||
     description.value !== (model.description ?? "") ||
-    requireConfirmedAccount.value !== model.requireConfirmedAccount ||
-    requireUniqueEmail.value !== model.requireUniqueEmail ||
+    defaultLocale.value !== (realm.value?.defaultLocale?.code ?? "") ||
+    secret.value !== model.secret ||
+    url.value !== (model.url ?? "") ||
     JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(model.uniqueNameSettings) ||
     JSON.stringify(passwordSettings.value) !== JSON.stringify(model.passwordSettings) ||
-    passwordRecoverySender.value?.id !== realm.value?.passwordRecoverySender?.id ||
-    passwordRecoveryTemplate.value?.id !== realm.value?.passwordRecoveryTemplate?.id ||
-    secret.value !== model.secret ||
-    JSON.stringify(claimMappings.value) !== JSON.stringify(model.claimMappings) ||
+    requireUniqueEmail.value !== model.requireUniqueEmail ||
     JSON.stringify(customAttributes.value) !== JSON.stringify(model.customAttributes)
   );
 });
@@ -91,15 +75,11 @@ const title = computed<string>(() => realm.value?.displayName ?? realm.value?.un
 
 function setModel(model: Realm): void {
   realm.value = model;
-  claimMappings.value = model.claimMappings.map((item) => ({ ...item }));
   customAttributes.value = model.customAttributes.map((item) => ({ ...item }));
   defaultLocale.value = model.defaultLocale?.code ?? "";
   description.value = model.description ?? "";
   displayName.value = model.displayName ?? "";
-  passwordRecoverySender.value = model.passwordRecoverySender;
-  passwordRecoveryTemplate.value = model.passwordRecoveryTemplate;
   passwordSettings.value = model.passwordSettings;
-  requireConfirmedAccount.value = model.requireConfirmedAccount;
   requireUniqueEmail.value = model.requireUniqueEmail;
   secret.value = model.secret;
   uniqueNameSettings.value = model.uniqueNameSettings;
@@ -107,52 +87,27 @@ function setModel(model: Realm): void {
   url.value = model.url ?? "";
 }
 
-function getClaimMappingModifications(source: ClaimMapping[], destination: ClaimMapping[]): ClaimMappingModification[] {
-  const modifications: ClaimMappingModification[] = [];
-
-  const destinationKeys = new Set(destination.map(({ key }) => key));
-  for (const claimMapping of source) {
-    const key = claimMapping.key;
-    if (!destinationKeys.has(key)) {
-      modifications.push({ key });
-    }
-  }
-
-  const sourceMap = new Map(source.map(({ key, name, type }) => [key, JSON.stringify({ name, type })]));
-  for (const claimMapping of destination) {
-    const value = JSON.stringify({ name: claimMapping.name, type: claimMapping.type });
-    if (sourceMap.get(claimMapping.key) !== value) {
-      modifications.push(claimMapping);
-    }
-  }
-
-  return modifications;
-}
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
   uniqueSlugAlreadyUsed.value = false;
   try {
     if (realm.value) {
-      const claimMappingModifications = getClaimMappingModifications(realm.value.claimMappings, claimMappings.value);
-      const customAttributeModifications = getCustomAttributeModifications(realm.value.customAttributes, customAttributes.value);
-      const updatedRealm = await updateRealm(realm.value.id, {
-        uniqueSlug: uniqueSlug.value !== realm.value.uniqueSlug ? uniqueSlug.value : undefined,
-        displayName: displayName.value !== (realm.value.displayName ?? "") ? { value: displayName.value } : undefined,
-        description: description.value !== (realm.value.description ?? "") ? { value: description.value } : undefined,
-        defaultLocale: defaultLocale.value !== (realm.value.defaultLocale ?? "") ? { value: defaultLocale.value } : undefined,
-        secret: secret.value !== realm.value.secret ? secret.value : undefined,
-        url: url.value !== (realm.value.url ?? "") ? { value: url.value } : undefined,
-        requireUniqueEmail: requireUniqueEmail.value !== realm.value.requireUniqueEmail ? requireUniqueEmail.value : undefined,
-        requireConfirmedAccount: requireConfirmedAccount.value !== realm.value.requireConfirmedAccount ? requireConfirmedAccount.value : undefined,
-        uniqueNameSettings: JSON.stringify(uniqueNameSettings.value) !== JSON.stringify(realm.value.uniqueNameSettings) ? uniqueNameSettings.value : undefined,
-        passwordSettings: JSON.stringify(passwordSettings.value) !== JSON.stringify(realm.value.passwordSettings) ? passwordSettings.value : undefined,
-        claimMappings: claimMappingModifications.length ? claimMappingModifications : undefined,
-        customAttributes: customAttributeModifications.length ? customAttributeModifications : undefined,
-        passwordRecoverySenderId:
-          passwordRecoverySender.value?.id !== realm.value.passwordRecoverySender?.id ? { value: passwordRecoverySender.value?.id } : undefined,
-        passwordRecoveryTemplateId:
-          passwordRecoveryTemplate.value?.id !== realm.value.passwordRecoveryTemplate?.id ? { value: passwordRecoveryTemplate.value?.id } : undefined,
-      });
+      const updatedRealm = await replaceRealm(
+        realm.value.id,
+        {
+          uniqueSlug: uniqueSlug.value,
+          displayName: displayName.value,
+          description: description.value,
+          defaultLocale: defaultLocale.value,
+          secret: secret.value,
+          url: url.value,
+          uniqueNameSettings: uniqueNameSettings.value,
+          passwordSettings: passwordSettings.value,
+          requireUniqueEmail: requireUniqueEmail.value,
+          customAttributes: customAttributes.value,
+        },
+        realm.value.version,
+      );
       setModel(updatedRealm);
       toasts.success("realms.updated");
       router.replace({ name: "RealmEdit", params: { uniqueSlug: updatedRealm.uniqueSlug } });
@@ -164,11 +119,9 @@ const onSubmit = handleSubmit(async () => {
         defaultLocale: defaultLocale.value,
         secret: secret.value,
         url: url.value,
-        requireConfirmedAccount: requireConfirmedAccount.value,
-        requireUniqueEmail: requireConfirmedAccount.value,
         uniqueNameSettings: uniqueNameSettings.value,
         passwordSettings: passwordSettings.value,
-        claimMappings: claimMappings.value,
+        requireUniqueEmail: requireUniqueEmail.value,
         customAttributes: customAttributes.value,
       });
       setModel(createdRealm);
@@ -177,7 +130,7 @@ const onSubmit = handleSubmit(async () => {
     }
   } catch (e: unknown) {
     const { data, status } = e as ApiError;
-    if (status === 409 && (data as ErrorDetail)?.errorCode === "UniqueSlugAlreadyUsed") {
+    if (status === 409 && (data as Error)?.code === "UniqueSlugAlreadyUsed") {
       uniqueSlugAlreadyUsed.value = true;
     } else {
       handleError(e);
@@ -247,13 +200,6 @@ onUpdated(() => registerTooltips());
             <description-textarea v-model="description" />
           </app-tab>
           <app-tab title="settings.title">
-            <form-checkbox class="mb-3" id="requireConfirmedAccount" v-model="requireConfirmedAccount">
-              <template #label>
-                <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireConfirmedAccount.info')">
-                  {{ t("realms.requireConfirmedAccount.label") }} <font-awesome-icon icon="fas fa-circle-info" />
-                </span>
-              </template>
-            </form-checkbox>
             <form-checkbox class="mb-3" id="requireUniqueEmail" v-model="requireUniqueEmail">
               <template #label>
                 <span data-bs-toggle="tooltip" :data-bs-title="t('realms.requireUniqueEmail.info')">
@@ -263,27 +209,8 @@ onUpdated(() => registerTooltips());
             </form-checkbox>
             <UniqueNameSettingsEdit v-model="uniqueNameSettings" />
             <PasswordSettingsEdit v-model="passwordSettings" />
-            <h5>{{ t("realms.passwordRecovery") }}</h5>
-            <div class="row">
-              <SenderSelect
-                class="col-lg-6"
-                :realm="realm"
-                :model-value="passwordRecoverySender?.id"
-                placeholder="senders.select.useDefault"
-                @sender-selected="passwordRecoverySender = $event"
-              />
-              <TemplateSelect
-                class="col-lg-6"
-                :realm="realm"
-                :model-value="passwordRecoveryTemplate?.id"
-                @template-selected="passwordRecoveryTemplate = $event"
-              />
-            </div>
             <h5>{{ t("settings.jwt.title") }}</h5>
             <JwtSecretField :old-value="realm?.secret" validate v-model="secret" warning="realms.jwt.secret.warning" />
-          </app-tab>
-          <app-tab title="realms.claimMappings.title">
-            <ClaimMappingList v-model="claimMappings" />
           </app-tab>
           <app-tab title="customAttributes.title">
             <custom-attribute-list v-model="customAttributes" />
