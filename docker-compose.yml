@@ -52,17 +52,17 @@ services:
     ports:
       - 8087:8080
 
-  # portal_worker:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: /src/Logitar.Portal.Worker/Dockerfile
-  #   image: portal_worker
-  #   container_name: Logitar.Portal_worker
-  #   depends_on:
-  #     - portal_mssql
-  #     - portal_postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     ASPNETCORE_Environment: Development
-  #     POSTGRESQLCONNSTR_Portal: "User ID=postgres;Password=YStQn6XF5VbgcPBw;Host=portal_postgres;Port=5432;Database=Portal;"
-  #     SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
+  portal_worker:
+    build:
+      context: ./backend
+      dockerfile: /src/Logitar.Portal.Worker/Dockerfile
+    image: portal_worker
+    container_name: Logitar.Portal_worker
+    depends_on:
+      - portal_mssql
+      - portal_postgres
+    restart: unless-stopped
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      POSTGRESQLCONNSTR_Portal: "User ID=postgres;Password=YStQn6XF5VbgcPBw;Host=portal_postgres;Port=5432;Database=Portal;"
+      SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
