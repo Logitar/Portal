@@ -26,6 +26,7 @@ query($payload: SearchMessagesPayload!) {
         displayName
         version
       }
+      isDemo
       status
       updatedBy {
         id

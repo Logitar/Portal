@@ -5,8 +5,8 @@ import type { SelectOption } from "@/types/components";
 import type { User } from "@/types/users";
 import { formatUser } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
+import { listUsers } from "@/api/users";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchUsers } from "@/api/users";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -57,8 +57,7 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const results = await searchUsers({});
-    users.value = results.items;
+    users.value = await listUsers();
   } catch (e: unknown) {
     handleError(e);
   }

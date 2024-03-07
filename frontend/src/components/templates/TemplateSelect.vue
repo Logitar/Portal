@@ -5,8 +5,8 @@ import type { SelectOption } from "@/types/components";
 import type { Template } from "@/types/templates";
 import { formatTemplate } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
+import { listTemplates } from "@/api/templates";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchTemplates } from "@/api/templates";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -57,8 +57,7 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const results = await searchTemplates({});
-    templates.value = results.items;
+    templates.value = await listTemplates();
   } catch (e: unknown) {
     handleError(e);
   }

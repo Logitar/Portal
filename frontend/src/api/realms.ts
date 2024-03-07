@@ -10,6 +10,27 @@ export async function deleteRealm(id: string): Promise<Realm> {
   return (await _delete<Realm>(`/api/realms/${id}`)).data;
 }
 
+const listRealmsQuery = `
+query($payload: SearchRealmsPayload!) {
+  realms(payload: $payload) {
+    items {
+      id
+      uniqueSlug
+      displayName
+    }
+  }
+}
+`;
+type ListRealmsRequest = {
+  payload: SearchRealmsPayload;
+};
+type ListRealmsResponse = {
+  realms: SearchResults<Realm>;
+};
+export async function listRealms(): Promise<Realm[]> {
+  return (await graphQL<ListRealmsRequest, ListRealmsResponse>(listRealmsQuery, { payload: {} })).data.realms.items;
+}
+
 export async function readRealm(id: string): Promise<Realm> {
   return (await get<Realm>(`/api/realms/${id}`)).data;
 }
@@ -30,18 +51,6 @@ query($payload: SearchRealmsPayload!) {
       id
       uniqueSlug
       displayName
-      uniqueNameSettings {
-        allowedCharacters
-      }
-      passwordSettings {
-        requiredLength
-        requiredUniqueChars
-        requireNonAlphanumeric
-        requireLowercase
-        requireUppercase
-        requireDigit
-        hashingStrategy
-      }
       updatedBy {
         id
         type

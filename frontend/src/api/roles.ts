@@ -10,6 +10,27 @@ export async function deleteRole(id: string): Promise<Role> {
   return (await _delete<Role>(`/api/roles/${id}`)).data;
 }
 
+const listRolesQuery = `
+query($payload: SearchRolesPayload!) {
+  roles(payload: $payload) {
+    items {
+      id
+      uniqueName
+      displayName
+    }
+  }
+}
+`;
+type ListRolesRequest = {
+  payload: SearchRolesPayload;
+};
+type ListRolesResponse = {
+  roles: SearchResults<Role>;
+};
+export async function listRoles(): Promise<Role[]> {
+  return (await graphQL<ListRolesRequest, ListRolesResponse>(listRolesQuery, { payload: {} })).data.roles.items;
+}
+
 export async function readRole(id: string): Promise<Role> {
   return (await get<Role>(`/api/roles/${id}`)).data;
 }
