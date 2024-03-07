@@ -222,8 +222,8 @@ onMounted(async () => {
               </RouterLink>
             </td>
             <td>
-              <status-block v-if="session.signedOutBy && session.signedOutOn" :actor="session.signedOutBy" :date="session.signedOutOn" />
-              <app-badge v-else>{{ t("sessions.isActive.label") }}</app-badge>
+              <app-badge v-if="session.isActive">{{ t("sessions.isActive.label") }}</app-badge>
+              <status-block v-else :actor="session.signedOutBy" :date="session.signedOutOn" />
             </td>
             <td>{{ t(session.isPersistent ? "yes" : "no") }}</td>
             <td><SignOutSession :session="session" @signed-out="onSessionSignedOut" /></td>

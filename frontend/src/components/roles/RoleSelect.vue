@@ -5,8 +5,8 @@ import type { Role } from "@/types/roles";
 import type { SelectOption } from "@/types/components";
 import { formatRole } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
+import { listRoles } from "@/api/roles";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchRoles } from "@/api/roles";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -65,8 +65,7 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const results = await searchRoles({});
-    roles.value = results.items;
+    roles.value = await listRoles();
   } catch (e: unknown) {
     handleError(e);
   }

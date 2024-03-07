@@ -10,6 +10,27 @@ export async function deleteUser(id: string): Promise<User> {
   return (await _delete<User>(`/api/users/${id}`)).data;
 }
 
+const listUsersQuery = `
+query($payload: SearchUsersPayload!) {
+  users(payload: $payload) {
+    items {
+      id
+      uniqueName
+      fullName
+    }
+  }
+}
+`;
+type ListUsersRequest = {
+  payload: SearchUsersPayload;
+};
+type ListUsersResponse = {
+  users: SearchResults<User>;
+};
+export async function listUsers(): Promise<User[]> {
+  return (await graphQL<ListUsersRequest, ListUsersResponse>(listUsersQuery, { payload: {} })).data.users.items;
+}
+
 export async function readUser(id: string): Promise<User> {
   return (await get<User>(`/api/users/${id}`)).data;
 }
@@ -32,9 +53,6 @@ query($payload: SearchUsersPayload!) {
       }
       fullName
       picture
-      realm {
-        id
-      }
       updatedBy {
         id
         type

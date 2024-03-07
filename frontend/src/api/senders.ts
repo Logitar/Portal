@@ -10,6 +10,27 @@ export async function deleteSender(id: string): Promise<Sender> {
   return (await _delete<Sender>(`/api/senders/${id}`)).data;
 }
 
+const listSendersQuery = `
+query($payload: SearchSendersPayload!) {
+  senders(payload: $payload) {
+    items {
+      id
+      emailAddress
+      displayName
+    }
+  }
+}
+`;
+type ListSendersRequest = {
+  payload: SearchSendersPayload;
+};
+type ListSendersResponse = {
+  senders: SearchResults<Sender>;
+};
+export async function listSenders(): Promise<Sender[]> {
+  return (await graphQL<ListSendersRequest, ListSendersResponse>(listSendersQuery, { payload: {} })).data.senders.items;
+}
+
 export async function readSender(id: string): Promise<Sender> {
   return (await get<Sender>(`/api/senders/${id}`)).data;
 }

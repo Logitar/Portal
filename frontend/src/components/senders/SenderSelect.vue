@@ -5,8 +5,8 @@ import type { SelectOption } from "@/types/components";
 import type { Sender } from "@/types/senders";
 import { formatSender } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
+import { listSenders } from "@/api/senders";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchSenders } from "@/api/senders";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -57,8 +57,7 @@ function onModelValueUpdate(id: string): void {
 
 onMounted(async () => {
   try {
-    const results = await searchSenders({});
-    senders.value = results.items;
+    senders.value = await listSenders();
   } catch (e: unknown) {
     handleError(e);
   }

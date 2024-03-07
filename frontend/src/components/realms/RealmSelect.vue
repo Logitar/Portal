@@ -5,8 +5,8 @@ import type { Realm } from "@/types/realms";
 import type { SelectOption } from "@/types/components";
 import { formatRealm } from "@/helpers/displayUtils";
 import { handleErrorKey } from "@/inject/App";
+import { listRealms } from "@/api/realms";
 import { orderBy } from "@/helpers/arrayUtils";
-import { searchRealms } from "@/api/realms";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 
@@ -50,8 +50,7 @@ const emit = defineEmits<{
 
 onMounted(async () => {
   try {
-    const results = await searchRealms({});
-    realms.value = results.items;
+    realms.value = await listRealms();
   } catch (e: unknown) {
     handleError(e);
   }

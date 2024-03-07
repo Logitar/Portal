@@ -10,6 +10,27 @@ export async function deleteTemplate(id: string): Promise<Template> {
   return (await _delete<Template>(`/api/templates/${id}`)).data;
 }
 
+const listTemplatesQuery = `
+query($payload: SearchTemplatesPayload!) {
+  templates(payload: $payload) {
+    items {
+      id
+      uniqueKey
+      displayName
+    }
+  }
+}
+`;
+type ListTemplatesRequest = {
+  payload: SearchTemplatesPayload;
+};
+type ListTemplatesResponse = {
+  templates: SearchResults<Template>;
+};
+export async function listTemplates(): Promise<Template[]> {
+  return (await graphQL<ListTemplatesRequest, ListTemplatesResponse>(listTemplatesQuery, { payload: {} })).data.templates.items;
+}
+
 export async function readTemplate(id: string): Promise<Template> {
   return (await get<Template>(`/api/templates/${id}`)).data;
 }
@@ -28,7 +49,6 @@ query($payload: SearchTemplatesPayload!) {
       displayName
       content {
         type
-        text
       }
       updatedBy {
         id

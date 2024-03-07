@@ -174,7 +174,7 @@ watch(
             <td>
               <RouterLink :to="{ name: 'MessageView', params: { id: message.id } }"><font-awesome-icon icon="fas fa-eye" />{{ message.subject }}</RouterLink>
               {{ " " }}
-              <app-badge v-if="!message.isDemo">{{ t("messages.demo.label") }}</app-badge>
+              <app-badge v-if="message.isDemo">{{ t("messages.demo.label") }}</app-badge>
             </td>
             <td>{{ message.recipientCount }}</td>
             <td>
