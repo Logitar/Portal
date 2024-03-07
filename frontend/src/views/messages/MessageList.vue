@@ -130,37 +130,34 @@ watch(
 </script>
 
 <template>
-  <main>
-    <div class="container">
-      <h1>{{ t("messages.title.list") }}</h1>
-      <div class="my-2">
-        <icon-button :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-      </div>
-      <div class="row">
-        <TemplateSelect class="col-lg-6" :model-value="template" @template-selected="onTemplateSelected" />
-        <StatusSelect
-          class="col-lg-6"
-          :is-demo="isDemo"
-          :model-value="status"
-          @is-demo="setQuery('isDemo', $event.toString())"
-          @update:model-value="setQuery('status', $event)"
-        />
-      </div>
-      <div class="row">
-        <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
-        <sort-select
-          class="col-lg-4"
-          :descending="isDescending"
-          :model-value="sort"
-          :options="sortOptions"
-          @descending="setQuery('isDescending', $event)"
-          @update:model-value="setQuery('sort', $event)"
-        />
-        <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
-        <p v-if="messages.length === 0">{{ t("messages.empty") }}</p>
-      </div>
+  <main class="container-fluid">
+    <h1>{{ t("messages.title.list") }}</h1>
+    <div class="my-2">
+      <icon-button :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
     </div>
-    <div v-if="messages.length" class="container-fluid">
+    <div class="row">
+      <TemplateSelect class="col-lg-6" :model-value="template" @template-selected="onTemplateSelected" />
+      <StatusSelect
+        class="col-lg-6"
+        :is-demo="isDemo"
+        :model-value="status"
+        @is-demo="setQuery('isDemo', $event.toString())"
+        @update:model-value="setQuery('status', $event)"
+      />
+    </div>
+    <div class="row">
+      <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
+      <sort-select
+        class="col-lg-4"
+        :descending="isDescending"
+        :model-value="sort"
+        :options="sortOptions"
+        @descending="setQuery('isDescending', $event)"
+        @update:model-value="setQuery('sort', $event)"
+      />
+      <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
+    </div>
+    <template v-if="messages.length">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -204,6 +201,7 @@ watch(
         </tbody>
       </table>
       <app-pagination :count="count" :model-value="page" :total="total" @update:model-value="setQuery('page', $event)" />
-    </div>
+    </template>
+    <p v-else>{{ t("messages.empty") }}</p>
   </main>
 </template>

@@ -57,8 +57,9 @@ const onSubmit = handleSubmit(async () => {
   showStatus.value = false;
   realmHasNoDefaultSender.value = false;
   const user: User | undefined = account.authenticated;
+  const realmId: string | undefined = props.sender?.realm?.id ?? props.template?.realm?.id;
   const recipient: RecipientPayload = { type: "To" };
-  if (user?.realm?.id === props.template?.id) {
+  if (user?.realm?.id === realmId) {
     recipient.userId = user?.id;
   } else {
     recipient.address = user?.email?.address;

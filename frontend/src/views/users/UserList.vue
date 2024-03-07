@@ -144,46 +144,43 @@ watch(
 </script>
 
 <template>
-  <main>
-    <div class="container">
-      <h1>{{ t("users.title.list") }}</h1>
-      <div class="my-2">
-        <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
-        <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateUser' }" variant="success" />
-      </div>
-      <div class="row">
-        <yes-no-select
-          class="col-lg-6"
-          id="isConfirmed"
-          label="users.isConfirmed.label"
-          placeholder="users.isConfirmed.placeholder"
-          :model-value="isConfirmed?.toString()"
-          @update:model-value="setQuery('isConfirmed', $event)"
-        />
-        <yes-no-select
-          class="col-lg-6"
-          id="isDisabled"
-          label="users.isDisabled.label"
-          placeholder="users.isDisabled.placeholder"
-          :model-value="isDisabled?.toString()"
-          @update:model-value="setQuery('isDisabled', $event)"
-        />
-      </div>
-      <div class="row">
-        <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
-        <sort-select
-          class="col-lg-4"
-          :descending="isDescending"
-          :model-value="sort"
-          :options="sortOptions"
-          @descending="setQuery('isDescending', $event)"
-          @update:model-value="setQuery('sort', $event)"
-        />
-        <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
-      </div>
-      <p v-show="users.length === 0">{{ t("users.empty") }}</p>
+  <main class="container-fluid">
+    <h1>{{ t("users.title.list") }}</h1>
+    <div class="my-2">
+      <icon-button class="me-1" :disabled="isLoading" icon="fas fa-rotate" :loading="isLoading" text="actions.refresh" @click="refresh()" />
+      <icon-button class="ms-1" icon="fas fa-plus" text="actions.create" :to="{ name: 'CreateUser' }" variant="success" />
     </div>
-    <div v-if="users.length" class="container-fluid">
+    <div class="row">
+      <yes-no-select
+        class="col-lg-6"
+        id="isConfirmed"
+        label="users.isConfirmed.label"
+        placeholder="users.isConfirmed.placeholder"
+        :model-value="isConfirmed?.toString()"
+        @update:model-value="setQuery('isConfirmed', $event)"
+      />
+      <yes-no-select
+        class="col-lg-6"
+        id="isDisabled"
+        label="users.isDisabled.label"
+        placeholder="users.isDisabled.placeholder"
+        :model-value="isDisabled?.toString()"
+        @update:model-value="setQuery('isDisabled', $event)"
+      />
+    </div>
+    <div class="row">
+      <search-input class="col-lg-4" :model-value="search" @update:model-value="setQuery('search', $event)" />
+      <sort-select
+        class="col-lg-4"
+        :descending="isDescending"
+        :model-value="sort"
+        :options="sortOptions"
+        @descending="setQuery('isDescending', $event)"
+        @update:model-value="setQuery('sort', $event)"
+      />
+      <count-select class="col-lg-4" :model-value="count" @update:model-value="setQuery('count', $event)" />
+    </div>
+    <template v-if="users.length">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -243,6 +240,7 @@ watch(
         </tbody>
       </table>
       <app-pagination :count="count" :model-value="page" :total="total" @update:model-value="setQuery('page', $event)" />
-    </div>
+    </template>
+    <p v-else>{{ t("users.empty") }}</p>
   </main>
 </template>

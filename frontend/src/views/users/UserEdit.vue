@@ -161,7 +161,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="container">
+  <main class="container-fluid">
     <template v-if="hasLoaded">
       <h1>{{ title }}</h1>
       <app-alert dismissible variant="warning" v-model="uniqueNameAlreadyUsed">

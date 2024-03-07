@@ -36,7 +36,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="container">
+  <main class="container-fluid">
     <template v-if="message">
       <h1>{{ t("messages.title.view") }}</h1>
       <div class="mb-3">
