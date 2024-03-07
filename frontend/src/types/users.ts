@@ -36,6 +36,22 @@ export type ChangePasswordPayload = {
   new: string;
 };
 
+export type Contact = {
+  isVerified: boolean;
+  verifiedBy?: Actor;
+  verifiedOn?: string;
+};
+
+export type ContactPayload = {
+  isVerified: boolean;
+};
+
+export type CountrySettings = {
+  code: string;
+  postalCode?: string;
+  regions: string[];
+};
+
 export type CreateUserPayload = {
   uniqueName: string;
   password?: string;
@@ -57,22 +73,6 @@ export type CreateUserPayload = {
   customAttributes: CustomAttribute[];
   customIdentifiers: CustomIdentifier[];
   roles: string[];
-};
-
-export type Contact = {
-  isVerified: boolean;
-  verifiedBy?: Actor;
-  verifiedOn?: string;
-};
-
-export type ContactPayload = {
-  isVerified: boolean;
-};
-
-export type CountrySettings = {
-  code: string;
-  postalCode?: string;
-  regions: string[];
 };
 
 export type Email = Contact & {
