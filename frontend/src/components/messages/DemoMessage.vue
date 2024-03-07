@@ -12,7 +12,7 @@ import type { Message, RecipientPayload, Variable } from "@/types/messages";
 import type { Sender } from "@/types/senders";
 import type { Template } from "@/types/templates";
 import type { User } from "@/types/users";
-import { sendMessage } from "@/api/messages";
+import { readMessage, sendMessage } from "@/api/messages";
 import { useAccountStore } from "@/stores/account";
 
 const account = useAccountStore();
@@ -54,6 +54,7 @@ const emit = defineEmits<{
 }>();
 const { handleSubmit, isSubmitting } = useForm();
 const onSubmit = handleSubmit(async () => {
+  showStatus.value = false;
   realmHasNoDefaultSender.value = false;
   const user: User | undefined = account.authenticated;
   const recipient: RecipientPayload = { type: "To" };
@@ -64,7 +65,7 @@ const onSubmit = handleSubmit(async () => {
     recipient.displayName = user?.fullName;
   }
   try {
-    message.value = await sendMessage({
+    const sentMessages = await sendMessage({
       senderId: props.sender?.id ?? selectedSender.value?.id,
       template: props.template?.id ?? selectedTemplate.value?.id ?? "",
       recipients: [recipient],
@@ -73,6 +74,7 @@ const onSubmit = handleSubmit(async () => {
       variables: variables.value,
       isDemo: true,
     });
+    message.value = await readMessage(sentMessages.ids[0]);
     showStatus.value = true;
   } catch (e: unknown) {
     const { data, status } = e as ApiError;

@@ -6,6 +6,8 @@ import { useRoute, useRouter } from "vue-router";
 
 import DemoMessage from "@/components/messages/DemoMessage.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
+import MailgunSettingsEdit from "./MailgunSettingsEdit.vue";
+import SendGridSettingsEdit from "./SendGridSettingsEdit.vue";
 import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
 import type { ApiError } from "@/types/api";
@@ -159,8 +161,8 @@ onMounted(async () => {
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>
             <description-textarea v-model="description" />
-            <!-- <MailgunSettingsEdit v-if="provider === 'Mailgun'" v-model="mailgun" /> -->
-            <!-- <SendGridSettingsEdit v-else-if="provider === 'SendGrid'" v-model="sendGrid" /> -->
+            <MailgunSettingsEdit v-if="provider === 'Mailgun'" v-model="mailgun" />
+            <SendGridSettingsEdit v-else-if="provider === 'SendGrid'" v-model="sendGrid" />
           </form>
         </app-tab>
         <app-tab :disabled="!sender" title="messages.demo.label">

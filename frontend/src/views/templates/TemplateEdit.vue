@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import ContentTypeSelect from "@/components/templates/ContentTypeSelect.vue";
 import DemoMessage from "@/components/messages/DemoMessage.vue";
+import UniqueKeyInput from "@/components/templates/UniqueKeyInput.vue";
 import type { ApiError, Error } from "@/types/api";
 import type { Template } from "@/types/templates";
 import type { ToastUtils } from "@/types/components";
@@ -132,7 +133,7 @@ onMounted(async () => {
     <template v-if="hasLoaded">
       <h1>{{ title }}</h1>
       <app-alert dismissible variant="warning" v-model="uniqueKeyAlreadyUsed">
-        <strong>{{ t("templates.uniqueKeyAlreadyUsed.lead") }}</strong> {{ t("templates.uniqueKeyAlreadyUsed.help") }}
+        <strong>{{ t("templates.uniqueKey.alreadyUsed.lead") }}</strong> {{ t("templates.uniqueKey.alreadyUsed.help") }}
       </app-alert>
       <status-detail v-if="template" :aggregate="template" />
       <form @submit.prevent="onSubmit">
@@ -151,8 +152,7 @@ onMounted(async () => {
           <app-tab active title="general">
             <ContentTypeSelect required v-model="contentType" />
             <div class="row">
-              <!-- TODO(fpion): implement UniqueKeyInput.vue -->
-              <unique-key-input class="col-lg-6" required validate v-model="uniqueKey" />
+              <UniqueKeyInput class="col-lg-6" required validate v-model="uniqueKey" />
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>
             <form-input id="subject" label="templates.subject.label" :maxLength="255" placeholder="templates.subject.placeholder" required v-model="subject" />

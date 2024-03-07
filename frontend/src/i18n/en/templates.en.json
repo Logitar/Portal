@@ -38,9 +38,13 @@
     "list": "Templates",
     "new": "New template"
   },
-  "uniqueKeyAlreadyUsed": {
-    "help": "Please enter a different unique key.",
-    "lead": "The unique key is already used."
+  "uniqueKey": {
+    "alreadyUsed": {
+      "help": "Please enter a different unique key.",
+      "lead": "The unique key is already used."
+    },
+    "label": "Unique Key",
+    "placeholder": "Enter an unique key"
   },
   "updated": "The template has been updated."
 }

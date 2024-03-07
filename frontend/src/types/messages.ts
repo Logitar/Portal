@@ -69,6 +69,10 @@ export type SendMessagePayload = {
   isDemo: boolean;
 };
 
+export type SentMessages = {
+  ids: string[];
+};
+
 export type Variable = {
   key: string;
   value: string;
