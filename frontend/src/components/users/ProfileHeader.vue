@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 import ViewSessionsLink from "@/components/sessions/ViewSessionsLink.vue";
 import type { User } from "@/types/users";
+import { useAccountStore } from "@/stores/account";
 
+const account = useAccountStore();
+const router = useRouter();
 const { d, t } = useI18n();
 
 const props = defineProps<{
@@ -12,6 +16,14 @@ const props = defineProps<{
 }>();
 
 const addressLines = computed<string[]>(() => props.user.address?.formatted.split("\n") ?? []);
+
+function viewSessions(): void {
+  account.setRealm(undefined);
+  router.push({
+    name: "SessionList",
+    query: { user: props.user.id, sort: "UpdatedOn", isDescending: "true", page: "1", count: "10" },
+  });
+}
 </script>
 
 <template>
@@ -58,7 +70,11 @@ const addressLines = computed<string[]>(() => props.user.address?.formatted.spli
         <td>
           {{ d(user.authenticatedOn, "medium") }}
           <br />
-          <ViewSessionsLink :user="user" />
+          <template v-if="account.currentRealm">
+            <icon-button class="me-1" icon="fas fa-chess-rook" text="sessions.view.label" variant="warning" @click="viewSessions" />
+            <i class="ms-1 text-warning"><font-awesome-icon icon="fas fa-triangle-exclamation" /> {{ t("sessions.view.warning") }}</i>
+          </template>
+          <ViewSessionsLink v-else :user="user" />
         </td>
       </tr>
     </tbody>

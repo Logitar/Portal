@@ -13,10 +13,10 @@ const props = defineProps<{
 
 const to = computed<RouteLocationRaw>(() => ({
   name: "SessionList",
-  query: { realm: props.user.realm?.id ?? "", user: props.user.id, sort: "UpdatedOn", isDescending: "true", page: "1", count: "10" },
+  query: { user: props.user.id, sort: "UpdatedOn", isDescending: "true", page: "1", count: "10" },
 }));
 </script>
 
 <template>
-  <RouterLink :to="to">{{ t("sessions.view") }}</RouterLink>
+  <RouterLink :to="to">{{ t("sessions.view.label") }}</RouterLink>
 </template>
