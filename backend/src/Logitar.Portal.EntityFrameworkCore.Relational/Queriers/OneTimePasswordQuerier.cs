@@ -16,15 +16,11 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<OneTimePasswordEntity> _oneTimePasswords;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
 
-  public OneTimePasswordQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public OneTimePasswordQuerier(IActorService actorService, IdentityContext context)
   {
     _actorService = actorService;
     _oneTimePasswords = context.OneTimePasswords;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
   }
 
   public async Task<OneTimePassword> ReadAsync(Realm? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
