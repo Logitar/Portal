@@ -6,7 +6,7 @@ namespace Logitar.Portal.Application.Users.Commands;
 
 internal record ResetUserPasswordCommand(Guid Id, ResetUserPasswordPayload Payload) : ApplicationRequest, IRequest<User?>
 {
-  public override IActivity GetActivity()
+  public override IActivity Anonymize()
   {
     ResetUserPasswordCommand command = this.DeepClone();
     command.Payload.Password = Payload.Password.Mask();

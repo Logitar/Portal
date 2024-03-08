@@ -6,7 +6,7 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 
 internal record SignInSessionCommand(SignInSessionPayload Payload) : ApplicationRequest, IRequest<Session>
 {
-  public override IActivity GetActivity()
+  public override IActivity Anonymize()
   {
     SignInSessionCommand command = this.DeepClone();
     command.Payload.Password = Payload.Password.Mask();

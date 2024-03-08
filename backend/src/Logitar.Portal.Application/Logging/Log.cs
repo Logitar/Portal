@@ -23,10 +23,10 @@ public class Log
     Operation = operation;
   }
 
-  public object? Activity { get; private set; }
-  public void SetActivity(object activity)
+  public IActivity? Activity { get; private set; }
+  public void SetActivity(IActivity activity)
   {
-    Activity = activity;
+    Activity = activity.Anonymize();
   }
 
   public int? StatusCode { get; private set; }
