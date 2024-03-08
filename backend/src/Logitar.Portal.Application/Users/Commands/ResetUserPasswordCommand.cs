@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record ResetUserPasswordCommand(Guid Id, ResetUserPasswordPayload Payload) : ApplicationRequest, IRequest<User?>
+internal record ResetUserPasswordCommand(Guid Id, ResetUserPasswordPayload Payload) : Activity, IRequest<User?>
 {
   public override IActivity Anonymize()
   {

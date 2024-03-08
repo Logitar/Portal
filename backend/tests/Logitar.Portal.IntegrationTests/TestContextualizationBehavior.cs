@@ -18,11 +18,11 @@ internal class TestContextualizationBehavior<TRequest, TResponse> : IPipelineBeh
 
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
   {
-    if (request is ApplicationRequest applicationRequest)
+    if (request is Activity activity)
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration should be in the cache.");
       ActivityContext context = _context.ToActivityContext(configuration);
-      applicationRequest.Contextualize(context);
+      activity.Contextualize(context);
     }
 
     return await next();

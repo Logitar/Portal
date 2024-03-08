@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Tokens.Commands;
 
-internal record ValidateTokenCommand(ValidateTokenPayload Payload) : ApplicationRequest, IRequest<ValidatedToken>;
+internal record ValidateTokenCommand(ValidateTokenPayload Payload) : Activity, IRequest<ValidatedToken>;

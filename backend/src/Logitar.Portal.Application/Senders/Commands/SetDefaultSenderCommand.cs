@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal record SetDefaultSenderCommand(Guid Id) : ApplicationRequest, IRequest<Sender?>;
+internal record SetDefaultSenderCommand(Guid Id) : Activity, IRequest<Sender?>;

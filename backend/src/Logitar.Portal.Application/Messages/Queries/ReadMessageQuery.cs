@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
-internal record ReadMessageQuery(Guid Id) : ApplicationRequest, IRequest<Message>;
+internal record ReadMessageQuery(Guid Id) : Activity, IRequest<Message>;

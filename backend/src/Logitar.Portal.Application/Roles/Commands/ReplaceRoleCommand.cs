@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
-internal record ReplaceRoleCommand(Guid Id, ReplaceRolePayload Payload, long? Version) : ApplicationRequest, IRequest<Role?>;
+internal record ReplaceRoleCommand(Guid Id, ReplaceRolePayload Payload, long? Version) : Activity, IRequest<Role?>;

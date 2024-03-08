@@ -10,7 +10,7 @@ using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.Application;
 
-public abstract record ApplicationRequest : IActivity
+public abstract record Activity : IActivity
 {
   [JsonIgnore]
   private ActivityContext? _context = null;
