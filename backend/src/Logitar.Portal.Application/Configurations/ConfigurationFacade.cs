@@ -1,31 +1,30 @@
 ﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Application.Configurations.Queries;
 using Logitar.Portal.Contracts.Configurations;
-using MediatR;
 
 namespace Logitar.Portal.Application.Configurations;
 
 internal class ConfigurationFacade : IConfigurationService
 {
-  private readonly IMediator _mediator;
+  private readonly IActivityPipeline _activityPipeline;
 
-  public ConfigurationFacade(IMediator mediator)
+  public ConfigurationFacade(IActivityPipeline activityPipeline)
   {
-    _mediator = mediator;
+    _activityPipeline = activityPipeline;
   }
 
   public async Task<Configuration> ReadAsync(CancellationToken cancellationToken)
   {
-    return await _mediator.Send(new ReadConfigurationQuery(), cancellationToken);
+    return await _activityPipeline.ExecuteAsync(new ReadConfigurationQuery(), cancellationToken);
   }
 
   public async Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
   {
-    return await _mediator.Send(new ReplaceConfigurationCommand(payload, version), cancellationToken);
+    return await _activityPipeline.ExecuteAsync(new ReplaceConfigurationCommand(payload, version), cancellationToken);
   }
 
   public async Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
-    return await _mediator.Send(new UpdateConfigurationCommand(payload), cancellationToken);
+    return await _activityPipeline.ExecuteAsync(new UpdateConfigurationCommand(payload), cancellationToken);
   }
 }

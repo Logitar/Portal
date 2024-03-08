@@ -16,16 +16,16 @@ internal class ConsumerPipeline : IConsumerPipeline
 {
   private const string OperationType = nameof(MassTransit);
 
+  private readonly IActivityPipeline _activityPipeline;
   private readonly ICacheService _cacheService;
   private readonly ILoggingService _loggingService;
-  private readonly IMediator _mediator;
   private readonly IMassTransitSettings _settings;
 
-  public ConsumerPipeline(ICacheService cacheService, ILoggingService loggingService, IMediator mediator, IMassTransitSettings settings)
+  public ConsumerPipeline(IActivityPipeline activityPipeline, ICacheService cacheService, ILoggingService loggingService, IMassTransitSettings settings)
   {
+    _activityPipeline = activityPipeline;
     _cacheService = cacheService;
     _loggingService = loggingService;
-    _mediator = mediator;
     _settings = settings;
   }
 
@@ -51,7 +51,7 @@ internal class ConsumerPipeline : IConsumerPipeline
         await ContextualizeAsync(activity, context);
       }
 
-      return await _mediator.Send(request, cancellationToken);
+      return await _activityPipeline.ExecuteAsync(request, cancellationToken);
     }
     catch (Exception exception)
     {
@@ -91,7 +91,7 @@ internal class ConsumerPipeline : IConsumerPipeline
     if (context.TryGetHeader(Contracts.Constants.Headers.Realm, out string? idOrUniqueSlug))
     {
       bool parsed = Guid.TryParse(idOrUniqueSlug.Trim(), out Guid id);
-      realm = await _mediator.Send(new ReadRealmQuery(parsed ? id : null, idOrUniqueSlug), context.CancellationToken)
+      realm = await _activityPipeline.ExecuteAsync(new ReadRealmQuery(parsed ? id : null, idOrUniqueSlug), context.CancellationToken)
         ?? throw new InvalidOperationException($"The realm '{idOrUniqueSlug}' could not be found.");
     }
 
@@ -109,7 +109,7 @@ internal class ConsumerPipeline : IConsumerPipeline
       ActivityContext activityContext = new(configuration, realm, ApiKey: null, User: null, Session: null);
       query.Contextualize(activityContext);
 
-      user = await _mediator.Send(query, context.CancellationToken)
+      user = await _activityPipeline.ExecuteAsync(query, context.CancellationToken)
         ?? throw new InvalidOperationException($"The user '{idOrUniqueName}' could not be found");
     }
 
