@@ -38,7 +38,8 @@ And voilà! Your Portal should be available at the `http://localhost:8087` endpo
 - Microsoft Visual Studio 2022 Community Edition
 - Microsoft Visual Studio Code
 - Microsoft Edge Web Browser
-- Docker Desktop v4+
+- Node.js 20.10.0
+- Docker Desktop v4.28.0
 
 Other stacks may be working fine, but we will not supported them.
 
