@@ -68,5 +68,5 @@ Debugging the Backend with the Frontend requires extra steps but is still fairly
 
 1. Start by following the setup steps in the `Backend Debug Only` section.
 2. Take note of your backend Base URL, which should look like `http://localhost:5087`, `https://localhost:7005` or `https://localhost:32768`. It could be any port or Base URL, it does not really matter.
-3. In the `frontend` directory, create a `.env.development.local` file and set the `VITE_APP_API_BASE_URL` variable. The file contents should look like this: `VITE_APP_API_BASE_URL=https://localhost:7005`.
+3. In the `frontend` directory, create a `.env.development.local` file and set the `VITE_APP_API_BASE_URL` variable. The file contents should look like this: `VITE_APP_API_BASE_URL={YOUR_BASE_URL_FROM_PREVIOUS_STEP}`.
 4. Follow the setup steps in the `Frontend Debug Only` section.
