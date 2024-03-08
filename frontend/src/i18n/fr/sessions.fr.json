@@ -29,5 +29,8 @@
     "list": "Sessions",
     "view": "Examiner la session"
   },
-  "view": "Voir les sessions"
+  "view": {
+    "label": "Voir les sessions",
+    "warning": "Voir vos sessions réinitialisera le royaume actuel."
+  }
 }

@@ -29,5 +29,8 @@
     "list": "Sessions",
     "view": "View session"
   },
-  "view": "View sessions"
+  "view": {
+    "label": "View sessions",
+    "warning": "Viewing your sessions will reset your current realm."
+  }
 }
