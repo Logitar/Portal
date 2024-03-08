@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Queries;
 
-internal record SearchDictionariesQuery(SearchDictionariesPayload Payload) : Activity,IRequest<SearchResults<Dictionary>>;
+internal record SearchDictionariesQuery(SearchDictionariesPayload Payload) : Activity, IRequest<SearchResults<Dictionary>>;

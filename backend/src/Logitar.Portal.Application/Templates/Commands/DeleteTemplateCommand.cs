@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
-internal record DeleteTemplateCommand(Guid Id) : Activity,IRequest<Template?>;
+internal record DeleteTemplateCommand(Guid Id) : Activity, IRequest<Template?>;

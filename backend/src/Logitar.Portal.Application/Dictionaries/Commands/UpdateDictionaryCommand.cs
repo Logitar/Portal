@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
-internal record UpdateDictionaryCommand(Guid Id, UpdateDictionaryPayload Payload) : Activity,IRequest<Dictionary?>;
+internal record UpdateDictionaryCommand(Guid Id, UpdateDictionaryPayload Payload) : Activity, IRequest<Dictionary?>;

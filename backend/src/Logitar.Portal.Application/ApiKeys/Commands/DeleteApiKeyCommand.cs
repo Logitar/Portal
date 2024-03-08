@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal record DeleteApiKeyCommand(Guid Id) : Activity,IRequest<ApiKey?>;
+internal record DeleteApiKeyCommand(Guid Id) : Activity, IRequest<ApiKey?>;

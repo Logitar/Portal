@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal record CreateSessionCommand(CreateSessionPayload Payload) : Activity,IRequest<Session>;
+internal record CreateSessionCommand(CreateSessionPayload Payload) : Activity, IRequest<Session>;

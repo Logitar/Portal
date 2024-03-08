@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
-internal record UpdateTemplateCommand(Guid Id, UpdateTemplatePayload Payload) : Activity,IRequest<Template?>;
+internal record UpdateTemplateCommand(Guid Id, UpdateTemplatePayload Payload) : Activity, IRequest<Template?>;
