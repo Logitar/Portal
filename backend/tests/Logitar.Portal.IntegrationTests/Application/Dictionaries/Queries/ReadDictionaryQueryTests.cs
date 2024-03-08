@@ -44,7 +44,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     SetRealm();
 
     ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), Locale: null);
-    Dictionary? dictionary = await Mediator.Send(query);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(dictionary);
   }
 
@@ -52,7 +52,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   public async Task It_should_return_the_dictionary_found_by_Id()
   {
     ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), _dictionary.Locale.Code);
-    Dictionary? dictionary = await Mediator.Send(query);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(dictionary);
     Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
   }
@@ -61,7 +61,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   public async Task It_should_return_the_dictionary_found_by_locale()
   {
     ReadDictionaryQuery query = new(Id: null, _dictionary.Locale.Code);
-    Dictionary? dictionary = await Mediator.Send(query);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(dictionary);
     Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
   }
@@ -73,7 +73,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     await _dictionaryRepository.SaveAsync(dictionary);
 
     ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), "  FR  ");
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<Dictionary>>(async () => await Mediator.Send(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<Dictionary>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

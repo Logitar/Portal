@@ -38,7 +38,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
     OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
 
     DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
-    OneTimePassword? deleted = await Mediator.Send(command);
+    OneTimePassword? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
   }
@@ -47,7 +47,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_One_Time_Password_cannot_be_found()
   {
     DeleteOneTimePasswordCommand command = new(Guid.NewGuid());
-    OneTimePassword? oneTimePassword = await Mediator.Send(command);
+    OneTimePassword? oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(oneTimePassword);
   }
 
@@ -59,7 +59,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
     SetRealm();
 
     DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
-    OneTimePassword? result = await Mediator.Send(command);
+    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.ApiKeys;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.ApiKeys.Commands;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Extensions;
@@ -11,12 +12,12 @@ namespace Logitar.Portal.Authentication;
 
 internal class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
 {
-  private readonly IApiKeyService _apiKeyService;
+  private readonly IActivityPipeline _activityPipeline;
 
-  public ApiKeyAuthenticationHandler(IApiKeyService apiKeyService, IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+  public ApiKeyAuthenticationHandler(IActivityPipeline activityPipeline, IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : base(options, logger, encoder)
   {
-    _apiKeyService = apiKeyService;
+    _activityPipeline = activityPipeline;
   }
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -29,7 +30,8 @@ internal class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthent
         try
         {
           AuthenticateApiKeyPayload payload = new(value);
-          ApiKey apiKey = await _apiKeyService.AuthenticateAsync(payload);
+          AuthenticateApiKeyCommand command = new(payload);
+          ApiKey apiKey = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
 
           Context.SetApiKey(apiKey);
 

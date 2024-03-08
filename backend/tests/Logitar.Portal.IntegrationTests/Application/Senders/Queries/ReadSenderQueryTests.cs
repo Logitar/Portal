@@ -47,7 +47,7 @@ public class ReadSenderQueryTests : IntegrationTests
     SetRealm();
 
     ReadSenderQuery query = new(_sender.Id.ToGuid());
-    Sender? sender = await Mediator.Send(query);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(sender);
   }
 
@@ -55,7 +55,7 @@ public class ReadSenderQueryTests : IntegrationTests
   public async Task It_should_return_the_sender_found_by_Id()
   {
     ReadSenderQuery query = new(_sender.Id.ToGuid());
-    Sender? sender = await Mediator.Send(query);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(sender);
     Assert.Equal(_sender.Id.ToGuid(), sender.Id);
   }

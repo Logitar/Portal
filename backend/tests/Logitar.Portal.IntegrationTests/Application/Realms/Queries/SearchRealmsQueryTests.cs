@@ -37,7 +37,7 @@ public class SearchRealmsQueryTests : IntegrationTests
     SearchRealmsPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchRealmsQuery query = new(payload);
-    SearchResults<Realm> results = await Mediator.Send(query);
+    SearchResults<Realm> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -64,7 +64,7 @@ public class SearchRealmsQueryTests : IntegrationTests
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new RealmSortOption(RealmSort.DisplayName, isDescending: false));
     SearchRealmsQuery query = new(payload);
-    SearchResults<Realm> results = await Mediator.Send(query);
+    SearchResults<Realm> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Realm realm = Assert.Single(results.Items);

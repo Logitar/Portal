@@ -41,7 +41,7 @@ public class SearchApiKeysQueryTests : IntegrationTests
     SearchApiKeysPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchApiKeysQuery query = new(payload);
-    SearchResults<ApiKey> results = await Mediator.Send(query);
+    SearchResults<ApiKey> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -83,7 +83,7 @@ public class SearchApiKeysQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("%key"));
     payload.Sort.Add(new ApiKeySortOption(ApiKeySort.ExpiresOn, isDescending: false));
     SearchApiKeysQuery query = new(payload);
-    SearchResults<ApiKey> results = await Mediator.Send(query);
+    SearchResults<ApiKey> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     ApiKey apiKey = Assert.Single(results.Items);

@@ -62,7 +62,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_users", bool.FalseString));
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, version);
-    Role? role = await Mediator.Send(command);
+    Role? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
@@ -80,7 +80,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
   {
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Role? role = await Mediator.Send(command);
+    Role? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -91,7 +91,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
 
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, Version: null);
-    Role? result = await Mediator.Send(command);
+    Role? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -103,7 +103,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
 
     ReplaceRolePayload payload = new("AdmIn");
     ReplaceRoleCommand command = new(role.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
@@ -113,7 +113,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
   {
     ReplaceRolePayload payload = new("/!\\");
     ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
   }
 }

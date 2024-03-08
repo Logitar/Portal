@@ -41,7 +41,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   public async Task It_should_delete_an_existing_dictionary()
   {
     DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
     Assert.Equal(command.Id, dictionary.Id);
   }
@@ -50,7 +50,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_dictionary_cannot_be_found()
   {
     DeleteDictionaryCommand command = new(Guid.NewGuid());
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -60,7 +60,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
-    Dictionary? result = await Mediator.Send(command);
+    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

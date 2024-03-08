@@ -49,7 +49,7 @@ public class SearchSendersQueryTests : IntegrationTests
     SearchSendersPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchSendersQuery query = new(payload);
-    SearchResults<Sender> results = await Mediator.Send(query);
+    SearchResults<Sender> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -94,7 +94,7 @@ public class SearchSendersQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("%sender%"));
     payload.Sort.Add(new SenderSortOption(SenderSort.EmailAddress, isDescending: false));
     SearchSendersQuery query = new(payload);
-    SearchResults<Sender> results = await Mediator.Send(query);
+    SearchResults<Sender> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Sender sender = Assert.Single(results.Items);

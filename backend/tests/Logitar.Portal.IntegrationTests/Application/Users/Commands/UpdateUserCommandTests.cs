@@ -33,7 +33,7 @@ public class UpdateUserCommandTests : IntegrationTests
   {
     UpdateUserPayload payload = new();
     UpdateUserCommand command = new(Guid.NewGuid(), payload);
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -46,7 +46,7 @@ public class UpdateUserCommandTests : IntegrationTests
 
     UpdateUserPayload payload = new();
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -61,7 +61,7 @@ public class UpdateUserCommandTests : IntegrationTests
       Email = new Modification<EmailPayload>(new EmailPayload(Faker.Person.Email, isVerified: true))
     };
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.NotNull(payload.Email.Value);
     Assert.Equal(payload.Email.Value.Address, exception.Email.Address);
@@ -75,7 +75,7 @@ public class UpdateUserCommandTests : IntegrationTests
     UpdateUserPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
   }
@@ -91,7 +91,7 @@ public class UpdateUserCommandTests : IntegrationTests
       UniqueName = UsernameString
     };
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
@@ -104,7 +104,7 @@ public class UpdateUserCommandTests : IntegrationTests
       UniqueName = "/!\\"
     };
     UpdateUserCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
   }
 
@@ -149,7 +149,7 @@ public class UpdateUserCommandTests : IntegrationTests
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.NotNull(result.PasswordChangedBy);

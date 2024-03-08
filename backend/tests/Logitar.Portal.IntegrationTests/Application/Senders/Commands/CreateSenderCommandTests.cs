@@ -31,7 +31,7 @@ public class CreateSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     CreateSenderCommand command = new(payload);
-    Sender sender = await Mediator.Send(command);
+    Sender sender = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(sender.IsDefault);
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -42,11 +42,11 @@ public class CreateSenderCommandTests : IntegrationTests
     Assert.Null(sender.Realm);
 
     SetRealm();
-    Sender other1 = await Mediator.Send(command);
+    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other1.Realm);
     Assert.True(other1.IsDefault);
 
-    Sender other2 = await Mediator.Send(command);
+    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotEqual(other1, other2);
     Assert.Same(Realm, other1.Realm);
     Assert.False(other2.IsDefault);
@@ -60,7 +60,7 @@ public class CreateSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     CreateSenderCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 }

@@ -59,7 +59,7 @@ internal class ActivityPipeline : IActivityPipeline
   private async Task<ActivityContext> GetContextAsync(IContextParameters parameters, CancellationToken cancellationToken)
   {
     Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
-    Realm? realm = null;
+    Realm? realm = parameters.Realm;
     ApiKey? apiKey = parameters.ApiKey;
     User? user = parameters.User;
     Session? session = parameters.Session;

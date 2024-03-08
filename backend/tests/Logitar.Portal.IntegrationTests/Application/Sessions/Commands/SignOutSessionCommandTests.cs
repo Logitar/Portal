@@ -21,7 +21,7 @@ public class SignOutSessionCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_session_cannot_be_found()
   {
     SignOutSessionCommand command = new(Guid.NewGuid());
-    Session? session = await Mediator.Send(command);
+    Session? session = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(session);
   }
 
@@ -31,7 +31,7 @@ public class SignOutSessionCommandTests : IntegrationTests
     SetRealm();
 
     SignOutSessionCommand command = new(Guid.NewGuid());
-    Session? session = await Mediator.Send(command);
+    Session? session = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(session);
   }
 
@@ -44,7 +44,7 @@ public class SignOutSessionCommandTests : IntegrationTests
 
     SignOutSessionCommand command = new(aggregate.Id.ToGuid());
 
-    Session? session = await Mediator.Send(command);
+    Session? session = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(session);
     Assert.False(session.IsActive);
     Assert.Equal(aggregate.Id.ToGuid(), session.Id);

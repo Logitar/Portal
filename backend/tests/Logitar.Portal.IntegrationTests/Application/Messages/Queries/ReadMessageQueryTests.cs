@@ -43,7 +43,7 @@ public class ReadMessageQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_message_cannot_be_found()
   {
     ReadMessageQuery query = new(Guid.NewGuid());
-    Message? message = await Mediator.Send(query);
+    Message? message = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(message);
   }
 
@@ -68,7 +68,7 @@ public class ReadMessageQueryTests : IntegrationTests
     SetRealm();
 
     ReadMessageQuery query = new(message.Id.ToGuid());
-    Message? result = await Mediator.Send(query);
+    Message? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(message.Id.ToGuid(), result.Id);
   }

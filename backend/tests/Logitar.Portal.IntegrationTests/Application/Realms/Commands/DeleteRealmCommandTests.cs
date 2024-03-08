@@ -50,7 +50,7 @@ public class DeleteRealmCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     DeleteRealmCommand command = new(_realm.Id.ToGuid());
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
@@ -61,7 +61,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     DeleteRealmCommand command = new(Guid.NewGuid());
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 }

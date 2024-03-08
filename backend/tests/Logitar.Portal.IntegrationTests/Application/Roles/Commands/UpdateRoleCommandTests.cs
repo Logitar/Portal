@@ -46,7 +46,7 @@ public class UpdateRoleCommandTests : IntegrationTests
   {
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(Guid.NewGuid(), payload);
-    Role? role = await Mediator.Send(command);
+    Role? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -57,7 +57,7 @@ public class UpdateRoleCommandTests : IntegrationTests
 
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? result = await Mediator.Send(command);
+    Role? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -72,7 +72,7 @@ public class UpdateRoleCommandTests : IntegrationTests
       UniqueName = "AdmIn"
     };
     UpdateRoleCommand command = new(role.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
@@ -85,7 +85,7 @@ public class UpdateRoleCommandTests : IntegrationTests
       UniqueName = "/!\\"
     };
     UpdateRoleCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
   }
 
@@ -107,7 +107,7 @@ public class UpdateRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_realms", bool.TrueString));
     payload.CustomAttributes.Add(new("configuration", value: null));
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? role = await Mediator.Send(command);
+    Role? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(_role.UniqueName.Value, role.UniqueName);

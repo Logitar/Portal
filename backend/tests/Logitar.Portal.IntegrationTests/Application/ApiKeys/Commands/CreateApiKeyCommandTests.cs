@@ -48,7 +48,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("JobTitle", "Sales Manager"));
     payload.Roles.Add("  Manage_Sales  ");
     CreateApiKeyCommand command = new(payload);
-    ApiKey apiKey = await Mediator.Send(command);
+    ApiKey apiKey = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DisplayName, apiKey.DisplayName);
     Assert.Equal(payload.Description.Trim(), apiKey.Description);
@@ -71,7 +71,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     CreateApiKeyPayload payload = new("Default");
     payload.Roles.Add("admin");
     CreateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
   }
@@ -81,7 +81,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
   {
     CreateApiKeyPayload payload = new(displayName: string.Empty);
     CreateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("DisplayName", exception.Errors.Single().PropertyName);
   }
 }

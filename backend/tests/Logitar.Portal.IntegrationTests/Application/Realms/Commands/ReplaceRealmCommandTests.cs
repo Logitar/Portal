@@ -60,7 +60,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("Guid", Guid.NewGuid().ToString()));
     ReplaceRealmCommand command = new(_realm.Id.ToGuid(), payload, version);
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
 
     Assert.Equal(command.Id, realm.Id);
@@ -77,7 +77,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     ReplaceRealmPayload payload = new("tests", secret: string.Empty);
     ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 
@@ -89,7 +89,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
 
     ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpper(), secret: string.Empty);
     ReplaceRealmCommand command = new(realm.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug.Value, ignoreCase: true);
   }
 
@@ -98,7 +98,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     ReplaceRealmPayload payload = new("hello--world!", secret: string.Empty);
     ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueSlug", exception.Errors.Single().PropertyName);
   }
 }

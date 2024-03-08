@@ -39,7 +39,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   {
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(Guid.NewGuid(), payload);
-    OneTimePassword? oneTimePassword = await Mediator.Send(command);
+    OneTimePassword? oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(oneTimePassword);
   }
 
@@ -52,7 +52,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    OneTimePassword? result = await Mediator.Send(command);
+    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -63,7 +63,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
@@ -75,8 +75,8 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    _ = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await Mediator.Send(command));
-    var exception = await Assert.ThrowsAsync<MaximumAttemptsReachedException>(async () => await Mediator.Send(command));
+    _ = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<MaximumAttemptsReachedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
     Assert.Equal(1, exception.AttemptCount);
   }
@@ -92,7 +92,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<OneTimePasswordAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<OneTimePasswordAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
   }
 
@@ -108,7 +108,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new(_password);
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<OneTimePasswordIsExpiredException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<OneTimePasswordIsExpiredException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
   }
 
@@ -117,7 +117,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   {
     ValidateOneTimePasswordPayload payload = new(string.Empty);
     ValidateOneTimePasswordCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Password", exception.Errors.Single().PropertyName);
   }
 
@@ -131,7 +131,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("ValidatedBy", UsernameString));
     payload.CustomAttributes.Add(new("ValidatedOn", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    OneTimePassword? result = await Mediator.Send(command);
+    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(1, result.AttemptCount);
     Assert.True(result.HasValidationSucceeded);

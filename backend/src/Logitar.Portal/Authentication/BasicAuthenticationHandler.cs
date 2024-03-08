@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Users;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Constants;
 using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Users;
@@ -12,12 +13,12 @@ namespace Logitar.Portal.Authentication;
 
 internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
 {
-  private readonly IUserService _userService;
+  private readonly IActivityPipeline _activityPipeline;
 
-  public BasicAuthenticationHandler(IUserService userService, IOptionsMonitor<BasicAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+  public BasicAuthenticationHandler(IActivityPipeline activityPipeline, IOptionsMonitor<BasicAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : base(options, logger, encoder)
   {
-    _userService = userService;
+    _activityPipeline = activityPipeline;
   }
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -45,7 +46,8 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
           try
           {
             AuthenticateUserPayload payload = new(uniqueName: credentials[..index], password: credentials[(index + 1)..]);
-            User user = await _userService.AuthenticateAsync(payload);
+            AuthenticateUserCommand command = new(payload);
+            User user = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
 
             Context.SetUser(user);
 

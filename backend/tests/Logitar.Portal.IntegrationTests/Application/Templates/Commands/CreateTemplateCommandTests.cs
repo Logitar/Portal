@@ -41,7 +41,7 @@ public class CreateTemplateCommandTests : IntegrationTests
       Description = "This is the password recovery message template."
     };
     CreateTemplateCommand command = new(payload);
-    Template template = await Mediator.Send(command);
+    Template template = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
     Assert.Equal(payload.DisplayName.Trim(), template.DisplayName);
@@ -51,7 +51,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     Assert.Null(template.Realm);
 
     SetRealm();
-    Template other = await Mediator.Send(command);
+    Template other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 
@@ -66,7 +66,7 @@ public class CreateTemplateCommandTests : IntegrationTests
 
     CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new Content(content));
     CreateTemplateCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(template.UniqueKey, exception.UniqueKey);
   }
@@ -77,7 +77,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     Content content = Content.PlainText("Hello World!");
     CreateTemplatePayload payload = new(uniqueKey: "", "Reset your password", content);
     CreateTemplateCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueKey", exception.Errors.Single().PropertyName);
   }
 }

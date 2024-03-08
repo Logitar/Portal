@@ -46,7 +46,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   {
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(Guid.NewGuid(), payload);
-    ApiKey? apiKey = await Mediator.Send(command);
+    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
@@ -59,7 +59,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await Mediator.Send(command);
+    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -71,7 +71,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     UpdateApiKeyPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
   }
@@ -84,7 +84,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
       ExpiresOn = DateTime.Now.AddDays(-1)
     };
     UpdateApiKeyCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("ExpiresOn.Value", exception.Errors.Single().PropertyName);
   }
 
@@ -118,7 +118,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await Mediator.Send(command);
+    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
