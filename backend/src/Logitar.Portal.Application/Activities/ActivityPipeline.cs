@@ -38,7 +38,7 @@ internal class ActivityPipeline : IActivityPipeline
   {
     try
     {
-      if (request is Activity activity)
+      if (request is IActivity activity)
       {
         ActivityContext context = await GetContextAsync(parameters, cancellationToken);
         activity.Contextualize(context);
