@@ -1,4 +1,5 @@
 ﻿using Logitar.Portal.Application;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure;
@@ -51,6 +52,7 @@ internal class Startup
     }
 
     services.AddSingleton<IBaseUrl, WorkerBaseUrl>();
+    services.AddSingleton<IContextParametersResolver, WorkerContextParametersResolver>();
 
     services.AddSingleton(_configuration.GetSection("Cron").Get<CronSettings>() ?? new());
     services.AddHostedService<PurgeTokenBlacklist>();
