@@ -1,4 +1,5 @@
 version: '3.8'
+name: portal
 services:
   portal_mongo:
     image: mongo
