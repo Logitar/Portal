@@ -19,8 +19,8 @@ public static class DependencyInjectionExtensions
   {
     if (!string.IsNullOrWhiteSpace(settings.ConnectionString) && !string.IsNullOrWhiteSpace(settings.DatabaseName))
     {
-      MongoClient client = new(settings.ConnectionString);
-      IMongoDatabase database = client.GetDatabase(settings.DatabaseName);
+      MongoClient client = new(settings.ConnectionString.Trim());
+      IMongoDatabase database = client.GetDatabase(settings.DatabaseName.Trim());
       services.AddSingleton(database).AddTransient<ILogRepository, LogRepository>();
     }
 
