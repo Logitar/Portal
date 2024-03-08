@@ -1,6 +1,7 @@
 ﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Application.Sessions;
-using Logitar.Portal.Application.Users;
+using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Sessions.Commands;
+using Logitar.Portal.Application.Users.Commands;
 using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
@@ -17,15 +18,17 @@ namespace Logitar.Portal.Web.Controllers;
 [Route("api/account")]
 public class AccountController : ControllerBase
 {
-  private readonly ISessionService _sessionService;
-  private readonly IUserService _userService;
+  private readonly IActivityPipeline _activityPipeline;
 
+  protected ContextParameters Parameters => new()
+  {
+    User = User
+  };
   protected new User User => HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
 
-  public AccountController(ISessionService sessionService, IUserService userService)
+  public AccountController(IActivityPipeline activityPipeline)
   {
-    _sessionService = sessionService;
-    _userService = userService;
+    _activityPipeline = activityPipeline;
   }
 
   [Authorize(Policy = Policies.PortalUser)]
@@ -37,7 +40,8 @@ public class AccountController : ControllerBase
   public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
   {
     UpdateUserPayload payload = model.ToPayload();
-    return Ok(await _userService.UpdateAsync(User.Id, payload, cancellationToken) ?? throw new InvalidOperationException("The User is required."));
+    UpdateUserCommand command = new(User.Id, payload);
+    return Ok(await _activityPipeline.ExecuteAsync(command, Parameters, cancellationToken) ?? throw new InvalidOperationException("The User is required."));
   }
 
   [HttpPost("sign/in")]
@@ -46,7 +50,8 @@ public class AccountController : ControllerBase
     try
     {
       SignInSessionPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
-      Session session = await _sessionService.SignInAsync(payload, cancellationToken);
+      SignInSessionCommand command = new(payload);
+      Session session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
       HttpContext.SignIn(session);
 
       return Ok(session);
@@ -61,7 +66,8 @@ public class AccountController : ControllerBase
   [HttpPost("sign/out/all")]
   public async Task<ActionResult> SignOutAllAsync(CancellationToken cancellationToken)
   {
-    _ = await _userService.SignOutAsync(User.Id, cancellationToken);
+    SignOutUserCommand command = new(User.Id);
+    _ = await _activityPipeline.ExecuteAsync(command, Parameters, cancellationToken);
     HttpContext.SignOut();
 
     return NoContent();
@@ -74,7 +80,8 @@ public class AccountController : ControllerBase
     Guid? sessionId = HttpContext.GetSessionId();
     if (sessionId.HasValue)
     {
-      _ = await _sessionService.SignOutAsync(sessionId.Value, cancellationToken);
+      SignOutSessionCommand command = new(sessionId.Value);
+      _ = await _activityPipeline.ExecuteAsync(command, Parameters, cancellationToken);
     }
     HttpContext.SignOut();
 

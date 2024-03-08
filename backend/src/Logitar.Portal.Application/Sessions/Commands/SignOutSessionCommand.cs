@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal record SignOutSessionCommand(Guid Id) : Activity, IRequest<Session?>;
+public record SignOutSessionCommand(Guid Id) : Activity, IRequest<Session?>;
