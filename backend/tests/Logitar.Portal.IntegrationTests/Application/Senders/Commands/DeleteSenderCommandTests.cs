@@ -45,7 +45,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   public async Task It_should_delete_an_existing_sender()
   {
     DeleteSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
     Assert.Equal(command.Id, sender.Id);
   }
@@ -54,7 +54,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_sender_cannot_be_found()
   {
     DeleteSenderCommand command = new(Guid.NewGuid());
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -64,7 +64,7 @@ public class DeleteSenderCommandTests : IntegrationTests
     SetRealm();
 
     DeleteSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? result = await Mediator.Send(command);
+    Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -75,7 +75,7 @@ public class DeleteSenderCommandTests : IntegrationTests
     await _senderRepository.SaveAsync(other);
 
     DeleteSenderCommand command = new(_sender.Id.ToGuid());
-    var exception = await Assert.ThrowsAsync<CannotDeleteDefaultSenderException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<CannotDeleteDefaultSenderException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(_sender.Id, exception.SenderId);
   }
 }

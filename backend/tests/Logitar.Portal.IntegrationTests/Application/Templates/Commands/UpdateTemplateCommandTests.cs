@@ -46,7 +46,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
   {
     UpdateTemplatePayload payload = new();
     UpdateTemplateCommand command = new(Guid.NewGuid(), payload);
-    Template? template = await Mediator.Send(command);
+    Template? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
   }
 
@@ -57,7 +57,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
 
     UpdateTemplatePayload payload = new();
     UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
-    Template? result = await Mediator.Send(command);
+    Template? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -72,7 +72,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
       UniqueKey = "PaSSWoRDReCoVeRy"
     };
     UpdateTemplateCommand command = new(template.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);
   }
@@ -85,7 +85,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
       UniqueKey = "/!\\"
     };
     UpdateTemplateCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueKey", exception.Errors.Single().PropertyName);
   }
 
@@ -98,7 +98,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
       Description = new Modification<string>("  ")
     };
     UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
-    Template? template = await Mediator.Send(command);
+    Template? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 
     Assert.Equal(_template.UniqueKey.Value, template.UniqueKey);

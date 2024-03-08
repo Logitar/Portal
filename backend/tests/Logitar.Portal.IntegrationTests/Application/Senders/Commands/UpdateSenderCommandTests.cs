@@ -47,7 +47,7 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     UpdateSenderPayload payload = new();
     UpdateSenderCommand command = new(Guid.NewGuid(), payload);
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -58,7 +58,7 @@ public class UpdateSenderCommandTests : IntegrationTests
 
     UpdateSenderPayload payload = new();
     UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
-    Sender? result = await Mediator.Send(command);
+    Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -70,7 +70,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       EmailAddress = "aa@@bb..cc"
     };
     UpdateSenderCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 
@@ -83,7 +83,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       Description = new Modification<string>("  ")
     };
     UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(_sender.Email.Address, sender.EmailAddress);

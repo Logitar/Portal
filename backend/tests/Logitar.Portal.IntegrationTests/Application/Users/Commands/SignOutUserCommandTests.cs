@@ -21,7 +21,7 @@ public class SignOutUserCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_user_cannot_be_found()
   {
     SignOutUserCommand command = new(Guid.NewGuid());
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -31,7 +31,7 @@ public class SignOutUserCommandTests : IntegrationTests
     SetRealm();
 
     SignOutUserCommand command = new(Guid.NewGuid());
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -41,7 +41,7 @@ public class SignOutUserCommandTests : IntegrationTests
     UserAggregate aggregate = (await _userRepository.LoadAsync()).Single();
     SignOutUserCommand command = new(aggregate.Id.ToGuid());
 
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(user);
     Assert.Equal(command.Id, user.Id);
 

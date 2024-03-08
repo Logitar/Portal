@@ -36,7 +36,7 @@ public class ReadOneTimePasswordQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_One_Time_Password_cannot_be_found()
   {
     ReadOneTimePasswordQuery query = new(Guid.NewGuid());
-    OneTimePassword? oneTimePassword = await Mediator.Send(query);
+    OneTimePassword? oneTimePassword = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(oneTimePassword);
   }
 
@@ -46,7 +46,7 @@ public class ReadOneTimePasswordQueryTests : IntegrationTests
     OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
 
     ReadOneTimePasswordQuery query = new(oneTimePassword.Id.ToGuid());
-    OneTimePassword? result = await Mediator.Send(query);
+    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);
   }

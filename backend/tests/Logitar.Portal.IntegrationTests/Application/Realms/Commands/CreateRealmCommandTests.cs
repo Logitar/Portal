@@ -37,7 +37,7 @@ public class CreateRealmCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("MfaMode", "MagicLink"));
     CreateRealmCommand command = new(payload);
 
-    Realm realm = await Mediator.Send(command);
+    Realm realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(payload.UniqueSlug, realm.UniqueSlug);
     Assert.NotEmpty(realm.Secret);
     Assert.Equal(payload.CustomAttributes, realm.CustomAttributes);
@@ -51,7 +51,7 @@ public class CreateRealmCommandTests : IntegrationTests
 
     CreateRealmPayload payload = new(realm.UniqueSlug.Value, secret: string.Empty);
     CreateRealmCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(realm.UniqueSlug, exception.UniqueSlug);
   }
 
@@ -60,7 +60,7 @@ public class CreateRealmCommandTests : IntegrationTests
   {
     CreateRealmPayload payload = new(uniqueSlug: "", secret: string.Empty);
     CreateRealmCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.All(exception.Errors, e => Assert.Equal("UniqueSlug", e.PropertyName));
   }
 }

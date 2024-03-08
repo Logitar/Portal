@@ -19,7 +19,7 @@ public class ReadConfigurationQueryTests : IntegrationTests
   {
     Assert.NotNull(_cacheService.Configuration);
 
-    Configuration? configuration = await Mediator.Send(new ReadConfigurationQuery());
+    Configuration? configuration = await ActivityPipeline.ExecuteAsync(new ReadConfigurationQuery());
     Assert.NotNull(configuration);
     Assert.Same(_cacheService.Configuration, configuration);
   }
@@ -30,6 +30,6 @@ public class ReadConfigurationQueryTests : IntegrationTests
     _cacheService.Configuration = null;
     Assert.Null(_cacheService.Configuration);
 
-    await Assert.ThrowsAsync<InvalidOperationException>(async () => await Mediator.Send(new ReadConfigurationQuery()));
+    await Assert.ThrowsAsync<InvalidOperationException>(async () => await ActivityPipeline.ExecuteAsync(new ReadConfigurationQuery()));
   }
 }

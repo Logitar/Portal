@@ -31,7 +31,7 @@ public class SignInSessionCommandTests : IntegrationTests
     ];
     SignInSessionPayload payload = new(UsernameString, PasswordString, isPersistent: true, customAttributes);
     SignInSessionCommand command = new(payload);
-    Session session = await Mediator.Send(command);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(session.IsPersistent);
     Assert.True(session.IsActive);
@@ -60,7 +60,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     SignInSessionPayload payload = new(uniqueName.Value, PasswordString);
     SignInSessionCommand command = new(payload);
-    Session session = await Mediator.Send(command);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -77,7 +77,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
-    Session session = await Mediator.Send(command);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -93,7 +93,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SignInSessionPayload payload = new(UsernameString, PasswordString[..^1]);
     SignInSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
 
@@ -104,7 +104,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
@@ -115,7 +115,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SignInSessionPayload payload = new(UsernameString, password: string.Empty);
     SignInSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Password", exception.Errors.Single().PropertyName);
   }
 }

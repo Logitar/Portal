@@ -42,7 +42,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   {
     UpdateDictionaryPayload payload = new();
     UpdateDictionaryCommand command = new(Guid.NewGuid(), payload);
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -53,7 +53,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
 
     UpdateDictionaryPayload payload = new();
     UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
-    Dictionary? result = await Mediator.Send(command);
+    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -68,7 +68,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
       Locale = Faker.Locale
     };
     UpdateDictionaryCommand command = new(dictionary.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Locale, exception.Locale.Code);
   }
@@ -81,7 +81,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
       Locale = " Hello World! "
     };
     UpdateDictionaryCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Locale", exception.Errors.Single().PropertyName);
   }
 
@@ -102,7 +102,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("rouge", "scarlet"));
     payload.Entries.Add(new("vert", value: null));
     UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);

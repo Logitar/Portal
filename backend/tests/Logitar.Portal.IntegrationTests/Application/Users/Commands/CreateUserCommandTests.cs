@@ -43,7 +43,7 @@ public class CreateUserCommandTests : IntegrationTests
     payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", Faker.Person.BuildHealthInsuranceNumber()));
     payload.Roles.Add("  Manage_Sales  ");
     CreateUserCommand command = new(payload);
-    User user = await Mediator.Send(command);
+    User user = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueName, user.UniqueName);
     Assert.True(user.HasPassword);
@@ -76,7 +76,7 @@ public class CreateUserCommandTests : IntegrationTests
     CreateUserPayload payload = new(Faker.Internet.UserName());
     payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", healthInsuranceNumber));
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal("HealthInsuranceNumber", exception.Key);
     Assert.Equal(healthInsuranceNumber, exception.Value);
@@ -90,7 +90,7 @@ public class CreateUserCommandTests : IntegrationTests
       Email = new EmailPayload(Faker.Person.Email, isVerified: false)
     };
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Email.Address, exception.Email.Address);
   }
@@ -101,7 +101,7 @@ public class CreateUserCommandTests : IntegrationTests
     CreateUserPayload payload = new(UsernameString);
     payload.Roles.Add("admin");
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
   }
@@ -111,7 +111,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     CreateUserPayload payload = new(UsernameString);
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
@@ -121,7 +121,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     CreateUserPayload payload = new($"get_rekt_{Guid.NewGuid()};DROP TABLE users");
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
   }
 }

@@ -47,7 +47,7 @@ public class SearchRolesQueryTests : IntegrationTests
     SearchRolesPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchRolesQuery query = new(payload);
-    SearchResults<Role> results = await Mediator.Send(query);
+    SearchResults<Role> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -77,7 +77,7 @@ public class SearchRolesQueryTests : IntegrationTests
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new RoleSortOption(RoleSort.DisplayName, isDescending: false));
     SearchRolesQuery query = new(payload);
-    SearchResults<Role> results = await Mediator.Send(query);
+    SearchResults<Role> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Role role = Assert.Single(results.Items);

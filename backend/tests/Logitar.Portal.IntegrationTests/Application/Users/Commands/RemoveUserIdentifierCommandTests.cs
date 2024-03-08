@@ -26,7 +26,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.DoesNotContain(result.CustomIdentifiers, id => id.Key == Key);
   }
@@ -35,7 +35,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_user_cannot_be_found()
   {
     RemoveUserIdentifierCommand command = new(Guid.NewGuid(), Key);
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -47,7 +47,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
     SetRealm();
 
     RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

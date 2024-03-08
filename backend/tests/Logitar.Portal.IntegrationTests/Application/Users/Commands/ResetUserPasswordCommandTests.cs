@@ -23,7 +23,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
 
     ResetUserPasswordPayload payload = new(newPassword);
     ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
   }
@@ -33,7 +33,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   {
     ResetUserPasswordPayload payload = new(PasswordString);
     ResetUserPasswordCommand command = new(Guid.NewGuid(), payload);
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -46,7 +46,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
 
     ResetUserPasswordPayload payload = new(PasswordString);
     ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -55,7 +55,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   {
     ResetUserPasswordPayload payload = new(password: string.Empty);
     ResetUserPasswordCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.All(exception.Errors, e => Assert.Equal("Password", e.PropertyName));
   }
 }

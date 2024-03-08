@@ -50,7 +50,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, _secret));
     AuthenticateApiKeyCommand command = new(payload);
-    ApiKey result = await Mediator.Send(command);
+    ApiKey result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(apiKey.Id.ToGuid(), result.Id);
 
     apiKey = Assert.Single(await _apiKeyRepository.LoadAsync());
@@ -75,7 +75,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, _secret));
     AuthenticateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<ApiKeyIsExpiredException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<ApiKeyIsExpiredException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(apiKey.Id, exception.ApiKeyId);
   }
 
@@ -85,7 +85,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     XApiKey xApiKey = new(ApiKeyId.NewId(), RandomStringGenerator.GetBase64String(XApiKey.SecretLength, out _));
     AuthenticateApiKeyPayload payload = new(xApiKey.Encode());
     AuthenticateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(xApiKey.Id, exception.Id);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
@@ -102,7 +102,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyPayload payload = new(xApiKey);
     AuthenticateApiKeyCommand command = new(payload);
 
-    var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(apiKey.Id, exception.Id);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
@@ -116,7 +116,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, secret));
     AuthenticateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<IncorrectApiKeySecretException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<IncorrectApiKeySecretException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(apiKey.Id, exception.ApiKeyId);
     Assert.Equal(secret, exception.AttemptedSecret);
   }
@@ -126,7 +126,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     AuthenticateApiKeyPayload payload = new("test");
     AuthenticateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<InvalidApiKeyException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<InvalidApiKeyException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.XApiKey, exception.ApiKey);
     Assert.Equal("XApiKey", exception.PropertyName);
     Assert.NotNull(exception.InnerException);
@@ -137,7 +137,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     AuthenticateApiKeyPayload payload = new(string.Empty);
     AuthenticateApiKeyCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("XApiKey", exception.Errors.Single().PropertyName);
   }
 

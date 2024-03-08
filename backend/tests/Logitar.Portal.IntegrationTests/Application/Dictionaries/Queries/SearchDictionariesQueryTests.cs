@@ -44,7 +44,7 @@ public class SearchDictionariesQueryTests : IntegrationTests
     SearchDictionariesPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchDictionariesQuery query = new(payload);
-    SearchResults<Dictionary> results = await Mediator.Send(query);
+    SearchResults<Dictionary> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -76,7 +76,7 @@ public class SearchDictionariesQueryTests : IntegrationTests
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new DictionarySortOption(DictionarySort.EntryCount, isDescending: false));
     SearchDictionariesQuery query = new(payload);
-    SearchResults<Dictionary> results = await Mediator.Send(query);
+    SearchResults<Dictionary> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Dictionary dictionary = Assert.Single(results.Items);

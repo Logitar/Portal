@@ -74,7 +74,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(sendMessages.UniqueName.Value);
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, version);
-    ApiKey? result = await Mediator.Send(command);
+    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
@@ -96,7 +96,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   {
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
-    ApiKey? apiKey = await Mediator.Send(command);
+    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
@@ -109,7 +109,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
 
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
-    ApiKey? result = await Mediator.Send(command);
+    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -121,7 +121,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     ReplaceApiKeyPayload payload = new(apiKey.DisplayName.Value);
     payload.Roles.Add("admin");
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
   }
@@ -131,7 +131,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   {
     ReplaceApiKeyPayload payload = new(displayName: string.Empty);
     ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("DisplayName", exception.Errors.Single().PropertyName);
   }
 

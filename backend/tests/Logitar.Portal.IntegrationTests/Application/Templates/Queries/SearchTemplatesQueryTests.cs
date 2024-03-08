@@ -46,7 +46,7 @@ public class SearchTemplatesQueryTests : IntegrationTests
     SearchTemplatesPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchTemplatesQuery query = new(payload);
-    SearchResults<Template> results = await Mediator.Send(query);
+    SearchResults<Template> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -78,7 +78,7 @@ public class SearchTemplatesQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("reset%"));
     payload.Sort.Add(new TemplateSortOption(TemplateSort.Subject, isDescending: false));
     SearchTemplatesQuery query = new(payload);
-    SearchResults<Template> results = await Mediator.Send(query);
+    SearchResults<Template> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Template template = Assert.Single(results.Items);

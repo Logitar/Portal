@@ -32,7 +32,7 @@ public class CreateOneTimePasswordCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("UserId", Guid.NewGuid().ToString()));
     CreateOneTimePasswordCommand command = new(payload);
-    OneTimePassword oneTimePassword = await Mediator.Send(command);
+    OneTimePassword oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
 
     Assertions.Equal(payload.ExpiresOn, oneTimePassword.ExpiresOn, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.MaximumAttempts, oneTimePassword.MaximumAttempts);
@@ -51,7 +51,7 @@ public class CreateOneTimePasswordCommandTests : IntegrationTests
   {
     CreateOneTimePasswordPayload payload = new(characters: string.Empty, length: byte.MaxValue);
     CreateOneTimePasswordCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Characters", exception.Errors.Single().PropertyName);
   }
 }

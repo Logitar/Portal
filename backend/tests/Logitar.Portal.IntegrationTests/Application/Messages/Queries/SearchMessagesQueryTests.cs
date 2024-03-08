@@ -45,7 +45,7 @@ public class SearchMessagesQueryTests : IntegrationTests
   {
     SearchMessagesPayload payload = new();
     SearchMessagesQuery query = new(payload);
-    SearchResults<Message> results = await Mediator.Send(query);
+    SearchResults<Message> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -102,7 +102,7 @@ public class SearchMessagesQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("Reset%"));
     payload.Sort.Add(new MessageSortOption(MessageSort.RecipientCount, isDescending: false));
     SearchMessagesQuery query = new(payload);
-    SearchResults<Message> results = await Mediator.Send(query);
+    SearchResults<Message> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
     Message message = Assert.Single(results.Items);

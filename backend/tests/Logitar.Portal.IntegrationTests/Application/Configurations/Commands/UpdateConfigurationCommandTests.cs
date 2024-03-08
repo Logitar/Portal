@@ -24,7 +24,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
       DefaultLocale = new Modification<string>("test")
     };
     UpdateConfigurationCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("DefaultLocale.Value", exception.Errors.Single().PropertyName);
   }
 
@@ -45,7 +45,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
       LoggingSettings = new LoggingSettings(LoggingExtent.Full, onlyErrors: true)
     };
     UpdateConfigurationCommand command = new(payload);
-    Configuration result = await Mediator.Send(command);
+    Configuration result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DefaultLocale.Value, result.DefaultLocale?.Code);
     Assert.NotEqual(secret, result.Secret);

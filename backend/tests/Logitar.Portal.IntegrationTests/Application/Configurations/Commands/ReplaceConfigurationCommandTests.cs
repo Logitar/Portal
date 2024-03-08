@@ -38,7 +38,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
       LoggingSettings = new LoggingSettings(LoggingExtent.Full, onlyErrors: true)
     };
     ReplaceConfigurationCommand command = new(payload, version);
-    Configuration result = await Mediator.Send(command);
+    Configuration result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DefaultLocale, result.DefaultLocale?.Code);
     Assert.Equal(newSecret, result.Secret);
@@ -56,7 +56,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
       DefaultLocale = "test"
     };
     ReplaceConfigurationCommand command = new(payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("DefaultLocale", exception.Errors.Single().PropertyName);
   }
 }

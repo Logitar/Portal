@@ -19,7 +19,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    User result = await Mediator.Send(command);
+    User result = await ActivityPipeline.ExecuteAsync(command);
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Equal(user.Id.ToGuid(), result.Id);
@@ -32,7 +32,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 
     AuthenticateUserPayload payload = new(UsernameString, PasswordString[..^1]);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(user.Id, exception.UserId);
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
@@ -48,7 +48,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 
     AuthenticateUserPayload payload = new(other.UniqueName.Value, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UserHasNoPasswordException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UserHasNoPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(other.Id, exception.UserId);
   }
 
@@ -64,7 +64,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 
     AuthenticateUserPayload payload = new(disabled.UniqueName.Value, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UserIsDisabledException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UserIsDisabledException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(disabled.Id, exception.UserId);
   }
 
@@ -75,7 +75,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 
     AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
@@ -86,7 +86,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     AuthenticateUserPayload payload = new(UsernameString, password: string.Empty);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Password", exception.Errors.Single().PropertyName);
   }
 }

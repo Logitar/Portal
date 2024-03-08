@@ -42,7 +42,7 @@ public class CreateRoleCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("root", bool.TrueString));
     CreateRoleCommand command = new(payload);
-    Role role = await Mediator.Send(command);
+    Role role = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
     Assert.Equal(payload.DisplayName, role.DisplayName);
@@ -51,7 +51,7 @@ public class CreateRoleCommandTests : IntegrationTests
     Assert.Null(role.Realm);
 
     SetRealm();
-    Role other = await Mediator.Send(command);
+    Role other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 
@@ -65,7 +65,7 @@ public class CreateRoleCommandTests : IntegrationTests
 
     CreateRolePayload payload = new(role.UniqueName.Value);
     CreateRoleCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(role.UniqueName, exception.UniqueName);
   }
@@ -75,7 +75,7 @@ public class CreateRoleCommandTests : IntegrationTests
   {
     CreateRolePayload payload = new(uniqueName: "");
     CreateRoleCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
   }
 }

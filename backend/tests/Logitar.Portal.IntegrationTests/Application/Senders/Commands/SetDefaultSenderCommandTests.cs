@@ -45,7 +45,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_sender_cannot_be_found()
   {
     SetDefaultSenderCommand command = new(Guid.NewGuid());
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -55,7 +55,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
     SetRealm();
 
     SetDefaultSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? result = await Mediator.Send(command);
+    Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -66,7 +66,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
     await _senderRepository.SaveAsync(sender);
 
     SetDefaultSenderCommand command = new(sender.Id.ToGuid());
-    Sender? result = await Mediator.Send(command);
+    Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
     Assert.True(result.IsDefault);

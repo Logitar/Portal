@@ -24,7 +24,7 @@ public class CreateSessionCommandTests : IntegrationTests
       IsPersistent = true
     };
     CreateSessionCommand command = new(payload);
-    Session session = await Mediator.Send(command);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(session.IsPersistent);
     Assert.NotNull(session.RefreshToken);
@@ -50,7 +50,7 @@ public class CreateSessionCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
     payload.CustomAttributes.Add(new("IpAddress", Faker.Internet.Ip()));
     CreateSessionCommand command = new(payload);
-    Session session = await Mediator.Send(command);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -68,7 +68,7 @@ public class CreateSessionCommandTests : IntegrationTests
 
     CreateSessionPayload payload = new(UsernameString);
     CreateSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(payload.User, exception.User);
     Assert.Equal("User", exception.PropertyName);
@@ -79,7 +79,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     CreateSessionPayload payload = new(user: string.Empty);
     CreateSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("User", exception.Errors.Single().PropertyName);
   }
 }

@@ -42,7 +42,7 @@ public class UpdateRealmCommandTests : IntegrationTests
   {
     UpdateRealmPayload payload = new();
     UpdateRealmCommand command = new(Guid.NewGuid(), payload);
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 
@@ -57,7 +57,7 @@ public class UpdateRealmCommandTests : IntegrationTests
       UniqueSlug = _realm.UniqueSlug.Value
     };
     UpdateRealmCommand command = new(realm.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(_realm.UniqueSlug, exception.UniqueSlug);
   }
 
@@ -69,7 +69,7 @@ public class UpdateRealmCommandTests : IntegrationTests
       UniqueSlug = "hello--world!"
     };
     UpdateRealmCommand command = new(Guid.NewGuid(), payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueSlug", exception.Errors.Single().PropertyName);
   }
 
@@ -84,7 +84,7 @@ public class UpdateRealmCommandTests : IntegrationTests
       Url = new Modification<string>($"https://www.{Faker.Internet.DomainName()}/")
     };
     UpdateRealmCommand command = new(_realm.Id.ToGuid(), payload);
-    Realm? realm = await Mediator.Send(command);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
 
     Assert.Equal(command.Id, realm.Id);

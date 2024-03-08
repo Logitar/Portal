@@ -60,7 +60,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
       Description = " This is the password recovery message template. "
     };
     ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, version);
-    Template? template = await Mediator.Send(command);
+    Template? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
@@ -75,7 +75,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   {
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new Content(_template.Content));
     ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Template? template = await Mediator.Send(command);
+    Template? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
   }
 
@@ -86,7 +86,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
 
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new Content(_template.Content));
     ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, Version: null);
-    Template? result = await Mediator.Send(command);
+    Template? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -98,7 +98,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
 
     ReplaceTemplatePayload payload = new("PaSSWoRDReCoVeRy", _template.Subject.Value, new Content(_template.Content));
     ReplaceTemplateCommand command = new(template.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);
   }
@@ -108,7 +108,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   {
     ReplaceTemplatePayload payload = new("/!\\", _template.Subject.Value, new Content(_template.Content));
     ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("UniqueKey", exception.Errors.Single().PropertyName);
   }
 }

@@ -62,7 +62,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, version);
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -79,7 +79,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Sender? sender = await Mediator.Send(command);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -93,7 +93,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, Version: null);
-    Sender? result = await Mediator.Send(command);
+    Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -105,7 +105,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 }

@@ -41,7 +41,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     ReadRealmQuery query = new(Guid.NewGuid(), UniqueSlug: null);
-    Realm? realm = await Mediator.Send(query);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(realm);
   }
 
@@ -49,7 +49,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_the_realm_found_by_Id()
   {
     ReadRealmQuery query = new(_realm.Id.ToGuid(), _realm.UniqueSlug.Value);
-    Realm? realm = await Mediator.Send(query);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
@@ -58,7 +58,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_the_realm_found_by_unique_slug()
   {
     ReadRealmQuery query = new(Id: null, _realm.UniqueSlug.Value);
-    Realm? realm = await Mediator.Send(query);
+    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
@@ -70,7 +70,7 @@ public class ReadRealmQueryTests : IntegrationTests
     await _realmRepository.SaveAsync(realm);
 
     ReadRealmQuery query = new(_realm.Id.ToGuid(), "  OthEr  ");
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(async () => await Mediator.Send(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

@@ -44,7 +44,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
 
     CreateDictionaryPayload payload = new(Faker.Locale);
     CreateDictionaryCommand command = new(payload);
-    Dictionary dictionary = await Mediator.Send(command);
+    Dictionary dictionary = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
     Assert.Equal(0, dictionary.EntryCount);
@@ -57,7 +57,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
   {
     CreateDictionaryPayload payload = new(Faker.Locale);
     CreateDictionaryCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Locale, exception.Locale.Code);
   }
@@ -67,7 +67,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
   {
     CreateDictionaryPayload payload = new(locale: string.Empty);
     CreateDictionaryCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.All(exception.Errors, e => Assert.Equal("Locale", e.PropertyName));
   }
 }

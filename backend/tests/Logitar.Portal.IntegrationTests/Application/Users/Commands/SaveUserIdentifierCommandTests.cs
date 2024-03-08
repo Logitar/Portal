@@ -30,7 +30,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Contains(result.CustomIdentifiers, id => id.Key == command.Key && id.Value == payload.Value);
   }
@@ -40,7 +40,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   {
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(Guid.NewGuid(), Key, payload);
-    User? user = await Mediator.Send(command);
+    User? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -53,7 +53,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    User? result = await Mediator.Send(command);
+    User? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -68,7 +68,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(command.Key, exception.Key);
     Assert.Equal(payload.Value, exception.Value);
@@ -79,7 +79,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   {
     SaveUserIdentifierPayload payload = new(value: string.Empty);
     SaveUserIdentifierCommand command = new(Guid.NewGuid(), Key: string.Empty, payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(2, exception.Errors.Count());
     Assert.Contains(exception.Errors, e => e.PropertyName == "Key");
     Assert.Contains(exception.Errors, e => e.PropertyName == "Value");

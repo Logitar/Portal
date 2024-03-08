@@ -40,7 +40,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected Faker Faker { get; } = new();
 
   protected IServiceProvider ServiceProvider { get; }
-  protected IMediator Mediator { get; }
+  protected IActivityPipeline ActivityPipeline { get; }
   protected EventContext EventContext { get; }
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
@@ -80,7 +80,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     ServiceProvider = services.BuildServiceProvider();
     _context = ServiceProvider.GetRequiredService<TestContext>();
 
-    Mediator = ServiceProvider.GetRequiredService<IMediator>();
+    ActivityPipeline = ServiceProvider.GetRequiredService<IActivityPipeline>();
     EventContext = ServiceProvider.GetRequiredService<EventContext>();
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();

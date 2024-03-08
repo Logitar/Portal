@@ -55,7 +55,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("cyan", "cyan"));
     payload.Entries.Add(new("or", "golden"));
     ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, version);
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
@@ -72,7 +72,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   {
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Dictionary? dictionary = await Mediator.Send(command);
+    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -83,7 +83,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
 
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, Version: null);
-    Dictionary? result = await Mediator.Send(command);
+    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -95,7 +95,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
 
     ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());
     ReplaceDictionaryCommand command = new(dictionary.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.Locale, exception.Locale.Code, ignoreCase: true);
   }
@@ -105,7 +105,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   {
     ReplaceDictionaryPayload payload = new("/!\\");
     ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("Locale", exception.Errors.Single().PropertyName);
   }
 }

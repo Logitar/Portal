@@ -60,7 +60,7 @@ public class RenewSessionCommandTests : IntegrationTests
     ];
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, currentSecret), customAttributes);
     RenewSessionCommand command = new(payload);
-    Session result = await Mediator.Send(command);
+    Session result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(result.IsPersistent);
     Assert.NotNull(result.RefreshToken);
@@ -85,7 +85,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, currentSecret));
     RenewSessionCommand command = new(payload);
-    Session result = await Mediator.Send(command);
+    Session result = await ActivityPipeline.ExecuteAsync(command);
 
     Guid actorId = new ActorId(user.Id.Value).ToGuid();
     Assert.Equal(session.Id.ToGuid(), result.Id);
@@ -105,7 +105,7 @@ public class RenewSessionCommandTests : IntegrationTests
     _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<IncorrectSessionSecretException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<IncorrectSessionSecretException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(session.Id, exception.SessionId);
     Assert.Equal(secretString, exception.AttemptedSecret);
   }
@@ -115,7 +115,7 @@ public class RenewSessionCommandTests : IntegrationTests
   {
     RenewSessionPayload payload = new(Guid.NewGuid().ToString());
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<InvalidRefreshTokenException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<InvalidRefreshTokenException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.RefreshToken, exception.RefreshToken);
     Assert.Equal("RefreshToken", exception.PropertyName);
     Assert.NotNull(exception.InnerException);
@@ -133,7 +133,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SessionIsNotActiveException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<SessionIsNotActiveException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(session.Id, exception.SessionId);
   }
 
@@ -148,7 +148,7 @@ public class RenewSessionCommandTests : IntegrationTests
     _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SessionIsNotPersistentException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<SessionIsNotPersistentException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(session.Id, exception.SessionId);
   }
 
@@ -158,7 +158,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RefreshToken refreshToken = new(SessionId.NewId(), RandomStringGenerator.GetBase64String(RefreshToken.SecretLength, out _));
     RenewSessionPayload payload = new(refreshToken.Encode());
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(refreshToken.Id, exception.Id);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
@@ -177,7 +177,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionPayload payload = new(refreshToken);
     RenewSessionCommand command = new(payload);
 
-    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(session.Id, exception.Id);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
@@ -187,7 +187,7 @@ public class RenewSessionCommandTests : IntegrationTests
   {
     RenewSessionPayload payload = new();
     RenewSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await Mediator.Send(command));
+    var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("RefreshToken", exception.Errors.Single().PropertyName);
   }
 }
