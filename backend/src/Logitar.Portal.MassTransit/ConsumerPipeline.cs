@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application;
+﻿using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.MassTransit.Settings;
 using MassTransit;

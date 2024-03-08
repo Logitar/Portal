@@ -1,4 +1,5 @@
 ﻿using Logitar.Identity.Domain;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;

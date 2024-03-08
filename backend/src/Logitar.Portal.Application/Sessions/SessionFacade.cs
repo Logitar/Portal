@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Sessions.Queries;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;

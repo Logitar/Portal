@@ -2,6 +2,7 @@
 using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Configurations;

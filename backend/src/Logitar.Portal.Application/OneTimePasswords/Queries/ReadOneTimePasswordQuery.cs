@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Passwords;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Contracts.Passwords;
 using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Queries;

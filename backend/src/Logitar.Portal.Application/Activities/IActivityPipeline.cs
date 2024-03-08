@@ -1,8 +1,8 @@
 ﻿using MediatR;
 
-namespace Logitar.Portal.Application;
+namespace Logitar.Portal.Application.Activities;
 
-public interface IActivityPipeline // TODO(fpion): move to Activities namespace with all activity classes & interfaces
+public interface IActivityPipeline
 {
   Task<T> ExecuteAsync<T>(IRequest<T> request, CancellationToken cancellationToken = default);
   Task<T> ExecuteAsync<T>(IRequest<T> request, IContextParameters parameters, CancellationToken cancellationToken = default);

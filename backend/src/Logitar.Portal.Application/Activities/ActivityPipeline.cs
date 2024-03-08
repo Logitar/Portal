@@ -12,7 +12,7 @@ using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
-namespace Logitar.Portal.Application;
+namespace Logitar.Portal.Application.Activities;
 
 internal class ActivityPipeline : IActivityPipeline
 {

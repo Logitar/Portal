@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Authentication;
 using Logitar.Portal.Authorization;
 using Logitar.Portal.Constants;

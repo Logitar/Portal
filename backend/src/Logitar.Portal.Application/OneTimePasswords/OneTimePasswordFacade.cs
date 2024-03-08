@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.OneTimePasswords.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.OneTimePasswords.Commands;
 using Logitar.Portal.Application.OneTimePasswords.Queries;
 using Logitar.Portal.Contracts.Passwords;
 

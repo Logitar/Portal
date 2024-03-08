@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Dictionaries.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Dictionaries.Commands;
 using Logitar.Portal.Application.Dictionaries.Queries;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Search;
