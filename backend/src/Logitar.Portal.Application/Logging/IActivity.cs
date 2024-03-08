@@ -2,4 +2,5 @@
 
 public interface IActivity
 {
+  IActivity Anonymize();
 }

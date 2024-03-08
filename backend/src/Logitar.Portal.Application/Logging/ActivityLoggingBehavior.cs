@@ -15,8 +15,7 @@ internal class ActivityLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<
   {
     if (request is ApplicationRequest applicationRequest)
     {
-      IActivity activity = applicationRequest.GetActivity();
-      _loggingService.SetActivity(activity);
+      _loggingService.SetActivity(applicationRequest);
     }
 
     try

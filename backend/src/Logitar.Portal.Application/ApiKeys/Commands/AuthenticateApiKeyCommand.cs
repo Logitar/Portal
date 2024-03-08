@@ -6,7 +6,7 @@ namespace Logitar.Portal.Application.ApiKeys.Commands;
 
 internal record AuthenticateApiKeyCommand(AuthenticateApiKeyPayload Payload) : ApplicationRequest, IRequest<ApiKey>
 {
-  public override IActivity GetActivity()
+  public override IActivity Anonymize()
   {
     AuthenticateApiKeyCommand command = this.DeepClone();
     command.Payload.XApiKey = Payload.XApiKey.Mask();
