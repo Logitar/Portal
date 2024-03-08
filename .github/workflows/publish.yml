@@ -22,7 +22,7 @@ jobs:
       - name: Build Portal Frontend
         run: |
           cd ./frontend
-          npm clean install
+          npm clean-install
           npm run build
           cd ../
 
