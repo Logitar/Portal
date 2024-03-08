@@ -81,8 +81,8 @@ internal class ConsumerPipeline : IConsumerPipeline
       _loggingService.SetUser(user);
     }
 
-    ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, user, Session: null);
-    request.Contextualize(applicationContext);
+    ActivityContext activityContext = new(configuration, realm, ApiKey: null, user, Session: null);
+    request.Contextualize(activityContext);
   }
   private async Task<Realm?> ResolveRealmAsync(ConsumeContext context)
   {
@@ -106,8 +106,8 @@ internal class ConsumerPipeline : IConsumerPipeline
       bool parsed = Guid.TryParse(idOrUniqueName.Trim(), out Guid id);
 
       ReadUserQuery query = new(parsed ? id : null, idOrUniqueName, Identifier: null);
-      ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, User: null, Session: null);
-      query.Contextualize(applicationContext);
+      ActivityContext activityContext = new(configuration, realm, ApiKey: null, User: null, Session: null);
+      query.Contextualize(activityContext);
 
       user = await _mediator.Send(query, context.CancellationToken)
         ?? throw new InvalidOperationException($"The user '{idOrUniqueName}' could not be found");

@@ -14,5 +14,5 @@ internal record TestContext
   public User? User { get; set; }
   public Session? Session { get; set; }
 
-  public ApplicationContext ToApplicationContext(Configuration configuration) => new(configuration, Realm, ApiKey, User, Session);
+  public ActivityContext ToActivityContext(Configuration configuration) => new(configuration, Realm, ApiKey, User, Session);
 }

@@ -21,7 +21,7 @@ internal class TestContextualizationBehavior<TRequest, TResponse> : IPipelineBeh
     if (request is ApplicationRequest applicationRequest)
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration should be in the cache.");
-      ApplicationContext context = _context.ToApplicationContext(configuration);
+      ActivityContext context = _context.ToActivityContext(configuration);
       applicationRequest.Contextualize(context);
     }
 

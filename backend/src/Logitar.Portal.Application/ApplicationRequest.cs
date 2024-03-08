@@ -13,9 +13,9 @@ namespace Logitar.Portal.Application;
 public abstract record ApplicationRequest : IActivity
 {
   [JsonIgnore]
-  private ApplicationContext? _context = null;
+  private ActivityContext? _context = null;
   [JsonIgnore]
-  protected ApplicationContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
+  protected ActivityContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
 
   [JsonIgnore]
   public Actor Actor
@@ -82,7 +82,7 @@ public abstract record ApplicationRequest : IActivity
     return this;
   }
 
-  public virtual void Contextualize(ApplicationContext context)
+  public virtual void Contextualize(ActivityContext context)
   {
     _context = context;
   }
