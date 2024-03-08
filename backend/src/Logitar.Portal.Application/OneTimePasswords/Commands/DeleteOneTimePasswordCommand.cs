@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
-internal record DeleteOneTimePasswordCommand(Guid Id) : ApplicationRequest, IRequest<OneTimePassword?>;
+internal record DeleteOneTimePasswordCommand(Guid Id) : Activity, IRequest<OneTimePassword?>;

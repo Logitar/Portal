@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal record CreateSenderCommand(CreateSenderPayload Payload) : ApplicationRequest, IRequest<Sender>;
+internal record CreateSenderCommand(CreateSenderPayload Payload) : Activity, IRequest<Sender>;

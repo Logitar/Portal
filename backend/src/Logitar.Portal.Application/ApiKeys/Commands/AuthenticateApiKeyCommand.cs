@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal record AuthenticateApiKeyCommand(AuthenticateApiKeyPayload Payload) : ApplicationRequest, IRequest<ApiKey>
+internal record AuthenticateApiKeyCommand(AuthenticateApiKeyPayload Payload) : Activity, IRequest<ApiKey>
 {
   public override IActivity Anonymize()
   {

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : ApplicationRequest, IRequest<User?>
+internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : Activity, IRequest<User?>
 {
   public override IActivity Anonymize()
   {

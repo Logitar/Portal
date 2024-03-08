@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Queries;
 
-internal record SearchUsersQuery(SearchUsersPayload Payload) : ApplicationRequest, IRequest<SearchResults<User>>;
+internal record SearchUsersQuery(SearchUsersPayload Payload) : Activity, IRequest<SearchResults<User>>;

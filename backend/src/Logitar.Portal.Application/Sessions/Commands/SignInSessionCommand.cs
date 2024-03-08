@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal record SignInSessionCommand(SignInSessionPayload Payload) : ApplicationRequest, IRequest<Session>
+internal record SignInSessionCommand(SignInSessionPayload Payload) : Activity, IRequest<Session>
 {
   public override IActivity Anonymize()
   {

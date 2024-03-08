@@ -20,11 +20,11 @@ internal class ContextualizationBehavior<TRequest, TResponse> : IPipelineBehavio
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
   {
     HttpContext? httpContext = _httpContextAccessor.HttpContext;
-    if (httpContext != null && request is ApplicationRequest applicationRequest)
+    if (httpContext != null && request is Activity activity)
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
       ActivityContext context = new(configuration, httpContext.GetRealm(), httpContext.GetApiKey(), httpContext.GetUser(), httpContext.GetSession());
-      applicationRequest.Contextualize(context);
+      activity.Contextualize(context);
     }
 
     return await next();
