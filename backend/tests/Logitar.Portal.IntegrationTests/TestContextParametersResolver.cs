@@ -1,5 +1,4 @@
-﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Activities;
+﻿using Logitar.Portal.Application.Activities;
 
 namespace Logitar.Portal;
 

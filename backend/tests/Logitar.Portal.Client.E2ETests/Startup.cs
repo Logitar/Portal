@@ -31,6 +31,7 @@ internal class Startup
   {
     PortalSettings settings = _configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
     StaticPortalSettings.Instance.BaseUrl = settings.BaseUrl;
+    StaticPortalSettings.Instance.Basic = settings.Basic;
     services.AddLogitarPortalClient(StaticPortalSettings.Instance);
     services.AddTransient<IApiKeyClient, ApiKeyClient>(); // NOTE(fpion): required since we inject it two times to create a Portal API key.
 
