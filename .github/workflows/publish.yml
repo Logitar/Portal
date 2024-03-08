@@ -5,6 +5,10 @@ on:
     types: [published]
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./backend
+
 jobs:
   publish:
     name: Publish Docker image to Docker Hub
@@ -21,10 +25,10 @@ jobs:
 
       - name: Build Portal Frontend
         run: |
-          cd ./frontend
+          cd ../frontend
           npm clean-install
           npm run build
-          cd ../
+          cd ../backend
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -35,7 +39,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: .
           file: /src/Logitar.Portal/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
