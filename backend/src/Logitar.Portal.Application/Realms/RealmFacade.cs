@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Realms.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Realms.Commands;
 using Logitar.Portal.Application.Realms.Queries;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Search;

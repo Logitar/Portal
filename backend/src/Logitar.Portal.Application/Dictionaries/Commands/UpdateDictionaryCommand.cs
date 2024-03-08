@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts.Dictionaries;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Contracts.Dictionaries;
 using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;

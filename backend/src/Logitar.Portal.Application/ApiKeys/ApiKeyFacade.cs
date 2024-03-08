@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.ApiKeys.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.ApiKeys.Commands;
 using Logitar.Portal.Application.ApiKeys.Queries;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Search;

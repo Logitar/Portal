@@ -12,7 +12,7 @@ using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
-namespace Logitar.Portal.Application;
+namespace Logitar.Portal.Application.Activities;
 
 internal class ActivityPipeline : IActivityPipeline
 {
@@ -38,7 +38,7 @@ internal class ActivityPipeline : IActivityPipeline
   {
     try
     {
-      if (request is Activity activity)
+      if (request is IActivity activity)
       {
         ActivityContext context = await GetContextAsync(parameters, cancellationToken);
         activity.Contextualize(context);

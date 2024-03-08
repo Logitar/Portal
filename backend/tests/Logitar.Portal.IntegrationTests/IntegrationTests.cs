@@ -8,6 +8,7 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;

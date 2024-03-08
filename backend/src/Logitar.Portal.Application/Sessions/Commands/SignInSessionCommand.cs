@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Logging;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts.Sessions;
 using MediatR;
 

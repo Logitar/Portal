@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Contracts;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 

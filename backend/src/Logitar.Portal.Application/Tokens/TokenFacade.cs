@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Tokens.Commands;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Tokens.Commands;
 using Logitar.Portal.Contracts.Tokens;
 
 namespace Logitar.Portal.Application.Tokens;

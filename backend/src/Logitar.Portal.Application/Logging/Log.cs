@@ -3,6 +3,7 @@ using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.Domain.Sessions;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
+using Logitar.Portal.Application.Activities;
 using Microsoft.Extensions.Logging;
 
 namespace Logitar.Portal.Application.Logging;

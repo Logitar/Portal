@@ -1,4 +1,4 @@
-﻿namespace Logitar.Portal.Application;
+﻿namespace Logitar.Portal.Application.Activities;
 
 public interface IContextParametersResolver
 {

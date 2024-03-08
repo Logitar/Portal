@@ -2,13 +2,12 @@
 using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Settings;
 using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Realms;
 
-namespace Logitar.Portal.Application;
+namespace Logitar.Portal.Application.Activities;
 
 public abstract record Activity : IActivity
 {
