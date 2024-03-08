@@ -19,7 +19,7 @@ public static class DependencyInjectionExtensions
       .AddSchema<PortalSchema>()
       .AddSystemTextJson()
       .AddErrorInfoProvider(new ErrorInfoProvider(options => options.ExposeExceptionDetails = settings.ExposeExceptionDetails))
-      .AddGraphTypes(typeof(PortalSchema).Assembly)
+      .AddGraphTypes(Assembly.GetExecutingAssembly())
       .ConfigureExecutionOptions(options => options.EnableMetrics = settings.EnableMetrics));
   }
 }

@@ -69,6 +69,8 @@ internal class Startup : StartupBase
         .AddRequirements(new PortalUserAuthorizationRequirement())
         .Build()
       );
+    services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
+    services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
 
     CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
     services.AddSingleton(cookiesSettings);
@@ -107,8 +109,6 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMongoDB(_configuration); // NOTE(fpion): needs to be placed after the relational database to override the LogRepository if MongoDB settings are provided.
 
     services.AddDistributedMemoryCache();
-    services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
-    services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
     services.AddSingleton<IBaseUrl, HttpBaseUrl>();
     services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualizationBehavior<,>));
   }
