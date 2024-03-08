@@ -26,7 +26,7 @@ public class Log
   public IActivity? Activity { get; private set; }
   public void SetActivity(IActivity activity)
   {
-    Activity = activity;
+    Activity = activity.Anonymize();
   }
 
   public int? StatusCode { get; private set; }

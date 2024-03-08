@@ -46,7 +46,7 @@ internal class LoggingService : ILoggingService
 
   public void SetActivity(IActivity activity)
   {
-    _log?.SetActivity(activity.Anonymize());
+    _log?.SetActivity(activity);
   }
 
   public void SetOperation(Operation operation)
