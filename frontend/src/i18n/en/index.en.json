@@ -19,7 +19,7 @@
   },
   "brand": "Portal",
   "by": "By",
-  "copyright": "© Logitar {version} 2023.",
+  "copyright": "© Logitar {version} {year}.",
   "count": "Count",
   "custom": "Custom",
   "customAttributes": {
