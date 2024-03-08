@@ -44,7 +44,7 @@ internal class LoggingService : ILoggingService
     _log?.Report(exception);
   }
 
-  public void SetActivity(object activity)
+  public void SetActivity(IActivity activity)
   {
     _log?.SetActivity(activity);
   }

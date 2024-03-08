@@ -10,7 +10,7 @@ using Logitar.Portal.Contracts.Realms;
 
 namespace Logitar.Portal.Application;
 
-public abstract record ApplicationRequest : IActivity
+public abstract record Activity : IActivity
 {
   [JsonIgnore]
   private ApplicationContext? _context = null;
@@ -77,13 +77,13 @@ public abstract record ApplicationRequest : IActivity
   [JsonIgnore]
   public bool RequireUniqueEmail => Realm?.RequireUniqueEmail ?? Configuration.RequireUniqueEmail;
 
+  public virtual IActivity Anonymize()
+  {
+    return this;
+  }
+
   public virtual void Contextualize(ApplicationContext context)
   {
     _context = context;
-  }
-
-  public virtual IActivity GetActivity()
-  {
-    return this;
   }
 }

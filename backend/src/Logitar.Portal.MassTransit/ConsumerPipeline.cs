@@ -46,9 +46,9 @@ internal class ConsumerPipeline : IConsumerPipeline
     int statusCode = (int)HttpStatusCode.OK;
     try
     {
-      if (request is ApplicationRequest applicationRequest)
+      if (request is Activity activity)
       {
-        await ContextualizeAsync(applicationRequest, context);
+        await ContextualizeAsync(activity, context);
       }
 
       return await _mediator.Send(request, cancellationToken);
@@ -67,7 +67,7 @@ internal class ConsumerPipeline : IConsumerPipeline
     }
   }
 
-  private async Task ContextualizeAsync(ApplicationRequest request, ConsumeContext context)
+  private async Task ContextualizeAsync(Activity activity, ConsumeContext context)
   {
     Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
     Realm? realm = await ResolveRealmAsync(context);
@@ -82,7 +82,7 @@ internal class ConsumerPipeline : IConsumerPipeline
     }
 
     ApplicationContext applicationContext = new(configuration, realm, ApiKey: null, user, Session: null);
-    request.Contextualize(applicationContext);
+    activity.Contextualize(applicationContext);
   }
   private async Task<Realm?> ResolveRealmAsync(ConsumeContext context)
   {

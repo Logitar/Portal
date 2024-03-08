@@ -13,9 +13,9 @@ internal class ActivityLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<
 
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
   {
-    if (request is ApplicationRequest applicationRequest)
+    if (request is IActivity activity)
     {
-      IActivity activity = applicationRequest.GetActivity();
+      activity = activity.Anonymize();
       _loggingService.SetActivity(activity);
     }
 

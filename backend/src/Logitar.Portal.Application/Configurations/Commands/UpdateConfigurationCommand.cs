@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal record UpdateConfigurationCommand(UpdateConfigurationPayload Payload) : ApplicationRequest, IRequest<Configuration>;
+internal record UpdateConfigurationCommand(UpdateConfigurationPayload Payload) : Activity,IRequest<Configuration>;

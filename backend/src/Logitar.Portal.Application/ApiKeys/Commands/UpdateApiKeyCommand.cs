@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal record UpdateApiKeyCommand(Guid Id, UpdateApiKeyPayload Payload) : ApplicationRequest, IRequest<ApiKey?>;
+internal record UpdateApiKeyCommand(Guid Id, UpdateApiKeyPayload Payload) : Activity,IRequest<ApiKey?>;

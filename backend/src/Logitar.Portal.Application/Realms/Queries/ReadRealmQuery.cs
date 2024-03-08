@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
-public record ReadRealmQuery(Guid? Id, string? UniqueSlug) : ApplicationRequest, IRequest<Realm?>;
+public record ReadRealmQuery(Guid? Id, string? UniqueSlug) : Activity,IRequest<Realm?>;

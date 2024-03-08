@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Tokens.Commands;
 
-internal record CreateTokenCommand(CreateTokenPayload Payload) : ApplicationRequest, IRequest<CreatedToken>;
+internal record CreateTokenCommand(CreateTokenPayload Payload) : Activity,IRequest<CreatedToken>;

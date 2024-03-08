@@ -4,13 +4,13 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : ApplicationRequest, IRequest<User?>
+internal record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : Activity, IRequest<User?>
 {
-  public override IActivity GetActivity()
+  public override IActivity Anonymize()
   {
     if (Payload.Password == null)
     {
-      return base.GetActivity();
+      return base.Anonymize();
     }
 
     UpdateUserCommand command = this.DeepClone();
