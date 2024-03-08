@@ -8,13 +8,15 @@ import JwtSecretField from "@/components/settings/JwtSecretField.vue";
 import PasswordSettingsEdit from "@/components/settings/PasswordSettingsEdit.vue";
 import UniqueNameSettingsEdit from "@/components/settings/UniqueNameSettingsEdit.vue";
 import type { ApiError, Error } from "@/types/api";
-import type { Realm } from "@/types/realms";
 import type { CustomAttribute } from "@/types/customAttributes";
 import type { PasswordSettings, UniqueNameSettings } from "@/types/settings";
+import type { Realm } from "@/types/realms";
 import type { ToastUtils } from "@/types/components";
 import { createRealm, readRealmByUniqueSlug, replaceRealm } from "@/api/realms";
 import { handleErrorKey, registerTooltipsKey, toastsKey } from "@/inject/App";
+import { useAccountStore } from "@/stores/account";
 
+const account = useAccountStore();
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
 const registerTooltips = inject(registerTooltipsKey) as () => void;
 const route = useRoute();
@@ -109,6 +111,9 @@ const onSubmit = handleSubmit(async () => {
         realm.value.version,
       );
       setModel(updatedRealm);
+      if (account.currentRealm?.id === updatedRealm.id) {
+        account.setRealm(updatedRealm);
+      }
       toasts.success("realms.updated");
       router.replace({ name: "RealmEdit", params: { uniqueSlug: updatedRealm.uniqueSlug } });
     } else {
