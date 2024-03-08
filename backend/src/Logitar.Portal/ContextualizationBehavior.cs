@@ -23,7 +23,7 @@ internal class ContextualizationBehavior<TRequest, TResponse> : IPipelineBehavio
     if (httpContext != null && request is Activity activity)
     {
       Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
-      ActivityContext context = new(configuration, httpContext.GetRealm(), httpContext.GetApiKey(), httpContext.GetUser(), httpContext.GetSession());
+      ActivityContext context = new(configuration, Realm: null, httpContext.GetApiKey(), httpContext.GetUser(), httpContext.GetSession());
       activity.Contextualize(context);
     }
 

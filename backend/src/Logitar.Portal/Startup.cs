@@ -146,8 +146,6 @@ internal class Startup : StartupBase
     builder.UseMiddleware<RedirectNotFound>();
     builder.UseAuthentication();
     builder.UseAuthorization();
-    builder.UseMiddleware<ResolveRealm>();
-    builder.UseMiddleware<ResolveUser>();
 
     builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(_authenticationSchemes));
 
