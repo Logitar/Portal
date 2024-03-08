@@ -27,7 +27,7 @@ function submit(): void {
 </script>
 
 <template>
-  <main class="container-fluid">
+  <main class="container">
     <h1>{{ t("realms.current.title") }}</h1>
     <p>
       <font-awesome-icon icon="info-circle" /> <i>{{ t("realms.current.help") }}</i>
