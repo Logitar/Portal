@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [4.0.0] - 2024-03-08
+
+### Added
+
+- Implemented One-Time Password (OTP) management with [Identity](https://github.com/Logitar/Identity).
+- Added Microsoft SQL Server.
+- Added MongoDB support for logs.
+- Implemented a MassTransit/RabbitMQ interface.
+- Created a Worker service to clean the token blacklist.
+- Added a Realm Selector in the Frontend.
+- Added simple Bearer authentication.
+- Sending messages from Mailgun.
+
+### Changed
+
+- Reimplemented logging.
+- Reimplemented configuration management.
+- Reimplemented account management.
+- Reimplemented realm management.
+- Reimplemented role management with Identity.
+- Reimplemented API key management with Identity.
+- Reimplemented user management with Identity.
+- Reimplemented session management with Identity.
+- Reimplemented token management with Identity.
+- Reimplemented dictionary management.
+- Reimplemented sender management.
+- Reimplemented template management.
+- Reimplemented message management.
+- Reimplemented HTTP client.
+- Optimized GraphQL queries.
+
+### Fixed
+
+- Fixed user realm refreshing after creation.
+
 ## [3.0.3] - 2023-10-16
 
 ### Added
@@ -117,7 +152,8 @@ Nothing yet.
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v3.0.3...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/Logitar/Portal/compare/v3.0.3...v4.0.0
 [3.0.3]: https://github.com/Logitar/Portal/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/Logitar/Portal/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/Logitar/Portal/compare/v3.0.0...v3.0.1
