@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal record RenewSessionCommand(RenewSessionPayload Payload) : Activity, IRequest<Session>;
+public record RenewSessionCommand(RenewSessionPayload Payload) : Activity, IRequest<Session>;

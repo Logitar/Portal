@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Extensions;
@@ -14,7 +15,7 @@ internal class RenewSession
     _next = next;
   }
 
-  public async Task InvokeAsync(HttpContext context, ISessionService sessionService)
+  public async Task InvokeAsync(HttpContext context, IActivityPipeline activityPipeline)
   {
     if (!context.GetSessionId().HasValue)
     {
@@ -23,7 +24,8 @@ internal class RenewSession
         try
         {
           RenewSessionPayload payload = new(refreshToken, context.GetSessionCustomAttributes());
-          Session session = await sessionService.RenewAsync(payload);
+          RenewSessionCommand command = new(payload);
+          Session session = await activityPipeline.ExecuteAsync(command, new ContextParameters());
           context.SignIn(session);
         }
         catch (Exception)

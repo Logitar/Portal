@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Sessions;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Sessions.Queries;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Extensions;
 using Logitar.Portal.Web.Extensions;
@@ -9,12 +10,12 @@ namespace Logitar.Portal.Authentication;
 
 internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthenticationOptions>
 {
-  private readonly ISessionQuerier _sessionQuerier;
+  private readonly IActivityPipeline _activityPipeline;
 
-  public SessionAuthenticationHandler(ISessionQuerier sessionQuerier, IOptionsMonitor<SessionAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+  public SessionAuthenticationHandler(IActivityPipeline activityPipeline, IOptionsMonitor<SessionAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : base(options, logger, encoder)
   {
-    _sessionQuerier = sessionQuerier;
+    _activityPipeline = activityPipeline;
   }
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -22,7 +23,8 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     Guid? sessionId = Context.GetSessionId();
     if (sessionId.HasValue)
     {
-      Session? session = await _sessionQuerier.ReadAsync(realm: null, sessionId.Value);
+      ReadSessionQuery query = new(sessionId.Value);
+      Session? session = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
       if (session == null)
       {
         return Fail($"The session 'Id={sessionId}' could not be found.");

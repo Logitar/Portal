@@ -1,5 +1,6 @@
-﻿using Logitar.Portal.Application.Tokens;
-using Logitar.Portal.Application.Users;
+﻿using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Tokens.Commands;
+using Logitar.Portal.Application.Users.Queries;
 using Logitar.Portal.Constants;
 using Logitar.Portal.Contracts.Constants;
 using Logitar.Portal.Contracts.Tokens;
@@ -14,14 +15,12 @@ namespace Logitar.Portal.Authentication;
 
 internal class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthenticationOptions>
 {
-  private readonly ITokenService _tokenService;
-  private readonly IUserQuerier _userQuerier;
+  private readonly IActivityPipeline _activityPipeline;
 
-  public BearerAuthenticationHandler(ITokenService tokenService, IUserQuerier userQuerier, IOptionsMonitor<BearerAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+  public BearerAuthenticationHandler(IActivityPipeline activityPipeline, IOptionsMonitor<BearerAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : base(options, logger, encoder)
   {
-    _tokenService = tokenService;
-    _userQuerier = userQuerier;
+    _activityPipeline = activityPipeline;
   }
 
   protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -44,13 +43,15 @@ internal class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthent
             {
               Type = "at+jwt"
             };
-            ValidatedToken validatedToken = await _tokenService.ValidateAsync(payload);
+            ValidateTokenCommand command = new(payload);
+            ValidatedToken validatedToken = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
             if (string.IsNullOrWhiteSpace(validatedToken.Subject))
             {
               return AuthenticateResult.Fail($"The '{nameof(validatedToken.Subject)}' claim is required.");
             }
 
-            User? user = await _userQuerier.ReadAsync(realm: null, Guid.Parse(validatedToken.Subject.Trim()));
+            ReadUserQuery query = new(Id: Guid.Parse(validatedToken.Subject.Trim()), UniqueName: null, Identifier: null);
+            User? user = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
             if (user == null)
             {
               return AuthenticateResult.Fail($"The user 'Id={validatedToken.Subject}' could not be found.");
