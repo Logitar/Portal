@@ -1,11 +1,5 @@
 ﻿using Logitar.Portal.Application;
-using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Logging;
-using Logitar.Portal.Application.Realms.Queries;
-using Logitar.Portal.Application.Users.Queries;
-using Logitar.Portal.Contracts.Configurations;
-using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.MassTransit.Settings;
 using MassTransit;
 using MediatR;
@@ -16,16 +10,14 @@ internal class ConsumerPipeline : IConsumerPipeline
 {
   private const string OperationType = nameof(MassTransit);
 
-  private readonly ICacheService _cacheService;
+  private readonly IActivityPipeline _activityPipeline;
   private readonly ILoggingService _loggingService;
-  private readonly IMediator _mediator;
   private readonly IMassTransitSettings _settings;
 
-  public ConsumerPipeline(ICacheService cacheService, ILoggingService loggingService, IMediator mediator, IMassTransitSettings settings)
+  public ConsumerPipeline(IActivityPipeline activityPipeline, ILoggingService loggingService, IMassTransitSettings settings)
   {
-    _cacheService = cacheService;
+    _activityPipeline = activityPipeline;
     _loggingService = loggingService;
-    _mediator = mediator;
     _settings = settings;
   }
 
@@ -46,12 +38,7 @@ internal class ConsumerPipeline : IConsumerPipeline
     int statusCode = (int)HttpStatusCode.OK;
     try
     {
-      if (request is Activity activity)
-      {
-        await ContextualizeAsync(activity, context);
-      }
-
-      return await _mediator.Send(request, cancellationToken);
+      return await _activityPipeline.ExecuteAsync(request, context.GetParameters(), cancellationToken);
     }
     catch (Exception exception)
     {
@@ -65,54 +52,5 @@ internal class ConsumerPipeline : IConsumerPipeline
     {
       await _loggingService.CloseAndSaveAsync(statusCode, cancellationToken);
     }
-  }
-
-  private async Task ContextualizeAsync(Activity activity, ConsumeContext context)
-  {
-    Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
-    Realm? realm = await ResolveRealmAsync(context);
-    if (realm != null)
-    {
-      _loggingService.SetRealm(realm);
-    }
-    User? user = await ResolveUserAsync(context, configuration, realm);
-    if (user != null)
-    {
-      _loggingService.SetUser(user);
-    }
-
-    ActivityContext activityContext = new(configuration, realm, ApiKey: null, user, Session: null);
-    activity.Contextualize(activityContext);
-  }
-  private async Task<Realm?> ResolveRealmAsync(ConsumeContext context)
-  {
-    Realm? realm = null;
-
-    if (context.TryGetHeader(Contracts.Constants.Headers.Realm, out string? idOrUniqueSlug))
-    {
-      bool parsed = Guid.TryParse(idOrUniqueSlug.Trim(), out Guid id);
-      realm = await _mediator.Send(new ReadRealmQuery(parsed ? id : null, idOrUniqueSlug), context.CancellationToken)
-        ?? throw new InvalidOperationException($"The realm '{idOrUniqueSlug}' could not be found.");
-    }
-
-    return realm;
-  }
-  private async Task<User?> ResolveUserAsync(ConsumeContext context, Configuration configuration, Realm? realm)
-  {
-    User? user = null;
-
-    if (context.TryGetHeader(Contracts.Constants.Headers.User, out string? idOrUniqueName))
-    {
-      bool parsed = Guid.TryParse(idOrUniqueName.Trim(), out Guid id);
-
-      ReadUserQuery query = new(parsed ? id : null, idOrUniqueName, Identifier: null);
-      ActivityContext activityContext = new(configuration, realm, ApiKey: null, User: null, Session: null);
-      query.Contextualize(activityContext);
-
-      user = await _mediator.Send(query, context.CancellationToken)
-        ?? throw new InvalidOperationException($"The user '{idOrUniqueName}' could not be found");
-    }
-
-    return user;
   }
 }

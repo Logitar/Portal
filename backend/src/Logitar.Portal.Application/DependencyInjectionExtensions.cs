@@ -12,7 +12,6 @@ using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens;
 using Logitar.Portal.Application.Users;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application;
@@ -25,11 +24,11 @@ public static class DependencyInjectionExtensions
       .AddFacades()
       .AddLogitarIdentityDomain()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
-      .AddTransient(typeof(IPipelineBehavior<,>), typeof(ActivityLoggingBehavior<,>))
+      .AddScoped<IActivityPipeline, ActivityPipeline>()
+      .AddScoped<ILoggingService, LoggingService>()
       .AddTransient<IDictionaryManager, DictionaryManager>()
       .AddTransient<IRealmManager, RealmManager>()
-      .AddTransient<ITemplateManager, TemplateManager>()
-      .AddScoped<ILoggingService, LoggingService>();
+      .AddTransient<ITemplateManager, TemplateManager>();
   }
 
   private static IServiceCollection AddFacades(this IServiceCollection services)

@@ -1,7 +1,7 @@
 ﻿using Logitar.Net.Http;
+using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
@@ -13,7 +13,6 @@ namespace Logitar.Portal.Web.Extensions;
 public static class HttpContextExtensions
 {
   private const string ApiKeyKey = nameof(ApiKey);
-  private const string RealmKey = nameof(Realm);
   private const string SessionKey = nameof(Session);
   private const string SessionIdKey = "SessionId";
   private const string UserKey = nameof(User);
@@ -72,15 +71,25 @@ public static class HttpContextExtensions
   }
 
   public static ApiKey? GetApiKey(this HttpContext context) => context.GetItem<ApiKey>(ApiKeyKey);
-  public static Realm? GetRealm(this HttpContext context) => context.GetItem<Realm>(RealmKey);
   public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key) => context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
 
-  public static void SetApiKey(this HttpContext context, ApiKey? apiKey) => context.SetItem(ApiKeyKey, apiKey);
-  public static void SetRealm(this HttpContext context, Realm? realm) => context.SetItem(RealmKey, realm);
-  public static void SetSession(this HttpContext context, Session? session) => context.SetItem(SessionKey, session);
-  public static void SetUser(this HttpContext context, User? user) => context.SetItem(UserKey, user);
+  public static void SetApiKey(this HttpContext context, ApiKey? apiKey)
+  {
+    context.SetItem(ApiKeyKey, apiKey);
+    context.GetLoggingService().SetApiKey(apiKey);
+  }
+  public static void SetSession(this HttpContext context, Session? session)
+  {
+    context.SetItem(SessionKey, session);
+    context.GetLoggingService().SetSession(session);
+  }
+  public static void SetUser(this HttpContext context, User? user)
+  {
+    context.SetItem(UserKey, user);
+    context.GetLoggingService().SetUser(user);
+  }
   private static void SetItem(this HttpContext context, object key, object? value)
   {
     if (value == null)
@@ -92,6 +101,8 @@ public static class HttpContextExtensions
       context.Items[key] = value;
     }
   }
+
+  private static ILoggingService GetLoggingService(this HttpContext context) => context.RequestServices.GetRequiredService<ILoggingService>();
 
   public static Guid? GetSessionId(this HttpContext context)
   {

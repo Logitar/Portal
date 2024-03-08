@@ -17,7 +17,6 @@ using Logitar.Portal.Settings;
 using Logitar.Portal.Web;
 using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
-using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
@@ -110,7 +109,7 @@ internal class Startup : StartupBase
 
     services.AddDistributedMemoryCache();
     services.AddSingleton<IBaseUrl, HttpBaseUrl>();
-    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualizationBehavior<,>));
+    services.AddSingleton<IContextParametersResolver, HttpContextParametersResolver>();
   }
 
   public override void Configure(IApplicationBuilder builder)
@@ -146,8 +145,6 @@ internal class Startup : StartupBase
     builder.UseMiddleware<RedirectNotFound>();
     builder.UseAuthentication();
     builder.UseAuthorization();
-    builder.UseMiddleware<ResolveRealm>();
-    builder.UseMiddleware<ResolveUser>();
 
     builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(_authenticationSchemes));
 

@@ -1,8 +1,4 @@
 ﻿using Logitar.Portal.Application.Logging;
-using Logitar.Portal.Contracts.ApiKeys;
-using Logitar.Portal.Contracts.Realms;
-using Logitar.Portal.Contracts.Sessions;
-using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -34,27 +30,6 @@ internal class Logging
     }
     finally
     {
-      Realm? realm = context.GetRealm();
-      if (realm != null)
-      {
-        loggingService.SetRealm(realm);
-      }
-      ApiKey? apiKey = context.GetApiKey();
-      if (apiKey != null)
-      {
-        loggingService.SetApiKey(apiKey);
-      }
-      User? user = context.GetUser();
-      if (user != null)
-      {
-        loggingService.SetUser(user);
-      }
-      Session? session = context.GetSession();
-      if (session != null)
-      {
-        loggingService.SetSession(session);
-      }
-
       HttpResponse response = context.Response;
       await loggingService.CloseAndSaveAsync(response.StatusCode);
     }

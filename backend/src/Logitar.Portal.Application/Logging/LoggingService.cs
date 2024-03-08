@@ -54,35 +54,35 @@ internal class LoggingService : ILoggingService
     _log?.SetOperation(operation);
   }
 
-  public void SetRealm(Realm realm)
+  public void SetRealm(Realm? realm)
   {
     if (_log != null)
     {
-      _log.TenantId = realm.GetTenantId();
+      _log.TenantId = realm?.GetTenantId();
     }
   }
 
-  public void SetApiKey(ApiKey apiKey)
+  public void SetApiKey(ApiKey? apiKey)
   {
     if (_log != null)
     {
-      _log.ApiKeyId = new ApiKeyId(apiKey.Id);
+      _log.ApiKeyId = apiKey == null ? null : new ApiKeyId(apiKey.Id);
     }
   }
 
-  public void SetSession(Session session)
+  public void SetSession(Session? session)
   {
     if (_log != null)
     {
-      _log.SessionId = new SessionId(session.Id);
+      _log.SessionId = session == null ? null : new SessionId(session.Id);
     }
   }
 
-  public void SetUser(User user)
+  public void SetUser(User? user)
   {
     if (_log != null)
     {
-      _log.UserId = new UserId(user.Id);
+      _log.UserId = user == null ? null : new UserId(user.Id);
     }
   }
 
