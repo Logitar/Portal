@@ -89,6 +89,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     typeof(SenderProviderNotSupportedException),
     typeof(TemplateNotInTenantException),
     typeof(ToRecipientMissingException),
+    typeof(TooManyHeaderValuesException),
     typeof(UsersNotInTenantException)
   ]);
   private static bool IsBadRequestError(Exception exception) => _badRequestExceptions.Contains(exception.GetType())
@@ -107,6 +108,8 @@ internal class ExceptionHandling : ExceptionFilterAttribute
 
   private static readonly HashSet<Type> _notFoundExceptions = new(
   [
+    typeof(ImpersonifiedUserNotFoundException),
+    typeof(RealmNotFoundException),
     typeof(RolesNotFoundException),
     typeof(SenderNotFoundException),
     typeof(TemplateNotFoundException),

@@ -56,9 +56,9 @@ public abstract class IntegrationTests : IAsyncLifetime
 
     ServiceCollection services = new();
     services.AddSingleton(configuration);
+    services.AddSingleton<IContextParametersResolver, TestContextParametersResolver>();
     services.AddScoped<IBaseUrl, TestBaseUrl>();
     services.AddScoped<TestContext>();
-    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TestContextualizationBehavior<,>));
 
     string connectionString;
     _databaseProvider = configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
