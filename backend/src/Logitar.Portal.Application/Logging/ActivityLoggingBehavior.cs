@@ -29,4 +29,4 @@ internal class ActivityLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<
       throw;
     }
   }
-}
+} // TODO(fpion): remove this class

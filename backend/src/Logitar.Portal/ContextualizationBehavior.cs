@@ -29,4 +29,4 @@ internal class ContextualizationBehavior<TRequest, TResponse> : IPipelineBehavio
 
     return await next();
   }
-}
+} // TODO(fpion): remove this class

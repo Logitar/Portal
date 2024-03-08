@@ -27,4 +27,4 @@ internal class TestContextualizationBehavior<TRequest, TResponse> : IPipelineBeh
 
     return await next();
   }
-}
+} // TODO(fpion): remove this class

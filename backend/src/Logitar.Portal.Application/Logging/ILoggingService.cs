@@ -13,9 +13,9 @@ public interface ILoggingService
   void Report(Exception exception);
   void SetActivity(IActivity activity);
   void SetOperation(Operation operation);
-  void SetRealm(Realm? realm); // TODO(fpion): not called by Web & GraphQL interfaces
+  void SetRealm(Realm? realm); // TODO(fpion): call when scoping an activity into a Realm
   void SetApiKey(ApiKey? apiKey);
   void SetSession(Session? session);
-  void SetUser(User? user);
+  void SetUser(User? user); // TODO(fpion): call when impersonating an User
   Task CloseAndSaveAsync(int statusCode, CancellationToken cancellationToken = default);
 }
