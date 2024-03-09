@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [4.0.1] - 2024-03-09
+
 ### Fixed
 
 - Fixed Authentication and Session issues.
@@ -155,7 +159,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v4.0.0...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/Logitar/Portal/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/Logitar/Portal/compare/v3.0.3...v4.0.0
 [3.0.3]: https://github.com/Logitar/Portal/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/Logitar/Portal/compare/v3.0.1...v3.0.2
