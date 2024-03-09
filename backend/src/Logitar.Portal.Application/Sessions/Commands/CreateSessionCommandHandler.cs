@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
+using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Sessions.Validators;
-using Logitar.Portal.Application.Users;
+using Logitar.Portal.Application.Users.Queries;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
 using MediatR;
@@ -14,14 +14,16 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 
 internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, Session>
 {
+  private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserManager _userManager;
 
-  public CreateSessionCommandHandler(IPasswordManager passwordManager,
+  public CreateSessionCommandHandler(IMediator mediator, IPasswordManager passwordManager,
     ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserManager userManager)
   {
+    _mediator = mediator;
     _passwordManager = passwordManager;
     _sessionQuerier = sessionQuerier;
     _sessionRepository = sessionRepository;
@@ -30,12 +32,13 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
 
   public async Task<Session> Handle(CreateSessionCommand command, CancellationToken cancellationToken)
   {
+    IUserSettings userSettings = command.UserSettings;
+
     CreateSessionPayload payload = command.Payload;
     new CreateSessionValidator().ValidateAndThrow(payload);
 
-    TenantId? tenantId = command.TenantId;
-    FoundUsers users = await _userManager.FindAsync(tenantId?.Value, payload.User, cancellationToken);
-    UserAggregate user = users.SingleOrDefault() ?? throw new UserNotFoundException(tenantId, payload.User, nameof(payload.User));
+    FindUserQuery query = new(command.TenantId, payload.User, command.UserSettings, nameof(payload.User), IncludeId: true);
+    UserAggregate user = await _mediator.Send(query, cancellationToken);
 
     Password? secret = null;
     string? secretString = null;
@@ -52,7 +55,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     }
     session.Update(actorId);
 
-    await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
+    await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
     Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
