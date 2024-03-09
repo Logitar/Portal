@@ -21,31 +21,14 @@ internal class Startup
   {
     services.AddApplicationInsightsTelemetryWorkerService();
 
-    string? connectionString;
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
       case DatabaseProvider.EntityFrameworkCorePostgreSQL:
-        connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_Portal");
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-          services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(_configuration);
-        }
-        else
-        {
-          services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(connectionString);
-        }
+        services.AddLogitarPortalWithEntityFrameworkCorePostgreSQL(_configuration);
         break;
       case DatabaseProvider.EntityFrameworkCoreSqlServer:
-        connectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_Portal");
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-          services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
-        }
-        else
-        {
-          services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
-        }
+        services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(_configuration);
         break;
       default:
         throw new DatabaseProviderNotSupportedException(databaseProvider);
