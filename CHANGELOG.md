@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed Authentication and Session issues.
+- Fixed configuration string environment variables.
 
 ## [4.0.0] - 2024-03-08
 

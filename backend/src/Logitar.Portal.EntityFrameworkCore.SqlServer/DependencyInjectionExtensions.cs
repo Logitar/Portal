@@ -8,10 +8,20 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer;
 
 public static class DependencyInjectionExtensions
 {
+  private const string ConfigurationKey = "SQLCONNSTR_Portal";
+
   public static IServiceCollection AddLogitarPortalWithEntityFrameworkCoreSqlServer(this IServiceCollection services, IConfiguration configuration)
   {
-    string connectionString = configuration.GetValue<string>("SQLCONNSTR_Portal") ?? string.Empty;
-    return services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString);
+    string? connectionString = Environment.GetEnvironmentVariable(ConfigurationKey);
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      connectionString = configuration.GetValue<string>(ConfigurationKey);
+    }
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      throw new ArgumentException($"The configuration '{ConfigurationKey}' could not be found.", nameof(configuration));
+    }
+    return services.AddLogitarPortalWithEntityFrameworkCoreSqlServer(connectionString.Trim());
   }
   public static IServiceCollection AddLogitarPortalWithEntityFrameworkCoreSqlServer(this IServiceCollection services, string connectionString)
   {
