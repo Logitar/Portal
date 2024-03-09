@@ -5,6 +5,7 @@ using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
+using Logitar.Portal.Domain.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
@@ -72,6 +73,30 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Same(Realm, session.User.Realm);
   }
 
+  [Fact(DisplayName = "It should create a session to an user with its email as unique name.")]
+  public async Task It_should_create_a_session_to_an_user_with_its_email_as_unique_name()
+  {
+    SetRealm();
+
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
+    user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
+    await _userRepository.SaveAsync(user);
+
+    SignInSessionPayload payload = new(Faker.Person.Email, PasswordString);
+    SignInSessionCommand command = new(payload);
+    Session session = await ActivityPipeline.ExecuteAsync(command);
+
+    Assert.False(session.IsPersistent);
+    Assert.Null(session.RefreshToken);
+    Assert.True(session.IsActive);
+    Assert.Null(session.SignedOutBy);
+    Assert.Null(session.SignedOutOn);
+    Assert.Empty(session.CustomAttributes);
+    Assert.Equal(payload.UniqueName, session.User.UniqueName);
+    Assert.Same(Realm, session.User.Realm);
+  }
+
   [Fact(DisplayName = "It should create an ephemereal session.")]
   public async Task It_should_create_an_ephemereal_session()
   {
@@ -95,6 +120,38 @@ public class SignInSessionCommandTests : IntegrationTests
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Password, exception.AttemptedPassword);
+  }
+
+  [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
+  public async Task It_should_throw_TooManyResultsException_when_multiple_users_are_found()
+  {
+    UserAggregate user = (await _userRepository.LoadAsync()).Single();
+    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
+    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    await _userRepository.SaveAsync([user, other]);
+
+    SignInSessionPayload payload = new(Faker.Person.Email, PasswordString);
+    SignInSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(1, exception.ExpectedCount);
+    Assert.Equal(2, exception.ActualCount);
+  }
+
+  [Fact(DisplayName = "It should throw UserNotFoundException when signing-in by ID.")]
+  public async Task It_should_throw_UserNotFoundException_when_signing_in_by_Id()
+  {
+    SetRealm();
+
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
+    await _userRepository.SaveAsync(user);
+
+    SignInSessionPayload payload = new(user.Id.ToGuid().ToString(), PasswordString);
+    SignInSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(payload.UniqueName, exception.User);
+    Assert.Equal("UniqueName", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw UserNotFoundException when the user could not be found.")]
