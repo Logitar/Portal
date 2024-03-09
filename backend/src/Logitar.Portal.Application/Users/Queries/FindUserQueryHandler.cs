@@ -25,7 +25,7 @@ internal class FindUserQueryHandler : IRequestHandler<FindUserQuery, UserAggrega
     if (query.IncludeId && Guid.TryParse(query.User, out Guid id))
     {
       UserAggregate? user = await _userRepository.LoadAsync(id, cancellationToken);
-      if (user != null)
+      if (user != null && user.TenantId == query.TenantId)
       {
         users[user.Id] = user;
       }
