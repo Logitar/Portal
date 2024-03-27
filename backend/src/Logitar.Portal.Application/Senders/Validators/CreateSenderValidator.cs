@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Application.Validators;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.Domain.Senders.Twilio;
+using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Application.Senders.Validators;
 

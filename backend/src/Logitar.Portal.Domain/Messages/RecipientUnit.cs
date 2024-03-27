@@ -12,6 +12,8 @@ public record RecipientUnit
   public string Address { get; }
   public string? DisplayName { get; }
 
+  public string? PhoneNumber { get; }
+
   public UserId? UserId { get; }
   [JsonIgnore]
   public UserAggregate? User { get; }

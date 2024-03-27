@@ -3,9 +3,9 @@ using Logitar.Identity.Domain;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Users;
 
-namespace Logitar.Portal.Application.Validators;
+namespace Logitar.Portal.Domain.Validators;
 
-internal class PhoneNumberValidator : AbstractValidator<string>
+public class PhoneNumberValidator : AbstractValidator<string>
 {
   public PhoneNumberValidator(string? propertyName = null)
   {

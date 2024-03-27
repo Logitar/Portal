@@ -33,11 +33,11 @@ public record SenderSummary
   {
   }
 
-  public MailAddress ToMailAddress()
+  public MailAddress ToMailAddress() // ISSUE #467: move to Logitar.Portal.Infrastructure.Messages.MessageExtensions and remove System usings
   {
     if (Email == null)
     {
-      throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Sms)} sender in order to be converted to a {nameof(MailAddress)}.");
+      throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to be converted to a {nameof(MailAddress)}.");
     }
     return new(Email.Address, DisplayName?.Value);
   }
