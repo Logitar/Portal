@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Search;
@@ -98,7 +97,7 @@ public class SearchSendersQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     Sender sender = Assert.Single(results.Items);
-    SenderAggregate expected = new[] { sender1, sender2 }.OrderBy(s => s.Email.Address).Skip(1).Single();
+    SenderAggregate expected = new[] { sender1, sender2 }.OrderBy(s => s.Email?.Address).Skip(1).Single();
     Assert.Equal(expected.Id.ToGuid(), sender.Id);
   }
 }
