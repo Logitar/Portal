@@ -7,6 +7,7 @@ using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
@@ -29,12 +30,35 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
 
     ActorId actorId = command.ActorId;
 
-    EmailUnit email = new(payload.EmailAddress, isVerified: false);
-    SenderAggregate sender = new(email, GetSettings(payload), command.TenantId, actorId)
+    SenderAggregate sender;
+    SenderSettings settings = GetSettings(payload);
+    SenderType type = settings.Provider.GetSenderType();
+    switch (type)
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description)
-    };
+      case SenderType.Email:
+        if (payload.EmailAddress == null)
+        {
+          throw new InvalidOperationException("The sender email address is required.");
+        }
+        EmailUnit email = new(payload.EmailAddress, isVerified: false);
+        sender = new(email, settings, command.TenantId, actorId)
+        {
+          DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName)
+        };
+        break;
+      case SenderType.Sms:
+        if (payload.PhoneNumber == null)
+        {
+          throw new InvalidOperationException("The sender phone number is required.");
+        }
+        PhoneUnit phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
+        sender = new(phone, settings, command.TenantId, actorId);
+        break;
+      default:
+        throw new SenderTypeNotSupportedException(type);
+    }
+
+    sender.Description = DescriptionUnit.TryCreate(payload.Description);
     sender.Update(actorId);
 
     IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
@@ -57,6 +81,10 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     else if (payload.Mailgun != null)
     {
       return new ReadOnlyMailgunSettings(payload.Mailgun);
+    }
+    else if (payload.Twilio != null)
+    {
+      return new ReadOnlyTwilioSettings(payload.Twilio);
     }
 
     throw new ArgumentException("No sender provider settings have been specified.", nameof(payload));

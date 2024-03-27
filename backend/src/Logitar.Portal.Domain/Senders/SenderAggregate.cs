@@ -118,7 +118,7 @@ public class SenderAggregate : AggregateRoot
         Raise(new SmsSenderCreatedEvent(actorId, phone, provider, tenantId));
         break;
       default:
-        throw new NotSupportedException($"The sender type '{type}' is not supported.");
+        throw new SenderTypeNotSupportedException(type);
     }
 
     switch (provider)
@@ -284,7 +284,7 @@ public class SenderAggregate : AggregateRoot
         s.Append(Phone.FormatToE164());
         break;
       default:
-        throw new NotSupportedException($"The sender type '{Type}' is not supported.");
+        throw new SenderTypeNotSupportedException(Type);
     }
     s.Append(" | ");
     s.Append(base.ToString());
