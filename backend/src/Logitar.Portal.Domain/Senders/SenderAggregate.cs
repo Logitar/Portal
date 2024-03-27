@@ -243,6 +243,10 @@ public class SenderAggregate : AggregateRoot
     {
       _email = @event.Email;
     }
+    if (@event.Phone != null)
+    {
+      _phone = @event.Phone;
+    }
     if (@event.DisplayName != null)
     {
       _displayName = @event.DisplayName.Value;
