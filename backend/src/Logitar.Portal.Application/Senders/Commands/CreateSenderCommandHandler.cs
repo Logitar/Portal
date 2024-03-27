@@ -74,19 +74,29 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
 
   private static SenderSettings GetSettings(CreateSenderPayload payload)
   {
+    List<SenderSettings> settings = new(capacity: 3);
     if (payload.SendGrid != null)
     {
-      return new ReadOnlySendGridSettings(payload.SendGrid);
+      settings.Add(new ReadOnlySendGridSettings(payload.SendGrid));
     }
-    else if (payload.Mailgun != null)
+    if (payload.Mailgun != null)
     {
-      return new ReadOnlyMailgunSettings(payload.Mailgun);
+      settings.Add(new ReadOnlyMailgunSettings(payload.Mailgun));
     }
-    else if (payload.Twilio != null)
+    if (payload.Twilio != null)
     {
-      return new ReadOnlyTwilioSettings(payload.Twilio);
+      settings.Add(new ReadOnlyTwilioSettings(payload.Twilio));
     }
 
-    throw new ArgumentException("No sender provider settings have been specified.", nameof(payload));
+    if (settings.Count < 1)
+    {
+      throw new ArgumentException("No sender provider settings has been specified.", nameof(payload));
+    }
+    else if (settings.Count > 1)
+    {
+      throw new ArgumentException("Multiple sender provider settings have been specified.", nameof(payload));
+    }
+
+    return settings.Single();
   }
 }
