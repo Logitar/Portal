@@ -13,8 +13,10 @@ internal class RecipientEntity
 
   public RecipientType Type { get; private set; }
 
-  public string Address { get; private set; } = string.Empty;
+  public string? Address { get; private set; }
   public string? DisplayName { get; private set; }
+
+  public string? PhoneNumber { get; private set; }
 
   public int? UserId { get; private set; }
   public string? UserUniqueName { get; private set; }
@@ -31,6 +33,8 @@ internal class RecipientEntity
 
     Address = recipient.Address;
     DisplayName = recipient.DisplayName;
+
+    PhoneNumber = recipient.PhoneNumber;
 
     if (user != null)
     {

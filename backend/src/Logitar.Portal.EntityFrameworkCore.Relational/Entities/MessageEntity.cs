@@ -22,7 +22,8 @@ internal class MessageEntity : AggregateEntity
   public SenderEntity? Sender { get; private set; }
   public int? SenderId { get; private set; }
   public bool SenderIsDefault { get; private set; }
-  public string SenderAddress { get; private set; } = string.Empty;
+  public string? SenderAddress { get; private set; }
+  public string? SenderPhoneNumber { get; private set; }
   public string? SenderDisplayName { get; private set; }
   public SenderProvider SenderProvider { get; private set; }
 
@@ -94,7 +95,8 @@ internal class MessageEntity : AggregateEntity
     Sender = sender;
     SenderId = sender.SenderId;
     SenderIsDefault = @event.Sender.IsDefault;
-    SenderAddress = @event.Sender.Email.Address;
+    SenderAddress = @event.Sender.Email?.Address;
+    SenderPhoneNumber = @event.Sender.Phone?.Number;
     SenderDisplayName = @event.Sender.DisplayName?.Value;
     SenderProvider = @event.Sender.Provider;
 

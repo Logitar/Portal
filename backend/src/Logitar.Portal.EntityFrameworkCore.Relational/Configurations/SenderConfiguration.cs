@@ -21,6 +21,7 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
 
     builder.HasIndex(x => new { x.TenantId, x.IsDefault });
     builder.HasIndex(x => x.EmailAddress);
+    builder.HasIndex(x => x.PhoneNumber);
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Provider);
 
@@ -28,6 +29,7 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
 
     builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.EmailAddress).HasMaxLength(EmailUnit.MaximumLength);
+    builder.Property(x => x.PhoneNumber).HasMaxLength(PhoneUnit.NumberMaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
     builder.Property(x => x.Provider).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<SenderProvider>());
     builder.Property(x => x.SettingsSerialized).HasColumnName(nameof(SenderEntity.Settings));
