@@ -32,7 +32,7 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     }
 
     UpdateSenderPayload payload = command.Payload;
-    new UpdateSenderValidator(sender.Type).ValidateAndThrow(payload);
+    new UpdateSenderValidator(sender.Provider).ValidateAndThrow(payload);
 
     ActorId actorId = command.ActorId;
 
