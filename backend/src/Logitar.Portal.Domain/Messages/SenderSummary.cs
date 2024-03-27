@@ -37,7 +37,7 @@ public record SenderSummary
   {
     if (Email == null)
     {
-      throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to be converted to a {nameof(MailAddress)}.");
+      throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to be converted into a {nameof(MailAddress)}.");
     }
     return new(Email.Address, DisplayName?.Value);
   }
