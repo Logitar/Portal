@@ -11,6 +11,9 @@ namespace Logitar.Portal.Application.Senders.Validators;
 
 internal class ReplaceSenderValidator : AbstractValidator<ReplaceSenderPayload>
 {
+  public ReplaceSenderValidator() : this(SenderProvider.SendGrid)
+  {
+  }
   public ReplaceSenderValidator(SenderProvider provider)
   {
     SenderType type = provider.GetSenderType();

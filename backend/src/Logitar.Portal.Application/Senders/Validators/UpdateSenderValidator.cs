@@ -8,6 +8,9 @@ namespace Logitar.Portal.Application.Senders.Validators;
 
 internal class UpdateSenderValidator : AbstractValidator<UpdateSenderPayload>
 {
+  public UpdateSenderValidator() : this(SenderProvider.SendGrid)
+  {
+  }
   public UpdateSenderValidator(SenderProvider provider)
   {
     SenderType type = provider.GetSenderType();
