@@ -12,6 +12,7 @@ internal class SenderProviderGraphType : EnumerationGraphType<SenderProvider>
 
     Add(SenderProvider.Mailgun, "The sender sends messages through Mailgun.");
     Add(SenderProvider.SendGrid, "The sender sends messages through SendGrid.");
+    Add(SenderProvider.Twilio, "The sender sends messages through Twilio.");
   }
 
   private void Add(SenderProvider value, string description) => Add(value.ToString(), value, description);

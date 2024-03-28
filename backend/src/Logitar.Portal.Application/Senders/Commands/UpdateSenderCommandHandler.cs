@@ -7,6 +7,7 @@ using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
@@ -24,20 +25,24 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
 
   public async Task<Sender?> Handle(UpdateSenderCommand command, CancellationToken cancellationToken)
   {
-    UpdateSenderPayload payload = command.Payload;
-    new UpdateSenderValidator().ValidateAndThrow(payload);
-
     SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
 
+    UpdateSenderPayload payload = command.Payload;
+    new UpdateSenderValidator(sender.Provider).ValidateAndThrow(payload);
+
     ActorId actorId = command.ActorId;
 
     if (!string.IsNullOrWhiteSpace(payload.EmailAddress))
     {
       sender.Email = new EmailUnit(payload.EmailAddress);
+    }
+    if (!string.IsNullOrWhiteSpace(payload.PhoneNumber))
+    {
+      sender.Phone = new PhoneUnit(payload.PhoneNumber);
     }
     if (payload.DisplayName != null)
     {
@@ -66,6 +71,11 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     if (payload.Mailgun != null)
     {
       ReadOnlyMailgunSettings settings = new(payload.Mailgun);
+      sender.SetSettings(settings, actorId);
+    }
+    if (payload.Twilio != null)
+    {
+      ReadOnlyTwilioSettings settings = new(payload.Twilio);
       sender.SetSettings(settings, actorId);
     }
   }

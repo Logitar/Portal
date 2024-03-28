@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.Application.Messages.Settings;
+﻿using Logitar.Portal.Contracts.Senders;
 
-internal record MailgunTestSettings
+namespace Logitar.Portal.Application.Messages.Settings;
+
+internal record MailgunTestSettings : IMailgunSettings
 {
   public string ApiKey { get; set; }
   public string DomainName { get; set; }

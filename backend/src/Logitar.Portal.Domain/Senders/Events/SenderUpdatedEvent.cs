@@ -9,8 +9,9 @@ namespace Logitar.Portal.Domain.Senders.Events;
 public record SenderUpdatedEvent : DomainEvent, INotification
 {
   public EmailUnit? Email { get; set; }
+  public PhoneUnit? Phone { get; set; }
   public Modification<DisplayNameUnit>? DisplayName { get; set; }
   public Modification<DescriptionUnit>? Description { get; set; }
 
-  public bool HasChanges => Email != null || DisplayName != null || Description != null;
+  public bool HasChanges => Email != null || Phone != null || DisplayName != null || Description != null;
 }

@@ -7,6 +7,7 @@ using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
@@ -24,14 +25,15 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
 
   public async Task<Sender?> Handle(ReplaceSenderCommand command, CancellationToken cancellationToken)
   {
-    ReplaceSenderPayload payload = command.Payload;
-    new ReplaceSenderValidator().ValidateAndThrow(payload);
-
     SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
+
+    ReplaceSenderPayload payload = command.Payload;
+    new ReplaceSenderValidator(sender.Provider).ValidateAndThrow(payload);
+
     SenderAggregate? reference = null;
     if (command.Version.HasValue)
     {
@@ -40,16 +42,39 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
 
     ActorId actorId = command.ActorId;
 
-    EmailUnit email = new(payload.EmailAddress, isVerified: false);
-    if (reference == null || email != reference.Email)
+    switch (sender.Type)
     {
-      sender.Email = email;
+      case SenderType.Email:
+        if (payload.EmailAddress == null)
+        {
+          throw new InvalidOperationException("The sender email address is required.");
+        }
+        EmailUnit email = new(payload.EmailAddress, isVerified: false);
+        if (reference == null || email != reference.Email)
+        {
+          sender.Email = email;
+        }
+        DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+        if (reference == null || displayName != reference.DisplayName)
+        {
+          sender.DisplayName = displayName;
+        }
+        break;
+      case SenderType.Sms:
+        if (payload.PhoneNumber == null)
+        {
+          throw new InvalidOperationException("The sender phone number is required.");
+        }
+        PhoneUnit phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
+        if (reference == null || phone != reference.Phone)
+        {
+          sender.Phone = phone;
+        }
+        break;
+      default:
+        throw new SenderTypeNotSupportedException(sender.Type);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
-    if (reference == null || displayName != reference.DisplayName)
-    {
-      sender.DisplayName = displayName;
-    }
+
     DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
@@ -77,6 +102,14 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     if (payload.Mailgun != null)
     {
       ReadOnlyMailgunSettings settings = new(payload.Mailgun);
+      if (reference == null || settings != reference.Settings)
+      {
+        sender.SetSettings(settings, actorId);
+      }
+    }
+    if (payload.Twilio != null)
+    {
+      ReadOnlyTwilioSettings settings = new(payload.Twilio);
       if (reference == null || settings != reference.Settings)
       {
         sender.SetSettings(settings, actorId);

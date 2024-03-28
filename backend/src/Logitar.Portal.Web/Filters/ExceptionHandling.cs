@@ -82,7 +82,8 @@ internal class ExceptionHandling : ExceptionFilterAttribute
   private static readonly HashSet<Type> _badRequestExceptions = new(
   [
     typeof(CannotDeleteDefaultSenderException),
-    typeof(MissingRecipientAddressesException),
+    typeof(InvalidSmsMessageContentTypeException),
+    typeof(MissingRecipientContactsException),
     typeof(NoDefaultSenderException),
     typeof(SenderNotInTenantException),
     typeof(SenderProviderMismatchException),

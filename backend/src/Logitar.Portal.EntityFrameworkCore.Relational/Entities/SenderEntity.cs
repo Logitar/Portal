@@ -12,7 +12,8 @@ internal class SenderEntity : AggregateEntity
 
   public bool IsDefault { get; private set; }
 
-  public string EmailAddress { get; private set; } = string.Empty;
+  public string? EmailAddress { get; private set; }
+  public string? PhoneNumber { get; private set; }
   public string? DisplayName { get; private set; }
   public string? Description { get; private set; }
 
@@ -36,11 +37,23 @@ internal class SenderEntity : AggregateEntity
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
+  public SenderEntity(EmailSenderCreatedEvent @event) : this((SenderCreatedEvent)@event)
+  {
+  }
   public SenderEntity(SenderCreatedEvent @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
     EmailAddress = @event.Email.Address;
+
+    Provider = @event.Provider;
+  }
+
+  public SenderEntity(SmsSenderCreatedEvent @event) : base(@event)
+  {
+    TenantId = @event.TenantId?.Value;
+
+    PhoneNumber = @event.Phone.Number;
 
     Provider = @event.Provider;
   }
@@ -67,6 +80,12 @@ internal class SenderEntity : AggregateEntity
     Settings.Clear();
     Settings[nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey;
   }
+  public void SetTwilioSettings(SenderTwilioSettingsChangedEvent @event)
+  {
+    Settings.Clear();
+    Settings[nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid;
+    Settings[nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken;
+  }
 
   public void Update(SenderUpdatedEvent @event)
   {
@@ -75,6 +94,10 @@ internal class SenderEntity : AggregateEntity
     if (@event.Email != null)
     {
       EmailAddress = @event.Email.Address;
+    }
+    if (@event.Phone != null)
+    {
+      PhoneNumber = @event.Phone.Number;
     }
     if (@event.DisplayName != null)
     {

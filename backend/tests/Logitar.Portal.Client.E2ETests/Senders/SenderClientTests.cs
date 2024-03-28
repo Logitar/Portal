@@ -53,7 +53,7 @@ internal class SenderClientTests : IClientTests
       {
         Provider = sender.Provider
       };
-      search.Search.Terms.Add(new SearchTerm($"{sender.EmailAddress.Split('@').First()}%"));
+      search.Search.Terms.Add(new SearchTerm($"{sender.EmailAddress?.Split('@').First()}%"));
       SearchResults<Sender> results = await _client.SearchAsync(search, context.Request);
       sender = results.Items.Single();
       context.Succeed();
@@ -70,7 +70,7 @@ internal class SenderClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReplaceAsync));
-      ReplaceSenderPayload replace = new(sender.EmailAddress)
+      ReplaceSenderPayload replace = new(sender.EmailAddress ?? string.Empty)
       {
         DisplayName = sender.DisplayName,
         Description = sender.Description,

@@ -111,9 +111,11 @@ internal class Mapper
     Sender sender;
     if (source.Sender == null)
     {
-      sender = new(source.SenderAddress)
+      sender = new()
       {
         IsDefault = source.SenderIsDefault,
+        EmailAddress = source.SenderAddress,
+        PhoneNumber = source.SenderPhoneNumber,
         DisplayName = source.SenderDisplayName,
         Provider = source.SenderProvider
       };
@@ -225,10 +227,12 @@ internal class Mapper
 
   public static Recipient ToRecipient(RecipientEntity source, User? user)
   {
-    Recipient destination = new(source.Address)
+    Recipient destination = new()
     {
       Type = source.Type,
-      DisplayName = source.DisplayName
+      Address = source.Address,
+      DisplayName = source.DisplayName,
+      PhoneNumber = source.PhoneNumber
     };
 
     if (user != null)
@@ -298,9 +302,11 @@ internal class Mapper
 
   public Sender ToSender(SenderEntity source, Realm? realm)
   {
-    Sender destination = new(source.EmailAddress)
+    Sender destination = new()
     {
       IsDefault = source.IsDefault,
+      EmailAddress = source.EmailAddress,
+      PhoneNumber = source.PhoneNumber,
       DisplayName = source.DisplayName,
       Description = source.Description,
       Provider = source.Provider,

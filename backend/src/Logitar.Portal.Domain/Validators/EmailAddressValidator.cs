@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain;
 
-namespace Logitar.Portal.Application.Validators;
+namespace Logitar.Portal.Domain.Validators;
 
-internal class EmailAddressValidator : AbstractValidator<string>
+public class EmailAddressValidator : AbstractValidator<string>
 {
   public EmailAddressValidator(string? propertyName = null)
   {

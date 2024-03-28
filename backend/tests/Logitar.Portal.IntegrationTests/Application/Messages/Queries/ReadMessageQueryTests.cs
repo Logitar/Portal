@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Messages;
@@ -61,7 +60,7 @@ public class ReadMessageQueryTests : IntegrationTests
     TemplateAggregate template = new(uniqueKey, subject, content, TenantId);
     await _templateRepository.SaveAsync(template);
 
-    RecipientUnit[] recipients = [new RecipientUnit(Faker.Person.Email, Faker.Person.FullName)];
+    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
     MessageAggregate message = new(subject, content, recipients, sender, template, tenantId: TenantId);
     await _messageRepository.SaveAsync(message);
 

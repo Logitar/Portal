@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
@@ -104,7 +103,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
