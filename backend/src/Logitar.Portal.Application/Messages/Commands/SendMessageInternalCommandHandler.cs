@@ -82,8 +82,6 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
 
   private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
-    // TODO(fpion): use senderType
-
     List<RecipientUnit> recipients = new(capacity: payload.Recipients.Count);
 
     HashSet<UserId> userIds = new(recipients.Capacity);
