@@ -1,7 +1,6 @@
 ﻿namespace Logitar.Portal.Application.Messages;
 
-[Obsolete($"Do not use this class. It will be removed in the next major release. It has been replaced by the {nameof(MissingRecipientContactsException)} class.")]
-public class MissingRecipientAddressesException : Exception
+public class MissingRecipientContactsException : Exception
 {
   public const string ErrorMessage = "The specified recipients are missing an email address.";
 
@@ -16,7 +15,7 @@ public class MissingRecipientAddressesException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public MissingRecipientAddressesException(IEnumerable<Guid> userIds, string propertyName) : base(BuildMessage(userIds, propertyName))
+  public MissingRecipientContactsException(IEnumerable<Guid> userIds, string propertyName) : base(BuildMessage(userIds, propertyName))
   {
     UserIds = userIds;
     PropertyName = propertyName;

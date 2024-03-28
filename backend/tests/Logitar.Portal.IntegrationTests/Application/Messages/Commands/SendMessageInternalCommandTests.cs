@@ -205,9 +205,29 @@ public class SendMessageInternalCommandTests : IntegrationTests
     }
   }
 
-  [Fact(DisplayName = "It should throw MissingRecipientAddressesException when an user is missing an email.")]
-  public async Task It_should_throw_MissingRecipientAddressesException_when_an_user_is_missing_an_email()
+  [Fact(DisplayName = "It should throw InvalidSmsMessageContentTypeException when sending an HTML SMS message.")]
+  public async Task It_should_throw_InvalidSmsMessageContentTypeException_when_sending_an_Html_Sms_message()
   {
+    await CreateTemplateAsync();
+    await CreateSenderAsync(provider: SenderProvider.Twilio);
+
+    SendMessagePayload payload = new("PasswordRecovery");
+    payload.Recipients.Add(new RecipientPayload
+    {
+      Type = RecipientType.To,
+      PhoneNumber = Faker.Phone.PhoneNumber()
+    });
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<InvalidSmsMessageContentTypeException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal("text/html", exception.ContentType);
+    Assert.Equal("Template", exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "It should throw MissingRecipientContactsException when an user is missing a phone.")]
+  public async Task It_should_throw_MissingRecipientContactsException_when_an_user_is_missing_a_phone()
+  {
+    await CreateSenderAsync(TenantId, SenderProvider.Twilio);
+
     UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
@@ -220,7 +240,29 @@ public class SendMessageInternalCommandTests : IntegrationTests
       UserId = user.Id.ToGuid()
     });
     SendMessageInternalCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<MissingRecipientAddressesException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal([user.Id.ToGuid()], exception.UserIds);
+    Assert.Equal("Recipients", exception.PropertyName);
+  }
+
+  [Fact(DisplayName = "It should throw MissingRecipientContactsException when an user is missing an email.")]
+  public async Task It_should_throw_MissingRecipientContactsException_when_an_user_is_missing_an_email()
+  {
+    await CreateSenderAsync(TenantId);
+
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    await _userRepository.SaveAsync(user);
+
+    SetRealm();
+
+    SendMessagePayload payload = new("PasswordRecovery");
+    payload.Recipients.Add(new RecipientPayload
+    {
+      Type = RecipientType.To,
+      UserId = user.Id.ToGuid()
+    });
+    SendMessageInternalCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal([user.Id.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
@@ -329,6 +371,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UsersNotFoundException when some users could not be found.")]
   public async Task It_should_throw_UsersNotFoundException_when_some_users_could_not_be_found()
   {
+    await CreateSenderAsync();
+
     Guid[] userIds = [Guid.NewGuid(), Guid.NewGuid()];
 
     SendMessagePayload payload = new("PasswordRecovery");
@@ -380,6 +424,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
+    await CreateSenderAsync();
+
     SendMessagePayload payload = new("PasswordRecovery");
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));

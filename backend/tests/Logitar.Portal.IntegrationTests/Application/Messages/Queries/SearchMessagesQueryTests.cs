@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Messages;
@@ -67,7 +66,7 @@ public class SearchMessagesQueryTests : IntegrationTests
     TemplateAggregate otherTemplate = new(new UniqueKeyUnit("AccountConfirmation"), otherSubject, content, TenantId);
     await _templateRepository.SaveAsync([template, otherTemplate]);
 
-    RecipientUnit[] recipients = [new RecipientUnit(Faker.Person.Email, Faker.Person.FullName)];
+    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
 
     MessageAggregate notMatching = new(otherSubject, content, recipients, sender, template, tenantId: TenantId);
     MessageAggregate notInIds = new(subject, content, recipients, sender, template, tenantId: TenantId);
@@ -81,7 +80,7 @@ public class SearchMessagesQueryTests : IntegrationTests
     RecipientUnit[] moreRecipients =
     [
       recipients.Single(),
-      new RecipientUnit(Faker.Internet.Email(), Faker.Name.FullName(), RecipientType.Bcc)
+      new RecipientUnit(RecipientType.Bcc, Faker.Internet.Email(), Faker.Name.FullName())
     ];
     MessageAggregate message2 = new(subject, content, moreRecipients, sender, template, tenantId: TenantId);
 
