@@ -4,13 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
-public record SenderMailgunSettingsChangedEvent : DomainEvent, INotification
-{
-  public ReadOnlyMailgunSettings Settings { get; }
-
-  public SenderMailgunSettingsChangedEvent(ActorId actorId, ReadOnlyMailgunSettings settings)
-  {
-    ActorId = actorId;
-    Settings = settings;
-  }
-}
+public record SenderMailgunSettingsChangedEvent(ReadOnlyMailgunSettings Settings) : DomainEvent, INotification;

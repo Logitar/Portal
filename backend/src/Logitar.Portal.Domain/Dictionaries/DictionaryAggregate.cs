@@ -26,7 +26,7 @@ public class DictionaryAggregate : AggregateRoot
   public DictionaryAggregate(LocaleUnit locale, TenantId? tenantId = null, ActorId actorId = default, DictionaryId? id = null)
     : base((id ?? DictionaryId.NewId()).AggregateId)
   {
-    Raise(new DictionaryCreatedEvent(actorId, locale, tenantId));
+    Raise(new DictionaryCreatedEvent(tenantId, locale), actorId);
   }
   protected virtual void Apply(DictionaryCreatedEvent @event)
   {
@@ -39,7 +39,7 @@ public class DictionaryAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new DictionaryDeletedEvent(actorId));
+      Raise(new DictionaryDeletedEvent(), actorId);
     }
   }
 
@@ -71,7 +71,7 @@ public class DictionaryAggregate : AggregateRoot
   {
     if (locale != _locale)
     {
-      Raise(new DictionaryLocaleChangedEvent(actorId, locale));
+      Raise(new DictionaryLocaleChangedEvent(locale), actorId);
     }
   }
   protected virtual void Apply(DictionaryLocaleChangedEvent @event)
@@ -85,8 +85,7 @@ public class DictionaryAggregate : AggregateRoot
   {
     if (_updatedEvent.HasChanges)
     {
-      _updatedEvent.ActorId = actorId;
-      Raise(_updatedEvent);
+      Raise(_updatedEvent, actorId, DateTime.Now);
       _updatedEvent = new();
     }
   }

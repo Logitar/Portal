@@ -5,11 +5,7 @@ namespace Logitar.Portal.Domain.Templates.Validators;
 
 internal class ContentTypeValidator : AbstractValidator<string>
 {
-  private static readonly HashSet<string> _contentTypes = new(new[]
-  {
-    MediaTypeNames.Text.Html,
-    MediaTypeNames.Text.Plain
-  });
+  private static readonly HashSet<string> _contentTypes = new([MediaTypeNames.Text.Html, MediaTypeNames.Text.Plain]);
 
   public ContentTypeValidator(string? propertyName = null)
   {

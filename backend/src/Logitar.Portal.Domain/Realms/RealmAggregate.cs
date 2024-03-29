@@ -134,7 +134,7 @@ public class RealmAggregate : AggregateRoot
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passwordSettings = new();
     bool requireUniqueEmail = true;
-    Raise(new RealmCreatedEvent(actorId, uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail));
+    Raise(new RealmCreatedEvent(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
   }
   protected virtual void Apply(RealmCreatedEvent @event)
   {
@@ -149,7 +149,7 @@ public class RealmAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new RealmDeletedEvent(actorId));
+      Raise(new RealmDeletedEvent(), actorId);
     }
   }
 
@@ -180,7 +180,7 @@ public class RealmAggregate : AggregateRoot
 
   public void SetUniqueSlug(UniqueSlugUnit uniqueSlug, ActorId actorId = default)
   {
-    Raise(new RealmUniqueSlugChangedEvent(actorId, uniqueSlug));
+    Raise(new RealmUniqueSlugChangedEvent(uniqueSlug), actorId);
   }
   protected virtual void Apply(RealmUniqueSlugChangedEvent @event)
   {
@@ -191,8 +191,7 @@ public class RealmAggregate : AggregateRoot
   {
     if (_updatedEvent.HasChanges)
     {
-      _updatedEvent.ActorId = actorId;
-      Raise(_updatedEvent);
+      Raise(_updatedEvent, actorId, DateTime.Now);
       _updatedEvent = new();
     }
   }

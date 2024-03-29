@@ -111,11 +111,11 @@ public class SenderAggregate : AggregateRoot
     {
       case SenderType.Email:
         ArgumentNullException.ThrowIfNull(email);
-        Raise(new EmailSenderCreatedEvent(actorId, email, provider, tenantId));
+        Raise(new EmailSenderCreatedEvent(tenantId, email, provider), actorId);
         break;
       case SenderType.Sms:
         ArgumentNullException.ThrowIfNull(phone);
-        Raise(new SmsSenderCreatedEvent(actorId, phone, provider, tenantId));
+        Raise(new SmsSenderCreatedEvent(tenantId, phone, provider), actorId);
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
@@ -163,7 +163,7 @@ public class SenderAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new SenderDeletedEvent(actorId));
+      Raise(new SenderDeletedEvent(), actorId);
     }
   }
 
@@ -172,7 +172,7 @@ public class SenderAggregate : AggregateRoot
   {
     if (isDefault != IsDefault)
     {
-      Raise(new SenderSetDefaultEvent(actorId, isDefault));
+      Raise(new SenderSetDefaultEvent(isDefault), actorId);
     }
   }
   protected virtual void Apply(SenderSetDefaultEvent @event)
@@ -188,7 +188,7 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderMailgunSettingsChangedEvent(actorId, settings));
+      Raise(new SenderMailgunSettingsChangedEvent(settings), actorId);
     }
   }
   protected virtual void Apply(SenderMailgunSettingsChangedEvent @event)
@@ -204,7 +204,7 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderSendGridSettingsChangedEvent(actorId, settings));
+      Raise(new SenderSendGridSettingsChangedEvent(settings), actorId);
     }
   }
   protected virtual void Apply(SenderSendGridSettingsChangedEvent @event)
@@ -220,7 +220,7 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderTwilioSettingsChangedEvent(actorId, settings));
+      Raise(new SenderTwilioSettingsChangedEvent(settings), actorId);
     }
   }
   protected virtual void Apply(SenderTwilioSettingsChangedEvent @event)
@@ -232,8 +232,7 @@ public class SenderAggregate : AggregateRoot
   {
     if (_updatedEvent.HasChanges)
     {
-      _updatedEvent.ActorId = actorId;
-      Raise(_updatedEvent);
+      Raise(_updatedEvent, actorId, DateTime.Now);
       _updatedEvent = new();
     }
   }
