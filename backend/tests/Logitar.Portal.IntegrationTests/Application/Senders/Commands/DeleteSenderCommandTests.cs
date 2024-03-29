@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
@@ -71,6 +70,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw CannotDeleteDefaultSenderException when the default sender is not unique in its realm.")]
   public async Task It_should_throw_CannotDeleteDefaultSenderException_when_the_default_sender_is_not_unique_in_its_realm()
   {
+    Assert.NotNull(_sender.Email);
     SenderAggregate other = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(other);
 

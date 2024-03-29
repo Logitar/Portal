@@ -7,6 +7,7 @@ using Logitar.Portal.Infrastructure.Converters;
 using Logitar.Portal.Infrastructure.Messages.Providers;
 using Logitar.Portal.Infrastructure.Messages.Providers.Mailgun;
 using Logitar.Portal.Infrastructure.Messages.Providers.SendGrid;
+using Logitar.Portal.Infrastructure.Messages.Providers.Twilio;
 using Logitar.Portal.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +34,8 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddSingleton<IProviderStrategy, MailgunStrategy>()
-      .AddSingleton<IProviderStrategy, SendGridStrategy>();
+      .AddSingleton<IProviderStrategy, SendGridStrategy>()
+      .AddSingleton<IProviderStrategy, TwilioStrategy>();
   }
 
   public static IEnumerable<JsonConverter> GetLogitarPortalJsonConverters(this IServiceProvider serviceProvider)

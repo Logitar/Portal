@@ -37,16 +37,16 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
 
   public async Task<SentMessages> Handle(SendMessageInternalCommand command, CancellationToken cancellationToken)
   {
-    SendMessagePayload payload = command.Payload;
-    new SendMessageValidator().ValidateAndThrow(payload);
-
     ActorId actorId = command.ActorId;
-    LocaleUnit? defaultLocale = command.DefaultLocale;
     TenantId? tenantId = command.TenantId;
+    LocaleUnit? defaultLocale = command.DefaultLocale;
 
-    Recipients allRecipients = await ResolveRecipientsAsync(payload, cancellationToken);
+    SendMessagePayload payload = command.Payload;
     SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
-    TemplateAggregate template = await ResolveTemplateAsync(tenantId, payload, cancellationToken);
+    new SendMessageValidator(sender.Type).ValidateAndThrow(payload);
+
+    Recipients allRecipients = await ResolveRecipientsAsync(payload, sender.Type, cancellationToken);
+    TemplateAggregate template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
 
     Dictionary<LocaleUnit, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
@@ -80,7 +80,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     return new SentMessages(messages.Select(x => x.Id.ToGuid()));
   }
 
-  private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
     List<RecipientUnit> recipients = new(capacity: payload.Recipients.Count);
 
@@ -104,21 +104,34 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     }
 
     List<Guid> missingUsers = new(recipients.Capacity);
-    List<Guid> missingEmails = new(recipients.Capacity);
+    List<Guid> missingContacts = new(recipients.Capacity);
     foreach (RecipientPayload recipient in payload.Recipients)
     {
       if (recipient.UserId.HasValue)
       {
         if (users.TryGetValue(recipient.UserId.Value, out UserAggregate? user))
         {
-          if (user.Email == null)
+          switch (senderType)
           {
-            missingEmails.Add(recipient.UserId.Value);
+            case SenderType.Email:
+              if (user.Email == null)
+              {
+                missingContacts.Add(recipient.UserId.Value);
+                continue;
+              }
+              break;
+            case SenderType.Sms:
+              if (user.Phone == null)
+              {
+                missingContacts.Add(recipient.UserId.Value);
+                continue;
+              }
+              break;
+            default:
+              throw new SenderTypeNotSupportedException(senderType);
           }
-          else
-          {
-            recipients.Add(new RecipientUnit(user, recipient.Type));
-          }
+
+          recipients.Add(new RecipientUnit(user, recipient.Type));
         }
         else
         {
@@ -127,16 +140,16 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       }
       else
       {
-        recipients.Add(new RecipientUnit(recipient.Address ?? string.Empty, recipient.DisplayName, recipient.Type));
+        recipients.Add(new RecipientUnit(recipient.Type, recipient.Address, recipient.DisplayName, recipient.PhoneNumber));
       }
     }
     if (missingUsers.Count > 0)
     {
       throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
     }
-    else if (missingEmails.Count > 0)
+    else if (missingContacts.Count > 0)
     {
-      throw new MissingRecipientAddressesException(missingEmails, nameof(payload.Recipients));
+      throw new MissingRecipientContactsException(missingContacts, nameof(payload.Recipients));
     }
 
     return new Recipients(recipients);
@@ -154,7 +167,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       ?? throw new NoDefaultSenderException(tenantId);
   }
 
-  private async Task<TemplateAggregate> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<TemplateAggregate> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
     TemplateAggregate? template = null;
     if (Guid.TryParse(payload.Template, out Guid id))
@@ -174,6 +187,15 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       }
     }
 
-    return template ?? throw new TemplateNotFoundException(payload.Template, nameof(payload.Template));
+    if (template == null)
+    {
+      throw new TemplateNotFoundException(payload.Template, nameof(payload.Template));
+    }
+    else if (senderType == SenderType.Sms && template.Content.Type != MediaTypeNames.Text.Plain)
+    {
+      throw new InvalidSmsMessageContentTypeException(template.Content.Type, nameof(payload.Template));
+    }
+
+    return template;
   }
 }

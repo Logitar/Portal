@@ -1,5 +1,5 @@
-﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
+﻿using Bogus;
+using Logitar.Data;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
@@ -62,6 +62,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should set the default sender.")]
   public async Task It_should_set_the_default_sender()
   {
+    Assert.NotNull(_sender.Email);
     SenderAggregate sender = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(sender);
 

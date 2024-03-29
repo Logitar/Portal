@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Contracts;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
@@ -69,7 +68,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     {
       EmailAddress = "aa@@bb..cc"
     };
-    UpdateSenderCommand command = new(Guid.NewGuid(), payload);
+    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
@@ -86,7 +85,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
-    Assert.Equal(_sender.Email.Address, sender.EmailAddress);
+    Assert.Equal(_sender.Email?.Address, sender.EmailAddress);
     Assert.NotNull(payload.DisplayName.Value);
     Assert.Equal(payload.DisplayName.Value.Trim(), sender.DisplayName);
     Assert.Null(sender.Description);

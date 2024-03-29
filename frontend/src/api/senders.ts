@@ -16,7 +16,9 @@ query($payload: SearchSendersPayload!) {
     items {
       id
       emailAddress
+      phoneNumber
       displayName
+      provider
     }
   }
 }
@@ -29,6 +31,10 @@ type ListSendersResponse = {
 };
 export async function listSenders(): Promise<Sender[]> {
   return (await graphQL<ListSendersRequest, ListSendersResponse>(listSendersQuery, { payload: {} })).data.senders.items;
+}
+
+export async function readDefaultSender(): Promise<Sender> {
+  return (await get<Sender>("/api/senders/default")).data;
 }
 
 export async function readSender(id: string): Promise<Sender> {
@@ -47,6 +53,7 @@ query($payload: SearchSendersPayload!) {
       id
       isDefault
       emailAddress
+      phoneNumber
       displayName
       provider
       updatedBy {

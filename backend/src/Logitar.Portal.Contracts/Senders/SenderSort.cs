@@ -4,5 +4,6 @@ public enum SenderSort
 {
   DisplayName,
   EmailAddress,
+  PhoneNumber,
   UpdatedOn
 }

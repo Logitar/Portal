@@ -21,7 +21,7 @@ export function formatRole(role: Role): string {
 }
 
 export function formatSender(sender: Sender): string {
-  return sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress;
+  return (sender.emailAddress ? (sender.displayName ? `${sender.displayName} <${sender.emailAddress}>` : sender.emailAddress) : sender.phoneNumber) ?? "";
 }
 
 export function formatTemplate(template: Template): string {

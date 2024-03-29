@@ -154,7 +154,7 @@ public class MessageAggregate : AggregateRoot
     }
   }
 
-  public MailMessage ToMailMessage()
+  public MailMessage ToMailMessage() // ISSUE #467: move to Logitar.Portal.Infrastructure.Messages.MessageExtensions and remove System usings
   {
     MailMessage message = new()
     {

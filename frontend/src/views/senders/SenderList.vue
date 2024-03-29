@@ -178,7 +178,7 @@ watch(
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ t("senders.sort.options.EmailAddress") }}</th>
+            <th scope="col">{{ t("senders.emailOrPhone") }}</th>
             <th scope="col">{{ t("senders.sort.options.DisplayName") }}</th>
             <th scope="col">{{ t("senders.providers.label") }}</th>
             <th scope="col">{{ t("senders.sort.options.UpdatedOn") }}</th>
@@ -189,7 +189,8 @@ watch(
           <tr v-for="sender in senders" :key="sender.id">
             <td>
               <RouterLink :to="{ name: 'SenderEdit', params: { id: sender.id } }">
-                <font-awesome-icon icon="fas fa-edit" />{{ sender.emailAddress }}
+                <template v-if="sender.emailAddress"><font-awesome-icon icon="fas fa-at" />{{ " " + sender.emailAddress }}</template>
+                <template v-else-if="sender.phoneNumber"><font-awesome-icon icon="fas fa-phone" />{{ " " + sender.phoneNumber }}</template>
               </RouterLink>
             </td>
             <td>{{ sender.displayName ?? "—" }}</td>

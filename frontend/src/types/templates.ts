@@ -3,9 +3,11 @@ import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 
 export type Content = {
-  type: string;
+  type: ContentType;
   text: string;
 };
+
+export type ContentType = "text/html" | "text/plain";
 
 export type CreateTemplatePayload = {
   uniqueKey: string;

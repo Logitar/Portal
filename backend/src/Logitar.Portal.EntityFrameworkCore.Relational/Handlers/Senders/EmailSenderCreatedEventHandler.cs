@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Handlers.Senders;
 
-internal class SenderCreatedEventHandler : INotificationHandler<SenderCreatedEvent>
+internal class EmailSenderCreatedEventHandler : INotificationHandler<EmailSenderCreatedEvent>
 {
   private readonly PortalContext _context;
 
-  public SenderCreatedEventHandler(PortalContext context)
+  public EmailSenderCreatedEventHandler(PortalContext context)
   {
     _context = context;
   }
 
-  public async Task Handle(SenderCreatedEvent @event, CancellationToken cancellationToken)
+  public async Task Handle(EmailSenderCreatedEvent @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);

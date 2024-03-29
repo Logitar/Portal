@@ -34,6 +34,7 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.Property(x => x.Subject).HasMaxLength(SubjectUnit.MaximumLength);
     builder.Property(x => x.BodyType).HasMaxLength(TemplateConfiguration.ContentTypeMaximumLength);
     builder.Property(x => x.SenderAddress).HasMaxLength(EmailUnit.MaximumLength);
+    builder.Property(x => x.SenderPhoneNumber).HasMaxLength(PhoneUnit.NumberMaximumLength);
     builder.Property(x => x.SenderDisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
     builder.Property(x => x.SenderProvider).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<SenderProvider>());
     builder.Property(x => x.TemplateUniqueKey).HasMaxLength(IdentifierValidator.MaximumLength);

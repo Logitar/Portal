@@ -1,6 +1,8 @@
-﻿namespace Logitar.Portal.Application.Messages.Settings;
+﻿using Logitar.Portal.Contracts.Senders;
 
-internal record SendGridTestSettings
+namespace Logitar.Portal.Application.Messages.Settings;
+
+internal record SendGridTestSettings : ISendGridSettings
 {
   public string ApiKey { get; set; }
 

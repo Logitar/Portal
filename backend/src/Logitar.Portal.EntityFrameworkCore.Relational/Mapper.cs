@@ -15,6 +15,7 @@ using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -111,9 +112,11 @@ internal class Mapper
     Sender sender;
     if (source.Sender == null)
     {
-      sender = new(source.SenderAddress)
+      sender = new()
       {
         IsDefault = source.SenderIsDefault,
+        EmailAddress = source.SenderAddress,
+        PhoneNumber = source.SenderPhoneNumber,
         DisplayName = source.SenderDisplayName,
         Provider = source.SenderProvider
       };
@@ -225,10 +228,12 @@ internal class Mapper
 
   public static Recipient ToRecipient(RecipientEntity source, User? user)
   {
-    Recipient destination = new(source.Address)
+    Recipient destination = new()
     {
       Type = source.Type,
-      DisplayName = source.DisplayName
+      Address = source.Address,
+      DisplayName = source.DisplayName,
+      PhoneNumber = source.PhoneNumber
     };
 
     if (user != null)
@@ -298,9 +303,11 @@ internal class Mapper
 
   public Sender ToSender(SenderEntity source, Realm? realm)
   {
-    Sender destination = new(source.EmailAddress)
+    Sender destination = new()
     {
       IsDefault = source.IsDefault,
+      EmailAddress = source.EmailAddress,
+      PhoneNumber = source.PhoneNumber,
       DisplayName = source.DisplayName,
       Description = source.Description,
       Provider = source.Provider,
@@ -315,6 +322,11 @@ internal class Mapper
       case SenderProvider.SendGrid:
         destination.SendGrid = new SendGridSettings(source.Settings[nameof(ISendGridSettings.ApiKey)]);
         break;
+      case SenderProvider.Twilio:
+        destination.Twilio = new TwilioSettings(source.Settings[nameof(ITwilioSettings.AccountSid)], source.Settings[nameof(ITwilioSettings.AuthenticationToken)]);
+        break;
+      default:
+        throw new SenderProviderNotSupportedException(source.Provider);
     }
 
     MapAggregate(source, destination);

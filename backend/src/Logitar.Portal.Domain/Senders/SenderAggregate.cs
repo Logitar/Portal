@@ -6,6 +6,7 @@ using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders.Events;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 
 namespace Logitar.Portal.Domain.Senders;
 
@@ -20,15 +21,36 @@ public class SenderAggregate : AggregateRoot
   public bool IsDefault { get; private set; }
 
   private EmailUnit? _email = null;
-  public EmailUnit Email
+  public EmailUnit? Email
   {
-    get => _email ?? throw new InvalidOperationException($"The {nameof(Email)} has not been initialized yet.");
+    get => _email;
     set
     {
-      if (value != _email)
+      if (Type != SenderType.Email)
+      {
+        throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to set its email address.");
+      }
+      else if (value != _email)
       {
         _email = value;
         _updatedEvent.Email = value;
+      }
+    }
+  }
+  private PhoneUnit? _phone = null;
+  public PhoneUnit? Phone
+  {
+    get => _phone;
+    set
+    {
+      if (Type != SenderType.Sms)
+      {
+        throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Sms)} sender in order to set its phone number.");
+      }
+      else if (value != _phone)
+      {
+        _phone = value;
+        _updatedEvent.Phone = value;
       }
     }
   }
@@ -38,7 +60,11 @@ public class SenderAggregate : AggregateRoot
     get => _displayName;
     set
     {
-      if (value != _displayName)
+      if (Type != SenderType.Email)
+      {
+        throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to set its display name.");
+      }
+      else if (value != _displayName)
       {
         _displayName = value;
         _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
@@ -59,6 +85,7 @@ public class SenderAggregate : AggregateRoot
     }
   }
 
+  public SenderType Type { get; private set; }
   public SenderProvider Provider { get; private set; }
   private SenderSettings? _settings = null;
   public SenderSettings Settings => _settings ?? throw new InvalidOperationException($"The {nameof(Settings)} have not been initialized yet.");
@@ -68,11 +95,33 @@ public class SenderAggregate : AggregateRoot
   }
 
   public SenderAggregate(EmailUnit email, SenderSettings settings, TenantId? tenantId = null, ActorId actorId = default, SenderId? id = null)
+    : this(email, phone: null, settings, tenantId, actorId, id)
+  {
+  }
+  public SenderAggregate(PhoneUnit phone, SenderSettings settings, TenantId? tenantId = null, ActorId actorId = default, SenderId? id = null)
+    : this(email: null, phone, settings, tenantId, actorId, id)
+  {
+  }
+  private SenderAggregate(EmailUnit? email, PhoneUnit? phone, SenderSettings settings, TenantId? tenantId = null, ActorId actorId = default, SenderId? id = null)
     : base((id ?? SenderId.NewId()).AggregateId)
   {
-    Raise(new SenderCreatedEvent(actorId, email, settings.Provider, tenantId));
+    SenderProvider provider = settings.Provider;
+    SenderType type = provider.GetSenderType();
+    switch (type)
+    {
+      case SenderType.Email:
+        ArgumentNullException.ThrowIfNull(email);
+        Raise(new EmailSenderCreatedEvent(actorId, email, provider, tenantId));
+        break;
+      case SenderType.Sms:
+        ArgumentNullException.ThrowIfNull(phone);
+        Raise(new SmsSenderCreatedEvent(actorId, phone, provider, tenantId));
+        break;
+      default:
+        throw new SenderTypeNotSupportedException(type);
+    }
 
-    switch (settings.Provider)
+    switch (provider)
     {
       case SenderProvider.Mailgun:
         SetSettings((ReadOnlyMailgunSettings)settings);
@@ -80,9 +129,16 @@ public class SenderAggregate : AggregateRoot
       case SenderProvider.SendGrid:
         SetSettings((ReadOnlySendGridSettings)settings);
         break;
+      case SenderProvider.Twilio:
+        SetSettings((ReadOnlyTwilioSettings)settings);
+        break;
       default:
-        throw new SenderProviderNotSupportedException(settings.Provider);
+        throw new SenderProviderNotSupportedException(provider);
     }
+  }
+  protected virtual void Apply(EmailSenderCreatedEvent @event)
+  {
+    Apply((SenderCreatedEvent)@event);
   }
   protected virtual void Apply(SenderCreatedEvent @event)
   {
@@ -90,6 +146,16 @@ public class SenderAggregate : AggregateRoot
 
     _email = @event.Email;
 
+    Type = @event.Provider.GetSenderType();
+    Provider = @event.Provider;
+  }
+  protected virtual void Apply(SmsSenderCreatedEvent @event)
+  {
+    TenantId = @event.TenantId;
+
+    _phone = @event.Phone;
+
+    Type = @event.Provider.GetSenderType();
     Provider = @event.Provider;
   }
 
@@ -146,6 +212,22 @@ public class SenderAggregate : AggregateRoot
     _settings = @event.Settings;
   }
 
+  public void SetSettings(ReadOnlyTwilioSettings settings, ActorId actorId = default)
+  {
+    if (Provider != SenderProvider.Twilio)
+    {
+      throw new SenderProviderMismatchException(this, settings.Provider);
+    }
+    else if (settings != _settings)
+    {
+      Raise(new SenderTwilioSettingsChangedEvent(actorId, settings));
+    }
+  }
+  protected virtual void Apply(SenderTwilioSettingsChangedEvent @event)
+  {
+    _settings = @event.Settings;
+  }
+
   public void Update(ActorId actorId = default)
   {
     if (_updatedEvent.HasChanges)
@@ -161,6 +243,10 @@ public class SenderAggregate : AggregateRoot
     {
       _email = @event.Email;
     }
+    if (@event.Phone != null)
+    {
+      _phone = @event.Phone;
+    }
     if (@event.DisplayName != null)
     {
       _displayName = @event.DisplayName.Value;
@@ -174,13 +260,31 @@ public class SenderAggregate : AggregateRoot
   public override string ToString()
   {
     StringBuilder s = new();
-    if (DisplayName == null)
+    switch (Type)
     {
-      s.Append(Email.Address);
-    }
-    else
-    {
-      s.Append(DisplayName.Value).Append(" <").Append(Email.Address).Append('>');
+      case SenderType.Email:
+        if (Email == null)
+        {
+          throw new InvalidOperationException($"The {nameof(Email)} has not been initialized yet.");
+        }
+        if (DisplayName == null)
+        {
+          s.Append(Email.Address);
+        }
+        else
+        {
+          s.Append(DisplayName.Value).Append(" <").Append(Email.Address).Append('>');
+        }
+        break;
+      case SenderType.Sms:
+        if (Phone == null)
+        {
+          throw new InvalidOperationException($"The {nameof(Phone)} has not been initialized yet.");
+        }
+        s.Append(Phone.FormatToE164());
+        break;
+      default:
+        throw new SenderTypeNotSupportedException(Type);
     }
     s.Append(" | ");
     s.Append(base.ToString());

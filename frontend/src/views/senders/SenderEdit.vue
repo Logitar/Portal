@@ -7,14 +7,17 @@ import { useRoute, useRouter } from "vue-router";
 import DemoMessage from "@/components/messages/DemoMessage.vue";
 import EmailAddressInput from "@/components/users/EmailAddressInput.vue";
 import MailgunSettingsEdit from "./MailgunSettingsEdit.vue";
+import PhoneNumberInput from "@/components/users/PhoneNumberInput.vue";
 import SendGridSettingsEdit from "./SendGridSettingsEdit.vue";
 import SenderProviderSelect from "./SenderProviderSelect.vue";
 import SetDefaultSender from "./SetDefaultSender.vue";
+import TwilioSettingsEdit from "./TwilioSettingsEdit.vue";
 import type { ApiError } from "@/types/api";
-import type { MailgunSettings, Sender, SenderProvider, SendGridSettings } from "@/types/senders";
+import type { MailgunSettings, Sender, SenderProvider, SenderType, SendGridSettings, TwilioSettings } from "@/types/senders";
 import type { ToastUtils } from "@/types/components";
 import { createSender, readSender, replaceSender } from "@/api/senders";
 import { formatSender } from "@/helpers/displayUtils";
+import { getSenderType } from "@/helpers/senderUtils";
 import { handleErrorKey, toastsKey } from "@/inject/App";
 
 const handleError = inject(handleErrorKey) as (e: unknown) => void;
@@ -25,6 +28,7 @@ const { t } = useI18n();
 
 const defaults = {
   emailAddress: "",
+  phoneNumber: "",
   displayName: "",
   description: "",
   mailgun: {
@@ -34,6 +38,10 @@ const defaults = {
   sendGrid: {
     apiKey: "",
   },
+  twilio: {
+    accountSid: "",
+    authenticationToken: "",
+  },
 };
 
 const description = ref<string>(defaults.description);
@@ -41,31 +49,39 @@ const displayName = ref<string>(defaults.displayName);
 const emailAddress = ref<string>(defaults.emailAddress);
 const hasLoaded = ref<boolean>(false);
 const mailgun = ref<MailgunSettings>(defaults.mailgun);
+const phoneNumber = ref<string>(defaults.phoneNumber);
 const provider = ref<SenderProvider>();
-const sender = ref<Sender>();
 const sendGrid = ref<SendGridSettings>(defaults.sendGrid);
+const sender = ref<Sender>();
+const twilio = ref<TwilioSettings>(defaults.twilio);
 
 const hasChanges = computed<boolean>(() => {
   const model = sender.value ?? defaults;
   return (
-    emailAddress.value !== model.emailAddress ||
+    emailAddress.value !== (model.emailAddress ?? "") ||
+    phoneNumber.value !== (model.phoneNumber ?? "") ||
     displayName.value !== (model.displayName ?? "") ||
     description.value !== (model.description ?? "") ||
     (provider.value === "Mailgun" &&
       (mailgun.value.apiKey !== (model.mailgun?.apiKey ?? "") || mailgun.value.domainName !== (model.mailgun?.domainName ?? ""))) ||
-    (provider.value === "SendGrid" && sendGrid.value.apiKey !== (model.sendGrid?.apiKey ?? ""))
+    (provider.value === "SendGrid" && sendGrid.value.apiKey !== (model.sendGrid?.apiKey ?? "")) ||
+    (provider.value === "Twilio" &&
+      (twilio.value.accountSid !== (model.twilio?.accountSid ?? "") || twilio.value.authenticationToken !== (model.twilio?.authenticationToken ?? "")))
   );
 });
+const senderType = computed<SenderType | undefined>(() => (provider.value ? getSenderType(provider.value) : undefined));
 const title = computed<string>(() => (sender.value ? formatSender(sender.value) : t("senders.title.new")));
 
 function setModel(model: Sender): void {
   sender.value = model;
-  emailAddress.value = model.emailAddress;
+  emailAddress.value = model.emailAddress ?? "";
+  phoneNumber.value = model.phoneNumber ?? "";
   displayName.value = model.displayName ?? "";
   description.value = model.description ?? "";
   provider.value = model.provider;
   mailgun.value = model.mailgun ?? defaults.mailgun;
   sendGrid.value = model.sendGrid ?? defaults.sendGrid;
+  twilio.value = model.twilio ?? defaults.twilio;
 }
 
 const { handleSubmit, isSubmitting } = useForm();
@@ -75,11 +91,13 @@ const onSubmit = handleSubmit(async () => {
       const updatedSender = await replaceSender(
         sender.value.id,
         {
-          emailAddress: emailAddress.value,
-          displayName: displayName.value,
+          emailAddress: senderType.value === "Email" ? emailAddress.value : undefined,
+          phoneNumber: senderType.value === "Sms" ? phoneNumber.value : undefined,
+          displayName: senderType.value === "Email" ? displayName.value : undefined,
           description: description.value,
           mailgun: provider.value === "Mailgun" ? mailgun.value : undefined,
           sendGrid: provider.value === "SendGrid" ? sendGrid.value : undefined,
+          twilio: provider.value === "Twilio" ? twilio.value : undefined,
         },
         sender.value.version,
       );
@@ -87,11 +105,13 @@ const onSubmit = handleSubmit(async () => {
       toasts.success("senders.updated");
     } else {
       const createdSender = await createSender({
-        emailAddress: emailAddress.value,
-        displayName: displayName.value,
+        emailAddress: senderType.value === "Email" ? emailAddress.value : undefined,
+        phoneNumber: senderType.value === "Sms" ? phoneNumber.value : undefined,
+        displayName: senderType.value === "Email" ? displayName.value : undefined,
         description: description.value,
         mailgun: provider.value === "Mailgun" ? mailgun.value : undefined,
         sendGrid: provider.value === "SendGrid" ? sendGrid.value : undefined,
+        twilio: provider.value === "Twilio" ? twilio.value : undefined,
       });
       setModel(createdSender);
       toasts.success("senders.created");
@@ -156,13 +176,15 @@ onMounted(async () => {
               <SetDefaultSender v-if="sender" class="ms-1" :sender="sender" @error="handleError" @success="onSetDefault" />
             </div>
             <SenderProviderSelect :disabled="Boolean(sender)" required v-model="provider" />
-            <div class="row">
+            <div v-if="senderType === 'Email'" class="row">
               <EmailAddressInput class="col-lg-6" required validate v-model="emailAddress" />
               <display-name-input class="col-lg-6" validate v-model="displayName" />
             </div>
-            <description-textarea v-model="description" />
+            <PhoneNumberInput v-else-if="senderType === 'Sms'" required v-model="phoneNumber" />
+            <description-textarea v-if="Boolean(senderType)" v-model="description" />
             <MailgunSettingsEdit v-if="provider === 'Mailgun'" v-model="mailgun" />
             <SendGridSettingsEdit v-else-if="provider === 'SendGrid'" v-model="sendGrid" />
+            <TwilioSettingsEdit v-else-if="provider === 'Twilio'" v-model="twilio" />
           </form>
         </app-tab>
         <app-tab :disabled="!sender" title="messages.demo.label">

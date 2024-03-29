@@ -340,7 +340,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnName("ResultData");
 
                     b.Property<string>("SenderAddress")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -353,6 +352,10 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.Property<bool>("SenderIsDefault")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("SenderPhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("SenderProvider")
                         .IsRequired()
@@ -562,7 +565,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RecipientId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -572,6 +574,10 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
 
                     b.Property<int>("MessageId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -604,6 +610,8 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("DisplayName");
 
                     b.HasIndex("MessageId");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Type");
 
@@ -641,12 +649,15 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("EmailAddress")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Provider")
                         .IsRequired()
@@ -684,6 +695,8 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                     b.HasIndex("DisplayName");
 
                     b.HasIndex("EmailAddress");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Provider");
 

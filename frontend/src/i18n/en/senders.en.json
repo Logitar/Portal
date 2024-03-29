@@ -13,6 +13,7 @@
     "success": "The sender has been deleted.",
     "title": "Delete sender"
   },
+  "emailOrPhone": "Email address or phone number",
   "empty": "There are no results.",
   "providers": {
     "label": "Provider",
@@ -29,7 +30,8 @@
     },
     "options": {
       "Mailgun": "Mailgun",
-      "SendGrid": "SendGrid"
+      "SendGrid": "SendGrid",
+      "Twilio": "Twilio"
     },
     "placeholder": "Select a provider",
     "sendGrid": {
@@ -38,6 +40,17 @@
         "placeholder": "Paste your SendGrid API key"
       },
       "settings": "SendGrid Settings"
+    },
+    "twilio": {
+      "accountSid": {
+        "label": "Account SID",
+        "placeholder": "Paste your Twilio Account SID"
+      },
+      "authenticationToken": {
+        "label": "Authentication Token",
+        "placeholder": "Paste your Twilio authentication token"
+      },
+      "settings": "Twilio Settings"
     }
   },
   "select": {
@@ -49,6 +62,7 @@
     "options": {
       "DisplayName": "Display name",
       "EmailAddress": "Email address",
+      "PhoneNumber": "Phone number",
       "UpdatedOn": "Updated on"
     }
   },

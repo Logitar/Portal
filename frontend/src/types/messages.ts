@@ -35,14 +35,16 @@ export type Recipient = {
   type: RecipientType;
   address: string;
   displayName?: string;
+  phoneNumber?: string;
   user?: User;
 };
 
 export type RecipientPayload = {
   type: RecipientType;
-  userId?: string;
   address?: string;
   displayName?: string;
+  phoneNumber?: string;
+  userId?: string;
 };
 
 export type RecipientType = "Bcc" | "CC" | "To";

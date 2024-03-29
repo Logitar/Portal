@@ -8,7 +8,7 @@ import ContentTypeSelect from "@/components/templates/ContentTypeSelect.vue";
 import DemoMessage from "@/components/messages/DemoMessage.vue";
 import UniqueKeyInput from "@/components/templates/UniqueKeyInput.vue";
 import type { ApiError, Error } from "@/types/api";
-import type { Template } from "@/types/templates";
+import type { ContentType, Template } from "@/types/templates";
 import type { ToastUtils } from "@/types/components";
 import { createTemplate, readTemplate, replaceTemplate } from "@/api/templates";
 import { handleErrorKey, toastsKey } from "@/inject/App";
@@ -76,7 +76,7 @@ const onSubmit = handleSubmit(async () => {
           description: description.value,
           subject: subject.value,
           content: {
-            type: contentType.value,
+            type: contentType.value as ContentType,
             text: contents.value,
           },
         },
@@ -91,7 +91,7 @@ const onSubmit = handleSubmit(async () => {
         description: description.value,
         subject: subject.value,
         content: {
-          type: contentType.value,
+          type: contentType.value as ContentType,
           text: contents.value,
         },
       });

@@ -3,11 +3,13 @@ import type { Realm } from "@/types/realms";
 import type { SearchPayload, SortOption } from "@/types/search";
 
 export type CreateSenderPayload = {
-  emailAddress: string;
+  emailAddress?: string;
+  phoneNumber?: string;
   displayName?: string;
   description?: string;
   mailgun?: MailgunSettings;
   sendGrid?: SendGridSettings;
+  twilio?: TwilioSettings;
 };
 
 export type MailgunSettings = {
@@ -16,11 +18,13 @@ export type MailgunSettings = {
 };
 
 export type ReplaceSenderPayload = {
-  emailAddress: string;
+  emailAddress?: string;
+  phoneNumber?: string;
   displayName?: string;
   description?: string;
   mailgun?: MailgunSettings;
   sendGrid?: SendGridSettings;
+  twilio?: TwilioSettings;
 };
 
 export type SearchSendersPayload = SearchPayload & {
@@ -30,16 +34,18 @@ export type SearchSendersPayload = SearchPayload & {
 
 export type Sender = Aggregate & {
   isDefault: boolean;
-  emailAddress: string;
+  emailAddress?: string;
+  phoneNumber?: string;
   displayName?: string;
   description?: string;
   provider: SenderProvider;
   mailgun?: MailgunSettings;
   sendGrid?: SendGridSettings;
+  twilio?: TwilioSettings;
   realm?: Realm;
 };
 
-export type SenderProvider = "Mailgun" | "SendGrid";
+export type SenderProvider = "Mailgun" | "SendGrid" | "Twilio";
 
 export type SenderSort = "DisplayName" | "EmailAddress" | "UpdatedOn";
 
@@ -47,6 +53,13 @@ export type SenderSortOption = SortOption & {
   field: SenderSort;
 };
 
+export type SenderType = "Email" | "Sms";
+
 export type SendGridSettings = {
   apiKey: string;
+};
+
+export type TwilioSettings = {
+  accountSid: string;
+  authenticationToken: string;
 };

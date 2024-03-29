@@ -1,5 +1,6 @@
 ﻿namespace Logitar.Portal.Application.Messages;
 
+[Obsolete($"Do not use this class. It will be removed in the next major release. It has been replaced by the {nameof(MissingRecipientContactsException)} class.")]
 public class MissingRecipientAddressesException : Exception
 {
   public const string ErrorMessage = "The specified recipients are missing an email address.";

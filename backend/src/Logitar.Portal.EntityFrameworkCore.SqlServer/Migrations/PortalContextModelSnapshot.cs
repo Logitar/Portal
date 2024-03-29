@@ -341,7 +341,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnName("ResultData");
 
                     b.Property<string>("SenderAddress")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -354,6 +353,10 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.Property<bool>("SenderIsDefault")
                         .HasColumnType("bit");
+
+                    b.Property<string>("SenderPhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("SenderProvider")
                         .IsRequired()
@@ -563,7 +566,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipientId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -573,6 +575,10 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.Property<int>("MessageId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -605,6 +611,8 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.HasIndex("DisplayName");
 
                     b.HasIndex("MessageId");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Type");
 
@@ -642,12 +650,15 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("EmailAddress")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Provider")
                         .IsRequired()
@@ -685,6 +696,8 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.HasIndex("DisplayName");
 
                     b.HasIndex("EmailAddress");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Provider");
 
