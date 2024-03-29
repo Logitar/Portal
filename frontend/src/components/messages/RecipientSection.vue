@@ -18,6 +18,7 @@ defineProps<{
         <tr>
           <th scope="col">{{ t("messages.recipients.type.label") }}</th>
           <th scope="col">{{ t("users.email.address.label") }}</th>
+          <th scope="col">{{ t("users.phone.number.label") }}</th>
           <th scope="col">{{ t("displayName.label") }}</th>
           <th scope="col">{{ t("messages.recipients.associatedUser") }}</th>
         </tr>
@@ -25,8 +26,9 @@ defineProps<{
       <tbody>
         <tr v-for="(recipient, index) in recipients" :key="index">
           <td>{{ t(`messages.recipients.type.options.${recipient.type}`) }}</td>
-          <td>{{ recipient.user?.email?.address ?? recipient.address }}</td>
-          <td>{{ recipient.user?.fullName ?? recipient.displayName }}</td>
+          <td>{{ recipient.user?.email?.address ?? recipient.address ?? "—" }}</td>
+          <td>{{ recipient.user?.phone?.number ?? recipient.phoneNumber ?? "—" }}</td>
+          <td>{{ recipient.user?.fullName ?? recipient.displayName ?? "—" }}</td>
           <td>
             <template v-if="recipient.user?.version">
               <RouterLink :to="{ name: 'UserEdit', params: { id: recipient.user.id } }" target="_blank">

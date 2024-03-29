@@ -13,6 +13,7 @@
     "success": "L’expéditeur a été supprimé.",
     "title": "Supprimer l’expéditeur"
   },
+  "emailOrPhone": "Adresse courriel ou numéro de téléphone",
   "empty": "Il n’y a aucun résultat.",
   "providers": {
     "label": "Fournisseur",
@@ -29,7 +30,8 @@
     },
     "options": {
       "Mailgun": "Mailgun",
-      "SendGrid": "SendGrid"
+      "SendGrid": "SendGrid",
+      "Twilio": "Twilio"
     },
     "placeholder": "Sélectionnez un fournisseur",
     "sendGrid": {
@@ -38,6 +40,17 @@
         "placeholder": "Collez votre clé d’API SendGrid"
       },
       "settings": "Paramètres de SendGrid"
+    },
+    "twilio": {
+      "accountSid": {
+        "label": "SID de compte (Account SID)",
+        "placeholder": "Collez votre SID de compte Twilio (Account SID)"
+      },
+      "authenticationToken": {
+        "label": "Jeton d’authentification",
+        "placeholder": "Collez votre jeton d'authentification Twilio"
+      },
+      "settings": "Paramètres de Twilio"
     }
   },
   "select": {
@@ -49,6 +62,7 @@
     "options": {
       "DisplayName": "Nom d’affichage",
       "EmailAddress": "Adresse courriel",
+      "PhoneNumber": "Numéro de téléphone",
       "UpdatedOn": "Dernière modification"
     }
   },

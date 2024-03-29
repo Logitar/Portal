@@ -15,6 +15,7 @@ using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Configurations;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -321,6 +322,11 @@ internal class Mapper
       case SenderProvider.SendGrid:
         destination.SendGrid = new SendGridSettings(source.Settings[nameof(ISendGridSettings.ApiKey)]);
         break;
+      case SenderProvider.Twilio:
+        destination.Twilio = new TwilioSettings(source.Settings[nameof(ITwilioSettings.AccountSid)], source.Settings[nameof(ITwilioSettings.AuthenticationToken)]);
+        break;
+      default:
+        throw new SenderProviderNotSupportedException(source.Provider);
     }
 
     MapAggregate(source, destination);

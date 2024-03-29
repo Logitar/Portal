@@ -12,6 +12,7 @@ internal class SenderSortGraphType : EnumerationGraphType<SenderSort>
 
     Add(SenderSort.DisplayName, "The senders will be sorted by their display name.");
     Add(SenderSort.EmailAddress, "The senders will be sorted by their email address.");
+    Add(SenderSort.PhoneNumber, "The senders will be sorted by their phone number.");
     Add(SenderSort.UpdatedOn, "The senders will be sorted by their latest update date and time.");
   }
 

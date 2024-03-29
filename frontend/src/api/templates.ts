@@ -17,6 +17,9 @@ query($payload: SearchTemplatesPayload!) {
       id
       uniqueKey
       displayName
+      content {
+        type
+      }
     }
   }
 }

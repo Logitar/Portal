@@ -27,11 +27,10 @@
   "demo": {
     "emailRequired": "You need an email address to receive a demo message.",
     "hint": "This message is a demo message.",
+    "invalidSmsMessageContentType": "A SMS message cannot be sent using the specified template's content type.",
     "label": "Demo",
-    "realmHasNoDefaultSender": {
-      "help": "No default sender has been configured for the realm in which the template resides.",
-      "lead": "Sending failed!"
-    },
+    "phoneRequired": "You need a phone number to receive a demo message.",
+    "realmHasNoDefaultSender": "No default sender has been configured for the realm in which the template resides.",
     "status": {
       "Failed": "The message was not sent due to an unexpected failure.",
       "Succeeded": "The message has been successfully sent.",
