@@ -76,7 +76,7 @@ public class TemplateAggregate : AggregateRoot
   public TemplateAggregate(UniqueKeyUnit uniqueKey, SubjectUnit subject, ContentUnit content, TenantId? tenantId = null,
     ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).AggregateId)
   {
-    Raise(new TemplateCreatedEvent(actorId, content, subject, tenantId, uniqueKey));
+    Raise(new TemplateCreatedEvent(tenantId, uniqueKey, subject, content), actorId);
   }
   protected virtual void Apply(TemplateCreatedEvent @event)
   {
@@ -92,7 +92,7 @@ public class TemplateAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new TemplateDeletedEvent(actorId));
+      Raise(new TemplateDeletedEvent(), actorId);
     }
   }
 
@@ -100,7 +100,7 @@ public class TemplateAggregate : AggregateRoot
   {
     if (uniqueKey != _uniqueKey)
     {
-      Raise(new TemplateUniqueKeyChangedEvent(actorId, uniqueKey));
+      Raise(new TemplateUniqueKeyChangedEvent(uniqueKey), actorId);
     }
   }
   protected virtual void Apply(TemplateUniqueKeyChangedEvent @event)
@@ -112,8 +112,7 @@ public class TemplateAggregate : AggregateRoot
   {
     if (_updatedEvent.HasChanges)
     {
-      _updatedEvent.ActorId = actorId;
-      Raise(_updatedEvent);
+      Raise(_updatedEvent, actorId, DateTime.Now);
       _updatedEvent = new();
     }
   }

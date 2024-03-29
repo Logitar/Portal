@@ -5,9 +5,8 @@ namespace Logitar.Portal.Domain.Messages.Events;
 
 public record MessageDeletedEvent : DomainEvent, INotification
 {
-  public MessageDeletedEvent(ActorId actorId)
+  public MessageDeletedEvent()
   {
-    ActorId = actorId;
     IsDeleted = true;
   }
 }

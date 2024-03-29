@@ -5,9 +5,8 @@ namespace Logitar.Portal.Domain.Dictionaries.Events;
 
 public record DictionaryDeletedEvent : DomainEvent, INotification
 {
-  public DictionaryDeletedEvent(ActorId actorId)
+  public DictionaryDeletedEvent()
   {
-    ActorId = actorId;
     IsDeleted = true;
   }
 }

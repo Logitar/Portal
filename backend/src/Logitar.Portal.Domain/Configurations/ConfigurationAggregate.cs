@@ -100,12 +100,13 @@ public class ConfigurationAggregate : AggregateRoot
     ConfigurationId id = new();
     ConfigurationAggregate configuration = new(id.AggregateId);
 
+    LocaleUnit? defaultLocale = null;
     JwtSecretUnit secret = JwtSecretUnit.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passordSettings = new();
     bool requireUniqueEmail = true;
     ReadOnlyLoggingSettings loggingSettings = new();
-    configuration.Raise(new ConfigurationInitializedEvent(actorId, defaultLocale: null, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings));
+    configuration.Raise(new ConfigurationInitializedEvent(defaultLocale, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings), actorId);
 
     return configuration;
   }
@@ -125,8 +126,7 @@ public class ConfigurationAggregate : AggregateRoot
   {
     if (_updatedEvent.HasChanges)
     {
-      _updatedEvent.ActorId = actorId;
-      Raise(_updatedEvent);
+      Raise(_updatedEvent, actorId, DateTime.Now);
       _updatedEvent = new();
     }
   }

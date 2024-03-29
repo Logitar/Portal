@@ -4,16 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Dictionaries.Events;
 
-public record DictionaryCreatedEvent : DomainEvent, INotification
-{
-  public TenantId? TenantId { get; }
-
-  public LocaleUnit Locale { get; }
-
-  public DictionaryCreatedEvent(ActorId actorId, LocaleUnit locale, TenantId? tenantId)
-  {
-    ActorId = actorId;
-    Locale = locale;
-    TenantId = tenantId;
-  }
-}
+public record DictionaryCreatedEvent(TenantId? TenantId, LocaleUnit Locale) : DomainEvent, INotification;

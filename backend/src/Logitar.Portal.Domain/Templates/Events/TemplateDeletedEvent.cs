@@ -5,9 +5,8 @@ namespace Logitar.Portal.Domain.Templates.Events;
 
 public record TemplateDeletedEvent : DomainEvent, INotification
 {
-  public TemplateDeletedEvent(ActorId actorId)
+  public TemplateDeletedEvent()
   {
-    ActorId = actorId;
     IsDeleted = true;
   }
 }
