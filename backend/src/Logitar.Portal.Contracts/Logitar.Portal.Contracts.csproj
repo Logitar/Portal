@@ -15,14 +15,14 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Logitar/Portal</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>4.1.0.0</AssemblyVersion>
+    <AssemblyVersion>4.1.1.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>4.1.0</Version>
+    <Version>4.1.1</Version>
     <NeutralLanguage>en-CA</NeutralLanguage>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <PackageReleaseNotes>Implemented SMS messages.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated NuGet packages.</PackageReleaseNotes>
     <PackageTags>logitar;portal;contracts</PackageTags>
     <PackageProjectUrl>https://github.com/Logitar/Portal/tree/main/backend/src/Logitar.Portal.Contracts</PackageProjectUrl>
   </PropertyGroup>
@@ -51,8 +51,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar" Version="6.1.0" />
-    <PackageReference Include="Logitar.Identity.Contracts" Version="1.0.0" />
+    <PackageReference Include="Logitar" Version="6.2.0" />
+    <PackageReference Include="Logitar.Identity.Contracts" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
