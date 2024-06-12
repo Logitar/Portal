@@ -1,9 +1,12 @@
 ﻿using Logitar.Data;
 using Logitar.Identity.Contracts;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,16 +18,25 @@ public class UpdateSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _sender;
+  private readonly SenderAggregate _mailgun;
+  private readonly SenderAggregate _sendGrid;
+  private readonly SenderAggregate _twilio;
 
   public UpdateSenderCommandTests() : base()
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
-    ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    _sender = new(email, settings);
-    _sender.SetDefault();
+    _mailgun = new(email, new ReadOnlyMailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName()));
+    _sendGrid = new(email, new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()));
+    _sendGrid.SetDefault();
+
+    PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
+    _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()))
+    {
+      Description = new DescriptionUnit("This is the SMS sender.")
+    };
+    _twilio.Update();
   }
 
   public override async Task InitializeAsync()
@@ -38,7 +50,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
-    await _senderRepository.SaveAsync(_sender);
+    await _senderRepository.SaveAsync([_sendGrid, _mailgun, _twilio]);
   }
 
   [Fact(DisplayName = "It should return null when the sender cannot be found.")]
@@ -56,7 +68,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     SetRealm();
 
     UpdateSenderPayload payload = new();
-    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
     Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -68,27 +80,63 @@ public class UpdateSenderCommandTests : IntegrationTests
     {
       EmailAddress = "aa@@bb..cc"
     };
-    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
 
-  [Fact(DisplayName = "It should update an existing sender.")]
-  public async Task It_should_update_an_existing_sender()
+  [Fact(DisplayName = "It should update an existing Mailgun sender.")]
+  public async Task It_should_update_an_existing_Mailgun_sender()
+  {
+    UpdateSenderPayload payload = new()
+    {
+      DisplayName = new Modification<string>("  Alternative Sender  "),
+      Description = new Modification<string>("  ")
+    };
+    UpdateSenderCommand command = new(_mailgun.Id.ToGuid(), payload);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(sender);
+
+    Assert.Equal(_mailgun.Email?.Address, sender.EmailAddress);
+    Assert.NotNull(payload.DisplayName.Value);
+    Assert.Equal(payload.DisplayName.Value.Trim(), sender.DisplayName);
+    Assert.Null(sender.Description);
+    Assert.Null(sender.Realm);
+  }
+
+  [Fact(DisplayName = "It should update an existing SendGrid sender.")]
+  public async Task It_should_update_an_existing_SendGrid_sender()
   {
     UpdateSenderPayload payload = new()
     {
       DisplayName = new Modification<string>("  Default Sender  "),
       Description = new Modification<string>("  ")
     };
-    UpdateSenderCommand command = new(_sender.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
     Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
-    Assert.Equal(_sender.Email?.Address, sender.EmailAddress);
+    Assert.Equal(_sendGrid.Email?.Address, sender.EmailAddress);
     Assert.NotNull(payload.DisplayName.Value);
     Assert.Equal(payload.DisplayName.Value.Trim(), sender.DisplayName);
     Assert.Null(sender.Description);
+    Assert.Null(sender.Realm);
+  }
+
+  [Fact(DisplayName = "It should update an existing Twilio sender.")]
+  public async Task It_should_update_an_existing_Twilio_sender()
+  {
+    UpdateSenderPayload payload = new()
+    {
+      PhoneNumber = "+15148422112"
+    };
+    UpdateSenderCommand command = new(_twilio.Id.ToGuid(), payload);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(sender);
+
+    Assert.Equal(payload.PhoneNumber, sender.PhoneNumber);
+    Assert.NotNull(_twilio.Description);
+    Assert.Equal(_twilio.Description.Value, sender.Description);
     Assert.Null(sender.Realm);
   }
 }

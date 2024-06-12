@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated Docker Compose file.
 - Updated NPM packages & fixed security issues.
+- Fixed Twilio sender replacement.
 
 ## [4.1.0] - 2024-03-28
 

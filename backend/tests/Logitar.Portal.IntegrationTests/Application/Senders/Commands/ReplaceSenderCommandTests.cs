@@ -3,7 +3,9 @@ using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
+using Logitar.Portal.Domain.Senders.Twilio;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,16 +17,21 @@ public class ReplaceSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _sender;
+  private readonly SenderAggregate _mailgun;
+  private readonly SenderAggregate _sendGrid;
+  private readonly SenderAggregate _twilio;
 
   public ReplaceSenderCommandTests() : base()
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
-    ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    _sender = new(email, settings);
-    _sender.SetDefault();
+    _mailgun = new(email, new ReadOnlyMailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName()));
+    _sendGrid = new(email, new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()));
+    _sendGrid.SetDefault();
+
+    PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
+    _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()));
   }
 
   public override async Task InitializeAsync()
@@ -38,36 +45,93 @@ public class ReplaceSenderCommandTests : IntegrationTests
       await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
     }
 
-    await _senderRepository.SaveAsync(_sender);
+    await _senderRepository.SaveAsync([_sendGrid, _mailgun]);
   }
 
-  [Fact(DisplayName = "It should replace an existing sender.")]
-  public async Task It_should_replace_an_existing_sender()
+  [Fact(DisplayName = "It should replace a Mailgun sender.")]
+  public async Task It_should_replace_a_Mailgun_sender()
   {
-    _sender.DisplayName = new DisplayNameUnit("Reset Password");
-    _sender.Update();
-    await _senderRepository.SaveAsync(_sender);
-    long version = _sender.Version;
+    _mailgun.DisplayName = new DisplayNameUnit("Logitar");
+    _mailgun.Update();
+    await _senderRepository.SaveAsync(_mailgun);
+    long version = _mailgun.Version;
 
-    DisplayNameUnit displayName = new("Password Recovery");
-    _sender.DisplayName = displayName;
-    _sender.Update();
-    await _senderRepository.SaveAsync(_sender);
+    DisplayNameUnit displayName = new("Logitar Portal");
+    _mailgun.DisplayName = displayName;
+    _mailgun.Update();
+    await _senderRepository.SaveAsync(_mailgun);
 
     ReplaceSenderPayload payload = new(Faker.Internet.Email())
     {
-      DisplayName = " Default Sender ",
+      DisplayName = " Logitar ",
       Description = "                ",
-      SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
+      Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
     };
-    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_mailgun.Id.ToGuid(), payload, version);
     Sender? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
-    Assert.Equal(payload.DisplayName.Trim(), sender.DisplayName);
+    Assert.Equal(displayName.Value, sender.DisplayName);
+    Assert.Null(sender.Description);
+    Assert.Equal(payload.Mailgun, sender.Mailgun);
+  }
+
+  [Fact(DisplayName = "It should replace a SendGrid sender.")]
+  public async Task It_should_replace_a_SendGrid_sender()
+  {
+    _sendGrid.DisplayName = new DisplayNameUnit("Logitar");
+    _sendGrid.Update();
+    await _senderRepository.SaveAsync(_sendGrid);
+    long version = _sendGrid.Version;
+
+    DisplayNameUnit displayName = new("Logitar Portal");
+    _sendGrid.DisplayName = displayName;
+    _sendGrid.Update();
+    await _senderRepository.SaveAsync(_sendGrid);
+
+    ReplaceSenderPayload payload = new(Faker.Internet.Email())
+    {
+      DisplayName = " Logitar ",
+      Description = "                ",
+      SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
+    };
+    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, version);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(sender);
+
+    Assert.Equal(payload.EmailAddress, sender.EmailAddress);
+    Assert.Equal(displayName.Value, sender.DisplayName);
     Assert.Null(sender.Description);
     Assert.Equal(payload.SendGrid, sender.SendGrid);
+  }
+
+  [Fact(DisplayName = "It should replace a Twilio sender.")]
+  public async Task It_should_replace_a_Twilio_sender()
+  {
+    _twilio.Phone = new PhoneUnit("+15149873651", countryCode: null, extension: null, isVerified: false);
+    _twilio.Update();
+    await _senderRepository.SaveAsync(_twilio);
+    long version = _twilio.Version;
+
+    PhoneUnit phone = new("+15148422112", countryCode: null, extension: null, isVerified: false);
+    _twilio.Phone = phone;
+    _twilio.Update();
+    await _senderRepository.SaveAsync(_twilio);
+
+    ReplaceSenderPayload payload = new()
+    {
+      PhoneNumber = " +15149873651 ",
+      Description = "                ",
+      Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
+    };
+    ReplaceSenderCommand command = new(_twilio.Id.ToGuid(), payload, version);
+    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(sender);
+
+    Assert.Equal(phone.Number, sender.PhoneNumber);
+    Assert.Null(sender.Description);
+    Assert.Equal(payload.Twilio, sender.Twilio);
   }
 
   [Fact(DisplayName = "It should return null when the sender cannot be found.")]
@@ -91,7 +155,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
     Sender? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -103,7 +167,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sender.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
