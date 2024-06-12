@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [4.1.1] - 2024-06-11
+
 ### Fixed
 
 - Updated Docker Compose file.
@@ -177,7 +181,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v4.1.0...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/Logitar/Portal/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/Logitar/Portal/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/Logitar/Portal/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/Logitar/Portal/compare/v3.0.3...v4.0.0
