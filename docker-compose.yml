@@ -1,9 +1,9 @@
-version: '3.8'
 name: portal
 services:
   portal_mongo:
     image: mongo
     container_name: Logitar.Portal_mongo
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: portal
       MONGO_INITDB_ROOT_PASSWORD: LB6SAj52nU73ZxFz
@@ -13,6 +13,7 @@ services:
   portal_mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: Logitar.Portal_mssql
+    restart: unless-stopped
     environment:
       ACCEPT_EULA: 'Y'
       SA_PASSWORD: w8x6pF9H5QEJL7sN
@@ -22,6 +23,7 @@ services:
   portal_postgres:
     image: postgres
     container_name: Logitar.Portal_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: YStQn6XF5VbgcPBw
     ports:
@@ -30,6 +32,7 @@ services:
   portal_rabbitmq:
     image: masstransit/rabbitmq
     container_name: Logitar.Portal_rabbitmq
+    restart: unless-stopped
     ports:
       - 5677:5672
       - 15677:15672
