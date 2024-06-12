@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +20,40 @@ public class CreateSenderCommandTests : IntegrationTests
     }
   }
 
-  [Fact(DisplayName = "It should create a new sender.")]
-  public async Task It_should_create_a_new_sender()
+  [Fact(DisplayName = "It should create a new Mailgun sender.")]
+  public async Task It_should_create_a_new_Mailgun_sender()
+  {
+    CreateSenderPayload payload = new(Faker.Internet.Email())
+    {
+      DisplayName = "Alternative Sender",
+      Description = "    ",
+      Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
+    };
+    CreateSenderCommand command = new(payload);
+    Sender sender = await ActivityPipeline.ExecuteAsync(command);
+
+    Assert.True(sender.IsDefault);
+    Assert.Equal(payload.EmailAddress, sender.EmailAddress);
+    Assert.Null(sender.PhoneNumber);
+    Assert.Equal(payload.DisplayName, sender.DisplayName);
+    Assert.Null(sender.Description);
+    Assert.Equal(SenderProvider.Mailgun, sender.Provider);
+    Assert.Equal(payload.Mailgun, sender.Mailgun);
+    Assert.Null(sender.Realm);
+
+    SetRealm();
+    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
+    Assert.Same(Realm, other1.Realm);
+    Assert.True(other1.IsDefault);
+
+    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotEqual(other1, other2);
+    Assert.Same(Realm, other1.Realm);
+    Assert.False(other2.IsDefault);
+  }
+
+  [Fact(DisplayName = "It should create a new SendGrid sender.")]
+  public async Task It_should_create_a_new_SendGrid_sender()
   {
     CreateSenderPayload payload = new(Faker.Internet.Email())
     {
@@ -35,10 +66,43 @@ public class CreateSenderCommandTests : IntegrationTests
 
     Assert.True(sender.IsDefault);
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
+    Assert.Null(sender.PhoneNumber);
     Assert.Equal(payload.DisplayName, sender.DisplayName);
     Assert.Null(sender.Description);
     Assert.Equal(SenderProvider.SendGrid, sender.Provider);
     Assert.Equal(payload.SendGrid, sender.SendGrid);
+    Assert.Null(sender.Realm);
+
+    SetRealm();
+    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
+    Assert.Same(Realm, other1.Realm);
+    Assert.True(other1.IsDefault);
+
+    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotEqual(other1, other2);
+    Assert.Same(Realm, other1.Realm);
+    Assert.False(other2.IsDefault);
+  }
+
+  [Fact(DisplayName = "It should create a new Twilio sender.")]
+  public async Task It_should_create_a_new_Twilio_sender()
+  {
+    CreateSenderPayload payload = new()
+    {
+      PhoneNumber = "+15148454636",
+      Description = "    ",
+      Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
+    };
+    CreateSenderCommand command = new(payload);
+    Sender sender = await ActivityPipeline.ExecuteAsync(command);
+
+    Assert.True(sender.IsDefault);
+    Assert.Null(sender.EmailAddress);
+    Assert.Equal(payload.PhoneNumber, sender.PhoneNumber);
+    Assert.Null(sender.DisplayName);
+    Assert.Null(sender.Description);
+    Assert.Equal(SenderProvider.Twilio, sender.Provider);
+    Assert.Equal(payload.Twilio, sender.Twilio);
     Assert.Null(sender.Realm);
 
     SetRealm();

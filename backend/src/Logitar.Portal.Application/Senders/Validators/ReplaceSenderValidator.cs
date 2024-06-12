@@ -54,7 +54,7 @@ internal class ReplaceSenderValidator : AbstractValidator<ReplaceSenderPayload>
       case SenderProvider.Twilio:
         RuleFor(x => x.Mailgun).Null();
         RuleFor(x => x.SendGrid).Null();
-        RuleFor(x => x.Twilio).Null();
+        RuleFor(x => x.Twilio).NotNull();
         When(x => x.Twilio != null, () => RuleFor(x => x.Twilio!).SetValidator(new TwilioSettingsValidator()));
         break;
       default:
