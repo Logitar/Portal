@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
-internal class SendEmailCommandHandler : INotificationHandler<SendEmailCommand>
+internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 {
   private readonly JsonSerializerOptions _serializerOptions;
 
