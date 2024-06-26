@@ -18,18 +18,18 @@ namespace Logitar.Portal.Application.Messages.Commands;
 internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageInternalCommand, SentMessages>
 {
   private readonly IDictionaryRepository _dictionaryRepository;
-  private readonly IMediator _mediator;
   private readonly IMessageRepository _messageRepository;
+  private readonly ISender _sender;
   private readonly ISenderRepository _senderRepository;
   private readonly ITemplateRepository _templateRepository;
   private readonly IUserRepository _userRepository;
 
-  public SendMessageInternalCommandHandler(IDictionaryRepository dictionaryRepository, IMediator mediator, IMessageRepository messageRepository,
+  public SendMessageInternalCommandHandler(IDictionaryRepository dictionaryRepository, IMessageRepository messageRepository, ISender sender,
     ISenderRepository senderRepository, ITemplateRepository templateRepository, IUserRepository userRepository)
   {
     _dictionaryRepository = dictionaryRepository;
-    _mediator = mediator;
     _messageRepository = messageRepository;
+    _sender = sender;
     _senderRepository = senderRepository;
     _templateRepository = templateRepository;
     _userRepository = userRepository;
@@ -67,13 +67,13 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
 
       SubjectUnit subject = new(dictionaries.Translate(template.Subject.Value));
       LocaleUnit? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
-      ContentUnit body = await _mediator.Send(new CompileTemplateCommand(id, template, dictionaries, locale, recipient.User, variables), cancellationToken);
+      ContentUnit body = await _sender.Send(new CompileTemplateCommand(id, template, dictionaries, locale, recipient.User, variables), cancellationToken);
       IReadOnlyCollection<RecipientUnit> recipients = [recipient, .. allRecipients.CC, .. allRecipients.Bcc];
 
       MessageAggregate message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
       messages.Add(message);
 
-      await _mediator.Publish(new SendEmailCommand(actorId, message, sender), cancellationToken);
+      await _sender.Send(new SendEmailCommand(actorId, message, sender), cancellationToken);
     }
     await _messageRepository.SaveAsync(messages, cancellationToken);
 
