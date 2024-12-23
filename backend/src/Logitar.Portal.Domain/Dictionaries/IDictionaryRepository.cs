@@ -4,11 +4,12 @@ namespace Logitar.Portal.Domain.Dictionaries;
 
 public interface IDictionaryRepository
 {
-  Task<DictionaryAggregate?> LoadAsync(DictionaryId id, long? version = null, CancellationToken cancellationToken = default);
-  Task<IReadOnlyCollection<DictionaryAggregate>> LoadAsync(CancellationToken cancellationToken = default);
-  Task<IReadOnlyCollection<DictionaryAggregate>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
-  Task<DictionaryAggregate?> LoadAsync(TenantId? tenantId, Locale locale, CancellationToken cancellationToken = default);
+  Task<Dictionary?> LoadAsync(DictionaryId id, CancellationToken cancellationToken = default);
+  Task<Dictionary?> LoadAsync(DictionaryId id, long? version = null, CancellationToken cancellationToken = default);
+  Task<IEnumerable<Dictionary>> LoadAsync(CancellationToken cancellationToken = default);
+  Task<IEnumerable<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
+  Task<Dictionary?> LoadAsync(TenantId? tenantId, Locale locale, CancellationToken cancellationToken = default);
 
-  Task SaveAsync(DictionaryAggregate dictionary, CancellationToken cancellationToken = default);
-  Task SaveAsync(IEnumerable<DictionaryAggregate> dictionaries, CancellationToken cancellationToken = default);
+  Task SaveAsync(Dictionary dictionary, CancellationToken cancellationToken = default);
+  Task SaveAsync(IEnumerable<Dictionary> dictionaries, CancellationToken cancellationToken = default);
 }

@@ -15,13 +15,13 @@ public class SearchDictionariesQueryTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public SearchDictionariesQueryTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new Locale(Faker.Locale));
+    _dictionary = new(new LocaleUnit(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -44,7 +44,7 @@ public class SearchDictionariesQueryTests : IntegrationTests
     SearchDictionariesPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchDictionariesQuery query = new(payload);
-    SearchResults<Dictionary> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<DictionaryModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -52,10 +52,10 @@ public class SearchDictionariesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    DictionaryAggregate notMatching = new(new Locale(Faker.Locale), TenantId);
-    DictionaryAggregate notInIds = new(new Locale("fr"), TenantId);
-    DictionaryAggregate empty = new(new Locale("fr-FR"), TenantId);
-    DictionaryAggregate notEmpty = new(new Locale("fr-CA"), TenantId);
+    Dictionary notMatching = new(new LocaleUnit(Faker.Locale), TenantId);
+    Dictionary notInIds = new(new LocaleUnit("fr"), TenantId);
+    Dictionary empty = new(new LocaleUnit("fr-FR"), TenantId);
+    Dictionary notEmpty = new(new LocaleUnit("fr-CA"), TenantId);
     notEmpty.SetEntry("Poutine", "Poutine");
     notEmpty.Update();
     await _dictionaryRepository.SaveAsync([notMatching, notInIds, empty, notEmpty]);
@@ -76,10 +76,10 @@ public class SearchDictionariesQueryTests : IntegrationTests
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new DictionarySortOption(DictionarySort.EntryCount, isDescending: false));
     SearchDictionariesQuery query = new(payload);
-    SearchResults<Dictionary> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<DictionaryModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Dictionary dictionary = Assert.Single(results.Items);
+    DictionaryModel dictionary = Assert.Single(results.Items);
     Assert.Equal(notEmpty.Id.ToGuid(), dictionary.Id);
   }
 }

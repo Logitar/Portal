@@ -4,7 +4,7 @@ using Logitar.Portal.Domain.Dictionaries.Events;
 
 namespace Logitar.Portal.Domain.Dictionaries;
 
-public class DictionaryAggregate : AggregateRoot
+public class Dictionary : AggregateRoot
 {
   private DictionaryUpdated _updated = new();
 
@@ -18,11 +18,11 @@ public class DictionaryAggregate : AggregateRoot
   private readonly Dictionary<Identifier, string> _entries = [];
   public IReadOnlyDictionary<Identifier, string> Entries => _entries.AsReadOnly();
 
-  public DictionaryAggregate() : base()
+  public Dictionary() : base()
   {
   }
 
-  public DictionaryAggregate(Locale locale, ActorId actorId = default, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
+  public Dictionary(Locale locale, ActorId actorId = default, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
   {
     Raise(new DictionaryCreated(locale), actorId);
   }

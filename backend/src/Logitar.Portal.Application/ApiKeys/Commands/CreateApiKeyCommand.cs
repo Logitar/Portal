@@ -39,8 +39,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
 
     DisplayName displayName = new(payload.DisplayName);
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secretString);
-    ApiKeyId id = ApiKeyId.NewId(command.TenantId);
-    ApiKey apiKey = new(displayName, secret, actorId, id)
+    ApiKey apiKey = new(displayName, secret, actorId, ApiKeyId.NewId(command.TenantId))
     {
       Description = Description.TryCreate(payload.Description)
     };

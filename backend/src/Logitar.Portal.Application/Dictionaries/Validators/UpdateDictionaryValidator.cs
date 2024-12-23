@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 
 namespace Logitar.Portal.Application.Dictionaries.Validators;
@@ -8,7 +8,7 @@ internal class UpdateDictionaryValidator : AbstractValidator<UpdateDictionaryPay
 {
   public UpdateDictionaryValidator()
   {
-    When(x => !string.IsNullOrWhiteSpace(x.Locale), () => RuleFor(x => x.Locale!).SetValidator(new LocaleValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.Locale), () => RuleFor(x => x.Locale!).Locale());
     RuleForEach(x => x.Entries).SetValidator(new DictionaryEntryModificationValidator());
   }
 }

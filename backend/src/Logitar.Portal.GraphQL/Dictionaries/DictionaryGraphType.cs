@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Dictionaries;
 
-internal class DictionaryGraphType : AggregateGraphType<Dictionary>
+internal class DictionaryGraphType : AggregateGraphType<DictionaryModel>
 {
   public DictionaryGraphType() : base("Represents a textual resource dictionary that will be used to localized email templates.")
   {

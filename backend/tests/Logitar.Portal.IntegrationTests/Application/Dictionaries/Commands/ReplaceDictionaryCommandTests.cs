@@ -14,13 +14,13 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public ReplaceDictionaryCommandTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new Locale(Faker.Locale));
+    _dictionary = new(new LocaleUnit(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -55,7 +55,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("cyan", "cyan"));
     payload.Entries.Add(new("or", "golden"));
     ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, version);
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
@@ -72,7 +72,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   {
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -83,14 +83,14 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
 
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, Version: null);
-    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
   public async Task It_should_throw_DictionaryAlreadyExistsException_when_the_dictionary_already_exists()
   {
-    DictionaryAggregate dictionary = new(new Locale("fr"));
+    Dictionary dictionary = new(new LocaleUnit("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());

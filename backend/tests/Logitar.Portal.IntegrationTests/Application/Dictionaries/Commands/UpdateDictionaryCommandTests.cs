@@ -14,13 +14,13 @@ public class UpdateDictionaryCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public UpdateDictionaryCommandTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new Locale(Faker.Locale));
+    _dictionary = new(new LocaleUnit(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -42,7 +42,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   {
     UpdateDictionaryPayload payload = new();
     UpdateDictionaryCommand command = new(Guid.NewGuid(), payload);
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -53,14 +53,14 @@ public class UpdateDictionaryCommandTests : IntegrationTests
 
     UpdateDictionaryPayload payload = new();
     UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
-    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
   public async Task It_should_throw_DictionaryAlreadyExistsException_when_the_dictionary_already_exists()
   {
-    DictionaryAggregate dictionary = new(new Locale("fr-CA"));
+    Dictionary dictionary = new(new LocaleUnit("fr-CA"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     UpdateDictionaryPayload payload = new()
@@ -102,7 +102,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("rouge", "scarlet"));
     payload.Entries.Add(new("vert", value: null));
     UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);

@@ -13,12 +13,12 @@ internal class DictionaryManager : IDictionaryManager
     _dictionaryRepository = dictionaryRepository;
   }
 
-  public async Task SaveAsync(DictionaryAggregate dictionary, ActorId actorId, CancellationToken cancellationToken)
+  public async Task SaveAsync(Dictionary dictionary, ActorId actorId, CancellationToken cancellationToken)
   {
     bool hasLocaleChanged = false;
-    foreach (DomainEvent change in dictionary.Changes)
+    foreach (IEvent change in dictionary.Changes)
     {
-      if (change is DictionaryCreatedEvent || change is DictionaryLocaleChangedEvent)
+      if (change is DictionaryCreated || change is DictionaryLocaleChanged)
       {
         hasLocaleChanged = true;
       }
@@ -26,7 +26,7 @@ internal class DictionaryManager : IDictionaryManager
 
     if (hasLocaleChanged)
     {
-      DictionaryAggregate? other = await _dictionaryRepository.LoadAsync(dictionary.TenantId, dictionary.Locale, cancellationToken);
+      Dictionary? other = await _dictionaryRepository.LoadAsync(dictionary.TenantId, dictionary.Locale, cancellationToken);
       if (other?.Equals(dictionary) == false)
       {
         throw new DictionaryAlreadyExistsException(dictionary.TenantId, dictionary.Locale);

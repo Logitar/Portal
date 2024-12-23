@@ -16,9 +16,9 @@ internal class DeleteRealmDictionariesCommandHandler : INotificationHandler<Dele
   public async Task Handle(DeleteRealmDictionariesCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<DictionaryAggregate> dictionaries = await _dictionaryRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<Dictionary> dictionaries = await _dictionaryRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (DictionaryAggregate dictionary in dictionaries)
+    foreach (Dictionary dictionary in dictionaries)
     {
       dictionary.Delete(command.ActorId);
     }

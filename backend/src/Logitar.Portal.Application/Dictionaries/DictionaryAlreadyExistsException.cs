@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Application.Dictionaries;
 
@@ -6,25 +6,25 @@ public class DictionaryAlreadyExistsException : Exception
 {
   public const string ErrorMessage = "The specified dictionary already exists.";
 
-  public TenantId? TenantId
+  public string? TenantId
   {
-    get => TenantId.TryCreate((string)Data[nameof(TenantId)]!);
-    private set => Data[nameof(TenantId)] = value?.Value;
+    get => (string?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
-  public Locale Locale
+  public string Locale
   {
-    get => new((string)Data[nameof(Locale)]!);
-    private set => Data[nameof(Locale)] = value.Code;
+    get => (string)Data[nameof(Locale)]!;
+    private set => Data[nameof(Locale)] = value;
   }
 
   public DictionaryAlreadyExistsException(TenantId? tenantId, Locale locale) : base(BuildMessage(tenantId, locale))
   {
-    TenantId = tenantId;
-    Locale = locale;
+    TenantId = tenantId?.Value;
+    Locale = locale.Code;
   }
 
   private static string BuildMessage(TenantId? tenantId, Locale locale) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
-    .AddData(nameof(Locale), locale.Code)
+    .AddData(nameof(TenantId), tenantId, "<null>")
+    .AddData(nameof(Locale), locale)
     .Build();
 }
