@@ -6,10 +6,10 @@ public class SenderProviderMismatchException : Exception
 {
   public const string ErrorMessage = "The specified sender provider was not expected.";
 
-  public SenderId SenderId
+  public string SenderId
   {
-    get => new((string)Data[nameof(SenderId)]!);
-    private set => Data[nameof(SenderId)] = value.Value;
+    get => (string)Data[nameof(SenderId)]!;
+    private set => Data[nameof(SenderId)] = value;
   }
   public SenderProvider ExpectedProvider
   {
@@ -24,7 +24,7 @@ public class SenderProviderMismatchException : Exception
 
   public SenderProviderMismatchException(SenderAggregate sender, SenderProvider actualProvider) : base(BuildMessage(sender, actualProvider))
   {
-    SenderId = sender.Id;
+    SenderId = sender.Id.Value;
     ExpectedProvider = sender.Provider;
     ActualProvider = actualProvider;
   }

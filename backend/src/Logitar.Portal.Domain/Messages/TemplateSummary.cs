@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Templates;
 
 namespace Logitar.Portal.Domain.Messages;
@@ -6,11 +6,11 @@ namespace Logitar.Portal.Domain.Messages;
 public record TemplateSummary
 {
   public TemplateId Id { get; }
-  public UniqueKeyUnit UniqueKey { get; }
-  public DisplayNameUnit? DisplayName { get; }
+  public Identifier UniqueKey { get; }
+  public DisplayName? DisplayName { get; }
 
   [JsonConstructor]
-  public TemplateSummary(TemplateId id, UniqueKeyUnit uniqueKey, DisplayNameUnit? displayName)
+  public TemplateSummary(TemplateId id, Identifier uniqueKey, DisplayName? displayName)
   {
     Id = id;
     UniqueKey = uniqueKey;

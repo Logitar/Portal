@@ -7,7 +7,7 @@ public class ContentValidator : AbstractValidator<IContent>
 {
   public ContentValidator()
   {
-    RuleFor(x => x.Type).SetValidator(new ContentTypeValidator());
+    RuleFor(x => x.Type).ContentType();
     RuleFor(x => x.Text).NotEmpty();
   }
 }

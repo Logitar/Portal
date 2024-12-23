@@ -1,39 +1,33 @@
-﻿using FluentValidation;
-using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.EventSourcing;
 
 namespace Logitar.Portal.Domain.Realms;
 
-public record RealmId
+public readonly struct RealmId
 {
-  public AggregateId AggregateId { get; }
-  public string Value => AggregateId.Value;
+  public StreamId StreamId { get; }
+  public string Value => StreamId.Value;
 
-  public RealmId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  public RealmId(Guid value)
   {
+    StreamId = new(value);
+  }
+  public RealmId(string value)
+  {
+    StreamId = new(value);
+  }
+  public RealmId(StreamId streamId)
+  {
+    StreamId = streamId;
   }
 
-  public RealmId(AggregateId aggregateId, string? propertyName = null)
-  {
-    new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
+  public static RealmId NewId() => new(Guid.NewGuid());
 
-    AggregateId = aggregateId;
-  }
+  public Guid ToGuid => StreamId.ToGuid();
 
-  public RealmId(string value, string? propertyName = null)
-  {
-    value = value.Trim();
-    new IdValidator(propertyName).ValidateAndThrow(value);
+  public static bool operator ==(RealmId left, RealmId right) => left.Equals(right);
+  public static bool operator !=(RealmId left, RealmId right) => !left.Equals(right);
 
-    AggregateId = new(value);
-  }
-
-  public static RealmId NewId() => new(AggregateId.NewId());
-
-  public static RealmId? TryCreate(string? value, string? propertyName = null)
-  {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
-  }
-
-  public Guid ToGuid() => AggregateId.ToGuid();
+  public override bool Equals([NotNullWhen(true)] object? obj) => obj is RealmId id && id.Value == Value;
+  public override int GetHashCode() => Value.GetHashCode();
+  public override string ToString() => Value;
 }
