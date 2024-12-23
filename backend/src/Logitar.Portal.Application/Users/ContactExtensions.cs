@@ -1,15 +1,15 @@
 ﻿using Logitar.Identity.Contracts.Users;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Users;
 
 internal static class ContactExtensions
 {
-  public static AddressUnit ToAddressUnit(this AddressPayload address) => address.ToAddressUnit(address.IsVerified);
-  public static AddressUnit ToAddressUnit(this IAddress address, bool isVerified = false)
+  public static Address ToAddress(this AddressPayload address, IAddressHelper helper) => address.ToAddress(helper, address.IsVerified);
+  public static Address ToAddress(this IAddress address, IAddressHelper helper, bool isVerified = false)
   {
-    return new AddressUnit(address.Street, address.Locality, address.Country, address.Region, address.PostalCode, isVerified);
+    return new Address(helper, address.Street, address.Locality, address.Country, address.Region, address.PostalCode, isVerified);
   }
 
   public static Email ToEmail(this EmailPayload email) => email.ToEmail(email.IsVerified);

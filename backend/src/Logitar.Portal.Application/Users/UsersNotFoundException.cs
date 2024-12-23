@@ -4,9 +4,9 @@ public class UsersNotFoundException : Exception
 {
   public const string ErrorMessage = "The specified users could not be found.";
 
-  public IEnumerable<Guid> Ids
+  public IReadOnlyCollection<Guid> Ids
   {
-    get => (IEnumerable<Guid>)Data[nameof(Ids)]!;
+    get => (IReadOnlyCollection<Guid>)Data[nameof(Ids)]!;
     private set => Data[nameof(Ids)] = value;
   }
   public string? PropertyName
@@ -17,7 +17,7 @@ public class UsersNotFoundException : Exception
 
   public UsersNotFoundException(IEnumerable<Guid> ids, string? propertyName = null) : base(BuildMessage(ids, propertyName))
   {
-    Ids = ids;
+    Ids = ids.ToArray();
     PropertyName = propertyName;
   }
 

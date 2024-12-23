@@ -1,15 +1,15 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Application.Users;
 
 public class UserNotFoundException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified user could not be found.";
+  private const string ErrorMessage = "The specified user could not be found.";
 
-  public TenantId? TenantId
+  public string? TenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(TenantId)]);
-    private set => Data[nameof(TenantId)] = value?.Value;
+    get => (string?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
   public string User
   {
@@ -24,13 +24,13 @@ public class UserNotFoundException : InvalidCredentialsException
 
   public UserNotFoundException(TenantId? tenantId, string user, string? propertyName = null) : base(BuildMessage(tenantId, user, propertyName))
   {
-    TenantId = tenantId;
+    TenantId = tenantId?.Value;
     User = user;
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(TenantId? tenantId, string user, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
+    .AddData(nameof(TenantId), tenantId, "<null>")
     .AddData(nameof(User), user)
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
