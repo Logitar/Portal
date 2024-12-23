@@ -23,7 +23,7 @@ internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdenti
 
   public async Task<User?> Handle(SaveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
-    CustomIdentifier identifier = new(command.Key, command.Payload.Value);
+    CustomIdentifierModel identifier = new(command.Key, command.Payload.Value);
     new CustomIdentifierContractValidator().ValidateAndThrow(identifier);
 
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);

@@ -16,7 +16,7 @@ public class UpdateRoleCommandTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public UpdateRoleCommandTests() : base()
   {
@@ -46,7 +46,7 @@ public class UpdateRoleCommandTests : IntegrationTests
   {
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(Guid.NewGuid(), payload);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -57,14 +57,14 @@ public class UpdateRoleCommandTests : IntegrationTests
 
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? result = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     UpdateRolePayload payload = new()
@@ -72,7 +72,7 @@ public class UpdateRoleCommandTests : IntegrationTests
       UniqueName = "AdmIn"
     };
     UpdateRoleCommand command = new(role.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<Role>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
@@ -107,7 +107,7 @@ public class UpdateRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_realms", bool.TrueString));
     payload.CustomAttributes.Add(new("configuration", value: null));
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(_role.UniqueName.Value, role.UniqueName);

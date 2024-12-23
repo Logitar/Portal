@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Roles;
 
-public class Role : Aggregate
+public class RoleModel : Aggregate
 {
   public string UniqueName { get; set; }
   public string? DisplayName { get; set; }
@@ -12,11 +12,11 @@ public class Role : Aggregate
 
   public RealmModel? Realm { get; set; }
 
-  public Role() : this(string.Empty)
+  public RoleModel() : this(string.Empty)
   {
   }
 
-  public Role(string uniqueName)
+  public RoleModel(string uniqueName)
   {
     UniqueName = uniqueName;
     CustomAttributes = [];

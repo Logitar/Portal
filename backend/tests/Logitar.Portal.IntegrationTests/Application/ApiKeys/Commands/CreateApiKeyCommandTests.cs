@@ -37,7 +37,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateApiKeyPayload payload = new("Default")
@@ -56,7 +56,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     Assert.Equal(payload.CustomAttributes, apiKey.CustomAttributes);
     Assert.Same(Realm, apiKey.Realm);
 
-    Role apiKeyRole = Assert.Single(apiKey.Roles);
+    RoleModel apiKeyRole = Assert.Single(apiKey.Roles);
     Assert.Equal(role.Id.ToGuid(), apiKeyRole.Id);
 
     Assert.NotNull(apiKey.XApiKey);

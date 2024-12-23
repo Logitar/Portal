@@ -247,7 +247,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       if (!roleIds.Contains(roleId))
       {
-        RoleAggregate role = new(roleId.AggregateId);
+        Role role = new(roleId.AggregateId);
         user.RemoveRole(role, actorId);
       }
     }

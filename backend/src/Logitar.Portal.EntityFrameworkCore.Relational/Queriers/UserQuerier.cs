@@ -31,14 +31,14 @@ internal class UserQuerier : IUserQuerier
     _users = context.Users;
   }
 
-  public async Task<User> ReadAsync(RealmModel? realm, UserAggregate user, CancellationToken cancellationToken)
+  public async Task<User> ReadAsync(Realm? realm, UserAggregate user, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, user.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id.Value}' could not be found.");
   }
-  public async Task<User?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Realm? realm, UserId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<User?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -56,7 +56,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
@@ -74,7 +74,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<IEnumerable<User>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken)
+  public async Task<IEnumerable<User>> ReadAsync(Realm? realm, IEmail email, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string emailAddressNormalized = email.Address.Trim().ToUpper();
@@ -88,7 +88,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(users, realm, cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(RealmModel? realm, CustomIdentifier identifier, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Realm? realm, CustomIdentifierModel identifier, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string key = identifier.Key.Trim();
@@ -107,7 +107,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<User>> SearchAsync(RealmModel? realm, SearchUsersPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<User>> SearchAsync(Realm? realm, SearchUsersPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Users.Table).SelectAll(IdentityDb.Users.Table)
       .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)
@@ -221,9 +221,9 @@ internal class UserQuerier : IUserQuerier
     return new SearchResults<User>(items, total);
   }
 
-  private async Task<User> MapAsync(UserEntity user, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<User> MapAsync(UserEntity user, Realm? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([user], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<User>> MapAsync(IEnumerable<UserEntity> users, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<User>> MapAsync(IEnumerable<UserEntity> users, Realm? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = users.SelectMany(user => user.GetActorIds());
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

@@ -46,7 +46,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       Nickname = PersonNameUnit.TryCreate(payload.Nickname),
       Birthdate = payload.Birthdate,
       Gender = GenderUnit.TryCreate(payload.Gender),
-      Locale = Locale.TryCreate(payload.Locale),
+      Locale = LocaleUnit.TryCreate(payload.Locale),
       TimeZone = TimeZoneUnit.TryCreate(payload.TimeZone),
       Picture = UrlUnit.TryCreate(payload.Picture),
       Profile = UrlUnit.TryCreate(payload.Profile),
@@ -84,7 +84,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       user.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
 
-    foreach (CustomIdentifier customIdentifier in payload.CustomIdentifiers)
+    foreach (CustomIdentifierModel customIdentifier in payload.CustomIdentifiers)
     {
       user.SetCustomIdentifier(customIdentifier.Key, customIdentifier.Value, actorId);
     }

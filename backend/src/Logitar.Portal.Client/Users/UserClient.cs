@@ -33,7 +33,7 @@ internal class UserClient : BaseClient, IUserClient
     return await DeleteAsync<User>(uri, context);
   }
 
-  public async Task<User?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifier? identifier, IRequestContext? context)
+  public async Task<User?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifierModel? identifier, IRequestContext? context)
   {
     Dictionary<Guid, User> users = new(capacity: 2);
 

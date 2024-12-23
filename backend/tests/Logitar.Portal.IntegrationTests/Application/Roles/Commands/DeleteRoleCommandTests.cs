@@ -17,7 +17,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public DeleteRoleCommandTests() : base()
   {
@@ -51,7 +51,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     DeleteRoleCommand command = new(_role.Id.ToGuid());
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
     Assert.Equal(command.Id, role.Id);
 
@@ -63,7 +63,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_role_cannot_be_found()
   {
     DeleteRoleCommand command = new(Guid.NewGuid());
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -73,7 +73,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     SetRealm();
 
     DeleteRoleCommand command = new(_role.Id.ToGuid());
-    Role? result = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

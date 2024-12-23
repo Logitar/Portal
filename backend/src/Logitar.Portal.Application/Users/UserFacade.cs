@@ -31,7 +31,7 @@ internal class UserFacade : IUserService
     return await _activityPipeline.ExecuteAsync(new DeleteUserCommand(id), cancellationToken);
   }
 
-  public async Task<User?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifier? identifier, CancellationToken cancellationToken)
+  public async Task<User?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifierModel? identifier, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadUserQuery(id, uniqueName, identifier), cancellationToken);
   }

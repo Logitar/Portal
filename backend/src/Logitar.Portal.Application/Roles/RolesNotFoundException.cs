@@ -4,9 +4,9 @@ public class RolesNotFoundException : Exception
 {
   public const string ErrorMessage = "The specified roles could not be found.";
 
-  public IEnumerable<string> Roles
+  public IReadOnlyCollection<string> Roles
   {
-    get => (IEnumerable<string>)Data[nameof(Roles)]!;
+    get => (IReadOnlyCollection<string>)Data[nameof(Roles)]!;
     private set => Data[nameof(Roles)] = value;
   }
   public string? PropertyName
@@ -17,7 +17,7 @@ public class RolesNotFoundException : Exception
 
   public RolesNotFoundException(IEnumerable<string> roles, string? propertyName = null) : base(BuildMessage(roles, propertyName))
   {
-    Roles = roles;
+    Roles = roles.ToArray();
     PropertyName = propertyName;
   }
 

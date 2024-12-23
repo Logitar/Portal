@@ -147,7 +147,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     {
       if (!roleIds.Contains(roleId))
       {
-        //RoleAggregate role = new(roleId.AggregateId);
+        //Role role = new(roleId.AggregateId);
         //apiKey.RemoveRole(role, actorId); // TODO(fpion): implement
       }
     }

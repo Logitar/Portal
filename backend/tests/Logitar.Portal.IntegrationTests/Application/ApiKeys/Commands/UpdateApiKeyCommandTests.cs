@@ -92,9 +92,9 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   public async Task It_should_update_an_existing_Api_key()
   {
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueName(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueName(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
+    Role admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    Role editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    Role reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
     ApiKey apiKey = await CreateApiKeyAsync();
