@@ -29,14 +29,14 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<ApiKey> ReadAsync(Realm? realm, ApiKeyAggregate apiKey, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> ReadAsync(Realm? realm, ApiKey apiKey, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, apiKey.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The API key entity 'AggregateId={apiKey.Id.Value}' could not be found.");
   }
-  public async Task<ApiKey?> ReadAsync(Realm? realm, ApiKeyId id, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> ReadAsync(Realm? realm, ApiKeyId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<ApiKey?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -52,7 +52,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     return await MapAsync(apiKey, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<ApiKey>> SearchAsync(Realm? realm, SearchApiKeysPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<ApiKeyModel>> SearchAsync(Realm? realm, SearchApiKeysPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.ApiKeys.Table).SelectAll(IdentityDb.ApiKeys.Table)
       .ApplyRealmFilter(IdentityDb.ApiKeys.TenantId, realm)
@@ -107,14 +107,14 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     query = query.ApplyPaging(payload);
 
     ApiKeyEntity[] apiKeys = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<ApiKey> items = await MapAsync(apiKeys, realm, cancellationToken);
+    IEnumerable<ApiKeyModel> items = await MapAsync(apiKeys, realm, cancellationToken);
 
-    return new SearchResults<ApiKey>(items, total);
+    return new SearchResults<ApiKeyModel>(items, total);
   }
 
-  private async Task<ApiKey> MapAsync(ApiKeyEntity apiKey, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<ApiKeyModel> MapAsync(ApiKeyEntity apiKey, Realm? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([apiKey], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<ApiKey>> MapAsync(IEnumerable<ApiKeyEntity> apiKeys, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<ApiKeyModel>> MapAsync(IEnumerable<ApiKeyEntity> apiKeys, Realm? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = apiKeys.SelectMany(apiKey => apiKey.GetActorIds());
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

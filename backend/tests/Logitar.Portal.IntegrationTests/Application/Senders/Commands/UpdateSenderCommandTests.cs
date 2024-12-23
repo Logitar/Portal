@@ -34,7 +34,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
     _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()))
     {
-      Description = new DescriptionUnit("This is the SMS sender.")
+      Description = new Description("This is the SMS sender.")
     };
     _twilio.Update();
   }

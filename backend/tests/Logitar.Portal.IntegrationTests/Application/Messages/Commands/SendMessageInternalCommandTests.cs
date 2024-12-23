@@ -491,7 +491,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
         }
         _sender = new(email, settings, tenantId)
         {
-          DisplayName = DisplayNameUnit.TryCreate(_senderSettings.DisplayName)
+          DisplayName = DisplayName.TryCreate(_senderSettings.DisplayName)
         };
         _sender.Update();
         break;

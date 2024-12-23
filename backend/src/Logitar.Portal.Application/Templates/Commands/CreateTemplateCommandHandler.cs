@@ -31,8 +31,8 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
     ContentUnit content = new(payload.Content);
     TemplateAggregate template = new(uniqueKey, subject, content, command.TenantId, actorId)
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description)
+      DisplayName = DisplayName.TryCreate(payload.DisplayName),
+      Description = Description.TryCreate(payload.Description)
     };
     template.Update(actorId);
 

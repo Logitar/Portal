@@ -44,12 +44,12 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     {
       template.SetUniqueKey(uniqueKey, actorId);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       template.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       template.Description = description;

@@ -1,16 +1,16 @@
-﻿using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 
 namespace Logitar.Portal.Application.ApiKeys;
 
 public class ApiKeyNotFoundException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified API key could not be found.";
+  private const string ErrorMessage = "The specified API key could not be found.";
 
-  public ApiKeyId Id
+  public string Id
   {
-    get => new((string)Data[nameof(Id)]!);
-    private set => Data[nameof(Id)] = value.Value;
+    get => (string)Data[nameof(Id)]!;
+    private set => Data[nameof(Id)] = value;
   }
   public string? PropertyName
   {
@@ -20,7 +20,7 @@ public class ApiKeyNotFoundException : InvalidCredentialsException
 
   public ApiKeyNotFoundException(ApiKeyId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id;
+    Id = id.Value;
     PropertyName = propertyName;
   }
 

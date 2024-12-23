@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Roles;
 using MediatR;
 

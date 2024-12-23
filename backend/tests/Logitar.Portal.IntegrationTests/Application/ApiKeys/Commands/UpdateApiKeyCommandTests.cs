@@ -46,27 +46,27 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   {
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(Guid.NewGuid(), payload);
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
   [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
   public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     SetRealm();
 
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     UpdateApiKeyPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
@@ -97,7 +97,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     apiKey.SetCustomAttribute("UserId", Guid.NewGuid().ToString());
     apiKey.SetCustomAttribute("SubSystem", "tests");
@@ -118,7 +118,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
@@ -134,10 +134,10 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

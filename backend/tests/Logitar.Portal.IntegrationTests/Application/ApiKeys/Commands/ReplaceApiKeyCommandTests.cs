@@ -47,7 +47,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     RoleAggregate sendMessages = new(new UniqueNameUnit(uniqueNameSettings, "sendMessages"));
     await _roleRepository.SaveAsync([admin, manageUsers, sendMessages]);
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     apiKey.SetCustomAttribute("Confidentiality", "Private");
     apiKey.SetCustomAttribute("SubSystem", "tests");
@@ -74,7 +74,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(sendMessages.UniqueName.Value);
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, version);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
@@ -96,27 +96,27 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   {
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
   [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
   public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     SetRealm();
 
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     ReplaceApiKeyPayload payload = new(apiKey.DisplayName.Value);
     payload.Roles.Add("admin");
@@ -135,10 +135,10 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     Assert.Equal("DisplayName", exception.Errors.Single().PropertyName);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

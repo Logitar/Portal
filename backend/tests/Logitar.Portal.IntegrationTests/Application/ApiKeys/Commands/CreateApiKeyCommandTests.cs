@@ -48,7 +48,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("JobTitle", "Sales Manager"));
     payload.Roles.Add("  Manage_Sales  ");
     CreateApiKeyCommand command = new(payload);
-    ApiKey apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel apiKey = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DisplayName, apiKey.DisplayName);
     Assert.Equal(payload.Description.Trim(), apiKey.Description);

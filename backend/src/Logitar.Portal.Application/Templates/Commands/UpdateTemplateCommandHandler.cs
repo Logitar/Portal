@@ -41,11 +41,11 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
     }
     if (payload.DisplayName != null)
     {
-      template.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      template.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      template.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      template.Description = Description.TryCreate(payload.Description.Value);
     }
 
     SubjectUnit? subject = SubjectUnit.TryCreate(payload.Subject);

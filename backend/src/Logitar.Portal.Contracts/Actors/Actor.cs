@@ -24,7 +24,7 @@ public class Actor
     DisplayName = displayName;
   }
 
-  public Actor(ApiKey apiKey) : this(apiKey.DisplayName)
+  public Actor(ApiKeyModel apiKey) : this(apiKey.DisplayName)
   {
     Id = apiKey.Id;
     Type = ActorType.ApiKey;

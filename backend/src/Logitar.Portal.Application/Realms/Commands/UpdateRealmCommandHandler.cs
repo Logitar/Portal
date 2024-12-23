@@ -43,11 +43,11 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     }
     if (payload.DisplayName != null)
     {
-      realm.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      realm.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      realm.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      realm.Description = Description.TryCreate(payload.Description.Value);
     }
 
     if (payload.DefaultLocale != null)

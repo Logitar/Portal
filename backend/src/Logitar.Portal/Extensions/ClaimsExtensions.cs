@@ -8,7 +8,7 @@ namespace Logitar.Portal.Extensions;
 
 internal static class ClaimsExtensions
 {
-  public static ClaimsIdentity CreateClaimsIdentity(this ApiKey apiKey, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this ApiKeyModel apiKey, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
 
