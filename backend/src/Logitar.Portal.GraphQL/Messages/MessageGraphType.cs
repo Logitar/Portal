@@ -6,7 +6,7 @@ using Logitar.Portal.GraphQL.Templates;
 
 namespace Logitar.Portal.GraphQL.Messages;
 
-internal class MessageGraphType : AggregateGraphType<Message>
+internal class MessageGraphType : AggregateGraphType<MessageModel>
 {
   public MessageGraphType() : base("Represents a message in a mailing system. The message is what content has been sent to its recipients.")
   {

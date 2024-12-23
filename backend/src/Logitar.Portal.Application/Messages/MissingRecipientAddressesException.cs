@@ -5,9 +5,9 @@ public class MissingRecipientAddressesException : Exception
 {
   public const string ErrorMessage = "The specified recipients are missing an email address.";
 
-  public IEnumerable<Guid> UserIds
+  public IReadOnlyCollection<Guid> UserIds
   {
-    get => (IEnumerable<Guid>)Data[nameof(UserIds)]!;
+    get => (IReadOnlyCollection<Guid>)Data[nameof(UserIds)]!;
     private set => Data[nameof(UserIds)] = value;
   }
   public string? PropertyName
@@ -18,7 +18,7 @@ public class MissingRecipientAddressesException : Exception
 
   public MissingRecipientAddressesException(IEnumerable<Guid> userIds, string propertyName) : base(BuildMessage(userIds, propertyName))
   {
-    UserIds = userIds;
+    UserIds = userIds.ToArray();
     PropertyName = propertyName;
   }
 

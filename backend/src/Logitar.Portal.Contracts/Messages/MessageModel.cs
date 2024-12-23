@@ -4,13 +4,13 @@ using Logitar.Portal.Contracts.Templates;
 
 namespace Logitar.Portal.Contracts.Messages;
 
-public class Message : AggregateModel
+public class MessageModel : AggregateModel
 {
   public string Subject { get; set; }
   public ContentModel Body { get; set; }
 
   public int RecipientCount { get; set; }
-  public List<Recipient> Recipients { get; set; }
+  public List<RecipientModel> Recipients { get; set; }
 
   public SenderModel Sender { get; set; }
   public TemplateModel Template { get; set; }
@@ -27,11 +27,11 @@ public class Message : AggregateModel
 
   public RealmModel? Realm { get; set; }
 
-  public Message() : this(string.Empty, new ContentModel(), new SenderModel(), new TemplateModel())
+  public MessageModel() : this(string.Empty, new ContentModel(), new SenderModel(), new TemplateModel())
   {
   }
 
-  public Message(string subject, ContentModel body, SenderModel sender, TemplateModel template)
+  public MessageModel(string subject, ContentModel body, SenderModel sender, TemplateModel template)
   {
     Subject = subject;
     Body = body;

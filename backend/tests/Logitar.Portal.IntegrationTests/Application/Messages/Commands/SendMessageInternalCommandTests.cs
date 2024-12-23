@@ -162,7 +162,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     SentMessages sentMessages = await ActivityPipeline.ExecuteAsync(command);
 
     Guid id = Assert.Single(sentMessages.Ids);
-    MessageAggregate? message = await _messageRepository.LoadAsync(id);
+    Message? message = await _messageRepository.LoadAsync(id);
     Assert.NotNull(message);
 
     Assert.Equal(TenantId, message.TenantId);

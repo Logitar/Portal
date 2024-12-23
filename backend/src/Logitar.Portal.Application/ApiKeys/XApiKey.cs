@@ -30,7 +30,8 @@ internal record XApiKey
       throw new ArgumentException($"The value '{value}' is not a valid X-API-Key.", nameof(value));
     }
 
-    ApiKeyId id = new(values[1]);
+    ApiKeyId id = new();
+    //ApiKeyId id = new(values[1]); // TODO(fpion): implement
     string secret = values[2].FromUriSafeBase64();
     return new XApiKey(id, secret);
   }

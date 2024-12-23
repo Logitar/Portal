@@ -17,7 +17,7 @@ internal static class MessageExtensions
     return sender.Phone.FormatToE164();
   }
 
-  public static SmsMessage ToSmsMessage(this MessageAggregate aggregate)
+  public static SmsMessage ToSmsMessage(this Message aggregate)
   {
     RecipientUnit[] recipients = aggregate.Recipients.Where(recipient => recipient.Type == RecipientType.To).ToArray();
     if (recipients.Length != 1)

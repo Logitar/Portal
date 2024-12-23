@@ -31,12 +31,12 @@ internal class MessageClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Message? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
+      MessageModel? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The message should not be found.");
       }
-      Message message = await _client.ReadAsync(messageId, context.Request)
+      MessageModel message = await _client.ReadAsync(messageId, context.Request)
         ?? throw new InvalidOperationException("The message should not be null.");
       context.Succeed();
 
