@@ -25,7 +25,7 @@ public record JwtSecret
   {
     public Validator()
     {
-      RuleFor(x => x.Value).JwtSecret(); // TODO(fpion): implement
+      RuleFor(x => x.Value).JwtSecret();
     }
   }
 }

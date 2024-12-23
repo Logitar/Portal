@@ -20,7 +20,7 @@ public record Slug
   {
     public Validator()
     {
-      RuleFor(x => x.Value).Slug(); // TODO(fpion): implement
+      RuleFor(x => x.Value).Slug();
     }
   }
 }
