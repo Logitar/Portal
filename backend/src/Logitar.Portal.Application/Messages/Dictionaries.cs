@@ -13,7 +13,7 @@ public record Dictionaries
   {
   }
 
-  public Dictionaries(IReadOnlyDictionary<LocaleUnit, DictionaryAggregate> dictionaries, LocaleUnit? targetLocale = null, LocaleUnit? defaultLocale = null) : this()
+  public Dictionaries(IReadOnlyDictionary<Locale, DictionaryAggregate> dictionaries, Locale? targetLocale = null, Locale? defaultLocale = null) : this()
   {
     if (targetLocale != null)
     {
@@ -24,7 +24,7 @@ public record Dictionaries
 
       if (!string.IsNullOrEmpty(targetLocale.Culture.Parent?.Name))
       {
-        LocaleUnit fallbackLocale = new(targetLocale.Culture.Parent.Name);
+        Locale fallbackLocale = new(targetLocale.Culture.Parent.Name);
         if (dictionaries.TryGetValue(fallbackLocale, out DictionaryAggregate? fallback))
         {
           Fallback = fallback;

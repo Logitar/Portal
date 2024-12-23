@@ -26,7 +26,7 @@ internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionary
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit locale = new(payload.Locale);
+    Locale locale = new(payload.Locale);
     DictionaryAggregate dictionary = new(locale, command.TenantId, actorId);
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);

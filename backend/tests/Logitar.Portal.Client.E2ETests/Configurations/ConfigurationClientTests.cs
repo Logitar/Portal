@@ -17,7 +17,7 @@ internal class ConfigurationClientTests : IClientTests
     try
     {
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Configuration configuration = await _client.ReadAsync(context.Request);
+      ConfigurationModel configuration = await _client.ReadAsync(context.Request);
       context.Succeed();
 
       long version = configuration.Version;

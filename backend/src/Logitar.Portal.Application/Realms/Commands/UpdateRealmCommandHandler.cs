@@ -52,11 +52,11 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     if (payload.DefaultLocale != null)
     {
-      realm.DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale.Value);
+      realm.DefaultLocale = Locale.TryCreate(payload.DefaultLocale.Value);
     }
     if (payload.Secret != null)
     {
-      realm.Secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+      realm.Secret = JwtSecret.CreateOrGenerate(payload.Secret);
     }
     if (payload.Url != null)
     {

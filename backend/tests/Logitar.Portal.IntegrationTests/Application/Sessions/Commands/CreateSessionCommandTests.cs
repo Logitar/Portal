@@ -45,7 +45,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
     CreateSessionPayload payload = new(UsernameString);
@@ -68,7 +68,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
     CreateSessionPayload payload = new(user.Id.ToGuid().ToString());
@@ -89,7 +89,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
     user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
     await _userRepository.SaveAsync(user);
 
@@ -111,7 +111,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     UserAggregate user = (await _userRepository.LoadAsync()).Single();
     user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
-    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    UserAggregate other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
     await _userRepository.SaveAsync([user, other]);
 
     CreateSessionPayload payload = new(Faker.Person.Email);

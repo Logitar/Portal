@@ -33,7 +33,7 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     {
       DisplayName = DisplayName.TryCreate(payload.DisplayName),
       Description = Description.TryCreate(payload.Description),
-      DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale),
+      DefaultLocale = Locale.TryCreate(payload.DefaultLocale),
       Url = UrlUnit.TryCreate(payload.Url),
       UniqueNameSettings = new ReadOnlyUniqueNameSettings(payload.UniqueNameSettings),
       PasswordSettings = new ReadOnlyPasswordSettings(payload.PasswordSettings),
@@ -41,7 +41,7 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     };
     if (!string.IsNullOrWhiteSpace(payload.Secret))
     {
-      realm.Secret = new JwtSecretUnit(payload.Secret);
+      realm.Secret = new JwtSecret(payload.Secret);
     }
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)

@@ -43,7 +43,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
+    UniqueName uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
       role.SetUniqueName(uniqueName, actorId);

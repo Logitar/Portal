@@ -29,7 +29,7 @@ public class CreateTokenCommandTests : IntegrationTests
   {
     SetRealm();
 
-    JwtSecretUnit secret = JwtSecretUnit.Generate(length: 512 / 8);
+    JwtSecret secret = JwtSecret.Generate(length: 512 / 8);
     CreateTokenPayload payload = new()
     {
       Algorithm = "HS512",
@@ -60,7 +60,7 @@ public class CreateTokenCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a Portal token.")]
   public async Task It_should_create_a_Portal_token()
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
+    Configuration? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
 
     string subject = Guid.NewGuid().ToString();

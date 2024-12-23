@@ -38,7 +38,7 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit? uniqueName = UniqueNameUnit.TryCreate(roleSettings.UniqueName, payload.UniqueName);
+    UniqueName? uniqueName = UniqueName.TryCreate(roleSettings.UniqueName, payload.UniqueName);
     if (uniqueName != null)
     {
       role.SetUniqueName(uniqueName, actorId);

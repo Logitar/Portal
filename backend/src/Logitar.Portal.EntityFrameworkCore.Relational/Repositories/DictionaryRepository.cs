@@ -48,7 +48,7 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
     return Load<DictionaryAggregate>(events.Select(EventSerializer.Deserialize));
   }
 
-  public async Task<DictionaryAggregate?> LoadAsync(TenantId? tenantId, LocaleUnit locale, CancellationToken cancellationToken)
+  public async Task<DictionaryAggregate?> LoadAsync(TenantId? tenantId, Locale locale, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Dictionaries.AggregateId, EventDb.Events.AggregateId,

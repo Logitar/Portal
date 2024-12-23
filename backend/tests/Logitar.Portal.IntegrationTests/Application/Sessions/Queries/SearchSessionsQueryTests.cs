@@ -40,8 +40,8 @@ public class SearchSessionsQueryTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user1 = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
-    UserAggregate user2 = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    UserAggregate user1 = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user2 = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
     await _userRepository.SaveAsync([user1, user2]);
 
     SessionAggregate notInIds = user1.SignIn();

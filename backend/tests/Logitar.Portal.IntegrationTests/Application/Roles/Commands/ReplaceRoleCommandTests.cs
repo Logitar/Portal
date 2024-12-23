@@ -22,7 +22,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 
@@ -98,7 +98,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "guest"));
+    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     ReplaceRolePayload payload = new("AdmIn");

@@ -25,7 +25,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
     user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
@@ -65,7 +65,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     UserAggregate user = (await _userRepository.LoadAsync()).Single();
     user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
-    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    UserAggregate other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
     await _userRepository.SaveAsync([user, other]);
 
     AuthenticateUserPayload payload = new(Faker.Person.Email, PasswordString);
@@ -111,7 +111,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 

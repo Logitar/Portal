@@ -57,12 +57,12 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
       realm.Description = description;
     }
 
-    LocaleUnit? defaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale);
+    Locale? defaultLocale = Locale.TryCreate(payload.DefaultLocale);
     if (reference == null || defaultLocale != reference.DefaultLocale)
     {
       realm.DefaultLocale = defaultLocale;
     }
-    JwtSecretUnit secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+    JwtSecret secret = JwtSecret.CreateOrGenerate(payload.Secret);
     if (reference == null || secret != reference.Secret)
     {
       realm.Secret = secret;

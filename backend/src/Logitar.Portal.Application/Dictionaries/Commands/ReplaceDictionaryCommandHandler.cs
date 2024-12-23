@@ -39,7 +39,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit locale = new(payload.Locale);
+    Locale locale = new(payload.Locale);
     if (reference == null || locale != reference.Locale)
     {
       dictionary.SetLocale(locale, actorId);

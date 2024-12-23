@@ -31,7 +31,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
   [Fact(DisplayName = "It should update the configuration.")]
   public async Task It_should_update_the_configuration()
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
+    Configuration? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
     string secret = configuration.Secret.Value;
 
@@ -45,7 +45,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
       LoggingSettings = new LoggingSettings(LoggingExtent.Full, onlyErrors: true)
     };
     UpdateConfigurationCommand command = new(payload);
-    Configuration result = await ActivityPipeline.ExecuteAsync(command);
+    ConfigurationModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DefaultLocale.Value, result.DefaultLocale?.Code);
     Assert.NotEqual(secret, result.Secret);

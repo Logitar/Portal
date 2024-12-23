@@ -26,7 +26,7 @@ internal class RecipientConfiguration : IEntityTypeConfiguration<RecipientEntity
     builder.Property(x => x.Address).HasMaxLength(EmailUnit.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);
     builder.Property(x => x.PhoneNumber).HasMaxLength(PhoneUnit.NumberMaximumLength);
-    builder.Property(x => x.UserUniqueName).HasMaxLength(UniqueNameUnit.MaximumLength);
+    builder.Property(x => x.UserUniqueName).HasMaxLength(UniqueName.MaximumLength);
     builder.Property(x => x.UserEmailAddress).HasMaxLength(EmailUnit.MaximumLength);
     builder.Property(x => x.UserFullName).HasMaxLength(UserConfiguration.FullNameMaximumLength);
     builder.Property(x => x.UserPicture).HasMaxLength(UrlUnit.MaximumLength);

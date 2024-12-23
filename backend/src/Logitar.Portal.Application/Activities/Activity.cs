@@ -36,7 +36,7 @@ public abstract record Activity : IActivity
   public ActorId ActorId => new(Actor.Id);
 
   [JsonIgnore]
-  private Configuration Configuration => Context.Configuration;
+  private ConfigurationModel Configuration => Context.Configuration;
 
   [JsonIgnore]
   public Realm? Realm => Context.Realm;
