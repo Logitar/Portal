@@ -32,7 +32,7 @@ public class CreateOneTimePasswordCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("UserId", Guid.NewGuid().ToString()));
     CreateOneTimePasswordCommand command = new(payload);
-    OneTimePassword oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
+    OneTimePasswordModel oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
 
     Assertions.Equal(payload.ExpiresOn, oneTimePassword.ExpiresOn, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.MaximumAttempts, oneTimePassword.MaximumAttempts);

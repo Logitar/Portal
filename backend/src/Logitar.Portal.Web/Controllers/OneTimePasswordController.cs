@@ -19,32 +19,32 @@ public class OneTimePasswordController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult<OneTimePassword>> CreateAsync([FromBody] CreateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<OneTimePasswordModel>> CreateAsync([FromBody] CreateOneTimePasswordPayload payload, CancellationToken cancellationToken)
   {
-    OneTimePassword oneTimePassword = await _oneTimePasswordService.CreateAsync(payload, cancellationToken);
+    OneTimePasswordModel oneTimePassword = await _oneTimePasswordService.CreateAsync(payload, cancellationToken);
     return Created(BuildLocation(oneTimePassword), oneTimePassword);
   }
 
   [HttpDelete("{id}")]
-  public async Task<ActionResult<OneTimePassword>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<OneTimePasswordModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    OneTimePassword? oneTimePassword = await _oneTimePasswordService.DeleteAsync(id, cancellationToken);
+    OneTimePasswordModel? oneTimePassword = await _oneTimePasswordService.DeleteAsync(id, cancellationToken);
     return oneTimePassword == null ? NotFound() : Ok(oneTimePassword);
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult<OneTimePassword>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<OneTimePasswordModel>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    OneTimePassword? oneTimePassword = await _oneTimePasswordService.ReadAsync(id: id, cancellationToken: cancellationToken);
+    OneTimePasswordModel? oneTimePassword = await _oneTimePasswordService.ReadAsync(id: id, cancellationToken: cancellationToken);
     return oneTimePassword == null ? NotFound() : Ok(oneTimePassword);
   }
 
   [HttpPatch("{id}")]
-  public async Task<ActionResult<OneTimePassword>> ValidateAsync(Guid id, [FromBody] ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<OneTimePasswordModel>> ValidateAsync(Guid id, [FromBody] ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
   {
-    OneTimePassword? oneTimePassword = await _oneTimePasswordService.ValidateAsync(id, payload, cancellationToken);
+    OneTimePasswordModel? oneTimePassword = await _oneTimePasswordService.ValidateAsync(id, payload, cancellationToken);
     return oneTimePassword == null ? NotFound() : Ok(oneTimePassword);
   }
 
-  private Uri BuildLocation(OneTimePassword oneTimePassword) => HttpContext.BuildLocation("one-time-passwords/{id}", new Dictionary<string, string> { ["id"] = oneTimePassword.Id.ToString() });
+  private Uri BuildLocation(OneTimePasswordModel oneTimePassword) => HttpContext.BuildLocation("one-time-passwords/{id}", new Dictionary<string, string> { ["id"] = oneTimePassword.Id.ToString() });
 }
