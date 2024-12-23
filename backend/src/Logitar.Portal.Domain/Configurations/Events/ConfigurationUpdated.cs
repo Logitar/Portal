@@ -8,7 +8,7 @@ namespace Logitar.Portal.Domain.Configurations.Events;
 public record ConfigurationUpdated : DomainEvent, INotification
 {
   public Change<Locale>? DefaultLocale { get; set; }
-  public JwtSecretUnit? Secret { get; set; }
+  public JwtSecret? Secret { get; set; }
 
   public ReadOnlyUniqueNameSettings? UniqueNameSettings { get; set; }
   public ReadOnlyPasswordSettings? PasswordSettings { get; set; }

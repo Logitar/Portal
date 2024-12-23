@@ -22,8 +22,8 @@ public class ConfigurationAggregate : AggregateRoot
       }
     }
   }
-  private JwtSecretUnit? _secret = null;
-  public JwtSecretUnit Secret
+  private JwtSecret? _secret = null;
+  public JwtSecret Secret
   {
     get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
@@ -104,7 +104,7 @@ public class ConfigurationAggregate : AggregateRoot
     ConfigurationAggregate configuration = new(id);
 
     Locale? defaultLocale = null;
-    JwtSecretUnit secret = JwtSecretUnit.Generate();
+    JwtSecret secret = JwtSecret.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passordSettings = new();
     bool requireUniqueEmail = true;
