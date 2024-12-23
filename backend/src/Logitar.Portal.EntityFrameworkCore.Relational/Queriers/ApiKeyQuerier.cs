@@ -117,7 +117,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
   private async Task<IEnumerable<ApiKey>> MapAsync(IEnumerable<ApiKeyEntity> apiKeys, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = apiKeys.SelectMany(apiKey => apiKey.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return apiKeys.Select(apiKey => mapper.ToApiKey(apiKey, realm));

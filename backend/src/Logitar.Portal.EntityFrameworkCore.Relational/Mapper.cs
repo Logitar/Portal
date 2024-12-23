@@ -22,22 +22,22 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
 internal class Mapper
 {
-  private readonly Dictionary<ActorId, Actor> _actors = [];
+  private readonly Dictionary<ActorId, ActorModel> _actors = [];
 
   public Mapper()
   {
   }
 
-  public Mapper(IEnumerable<Actor> actors)
+  public Mapper(IEnumerable<ActorModel> actors)
   {
-    foreach (Actor actor in actors)
+    foreach (ActorModel actor in actors)
     {
       ActorId id = new(actor.Id);
       _actors[id] = actor;
     }
   }
 
-  public static Actor ToActor(ActorEntity actor) => new(actor.DisplayName)
+  public static ActorModel ToActor(ActorEntity actor) => new(actor.DisplayName)
   {
     Id = new ActorId(actor.Id).ToGuid(),
     Type = Enum.Parse<ActorType>(actor.Type),
@@ -109,7 +109,7 @@ internal class Mapper
   {
     Content body = new(source.BodyType, source.BodyText);
 
-    SenderModel sender;
+    Sender sender;
     if (source.Sender == null)
     {
       sender = new()
@@ -126,7 +126,7 @@ internal class Mapper
       sender = ToSender(source.Sender, realm);
     }
 
-    Template template;
+    TemplateModel template;
     if (source.Template == null)
     {
       template = new()
@@ -150,14 +150,14 @@ internal class Mapper
       Realm = realm
     };
 
-    Dictionary<int, User> usersById = new(capacity: users.Count());
+    Dictionary<int, UserModel> usersById = new(capacity: users.Count());
     foreach (UserEntity user in users)
     {
       usersById[user.UserId] = ToUser(user, realm);
     }
     foreach (RecipientEntity recipient in source.Recipients)
     {
-      User? user = null;
+      UserModel? user = null;
       if (recipient.UserId.HasValue)
       {
         _ = usersById.TryGetValue(recipient.UserId.Value, out user);
@@ -226,7 +226,7 @@ internal class Mapper
     return destination;
   }
 
-  public static Recipient ToRecipient(RecipientEntity source, User? user)
+  public static Recipient ToRecipient(RecipientEntity source, UserModel? user)
   {
     Recipient destination = new()
     {
@@ -249,7 +249,7 @@ internal class Mapper
       };
       if (source.UserEmailAddress != null)
       {
-        destination.User.Email = new Email(source.UserEmailAddress);
+        destination.User.Email = new EmailModel(source.UserEmailAddress);
       }
     }
 
@@ -275,15 +275,15 @@ internal class Mapper
     return destination;
   }
 
-  public SessionModel ToSession(SessionEntity source, Realm? realm)
+  public Session ToSession(SessionEntity source, Realm? realm)
   {
     if (source.User == null)
     {
       throw new ArgumentException($"The {nameof(source.User)} is required.", nameof(source));
     }
 
-    User user = ToUser(source.User, realm);
-    SessionModel destination = new(user)
+    UserModel user = ToUser(source.User, realm);
+    Session destination = new(user)
     {
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
@@ -301,9 +301,9 @@ internal class Mapper
     return destination;
   }
 
-  public SenderModel ToSender(SenderEntity source, Realm? realm)
+  public Sender ToSender(SenderEntity source, Realm? realm)
   {
-    SenderModel destination = new()
+    Sender destination = new()
     {
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
@@ -334,10 +334,10 @@ internal class Mapper
     return destination;
   }
 
-  public Template ToTemplate(TemplateEntity source, Realm? realm)
+  public TemplateModel ToTemplate(TemplateEntity source, Realm? realm)
   {
     Content content = new(source.ContentType, source.ContentText);
-    Template destination = new(source.UniqueKey, source.Subject, content)
+    TemplateModel destination = new(source.UniqueKey, source.Subject, content)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
@@ -349,9 +349,9 @@ internal class Mapper
     return destination;
   }
 
-  public User ToUser(UserEntity source, Realm? realm)
+  public UserModel ToUser(UserEntity source, Realm? realm)
   {
-    User destination = new(source.UniqueName)
+    UserModel destination = new(source.UniqueName)
     {
       HasPassword = source.HasPassword,
       PasswordChangedBy = TryFindActor(source.PasswordChangedBy),
@@ -378,7 +378,7 @@ internal class Mapper
 
     if (source.AddressStreet != null && source.AddressLocality != null && source.AddressCountry != null && source.AddressFormatted != null)
     {
-      destination.Address = new Address(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
+      destination.Address = new AddressModel(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
       {
         IsVerified = source.IsAddressVerified,
         VerifiedBy = TryFindActor(source.AddressVerifiedBy),
@@ -387,7 +387,7 @@ internal class Mapper
     }
     if (source.EmailAddress != null)
     {
-      destination.Email = new Email(source.EmailAddress)
+      destination.Email = new EmailModel(source.EmailAddress)
       {
         IsVerified = source.IsEmailVerified,
         VerifiedBy = TryFindActor(source.EmailVerifiedBy),
@@ -396,7 +396,7 @@ internal class Mapper
     }
     if (source.PhoneNumber != null && source.PhoneE164Formatted != null)
     {
-      destination.Phone = new Phone(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
+      destination.Phone = new PhoneModel(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
       {
         IsVerified = source.IsPhoneVerified,
         VerifiedBy = TryFindActor(source.PhoneVerifiedBy),
@@ -424,7 +424,7 @@ internal class Mapper
     return destination;
   }
 
-  private void MapAggregate(AggregateRoot source, Aggregate destination)
+  private void MapAggregate(AggregateRoot source, AggregateModel destination)
   {
     destination.Id = source.Id.ToGuid();
     destination.Version = source.Version;
@@ -433,7 +433,7 @@ internal class Mapper
     destination.UpdatedBy = FindActor(source.UpdatedBy);
     destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
   }
-  private void MapAggregate(AggregateEntity source, Aggregate destination)
+  private void MapAggregate(AggregateEntity source, AggregateModel destination)
   {
     destination.Id = new AggregateId(source.AggregateId).ToGuid();
     destination.Version = source.Version;
@@ -443,9 +443,9 @@ internal class Mapper
     destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
   }
 
-  private Actor? TryFindActor(string? id) => id == null ? null : FindActor(id);
-  private Actor FindActor(string id) => FindActor(new ActorId(id));
-  private Actor FindActor(ActorId id) => _actors.TryGetValue(id, out Actor? actor) ? actor : Actor.System;
+  private ActorModel? TryFindActor(string? id) => id == null ? null : FindActor(id);
+  private ActorModel FindActor(string id) => FindActor(new ActorId(id));
+  private ActorModel FindActor(ActorId id) => _actors.TryGetValue(id, out ActorModel? actor) ? actor : ActorModel.System;
 
   private static DateTime? AsUniversalTime(DateTime? value) => value.HasValue ? AsUniversalTime(value.Value) : null;
   private static DateTime AsUniversalTime(DateTime value) => value.Kind switch

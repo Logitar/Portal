@@ -9,6 +9,6 @@ internal record TestContext
 {
   public RealmModel? Realm { get; set; }
   public ApiKey? ApiKey { get; set; }
-  public User? User { get; set; }
-  public SessionModel? Session { get; set; }
+  public UserModel? User { get; set; }
+  public Session? Session { get; set; }
 }

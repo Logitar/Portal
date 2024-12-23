@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.GraphQL.Users;
 
-internal class AddressGraphType : ContactGraphType<Address>
+internal class AddressGraphType : ContactGraphType<AddressModel>
 {
   public AddressGraphType() : base("Represents a postal address.")
   {

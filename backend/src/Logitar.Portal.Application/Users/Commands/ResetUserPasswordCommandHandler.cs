@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, User?>
+internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, UserModel?>
 {
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
@@ -24,7 +24,7 @@ internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswo
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(ResetUserPasswordCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel?> Handle(ResetUserPasswordCommand command, CancellationToken cancellationToken)
   {
     IUserSettings userSettings = command.UserSettings;
 

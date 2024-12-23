@@ -46,9 +46,9 @@ internal class TestContext
     _role = role;
   }
 
-  private User? _user = null;
-  public User User => _user ?? throw new InvalidOperationException($"The {nameof(User)} has not been initialized yet.");
-  public void SetUser(User user)
+  private UserModel? _user = null;
+  public UserModel User => _user ?? throw new InvalidOperationException($"The {nameof(User)} has not been initialized yet.");
+  public void SetUser(UserModel user)
   {
     AssertHasNotEnded();
     _user = user;
@@ -62,9 +62,9 @@ internal class TestContext
     _token = token;
   }
 
-  private TemplateModel? _template = null;
-  public TemplateModel Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
-  public void SetTemplate(TemplateModel template)
+  private Template? _template = null;
+  public Template Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
+  public void SetTemplate(Template template)
   {
     AssertHasNotEnded();
     _template = template;

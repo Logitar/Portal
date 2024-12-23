@@ -2,15 +2,15 @@
 
 namespace Logitar.Portal.Contracts.Users;
 
-public record Email : Contact, IEmail
+public record EmailModel : ContactModel, IEmail
 {
   public string Address { get; set; }
 
-  public Email() : this(string.Empty)
+  public EmailModel() : this(string.Empty)
   {
   }
 
-  public Email(string address)
+  public EmailModel(string address)
   {
     Address = address;
   }

@@ -13,9 +13,9 @@ namespace Logitar.Portal.Web.Extensions;
 public static class HttpContextExtensions
 {
   private const string ApiKeyKey = nameof(ApiKeyModel);
-  private const string SessionKey = nameof(SessionModel);
+  private const string SessionKey = nameof(Session);
   private const string SessionIdKey = "SessionId";
-  private const string UserKey = nameof(User);
+  private const string UserKey = nameof(UserModel);
 
   public static Uri GetBaseUri(this HttpContext context)
   {
@@ -77,8 +77,8 @@ public static class HttpContextExtensions
   }
 
   public static ApiKeyModel? GetApiKey(this HttpContext context) => context.GetItem<ApiKeyModel>(ApiKeyKey);
-  public static SessionModel? GetSession(this HttpContext context) => context.GetItem<SessionModel>(SessionKey);
-  public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
+  public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
+  public static UserModel? GetUser(this HttpContext context) => context.GetItem<UserModel>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key) => context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
 
   public static void SetApiKey(this HttpContext context, ApiKeyModel? apiKey)
@@ -86,12 +86,12 @@ public static class HttpContextExtensions
     context.SetItem(ApiKeyKey, apiKey);
     context.GetLoggingService().SetApiKey(apiKey);
   }
-  public static void SetSession(this HttpContext context, SessionModel? session)
+  public static void SetSession(this HttpContext context, Session? session)
   {
     context.SetItem(SessionKey, session);
     context.GetLoggingService().SetSession(session);
   }
-  public static void SetUser(this HttpContext context, User? user)
+  public static void SetUser(this HttpContext context, UserModel? user)
   {
     context.SetItem(UserKey, user);
     context.GetLoggingService().SetUser(user);
@@ -117,7 +117,7 @@ public static class HttpContextExtensions
     return bytes == null ? null : new Guid(bytes);
   }
   public static bool IsSignedIn(this HttpContext context) => context.GetSessionId().HasValue;
-  public static void SignIn(this HttpContext context, SessionModel session)
+  public static void SignIn(this HttpContext context, Session session)
   {
     context.Session.Set(SessionIdKey, session.Id.ToByteArray());
 

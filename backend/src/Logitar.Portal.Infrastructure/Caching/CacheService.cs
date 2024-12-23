@@ -25,9 +25,9 @@ internal class CacheService : ICacheService
   }
   private const string ConfigurationKey = nameof(Configuration);
 
-  public Actor? GetActor(ActorId id) => GetItem<Actor>(GetActorKey(id));
-  public void RemoveActor(ActorId id) => SetItem<Actor>(GetActorKey(id), value: null);
-  public void SetActor(Actor actor) => SetItem(GetActorKey(actor.Id), actor, _settings.ActorLifetime);
+  public ActorModel? GetActor(ActorId id) => GetItem<ActorModel>(GetActorKey(id));
+  public void RemoveActor(ActorId id) => SetItem<ActorModel>(GetActorKey(id), value: null);
+  public void SetActor(ActorModel actor) => SetItem(GetActorKey(actor.Id), actor, _settings.ActorLifetime);
   private static string GetActorKey(Guid id) => GetActorKey(new ActorId(id));
   private static string GetActorKey(ActorId id) => $"Actor.Id:{id}";
 

@@ -23,7 +23,7 @@ internal class TokenClientTests : IClientTests
         Type = "reset_password+jwt",
         Subject = context.User.Id.ToString()
       };
-      CreatedToken createdToken = await _client.CreateAsync(create, context.Request);
+      CreatedTokenModel createdToken = await _client.CreateAsync(create, context.Request);
       context.SetToken(createdToken.Token);
       context.Succeed();
 

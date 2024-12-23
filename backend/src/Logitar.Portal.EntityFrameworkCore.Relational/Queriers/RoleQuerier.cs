@@ -115,7 +115,7 @@ internal class RoleQuerier : IRoleQuerier
   private async Task<IEnumerable<RoleModel>> MapAsync(IEnumerable<RoleEntity> roles, Realm? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = roles.SelectMany(role => role.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return roles.Select(role => mapper.ToRole(role, realm));

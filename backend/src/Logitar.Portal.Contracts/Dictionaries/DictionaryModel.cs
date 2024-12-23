@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Dictionaries;
 
-public class DictionaryModel : Aggregate
+public class DictionaryModel : AggregateModel
 {
   public LocaleModel Locale { get; set; }
 

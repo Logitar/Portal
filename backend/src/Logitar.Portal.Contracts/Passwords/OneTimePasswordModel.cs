@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Passwords;
 
-public class OneTimePasswordModel : Aggregate
+public class OneTimePasswordModel : AggregateModel
 {
   public string? Password { get; set; }
 

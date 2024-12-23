@@ -3,9 +3,9 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Contracts.Actors;
 
-public class Actor
+public class ActorModel
 {
-  public static readonly Actor System = new("System");
+  public static readonly ActorModel System = new("System");
 
   public Guid Id { get; set; }
   public ActorType Type { get; set; }
@@ -15,22 +15,22 @@ public class Actor
   public string? EmailAddress { get; set; }
   public string? PictureUrl { get; set; }
 
-  public Actor() : this(string.Empty)
+  public ActorModel() : this(string.Empty)
   {
   }
 
-  public Actor(string displayName)
+  public ActorModel(string displayName)
   {
     DisplayName = displayName;
   }
 
-  public Actor(ApiKeyModel apiKey) : this(apiKey.DisplayName)
+  public ActorModel(ApiKeyModel apiKey) : this(apiKey.DisplayName)
   {
     Id = apiKey.Id;
     Type = ActorType.ApiKey;
   }
 
-  public Actor(User user) : this(user.FullName ?? user.UniqueName)
+  public ActorModel(UserModel user) : this(user.FullName ?? user.UniqueName)
   {
     Id = user.Id;
     Type = ActorType.User;
@@ -38,7 +38,7 @@ public class Actor
     PictureUrl = user.Picture;
   }
 
-  public override bool Equals(object? obj) => obj is Actor actor && actor.Id == Id;
+  public override bool Equals(object? obj) => obj is ActorModel actor && actor.Id == Id;
   public override int GetHashCode() => HashCode.Combine(GetType(), Id);
   public override string ToString()
   {

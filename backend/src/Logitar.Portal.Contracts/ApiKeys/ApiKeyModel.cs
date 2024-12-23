@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.ApiKeys;
 
-public class ApiKeyModel : Aggregate
+public class ApiKeyModel : AggregateModel
 {
   public string? XApiKey { get; set; }
 

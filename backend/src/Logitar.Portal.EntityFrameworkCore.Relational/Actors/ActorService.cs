@@ -18,17 +18,17 @@ internal class ActorService : IActorService
     _cacheService = cacheService;
   }
 
-  public async Task<IEnumerable<Actor>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken)
+  public async Task<IEnumerable<ActorModel>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken)
   {
     int capacity = ids.Count();
-    Dictionary<ActorId, Actor> actors = new(capacity);
+    Dictionary<ActorId, ActorModel> actors = new(capacity);
     HashSet<string> missingIds = new(capacity);
 
     foreach (ActorId id in ids)
     {
       if (id != default)
       {
-        Actor? actor = _cacheService.GetActor(id);
+        ActorModel? actor = _cacheService.GetActor(id);
         if (actor == null)
         {
           missingIds.Add(id.Value);
@@ -49,7 +49,7 @@ internal class ActorService : IActorService
 
       foreach (ActorEntity entity in entities)
       {
-        Actor actor = Mapper.ToActor(entity);
+        ActorModel actor = Mapper.ToActor(entity);
         ActorId id = new(entity.Id);
 
         actors[id] = actor;

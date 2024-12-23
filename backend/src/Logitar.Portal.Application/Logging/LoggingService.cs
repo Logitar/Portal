@@ -1,7 +1,4 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Contracts.ApiKeys;
@@ -67,7 +64,7 @@ internal class LoggingService : ILoggingService
   {
     if (_log != null)
     {
-      _log.ApiKeyId = apiKey == null ? null : new ApiKeyId(apiKey.Id);
+      _log.ApiKeyId = apiKey?.Id;
     }
   }
 
@@ -75,15 +72,15 @@ internal class LoggingService : ILoggingService
   {
     if (_log != null)
     {
-      _log.SessionId = session == null ? null : new SessionId(session.Id);
+      _log.SessionId = session?.Id;
     }
   }
 
-  public void SetUser(User? user)
+  public void SetUser(UserModel? user)
   {
     if (_log != null)
     {
-      _log.UserId = user == null ? null : new UserId(user.Id);
+      _log.UserId = user?.Id;
     }
   }
 
@@ -106,7 +103,7 @@ internal class LoggingService : ILoggingService
 
   private bool ShouldSaveLog()
   {
-    ILoggingSettings? loggingSettings = _cacheService.Configuration?.LoggingSettings;
+    LoggingSettings? loggingSettings = _cacheService.Configuration?.LoggingSettings;
     if (loggingSettings != null && _log != null)
     {
       if (!loggingSettings.OnlyErrors || _log.HasErrors)

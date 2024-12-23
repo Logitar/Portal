@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Actors;
 
 namespace Logitar.Portal.GraphQL.Users;
 
-internal abstract class ContactGraphType<T> : ObjectGraphType<T> where T : Contact
+internal abstract class ContactGraphType<T> : ObjectGraphType<T> where T : ContactModel
 {
   protected ContactGraphType(string? description = null)
   {

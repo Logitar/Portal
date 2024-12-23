@@ -19,7 +19,7 @@ internal class ConfigurationQuerier : IConfigurationQuerier
   public async Task<ConfigurationModel> ReadAsync(Configuration configuration, CancellationToken cancellationToken)
   {
     IEnumerable<ActorId> actorIds = [configuration.CreatedBy, configuration.UpdatedBy];
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return mapper.ToConfiguration(configuration);

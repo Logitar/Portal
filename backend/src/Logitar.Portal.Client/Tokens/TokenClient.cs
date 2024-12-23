@@ -12,15 +12,15 @@ internal class TokenClient : BaseClient, ITokenClient
   {
   }
 
-  public async Task<CreatedToken> CreateAsync(CreateTokenPayload payload, IRequestContext? context)
+  public async Task<CreatedTokenModel> CreateAsync(CreateTokenPayload payload, IRequestContext? context)
   {
-    return await PostAsync<CreatedToken>(UriPath, payload, context)
+    return await PostAsync<CreatedTokenModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<ValidatedToken> ValidateAsync(ValidateTokenPayload payload, IRequestContext? context)
+  public async Task<ValidatedTokenModel> ValidateAsync(ValidateTokenPayload payload, IRequestContext? context)
   {
-    return await PutAsync<ValidatedToken>(UriPath, payload, context)
+    return await PutAsync<ValidatedTokenModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(ValidateAsync), HttpMethod.Put, UriPath, payload, context);
   }
 }

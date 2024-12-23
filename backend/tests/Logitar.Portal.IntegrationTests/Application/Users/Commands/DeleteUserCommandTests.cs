@@ -23,7 +23,7 @@ public class DeleteUserCommandTests : IntegrationTests
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
     DeleteUserCommand command = new(user.Id.ToGuid());
-    User? deleted = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
 
@@ -34,7 +34,7 @@ public class DeleteUserCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_user_cannot_be_found()
   {
     DeleteUserCommand command = new(Guid.NewGuid());
-    User? user = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -46,7 +46,7 @@ public class DeleteUserCommandTests : IntegrationTests
     SetRealm();
 
     DeleteUserCommand command = new(user.Id.ToGuid());
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

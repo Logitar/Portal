@@ -14,7 +14,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, User?>
+internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, UserModel?>
 {
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
@@ -32,7 +32,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(ReplaceUserCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel?> Handle(ReplaceUserCommand command, CancellationToken cancellationToken)
   {
     IUserSettings userSettings = command.UserSettings;
 
@@ -99,13 +99,13 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
       user.SetAddress(address, actorId);
     }
 
-    Email? email = payload.Email?.ToEmail();
+    EmailUnit? email = payload.Email?.ToEmailUnit();
     if (reference == null || email != reference.Email)
     {
       user.SetEmail(email, actorId);
     }
 
-    Phone? phone = payload.Phone?.ToPhone();
+    PhoneUnit? phone = payload.Phone?.ToPhoneUnit();
     if (reference == null || phone != reference.Phone)
     {
       user.SetPhone(phone, actorId);

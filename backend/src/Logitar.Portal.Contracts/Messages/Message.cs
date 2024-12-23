@@ -4,7 +4,7 @@ using Logitar.Portal.Contracts.Templates;
 
 namespace Logitar.Portal.Contracts.Messages;
 
-public class Message : Aggregate
+public class Message : AggregateModel
 {
   public string Subject { get; set; }
   public ContentModel Body { get; set; }

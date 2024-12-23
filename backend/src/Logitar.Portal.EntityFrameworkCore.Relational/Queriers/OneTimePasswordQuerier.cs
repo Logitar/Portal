@@ -50,7 +50,7 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
   private async Task<IEnumerable<OneTimePassword>> MapAsync(IEnumerable<OneTimePasswordEntity> oneTimePasswords, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = oneTimePasswords.SelectMany(oneTimePassword => oneTimePassword.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return oneTimePasswords.Select(oneTimePassword => mapper.ToOneTimePassword(oneTimePassword, realm));

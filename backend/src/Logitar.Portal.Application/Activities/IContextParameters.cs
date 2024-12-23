@@ -9,7 +9,7 @@ public interface IContextParameters
 {
   RealmModel? Realm { get; }
   ApiKeyModel? ApiKey { get; }
-  User? User { get; }
+  UserModel? User { get; }
   SessionModel? Session { get; }
 
   string? RealmOverride { get; }

@@ -1,13 +1,13 @@
 ﻿namespace Logitar.Portal.Contracts.Tokens;
 
-public record CreatedToken
+public record CreatedTokenModel
 {
   public string Token { get; set; }
 
-  public CreatedToken() : this(string.Empty)
+  public CreatedTokenModel() : this(string.Empty)
   {
   }
-  public CreatedToken(string token)
+  public CreatedTokenModel(string token)
   {
     Token = token;
   }

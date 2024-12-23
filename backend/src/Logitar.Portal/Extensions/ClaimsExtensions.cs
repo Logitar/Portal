@@ -24,7 +24,7 @@ internal static class ClaimsExtensions
     return identity;
   }
 
-  public static ClaimsIdentity CreateClaimsIdentity(this SessionModel session, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this Session session, string? authenticationType = null)
   {
     ClaimsIdentity identity = session.User.CreateClaimsIdentity(authenticationType);
 
@@ -32,7 +32,7 @@ internal static class ClaimsExtensions
 
     return identity;
   }
-  public static ClaimsIdentity CreateClaimsIdentity(this User user, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this UserModel user, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
 
@@ -123,7 +123,7 @@ internal static class ClaimsExtensions
     return identity;
   }
 
-  private static Claim CreateClaim(this Address address, string name)
+  private static Claim CreateClaim(this AddressModel address, string name)
   {
     Rfc7519PostalAddress postalAddress = new()
     {

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Users;
 
-public record Address : Contact, IAddress
+public record AddressModel : ContactModel, IAddress
 {
   public string Street { get; set; }
   public string Locality { get; set; }
@@ -11,11 +11,11 @@ public record Address : Contact, IAddress
   public string Country { get; set; }
   public string Formatted { get; set; }
 
-  public Address() : this(string.Empty, string.Empty, null, null, string.Empty, string.Empty)
+  public AddressModel() : this(string.Empty, string.Empty, null, null, string.Empty, string.Empty)
   {
   }
 
-  public Address(string street, string locality, string? postalCode, string? region, string country, string formatted)
+  public AddressModel(string street, string locality, string? postalCode, string? region, string country, string formatted)
   {
     Street = street;
     Locality = locality;

@@ -29,14 +29,14 @@ internal class SenderQuerier : ISenderQuerier
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<SenderModel> ReadAsync(RealmModel? realm, Sender sender, CancellationToken cancellationToken)
+  public async Task<Sender> ReadAsync(RealmModel? realm, SenderAggregate sender, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, sender.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The sender entity 'AggregateId={sender.Id.Value}' could not be found.");
   }
-  public async Task<SenderModel?> ReadAsync(RealmModel? realm, SenderId id, CancellationToken cancellationToken)
+  public async Task<Sender?> ReadAsync(RealmModel? realm, SenderId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<SenderModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<Sender?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -51,7 +51,7 @@ internal class SenderQuerier : ISenderQuerier
     return await MapAsync(sender, realm, cancellationToken);
   }
 
-  public async Task<SenderModel?> ReadDefaultAsync(RealmModel? realm, CancellationToken cancellationToken)
+  public async Task<Sender?> ReadDefaultAsync(RealmModel? realm, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
 
@@ -66,7 +66,7 @@ internal class SenderQuerier : ISenderQuerier
     return await MapAsync(sender, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<SenderModel>> SearchAsync(RealmModel? realm, SearchSendersPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Sender>> SearchAsync(RealmModel? realm, SearchSendersPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Senders.Table).SelectAll(PortalDb.Senders.Table)
       .ApplyRealmFilter(PortalDb.Senders.TenantId, realm)
@@ -114,17 +114,17 @@ internal class SenderQuerier : ISenderQuerier
     query = query.ApplyPaging(payload);
 
     SenderEntity[] senders = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<SenderModel> items = await MapAsync(senders, realm, cancellationToken);
+    IEnumerable<Sender> items = await MapAsync(senders, realm, cancellationToken);
 
-    return new SearchResults<SenderModel>(items, total);
+    return new SearchResults<Sender>(items, total);
   }
 
-  private async Task<SenderModel> MapAsync(SenderEntity sender, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<Sender> MapAsync(SenderEntity sender, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([sender], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<SenderModel>> MapAsync(IEnumerable<SenderEntity> senders, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<Sender>> MapAsync(IEnumerable<SenderEntity> senders, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = senders.SelectMany(sender => sender.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return senders.Select(sender => mapper.ToSender(sender, realm));

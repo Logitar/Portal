@@ -123,7 +123,7 @@ internal class MessageQuerier : IMessageQuerier
   private async Task<IEnumerable<Message>> MapAsync(IEnumerable<MessageEntity> messages, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = messages.SelectMany(message => message.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     HashSet<int> userIds = [];

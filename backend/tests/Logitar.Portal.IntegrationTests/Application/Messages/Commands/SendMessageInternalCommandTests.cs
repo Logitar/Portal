@@ -39,8 +39,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private readonly RecipientSettings _recipientSettings;
   private readonly SenderSettings _senderSettings;
 
-  private SenderAggregate? _sender = null;
-  private Template? _template = null;
+  private Sender? _sender = null;
+  private TemplateAggregate? _template = null;
 
   public SendMessageInternalCommandTests() : base()
   {
@@ -138,7 +138,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
           Type = "reset_password+jwt",
           Subject = user.Id.ToGuid().ToString()
         };
-        CreatedToken createdToken = await ActivityPipeline.ExecuteAsync(new CreateTokenCommand(createToken));
+        CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(new CreateTokenCommand(createToken));
         payload.Variables.Add(new Variable("Token", createdToken.Token));
         break;
       case SenderType.Sms:

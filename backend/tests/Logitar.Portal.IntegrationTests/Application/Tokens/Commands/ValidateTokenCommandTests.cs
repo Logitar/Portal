@@ -78,7 +78,7 @@ public class ValidateTokenCommandTests : IntegrationTests
       Type = tokenType
     };
     ValidateTokenCommand command = new(payload);
-    ValidatedToken validatedToken = await ActivityPipeline.ExecuteAsync(command);
+    ValidatedTokenModel validatedToken = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(Faker.Person.UserName, validatedToken.Claims.Single(x => x.Name == Rfc7519ClaimNames.Username).Value);
 
     BlacklistedTokenEntity? blacklisted = await IdentityContext.TokenBlacklist.AsNoTracking().SingleOrDefaultAsync();
@@ -106,7 +106,7 @@ public class ValidateTokenCommandTests : IntegrationTests
 
     ValidateTokenPayload payload = new(token);
     ValidateTokenCommand command = new(payload);
-    ValidatedToken validatedToken = await ActivityPipeline.ExecuteAsync(command);
+    ValidatedTokenModel validatedToken = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(subject, validatedToken.Subject);
   }
 
@@ -127,7 +127,7 @@ public class ValidateTokenCommandTests : IntegrationTests
 
     ValidateTokenPayload payload = new(token);
     ValidateTokenCommand command = new(payload);
-    ValidatedToken validatedToken = await ActivityPipeline.ExecuteAsync(command);
+    ValidatedTokenModel validatedToken = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(validatedToken);
     Assert.NotNull(validatedToken.Email);
     Assert.Equal(Faker.Person.Email, validatedToken.Email.Address);

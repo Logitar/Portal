@@ -121,7 +121,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
   private async Task<IEnumerable<Dictionary>> MapAsync(IEnumerable<DictionaryEntity> dictionaries, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = dictionaries.SelectMany(dictionary => dictionary.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return dictionaries.Select(dictionary => mapper.ToDictionary(dictionary, realm));
