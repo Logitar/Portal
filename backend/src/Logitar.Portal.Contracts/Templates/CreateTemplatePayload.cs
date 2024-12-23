@@ -7,13 +7,13 @@ public record CreateTemplatePayload
   public string? Description { get; set; }
 
   public string Subject { get; set; }
-  public Content Content { get; set; }
+  public ContentModel Content { get; set; }
 
-  public CreateTemplatePayload() : this(string.Empty, string.Empty, new Content())
+  public CreateTemplatePayload() : this(string.Empty, string.Empty, new ContentModel())
   {
   }
 
-  public CreateTemplatePayload(string uniqueKey, string subject, Content content)
+  public CreateTemplatePayload(string uniqueKey, string subject, ContentModel content)
   {
     UniqueKey = uniqueKey;
     Subject = subject;

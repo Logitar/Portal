@@ -7,9 +7,9 @@ namespace Logitar.Portal.Application.Templates;
 
 public interface ITemplateQuerier
 {
-  Task<Template> ReadAsync(RealmModel? realm, TemplateAggregate template, CancellationToken cancellationToken = default);
-  Task<Template?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken = default);
-  Task<Template?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
-  Task<Template?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken = default);
-  Task<SearchResults<Template>> SearchAsync(RealmModel? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken = default);
+  Task<TemplateModel> ReadAsync(RealmModel? realm, Template template, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken = default);
+  Task<SearchResults<TemplateModel>> SearchAsync(RealmModel? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken = default);
 }

@@ -17,7 +17,7 @@ public record TemplateSummary
     DisplayName = displayName;
   }
 
-  public TemplateSummary(TemplateAggregate template) : this(template.Id, template.UniqueKey, template.DisplayName)
+  public TemplateSummary(Template template) : this(template.Id, template.UniqueKey, template.DisplayName)
   {
   }
 }

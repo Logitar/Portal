@@ -21,7 +21,7 @@ internal class TemplateClientTests : IClientTests
       string text = await File.ReadAllTextAsync("Templates/PasswordRecovery.html");
       Content content = Content.Html(text);
       CreateTemplatePayload create = new("PasswordRecovery", "PasswordRecovery_Subject", content);
-      Template template = await _client.CreateAsync(create, context.Request);
+      TemplateModel template = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -32,7 +32,7 @@ internal class TemplateClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Template? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueKey: null, context.Request);
+      TemplateModel? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueKey: null, context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The template should not be found.");
@@ -47,7 +47,7 @@ internal class TemplateClientTests : IClientTests
         ContentType = MediaTypeNames.Text.Html
       };
       search.Search.Terms.Add(new SearchTerm("%_Subject"));
-      SearchResults<Template> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<TemplateModel> results = await _client.SearchAsync(search, context.Request);
       template = results.Items.Single();
       context.Succeed();
 

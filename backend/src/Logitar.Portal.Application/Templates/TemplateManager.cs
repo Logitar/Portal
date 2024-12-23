@@ -1,5 +1,4 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Templates.Events;
 
@@ -14,12 +13,12 @@ internal class TemplateManager : ITemplateManager
     _templateRepository = templateRepository;
   }
 
-  public async Task SaveAsync(TemplateAggregate template, ActorId actorId, CancellationToken cancellationToken)
+  public async Task SaveAsync(Template template, ActorId actorId, CancellationToken cancellationToken)
   {
     bool hasUniqueKeyChanged = false;
-    foreach (DomainEvent change in template.Changes)
+    foreach (IEvent change in template.Changes)
     {
-      if (change is TemplateCreatedEvent || change is TemplateUniqueKeyChangedEvent)
+      if (change is TemplateCreated || change is TemplateUniqueKeyChanged)
       {
         hasUniqueKeyChanged = true;
       }
@@ -27,7 +26,7 @@ internal class TemplateManager : ITemplateManager
 
     if (hasUniqueKeyChanged)
     {
-      TemplateAggregate? other = await _templateRepository.LoadAsync(template.TenantId, template.UniqueKey, cancellationToken);
+      Template? other = await _templateRepository.LoadAsync(template.TenantId, template.UniqueKey, cancellationToken);
       if (other?.Equals(template) == false)
       {
         throw new UniqueKeyAlreadyUsedException(template.TenantId, template.UniqueKey);

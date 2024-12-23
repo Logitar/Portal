@@ -7,5 +7,5 @@ public record UpdateTemplatePayload
   public ChangeModel<string>? Description { get; set; }
 
   public string? Subject { get; set; }
-  public Content? Content { get; set; }
+  public ContentModel? Content { get; set; }
 }

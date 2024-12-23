@@ -41,7 +41,7 @@ public class CreateTemplateCommandTests : IntegrationTests
       Description = "This is the password recovery message template."
     };
     CreateTemplateCommand command = new(payload);
-    Template template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel template = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
     Assert.Equal(payload.DisplayName.Trim(), template.DisplayName);
@@ -51,7 +51,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     Assert.Null(template.Realm);
 
     SetRealm();
-    Template other = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 
@@ -61,7 +61,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     SetRealm();
 
     ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery"), new SubjectUnit("Reset your password"), content, TenantId);
+    Template template = new(new UniqueKeyUnit("PasswordRecovery"), new SubjectUnit("Reset your password"), content, TenantId);
     await _templateRepository.SaveAsync(template);
 
     CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new Content(content));

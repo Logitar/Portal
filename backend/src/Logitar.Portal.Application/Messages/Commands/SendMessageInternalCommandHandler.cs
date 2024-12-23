@@ -42,11 +42,11 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     LocaleUnit? defaultLocale = command.DefaultLocale;
 
     SendMessagePayload payload = command.Payload;
-    Sender sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
+    SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
     new SendMessageValidator(sender.Type).ValidateAndThrow(payload);
 
     Recipients allRecipients = await ResolveRecipientsAsync(payload, sender.Type, cancellationToken);
-    TemplateAggregate template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
+    Template template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
 
     Dictionary<LocaleUnit, Dictionary> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
@@ -155,7 +155,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     return new Recipients(recipients);
   }
 
-  private async Task<Sender> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<SenderAggregate> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
   {
     if (payload.SenderId.HasValue)
     {
@@ -167,9 +167,9 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       ?? throw new NoDefaultSenderException(tenantId);
   }
 
-  private async Task<TemplateAggregate> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
+  private async Task<Template> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
-    TemplateAggregate? template = null;
+    Template? template = null;
     if (Guid.TryParse(payload.Template, out Guid id))
     {
       template = await _templateRepository.LoadAsync(id, cancellationToken);

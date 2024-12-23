@@ -14,7 +14,7 @@ public class ReadTemplateQueryTests : IntegrationTests
 {
   private readonly ITemplateRepository _templateRepository;
 
-  private readonly TemplateAggregate _template;
+  private readonly Template _template;
 
   public ReadTemplateQueryTests() : base()
   {
@@ -46,7 +46,7 @@ public class ReadTemplateQueryTests : IntegrationTests
     SetRealm();
 
     ReadTemplateQuery query = new(_template.Id.ToGuid(), UniqueKey: null);
-    Template? template = await ActivityPipeline.ExecuteAsync(query);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(template);
   }
 
@@ -54,7 +54,7 @@ public class ReadTemplateQueryTests : IntegrationTests
   public async Task It_should_return_the_template_found_by_Id()
   {
     ReadTemplateQuery query = new(_template.Id.ToGuid(), _template.UniqueKey.Value);
-    Template? template = await ActivityPipeline.ExecuteAsync(query);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(template);
     Assert.Equal(_template.Id.ToGuid(), template.Id);
   }
@@ -63,7 +63,7 @@ public class ReadTemplateQueryTests : IntegrationTests
   public async Task It_should_return_the_template_found_by_unique_key()
   {
     ReadTemplateQuery query = new(Id: null, _template.UniqueKey.Value);
-    Template? template = await ActivityPipeline.ExecuteAsync(query);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(template);
     Assert.Equal(_template.Id.ToGuid(), template.Id);
   }
@@ -73,11 +73,11 @@ public class ReadTemplateQueryTests : IntegrationTests
   {
     UniqueKeyUnit uniqueKey = new("ConfirmAccount");
     SubjectUnit subject = new("Confirm your account");
-    TemplateAggregate template = new(uniqueKey, subject, _template.Content);
+    Template template = new(uniqueKey, subject, _template.Content);
     await _templateRepository.SaveAsync(template);
 
     ReadTemplateQuery query = new(_template.Id.ToGuid(), "  CoNFiRMaCCouNT  ");
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<Template>>(async () => await ActivityPipeline.ExecuteAsync(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<TemplateModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

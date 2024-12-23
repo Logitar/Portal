@@ -15,32 +15,32 @@ internal class TemplateFacade : ITemplateService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<Template> CreateAsync(CreateTemplatePayload payload, CancellationToken cancellationToken)
+  public async Task<TemplateModel> CreateAsync(CreateTemplatePayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new CreateTemplateCommand(payload), cancellationToken);
   }
 
-  public async Task<Template?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new DeleteTemplateCommand(id), cancellationToken);
   }
 
-  public async Task<Template?> ReadAsync(Guid? id, string? uniqueKey, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> ReadAsync(Guid? id, string? uniqueKey, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadTemplateQuery(id, uniqueKey), cancellationToken);
   }
 
-  public async Task<Template?> ReplaceAsync(Guid id, ReplaceTemplatePayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> ReplaceAsync(Guid id, ReplaceTemplatePayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReplaceTemplateCommand(id, payload, version), cancellationToken);
   }
 
-  public async Task<SearchResults<Template>> SearchAsync(SearchTemplatesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<TemplateModel>> SearchAsync(SearchTemplatesPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new SearchTemplatesQuery(payload), cancellationToken);
   }
 
-  public async Task<Template?> UpdateAsync(Guid id, UpdateTemplatePayload payload, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> UpdateAsync(Guid id, UpdateTemplatePayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new UpdateTemplateCommand(id, payload), cancellationToken);
   }

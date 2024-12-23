@@ -13,7 +13,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
 {
   private readonly ITemplateRepository _templateRepository;
 
-  private readonly TemplateAggregate _template;
+  private readonly Template _template;
 
   public DeleteTemplateCommandTests() : base()
   {
@@ -43,7 +43,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   public async Task It_should_delete_an_existing_template()
   {
     DeleteTemplateCommand command = new(_template.Id.ToGuid());
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
     Assert.Equal(command.Id, template.Id);
   }
@@ -52,7 +52,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_template_cannot_be_found()
   {
     DeleteTemplateCommand command = new(Guid.NewGuid());
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
   }
 
@@ -62,7 +62,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
     SetRealm();
 
     DeleteTemplateCommand command = new(_template.Id.ToGuid());
-    Template? result = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

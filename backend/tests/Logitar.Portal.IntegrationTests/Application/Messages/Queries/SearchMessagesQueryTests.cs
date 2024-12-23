@@ -56,14 +56,14 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    Sender sender = new(email, settings, TenantId);
+    SenderAggregate sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);
 
     SubjectUnit subject = new("Reset your password");
     ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery"), subject, content, TenantId);
+    Template template = new(new UniqueKeyUnit("PasswordRecovery"), subject, content, TenantId);
     SubjectUnit otherSubject = new("Confirm your account");
-    TemplateAggregate otherTemplate = new(new UniqueKeyUnit("AccountConfirmation"), otherSubject, content, TenantId);
+    Template otherTemplate = new(new UniqueKeyUnit("AccountConfirmation"), otherSubject, content, TenantId);
     await _templateRepository.SaveAsync([template, otherTemplate]);
 
     RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];

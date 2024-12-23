@@ -62,9 +62,9 @@ internal class TestContext
     _token = token;
   }
 
-  private Template? _template = null;
-  public Template Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
-  public void SetTemplate(Template template)
+  private TemplateModel? _template = null;
+  public TemplateModel Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
+  public void SetTemplate(TemplateModel template)
   {
     AssertHasNotEnded();
     _template = template;
