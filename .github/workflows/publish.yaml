@@ -1,4 +1,4 @@
-name:Publish Docker Image to Docker Hub & NuGet Packages
+name: Publish Docker Image to Docker Hub & NuGet Packages
 
 on:
   release:
