@@ -14,32 +14,32 @@ internal class SessionClient : BaseClient, ISessionClient
   {
   }
 
-  public async Task<Session> CreateAsync(CreateSessionPayload payload, IRequestContext? context)
+  public async Task<SessionModel> CreateAsync(CreateSessionPayload payload, IRequestContext? context)
   {
-    return await PostAsync<Session>(UriPath, payload, context)
+    return await PostAsync<SessionModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<Session?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<SessionModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<Session>(uri, context);
+    return await DeleteAsync<SessionModel>(uri, context);
   }
 
-  public async Task<Session?> ReadAsync(Guid id, IRequestContext? context)
+  public async Task<SessionModel?> ReadAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await GetAsync<Session>(uri, context);
+    return await GetAsync<SessionModel>(uri, context);
   }
 
-  public async Task<Session> RenewAsync(RenewSessionPayload payload, IRequestContext? context)
+  public async Task<SessionModel> RenewAsync(RenewSessionPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/renew", UriKind.Relative);
-    return await PutAsync<Session>(uri, payload, context)
+    return await PutAsync<SessionModel>(uri, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(RenewAsync), HttpMethod.Put, uri, payload, context);
   }
 
-  public async Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, IRequestContext? context)
+  public async Task<SearchResults<SessionModel>> SearchAsync(SearchSessionsPayload payload, IRequestContext? context)
   {
     IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
     if (payload.UserId.HasValue)
@@ -56,20 +56,20 @@ internal class SessionClient : BaseClient, ISessionClient
     }
     Uri uri = builder.BuildUri(UriKind.Relative);
 
-    return await GetAsync<SearchResults<Session>>(uri, context)
+    return await GetAsync<SearchResults<SessionModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 
-  public async Task<Session> SignInAsync(SignInSessionPayload payload, IRequestContext? context)
+  public async Task<SessionModel> SignInAsync(SignInSessionPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/sign/in", UriKind.Relative);
-    return await PostAsync<Session>(uri, payload, context)
+    return await PostAsync<SessionModel>(uri, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(SignInAsync), HttpMethod.Post, uri, payload, context);
   }
 
-  public async Task<Session?> SignOutAsync(Guid id, IRequestContext? context)
+  public async Task<SessionModel?> SignOutAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}/sign/out", UriKind.Relative);
-    return await PatchAsync<Session>(uri, content: null, context);
+    return await PatchAsync<SessionModel>(uri, content: null, context);
   }
 }

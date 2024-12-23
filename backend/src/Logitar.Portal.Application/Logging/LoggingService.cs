@@ -71,7 +71,7 @@ internal class LoggingService : ILoggingService
     }
   }
 
-  public void SetSession(Session? session)
+  public void SetSession(SessionModel? session)
   {
     if (_log != null)
     {

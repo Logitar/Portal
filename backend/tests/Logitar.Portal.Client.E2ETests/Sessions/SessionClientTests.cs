@@ -23,7 +23,7 @@ internal class SessionClientTests : IClientTests
     {
       context.SetName(_client.GetType(), nameof(_client.SignInAsync));
       SignInSessionPayload signIn = new(_credentials.Username, _credentials.Password);
-      Session session = await _client.SignInAsync(signIn, context.Request);
+      SessionModel session = await _client.SignInAsync(signIn, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.SignOutAsync));
@@ -46,7 +46,7 @@ internal class SessionClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Session? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
+      SessionModel? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The session should not be found.");

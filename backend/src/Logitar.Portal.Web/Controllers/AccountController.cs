@@ -45,13 +45,13 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<SessionModel>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
   {
     try
     {
       SignInSessionPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
       SignInSessionCommand command = new(payload);
-      Session session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
+      SessionModel session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
       HttpContext.SignIn(session);
 
       return Ok(session);

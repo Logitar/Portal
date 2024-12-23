@@ -10,5 +10,5 @@ internal record TestContext
   public RealmModel? Realm { get; set; }
   public ApiKey? ApiKey { get; set; }
   public User? User { get; set; }
-  public Session? Session { get; set; }
+  public SessionModel? Session { get; set; }
 }

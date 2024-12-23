@@ -1,16 +1,16 @@
-﻿using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 
 namespace Logitar.Portal.Application.Sessions;
 
 public class SessionNotFoundException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified session could not be found.";
+  private const string ErrorMessage = "The specified session could not be found.";
 
-  public SessionId Id
+  public string Id
   {
-    get => new((string)Data[nameof(Id)]!);
-    private set => Data[nameof(Id)] = value.Value;
+    get => (string)Data[nameof(Id)]!;
+    private set => Data[nameof(Id)] = value;
   }
   public string? PropertyName
   {
@@ -20,7 +20,7 @@ public class SessionNotFoundException : InvalidCredentialsException
 
   public SessionNotFoundException(SessionId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id;
+    Id = id.Value;
     PropertyName = propertyName;
   }
 

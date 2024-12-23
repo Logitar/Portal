@@ -24,7 +24,7 @@ internal static class ClaimsExtensions
     return identity;
   }
 
-  public static ClaimsIdentity CreateClaimsIdentity(this Session session, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this SessionModel session, string? authenticationType = null)
   {
     ClaimsIdentity identity = session.User.CreateClaimsIdentity(authenticationType);
 

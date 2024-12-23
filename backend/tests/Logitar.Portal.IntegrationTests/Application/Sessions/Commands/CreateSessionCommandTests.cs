@@ -26,7 +26,7 @@ public class CreateSessionCommandTests : IntegrationTests
       IsPersistent = true
     };
     CreateSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(session.IsPersistent);
     Assert.NotNull(session.RefreshToken);
@@ -52,7 +52,7 @@ public class CreateSessionCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("AdditionalInformation", $@"{{""User-Agent"":""{Faker.Internet.UserAgent()}""}}"));
     payload.CustomAttributes.Add(new("IpAddress", Faker.Internet.Ip()));
     CreateSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -73,7 +73,7 @@ public class CreateSessionCommandTests : IntegrationTests
 
     CreateSessionPayload payload = new(user.Id.ToGuid().ToString());
     CreateSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -95,7 +95,7 @@ public class CreateSessionCommandTests : IntegrationTests
 
     CreateSessionPayload payload = new(Faker.Person.Email);
     CreateSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);

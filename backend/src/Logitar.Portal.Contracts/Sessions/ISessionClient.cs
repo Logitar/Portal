@@ -4,10 +4,10 @@ namespace Logitar.Portal.Contracts.Sessions;
 
 public interface ISessionClient
 {
-  Task<Session> CreateAsync(CreateSessionPayload payload, IRequestContext? context = null);
-  Task<Session?> ReadAsync(Guid id, IRequestContext? context = null);
-  Task<Session> RenewAsync(RenewSessionPayload payload, IRequestContext? context = null);
-  Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, IRequestContext? context = null);
-  Task<Session> SignInAsync(SignInSessionPayload payload, IRequestContext? context = null);
-  Task<Session?> SignOutAsync(Guid id, IRequestContext? context = null);
+  Task<SessionModel> CreateAsync(CreateSessionPayload payload, IRequestContext? context = null);
+  Task<SessionModel?> ReadAsync(Guid id, IRequestContext? context = null);
+  Task<SessionModel> RenewAsync(RenewSessionPayload payload, IRequestContext? context = null);
+  Task<SearchResults<SessionModel>> SearchAsync(SearchSessionsPayload payload, IRequestContext? context = null);
+  Task<SessionModel> SignInAsync(SignInSessionPayload payload, IRequestContext? context = null);
+  Task<SessionModel?> SignOutAsync(Guid id, IRequestContext? context = null);
 }

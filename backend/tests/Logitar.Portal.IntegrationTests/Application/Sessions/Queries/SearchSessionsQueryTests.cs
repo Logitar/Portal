@@ -30,7 +30,7 @@ public class SearchSessionsQueryTests : IntegrationTests
       IsPersistent = true
     };
     SearchSessionsQuery query = new(payload);
-    SearchResults<Session> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<SessionModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -69,10 +69,10 @@ public class SearchSessionsQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("Hello World!"));
     payload.Sort.Add(new SessionSortOption(SessionSort.UpdatedOn, isDescending: true));
     SearchSessionsQuery query = new(payload);
-    SearchResults<Session> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<SessionModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Session session = Assert.Single(results.Items);
+    SessionModel session = Assert.Single(results.Items);
     Assert.Equal(session1.Id.ToGuid(), session.Id);
   }
 }

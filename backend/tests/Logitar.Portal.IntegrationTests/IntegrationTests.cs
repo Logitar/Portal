@@ -142,7 +142,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     _context.User = user;
     _context.Session = null;
   }
-  protected void SetSession(Session? session)
+  protected void SetSession(SessionModel? session)
   {
     _context.User = session?.User;
     _context.Session = session;

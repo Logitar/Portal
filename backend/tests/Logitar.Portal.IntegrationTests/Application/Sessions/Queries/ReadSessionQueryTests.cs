@@ -24,7 +24,7 @@ public class ReadSessionQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_session_cannot_be_found()
   {
     ReadSessionQuery query = new(Guid.NewGuid());
-    Session? session = await ActivityPipeline.ExecuteAsync(query);
+    SessionModel? session = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(session);
   }
 
@@ -40,7 +40,7 @@ public class ReadSessionQueryTests : IntegrationTests
     Guid id = new AggregateId(entity.AggregateId).ToGuid();
 
     ReadSessionQuery query = new(id);
-    Session? session = await ActivityPipeline.ExecuteAsync(query);
+    SessionModel? session = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(session);
     Assert.Equal(id, session.Id);
   }
