@@ -93,11 +93,11 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       }
     }
 
-    Dictionary<Guid, UserAggregate> users = new(recipients.Capacity);
+    Dictionary<Guid, User> users = new(recipients.Capacity);
     if (userIds.Count > 0)
     {
-      IEnumerable<UserAggregate> allUsers = await _userRepository.LoadAsync(userIds, cancellationToken);
-      foreach (UserAggregate user in allUsers)
+      IEnumerable<User> allUsers = await _userRepository.LoadAsync(userIds, cancellationToken);
+      foreach (User user in allUsers)
       {
         users[user.Id.ToGuid()] = user;
       }
@@ -109,7 +109,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     {
       if (recipient.UserId.HasValue)
       {
-        if (users.TryGetValue(recipient.UserId.Value, out UserAggregate? user))
+        if (users.TryGetValue(recipient.UserId.Value, out User? user))
         {
           switch (senderType)
           {
