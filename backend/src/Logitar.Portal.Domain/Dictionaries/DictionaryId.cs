@@ -1,39 +1,47 @@
-﻿using FluentValidation;
-using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Dictionaries;
 
-public record DictionaryId
+public readonly struct DictionaryId
 {
-  public AggregateId AggregateId { get; }
-  public string Value => AggregateId.Value;
+  private const char Separator = ':';
 
-  public DictionaryId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  public StreamId StreamId { get; }
+  public string Value => StreamId.Value;
+
+  public TenantId? TenantId { get; }
+  public EntityId EntityId { get; }
+
+  public DictionaryId(TenantId? tenantId, EntityId entityId)
   {
+    StreamId = new(tenantId == null ? entityId.Value : string.Join(Separator, tenantId, entityId));
+    TenantId = tenantId;
+    EntityId = entityId;
   }
 
-  public DictionaryId(AggregateId aggregateId, string? propertyName = null)
+  public DictionaryId(StreamId streamId)
   {
-    new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
+    StreamId = streamId;
 
-    AggregateId = aggregateId;
+    string[] values = streamId.Value.Split(Separator);
+    if (values.Length > 2)
+    {
+      throw new ArgumentException($"The value '{streamId}' is not a valid dictionary ID.", nameof(streamId));
+    }
+    else if (values.Length == 2)
+    {
+      TenantId = new(values.First());
+    }
+    EntityId = new(values.Last());
   }
 
-  public DictionaryId(string value, string? propertyName = null)
-  {
-    value = value.Trim();
-    new IdValidator(propertyName).ValidateAndThrow(value);
+  public static DictionaryId NewId(TenantId? tenantId = null) => new(tenantId, EntityId.NewId());
 
-    AggregateId = new(value);
-  }
+  public static bool operator ==(DictionaryId left, DictionaryId right) => left.Equals(right);
+  public static bool operator !=(DictionaryId left, DictionaryId right) => !left.Equals(right);
 
-  public static DictionaryId NewId() => new(AggregateId.NewId());
-
-  public static DictionaryId? TryCreate(string? value, string? propertyName = null)
-  {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
-  }
-
-  public Guid ToGuid() => AggregateId.ToGuid();
+  public override bool Equals([NotNullWhen(true)] object? obj) => obj is DictionaryId id && id.Value == Value;
+  public override int GetHashCode() => Value.GetHashCode();
+  public override string ToString() => Value;
 }
