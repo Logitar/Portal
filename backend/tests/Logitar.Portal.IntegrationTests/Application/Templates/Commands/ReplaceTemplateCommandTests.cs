@@ -15,7 +15,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
 {
   private readonly ITemplateRepository _templateRepository;
 
-  private readonly TemplateAggregate _template;
+  private readonly Template _template;
 
   public ReplaceTemplateCommandTests() : base()
   {
@@ -60,7 +60,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
       Description = " This is the password recovery message template. "
     };
     ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, version);
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
@@ -75,7 +75,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   {
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new Content(_template.Content));
     ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
   }
 
@@ -86,14 +86,14 @@ public class ReplaceTemplateCommandTests : IntegrationTests
 
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new Content(_template.Content));
     ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, Version: null);
-    Template? result = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueKeyAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery_OLD"), _template.Subject, _template.Content);
+    Template template = new(new UniqueKeyUnit("PasswordRecovery_OLD"), _template.Subject, _template.Content);
     await _templateRepository.SaveAsync(template);
 
     ReplaceTemplatePayload payload = new("PaSSWoRDReCoVeRy", _template.Subject.Value, new Content(_template.Content));

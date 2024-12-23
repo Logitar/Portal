@@ -39,8 +39,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private readonly RecipientSettings _recipientSettings;
   private readonly SenderSettings _senderSettings;
 
-  private Sender? _sender = null;
-  private TemplateAggregate? _template = null;
+  private SenderAggregate? _sender = null;
+  private Template? _template = null;
 
   public SendMessageInternalCommandTests() : base()
   {

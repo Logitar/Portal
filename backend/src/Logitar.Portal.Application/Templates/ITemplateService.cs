@@ -5,10 +5,10 @@ namespace Logitar.Portal.Application.Templates;
 
 public interface ITemplateService
 {
-  Task<Template> CreateAsync(CreateTemplatePayload payload, CancellationToken cancellationToken = default);
-  Task<Template?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<Template?> ReadAsync(Guid? id = null, string? uniqueKey = null, CancellationToken cancellationToken = default);
-  Task<Template?> ReplaceAsync(Guid id, ReplaceTemplatePayload payload, long? version = null, CancellationToken cancellationToken = default);
-  Task<SearchResults<Template>> SearchAsync(SearchTemplatesPayload payload, CancellationToken cancellationToken = default);
-  Task<Template?> UpdateAsync(Guid id, UpdateTemplatePayload payload, CancellationToken cancellationToken = default);
+  Task<TemplateModel> CreateAsync(CreateTemplatePayload payload, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> ReadAsync(Guid? id = null, string? uniqueKey = null, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> ReplaceAsync(Guid id, ReplaceTemplatePayload payload, long? version = null, CancellationToken cancellationToken = default);
+  Task<SearchResults<TemplateModel>> SearchAsync(SearchTemplatesPayload payload, CancellationToken cancellationToken = default);
+  Task<TemplateModel?> UpdateAsync(Guid id, UpdateTemplatePayload payload, CancellationToken cancellationToken = default);
 }

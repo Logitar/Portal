@@ -1,31 +1,30 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Domain.Templates;
+﻿using Logitar.Identity.Core;
 
-namespace Logitar.Portal.Application.Realms;
+namespace Logitar.Portal.Application.Templates;
 
 public class UniqueKeyAlreadyUsedException : Exception
 {
   public const string ErrorMessage = "The specified unique key is already used.";
 
-  public TenantId? TenantId
+  public string? TenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(TenantId)]);
-    private set => Data[nameof(TenantId)] = value?.Value;
+    get => (string?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
-  public UniqueKeyUnit UniqueKey
+  public string UniqueKey
   {
-    get => new((string)Data[nameof(UniqueKey)]!);
-    private set => Data[nameof(UniqueKey)] = value.Value;
-  }
-
-  public UniqueKeyAlreadyUsedException(TenantId? tenantId, UniqueKeyUnit uniqueKey) : base(BuildMessage(tenantId, uniqueKey))
-  {
-    TenantId = tenantId;
-    UniqueKey = uniqueKey;
+    get => (string)Data[nameof(UniqueKey)]!;
+    private set => Data[nameof(UniqueKey)] = value;
   }
 
-  private static string BuildMessage(TenantId? tenantId, UniqueKeyUnit uniqueKey) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
-    .AddData(nameof(UniqueKey), uniqueKey.Value)
+  public UniqueKeyAlreadyUsedException(TenantId? tenantId, Identifier uniqueKey) : base(BuildMessage(tenantId, uniqueKey))
+  {
+    TenantId = tenantId?.Value;
+    UniqueKey = uniqueKey.Value;
+  }
+
+  private static string BuildMessage(TenantId? tenantId, Identifier uniqueKey) => new ErrorMessageBuilder(ErrorMessage)
+    .AddData(nameof(TenantId), tenantId, "<null>")
+    .AddData(nameof(UniqueKey), uniqueKey)
     .Build();
 }

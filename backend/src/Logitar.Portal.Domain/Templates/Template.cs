@@ -4,7 +4,7 @@ using Logitar.Portal.Domain.Templates.Events;
 
 namespace Logitar.Portal.Domain.Templates;
 
-public class TemplateAggregate : AggregateRoot
+public class Template : AggregateRoot
 {
   private TemplateUpdated _updated = new();
 
@@ -68,11 +68,11 @@ public class TemplateAggregate : AggregateRoot
     }
   }
 
-  public TemplateAggregate() : base()
+  public Template() : base()
   {
   }
 
-  public TemplateAggregate(Identifier uniqueKey, Subject subject, Content content, ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).StreamId)
+  public Template(Identifier uniqueKey, Subject subject, Content content, ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).StreamId)
   {
     Raise(new TemplateCreated(uniqueKey, subject, content), actorId);
   }

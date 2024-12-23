@@ -11,7 +11,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
 internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, ITemplateRepository
 {
-  private static readonly string AggregateType = typeof(TemplateAggregate).GetNamespaceQualifiedName();
+  private static readonly string AggregateType = typeof(Template).GetNamespaceQualifiedName();
 
   private readonly ISqlHelper _sqlHelper;
 
@@ -21,18 +21,18 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<TemplateAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await LoadAsync<TemplateAggregate>(new AggregateId(id), cancellationToken);
+  public async Task<Template?> LoadAsync(Guid id, CancellationToken cancellationToken)
+    => await LoadAsync<Template>(new AggregateId(id), cancellationToken);
 
-  public async Task<TemplateAggregate?> LoadAsync(TemplateId id, CancellationToken cancellationToken)
+  public async Task<Template?> LoadAsync(TemplateId id, CancellationToken cancellationToken)
     => await LoadAsync(id, version: null, cancellationToken);
-  public async Task<TemplateAggregate?> LoadAsync(TemplateId id, long? version, CancellationToken cancellationToken)
-    => await LoadAsync<TemplateAggregate>(id.AggregateId, version, cancellationToken);
+  public async Task<Template?> LoadAsync(TemplateId id, long? version, CancellationToken cancellationToken)
+    => await LoadAsync<Template>(id.AggregateId, version, cancellationToken);
 
-  public async Task<IEnumerable<TemplateAggregate>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<TemplateAggregate>(cancellationToken);
+  public async Task<IEnumerable<Template>> LoadAsync(CancellationToken cancellationToken)
+    => await LoadAsync<Template>(cancellationToken);
 
-  public async Task<IEnumerable<TemplateAggregate>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IEnumerable<Template>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
@@ -47,10 +47,10 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<TemplateAggregate>(events.Select(EventSerializer.Deserialize));
+    return Load<Template>(events.Select(EventSerializer.Deserialize));
   }
 
-  public async Task<TemplateAggregate?> LoadAsync(TenantId? tenantId, UniqueKeyUnit uniqueKey, CancellationToken cancellationToken)
+  public async Task<Template?> LoadAsync(TenantId? tenantId, UniqueKeyUnit uniqueKey, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
@@ -66,11 +66,11 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<TemplateAggregate>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+    return Load<Template>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
   }
 
-  public async Task SaveAsync(TemplateAggregate template, CancellationToken cancellationToken)
+  public async Task SaveAsync(Template template, CancellationToken cancellationToken)
     => await base.SaveAsync(template, cancellationToken);
-  public async Task SaveAsync(IEnumerable<TemplateAggregate> templates, CancellationToken cancellationToken)
+  public async Task SaveAsync(IEnumerable<Template> templates, CancellationToken cancellationToken)
     => await base.SaveAsync(templates, cancellationToken);
 }

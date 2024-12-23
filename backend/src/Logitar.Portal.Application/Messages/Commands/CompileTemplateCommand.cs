@@ -6,5 +6,5 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
-public record CompileTemplateCommand(MessageId MessageId, TemplateAggregate Template, Dictionaries? Dictionaries = null, Locale? Locale = null,
+public record CompileTemplateCommand(MessageId MessageId, Template Template, Dictionaries? Dictionaries = null, Locale? Locale = null,
   UserAggregate? User = null, Variables? Variables = null) : IRequest<ContentUnit>;

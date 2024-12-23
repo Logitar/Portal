@@ -2,22 +2,22 @@
 
 namespace Logitar.Portal.Contracts.Templates;
 
-public class Template : Aggregate
+public class TemplateModel : Aggregate
 {
   public string UniqueKey { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }
 
   public string Subject { get; set; }
-  public Content Content { get; set; }
+  public ContentModel Content { get; set; }
 
   public RealmModel? Realm { get; set; }
 
-  public Template() : this(string.Empty, string.Empty, new Content())
+  public TemplateModel() : this(string.Empty, string.Empty, new ContentModel())
   {
   }
 
-  public Template(string uniqueKey, string subject, Content content)
+  public TemplateModel(string uniqueKey, string subject, ContentModel content)
   {
     UniqueKey = uniqueKey;
     Subject = subject;
