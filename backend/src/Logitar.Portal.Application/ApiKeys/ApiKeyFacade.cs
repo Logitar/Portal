@@ -15,37 +15,37 @@ internal class ApiKeyFacade : IApiKeyService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<ApiKey> AuthenticateAsync(AuthenticateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> AuthenticateAsync(AuthenticateApiKeyPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new AuthenticateApiKeyCommand(payload), cancellationToken);
   }
 
-  public async Task<ApiKey> CreateAsync(CreateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> CreateAsync(CreateApiKeyPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new CreateApiKeyCommand(payload), cancellationToken);
   }
 
-  public async Task<ApiKey?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new DeleteApiKeyCommand(id), cancellationToken);
   }
 
-  public async Task<ApiKey?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadApiKeyQuery(id), cancellationToken);
   }
 
-  public async Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReplaceApiKeyCommand(id, payload, version), cancellationToken);
   }
 
-  public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<ApiKeyModel>> SearchAsync(SearchApiKeysPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new SearchApiKeysQuery(payload), cancellationToken);
   }
 
-  public async Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new UpdateApiKeyCommand(id, payload), cancellationToken);
   }

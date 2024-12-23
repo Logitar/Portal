@@ -16,7 +16,7 @@ public class Message : Aggregate
   public Template Template { get; set; }
 
   public bool IgnoreUserLocale { get; set; }
-  public Locale? Locale { get; set; }
+  public LocaleModel? Locale { get; set; }
 
   public List<Variable> Variables { get; set; }
 

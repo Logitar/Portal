@@ -60,7 +60,7 @@ internal class ActivityPipeline : IActivityPipeline
   {
     Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
     Realm? realm = parameters.Realm;
-    ApiKey? apiKey = parameters.ApiKey;
+    ApiKeyModel? apiKey = parameters.ApiKey;
     User? user = parameters.User;
     Session? session = parameters.Session;
 

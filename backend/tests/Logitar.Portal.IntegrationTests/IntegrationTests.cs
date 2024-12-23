@@ -89,7 +89,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = new LocaleModel(Faker.Locale),
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };
@@ -133,7 +133,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
   protected void SetRealm() => _context.Realm = Realm;
-  protected void SetApiKey(ApiKey? apiKey)
+  protected void SetApiKey(ApiKeyModel? apiKey)
   {
     _context.ApiKey = apiKey;
   }

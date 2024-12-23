@@ -12,7 +12,7 @@ namespace Logitar.Portal.Web.Extensions;
 
 public static class HttpContextExtensions
 {
-  private const string ApiKeyKey = nameof(ApiKey);
+  private const string ApiKeyKey = nameof(ApiKeyModel);
   private const string SessionKey = nameof(Session);
   private const string SessionIdKey = "SessionId";
   private const string UserKey = nameof(User);
@@ -76,12 +76,12 @@ public static class HttpContextExtensions
     return ipAddress;
   }
 
-  public static ApiKey? GetApiKey(this HttpContext context) => context.GetItem<ApiKey>(ApiKeyKey);
+  public static ApiKeyModel? GetApiKey(this HttpContext context) => context.GetItem<ApiKeyModel>(ApiKeyKey);
   public static Session? GetSession(this HttpContext context) => context.GetItem<Session>(SessionKey);
   public static User? GetUser(this HttpContext context) => context.GetItem<User>(UserKey);
   private static T? GetItem<T>(this HttpContext context, object key) => context.Items.TryGetValue(key, out object? value) ? (T?)value : default;
 
-  public static void SetApiKey(this HttpContext context, ApiKey? apiKey)
+  public static void SetApiKey(this HttpContext context, ApiKeyModel? apiKey)
   {
     context.SetItem(ApiKeyKey, apiKey);
     context.GetLoggingService().SetApiKey(apiKey);

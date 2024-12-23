@@ -48,12 +48,12 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     {
       role.SetUniqueName(uniqueName, actorId);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       role.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       role.Description = description;

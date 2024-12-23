@@ -51,12 +51,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace a Mailgun sender.")]
   public async Task It_should_replace_a_Mailgun_sender()
   {
-    _mailgun.DisplayName = new DisplayNameUnit("Logitar");
+    _mailgun.DisplayName = new DisplayName("Logitar");
     _mailgun.Update();
     await _senderRepository.SaveAsync(_mailgun);
     long version = _mailgun.Version;
 
-    DisplayNameUnit displayName = new("Logitar Portal");
+    DisplayName displayName = new("Logitar Portal");
     _mailgun.DisplayName = displayName;
     _mailgun.Update();
     await _senderRepository.SaveAsync(_mailgun);
@@ -80,12 +80,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace a SendGrid sender.")]
   public async Task It_should_replace_a_SendGrid_sender()
   {
-    _sendGrid.DisplayName = new DisplayNameUnit("Logitar");
+    _sendGrid.DisplayName = new DisplayName("Logitar");
     _sendGrid.Update();
     await _senderRepository.SaveAsync(_sendGrid);
     long version = _sendGrid.Version;
 
-    DisplayNameUnit displayName = new("Logitar Portal");
+    DisplayName displayName = new("Logitar Portal");
     _sendGrid.DisplayName = displayName;
     _sendGrid.Update();
     await _senderRepository.SaveAsync(_sendGrid);

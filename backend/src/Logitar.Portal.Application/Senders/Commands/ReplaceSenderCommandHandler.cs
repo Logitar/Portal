@@ -54,7 +54,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
         {
           sender.Email = email;
         }
-        DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+        DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
         if (reference == null || displayName != reference.DisplayName)
         {
           sender.DisplayName = displayName;
@@ -75,7 +75,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
         throw new SenderTypeNotSupportedException(sender.Type);
     }
 
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       sender.Description = description;

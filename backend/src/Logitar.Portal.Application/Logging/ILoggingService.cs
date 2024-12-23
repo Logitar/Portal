@@ -15,7 +15,7 @@ public interface ILoggingService
   void SetActivity(IActivity activity);
   void SetOperation(Operation operation);
   void SetRealm(Realm? realm);
-  void SetApiKey(ApiKey? apiKey);
+  void SetApiKey(ApiKeyModel? apiKey);
   void SetSession(Session? session);
   void SetUser(User? user);
   Task CloseAndSaveAsync(int statusCode, CancellationToken cancellationToken = default);

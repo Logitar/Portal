@@ -25,7 +25,7 @@ internal class RealmConfiguration : AggregateConfiguration<RealmEntity>, IEntity
 
     builder.Property(x => x.UniqueSlug).HasMaxLength(UniqueSlugUnit.MaximumLength);
     builder.Property(x => x.UniqueSlugNormalized).HasMaxLength(UniqueSlugUnit.MaximumLength);
-    builder.Property(x => x.DisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
+    builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);
     builder.Property(x => x.DefaultLocale).HasMaxLength(LocaleUnit.MaximumLength);
     builder.Property(x => x.Secret).HasMaxLength(JwtSecretUnit.MaximumLength);
     builder.Property(x => x.Url).HasMaxLength(UrlUnit.MaximumLength);

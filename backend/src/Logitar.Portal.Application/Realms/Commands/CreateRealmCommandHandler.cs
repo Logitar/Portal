@@ -31,8 +31,8 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     UniqueSlugUnit uniqueSlug = new(payload.UniqueSlug);
     RealmAggregate realm = new(uniqueSlug, actorId)
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description),
+      DisplayName = DisplayName.TryCreate(payload.DisplayName),
+      Description = Description.TryCreate(payload.Description),
       DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale),
       Url = UrlUnit.TryCreate(payload.Url),
       UniqueNameSettings = new ReadOnlyUniqueNameSettings(payload.UniqueNameSettings),

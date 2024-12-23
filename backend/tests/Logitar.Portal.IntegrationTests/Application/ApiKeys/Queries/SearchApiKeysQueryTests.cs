@@ -41,7 +41,7 @@ public class SearchApiKeysQueryTests : IntegrationTests
     SearchApiKeysPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchApiKeysQuery query = new(payload);
-    SearchResults<ApiKey> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<ApiKeyModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -52,16 +52,16 @@ public class SearchApiKeysQueryTests : IntegrationTests
     const int millisecondsDelay = 50;
 
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate notInRealm = new(new DisplayNameUnit("Portal API Key"), secret, tenantId: null);
-    ApiKeyAggregate notInSearch = new(new DisplayNameUnit("Default"), secret, TenantId);
-    ApiKeyAggregate notInIds = new(new DisplayNameUnit("Other API Key"), secret, TenantId);
-    ApiKeyAggregate expired = new(new DisplayNameUnit("Expired API Key"), secret, TenantId);
+    ApiKey notInRealm = new(new DisplayName("Portal API Key"), secret, tenantId: null);
+    ApiKey notInSearch = new(new DisplayName("Default"), secret, TenantId);
+    ApiKey notInIds = new(new DisplayName("Other API Key"), secret, TenantId);
+    ApiKey expired = new(new DisplayName("Expired API Key"), secret, TenantId);
     expired.SetExpiration(DateTime.Now.AddMilliseconds(millisecondsDelay));
     expired.Update();
-    ApiKeyAggregate apiKey1 = new(new DisplayNameUnit("First API Key"), secret, TenantId);
+    ApiKey apiKey1 = new(new DisplayName("First API Key"), secret, TenantId);
     apiKey1.SetExpiration(DateTime.Now.AddDays(90));
     apiKey1.Update();
-    ApiKeyAggregate apiKey2 = new(new DisplayNameUnit("Second API Key"), secret, TenantId);
+    ApiKey apiKey2 = new(new DisplayName("Second API Key"), secret, TenantId);
     apiKey2.SetExpiration(DateTime.Now.AddYears(1));
     apiKey2.Update();
     await _apiKeyRepository.SaveAsync([notInRealm, notInSearch, notInIds, expired, apiKey1, apiKey2]);
@@ -83,10 +83,10 @@ public class SearchApiKeysQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("%key"));
     payload.Sort.Add(new ApiKeySortOption(ApiKeySort.ExpiresOn, isDescending: false));
     SearchApiKeysQuery query = new(payload);
-    SearchResults<ApiKey> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<ApiKeyModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    ApiKey apiKey = Assert.Single(results.Items);
+    ApiKeyModel apiKey = Assert.Single(results.Items);
     Assert.Equal(apiKey2.Id.ToGuid(), apiKey.Id);
   }
 }

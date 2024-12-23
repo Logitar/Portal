@@ -46,11 +46,11 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     }
     if (payload.DisplayName != null)
     {
-      sender.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      sender.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      sender.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      sender.Description = Description.TryCreate(payload.Description.Value);
     }
 
     SetSettings(payload, sender, actorId);

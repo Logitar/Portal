@@ -24,7 +24,7 @@ internal class ApiKeyClientTests : IClientTests
       {
         ExpiresOn = expiresOn
       };
-      ApiKey apiKey = await _client.CreateAsync(create, context.Request);
+      ApiKeyModel apiKey = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -43,7 +43,7 @@ internal class ApiKeyClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      ApiKey? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
+      ApiKeyModel? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The API key should not be found.");
@@ -59,7 +59,7 @@ internal class ApiKeyClientTests : IClientTests
         Status = new ApiKeyStatus(isExpired: false, DateTime.Now)
       };
       search.Search.Terms.Add(new SearchTerm("test%"));
-      SearchResults<ApiKey> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<ApiKeyModel> results = await _client.SearchAsync(search, context.Request);
       apiKey = results.Items.Single();
       context.Succeed();
 

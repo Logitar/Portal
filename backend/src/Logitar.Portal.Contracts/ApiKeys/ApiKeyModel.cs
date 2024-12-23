@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.ApiKeys;
 
-public class ApiKey : Aggregate
+public class ApiKeyModel : Aggregate
 {
   public string? XApiKey { get; set; }
 
@@ -19,11 +19,11 @@ public class ApiKey : Aggregate
 
   public Realm? Realm { get; set; }
 
-  public ApiKey() : this(string.Empty)
+  public ApiKeyModel() : this(string.Empty)
   {
   }
 
-  public ApiKey(string displayName)
+  public ApiKeyModel(string displayName)
   {
     DisplayName = displayName;
     CustomAttributes = [];

@@ -63,7 +63,7 @@ internal class LoggingService : ILoggingService
     }
   }
 
-  public void SetApiKey(ApiKey? apiKey)
+  public void SetApiKey(ApiKeyModel? apiKey)
   {
     if (_log != null)
     {

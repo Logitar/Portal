@@ -45,11 +45,11 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
     }
     if (payload.DisplayName != null)
     {
-      role.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      role.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      role.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      role.Description = Description.TryCreate(payload.Description.Value);
     }
 
     foreach (CustomAttributeModification customAttribute in payload.CustomAttributes)

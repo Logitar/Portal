@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.ApiKeys;
+﻿using Logitar.Identity.Core.ApiKeys;
 
 namespace Logitar.Portal.Application.ApiKeys;
 

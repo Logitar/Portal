@@ -37,10 +37,10 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing API key.")]
   public async Task It_should_delete_an_existing_Api_key()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
-    ApiKey? deleted = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
   }
@@ -49,26 +49,26 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_Api_key_cannot_be_found()
   {
     DeleteApiKeyCommand command = new(Guid.NewGuid());
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
   [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
   public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     SetRealm();
 
     DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

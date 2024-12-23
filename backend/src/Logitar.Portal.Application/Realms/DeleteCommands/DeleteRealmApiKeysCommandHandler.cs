@@ -16,9 +16,9 @@ internal class DeleteRealmApiKeysCommandHandler : INotificationHandler<DeleteRea
   public async Task Handle(DeleteRealmApiKeysCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<ApiKeyAggregate> apiKeys = await _apiKeyRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<ApiKey> apiKeys = await _apiKeyRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (ApiKeyAggregate apiKey in apiKeys)
+    foreach (ApiKey apiKey in apiKeys)
     {
       apiKey.Delete(command.ActorId);
     }

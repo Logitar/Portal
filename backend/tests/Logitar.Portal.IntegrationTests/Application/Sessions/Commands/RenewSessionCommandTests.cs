@@ -31,10 +31,10 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should renew the session using the provided actor ID.")]
   public async Task It_should_renew_the_session_using_the_provided_actor_Id()
   {
-    ApiKeyAggregate apiKeyAggregate = new(new DisplayNameUnit("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
+    ApiKey apiKeyAggregate = new(new DisplayName("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
     await _apiKeyRepository.SaveAsync(apiKeyAggregate);
 
-    ApiKey apiKey = new(apiKeyAggregate.DisplayName.Value)
+    ApiKeyModel apiKey = new(apiKeyAggregate.DisplayName.Value)
     {
       Id = apiKeyAggregate.Id.ToGuid(),
       Version = apiKeyAggregate.Version,

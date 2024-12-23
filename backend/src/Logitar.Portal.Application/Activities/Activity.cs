@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Settings;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Settings;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Configurations;
@@ -44,12 +44,12 @@ public abstract record Activity : IActivity
   public TenantId? TenantId => Realm?.GetTenantId();
 
   [JsonIgnore]
-  public LocaleUnit? DefaultLocale
+  public Locale? DefaultLocale
   {
     get
     {
-      Locale? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
-      return defaultLocale == null ? null : new LocaleUnit(defaultLocale.Code);
+      LocaleModel? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
+      return defaultLocale == null ? null : new Locale(defaultLocale.Code);
     }
   }
   [JsonIgnore]

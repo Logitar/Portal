@@ -17,7 +17,7 @@ internal class CreateApiKeyTests : IClientTests
     {
       context.SetName(GetType(), nameof(ExecuteAsync));
       CreateApiKeyPayload payload = new("Test API Key");
-      ApiKey apiKey = await _client.CreateAsync(payload, context.Request);
+      ApiKeyModel apiKey = await _client.CreateAsync(payload, context.Request);
       StaticPortalSettings.Instance.ApiKey = apiKey.XApiKey ?? throw new InvalidOperationException("The X-API-Key should not be null.");
       context.Succeed();
     }

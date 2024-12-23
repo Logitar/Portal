@@ -33,7 +33,7 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
       }
       else
       {
-        ApiKey? apiKey = httpContext.GetApiKey();
+        ApiKeyModel? apiKey = httpContext.GetApiKey();
         if (apiKey != null)
         {
           if (apiKey.Realm == null)

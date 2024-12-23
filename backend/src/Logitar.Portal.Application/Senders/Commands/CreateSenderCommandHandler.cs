@@ -43,7 +43,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
         EmailUnit email = new(payload.EmailAddress, isVerified: false);
         sender = new(email, settings, command.TenantId, actorId)
         {
-          DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName)
+          DisplayName = DisplayName.TryCreate(payload.DisplayName)
         };
         break;
       case SenderType.Sms:
@@ -58,7 +58,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
         throw new SenderTypeNotSupportedException(type);
     }
 
-    sender.Description = DescriptionUnit.TryCreate(payload.Description);
+    sender.Description = Description.TryCreate(payload.Description);
     sender.Update(actorId);
 
     IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
