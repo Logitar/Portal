@@ -20,7 +20,7 @@ internal class TwilioHandler : IMessageHandler
     _client.Dispose();
   }
 
-  public async Task<SendMailResult> SendAsync(MessageAggregate aggregate, CancellationToken cancellationToken)
+  public async Task<SendMailResult> SendAsync(Message aggregate, CancellationToken cancellationToken)
   {
     SmsMessage message = aggregate.ToSmsMessage();
     SendSmsResult result = await _client.SendAsync(message, cancellationToken);

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Senders;
 
@@ -16,7 +16,7 @@ internal class SendMessageValidator : AbstractValidator<SendMessagePayload>
       .WithMessage($"'{{PropertyName}}' must contain at least one {nameof(RecipientType.To)} recipient.");
     RuleForEach(x => x.Recipients).SetValidator(new RecipientValidator(senderType));
 
-    When(x => !string.IsNullOrWhiteSpace(x.Locale), () => RuleFor(x => x.Locale!).SetValidator(new LocaleValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.Locale), () => RuleFor(x => x.Locale!).Locale());
 
     RuleForEach(x => x.Variables).SetValidator(new VariableValidator());
   }

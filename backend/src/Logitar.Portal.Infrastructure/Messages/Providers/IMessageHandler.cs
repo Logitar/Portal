@@ -5,5 +5,5 @@ namespace Logitar.Portal.Infrastructure.Messages.Providers;
 
 internal interface IMessageHandler : IDisposable
 {
-  Task<SendMailResult> SendAsync(MessageAggregate message, CancellationToken cancellationToken = default);
+  Task<SendMailResult> SendAsync(Message message, CancellationToken cancellationToken = default);
 }

@@ -11,7 +11,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
 internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IMessageRepository
 {
-  private static readonly string AggregateType = typeof(MessageAggregate).GetNamespaceQualifiedName();
+  private static readonly string AggregateType = typeof(Message).GetNamespaceQualifiedName();
 
   private readonly ISqlHelper _sqlHelper;
 
@@ -21,13 +21,13 @@ internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<MessageAggregate?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<MessageAggregate>(new AggregateId(id), cancellationToken);
+  public async Task<Message?> LoadAsync(Guid id, CancellationToken cancellationToken)
+    => await base.LoadAsync<Message>(new AggregateId(id), cancellationToken);
 
-  public async Task<IEnumerable<MessageAggregate>> LoadAsync(CancellationToken cancellationToken)
-    => await base.LoadAsync<MessageAggregate>(cancellationToken);
+  public async Task<IEnumerable<Message>> LoadAsync(CancellationToken cancellationToken)
+    => await base.LoadAsync<Message>(cancellationToken);
 
-  public async Task<IEnumerable<MessageAggregate>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IEnumerable<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Messages.AggregateId, EventDb.Events.AggregateId,
@@ -42,12 +42,12 @@ internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<MessageAggregate>(events.Select(EventSerializer.Deserialize));
+    return Load<Message>(events.Select(EventSerializer.Deserialize));
   }
 
-  public async Task SaveAsync(MessageAggregate message, CancellationToken cancellationToken)
+  public async Task SaveAsync(Message message, CancellationToken cancellationToken)
     => await base.SaveAsync(message, cancellationToken);
 
-  public async Task SaveAsync(IEnumerable<MessageAggregate> messages, CancellationToken cancellationToken)
+  public async Task SaveAsync(IEnumerable<Message> messages, CancellationToken cancellationToken)
     => await base.SaveAsync(messages, cancellationToken);
 }

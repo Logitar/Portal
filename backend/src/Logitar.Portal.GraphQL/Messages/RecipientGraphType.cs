@@ -4,11 +4,11 @@ using Logitar.Portal.GraphQL.Users;
 
 namespace Logitar.Portal.GraphQL.Messages;
 
-internal class RecipientGraphType : ObjectGraphType<Recipient>
+internal class RecipientGraphType : ObjectGraphType<RecipientModel>
 {
   public RecipientGraphType()
   {
-    Name = nameof(Recipient);
+    Name = nameof(RecipientModel);
     Description = "Represents a recipient of a message.";
 
     Field(x => x.Type, type: typeof(NonNullGraphType<RecipientTypeGraphType>))

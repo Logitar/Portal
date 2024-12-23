@@ -5,18 +5,18 @@ namespace Logitar.Portal.Application.Messages;
 
 internal record Recipients
 {
-  private readonly List<RecipientUnit> _to;
-  public IReadOnlyCollection<RecipientUnit> To => _to.AsReadOnly();
+  private readonly List<Recipient> _to;
+  public IReadOnlyCollection<Recipient> To => _to.AsReadOnly();
 
-  private readonly List<RecipientUnit> _cc;
-  public IReadOnlyCollection<RecipientUnit> CC => _cc.AsReadOnly();
+  private readonly List<Recipient> _cc;
+  public IReadOnlyCollection<Recipient> CC => _cc.AsReadOnly();
 
-  private readonly List<RecipientUnit> _bcc;
-  public IReadOnlyCollection<RecipientUnit> Bcc => _bcc.AsReadOnly();
+  private readonly List<Recipient> _bcc;
+  public IReadOnlyCollection<Recipient> Bcc => _bcc.AsReadOnly();
 
-  public Recipients(IEnumerable<RecipientUnit> recipients) : this(recipients.Count())
+  public Recipients(IEnumerable<Recipient> recipients) : this(recipients.Count())
   {
-    foreach (RecipientUnit recipient in recipients)
+    foreach (Recipient recipient in recipients)
     {
       switch (recipient.Type)
       {
