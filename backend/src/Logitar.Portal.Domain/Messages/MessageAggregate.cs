@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages.Events;
 using Logitar.Portal.Domain.Senders;
@@ -12,23 +12,23 @@ namespace Logitar.Portal.Domain.Messages;
 public class MessageAggregate : AggregateRoot
 {
   public new MessageId Id => new(base.Id);
-
-  public TenantId? TenantId { get; private set; }
+  public TenantId? TenantId => Id.TenantId;
+  public EntityId EntityId => Id.EntityId;
 
   private Subject? _subject = null;
   public Subject Subject => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
   private Content? _body = null;
   public Content Body => _body ?? throw new InvalidOperationException($"The {nameof(Body)} has not been initialized yet.");
 
-  private readonly List<RecipientUnit> _recipients = [];
-  public IReadOnlyCollection<RecipientUnit> Recipients => _recipients.AsReadOnly();
+  private readonly List<Recipient> _recipients = [];
+  public IReadOnlyCollection<Recipient> Recipients => _recipients.AsReadOnly();
   private SenderSummary? _sender = null;
   public SenderSummary Sender => _sender ?? throw new InvalidOperationException($"The {nameof(Sender)} has not been initialized yet.");
   private TemplateSummary? _template = null;
   public TemplateSummary Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
 
   public bool IgnoreUserLocale { get; private set; }
-  public LocaleUnit? Locale { get; private set; }
+  public Locale? Locale { get; private set; }
 
   private readonly Dictionary<string, string> _variables = [];
   public IReadOnlyDictionary<string, string> Variables => _variables.AsReadOnly();
@@ -39,17 +39,27 @@ public class MessageAggregate : AggregateRoot
   private readonly Dictionary<string, string> _resultData = [];
   public IReadOnlyDictionary<string, string> ResultData => _resultData.AsReadOnly();
 
-  public MessageAggregate(AggregateId id) : base(id)
+  public MessageAggregate() : base()
   {
   }
 
-  public MessageAggregate(Subject subject, Content body, IReadOnlyCollection<RecipientUnit> recipients, SenderAggregate sender,
-    TemplateAggregate template, bool ignoreUserLocale = false, LocaleUnit? locale = null, IReadOnlyDictionary<string, string>? variables = null,
-    bool isDemo = false, TenantId? tenantId = null, ActorId actorId = default, MessageId? id = null) : base((id ?? MessageId.NewId()).AggregateId)
+  public MessageAggregate(
+    Subject subject,
+    Content body,
+    IReadOnlyCollection<Recipient> recipients,
+    SenderAggregate sender,
+    TemplateAggregate template,
+    bool ignoreUserLocale = false,
+    Locale? locale = null,
+    IReadOnlyDictionary<string, string>? variables = null,
+    bool isDemo = false,
+    ActorId actorId = default,
+    MessageId? id = null) : base((id ?? MessageId.NewId()).StreamId)
   {
+    TenantId? tenantId = id?.TenantId;
     List<UserId> notInRealm = new(capacity: recipients.Count);
     int to = 0;
-    foreach (RecipientUnit recipient in recipients)
+    foreach (Recipient recipient in recipients)
     {
       if (recipient.Type == RecipientType.To)
       {
@@ -79,13 +89,10 @@ public class MessageAggregate : AggregateRoot
       throw new TemplateNotInTenantException(template, tenantId);
     }
 
-    Raise(new MessageCreatedEvent(tenantId, subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template),
-      ignoreUserLocale, locale, variables ?? new Dictionary<string, string>(), isDemo), actorId);
+    Raise(new MessageCreated(subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template), ignoreUserLocale, locale, variables ?? new Dictionary<string, string>(), isDemo), actorId);
   }
-  protected virtual void Apply(MessageCreatedEvent @event)
+  protected virtual void Apply(MessageCreated @event)
   {
-    TenantId = @event.TenantId;
-
     _subject = @event.Subject;
     _body = @event.Body;
 
@@ -112,7 +119,7 @@ public class MessageAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new MessageDeletedEvent(), actorId);
+      Raise(new MessageDeleted(), actorId);
     }
   }
 
@@ -121,10 +128,10 @@ public class MessageAggregate : AggregateRoot
   {
     if (Status == MessageStatus.Unsent)
     {
-      Raise(new MessageFailedEvent(resultData), actorId);
+      Raise(new MessageFailed(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageFailedEvent @event)
+  protected virtual void Apply(MessageFailed @event)
   {
     Status = MessageStatus.Failed;
 
@@ -140,10 +147,10 @@ public class MessageAggregate : AggregateRoot
   {
     if (Status == MessageStatus.Unsent)
     {
-      Raise(new MessageSucceededEvent(resultData), actorId);
+      Raise(new MessageSucceeded(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageSucceededEvent @event)
+  protected virtual void Apply(MessageSucceeded @event)
   {
     Status = MessageStatus.Succeeded;
 
@@ -164,7 +171,7 @@ public class MessageAggregate : AggregateRoot
       IsBodyHtml = Body.Type == MediaTypeNames.Text.Html
     };
 
-    foreach (RecipientUnit recipient in Recipients)
+    foreach (Recipient recipient in Recipients)
     {
       MailAddress address = recipient.ToMailAddress();
       switch (recipient.Type)
