@@ -5,7 +5,7 @@ using Logitar.Portal.Domain.Settings;
 
 namespace Logitar.Portal.Domain.Realms;
 
-public class RealmAggregate : AggregateRoot
+public class Realm : AggregateRoot
 {
   private RealmUpdated _updated = new();
 
@@ -123,11 +123,11 @@ public class RealmAggregate : AggregateRoot
   private readonly Dictionary<Identifier, string> _customAttributes = [];
   public IReadOnlyDictionary<Identifier, string> CustomAttributes => _customAttributes.AsReadOnly();
 
-  public RealmAggregate() : base()
+  public Realm() : base()
   {
   }
 
-  public RealmAggregate(Slug uniqueSlug, ActorId actorId = default, RealmId? id = null) : base((id ?? RealmId.NewId()).StreamId)
+  public Realm(Slug uniqueSlug, ActorId actorId = default, RealmId? id = null) : base((id ?? RealmId.NewId()).StreamId)
   {
     JwtSecret secret = JwtSecret.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();

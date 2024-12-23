@@ -25,7 +25,7 @@ public class Message : Aggregate
   public MessageStatus Status { get; set; }
   public List<ResultData> ResultData { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public Message() : this(string.Empty, new Content(), new Sender(), new Template())
   {

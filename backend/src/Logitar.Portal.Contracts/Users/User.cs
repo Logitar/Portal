@@ -42,7 +42,7 @@ public class User : Aggregate
   public List<CustomIdentifier> CustomIdentifiers { get; set; }
   public List<Role> Roles { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public User() : this(string.Empty)
   {

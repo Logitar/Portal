@@ -16,7 +16,7 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, User?>
 
   public async Task<User?> Handle(ReadUserQuery query, CancellationToken cancellationToken)
   {
-    Realm? realm = query.Realm;
+    RealmModel? realm = query.Realm;
 
     Dictionary<Guid, User> users = new(capacity: 3);
 

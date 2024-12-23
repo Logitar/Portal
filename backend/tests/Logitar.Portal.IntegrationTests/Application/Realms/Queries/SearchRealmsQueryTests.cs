@@ -37,7 +37,7 @@ public class SearchRealmsQueryTests : IntegrationTests
     SearchRealmsPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchRealmsQuery query = new(payload);
-    SearchResults<Realm> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<RealmModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -45,10 +45,10 @@ public class SearchRealmsQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    RealmAggregate notMatching = new(new UniqueSlugUnit("tests"));
-    RealmAggregate notInIds = new(new UniqueSlugUnit("realm-not-in-ids"));
-    RealmAggregate realm1 = new(new UniqueSlugUnit("realm-1"));
-    RealmAggregate realm2 = new(new UniqueSlugUnit("realm-2"));
+    Realm notMatching = new(new UniqueSlugUnit("tests"));
+    Realm notInIds = new(new UniqueSlugUnit("realm-not-in-ids"));
+    Realm realm1 = new(new UniqueSlugUnit("realm-1"));
+    Realm realm2 = new(new UniqueSlugUnit("realm-2"));
     await _realmRepository.SaveAsync([notMatching, notInIds, realm1, realm2]);
 
     SearchRealmsPayload payload = new()
@@ -64,10 +64,10 @@ public class SearchRealmsQueryTests : IntegrationTests
     payload.Search.Operator = SearchOperator.Or;
     payload.Sort.Add(new RealmSortOption(RealmSort.DisplayName, isDescending: false));
     SearchRealmsQuery query = new(payload);
-    SearchResults<Realm> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<RealmModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Realm realm = Assert.Single(results.Items);
+    RealmModel realm = Assert.Single(results.Items);
     Assert.Equal(realm2.Id.ToGuid(), realm.Id);
   }
 }

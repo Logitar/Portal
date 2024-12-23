@@ -16,7 +16,7 @@ public class Sender : Aggregate
   public SendGridSettings? SendGrid { get; set; }
   public TwilioSettings? Twilio { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public Sender() : this(string.Empty)
   {

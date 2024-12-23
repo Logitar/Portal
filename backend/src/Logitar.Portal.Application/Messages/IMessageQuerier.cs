@@ -7,8 +7,8 @@ namespace Logitar.Portal.Application.Messages;
 
 public interface IMessageQuerier
 {
-  Task<Message> ReadAsync(Realm? realm, MessageAggregate message, CancellationToken cancellationToken = default);
-  Task<Message?> ReadAsync(Realm? realm, MessageId id, CancellationToken cancellationToken = default);
-  Task<Message?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken = default);
-  Task<SearchResults<Message>> SearchAsync(Realm? realm, SearchMessagesPayload payload, CancellationToken cancellationToken = default);
+  Task<Message> ReadAsync(RealmModel? realm, MessageAggregate message, CancellationToken cancellationToken = default);
+  Task<Message?> ReadAsync(RealmModel? realm, MessageId id, CancellationToken cancellationToken = default);
+  Task<Message?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<SearchResults<Message>> SearchAsync(RealmModel? realm, SearchMessagesPayload payload, CancellationToken cancellationToken = default);
 }

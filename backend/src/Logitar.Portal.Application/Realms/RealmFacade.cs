@@ -15,32 +15,32 @@ internal class RealmFacade : IRealmService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<Realm> CreateAsync(CreateRealmPayload payload, CancellationToken cancellationToken)
+  public async Task<RealmModel> CreateAsync(CreateRealmPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new CreateRealmCommand(payload), cancellationToken);
   }
 
-  public async Task<Realm?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<RealmModel?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new DeleteRealmCommand(id), cancellationToken);
   }
 
-  public async Task<Realm?> ReadAsync(Guid? id, string? uniqueSlug, CancellationToken cancellationToken)
+  public async Task<RealmModel?> ReadAsync(Guid? id, string? uniqueSlug, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadRealmQuery(id, uniqueSlug), cancellationToken);
   }
 
-  public async Task<Realm?> ReplaceAsync(Guid id, ReplaceRealmPayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<RealmModel?> ReplaceAsync(Guid id, ReplaceRealmPayload payload, long? version, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReplaceRealmCommand(id, payload, version), cancellationToken);
   }
 
-  public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<RealmModel>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new SearchRealmsQuery(payload), cancellationToken);
   }
 
-  public async Task<Realm?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
+  public async Task<RealmModel?> UpdateAsync(Guid id, UpdateRealmPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new UpdateRealmCommand(id, payload), cancellationToken);
   }

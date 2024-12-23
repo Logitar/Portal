@@ -29,9 +29,9 @@ internal class TestContext
 
   public IRequestContext Request => new RequestContext(_user?.UniqueName, CancellationToken);
 
-  private Realm? _realm = null;
-  public Realm Realm => _realm ?? throw new InvalidOperationException($"The {nameof(Realm)} has not been initialized yet.");
-  public void SetRealm(Realm realm)
+  private RealmModel? _realm = null;
+  public RealmModel Realm => _realm ?? throw new InvalidOperationException($"The {nameof(Realm)} has not been initialized yet.");
+  public void SetRealm(RealmModel realm)
   {
     AssertHasNotEnded();
     _realm = realm;

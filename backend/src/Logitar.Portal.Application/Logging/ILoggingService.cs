@@ -14,7 +14,7 @@ public interface ILoggingService
   void Report(Exception exception);
   void SetActivity(IActivity activity);
   void SetOperation(Operation operation);
-  void SetRealm(Realm? realm);
+  void SetRealm(RealmModel? realm);
   void SetApiKey(ApiKeyModel? apiKey);
   void SetSession(Session? session);
   void SetUser(User? user);

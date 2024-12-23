@@ -16,7 +16,7 @@ internal class DeleteRealmTests : IClientTests
     try
     {
       context.SetName(GetType(), nameof(ExecuteAsync));
-      Realm realm = await _client.DeleteAsync(context.Realm.Id, context.Request)
+      RealmModel realm = await _client.DeleteAsync(context.Realm.Id, context.Request)
         ?? throw new InvalidOperationException("The realm should not be null.");
       context.Reset();
       context.Succeed();

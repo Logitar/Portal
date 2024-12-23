@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Realms;
 
-public class Realm : Aggregate
+public class RealmModel : Aggregate
 {
   public string UniqueSlug { get; set; }
   public string? DisplayName { get; set; }
@@ -18,11 +18,11 @@ public class Realm : Aggregate
 
   public List<CustomAttribute> CustomAttributes { get; set; }
 
-  public Realm() : this(string.Empty, string.Empty)
+  public RealmModel() : this(string.Empty, string.Empty)
   {
   }
 
-  public Realm(string uniqueSlug, string secret)
+  public RealmModel(string uniqueSlug, string secret)
   {
     UniqueSlug = uniqueSlug;
     Secret = secret;

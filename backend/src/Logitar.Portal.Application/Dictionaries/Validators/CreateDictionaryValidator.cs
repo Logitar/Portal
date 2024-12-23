@@ -8,6 +8,6 @@ internal class CreateDictionaryValidator : AbstractValidator<CreateDictionaryPay
 {
   public CreateDictionaryValidator()
   {
-    RuleFor(x => x.Locale).Locale());
+    RuleFor(x => x.Locale).Locale();
   }
 }

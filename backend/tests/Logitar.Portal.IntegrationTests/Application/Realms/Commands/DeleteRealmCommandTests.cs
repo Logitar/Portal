@@ -17,7 +17,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   private readonly IRealmRepository _realmRepository;
   private readonly IUserRepository _userRepository;
 
-  private readonly RealmAggregate _realm;
+  private readonly Realm _realm;
 
   public DeleteRealmCommandTests() : base()
   {
@@ -44,13 +44,13 @@ public class DeleteRealmCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing realm.")]
   public async Task It_should_delete_an_existing_realm()
   {
-    UniqueName uniqueName = new(new ReadOnlyUniqueNameSettings(), UsernameString);
+    UniqueNameUnit uniqueName = new(new ReadOnlyUniqueNameSettings(), UsernameString);
     TenantId tenantId = new(_realm.Id.Value);
     UserAggregate user = new(uniqueName, tenantId);
     await _userRepository.SaveAsync(user);
 
     DeleteRealmCommand command = new(_realm.Id.ToGuid());
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
@@ -61,7 +61,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     DeleteRealmCommand command = new(Guid.NewGuid());
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 }

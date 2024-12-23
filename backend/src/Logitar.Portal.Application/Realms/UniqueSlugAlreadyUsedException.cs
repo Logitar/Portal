@@ -6,18 +6,18 @@ public class UniqueSlugAlreadyUsedException : Exception
 {
   public const string ErrorMessage = "The specified unique slug is already used.";
 
-  public UniqueSlugUnit UniqueSlug
+  public string UniqueSlug
   {
-    get => new((string)Data[nameof(UniqueSlug)]!);
-    private set => Data[nameof(UniqueSlug)] = value.Value;
+    get => (string)Data[nameof(UniqueSlug)]!;
+    private set => Data[nameof(UniqueSlug)] = value;
   }
 
-  public UniqueSlugAlreadyUsedException(UniqueSlugUnit uniqueSlug) : base(BuildMessage(uniqueSlug))
+  public UniqueSlugAlreadyUsedException(Slug uniqueSlug) : base(BuildMessage(uniqueSlug))
   {
-    UniqueSlug = uniqueSlug;
+    UniqueSlug = uniqueSlug.Value;
   }
 
-  private static string BuildMessage(UniqueSlugUnit uniqueSlug) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(UniqueSlug), uniqueSlug.Value)
+  private static string BuildMessage(Slug uniqueSlug) => new ErrorMessageBuilder(ErrorMessage)
+    .AddData(nameof(UniqueSlug), uniqueSlug)
     .Build();
 }

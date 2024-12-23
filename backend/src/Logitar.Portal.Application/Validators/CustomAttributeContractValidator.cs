@@ -8,7 +8,7 @@ internal class CustomAttributeContractValidator : AbstractValidator<CustomAttrib
 {
   public CustomAttributeContractValidator()
   {
-    RuleFor(x => x.Key).Identifier());
-    RuleFor(x => x.Value).NotEmpty());
+    RuleFor(x => x.Key).Identifier();
+    RuleFor(x => x.Value).NotEmpty();
   }
 }

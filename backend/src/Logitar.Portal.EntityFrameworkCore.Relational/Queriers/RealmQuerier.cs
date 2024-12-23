@@ -27,14 +27,14 @@ internal class RealmQuerier : IRealmQuerier
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Realm> ReadAsync(RealmAggregate realm, CancellationToken cancellationToken)
+  public async Task<RealmModel> ReadAsync(Realm realm, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The realm entity 'AggregateId={realm.Id.Value}' could not be found.");
   }
-  public async Task<Realm?> ReadAsync(RealmId id, CancellationToken cancellationToken)
+  public async Task<RealmModel?> ReadAsync(RealmId id, CancellationToken cancellationToken)
     => await ReadAsync(id.ToGuid(), cancellationToken);
-  public async Task<Realm?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<RealmModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -44,7 +44,7 @@ internal class RealmQuerier : IRealmQuerier
     return realm == null ? null : await MapAsync(realm, cancellationToken);
   }
 
-  public async Task<Realm?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
+  public async Task<RealmModel?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
     string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
 
@@ -54,7 +54,7 @@ internal class RealmQuerier : IRealmQuerier
     return realm == null ? null : await MapAsync(realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Realm>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<RealmModel>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Realms.Table).SelectAll(PortalDb.Realms.Table)
       .ApplyIdFilter(PortalDb.Realms.AggregateId, payload.Ids);
@@ -91,14 +91,14 @@ internal class RealmQuerier : IRealmQuerier
     query = query.ApplyPaging(payload);
 
     RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<Realm> items = await MapAsync(realms, cancellationToken);
+    IEnumerable<RealmModel> items = await MapAsync(realms, cancellationToken);
 
-    return new SearchResults<Realm>(items, total);
+    return new SearchResults<RealmModel>(items, total);
   }
 
-  private async Task<Realm> MapAsync(RealmEntity realm, CancellationToken cancellationToken = default)
+  private async Task<RealmModel> MapAsync(RealmEntity realm, CancellationToken cancellationToken = default)
     => (await MapAsync([realm], cancellationToken)).Single();
-  private async Task<IEnumerable<Realm>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<RealmModel>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = realms.SelectMany(user => user.GetActorIds());
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

@@ -14,7 +14,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
 {
   private readonly IRealmRepository _realmRepository;
 
-  private readonly RealmAggregate _realm;
+  private readonly Realm _realm;
 
   public ReplaceRealmCommandTests() : base()
   {
@@ -42,12 +42,12 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     string oldSecret = _realm.Secret.Value;
 
-    _realm.DefaultLocale = new Locale("fr");
+    _realm.DefaultLocale = new LocaleUnit("fr");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
     long version = _realm.Version;
 
-    _realm.DefaultLocale = new Locale("fr-CA");
+    _realm.DefaultLocale = new LocaleUnit("fr-CA");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
 
@@ -60,7 +60,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("Guid", Guid.NewGuid().ToString()));
     ReplaceRealmCommand command = new(_realm.Id.ToGuid(), payload, version);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
 
     Assert.Equal(command.Id, realm.Id);
@@ -77,14 +77,14 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     ReplaceRealmPayload payload = new("tests", secret: string.Empty);
     ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 
   [Fact(DisplayName = "It should throw UniqueSlugAlreadySlugException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadySlugException_when_the_unique_slug_is_already_used()
   {
-    RealmAggregate realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new UniqueSlugUnit("other"));
     await _realmRepository.SaveAsync(realm);
 
     ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpper(), secret: string.Empty);

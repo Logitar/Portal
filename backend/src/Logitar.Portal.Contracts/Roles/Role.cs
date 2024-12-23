@@ -10,7 +10,7 @@ public class Role : Aggregate
 
   public List<CustomAttribute> CustomAttributes { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public Role() : this(string.Empty)
   {
