@@ -9,16 +9,23 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: LB6SAj52nU73ZxFz
     ports:
       - 27027:27017
+    volumes:
+      - mongodata:/data/db
 
   portal_mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: Logitar.Portal_mssql
     restart: unless-stopped
+    user: root
     environment:
       ACCEPT_EULA: 'Y'
       SA_PASSWORD: w8x6pF9H5QEJL7sN
     ports:
       - 1437:1433
+    volumes:
+      - mssql_backup:/var/opt/mssql/backup
+      - mssql_data:/var/opt/mssql/data
+      - mssql_log:/var/opt/mssql/log
 
   portal_postgres:
     image: postgres
@@ -28,6 +35,8 @@ services:
       POSTGRES_PASSWORD: YStQn6XF5VbgcPBw
     ports:
       - 5437:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   portal_rabbitmq:
     image: masstransit/rabbitmq
@@ -70,3 +79,10 @@ services:
       DOTNET_ENVIRONMENT: Development
       POSTGRESQLCONNSTR_Portal: "User ID=postgres;Password=YStQn6XF5VbgcPBw;Host=portal_postgres;Port=5432;Database=Portal;"
       SQLCONNSTR_Portal: "Server=portal_mssql;Database=Portal;User Id=SA;Password=w8x6pF9H5QEJL7sN;Persist Security Info=False;Encrypt=False;"
+
+volumes:
+  mongodata:
+  mssql_backup:
+  mssql_data:
+  mssql_log:
+  postgres_data:
