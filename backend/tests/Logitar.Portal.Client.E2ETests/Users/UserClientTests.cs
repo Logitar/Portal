@@ -62,7 +62,7 @@ internal class UserClientTests : IClientTests
       user = await _client.AuthenticateAsync(authenticate, context.Request);
       context.Succeed();
 
-      CustomIdentifier identifier = new("HealthInsuranceNumber", _faker.Person.BuildHealthInsuranceNumber());
+      CustomIdentifierModel identifier = new("HealthInsuranceNumber", _faker.Person.BuildHealthInsuranceNumber());
 
       context.SetName(_client.GetType(), nameof(_client.SaveIdentifierAsync));
       SaveUserIdentifierPayload saveIdentifier = new(identifier.Value);

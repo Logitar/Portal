@@ -7,7 +7,7 @@ public interface IUserClient
   Task<User> AuthenticateAsync(AuthenticateUserPayload payload, IRequestContext? context = null);
   Task<User> CreateAsync(CreateUserPayload payload, IRequestContext? context = null);
   Task<User?> DeleteAsync(Guid id, IRequestContext? context = null);
-  Task<User?> ReadAsync(Guid? id = null, string? uniqueName = null, CustomIdentifier? identifier = null, IRequestContext? context = null);
+  Task<User?> ReadAsync(Guid? id = null, string? uniqueName = null, CustomIdentifierModel? identifier = null, IRequestContext? context = null);
   Task<User?> RemoveIdentifierAsync(Guid id, string key, IRequestContext? context = null);
   Task<User?> ReplaceAsync(Guid id, ReplaceUserPayload payload, long? version = null, IRequestContext? context = null);
   Task<User?> ResetPasswordAsync(Guid id, ResetUserPasswordPayload payload, IRequestContext? context = null);

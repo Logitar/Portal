@@ -50,7 +50,7 @@ public class ReadUserQueryTests : IntegrationTests
     user.SetCustomIdentifier(key, healthInsuranceNumber);
     await _userRepository.SaveAsync(user);
 
-    ReadUserQuery query = new(Id: null, UniqueName: null, Identifier: new CustomIdentifier($" {key} ", $"  {healthInsuranceNumber}  "));
+    ReadUserQuery query = new(Id: null, UniqueName: null, Identifier: new CustomIdentifierModel($" {key} ", $"  {healthInsuranceNumber}  "));
     User? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(found);
     Assert.Equal(user.Id.ToGuid(), found.Id);

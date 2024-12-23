@@ -39,8 +39,8 @@ public class User : Aggregate
   public DateTime? AuthenticatedOn { get; set; }
 
   public List<CustomAttribute> CustomAttributes { get; set; }
-  public List<CustomIdentifier> CustomIdentifiers { get; set; }
-  public List<Role> Roles { get; set; }
+  public List<CustomIdentifierModel> CustomIdentifiers { get; set; }
+  public List<RoleModel> Roles { get; set; }
 
   public RealmModel? Realm { get; set; }
 

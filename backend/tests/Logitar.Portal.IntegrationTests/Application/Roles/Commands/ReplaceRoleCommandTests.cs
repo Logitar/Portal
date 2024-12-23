@@ -15,7 +15,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public ReplaceRoleCommandTests() : base()
   {
@@ -62,7 +62,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_users", bool.FalseString));
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, version);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
@@ -80,7 +80,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
   {
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -91,19 +91,19 @@ public class ReplaceRoleCommandTests : IntegrationTests
 
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, Version: null);
-    Role? result = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     ReplaceRolePayload payload = new("AdmIn");
     ReplaceRoleCommand command = new(role.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<Role>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }

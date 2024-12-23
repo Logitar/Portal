@@ -7,7 +7,7 @@ namespace Logitar.Portal.Application.Dictionaries;
 
 public interface IDictionaryQuerier
 {
-  Task<Dictionary> ReadAsync(RealmModel? realm, DictionaryAggregate dictionary, CancellationToken cancellationToken = default);
+  Task<Dictionary> ReadAsync(RealmModel? realm, Dictionary dictionary, CancellationToken cancellationToken = default);
   Task<Dictionary?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken = default);
   Task<Dictionary?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
   Task<Dictionary?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken = default);

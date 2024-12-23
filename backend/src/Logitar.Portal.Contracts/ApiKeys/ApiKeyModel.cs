@@ -15,7 +15,7 @@ public class ApiKeyModel : Aggregate
 
   public List<CustomAttribute> CustomAttributes { get; set; }
 
-  public List<Role> Roles { get; set; }
+  public List<RoleModel> Roles { get; set; }
 
   public RealmModel? Realm { get; set; }
 

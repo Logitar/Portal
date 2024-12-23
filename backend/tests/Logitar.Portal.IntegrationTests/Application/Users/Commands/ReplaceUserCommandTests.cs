@@ -45,9 +45,9 @@ public class ReplaceUserCommandTests : IntegrationTests
     const string newPassword = "Test123!";
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueName(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueName(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
+    Role admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    Role editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    Role reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());

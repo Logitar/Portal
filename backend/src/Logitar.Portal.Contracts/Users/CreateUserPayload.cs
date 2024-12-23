@@ -25,7 +25,7 @@ public record CreateUserPayload
   public string? Website { get; set; }
 
   public List<CustomAttribute> CustomAttributes { get; set; }
-  public List<CustomIdentifier> CustomIdentifiers { get; set; }
+  public List<CustomIdentifierModel> CustomIdentifiers { get; set; }
   public List<string> Roles { get; set; }
 
   public CreateUserPayload() : this(string.Empty)

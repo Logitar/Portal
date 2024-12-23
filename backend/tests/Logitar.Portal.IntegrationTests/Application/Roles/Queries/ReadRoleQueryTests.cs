@@ -16,7 +16,7 @@ public class ReadRoleQueryTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public ReadRoleQueryTests() : base()
   {
@@ -47,7 +47,7 @@ public class ReadRoleQueryTests : IntegrationTests
     SetRealm();
 
     ReadRoleQuery query = new(_role.Id.ToGuid(), UniqueName: null);
-    Role? role = await ActivityPipeline.ExecuteAsync(query);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(role);
   }
 
@@ -55,7 +55,7 @@ public class ReadRoleQueryTests : IntegrationTests
   public async Task It_should_return_the_role_found_by_Id()
   {
     ReadRoleQuery query = new(_role.Id.ToGuid(), _role.UniqueName.Value);
-    Role? role = await ActivityPipeline.ExecuteAsync(query);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(role);
     Assert.Equal(_role.Id.ToGuid(), role.Id);
   }
@@ -64,7 +64,7 @@ public class ReadRoleQueryTests : IntegrationTests
   public async Task It_should_return_the_role_found_by_unique_name()
   {
     ReadRoleQuery query = new(Id: null, _role.UniqueName.Value);
-    Role? role = await ActivityPipeline.ExecuteAsync(query);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(role);
     Assert.Equal(_role.Id.ToGuid(), role.Id);
   }
@@ -72,11 +72,11 @@ public class ReadRoleQueryTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     ReadRoleQuery query = new(_role.Id.ToGuid(), "  GueST  ");
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<Role>>(async () => await ActivityPipeline.ExecuteAsync(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<RoleModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

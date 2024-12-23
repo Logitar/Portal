@@ -58,7 +58,7 @@ internal class ActivityPipeline : IActivityPipeline
 
   private async Task<ActivityContext> GetContextAsync(IContextParameters parameters, CancellationToken cancellationToken)
   {
-    Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
+    ConfigurationModel configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
     RealmModel? realm = parameters.Realm;
     ApiKeyModel? apiKey = parameters.ApiKey;
     User? user = parameters.User;
@@ -85,19 +85,19 @@ internal class ActivityPipeline : IActivityPipeline
     ReadRealmQuery query = new(isId ? id : null, idOrUniqueSlug);
     return await _mediator.Send(query, cancellationToken) ?? throw new RealmNotFoundException(idOrUniqueSlug);
   }
-  private async Task<User> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, Configuration configuration, RealmModel? realm, CancellationToken cancellationToken)
+  private async Task<User> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, ConfigurationModel configuration, RealmModel? realm, CancellationToken cancellationToken)
   {
     bool isId = Guid.TryParse(idOrUniqueNameOrCustomIdentifier, out Guid id);
-    CustomIdentifier? identifier = ParseCustomIdentifier(idOrUniqueNameOrCustomIdentifier);
+    CustomIdentifierModel? identifier = ParseCustomIdentifier(idOrUniqueNameOrCustomIdentifier);
 
     ReadUserQuery query = new(isId ? id : null, idOrUniqueNameOrCustomIdentifier, identifier);
     ActivityContext context = new(configuration, realm, ApiKey: null, User: null, Session: null);
     query.Contextualize(context);
     return await _mediator.Send(query, cancellationToken) ?? throw new ImpersonifiedUserNotFoundException(realm?.GetTenantId(), idOrUniqueNameOrCustomIdentifier);
   }
-  private static CustomIdentifier? ParseCustomIdentifier(string value)
+  private static CustomIdentifierModel? ParseCustomIdentifier(string value)
   {
     int index = value.IndexOf(':');
-    return index < 0 ? null : new CustomIdentifier(value[..index], value[(index + 1)..]);
+    return index < 0 ? null : new CustomIdentifierModel(value[..index], value[(index + 1)..]);
   }
 }

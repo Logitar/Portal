@@ -25,7 +25,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateUserPayload payload = new(UsernameString)
@@ -60,7 +60,7 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.Equal(payload.CustomIdentifiers, user.CustomIdentifiers);
     Assert.Same(Realm, user.Realm);
 
-    Role userRole = Assert.Single(user.Roles);
+    RoleModel userRole = Assert.Single(user.Roles);
     Assert.Equal(role.Id.ToGuid(), userRole.Id);
   }
 

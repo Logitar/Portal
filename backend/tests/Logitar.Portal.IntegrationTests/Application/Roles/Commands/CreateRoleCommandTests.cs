@@ -42,7 +42,7 @@ public class CreateRoleCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("root", bool.TrueString));
     CreateRoleCommand command = new(payload);
-    Role role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel role = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
     Assert.Equal(payload.DisplayName, role.DisplayName);
@@ -51,7 +51,7 @@ public class CreateRoleCommandTests : IntegrationTests
     Assert.Null(role.Realm);
 
     SetRealm();
-    Role other = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 
@@ -60,12 +60,12 @@ public class CreateRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateRolePayload payload = new(role.UniqueName.Value);
     CreateRoleCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<Role>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(role.UniqueName, exception.UniqueName);
   }
