@@ -55,7 +55,7 @@ internal class LoggingService : ILoggingService
     _log?.SetOperation(operation);
   }
 
-  public void SetRealm(Realm? realm)
+  public void SetRealm(RealmModel? realm)
   {
     if (_log != null)
     {

@@ -17,7 +17,7 @@ public class ApiKeyModel : Aggregate
 
   public List<Role> Roles { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public ApiKeyModel() : this(string.Empty)
   {

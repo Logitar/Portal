@@ -7,8 +7,8 @@ namespace Logitar.Portal;
 
 internal record TestContext
 {
-  public Realm? Realm { get; set; }
-  public ApiKeyModel? ApiKey { get; set; }
+  public RealmModel? Realm { get; set; }
+  public ApiKey? ApiKey { get; set; }
   public User? User { get; set; }
   public Session? Session { get; set; }
 }

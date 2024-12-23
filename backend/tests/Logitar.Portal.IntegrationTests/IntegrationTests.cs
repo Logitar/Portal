@@ -45,7 +45,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
-  protected Realm Realm { get; }
+  protected RealmModel Realm { get; }
   protected TenantId TenantId => Realm.GetTenantId();
 
   protected IntegrationTests()
@@ -85,7 +85,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
 
-    Realm = new("tests", JwtSecret.Generate().Value)
+    Realm = new("tests", JwtSecretUnit.Generate().Value)
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",

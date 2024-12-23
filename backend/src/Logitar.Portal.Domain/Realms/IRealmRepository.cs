@@ -2,11 +2,11 @@
 
 public interface IRealmRepository
 {
-  Task<IReadOnlyCollection<RealmAggregate>> LoadAsync(CancellationToken cancellationToken = default);
-  Task<RealmAggregate?> LoadAsync(RealmId id, CancellationToken cancellationToken = default);
-  Task<RealmAggregate?> LoadAsync(RealmId id, long? version, CancellationToken cancellationToken = default);
-  Task<RealmAggregate?> LoadAsync(Slug uniqueSlug, CancellationToken cancellationToken = default);
+  Task<IReadOnlyCollection<Realm>> LoadAsync(CancellationToken cancellationToken = default);
+  Task<Realm?> LoadAsync(RealmId id, CancellationToken cancellationToken = default);
+  Task<Realm?> LoadAsync(RealmId id, long? version, CancellationToken cancellationToken = default);
+  Task<Realm?> LoadAsync(Slug uniqueSlug, CancellationToken cancellationToken = default);
 
-  Task SaveAsync(RealmAggregate realm, CancellationToken cancellationToken = default);
-  Task SaveAsync(IEnumerable<RealmAggregate> realms, CancellationToken cancellationToken = default);
+  Task SaveAsync(Realm realm, CancellationToken cancellationToken = default);
+  Task SaveAsync(IEnumerable<Realm> realms, CancellationToken cancellationToken = default);
 }

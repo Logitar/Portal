@@ -11,7 +11,7 @@ public class Template : Aggregate
   public string Subject { get; set; }
   public Content Content { get; set; }
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 
   public Template() : this(string.Empty, string.Empty, new Content())
   {

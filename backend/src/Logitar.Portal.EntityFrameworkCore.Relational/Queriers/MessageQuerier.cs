@@ -32,14 +32,14 @@ internal class MessageQuerier : IMessageQuerier
     _users = identityContext.Users;
   }
 
-  public async Task<Message> ReadAsync(Realm? realm, MessageAggregate message, CancellationToken cancellationToken)
+  public async Task<Message> ReadAsync(RealmModel? realm, MessageAggregate message, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, message.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The message entity 'AggregateId={message.Id.Value}' could not be found.");
   }
-  public async Task<Message?> ReadAsync(Realm? realm, MessageId id, CancellationToken cancellationToken)
+  public async Task<Message?> ReadAsync(RealmModel? realm, MessageId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Message?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<Message?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -57,7 +57,7 @@ internal class MessageQuerier : IMessageQuerier
     return await MapAsync(message, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Message>> SearchAsync(Realm? realm, SearchMessagesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Message>> SearchAsync(RealmModel? realm, SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
       .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.TemplateId)
@@ -118,9 +118,9 @@ internal class MessageQuerier : IMessageQuerier
     return new SearchResults<Message>(items, total);
   }
 
-  private async Task<Message> MapAsync(MessageEntity message, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<Message> MapAsync(MessageEntity message, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([message], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Message>> MapAsync(IEnumerable<MessageEntity> messages, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<Message>> MapAsync(IEnumerable<MessageEntity> messages, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = messages.SelectMany(message => message.GetActorIds());
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

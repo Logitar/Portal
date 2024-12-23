@@ -14,5 +14,5 @@ public class OneTimePasswordModel : Aggregate
 
   public List<CustomAttribute> CustomAttributes { get; set; } = [];
 
-  public Realm? Realm { get; set; }
+  public RealmModel? Realm { get; set; }
 }

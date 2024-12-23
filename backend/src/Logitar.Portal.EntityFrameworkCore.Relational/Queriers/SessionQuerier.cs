@@ -30,14 +30,14 @@ internal class SessionQuerier : ISessionQuerier
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Session> ReadAsync(Realm? realm, SessionAggregate session, CancellationToken cancellationToken)
+  public async Task<Session> ReadAsync(RealmModel? realm, SessionAggregate session, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, session.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The session entity 'AggregateId={session.Id.Value}' could not be found.");
   }
-  public async Task<Session?> ReadAsync(Realm? realm, SessionId id, CancellationToken cancellationToken)
+  public async Task<Session?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Session?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<Session?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -54,7 +54,7 @@ internal class SessionQuerier : ISessionQuerier
     return await MapAsync(session, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Session>> SearchAsync(Realm? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<Session>> SearchAsync(RealmModel? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Sessions.Table).SelectAll(IdentityDb.Sessions.Table)
       .Join(IdentityDb.Users.UserId, IdentityDb.Sessions.UserId)
@@ -109,9 +109,9 @@ internal class SessionQuerier : ISessionQuerier
     return new SearchResults<Session>(items, total);
   }
 
-  private async Task<Session> MapAsync(SessionEntity session, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<Session> MapAsync(SessionEntity session, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([session], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Session>> MapAsync(IEnumerable<SessionEntity> sessions, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<Session>> MapAsync(IEnumerable<SessionEntity> sessions, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = sessions.SelectMany(session => session.GetActorIds());
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

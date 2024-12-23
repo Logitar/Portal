@@ -36,10 +36,10 @@ public abstract record Activity : IActivity
   public ActorId ActorId => new(Actor.Id);
 
   [JsonIgnore]
-  private ConfigurationModel Configuration => Context.Configuration;
+  private Configuration Configuration => Context.Configuration;
 
   [JsonIgnore]
-  public Realm? Realm => Context.Realm;
+  public RealmModel? Realm => Context.Realm;
   [JsonIgnore]
   public TenantId? TenantId => Realm?.GetTenantId();
 

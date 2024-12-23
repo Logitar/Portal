@@ -31,7 +31,7 @@ internal class RealmClientTests : IClientTests
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
       CreateRealmPayload create = new(_uniqueSlug, secret: string.Empty);
-      Realm realm = await _client.CreateAsync(create, context.Request);
+      RealmModel realm = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -42,7 +42,7 @@ internal class RealmClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Realm? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueSlug: null, context.Request);
+      RealmModel? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueSlug: null, context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The realm should not be found.");
@@ -55,7 +55,7 @@ internal class RealmClientTests : IClientTests
       SearchRealmsPayload search = new();
       string[] terms = realm.UniqueSlug.Split('-');
       search.Search.Terms.Add(new SearchTerm($"%{terms[_random.Next(0, terms.Length)]}%"));
-      SearchResults<Realm> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<RealmModel> results = await _client.SearchAsync(search, context.Request);
       realm = results.Items.Single();
       context.Succeed();
 

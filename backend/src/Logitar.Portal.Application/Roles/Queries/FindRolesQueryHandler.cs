@@ -1,10 +1,9 @@
-﻿using Logitar.Identity.Domain.Roles;
-using Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Portal.Contracts.Roles;
 using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
-internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IEnumerable<FoundRole>>
+internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnlyCollection<FoundRole>>
 {
   private readonly IRoleRepository _roleRepository;
 
@@ -13,7 +12,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IEnumerab
     _roleRepository = roleRepository;
   }
 
-  public async Task<IEnumerable<FoundRole>> Handle(FindRolesQuery query, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<FoundRole>> Handle(FindRolesQuery query, CancellationToken cancellationToken)
   {
     int capacity = query.Roles.Count();
     Dictionary<RoleId, FoundRole> foundRoles = new(capacity);

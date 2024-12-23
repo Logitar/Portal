@@ -7,9 +7,9 @@ namespace Logitar.Portal.Application.Senders;
 
 public interface ISenderQuerier
 {
-  Task<Sender> ReadAsync(Realm? realm, SenderAggregate sender, CancellationToken cancellationToken = default);
-  Task<Sender?> ReadAsync(Realm? realm, SenderId id, CancellationToken cancellationToken = default);
-  Task<Sender?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken = default);
-  Task<Sender?> ReadDefaultAsync(Realm? realm, CancellationToken cancellationToken = default);
-  Task<SearchResults<Sender>> SearchAsync(Realm? realm, SearchSendersPayload payload, CancellationToken cancellationToken = default);
+  Task<Sender> ReadAsync(RealmModel? realm, SenderAggregate sender, CancellationToken cancellationToken = default);
+  Task<Sender?> ReadAsync(RealmModel? realm, SenderId id, CancellationToken cancellationToken = default);
+  Task<Sender?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<Sender?> ReadDefaultAsync(RealmModel? realm, CancellationToken cancellationToken = default);
+  Task<SearchResults<Sender>> SearchAsync(RealmModel? realm, SearchSendersPayload payload, CancellationToken cancellationToken = default);
 }

@@ -7,8 +7,8 @@ namespace Logitar.Portal.Application.Activities;
 
 public interface IContextParameters
 {
-  Realm? Realm { get; }
-  ApiKeyModel? ApiKey { get; }
+  RealmModel? Realm { get; }
+  ApiKey? ApiKey { get; }
   User? User { get; }
   Session? Session { get; }
 

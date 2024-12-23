@@ -46,9 +46,9 @@ internal class Mapper
     PictureUrl = actor.PictureUrl
   };
 
-  public ApiKey ToApiKey(ApiKeyEntity source, Realm? realm)
+  public ApiKeyModel ToApiKey(ApiKeyEntity source, RealmModel? realm)
   {
-    ApiKey destination = new(source.DisplayName)
+    ApiKeyModel destination = new(source.DisplayName)
     {
       Description = source.Description,
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
@@ -71,11 +71,11 @@ internal class Mapper
     return destination;
   }
 
-  public ConfigurationModel ToConfiguration(Configuration source)
+  public Configuration ToConfiguration(ConfigurationAggregate source)
   {
-    ConfigurationModel destination = new(source.Secret.Value)
+    Configuration destination = new(source.Secret.Value)
     {
-      DefaultLocale = Locale.TryCreate(source.DefaultLocale?.Code),
+      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale?.Code),
       UniqueNameSettings = new UniqueNameSettings(source.UniqueNameSettings),
       PasswordSettings = new PasswordSettings(source.PasswordSettings),
       RequireUniqueEmail = source.RequireUniqueEmail,
@@ -87,9 +87,9 @@ internal class Mapper
     return destination;
   }
 
-  public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
+  public DictionaryModel ToDictionary(DictionaryEntity source, RealmModel? realm)
   {
-    Dictionary destination = new(new Locale(source.Locale))
+    DictionaryModel destination = new(new LocaleModel(source.Locale))
     {
       EntryCount = source.EntryCount,
       Realm = realm
@@ -105,7 +105,7 @@ internal class Mapper
     return destination;
   }
 
-  public Message ToMessage(MessageEntity source, Realm? realm, IEnumerable<UserEntity> users)
+  public Message ToMessage(MessageEntity source, RealmModel? realm, IEnumerable<UserEntity> users)
   {
     Content body = new(source.BodyType, source.BodyText);
 
@@ -144,7 +144,7 @@ internal class Mapper
     {
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
-      Locale = Locale.TryCreate(source.Locale),
+      Locale = LocaleModel.TryCreate(source.Locale),
       IsDemo = source.IsDemo,
       Status = source.Status,
       Realm = realm
@@ -181,9 +181,9 @@ internal class Mapper
     return destination;
   }
 
-  public OneTimePasswordModel ToOneTimePassword(OneTimePasswordEntity source, Realm? realm)
+  public OneTimePassword ToOneTimePassword(OneTimePasswordEntity source, RealmModel? realm)
   {
-    OneTimePasswordModel destination = new()
+    OneTimePassword destination = new()
     {
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
       MaximumAttempts = source.MaximumAttempts,
@@ -202,13 +202,13 @@ internal class Mapper
     return destination;
   }
 
-  public Realm ToRealm(RealmEntity source)
+  public RealmModel ToRealm(RealmEntity source)
   {
-    Realm destination = new(source.UniqueSlug, source.Secret)
+    RealmModel destination = new(source.UniqueSlug, source.Secret)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
-      DefaultLocale = Locale.TryCreate(source.DefaultLocale),
+      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale),
       Url = source.Url,
       UniqueNameSettings = new UniqueNameSettings(source.AllowedUniqueNameCharacters),
       PasswordSettings = new PasswordSettings(source.RequiredPasswordLength, source.RequiredPasswordUniqueChars, source.PasswordsRequireNonAlphanumeric,
@@ -256,7 +256,7 @@ internal class Mapper
     return destination;
   }
 
-  public Role ToRole(RoleEntity source, Realm? realm)
+  public Role ToRole(RoleEntity source, RealmModel? realm)
   {
     Role destination = new(source.UniqueName)
     {
@@ -275,7 +275,7 @@ internal class Mapper
     return destination;
   }
 
-  public Session ToSession(SessionEntity source, Realm? realm)
+  public Session ToSession(SessionEntity source, RealmModel? realm)
   {
     if (source.User == null)
     {
@@ -301,7 +301,7 @@ internal class Mapper
     return destination;
   }
 
-  public Sender ToSender(SenderEntity source, Realm? realm)
+  public Sender ToSender(SenderEntity source, RealmModel? realm)
   {
     Sender destination = new()
     {
@@ -334,7 +334,7 @@ internal class Mapper
     return destination;
   }
 
-  public Template ToTemplate(TemplateEntity source, Realm? realm)
+  public Template ToTemplate(TemplateEntity source, RealmModel? realm)
   {
     Content content = new(source.ContentType, source.ContentText);
     Template destination = new(source.UniqueKey, source.Subject, content)
@@ -349,7 +349,7 @@ internal class Mapper
     return destination;
   }
 
-  public User ToUser(UserEntity source, Realm? realm)
+  public User ToUser(UserEntity source, RealmModel? realm)
   {
     User destination = new(source.UniqueName)
     {
@@ -367,7 +367,7 @@ internal class Mapper
       Nickname = source.Nickname,
       Birthdate = AsUniversalTime(source.Birthdate),
       Gender = source.Gender,
-      Locale = Locale.TryCreate(source.Locale),
+      Locale = LocaleModel.TryCreate(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,
