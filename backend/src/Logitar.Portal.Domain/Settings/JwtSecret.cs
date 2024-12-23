@@ -21,6 +21,8 @@ public record JwtSecret
   public static JwtSecret Generate() => new(RandomStringGenerator.GetString());
   public static JwtSecret Generate(int length) => new(RandomStringGenerator.GetString(length));
 
+  public override string ToString() => Value;
+
   private class Validator : AbstractValidator<JwtSecret>
   {
     public Validator()

@@ -16,6 +16,8 @@ public record Subject
 
   public static Subject? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
 
+  public override string ToString() => Value;
+
   private class Validator : AbstractValidator<Subject>
   {
     public Validator()

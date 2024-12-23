@@ -6,11 +6,11 @@ namespace Logitar.Portal.Domain.Messages;
 public record TemplateSummary
 {
   public TemplateId Id { get; }
-  public UniqueKeyUnit UniqueKey { get; }
+  public UniqueKey UniqueKey { get; }
   public DisplayNameUnit? DisplayName { get; }
 
   [JsonConstructor]
-  public TemplateSummary(TemplateId id, UniqueKeyUnit uniqueKey, DisplayNameUnit? displayName)
+  public TemplateSummary(TemplateId id, UniqueKey uniqueKey, DisplayNameUnit? displayName)
   {
     Id = id;
     UniqueKey = uniqueKey;

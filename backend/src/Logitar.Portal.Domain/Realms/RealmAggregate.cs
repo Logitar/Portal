@@ -166,6 +166,7 @@ public class RealmAggregate : AggregateRoot
     {
       RemoveCustomAttribute(key);
     }
+    value = value.Trim();
 
     if (!_customAttributes.TryGetValue(key, out string? existingValue) || existingValue != value)
     {

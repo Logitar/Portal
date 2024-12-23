@@ -15,10 +15,10 @@ public class MessageAggregate : AggregateRoot
 
   public TenantId? TenantId { get; private set; }
 
-  private SubjectUnit? _subject = null;
-  public SubjectUnit Subject => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
-  private ContentUnit? _body = null;
-  public ContentUnit Body => _body ?? throw new InvalidOperationException($"The {nameof(Body)} has not been initialized yet.");
+  private Subject? _subject = null;
+  public Subject Subject => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
+  private Content? _body = null;
+  public Content Body => _body ?? throw new InvalidOperationException($"The {nameof(Body)} has not been initialized yet.");
 
   private readonly List<RecipientUnit> _recipients = [];
   public IReadOnlyCollection<RecipientUnit> Recipients => _recipients.AsReadOnly();
@@ -43,7 +43,7 @@ public class MessageAggregate : AggregateRoot
   {
   }
 
-  public MessageAggregate(SubjectUnit subject, ContentUnit body, IReadOnlyCollection<RecipientUnit> recipients, SenderAggregate sender,
+  public MessageAggregate(Subject subject, Content body, IReadOnlyCollection<RecipientUnit> recipients, SenderAggregate sender,
     TemplateAggregate template, bool ignoreUserLocale = false, LocaleUnit? locale = null, IReadOnlyDictionary<string, string>? variables = null,
     bool isDemo = false, TenantId? tenantId = null, ActorId actorId = default, MessageId? id = null) : base((id ?? MessageId.NewId()).AggregateId)
   {

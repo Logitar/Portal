@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Senders;
 
