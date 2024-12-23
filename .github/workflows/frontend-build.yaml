@@ -1,16 +1,16 @@
-name: Build Portal Frontend
+name: Build & Test Portal Frontend
 
 on:
   push:
     branches:
       - main
     paths:
-      - "frontend/**"
+      - 'frontend/**'
   pull_request:
     branches:
       - main
     paths:
-      - "frontend/**"
+      - 'frontend/**'
   workflow_dispatch:
 
 defaults:

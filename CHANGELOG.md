@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- Upgraded build pipelines.
+
+### Fixed
+
+- Dependency vulnerabilities.
+- Project versions.
 
 ## [4.1.2] - 2024-06-26
 
