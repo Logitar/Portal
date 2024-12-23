@@ -19,7 +19,7 @@ public class ReadConfigurationQueryTests : IntegrationTests
   {
     Assert.NotNull(_cacheService.Configuration);
 
-    Configuration? configuration = await ActivityPipeline.ExecuteAsync(new ReadConfigurationQuery());
+    ConfigurationModel? configuration = await ActivityPipeline.ExecuteAsync(new ReadConfigurationQuery());
     Assert.NotNull(configuration);
     Assert.Same(_cacheService.Configuration, configuration);
   }

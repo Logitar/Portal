@@ -66,7 +66,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
   private void ReplaceAuthenticationInformation(IUserSettings userSettings, ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId)
   {
-    UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
+    UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
       user.SetUniqueName(uniqueName, actorId);
@@ -144,7 +144,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Gender = gender;
     }
-    LocaleUnit? locale = LocaleUnit.TryCreate(payload.Locale);
+    Locale? locale = Locale.TryCreate(payload.Locale);
     if (reference == null || locale != reference.Locale)
     {
       user.Locale = locale;

@@ -2,8 +2,8 @@
 
 public interface IConfigurationRepository
 {
-  Task<ConfigurationAggregate?> LoadAsync(CancellationToken cancellationToken = default);
-  Task<ConfigurationAggregate?> LoadAsync(long? version, CancellationToken cancellationToken = default);
+  Task<Configuration?> LoadAsync(CancellationToken cancellationToken = default);
+  Task<Configuration?> LoadAsync(long? version, CancellationToken cancellationToken = default);
 
-  Task SaveAsync(ConfigurationAggregate configuration, CancellationToken cancellationToken = default);
+  Task SaveAsync(Configuration configuration, CancellationToken cancellationToken = default);
 }

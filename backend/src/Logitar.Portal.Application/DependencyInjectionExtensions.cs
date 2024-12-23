@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys;
 using Logitar.Portal.Application.Configurations;
@@ -23,7 +23,7 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddFacades()
-      .AddLogitarIdentityDomain()
+      .AddLogitarIdentityCore()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddScoped<IActivityPipeline, ActivityPipeline>()
       .AddScoped<ILoggingService, LoggingService>()

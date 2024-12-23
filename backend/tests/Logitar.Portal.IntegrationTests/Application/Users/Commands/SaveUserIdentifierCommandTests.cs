@@ -62,7 +62,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   {
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
-    UserAggregate other = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()));
+    UserAggregate other = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()));
     other.SetCustomIdentifier(Key, _healthInsuranceNumber);
     await _userRepository.SaveAsync(other);
 

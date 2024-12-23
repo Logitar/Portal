@@ -25,7 +25,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    RoleAggregate role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateUserPayload payload = new(UsernameString)

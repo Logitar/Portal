@@ -18,9 +18,9 @@ internal class CacheService : ICacheService
     _settings = settings;
   }
 
-  public Configuration? Configuration
+  public ConfigurationModel? Configuration
   {
-    get => GetItem<Configuration>(ConfigurationKey);
+    get => GetItem<ConfigurationModel>(ConfigurationKey);
     set => SetItem(ConfigurationKey, value);
   }
   private const string ConfigurationKey = nameof(Configuration);

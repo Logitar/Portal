@@ -58,9 +58,9 @@ internal class ActivityPipeline : IActivityPipeline
 
   private async Task<ActivityContext> GetContextAsync(IContextParameters parameters, CancellationToken cancellationToken)
   {
-    Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
+    ConfigurationModel configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
     Realm? realm = parameters.Realm;
-    ApiKeyModel? apiKey = parameters.ApiKey;
+    ApiKey? apiKey = parameters.ApiKey;
     User? user = parameters.User;
     Session? session = parameters.Session;
 
@@ -85,7 +85,7 @@ internal class ActivityPipeline : IActivityPipeline
     ReadRealmQuery query = new(isId ? id : null, idOrUniqueSlug);
     return await _mediator.Send(query, cancellationToken) ?? throw new RealmNotFoundException(idOrUniqueSlug);
   }
-  private async Task<User> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, Configuration configuration, Realm? realm, CancellationToken cancellationToken)
+  private async Task<User> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, ConfigurationModel configuration, Realm? realm, CancellationToken cancellationToken)
   {
     bool isId = Guid.TryParse(idOrUniqueNameOrCustomIdentifier, out Guid id);
     CustomIdentifier? identifier = ParseCustomIdentifier(idOrUniqueNameOrCustomIdentifier);

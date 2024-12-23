@@ -84,7 +84,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
   private void UpdateAuthenticationInformation(IUserSettings userSettings, UpdateUserPayload payload, UserAggregate user, ActorId actorId)
   {
-    UniqueNameUnit? uniqueName = UniqueNameUnit.TryCreate(userSettings.UniqueName, payload.UniqueName);
+    UniqueName? uniqueName = UniqueName.TryCreate(userSettings.UniqueName, payload.UniqueName);
     if (uniqueName != null)
     {
       user.SetUniqueName(uniqueName, actorId);
@@ -166,7 +166,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
     if (payload.Locale != null)
     {
-      user.Locale = LocaleUnit.TryCreate(payload.Locale.Value);
+      user.Locale = Locale.TryCreate(payload.Locale.Value);
     }
     if (payload.TimeZone != null)
     {

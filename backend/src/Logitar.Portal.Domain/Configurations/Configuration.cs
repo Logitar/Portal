@@ -5,7 +5,7 @@ using Logitar.Portal.Domain.Settings;
 
 namespace Logitar.Portal.Domain.Configurations;
 
-public class ConfigurationAggregate : AggregateRoot
+public class Configuration : AggregateRoot
 {
   private ConfigurationUpdated _updated = new();
 
@@ -90,18 +90,18 @@ public class ConfigurationAggregate : AggregateRoot
     }
   }
 
-  public ConfigurationAggregate() : base()
+  public Configuration() : base()
   {
   }
 
-  private ConfigurationAggregate(ConfigurationId id) : base(id.StreamId)
+  private Configuration(ConfigurationId id) : base(id.StreamId)
   {
   }
 
-  public static ConfigurationAggregate Initialize(ActorId actorId)
+  public static Configuration Initialize(ActorId actorId)
   {
     ConfigurationId id = new();
-    ConfigurationAggregate configuration = new(id);
+    Configuration configuration = new(id);
 
     Locale? defaultLocale = null;
     JwtSecret secret = JwtSecret.Generate();

@@ -31,7 +31,7 @@ internal class FindUserQueryHandler : IRequestHandler<FindUserQuery, UserAggrega
       }
     }
 
-    UniqueNameUnit? uniqueName = null;
+    UniqueName? uniqueName = null;
     try
     {
       uniqueName = new(userSettings.UniqueName, query.User);

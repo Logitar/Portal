@@ -23,7 +23,7 @@ public class SearchRolesQueryTests : IntegrationTests
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 
@@ -55,10 +55,10 @@ public class SearchRolesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    RoleAggregate admin = new(new UniqueNameUnit(Realm.UniqueNameSettings, "admin"), TenantId);
-    RoleAggregate geoGuesser = new(new UniqueNameUnit(Realm.UniqueNameSettings, "geo_guesser"), TenantId);
-    RoleAggregate guest = new(new UniqueNameUnit(Realm.UniqueNameSettings, "guest"), TenantId);
-    RoleAggregate minister = new(new UniqueNameUnit(Realm.UniqueNameSettings, "minister"), TenantId);
+    RoleAggregate admin = new(new UniqueName(Realm.UniqueNameSettings, "admin"), TenantId);
+    RoleAggregate geoGuesser = new(new UniqueName(Realm.UniqueNameSettings, "geo_guesser"), TenantId);
+    RoleAggregate guest = new(new UniqueName(Realm.UniqueNameSettings, "guest"), TenantId);
+    RoleAggregate minister = new(new UniqueName(Realm.UniqueNameSettings, "minister"), TenantId);
     await _roleRepository.SaveAsync([admin, geoGuesser, guest, minister]);
 
     SetRealm();

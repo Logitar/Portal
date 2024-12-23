@@ -23,7 +23,7 @@ public class ReadRoleQueryTests : IntegrationTests
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 
@@ -72,7 +72,7 @@ public class ReadRoleQueryTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "guest"));
+    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     ReadRoleQuery query = new(_role.Id.ToGuid(), "  GueST  ");

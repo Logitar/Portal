@@ -46,7 +46,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
     ActorId actorId = new(apiKey.Id);
     SessionAggregate session = user.SignIn(secret, actorId);

@@ -60,7 +60,7 @@ public class CreateRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
+    RoleAggregate role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateRolePayload payload = new(role.UniqueName.Value);

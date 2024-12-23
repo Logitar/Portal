@@ -37,7 +37,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
+    UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
     UserAggregate user = new(uniqueName, command.TenantId, actorId)
     {
       FirstName = PersonNameUnit.TryCreate(payload.FirstName),
@@ -46,7 +46,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       Nickname = PersonNameUnit.TryCreate(payload.Nickname),
       Birthdate = payload.Birthdate,
       Gender = GenderUnit.TryCreate(payload.Gender),
-      Locale = LocaleUnit.TryCreate(payload.Locale),
+      Locale = Locale.TryCreate(payload.Locale),
       TimeZone = TimeZoneUnit.TryCreate(payload.TimeZone),
       Picture = UrlUnit.TryCreate(payload.Picture),
       Profile = UrlUnit.TryCreate(payload.Profile),

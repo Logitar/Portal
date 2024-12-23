@@ -23,8 +23,8 @@ internal class DictionaryConfiguration : AggregateConfiguration<DictionaryEntity
     builder.Ignore(x => x.Entries);
 
     builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
-    builder.Property(x => x.Locale).HasMaxLength(LocaleUnit.MaximumLength);
-    builder.Property(x => x.LocaleNormalized).HasMaxLength(LocaleUnit.MaximumLength);
+    builder.Property(x => x.Locale).HasMaxLength(Locale.MaximumLength);
+    builder.Property(x => x.LocaleNormalized).HasMaxLength(Locale.MaximumLength);
     builder.Property(x => x.EntriesSerialized).HasColumnName(nameof(DictionaryEntity.Entries));
   }
 }

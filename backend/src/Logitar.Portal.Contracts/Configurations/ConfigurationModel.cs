@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Configurations;
 
-public class Configuration : Aggregate
+public class ConfigurationModel : Aggregate
 {
   public LocaleModel? DefaultLocale { get; set; }
   public string Secret { get; set; }
@@ -13,11 +13,11 @@ public class Configuration : Aggregate
 
   public LoggingSettings LoggingSettings { get; set; } = new();
 
-  public Configuration() : this(string.Empty)
+  public ConfigurationModel() : this(string.Empty)
   {
   }
 
-  public Configuration(string secret)
+  public ConfigurationModel(string secret)
   {
     Secret = secret;
   }

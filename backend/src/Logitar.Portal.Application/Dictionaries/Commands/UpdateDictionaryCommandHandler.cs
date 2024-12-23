@@ -34,7 +34,7 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit? locale = LocaleUnit.TryCreate(payload.Locale);
+    Locale? locale = Locale.TryCreate(payload.Locale);
     if (locale != null)
     {
       dictionary.SetLocale(locale, actorId);

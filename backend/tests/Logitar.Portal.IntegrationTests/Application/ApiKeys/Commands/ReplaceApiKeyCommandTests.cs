@@ -42,9 +42,9 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   public async Task It_should_replace_an_existing_Api_key()
   {
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
-    RoleAggregate manageUsers = new(new UniqueNameUnit(uniqueNameSettings, "manage_users"));
-    RoleAggregate sendMessages = new(new UniqueNameUnit(uniqueNameSettings, "sendMessages"));
+    RoleAggregate admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    RoleAggregate manageUsers = new(new UniqueName(uniqueNameSettings, "manage_users"));
+    RoleAggregate sendMessages = new(new UniqueName(uniqueNameSettings, "sendMessages"));
     await _roleRepository.SaveAsync([admin, manageUsers, sendMessages]);
 
     ApiKey apiKey = await CreateApiKeyAsync();

@@ -45,9 +45,9 @@ public class ReplaceUserCommandTests : IntegrationTests
     const string newPassword = "Test123!";
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueNameUnit(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
+    RoleAggregate admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    RoleAggregate editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    RoleAggregate reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
@@ -176,7 +176,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw EmailAddressAlreadyUsedException when the email address is already used.")]
   public async Task It_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    UserAggregate user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(user.UniqueName.Value)
@@ -205,7 +205,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    UserAggregate user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(UsernameString.ToUpper());

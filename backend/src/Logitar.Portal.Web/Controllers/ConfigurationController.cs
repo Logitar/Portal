@@ -18,19 +18,19 @@ public class ConfigurationController : ControllerBase
   }
 
   [HttpGet]
-  public async Task<ActionResult<Configuration>> ReadAsync(CancellationToken cancellationToken)
+  public async Task<ActionResult<ConfigurationModel>> ReadAsync(CancellationToken cancellationToken)
   {
     return Ok(await _configurationService.ReadAsync(cancellationToken));
   }
 
   [HttpPut]
-  public async Task<ActionResult<Configuration>> ReplaceAsync([FromBody] ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<ActionResult<ConfigurationModel>> ReplaceAsync([FromBody] ReplaceConfigurationPayload payload, long? version, CancellationToken cancellationToken)
   {
     return Ok(await _configurationService.ReplaceAsync(payload, version, cancellationToken));
   }
 
   [HttpPatch]
-  public async Task<ActionResult<Configuration>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<ConfigurationModel>> UpdateAsync([FromBody] UpdateConfigurationPayload payload, CancellationToken cancellationToken)
   {
     return Ok(await _configurationService.UpdateAsync(payload, cancellationToken));
   }

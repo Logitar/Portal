@@ -20,7 +20,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -60,7 +60,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
   public async Task It_should_throw_DictionaryAlreadyExistsException_when_the_dictionary_already_exists()
   {
-    DictionaryAggregate dictionary = new(new LocaleUnit("fr-CA"));
+    DictionaryAggregate dictionary = new(new Locale("fr-CA"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     UpdateDictionaryPayload payload = new()

@@ -25,7 +25,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 

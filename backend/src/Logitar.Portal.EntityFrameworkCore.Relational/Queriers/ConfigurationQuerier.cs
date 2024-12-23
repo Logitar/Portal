@@ -16,7 +16,7 @@ internal class ConfigurationQuerier : IConfigurationQuerier
     _actorService = actorService;
   }
 
-  public async Task<Configuration> ReadAsync(ConfigurationAggregate configuration, CancellationToken cancellationToken)
+  public async Task<ConfigurationModel> ReadAsync(Configuration configuration, CancellationToken cancellationToken)
   {
     IEnumerable<ActorId> actorIds = [configuration.CreatedBy, configuration.UpdatedBy];
     IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);

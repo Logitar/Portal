@@ -84,7 +84,7 @@ public class ReadUserQueryTests : IntegrationTests
   {
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
 
-    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    UserAggregate other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(other);
 
     ReadUserQuery query = new(user.Id.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);

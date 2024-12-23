@@ -21,7 +21,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -69,7 +69,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    DictionaryAggregate dictionary = new(new LocaleUnit("fr"));
+    DictionaryAggregate dictionary = new(new Locale("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), "  FR  ");

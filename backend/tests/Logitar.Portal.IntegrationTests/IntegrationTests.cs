@@ -85,7 +85,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
 
-    Realm = new("tests", JwtSecretUnit.Generate().Value)
+    Realm = new("tests", JwtSecret.Generate().Value)
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",

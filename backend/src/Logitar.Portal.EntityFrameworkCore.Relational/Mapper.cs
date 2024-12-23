@@ -46,9 +46,9 @@ internal class Mapper
     PictureUrl = actor.PictureUrl
   };
 
-  public ApiKeyModel ToApiKey(ApiKeyEntity source, Realm? realm)
+  public ApiKey ToApiKey(ApiKeyEntity source, Realm? realm)
   {
-    ApiKeyModel destination = new(source.DisplayName)
+    ApiKey destination = new(source.DisplayName)
     {
       Description = source.Description,
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
@@ -71,11 +71,11 @@ internal class Mapper
     return destination;
   }
 
-  public Configuration ToConfiguration(ConfigurationAggregate source)
+  public ConfigurationModel ToConfiguration(Configuration source)
   {
-    Configuration destination = new(source.Secret.Value)
+    ConfigurationModel destination = new(source.Secret.Value)
     {
-      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale?.Code),
+      DefaultLocale = Locale.TryCreate(source.DefaultLocale?.Code),
       UniqueNameSettings = new UniqueNameSettings(source.UniqueNameSettings),
       PasswordSettings = new PasswordSettings(source.PasswordSettings),
       RequireUniqueEmail = source.RequireUniqueEmail,
@@ -89,7 +89,7 @@ internal class Mapper
 
   public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
   {
-    Dictionary destination = new(new LocaleModel(source.Locale))
+    Dictionary destination = new(new Locale(source.Locale))
     {
       EntryCount = source.EntryCount,
       Realm = realm
@@ -144,7 +144,7 @@ internal class Mapper
     {
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
-      Locale = LocaleModel.TryCreate(source.Locale),
+      Locale = Locale.TryCreate(source.Locale),
       IsDemo = source.IsDemo,
       Status = source.Status,
       Realm = realm
@@ -208,7 +208,7 @@ internal class Mapper
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
-      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale),
+      DefaultLocale = Locale.TryCreate(source.DefaultLocale),
       Url = source.Url,
       UniqueNameSettings = new UniqueNameSettings(source.AllowedUniqueNameCharacters),
       PasswordSettings = new PasswordSettings(source.RequiredPasswordLength, source.RequiredPasswordUniqueChars, source.PasswordsRequireNonAlphanumeric,
@@ -367,7 +367,7 @@ internal class Mapper
       Nickname = source.Nickname,
       Birthdate = AsUniversalTime(source.Birthdate),
       Gender = source.Gender,
-      Locale = LocaleModel.TryCreate(source.Locale),
+      Locale = Locale.TryCreate(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,

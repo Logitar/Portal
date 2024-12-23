@@ -39,7 +39,7 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.Property(x => x.SenderProvider).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<SenderProvider>());
     builder.Property(x => x.TemplateUniqueKey).HasMaxLength(IdentifierValidator.MaximumLength);
     builder.Property(x => x.TemplateDisplayName).HasMaxLength(DisplayName.MaximumLength);
-    builder.Property(x => x.Locale).HasMaxLength(LocaleUnit.MaximumLength);
+    builder.Property(x => x.Locale).HasMaxLength(Locale.MaximumLength);
     builder.Property(x => x.VariablesSerialized).HasColumnName(nameof(MessageEntity.Variables));
     builder.Property(x => x.Status).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<MessageStatus>());
     builder.Property(x => x.ResultDataSerialized).HasColumnName(nameof(MessageEntity.ResultData));
