@@ -76,7 +76,7 @@ public class TemplateAggregate : AggregateRoot
   {
     Raise(new TemplateCreated(uniqueKey, subject, content), actorId);
   }
-  protected virtual void Apply(TemplateCreated @event)
+  protected virtual void Handle(TemplateCreated @event)
   {
     _uniqueKey = @event.UniqueKey;
 
@@ -99,7 +99,7 @@ public class TemplateAggregate : AggregateRoot
       Raise(new TemplateUniqueKeyChanged(uniqueKey), actorId);
     }
   }
-  protected virtual void Apply(TemplateUniqueKeyChanged @event)
+  protected virtual void Handle(TemplateUniqueKeyChanged @event)
   {
     _uniqueKey = @event.UniqueKey;
   }
@@ -112,7 +112,7 @@ public class TemplateAggregate : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(TemplateUpdated @event)
+  protected virtual void Handle(TemplateUpdated @event)
   {
     if (@event.DisplayName != null)
     {

@@ -113,7 +113,7 @@ public class ConfigurationAggregate : AggregateRoot
 
     return configuration;
   }
-  protected virtual void Apply(ConfigurationInitialized @event)
+  protected virtual void Handle(ConfigurationInitialized @event)
   {
     _defaultLocale = @event.DefaultLocale;
     _secret = @event.Secret;
@@ -133,7 +133,7 @@ public class ConfigurationAggregate : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(ConfigurationUpdated @event)
+  protected virtual void Handle(ConfigurationUpdated @event)
   {
     if (@event.DefaultLocale != null)
     {

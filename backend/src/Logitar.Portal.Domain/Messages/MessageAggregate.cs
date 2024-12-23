@@ -91,7 +91,7 @@ public class MessageAggregate : AggregateRoot
 
     Raise(new MessageCreated(subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template), ignoreUserLocale, locale, variables ?? new Dictionary<string, string>(), isDemo), actorId);
   }
-  protected virtual void Apply(MessageCreated @event)
+  protected virtual void Handle(MessageCreated @event)
   {
     _subject = @event.Subject;
     _body = @event.Body;
@@ -131,7 +131,7 @@ public class MessageAggregate : AggregateRoot
       Raise(new MessageFailed(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageFailed @event)
+  protected virtual void Handle(MessageFailed @event)
   {
     Status = MessageStatus.Failed;
 
@@ -150,7 +150,7 @@ public class MessageAggregate : AggregateRoot
       Raise(new MessageSucceeded(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageSucceeded @event)
+  protected virtual void Handle(MessageSucceeded @event)
   {
     Status = MessageStatus.Succeeded;
 

@@ -135,7 +135,7 @@ public class RealmAggregate : AggregateRoot
     bool requireUniqueEmail = true;
     Raise(new RealmCreated(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
   }
-  protected virtual void Apply(RealmCreated @event)
+  protected virtual void Handle(RealmCreated @event)
   {
     _uniqueSlug = @event.UniqueSlug;
     _secret = @event.Secret;
@@ -182,7 +182,7 @@ public class RealmAggregate : AggregateRoot
       Raise(new RealmUniqueSlugChanged(uniqueSlug), actorId);
     }
   }
-  protected virtual void Apply(RealmUniqueSlugChanged @event)
+  protected virtual void Handle(RealmUniqueSlugChanged @event)
   {
     _uniqueSlug = @event.UniqueSlug;
   }
@@ -195,7 +195,7 @@ public class RealmAggregate : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(RealmUpdated @event)
+  protected virtual void Handle(RealmUpdated @event)
   {
     if (@event.DisplayName != null)
     {

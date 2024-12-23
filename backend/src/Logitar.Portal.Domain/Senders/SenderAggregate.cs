@@ -135,18 +135,18 @@ public class SenderAggregate : AggregateRoot
         throw new SenderProviderNotSupportedException(provider);
     }
   }
-  protected virtual void Apply(EmailSenderCreated @event)
+  protected virtual void Handle(EmailSenderCreated @event)
   {
-    Apply((SenderCreated)@event);
+    Handle((SenderCreated)@event);
   }
-  protected virtual void Apply(SenderCreated @event)
+  protected virtual void Handle(SenderCreated @event)
   {
     _email = @event.Email;
 
     Type = @event.Provider.GetSenderType();
     Provider = @event.Provider;
   }
-  protected virtual void Apply(SmsSenderCreated @event)
+  protected virtual void Handle(SmsSenderCreated @event)
   {
     _phone = @event.Phone;
 
@@ -170,7 +170,7 @@ public class SenderAggregate : AggregateRoot
       Raise(new SenderSetDefault(isDefault), actorId);
     }
   }
-  protected virtual void Apply(SenderSetDefault @event)
+  protected virtual void Handle(SenderSetDefault @event)
   {
     IsDefault = @event.IsDefault;
   }
@@ -186,7 +186,7 @@ public class SenderAggregate : AggregateRoot
       Raise(new SenderMailgunSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderMailgunSettingsChanged @event)
+  protected virtual void Handle(SenderMailgunSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
@@ -202,7 +202,7 @@ public class SenderAggregate : AggregateRoot
       Raise(new SenderSendGridSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderSendGridSettingsChanged @event)
+  protected virtual void Handle(SenderSendGridSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
@@ -218,7 +218,7 @@ public class SenderAggregate : AggregateRoot
       Raise(new SenderTwilioSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderTwilioSettingsChanged @event)
+  protected virtual void Handle(SenderTwilioSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
@@ -231,7 +231,7 @@ public class SenderAggregate : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(SenderUpdated @event)
+  protected virtual void Handle(SenderUpdated @event)
   {
     if (@event.Email != null)
     {

@@ -26,7 +26,7 @@ public class DictionaryAggregate : AggregateRoot
   {
     Raise(new DictionaryCreated(locale), actorId);
   }
-  protected virtual void Apply(DictionaryCreated @event)
+  protected virtual void Handle(DictionaryCreated @event)
   {
     _locale = @event.Locale;
   }
@@ -69,7 +69,7 @@ public class DictionaryAggregate : AggregateRoot
       Raise(new DictionaryLocaleChanged(locale), actorId);
     }
   }
-  protected virtual void Apply(DictionaryLocaleChanged @event)
+  protected virtual void Handle(DictionaryLocaleChanged @event)
   {
     _locale = @event.Locale;
   }
@@ -84,7 +84,7 @@ public class DictionaryAggregate : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(DictionaryUpdated @event)
+  protected virtual void Handle(DictionaryUpdated @event)
   {
     foreach (KeyValuePair<Identifier, string?> entry in @event.Entries)
     {
