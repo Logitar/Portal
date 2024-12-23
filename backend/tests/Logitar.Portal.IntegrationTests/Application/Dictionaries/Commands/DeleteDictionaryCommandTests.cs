@@ -14,13 +14,13 @@ public class DeleteDictionaryCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public DeleteDictionaryCommandTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new Locale(Faker.Locale));
+    _dictionary = new(new LocaleUnit(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -41,7 +41,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   public async Task It_should_delete_an_existing_dictionary()
   {
     DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
     Assert.Equal(command.Id, dictionary.Id);
   }
@@ -50,7 +50,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_dictionary_cannot_be_found()
   {
     DeleteDictionaryCommand command = new(Guid.NewGuid());
-    Dictionary? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
   }
 
@@ -60,7 +60,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
-    Dictionary? result = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 }

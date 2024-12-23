@@ -88,7 +88,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.NotNull(Realm.DefaultLocale);
     SetRealm();
 
-    Locale locale = await CreateDictionariesAsync(TenantId);
+    LocaleUnit locale = await CreateDictionariesAsync(TenantId);
 
     await CreateSenderAsync(TenantId, provider);
     Assert.NotNull(_sender);
@@ -96,7 +96,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     await CreateTemplateAsync(TenantId, provider);
     Assert.NotNull(_template);
 
-    UniqueName uniqueName = new(Realm.UniqueNameSettings, _recipientSettings.Address);
+    UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, _recipientSettings.Address);
     UserAggregate user = new(uniqueName, TenantId);
     user.SetEmail(new EmailUnit(_recipientSettings.Address, isVerified: false));
     user.SetPhone(new PhoneUnit(_recipientSettings.PhoneNumber, countryCode: null, extension: null, isVerified: false));
@@ -113,7 +113,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     {
       user.MiddleName = new PersonNameUnit(string.Join(' ', names.Skip(1).Take(names.Length - 2)));
     }
-    user.Locale = ignoreUserLocale ? new Locale(Realm.DefaultLocale.Code) : locale;
+    user.Locale = ignoreUserLocale ? new LocaleUnit(Realm.DefaultLocale.Code) : locale;
     user.Update();
     await _userRepository.SaveAsync(user);
 
@@ -228,7 +228,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   {
     await CreateSenderAsync(TenantId, SenderProvider.Twilio);
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
     SetRealm();
@@ -250,7 +250,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   {
     await CreateSenderAsync(TenantId);
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
     await _userRepository.SaveAsync(user);
 
     SetRealm();
@@ -432,19 +432,19 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.Equal("RecipientsValidator", exception.Errors.Single().ErrorCode);
   }
 
-  private async Task<Locale> CreateDictionariesAsync(TenantId? tenantId = null)
+  private async Task<LocaleUnit> CreateDictionariesAsync(TenantId? tenantId = null)
   {
-    Locale locale = new("fr-CA");
-    DictionaryAggregate canadianFrench = new(locale, tenantId);
+    LocaleUnit locale = new("fr-CA");
+    Dictionary canadianFrench = new(locale, tenantId);
     canadianFrench.SetEntry("Hello", "Bonjour {name} !");
     canadianFrench.Update();
 
-    DictionaryAggregate french = new(new Locale("fr"), tenantId);
+    Dictionary french = new(new LocaleUnit("fr"), tenantId);
     french.SetEntry("Team", "L'équipe Logitar");
     french.Update();
 
     Assert.NotNull(Realm.DefaultLocale);
-    DictionaryAggregate @default = new(new Locale(Realm.DefaultLocale.Code), tenantId);
+    Dictionary @default = new(new LocaleUnit(Realm.DefaultLocale.Code), tenantId);
     @default.SetEntry("Cordially", "Cordially,");
     @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
     @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");

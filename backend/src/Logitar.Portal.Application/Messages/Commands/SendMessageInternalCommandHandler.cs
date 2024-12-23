@@ -39,7 +39,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
   {
     ActorId actorId = command.ActorId;
     TenantId? tenantId = command.TenantId;
-    Locale? defaultLocale = command.DefaultLocale;
+    LocaleUnit? defaultLocale = command.DefaultLocale;
 
     SendMessagePayload payload = command.Payload;
     SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
@@ -48,10 +48,10 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     Recipients allRecipients = await ResolveRecipientsAsync(payload, sender.Type, cancellationToken);
     TemplateAggregate template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
 
-    Dictionary<Locale, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
+    Dictionary<LocaleUnit, Dictionary> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
     bool ignoreUserLocale = payload.IgnoreUserLocale;
-    Locale? targetLocale = Locale.TryCreate(payload.Locale);
+    LocaleUnit? targetLocale = LocaleUnit.TryCreate(payload.Locale);
     Dictionaries defaultDictionaries = new(allDictionaries, targetLocale, defaultLocale);
 
     Variables variables = new(payload.Variables);
@@ -66,7 +66,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
         ? defaultDictionaries : new(allDictionaries, recipient.User.Locale, defaultLocale);
 
       SubjectUnit subject = new(dictionaries.Translate(template.Subject.Value));
-      Locale? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
+      LocaleUnit? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
       ContentUnit body = await _sender.Send(new CompileTemplateCommand(id, template, dictionaries, locale, recipient.User, variables), cancellationToken);
       IReadOnlyCollection<RecipientUnit> recipients = [recipient, .. allRecipients.CC, .. allRecipients.Bcc];
 

@@ -18,11 +18,11 @@ internal class DictionaryClientTests : IClientTests
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
       CreateDictionaryPayload create = new("en");
-      Dictionary dictionary = await _client.CreateAsync(create, context.Request);
+      DictionaryModel dictionary = await _client.CreateAsync(create, context.Request);
       CreateDictionaryPayload createFr = new("fr");
-      Dictionary dictionaryFr = await _client.CreateAsync(createFr, context.Request);
+      DictionaryModel dictionaryFr = await _client.CreateAsync(createFr, context.Request);
       CreateDictionaryPayload createFrCa = new("fr-CA");
-      Dictionary dictionaryFrCa = await _client.CreateAsync(createFrCa, context.Request);
+      DictionaryModel dictionaryFrCa = await _client.CreateAsync(createFrCa, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -32,7 +32,7 @@ internal class DictionaryClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Dictionary? notFound = await _client.ReadAsync(Guid.NewGuid(), locale: null, context.Request);
+      DictionaryModel? notFound = await _client.ReadAsync(Guid.NewGuid(), locale: null, context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The dictionary should not be found.");
@@ -47,7 +47,7 @@ internal class DictionaryClientTests : IClientTests
         IsEmpty = true
       };
       search.Search.Terms.Add(new SearchTerm($"%{dictionary.Locale.Code}%"));
-      SearchResults<Dictionary> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<DictionaryModel> results = await _client.SearchAsync(search, context.Request);
       dictionary = results.Items.Single();
       context.Succeed();
 

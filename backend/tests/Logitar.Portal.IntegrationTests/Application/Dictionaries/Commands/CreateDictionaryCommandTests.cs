@@ -14,13 +14,13 @@ public class CreateDictionaryCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public CreateDictionaryCommandTests() : base()
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new Locale(Faker.Locale));
+    _dictionary = new(new LocaleUnit(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -44,7 +44,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
 
     CreateDictionaryPayload payload = new(Faker.Locale);
     CreateDictionaryCommand command = new(payload);
-    Dictionary dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel dictionary = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
     Assert.Equal(0, dictionary.EntryCount);

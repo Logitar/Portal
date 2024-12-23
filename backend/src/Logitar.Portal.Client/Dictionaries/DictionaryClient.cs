@@ -14,26 +14,26 @@ internal class DictionaryClient : BaseClient, IDictionaryClient
   {
   }
 
-  public async Task<Dictionary> CreateAsync(CreateDictionaryPayload payload, IRequestContext? context)
+  public async Task<DictionaryModel> CreateAsync(CreateDictionaryPayload payload, IRequestContext? context)
   {
-    return await PostAsync<Dictionary>(UriPath, payload, context)
+    return await PostAsync<DictionaryModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<Dictionary?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<DictionaryModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<Dictionary>(uri, context);
+    return await DeleteAsync<DictionaryModel>(uri, context);
   }
 
-  public async Task<Dictionary?> ReadAsync(Guid? id, string? locale, IRequestContext? context)
+  public async Task<DictionaryModel?> ReadAsync(Guid? id, string? locale, IRequestContext? context)
   {
-    Dictionary<Guid, Dictionary> dictionaries = new(capacity: 2);
+    Dictionary<Guid, DictionaryModel> dictionaries = new(capacity: 2);
 
     if (id.HasValue)
     {
       Uri uri = new($"{Path}/{id}", UriKind.Relative);
-      Dictionary? dictionary = await GetAsync<Dictionary>(uri, context);
+      DictionaryModel? dictionary = await GetAsync<DictionaryModel>(uri, context);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;
@@ -43,7 +43,7 @@ internal class DictionaryClient : BaseClient, IDictionaryClient
     if (!string.IsNullOrWhiteSpace(locale))
     {
       Uri uri = new($"{Path}/locale:{locale}", UriKind.Relative);
-      Dictionary? dictionary = await GetAsync<Dictionary>(uri, context);
+      DictionaryModel? dictionary = await GetAsync<DictionaryModel>(uri, context);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;
@@ -52,19 +52,19 @@ internal class DictionaryClient : BaseClient, IDictionaryClient
 
     if (dictionaries.Count > 1)
     {
-      throw new TooManyResultsException<Dictionary>(expectedCount: 1, actualCount: dictionaries.Count);
+      throw new TooManyResultsException<DictionaryModel>(expectedCount: 1, actualCount: dictionaries.Count);
     }
 
     return dictionaries.Values.SingleOrDefault();
   }
 
-  public async Task<Dictionary?> ReplaceAsync(Guid id, ReplaceDictionaryPayload payload, long? version, IRequestContext? context)
+  public async Task<DictionaryModel?> ReplaceAsync(Guid id, ReplaceDictionaryPayload payload, long? version, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath($"{Path}/{id}").SetVersion(version).BuildUri(UriKind.Relative);
-    return await PutAsync<Dictionary>(uri, payload, context);
+    return await PutAsync<DictionaryModel>(uri, payload, context);
   }
 
-  public async Task<SearchResults<Dictionary>> SearchAsync(SearchDictionariesPayload payload, IRequestContext? context)
+  public async Task<SearchResults<DictionaryModel>> SearchAsync(SearchDictionariesPayload payload, IRequestContext? context)
   {
     IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
     if (payload.IsEmpty.HasValue)
@@ -73,13 +73,13 @@ internal class DictionaryClient : BaseClient, IDictionaryClient
     }
     Uri uri = builder.BuildUri(UriKind.Relative);
 
-    return await GetAsync<SearchResults<Dictionary>>(uri, context)
+    return await GetAsync<SearchResults<DictionaryModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 
-  public async Task<Dictionary?> UpdateAsync(Guid id, UpdateDictionaryPayload payload, IRequestContext? context)
+  public async Task<DictionaryModel?> UpdateAsync(Guid id, UpdateDictionaryPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await PatchAsync<Dictionary>(uri, payload, context);
+    return await PatchAsync<DictionaryModel>(uri, payload, context);
   }
 }

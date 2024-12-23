@@ -5,5 +5,5 @@ namespace Logitar.Portal.Application.Dictionaries;
 
 public interface IDictionaryManager
 {
-  Task SaveAsync(DictionaryAggregate dictionary, ActorId actorId = default, CancellationToken cancellationToken = default);
+  Task SaveAsync(Dictionary dictionary, ActorId actorId = default, CancellationToken cancellationToken = default);
 }
