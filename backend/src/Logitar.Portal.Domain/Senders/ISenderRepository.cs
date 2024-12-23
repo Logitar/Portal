@@ -4,11 +4,12 @@ namespace Logitar.Portal.Domain.Senders;
 
 public interface ISenderRepository
 {
-  Task<SenderAggregate?> LoadAsync(SenderId id, long? version, CancellationToken cancellationToken = default);
-  Task<IReadOnlyCollection<SenderAggregate>> LoadAsync(CancellationToken cancellationToken = default);
-  Task<IReadOnlyCollection<SenderAggregate>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
-  Task<SenderAggregate?> LoadDefaultAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
+  Task<Sender?> LoadAsync(SenderId id, CancellationToken cancellationToken = default);
+  Task<Sender?> LoadAsync(SenderId id, long? version, CancellationToken cancellationToken = default);
+  Task<IReadOnlyCollection<Sender>> LoadAsync(CancellationToken cancellationToken = default);
+  Task<IReadOnlyCollection<Sender>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
+  Task<Sender?> LoadDefaultAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
 
-  Task SaveAsync(SenderAggregate sender, CancellationToken cancellationToken = default);
-  Task SaveAsync(IEnumerable<SenderAggregate> senders, CancellationToken cancellationToken = default);
+  Task SaveAsync(Sender sender, CancellationToken cancellationToken = default);
+  Task SaveAsync(IEnumerable<Sender> senders, CancellationToken cancellationToken = default);
 }

@@ -14,37 +14,37 @@ internal class SenderClient : BaseClient, ISenderClient
   {
   }
 
-  public async Task<Sender> CreateAsync(CreateSenderPayload payload, IRequestContext? context)
+  public async Task<SenderModel> CreateAsync(CreateSenderPayload payload, IRequestContext? context)
   {
-    return await PostAsync<Sender>(UriPath, payload, context)
+    return await PostAsync<SenderModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<Sender?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<SenderModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<Sender>(uri, context);
+    return await DeleteAsync<SenderModel>(uri, context);
   }
 
-  public async Task<Sender?> ReadAsync(Guid id, IRequestContext? context)
+  public async Task<SenderModel?> ReadAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await GetAsync<Sender>(uri, context);
+    return await GetAsync<SenderModel>(uri, context);
   }
 
-  public async Task<Sender?> ReadDefaultAsync(IRequestContext? context)
+  public async Task<SenderModel?> ReadDefaultAsync(IRequestContext? context)
   {
     Uri uri = new($"{Path}/default", UriKind.Relative);
-    return await GetAsync<Sender>(uri, context);
+    return await GetAsync<SenderModel>(uri, context);
   }
 
-  public async Task<Sender?> ReplaceAsync(Guid id, ReplaceSenderPayload payload, long? version, IRequestContext? context)
+  public async Task<SenderModel?> ReplaceAsync(Guid id, ReplaceSenderPayload payload, long? version, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath($"{Path}/{id}").SetVersion(version).BuildUri(UriKind.Relative);
-    return await PutAsync<Sender>(uri, payload, context);
+    return await PutAsync<SenderModel>(uri, payload, context);
   }
 
-  public async Task<SearchResults<Sender>> SearchAsync(SearchSendersPayload payload, IRequestContext? context)
+  public async Task<SearchResults<SenderModel>> SearchAsync(SearchSendersPayload payload, IRequestContext? context)
   {
     IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
     if (payload.Provider.HasValue)
@@ -53,19 +53,19 @@ internal class SenderClient : BaseClient, ISenderClient
     }
     Uri uri = builder.BuildUri(UriKind.Relative);
 
-    return await GetAsync<SearchResults<Sender>>(uri, context)
+    return await GetAsync<SearchResults<SenderModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 
-  public async Task<Sender?> SetDefaultAsync(Guid id, IRequestContext? context)
+  public async Task<SenderModel?> SetDefaultAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}/default", UriKind.Relative);
-    return await PatchAsync<Sender>(uri, content: null, context);
+    return await PatchAsync<SenderModel>(uri, content: null, context);
   }
 
-  public async Task<Sender?> UpdateAsync(Guid id, UpdateSenderPayload payload, IRequestContext? context)
+  public async Task<SenderModel?> UpdateAsync(Guid id, UpdateSenderPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await PatchAsync<Sender>(uri, payload, context);
+    return await PatchAsync<SenderModel>(uri, payload, context);
   }
 }

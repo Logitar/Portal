@@ -21,7 +21,7 @@ internal class SenderClientTests : IClientTests
     try
     {
       context.SetName(_client.GetType(), nameof(_client.ReadDefaultAsync));
-      Sender? @default = await _client.ReadDefaultAsync(context.Request);
+      SenderModel? @default = await _client.ReadDefaultAsync(context.Request);
       if (@default != null)
       {
         throw new InvalidOperationException("The default sender should be null.");
@@ -29,7 +29,7 @@ internal class SenderClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
-      Sender sender = await _client.CreateAsync(_createPayload, context.Request);
+      SenderModel sender = await _client.CreateAsync(_createPayload, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -39,7 +39,7 @@ internal class SenderClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Sender? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
+      SenderModel? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The sender should not be found.");
@@ -54,7 +54,7 @@ internal class SenderClientTests : IClientTests
         Provider = sender.Provider
       };
       search.Search.Terms.Add(new SearchTerm($"{sender.EmailAddress?.Split('@').First()}%"));
-      SearchResults<Sender> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<SenderModel> results = await _client.SearchAsync(search, context.Request);
       sender = results.Items.Single();
       context.Succeed();
 

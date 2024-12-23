@@ -69,7 +69,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
 
     if (payload.Email != null)
     {
-      EmailUnit email = payload.Email.ToEmailUnit();
+      Email email = payload.Email.ToEmail();
       subject.AddClaim(new(Rfc7519ClaimNames.EmailAddress, email.Address));
       subject.AddClaim(new(Rfc7519ClaimNames.IsEmailVerified, email.IsVerified.ToString()));
     }

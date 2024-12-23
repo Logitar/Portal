@@ -60,26 +60,12 @@ public record Recipient
         .WithErrorCode("RecipientValidator")
         .WithMessage(x => $"At least one of the following must be specified: {nameof(x.Address)}, {nameof(x.PhoneNumber)}.");
 
-      When(x => x.Address != null, () => RuleFor(x => x.Address!).NotEmpty().MaximumLength(Email.MaximumLength).EmailAddress());
+      When(x => x.Address != null, () => RuleFor(x => x.Address!).EmailAddressInput());
       When(x => x.DisplayName != null, () => RuleFor(x => x.DisplayName!).DisplayName());
 
-      When(x => x.PhoneNumber != null, () => RuleFor(x => x.PhoneNumber!).NotEmpty().MaximumLength(byte.MaxValue)
-        .Must(BeAValidPhone).WithErrorCode("PhoneNumberValidator").WithMessage("'{PropertyName}' must be a valid phone number."));
+      When(x => x.PhoneNumber != null, () => RuleFor(x => x.PhoneNumber!).PhoneNumber());
 
       When(x => x.User != null, () => RuleFor(x => x.UserId).NotNull());
-    }
-
-    private static bool BeAValidPhone(string phoneNumber)
-    {
-      try
-      {
-        Phone phone = new(phoneNumber);
-        return true;
-      }
-      catch (Exception)
-      {
-        return false;
-      }
     }
   }
 }

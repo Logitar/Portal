@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Senders;
 
-public class Sender : Aggregate
+public class SenderModel : Aggregate
 {
   public bool IsDefault { get; set; }
 
@@ -18,11 +18,11 @@ public class Sender : Aggregate
 
   public RealmModel? Realm { get; set; }
 
-  public Sender() : this(string.Empty)
+  public SenderModel() : this(string.Empty)
   {
   }
 
-  public Sender(string emailAddress)
+  public SenderModel(string emailAddress)
   {
     EmailAddress = emailAddress;
   }

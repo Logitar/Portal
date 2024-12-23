@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
-public record SendEmailCommand(ActorId ActorId, MessageAggregate Message, SenderAggregate Sender) : IRequest;
+public record SendEmailCommand(ActorId ActorId, MessageAggregate Message, Sender Sender) : IRequest;

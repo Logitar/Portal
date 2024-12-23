@@ -70,12 +70,12 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     }
     if (payload.Email != null)
     {
-      EmailUnit email = payload.Email.ToEmailUnit();
+      Email email = payload.Email.ToEmail();
       user.SetEmail(email, actorId);
     }
     if (payload.Phone != null)
     {
-      PhoneUnit phone = payload.Phone.ToPhoneUnit();
+      Phone phone = payload.Phone.ToPhone();
       user.SetPhone(phone, actorId);
     }
 

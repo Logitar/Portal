@@ -51,7 +51,7 @@ public class ReadMessageQueryTests : IntegrationTests
   {
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    SenderAggregate sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);
 
     UniqueKeyUnit uniqueKey = new("PasswordRecovery");
