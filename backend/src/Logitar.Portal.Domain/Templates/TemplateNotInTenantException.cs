@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Templates;
 
@@ -6,32 +6,32 @@ public class TemplateNotInTenantException : Exception
 {
   public const string ErrorMessage = "The specified template is not in the specified tenant.";
 
-  public TemplateId TemplateId
+  public string TemplateId
   {
-    get => new((string)Data[nameof(TemplateId)]!);
-    private set => Data[nameof(TemplateId)] = value.Value;
+    get => (string)Data[nameof(TemplateId)]!;
+    private set => Data[nameof(TemplateId)] = value;
   }
-  public TenantId? ExpectedTenantId
+  public string? ExpectedTenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(ExpectedTenantId)]);
-    private set => Data[nameof(ExpectedTenantId)] = value?.Value;
+    get => (string?)Data[nameof(ExpectedTenantId)];
+    private set => Data[nameof(ExpectedTenantId)] = value;
   }
-  public TenantId? ActualTenantId
+  public string? ActualTenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(ActualTenantId)]);
-    private set => Data[nameof(ActualTenantId)] = value?.Value;
+    get => (string?)Data[nameof(ActualTenantId)];
+    private set => Data[nameof(ActualTenantId)] = value;
   }
 
   public TemplateNotInTenantException(TemplateAggregate template, TenantId? expectedTenant) : base(BuildMessage(template, expectedTenant))
   {
-    TemplateId = template.Id;
-    ExpectedTenantId = expectedTenant;
-    ActualTenantId = template.TenantId;
+    TemplateId = template.Id.Value;
+    ExpectedTenantId = expectedTenant?.Value;
+    ActualTenantId = template.TenantId?.Value;
   }
 
   private static string BuildMessage(TemplateAggregate template, TenantId? expectedTenant) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TemplateId), template.Id.Value)
-    .AddData(nameof(ExpectedTenantId), expectedTenant?.Value, "<null>")
-    .AddData(nameof(ActualTenantId), template.TenantId?.Value, "<null>")
+    .AddData(nameof(TemplateId), template.Id)
+    .AddData(nameof(ExpectedTenantId), expectedTenant, "<null>")
+    .AddData(nameof(ActualTenantId), template.TenantId, "<null>")
     .Build();
 }

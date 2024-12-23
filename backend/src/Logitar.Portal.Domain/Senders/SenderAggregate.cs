@@ -14,7 +14,6 @@ public class SenderAggregate : AggregateRoot
   private SenderUpdated _updated = new();
 
   public new SenderId Id => new(base.Id);
-
   public TenantId? TenantId => Id.TenantId;
   public EntityId EntityId => Id.EntityId;
 

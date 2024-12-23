@@ -1,87 +1,83 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Templates.Events;
 
 namespace Logitar.Portal.Domain.Templates;
 
 public class TemplateAggregate : AggregateRoot
 {
-  private TemplateUpdatedEvent _updatedEvent = new();
+  private TemplateUpdated _updated = new();
 
   public new TemplateId Id => new(base.Id);
+  public TenantId? TenantId => Id.TenantId;
+  public EntityId EntityId => Id.EntityId;
 
-  public TenantId? TenantId { get; private set; }
-
-  private UniqueKeyUnit? _uniqueKey = null;
-  public UniqueKeyUnit UniqueKey => _uniqueKey ?? throw new InvalidOperationException($"The {nameof(UniqueKey)} has not been initialized yet.");
-  private DisplayNameUnit? _displayName = null;
-  public DisplayNameUnit? DisplayName
+  private Identifier? _uniqueKey = null;
+  public Identifier UniqueKey => _uniqueKey ?? throw new InvalidOperationException($"The {nameof(UniqueKey)} has not been initialized yet.");
+  private DisplayName? _displayName = null;
+  public DisplayName? DisplayName
   {
     get => _displayName;
     set
     {
-      if (value != _displayName)
+      if (_displayName != value)
       {
         _displayName = value;
-        _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Change<DisplayName>(value);
       }
     }
   }
-  private DescriptionUnit? _description = null;
-  public DescriptionUnit? Description
+  private Description? _description = null;
+  public Description? Description
   {
     get => _description;
     set
     {
-      if (value != _description)
+      if (_description != value)
       {
         _description = value;
-        _updatedEvent.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Change<Description>(value);
       }
     }
   }
 
-  private SubjectUnit? _subject = null;
-  public SubjectUnit Subject
+  private Subject? _subject = null;
+  public Subject Subject
   {
     get => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
     set
     {
-      if (value != _subject)
+      if (_subject != value)
       {
         _subject = value;
-        _updatedEvent.Subject = value;
+        _updated.Subject = value;
       }
     }
   }
-  private ContentUnit? _content = null;
-  public ContentUnit Content
+  private Content? _content = null;
+  public Content Content
   {
     get => _content ?? throw new InvalidOperationException($"The {nameof(Content)} has not been initialized yet.");
     set
     {
-      if (value != _content)
+      if (_content != value)
       {
         _content = value;
-        _updatedEvent.Content = value;
+        _updated.Content = value;
       }
     }
   }
 
-  public TemplateAggregate(AggregateId id) : base(id)
+  public TemplateAggregate() : base()
   {
   }
 
-  public TemplateAggregate(UniqueKeyUnit uniqueKey, SubjectUnit subject, ContentUnit content, TenantId? tenantId = null,
-    ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).AggregateId)
+  public TemplateAggregate(Identifier uniqueKey, Subject subject, Content content, ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).StreamId)
   {
-    Raise(new TemplateCreatedEvent(tenantId, uniqueKey, subject, content), actorId);
+    Raise(new TemplateCreated(uniqueKey, subject, content), actorId);
   }
-  protected virtual void Apply(TemplateCreatedEvent @event)
+  protected virtual void Apply(TemplateCreated @event)
   {
-    TenantId = @event.TenantId;
-
     _uniqueKey = @event.UniqueKey;
 
     _subject = @event.Subject;
@@ -92,31 +88,31 @@ public class TemplateAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new TemplateDeletedEvent(), actorId);
+      Raise(new TemplateDeleted(), actorId);
     }
   }
 
-  public void SetUniqueKey(UniqueKeyUnit uniqueKey, ActorId actorId = default)
+  public void SetUniqueKey(Identifier uniqueKey, ActorId actorId = default)
   {
     if (uniqueKey != _uniqueKey)
     {
-      Raise(new TemplateUniqueKeyChangedEvent(uniqueKey), actorId);
+      Raise(new TemplateUniqueKeyChanged(uniqueKey), actorId);
     }
   }
-  protected virtual void Apply(TemplateUniqueKeyChangedEvent @event)
+  protected virtual void Apply(TemplateUniqueKeyChanged @event)
   {
     _uniqueKey = @event.UniqueKey;
   }
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
-  protected virtual void Apply(TemplateUpdatedEvent @event)
+  protected virtual void Apply(TemplateUpdated @event)
   {
     if (@event.DisplayName != null)
     {
