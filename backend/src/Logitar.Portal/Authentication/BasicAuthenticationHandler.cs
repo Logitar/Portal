@@ -47,7 +47,7 @@ internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthentic
           {
             AuthenticateUserPayload payload = new(uniqueName: credentials[..index], password: credentials[(index + 1)..]);
             AuthenticateUserCommand command = new(payload);
-            User user = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
+            UserModel user = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
 
             Context.SetUser(user);
 

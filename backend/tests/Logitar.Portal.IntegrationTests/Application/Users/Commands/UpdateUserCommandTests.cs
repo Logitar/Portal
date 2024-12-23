@@ -33,7 +33,7 @@ public class UpdateUserCommandTests : IntegrationTests
   {
     UpdateUserPayload payload = new();
     UpdateUserCommand command = new(Guid.NewGuid(), payload);
-    User? user = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -46,7 +46,7 @@ public class UpdateUserCommandTests : IntegrationTests
 
     UpdateUserPayload payload = new();
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -149,7 +149,7 @@ public class UpdateUserCommandTests : IntegrationTests
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
     UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.NotNull(result.PasswordChangedBy);

@@ -2,9 +2,9 @@
 
 namespace Logitar.Portal.Contracts.Users;
 
-public abstract record Contact
+public abstract record ContactModel
 {
   public bool IsVerified { get; set; }
-  public Actor? VerifiedBy { get; set; }
+  public ActorModel? VerifiedBy { get; set; }
   public DateTime? VerifiedOn { get; set; }
 }

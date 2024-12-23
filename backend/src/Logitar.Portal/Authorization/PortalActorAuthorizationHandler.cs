@@ -19,7 +19,7 @@ internal class PortalActorAuthorizationHandler : AuthorizationHandler<PortalActo
     HttpContext? httpContext = _httpContextAccessor.HttpContext;
     if (httpContext != null)
     {
-      User? user = httpContext.GetUser();
+      UserModel? user = httpContext.GetUser();
       if (user != null)
       {
         if (user.Realm == null)

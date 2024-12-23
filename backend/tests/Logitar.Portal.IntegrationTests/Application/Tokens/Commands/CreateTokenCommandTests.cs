@@ -40,7 +40,7 @@ public class CreateTokenCommandTests : IntegrationTests
       Type = "Custom+JWT"
     };
     CreateTokenCommand command = new(payload);
-    CreatedToken createdToken = await ActivityPipeline.ExecuteAsync(command);
+    CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(command);
 
     TokenValidationParameters validationParameters = new()
     {
@@ -70,7 +70,7 @@ public class CreateTokenCommandTests : IntegrationTests
       Email = new EmailPayload(Faker.Person.Email, isVerified: true)
     };
     CreateTokenCommand command = new(payload);
-    CreatedToken createdToken = await ActivityPipeline.ExecuteAsync(command);
+    CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(command);
 
     string baseUrl = _baseUrl.Value.TrimEnd('/');
     TokenValidationParameters validationParameters = new()
@@ -102,7 +102,7 @@ public class CreateTokenCommandTests : IntegrationTests
     payload.Claims.Add(new(Rfc7519ClaimNames.FirstName, Faker.Person.FirstName));
     payload.Claims.Add(new(Rfc7519ClaimNames.LastName, Faker.Person.LastName));
     CreateTokenCommand command = new(payload);
-    CreatedToken createdToken = await ActivityPipeline.ExecuteAsync(command);
+    CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(command);
 
     TokenValidationParameters validationParameters = new()
     {

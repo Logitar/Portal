@@ -24,7 +24,7 @@ public class AccountController : ControllerBase
   {
     User = User
   };
-  protected new User User => HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
+  protected new UserModel User => HttpContext.GetUser() ?? throw new InvalidOperationException("The User is required.");
 
   public AccountController(IActivityPipeline activityPipeline)
   {
@@ -33,11 +33,11 @@ public class AccountController : ControllerBase
 
   [Authorize(Policy = Policies.PortalUser)]
   [HttpGet("profile")]
-  public ActionResult<User> GetProfile() => Ok(User);
+  public ActionResult<UserModel> GetProfile() => Ok(User);
 
   [Authorize(Policy = Policies.PortalUser)]
   [HttpPatch("profile")]
-  public async Task<ActionResult<User>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<UserModel>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
   {
     UpdateUserPayload payload = model.ToPayload();
     UpdateUserCommand command = new(User.Id, payload);
@@ -45,13 +45,13 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<SessionModel>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
   {
     try
     {
       SignInSessionPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
       SignInSessionCommand command = new(payload);
-      SessionModel session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
+      Session session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
       HttpContext.SignIn(session);
 
       return Ok(session);

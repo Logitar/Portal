@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Senders;
 
-public class SenderModel : Aggregate
+public class SenderModel : AggregateModel
 {
   public bool IsDefault { get; set; }
 

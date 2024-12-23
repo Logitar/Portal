@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Realms;
 
-public class RealmModel : Aggregate
+public class RealmModel : AggregateModel
 {
   public string UniqueSlug { get; set; }
   public string? DisplayName { get; set; }

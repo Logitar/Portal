@@ -44,14 +44,14 @@ internal class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthent
               Type = "at+jwt"
             };
             ValidateTokenCommand command = new(payload);
-            ValidatedToken validatedToken = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
+            ValidatedTokenModel validatedToken = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
             if (string.IsNullOrWhiteSpace(validatedToken.Subject))
             {
               return AuthenticateResult.Fail($"The '{nameof(validatedToken.Subject)}' claim is required.");
             }
 
             ReadUserQuery query = new(Id: Guid.Parse(validatedToken.Subject.Trim()), UniqueName: null, Identifier: null);
-            User? user = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
+            UserModel? user = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
             if (user == null)
             {
               return AuthenticateResult.Fail($"The user 'Id={validatedToken.Subject}' could not be found.");

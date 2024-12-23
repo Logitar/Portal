@@ -4,21 +4,21 @@ using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.Users;
 
-public class User : Aggregate
+public class UserModel : AggregateModel
 {
   public string UniqueName { get; set; }
 
   public bool HasPassword { get; set; }
-  public Actor? PasswordChangedBy { get; set; }
+  public ActorModel? PasswordChangedBy { get; set; }
   public DateTime? PasswordChangedOn { get; set; }
 
-  public Actor? DisabledBy { get; set; }
+  public ActorModel? DisabledBy { get; set; }
   public DateTime? DisabledOn { get; set; }
   public bool IsDisabled { get; set; }
 
-  public Address? Address { get; set; }
-  public Email? Email { get; set; }
-  public Phone? Phone { get; set; }
+  public AddressModel? Address { get; set; }
+  public EmailModel? Email { get; set; }
+  public PhoneModel? Phone { get; set; }
   public bool IsConfirmed { get; set; }
 
   public string? FirstName { get; set; }
@@ -44,11 +44,11 @@ public class User : Aggregate
 
   public RealmModel? Realm { get; set; }
 
-  public User() : this(string.Empty)
+  public UserModel() : this(string.Empty)
   {
   }
 
-  public User(string uniqueName)
+  public UserModel(string uniqueName)
   {
     UniqueName = uniqueName;
     CustomAttributes = [];

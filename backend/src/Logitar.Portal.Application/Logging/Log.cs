@@ -1,8 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Microsoft.Extensions.Logging;
 
@@ -51,20 +48,20 @@ public class Log
   {
     get
     {
-      if (UserId != null)
+      if (UserId.HasValue)
       {
         return new(UserId.Value);
       }
-      else if (ApiKeyId != null)
+      else if (ApiKeyId.HasValue)
       {
         return new(ApiKeyId.Value);
       }
       return new ActorId();
     }
   }
-  public ApiKeyId? ApiKeyId { get; set; }
-  public UserId? UserId { get; set; }
-  public SessionId? SessionId { get; set; }
+  public Guid? ApiKeyId { get; set; }
+  public Guid? UserId { get; set; }
+  public Guid? SessionId { get; set; }
 
   private readonly List<DomainEvent> _events = [];
   public IReadOnlyCollection<DomainEvent> Events => _events.AsReadOnly();

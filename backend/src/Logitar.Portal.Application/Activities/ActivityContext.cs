@@ -6,4 +6,4 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Activities;
 
-public record ActivityContext(ConfigurationModel Configuration, RealmModel? Realm, ApiKeyModel? ApiKey, User? User, SessionModel? Session);
+public record ActivityContext(ConfigurationModel Configuration, RealmModel? Realm, ApiKeyModel? ApiKey, UserModel? User, SessionModel? Session);

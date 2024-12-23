@@ -101,7 +101,7 @@ internal class RealmQuerier : IRealmQuerier
   private async Task<IEnumerable<RealmModel>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = realms.SelectMany(user => user.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return realms.Select(mapper.ToRealm);

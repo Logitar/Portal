@@ -15,5 +15,5 @@ public record CreateTokenPayload
 
   public string? Subject { get; set; }
   public EmailPayload? Email { get; set; }
-  public List<TokenClaim> Claims { get; set; } = [];
+  public List<ClaimModel> Claims { get; set; } = [];
 }

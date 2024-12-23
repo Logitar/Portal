@@ -2,18 +2,18 @@
 
 namespace Logitar.Portal.Contracts.Users;
 
-public record Phone : Contact, IPhone
+public record PhoneModel : ContactModel, IPhone
 {
   public string? CountryCode { get; set; }
   public string Number { get; set; }
   public string? Extension { get; set; }
   public string E164Formatted { get; set; }
 
-  public Phone() : this(null, string.Empty, null, string.Empty)
+  public PhoneModel() : this(null, string.Empty, null, string.Empty)
   {
   }
 
-  public Phone(string? countryCode, string number, string? extension, string e164Formatted)
+  public PhoneModel(string? countryCode, string number, string? extension, string e164Formatted)
   {
     CountryCode = countryCode;
     Number = number;

@@ -11,7 +11,7 @@ public record Recipient
 
   public string? PhoneNumber { get; set; }
 
-  public User? User { get; set; }
+  public UserModel? User { get; set; }
 
   public Recipient() : this(string.Empty)
   {

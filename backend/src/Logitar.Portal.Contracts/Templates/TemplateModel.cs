@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Templates;
 
-public class TemplateModel : Aggregate
+public class TemplateModel : AggregateModel
 {
   public string UniqueKey { get; set; }
   public string? DisplayName { get; set; }

@@ -4,7 +4,7 @@ using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
-internal class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, SearchResults<User>>
+internal class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, SearchResults<UserModel>>
 {
   private readonly IUserQuerier _sessionQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, Searc
     _sessionQuerier = sessionQuerier;
   }
 
-  public async Task<SearchResults<User>> Handle(SearchUsersQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<UserModel>> Handle(SearchUsersQuery query, CancellationToken cancellationToken)
   {
     return await _sessionQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }

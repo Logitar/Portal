@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Roles;
 
-public class RoleModel : Aggregate
+public class RoleModel : AggregateModel
 {
   public string UniqueName { get; set; }
   public string? DisplayName { get; set; }

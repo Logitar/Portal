@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Actors;
 
 namespace Logitar.Portal.GraphQL;
 
-internal abstract class AggregateGraphType<T> : ObjectGraphType<T> where T : Aggregate
+internal abstract class AggregateGraphType<T> : ObjectGraphType<T> where T : AggregateModel
 {
   protected AggregateGraphType(string? description = null)
   {

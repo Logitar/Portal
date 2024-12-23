@@ -120,7 +120,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     await userRepository.SaveAsync(userAggregate);
 
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    User? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
     SetUser(user);
   }
   protected IDeleteBuilder CreateDeleteBuilder(TableId table) => _databaseProvider switch
@@ -137,12 +137,12 @@ public abstract class IntegrationTests : IAsyncLifetime
   {
     _context.ApiKey = apiKey;
   }
-  protected void SetUser(User? user)
+  protected void SetUser(UserModel? user)
   {
     _context.User = user;
     _context.Session = null;
   }
-  protected void SetSession(SessionModel? session)
+  protected void SetSession(Session? session)
   {
     _context.User = session?.User;
     _context.Session = session;

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.GraphQL.Users;
 
-internal class EmailGraphType : ContactGraphType<Email>
+internal class EmailGraphType : ContactGraphType<EmailModel>
 {
   public EmailGraphType() : base("Represents an email address.")
   {

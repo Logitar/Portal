@@ -17,19 +17,19 @@ public abstract record Activity : IActivity
   protected ActivityContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
 
   [JsonIgnore]
-  public Actor Actor
+  public ActorModel Actor
   {
     get
     {
       if (Context.User != null)
       {
-        return new Actor(Context.User);
+        return new ActorModel(Context.User);
       }
       else if (Context.ApiKey != null)
       {
-        return new Actor(Context.ApiKey);
+        return new ActorModel(Context.ApiKey);
       }
-      return Actor.System;
+      return ActorModel.System;
     }
   }
   [JsonIgnore]
