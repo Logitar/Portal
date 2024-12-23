@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
-public record SenderSetDefaultEvent(bool IsDefault) : DomainEvent, INotification;
+public record SenderSetDefault(bool IsDefault) : DomainEvent, INotification;

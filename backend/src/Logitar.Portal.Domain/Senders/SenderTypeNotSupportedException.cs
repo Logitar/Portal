@@ -10,8 +10,7 @@ public class SenderTypeNotSupportedException : NotSupportedException
     private set => Data[nameof(SenderType)] = value;
   }
 
-  public SenderTypeNotSupportedException(SenderType senderType)
-    : base(BuildMessage(senderType))
+  public SenderTypeNotSupportedException(SenderType senderType) : base(BuildMessage(senderType))
   {
     SenderType = senderType;
   }

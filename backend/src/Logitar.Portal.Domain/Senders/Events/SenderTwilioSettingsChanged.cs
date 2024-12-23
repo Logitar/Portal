@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
-public record SenderTwilioSettingsChangedEvent(ReadOnlyTwilioSettings Settings) : DomainEvent, INotification;
+public record SenderTwilioSettingsChanged(ReadOnlyTwilioSettings Settings) : DomainEvent, INotification;

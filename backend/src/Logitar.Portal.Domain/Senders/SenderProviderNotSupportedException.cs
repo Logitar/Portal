@@ -12,8 +12,7 @@ public class SenderProviderNotSupportedException : NotSupportedException
     private set => Data[nameof(SenderProvider)] = value;
   }
 
-  public SenderProviderNotSupportedException(SenderProvider senderProvider)
-    : base(BuildMessage(senderProvider))
+  public SenderProviderNotSupportedException(SenderProvider senderProvider) : base(BuildMessage(senderProvider))
   {
     SenderProvider = senderProvider;
   }

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
-public record SenderSendGridSettingsChangedEvent(ReadOnlySendGridSettings Settings) : DomainEvent, INotification;
+public record SenderSendGridSettingsChanged(ReadOnlySendGridSettings Settings) : DomainEvent, INotification;
