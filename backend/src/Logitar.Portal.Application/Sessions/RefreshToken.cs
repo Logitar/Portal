@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Sessions;
+﻿using Logitar.Identity.Core.Sessions;
 
 namespace Logitar.Portal.Application.Sessions;
 

@@ -109,7 +109,7 @@ internal class Mapper
   {
     Content body = new(source.BodyType, source.BodyText);
 
-    Sender sender;
+    SenderModel sender;
     if (source.Sender == null)
     {
       sender = new()
@@ -126,7 +126,7 @@ internal class Mapper
       sender = ToSender(source.Sender, realm);
     }
 
-    TemplateModel template;
+    Template template;
     if (source.Template == null)
     {
       template = new()
@@ -275,7 +275,7 @@ internal class Mapper
     return destination;
   }
 
-  public Session ToSession(SessionEntity source, Realm? realm)
+  public SessionModel ToSession(SessionEntity source, Realm? realm)
   {
     if (source.User == null)
     {
@@ -283,7 +283,7 @@ internal class Mapper
     }
 
     User user = ToUser(source.User, realm);
-    Session destination = new(user)
+    SessionModel destination = new(user)
     {
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
@@ -301,9 +301,9 @@ internal class Mapper
     return destination;
   }
 
-  public Sender ToSender(SenderEntity source, Realm? realm)
+  public SenderModel ToSender(SenderEntity source, Realm? realm)
   {
-    Sender destination = new()
+    SenderModel destination = new()
     {
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
@@ -334,10 +334,10 @@ internal class Mapper
     return destination;
   }
 
-  public TemplateModel ToTemplate(TemplateEntity source, Realm? realm)
+  public Template ToTemplate(TemplateEntity source, Realm? realm)
   {
     Content content = new(source.ContentType, source.ContentText);
-    TemplateModel destination = new(source.UniqueKey, source.Subject, content)
+    Template destination = new(source.UniqueKey, source.Subject, content)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,

@@ -32,7 +32,7 @@ public class SignInSessionCommandTests : IntegrationTests
     ];
     SignInSessionPayload payload = new(UsernameString, PasswordString, isPersistent: true, customAttributes);
     SignInSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(session.IsPersistent);
     Assert.True(session.IsActive);
@@ -61,7 +61,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     SignInSessionPayload payload = new(uniqueName.Value, PasswordString);
     SignInSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -85,7 +85,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     SignInSessionPayload payload = new(Faker.Person.Email, PasswordString);
     SignInSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
@@ -102,7 +102,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
-    Session session = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);

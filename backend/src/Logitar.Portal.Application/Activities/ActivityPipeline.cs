@@ -62,7 +62,7 @@ internal class ActivityPipeline : IActivityPipeline
     RealmModel? realm = parameters.Realm;
     ApiKeyModel? apiKey = parameters.ApiKey;
     User? user = parameters.User;
-    Session? session = parameters.Session;
+    SessionModel? session = parameters.Session;
 
     if (!string.IsNullOrWhiteSpace(parameters.RealmOverride))
     {

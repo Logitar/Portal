@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Contracts.Sessions;
 
-public class Session : Aggregate
+public class SessionModel : Aggregate
 {
   public bool IsPersistent { get; set; }
   public string? RefreshToken { get; set; }
@@ -16,11 +16,11 @@ public class Session : Aggregate
 
   public User User { get; set; }
 
-  public Session() : this(new User())
+  public SessionModel() : this(new User())
   {
   }
 
-  public Session(User user)
+  public SessionModel(User user)
   {
     User = user;
     CustomAttributes = [];

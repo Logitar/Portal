@@ -1,10 +1,10 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Application.Sessions;
 
 public class InvalidRefreshTokenException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified value is not a valid refresh token.";
+  private const string ErrorMessage = "The specified value is not a valid refresh token.";
 
   public string RefreshToken
   {
