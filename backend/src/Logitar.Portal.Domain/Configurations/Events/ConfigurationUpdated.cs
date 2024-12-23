@@ -1,14 +1,13 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Settings;
 using MediatR;
 
 namespace Logitar.Portal.Domain.Configurations.Events;
 
-public record ConfigurationUpdatedEvent : DomainEvent, INotification
+public record ConfigurationUpdated : DomainEvent, INotification
 {
-  public Modification<LocaleUnit>? DefaultLocale { get; set; }
+  public Change<Locale>? DefaultLocale { get; set; }
   public JwtSecretUnit? Secret { get; set; }
 
   public ReadOnlyUniqueNameSettings? UniqueNameSettings { get; set; }
