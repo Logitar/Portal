@@ -24,7 +24,7 @@ internal class OneTimePasswordClientTests : IClientTests
       };
       create.CustomAttributes.Add(new CustomAttribute("Purpose", "MultiFactorAuthentication"));
       create.CustomAttributes.Add(new CustomAttribute("UserId", context.User.Id.ToString()));
-      OneTimePassword oneTimePassword = await _client.CreateAsync(create, context.Request);
+      OneTimePasswordModel oneTimePassword = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -35,7 +35,7 @@ internal class OneTimePasswordClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      OneTimePassword? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
+      OneTimePasswordModel? notFound = await _client.ReadAsync(Guid.NewGuid(), context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The One-Time Password (OTP) should not be found.");

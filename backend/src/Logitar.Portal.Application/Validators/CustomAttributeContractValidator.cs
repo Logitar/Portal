@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.Application.Validators;
@@ -8,7 +8,7 @@ internal class CustomAttributeContractValidator : AbstractValidator<CustomAttrib
 {
   public CustomAttributeContractValidator()
   {
-    RuleFor(x => x.Key).SetValidator(new CustomAttributeKeyValidator());
-    RuleFor(x => x.Value).SetValidator(new CustomAttributeValueValidator());
+    RuleFor(x => x.Key).Identifier());
+    RuleFor(x => x.Value).NotEmpty());
   }
 }
