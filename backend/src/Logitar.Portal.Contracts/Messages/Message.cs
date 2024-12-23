@@ -12,7 +12,7 @@ public class Message : Aggregate
   public int RecipientCount { get; set; }
   public List<Recipient> Recipients { get; set; }
 
-  public Sender Sender { get; set; }
+  public SenderModel Sender { get; set; }
   public Template Template { get; set; }
 
   public bool IgnoreUserLocale { get; set; }
@@ -27,11 +27,11 @@ public class Message : Aggregate
 
   public RealmModel? Realm { get; set; }
 
-  public Message() : this(string.Empty, new Content(), new Sender(), new Template())
+  public Message() : this(string.Empty, new Content(), new SenderModel(), new Template())
   {
   }
 
-  public Message(string subject, Content body, Sender sender, Template template)
+  public Message(string subject, Content body, SenderModel sender, Template template)
   {
     Subject = subject;
     Body = body;

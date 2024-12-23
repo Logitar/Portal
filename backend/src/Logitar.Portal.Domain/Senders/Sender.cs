@@ -9,7 +9,7 @@ using Logitar.Portal.Domain.Senders.Twilio;
 
 namespace Logitar.Portal.Domain.Senders;
 
-public class SenderAggregate : AggregateRoot
+public class Sender : AggregateRoot
 {
   private SenderUpdated _updated = new();
 
@@ -89,19 +89,19 @@ public class SenderAggregate : AggregateRoot
   private SenderSettings? _settings = null;
   public SenderSettings Settings => _settings ?? throw new InvalidOperationException($"The {nameof(Settings)} have not been initialized yet.");
 
-  public SenderAggregate() : base()
+  public Sender() : base()
   {
   }
 
-  public SenderAggregate(Email email, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  public Sender(Email email, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
     : this(email, phone: null, settings, actorId, id)
   {
   }
-  public SenderAggregate(Phone phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  public Sender(Phone phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
     : this(email: null, phone, settings, actorId, id)
   {
   }
-  private SenderAggregate(Email? email, Phone? phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  private Sender(Email? email, Phone? phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
     : base((id ?? SenderId.NewId()).StreamId)
   {
     SenderProvider provider = settings.Provider;

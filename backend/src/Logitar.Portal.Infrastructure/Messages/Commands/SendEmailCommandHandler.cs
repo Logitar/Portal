@@ -30,7 +30,7 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
   {
     ActorId actorId = command.ActorId;
     MessageAggregate message = command.Message;
-    SenderAggregate sender = command.Sender;
+    Sender sender = command.Sender;
 
     if (!_strategies.TryGetValue(sender.Provider, out IProviderStrategy? strategy))
     {

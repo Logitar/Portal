@@ -50,7 +50,7 @@ internal class FindUserQueryHandler : IRequestHandler<FindUserQuery, UserAggrega
 
     if (userSettings.RequireUniqueEmail)
     {
-      EmailUnit? email = null;
+      Email? email = null;
       try
       {
         email = new(query.User);

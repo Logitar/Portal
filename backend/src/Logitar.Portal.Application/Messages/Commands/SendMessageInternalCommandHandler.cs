@@ -42,7 +42,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     LocaleUnit? defaultLocale = command.DefaultLocale;
 
     SendMessagePayload payload = command.Payload;
-    SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
+    Sender sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
     new SendMessageValidator(sender.Type).ValidateAndThrow(payload);
 
     Recipients allRecipients = await ResolveRecipientsAsync(payload, sender.Type, cancellationToken);
@@ -155,7 +155,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     return new Recipients(recipients);
   }
 
-  private async Task<SenderAggregate> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<Sender> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
   {
     if (payload.SenderId.HasValue)
     {

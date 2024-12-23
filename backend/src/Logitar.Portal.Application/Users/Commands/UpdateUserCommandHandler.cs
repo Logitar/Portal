@@ -126,13 +126,13 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
     if (payload.Email != null)
     {
-      EmailUnit? email = payload.Email.Value?.ToEmailUnit();
+      Email? email = payload.Email.Value?.ToEmail();
       user.SetEmail(email, actorId);
     }
 
     if (payload.Phone != null)
     {
-      PhoneUnit? phone = payload.Phone.Value?.ToPhoneUnit();
+      Phone? phone = payload.Phone.Value?.ToPhone();
       user.SetPhone(phone, actorId);
     }
   }

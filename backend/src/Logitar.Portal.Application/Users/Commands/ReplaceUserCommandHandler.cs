@@ -99,13 +99,13 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
       user.SetAddress(address, actorId);
     }
 
-    EmailUnit? email = payload.Email?.ToEmailUnit();
+    Email? email = payload.Email?.ToEmail();
     if (reference == null || email != reference.Email)
     {
       user.SetEmail(email, actorId);
     }
 
-    PhoneUnit? phone = payload.Phone?.ToPhoneUnit();
+    Phone? phone = payload.Phone?.ToPhone();
     if (reference == null || phone != reference.Phone)
     {
       user.SetPhone(phone, actorId);

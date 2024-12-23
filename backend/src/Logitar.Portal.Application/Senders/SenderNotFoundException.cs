@@ -4,9 +4,9 @@ public class SenderNotFoundException : Exception
 {
   public const string ErrorMessage = "The specified sender could not be found.";
 
-  public Guid Id
+  public string Id
   {
-    get => (Guid)Data[nameof(Id)]!;
+    get => (string)Data[nameof(Id)]!;
     private set => Data[nameof(Id)] = value;
   }
   public string? PropertyName
@@ -15,13 +15,13 @@ public class SenderNotFoundException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public SenderNotFoundException(Guid id, string? propertyName = null) : base(BuildMessage(id, propertyName))
+  public SenderNotFoundException(string id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
     Id = id;
     PropertyName = propertyName;
   }
 
-  private static string BuildMessage(Guid id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(string id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(Id), id)
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();

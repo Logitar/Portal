@@ -12,15 +12,15 @@ internal static class ContactExtensions
     return new AddressUnit(address.Street, address.Locality, address.Country, address.Region, address.PostalCode, isVerified);
   }
 
-  public static EmailUnit ToEmailUnit(this EmailPayload email) => email.ToEmailUnit(email.IsVerified);
-  public static EmailUnit ToEmailUnit(this IEmail email, bool isVerified = false)
+  public static Email ToEmail(this EmailPayload email) => email.ToEmail(email.IsVerified);
+  public static Email ToEmail(this IEmail email, bool isVerified = false)
   {
-    return new EmailUnit(email.Address, isVerified);
+    return new Email(email.Address, isVerified);
   }
 
-  public static PhoneUnit ToPhoneUnit(this PhonePayload phone) => phone.ToPhoneUnit(phone.IsVerified);
-  public static PhoneUnit ToPhoneUnit(this IPhone phone, bool isVerified = false)
+  public static Phone ToPhone(this PhonePayload phone) => phone.ToPhone(phone.IsVerified);
+  public static Phone ToPhone(this IPhone phone, bool isVerified = false)
   {
-    return new PhoneUnit(phone.Number, phone.CountryCode, phone.Extension, isVerified);
+    return new Phone(phone.Number, phone.CountryCode, phone.Extension, isVerified);
   }
 }

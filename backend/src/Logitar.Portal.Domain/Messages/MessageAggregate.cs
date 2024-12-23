@@ -47,7 +47,7 @@ public class MessageAggregate : AggregateRoot
     Subject subject,
     Content body,
     IReadOnlyCollection<Recipient> recipients,
-    SenderAggregate sender,
+    Sender sender,
     TemplateAggregate template,
     bool ignoreUserLocale = false,
     Locale? locale = null,

@@ -18,9 +18,9 @@ public class UpdateSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _mailgun;
-  private readonly SenderAggregate _sendGrid;
-  private readonly SenderAggregate _twilio;
+  private readonly Sender _mailgun;
+  private readonly Sender _sendGrid;
+  private readonly Sender _twilio;
 
   public UpdateSenderCommandTests() : base()
   {
@@ -58,7 +58,7 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     UpdateSenderPayload payload = new();
     UpdateSenderCommand command = new(Guid.NewGuid(), payload);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -69,7 +69,7 @@ public class UpdateSenderCommandTests : IntegrationTests
 
     UpdateSenderPayload payload = new();
     UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
-    Sender? result = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -94,7 +94,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       Description = new Modification<string>("  ")
     };
     UpdateSenderCommand command = new(_mailgun.Id.ToGuid(), payload);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(_mailgun.Email?.Address, sender.EmailAddress);
@@ -113,7 +113,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       Description = new Modification<string>("  ")
     };
     UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(_sendGrid.Email?.Address, sender.EmailAddress);
@@ -131,7 +131,7 @@ public class UpdateSenderCommandTests : IntegrationTests
       PhoneNumber = "+15148422112"
     };
     UpdateSenderCommand command = new(_twilio.Id.ToGuid(), payload);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(payload.PhoneNumber, sender.PhoneNumber);

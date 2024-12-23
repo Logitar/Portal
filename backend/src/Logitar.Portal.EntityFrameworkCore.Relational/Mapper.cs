@@ -109,7 +109,7 @@ internal class Mapper
   {
     Content body = new(source.BodyType, source.BodyText);
 
-    Sender sender;
+    SenderModel sender;
     if (source.Sender == null)
     {
       sender = new()
@@ -301,9 +301,9 @@ internal class Mapper
     return destination;
   }
 
-  public Sender ToSender(SenderEntity source, Realm? realm)
+  public SenderModel ToSender(SenderEntity source, Realm? realm)
   {
-    Sender destination = new()
+    SenderModel destination = new()
     {
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,

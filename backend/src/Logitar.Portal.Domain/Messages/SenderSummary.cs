@@ -29,7 +29,7 @@ public record SenderSummary
     Provider = provider;
   }
 
-  public SenderSummary(SenderAggregate sender) : this(sender.Id, sender.IsDefault, sender.Email, sender.Phone, sender.DisplayName, sender.Provider)
+  public SenderSummary(Sender sender) : this(sender.Id, sender.IsDefault, sender.Email, sender.Phone, sender.DisplayName, sender.Provider)
   {
   }
 

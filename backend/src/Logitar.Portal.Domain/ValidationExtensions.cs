@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain;
@@ -10,9 +11,30 @@ public static class ValidationExtensions
     return ruleBuilder.NotEmpty().SetValidator(new ContentTypeValidator<T>());
   }
 
+  public static IRuleBuilderOptions<T, string> EmailAddressInput<T>(this IRuleBuilder<T, string> ruleBuilder)
+  {
+    return ruleBuilder.NotEmpty().MaximumLength(Email.MaximumLength).EmailAddress();
+  }
+
   public static IRuleBuilderOptions<T, string> JwtSecret<T>(this IRuleBuilder<T, string> ruleBuilder)
   {
     return ruleBuilder.NotEmpty().MinimumLength(Settings.JwtSecret.MinimumLength).MaximumLength(Settings.JwtSecret.MaximumLength);
+  }
+
+  public static IRuleBuilderOptions<T, string> PhoneNumber<T>(this IRuleBuilder<T, string> ruleBuilder)
+  {
+    return ruleBuilder.NotEmpty().MaximumLength(byte.MaxValue).Must(phoneNumber =>
+    {
+      try
+      {
+        Phone phone = new(phoneNumber);
+        return true;
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+    }).WithErrorCode("PhoneNumberValidator").WithMessage("'{PropertyName}' must be a valid phone number.");
   }
 
   public static IRuleBuilderOptions<T, string> Slug<T>(this IRuleBuilder<T, string> ruleBuilder)

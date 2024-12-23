@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.Domain.Senders.Twilio;
-using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Application.Senders.Validators;
 
@@ -21,9 +21,9 @@ internal class CreateSenderValidator : AbstractValidator<CreateSenderPayload>
       When(IsEmailSender, () =>
       {
         RuleFor(x => x.EmailAddress).NotNull();
-        When(x => x.EmailAddress != null, () => RuleFor(x => x.EmailAddress!).SetValidator(new EmailAddressValidator()));
+        When(x => x.EmailAddress != null, () => RuleFor(x => x.EmailAddress!).EmailAddressInput());
         RuleFor(x => x.PhoneNumber).Empty();
-        When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).SetValidator(new DisplayNameValidator()));
+        When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).DisplayName());
 
         When(x => x.Mailgun != null, () => RuleFor(x => x.Mailgun!).SetValidator(new MailgunSettingsValidator()));
         When(x => x.SendGrid != null, () => RuleFor(x => x.SendGrid!).SetValidator(new SendGridSettingsValidator()));
@@ -32,14 +32,14 @@ internal class CreateSenderValidator : AbstractValidator<CreateSenderPayload>
       {
         RuleFor(x => x.EmailAddress).Empty();
         RuleFor(x => x.PhoneNumber).NotNull();
-        When(x => x.PhoneNumber != null, () => RuleFor(x => x.PhoneNumber!).SetValidator(new PhoneNumberValidator()));
+        When(x => x.PhoneNumber != null, () => RuleFor(x => x.PhoneNumber!).PhoneNumber());
         RuleFor(x => x.DisplayName).Empty();
 
         When(x => x.Twilio != null, () => RuleFor(x => x.Twilio!).SetValidator(new TwilioSettingsValidator()));
       });
     });
 
-    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).SetValidator(new DescriptionValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).Description());
   }
 
   private static SenderProvider? GetProvider(CreateSenderPayload payload)

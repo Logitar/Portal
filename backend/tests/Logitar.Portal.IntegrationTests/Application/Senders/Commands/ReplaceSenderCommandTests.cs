@@ -17,9 +17,9 @@ public class ReplaceSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _mailgun;
-  private readonly SenderAggregate _sendGrid;
-  private readonly SenderAggregate _twilio;
+  private readonly Sender _mailgun;
+  private readonly Sender _sendGrid;
+  private readonly Sender _twilio;
 
   public ReplaceSenderCommandTests() : base()
   {
@@ -68,7 +68,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
     };
     ReplaceSenderCommand command = new(_mailgun.Id.ToGuid(), payload, version);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -97,7 +97,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, version);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -126,7 +126,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
     };
     ReplaceSenderCommand command = new(_twilio.Id.ToGuid(), payload, version);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
     Assert.Equal(phone.Number, sender.PhoneNumber);
@@ -142,7 +142,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -156,7 +156,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
-    Sender? result = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
