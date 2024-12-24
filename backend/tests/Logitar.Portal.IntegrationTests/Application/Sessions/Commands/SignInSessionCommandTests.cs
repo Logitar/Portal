@@ -42,7 +42,7 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Equal(UsernameString, session.User.UniqueName);
 
     Assert.NotNull(session.RefreshToken);
-    RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
+    RefreshToken refreshToken = RefreshToken.Decode(TenantId, session.RefreshToken);
     Assert.Equal(session.Id, refreshToken.Id.EntityId.ToGuid());
     Assert.Equal(RefreshToken.SecretLength, Convert.FromBase64String(refreshToken.Secret).Length);
   }

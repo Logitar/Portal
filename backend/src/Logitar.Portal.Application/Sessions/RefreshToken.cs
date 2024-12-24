@@ -37,5 +37,5 @@ internal record RefreshToken
   }
   public static string Encode(SessionId id, string secret) => new RefreshToken(id, secret).Encode();
 
-  public string Encode() => string.Join(Separator, Prefix, Id.Value, Secret.ToUriSafeBase64());
+  public string Encode() => string.Join(Separator, Prefix, Id.EntityId, Secret.ToUriSafeBase64());
 }

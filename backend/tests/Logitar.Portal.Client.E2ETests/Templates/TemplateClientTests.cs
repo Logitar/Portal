@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Contracts;
+﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Templates;
 
@@ -19,7 +19,7 @@ internal class TemplateClientTests : IClientTests
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
       string text = await File.ReadAllTextAsync("Templates/PasswordRecovery.html");
-      Content content = Content.Html(text);
+      ContentModel content = ContentModel.Html(text);
       CreateTemplatePayload create = new("PasswordRecovery", "PasswordRecovery_Subject", content);
       TemplateModel template = await _client.CreateAsync(create, context.Request);
       context.Succeed();
@@ -56,7 +56,7 @@ internal class TemplateClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateTemplatePayload update = new()
       {
-        DisplayName = new Modification<string>("Password Recovery")
+        DisplayName = new ChangeModel<string>("Password Recovery")
       };
       template = await _client.UpdateAsync(template.Id, update, context.Request)
         ?? throw new InvalidOperationException("The template should not be null.");

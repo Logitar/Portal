@@ -60,7 +60,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
     Assert.Equal(role.EntityId.ToGuid(), apiKeyRole.Id);
 
     Assert.NotNull(apiKey.XApiKey);
-    XApiKey xApiKey = XApiKey.Decode(apiKey.XApiKey);
+    XApiKey xApiKey = XApiKey.Decode(TenantId, apiKey.XApiKey);
     Assert.Equal(apiKey.Id, xApiKey.Id.EntityId.ToGuid());
     Assert.Equal(XApiKey.SecretLength, Convert.FromBase64String(xApiKey.Secret).Length);
   }
