@@ -1,11 +1,12 @@
 ﻿using Logitar.Data;
 using Logitar.Identity.Core.Passwords;
+using Logitar.Portal.Application.OneTimePasswords.Queries;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Queries;
+namespace Logitar.Portal.Application.Passwords.Queries;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class ReadOneTimePasswordQueryTests : IntegrationTests
