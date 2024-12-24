@@ -38,11 +38,16 @@ internal class LogEntity
   public DateTime? EndedOn { get; private set; }
   public TimeSpan? Duration { get; private set; }
 
-  public string? TenantId { get; private set; }
-  public string ActorId { get; private set; } = EventSourcing.ActorId.DefaultValue;
-  public string? ApiKeyId { get; private set; }
-  public string? UserId { get; private set; }
-  public string? SessionId { get; private set; }
+  [BsonRepresentation(BsonType.String)]
+  public Guid? TenantId { get; private set; }
+  [BsonRepresentation(BsonType.String)]
+  public Guid? ActorId { get; private set; }
+  [BsonRepresentation(BsonType.String)]
+  public Guid? ApiKeyId { get; private set; }
+  [BsonRepresentation(BsonType.String)]
+  public Guid? UserId { get; private set; }
+  [BsonRepresentation(BsonType.String)]
+  public Guid? SessionId { get; private set; }
 
   [BsonRepresentation(BsonType.String)]
   public List<Guid> EventIds { get; private set; } = [];
@@ -82,15 +87,15 @@ internal class LogEntity
     EndedOn = log.EndedOn?.ToUniversalTime();
     Duration = log.Duration;
 
-    TenantId = log.TenantId?.Value;
-    ActorId = log.ActorId.Value;
-    ApiKeyId = log.ApiKeyId?.Value;
-    UserId = log.UserId?.Value;
-    SessionId = log.SessionId?.Value;
+    TenantId = log.TenantId?.ToGuid();
+    ActorId = log.ActorId?.ToGuid();
+    ApiKeyId = log.ApiKeyId;
+    UserId = log.UserId;
+    SessionId = log.SessionId;
 
     foreach (DomainEvent @event in log.Events)
     {
-      EventIds.Add(@event.Id);
+      EventIds.Add(@event.Id.ToGuid());
     }
     foreach (Exception exception in log.Exceptions)
     {
