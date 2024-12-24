@@ -70,17 +70,18 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 
   private static SendMailResult ToResult(Exception exception)
   {
+    ExceptionDetail detail = new(exception);
     return SendMailResult.Failure(new Dictionary<string, object?>
     {
-      ["Type"] = exception.GetType().GetNamespaceQualifiedName(),
-      ["Message"] = exception.Message,
-      ["InnerException"] = null, // TODO(fpion): implement
-      ["HResult"] = exception.HResult,
-      ["HelpLink"] = exception.HelpLink,
-      ["Source"] = exception.Source,
-      ["StackTrace"] = exception.StackTrace,
-      ["TargetSite"] = exception.TargetSite?.ToString(),
-      ["Data"] = exception.Data
+      [nameof(ExceptionDetail.Type)] = detail.Type,
+      [nameof(ExceptionDetail.Message)] = detail.Message,
+      [nameof(ExceptionDetail.InnerException)] = detail.InnerException,
+      [nameof(ExceptionDetail.HResult)] = detail.HResult,
+      [nameof(ExceptionDetail.HelpLink)] = detail.HelpLink,
+      [nameof(ExceptionDetail.Source)] = detail.Source,
+      [nameof(ExceptionDetail.StackTrace)] = detail.StackTrace,
+      [nameof(ExceptionDetail.TargetSite)] = detail.TargetSite?.ToString(),
+      [nameof(ExceptionDetail.Data)] = detail.Data
     });
   }
 }
