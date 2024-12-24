@@ -3,17 +3,18 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Web.Models.Users;
 
-public record PhoneModel : IPhone
+public record UpdateProfilePhone : IPhone
 {
   public string? CountryCode { get; set; }
   public string Number { get; set; }
   public string? Extension { get; set; }
+  public bool IsVerified { get; set; }
 
-  public PhoneModel() : this(null, string.Empty, null)
+  public UpdateProfilePhone() : this(null, string.Empty, null)
   {
   }
 
-  public PhoneModel(string? countryCode, string number, string? extension)
+  public UpdateProfilePhone(string? countryCode, string number, string? extension)
   {
     CountryCode = countryCode;
     Number = number;

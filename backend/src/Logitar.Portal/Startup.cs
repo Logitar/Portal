@@ -32,8 +32,8 @@ internal class Startup : StartupBase
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
-    _authenticationSchemes = Schemes.GetEnabled(configuration);
-    _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
+    _authenticationSchemes = Schemes.GetEnabled(configuration); // TODO(fpion): FeatureManagement
+    _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi"); // TODO(fpion): FeatureManagement
   }
 
   public override void ConfigureServices(IServiceCollection services)
@@ -44,7 +44,7 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
 
-    CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new(); // TODO(fpion): SectionKey
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
@@ -72,7 +72,7 @@ internal class Startup : StartupBase
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
 
-    CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new(); // TODO(fpion): SectionKey
     services.AddSingleton(cookiesSettings);
     services.AddSession(options =>
     {
@@ -115,24 +115,16 @@ internal class Startup : StartupBase
 
   public override void Configure(IApplicationBuilder builder)
   {
-    if (_enableOpenApi)
+    if (_enableOpenApi) // TODO(fpion): FeatureManagement
     {
       builder.UseOpenApi();
     }
 
-    if (_configuration.GetValue<bool>("UseGraphQLAltair"))
-    {
-      builder.UseGraphQLAltair();
-    }
-    if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
+    if (_configuration.GetValue<bool>("UseGraphQLGraphiQL")) // TODO(fpion): FeatureManagement
     {
       builder.UseGraphQLGraphiQL();
     }
-    if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
-    {
-      builder.UseGraphQLPlayground();
-    }
-    if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
+    if (_configuration.GetValue<bool>("UseGraphQLVoyager")) // TODO(fpion): FeatureManagement
     {
       builder.UseGraphQLVoyager();
     }

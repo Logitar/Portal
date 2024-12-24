@@ -1,8 +1,6 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Application.Activities;
+﻿using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Users.Commands;
-using Logitar.Portal.Contracts.Errors;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
@@ -37,7 +35,7 @@ public class AccountController : ControllerBase
 
   [Authorize(Policy = Policies.PortalUser)]
   [HttpPatch("profile")]
-  public async Task<ActionResult<UserModel>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<UserModel>> SaveProfileAsync([FromBody] UpdateProfilePayload model, CancellationToken cancellationToken)
   {
     UpdateUserPayload payload = model.ToPayload();
     UpdateUserCommand command = new(User.Id, payload);
@@ -45,21 +43,23 @@ public class AccountController : ControllerBase
   }
 
   [HttpPost("sign/in")]
-  public async Task<ActionResult<Session>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<SessionModel>> SignInAsync([FromBody] SignInModel model, CancellationToken cancellationToken)
   {
-    try
-    {
-      SignInSessionPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
-      SignInSessionCommand command = new(payload);
-      Session session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
-      HttpContext.SignIn(session);
+    SignInSessionPayload payload = model.ToPayload(HttpContext.GetSessionCustomAttributes());
+    SignInSessionCommand command = new(payload);
+    SessionModel session = await _activityPipeline.ExecuteAsync(command, new ContextParameters(), cancellationToken);
+    HttpContext.SignIn(session);
 
-      return Ok(session);
-    }
-    catch (InvalidCredentialsException)
-    {
-      return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
-    }
+    return Ok(session);
+
+    //try
+    //{
+
+    //}
+    //catch (InvalidCredentialsException)
+    //{
+    //  return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
+    //} // TODO(fpion): ProblemDetails
   }
 
   [Authorize(Policy = Policies.PortalUser)]

@@ -8,7 +8,7 @@ internal class RecipientGraphType : ObjectGraphType<RecipientModel>
 {
   public RecipientGraphType()
   {
-    Name = nameof(RecipientModel);
+    Name = "Recipient";
     Description = "Represents a recipient of a message.";
 
     Field(x => x.Type, type: typeof(NonNullGraphType<RecipientTypeGraphType>))
