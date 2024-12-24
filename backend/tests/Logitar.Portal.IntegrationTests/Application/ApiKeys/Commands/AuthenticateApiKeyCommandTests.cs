@@ -67,7 +67,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
-    apiKey.ExpiresOn = DateTime.Now.AddMilliseconds(millisecondsDelay);
+    apiKey.ExpiresOn = DateTime.UtcNow.AddMilliseconds(millisecondsDelay);
     apiKey.Update();
     await _apiKeyRepository.SaveAsync(apiKey);
 
@@ -144,7 +144,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _secret);
-    ApiKey apiKey = new(new DisplayName("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret, id: ApiKeyId.NewId(TenantId));
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

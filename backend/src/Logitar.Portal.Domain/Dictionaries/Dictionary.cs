@@ -22,7 +22,7 @@ public class Dictionary : AggregateRoot
   {
   }
 
-  public Dictionary(Locale locale, ActorId actorId = default, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
+  public Dictionary(Locale locale, ActorId? actorId = null, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
   {
     Raise(new DictionaryCreated(locale), actorId);
   }
@@ -31,7 +31,7 @@ public class Dictionary : AggregateRoot
     _locale = @event.Locale;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -62,7 +62,7 @@ public class Dictionary : AggregateRoot
     }
   }
 
-  public void SetLocale(Locale locale, ActorId actorId = default)
+  public void SetLocale(Locale locale, ActorId? actorId = null)
   {
     if (_locale != locale)
     {
@@ -76,7 +76,7 @@ public class Dictionary : AggregateRoot
 
   public string? Translate(Identifier key) => _entries.TryGetValue(key, out string? value) ? value : null;
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {

@@ -53,7 +53,7 @@ public class Message : AggregateRoot
     Locale? locale = null,
     IReadOnlyDictionary<Identifier, string>? variables = null,
     bool isDemo = false,
-    ActorId actorId = default,
+    ActorId? actorId = null,
     MessageId? id = null) : base((id ?? MessageId.NewId()).StreamId)
   {
     TenantId? tenantId = id?.TenantId;
@@ -115,7 +115,7 @@ public class Message : AggregateRoot
     Status = MessageStatus.Unsent;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -123,8 +123,8 @@ public class Message : AggregateRoot
     }
   }
 
-  public void Fail(ActorId actorId = default) => Fail(new Dictionary<string, string>(), actorId);
-  public void Fail(IReadOnlyDictionary<string, string> resultData, ActorId actorId = default)
+  public void Fail(ActorId? actorId = null) => Fail(new Dictionary<string, string>(), actorId);
+  public void Fail(IReadOnlyDictionary<string, string> resultData, ActorId? actorId = null)
   {
     if (Status == MessageStatus.Unsent)
     {
@@ -142,8 +142,8 @@ public class Message : AggregateRoot
     }
   }
 
-  public void Succeed(ActorId actorId = default) => Succeed(new Dictionary<string, string>(), actorId);
-  public void Succeed(IReadOnlyDictionary<string, string> resultData, ActorId actorId = default)
+  public void Succeed(ActorId? actorId = null) => Succeed(new Dictionary<string, string>(), actorId);
+  public void Succeed(IReadOnlyDictionary<string, string> resultData, ActorId? actorId = null)
   {
     if (Status == MessageStatus.Unsent)
     {

@@ -93,15 +93,15 @@ public class Sender : AggregateRoot
   {
   }
 
-  public Sender(Email email, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  public Sender(Email email, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
     : this(email, phone: null, settings, actorId, id)
   {
   }
-  public Sender(Phone phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  public Sender(Phone phone, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
     : this(email: null, phone, settings, actorId, id)
   {
   }
-  private Sender(Email? email, Phone? phone, SenderSettings settings, ActorId actorId = default, SenderId? id = null)
+  private Sender(Email? email, Phone? phone, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
     : base((id ?? SenderId.NewId()).StreamId)
   {
     SenderProvider provider = settings.Provider;
@@ -154,7 +154,7 @@ public class Sender : AggregateRoot
     Provider = @event.Provider;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -162,8 +162,8 @@ public class Sender : AggregateRoot
     }
   }
 
-  public void SetDefault(ActorId actorId = default) => SetDefault(isDefault: true, actorId);
-  public void SetDefault(bool isDefault, ActorId actorId = default)
+  public void SetDefault(ActorId? actorId = null) => SetDefault(isDefault: true, actorId);
+  public void SetDefault(bool isDefault, ActorId? actorId = null)
   {
     if (isDefault != IsDefault)
     {
@@ -175,7 +175,7 @@ public class Sender : AggregateRoot
     IsDefault = @event.IsDefault;
   }
 
-  public void SetSettings(ReadOnlyMailgunSettings settings, ActorId actorId = default)
+  public void SetSettings(ReadOnlyMailgunSettings settings, ActorId? actorId = null)
   {
     if (Provider != SenderProvider.Mailgun)
     {
@@ -191,7 +191,7 @@ public class Sender : AggregateRoot
     _settings = @event.Settings;
   }
 
-  public void SetSettings(ReadOnlySendGridSettings settings, ActorId actorId = default)
+  public void SetSettings(ReadOnlySendGridSettings settings, ActorId? actorId = null)
   {
     if (Provider != SenderProvider.SendGrid)
     {
@@ -207,7 +207,7 @@ public class Sender : AggregateRoot
     _settings = @event.Settings;
   }
 
-  public void SetSettings(ReadOnlyTwilioSettings settings, ActorId actorId = default)
+  public void SetSettings(ReadOnlyTwilioSettings settings, ActorId? actorId = null)
   {
     if (Provider != SenderProvider.Twilio)
     {
@@ -223,7 +223,7 @@ public class Sender : AggregateRoot
     _settings = @event.Settings;
   }
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {
