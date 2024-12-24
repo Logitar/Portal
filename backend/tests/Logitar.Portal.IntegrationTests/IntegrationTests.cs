@@ -101,12 +101,14 @@ public abstract class IntegrationTests : IAsyncLifetime
     IPublisher publisher = ServiceProvider.GetRequiredService<IPublisher>();
     await publisher.Publish(new InitializeDatabaseCommand());
 
-    TableId[] tables = [EventDb.Events.Table, IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
+    StringBuilder sql = new();
+    TableId[] tables = [EventDb.Streams.Table, IdentityDb.Actors.Table, IdentityDb.CustomAttributes.Table, IdentityDb.Sessions.Table, IdentityDb.Users.Table];
     foreach (TableId table in tables)
     {
       ICommand command = CreateDeleteBuilder(table).Build();
-      await PortalContext.Database.ExecuteSqlRawAsync(command.Text, command.Parameters.ToArray());
+      sql.Append(command.Text).Append(';').AppendLine();
     }
+    await PortalContext.Database.ExecuteSqlRawAsync(sql.ToString());
 
     await publisher.Publish(new InitializeConfigurationCommand(UsernameString, PasswordString));
 
