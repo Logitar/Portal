@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,8 @@ internal class DictionaryConfiguration : AggregateConfiguration<DictionaryEntity
     builder.HasIndex(x => new { x.TenantId, x.LocaleNormalized }).IsUnique();
     builder.HasIndex(x => x.EntryCount);
 
+    builder.Property(x => x.TenantId).HasMaxLength(StreamId.MaximumLength);
+    builder.Property(x => x.EntityId).HasMaxLength(StreamId.MaximumLength);
     builder.Property(x => x.Locale).HasMaxLength(Locale.MaximumLength);
     builder.Property(x => x.LocaleNormalized).HasMaxLength(Locale.MaximumLength);
   }

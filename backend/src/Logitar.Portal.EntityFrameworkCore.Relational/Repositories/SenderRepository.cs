@@ -31,7 +31,7 @@ internal class SenderRepository : Repository, ISenderRepository
 
   public async Task<IReadOnlyCollection<Sender>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
 
     IEnumerable<StreamId> streamIds = (await _senders.AsNoTracking()
       .Where(x => x.TenantId == tenantIdValue)
@@ -43,7 +43,7 @@ internal class SenderRepository : Repository, ISenderRepository
 
   public async Task<Sender?> LoadDefaultAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
 
     string? streamId = await _senders.AsNoTracking()
       .Where(x => x.TenantId == tenantIdValue && x.IsDefault)

@@ -11,8 +11,8 @@ GO
 BEGIN TRANSACTION;
 CREATE TABLE [Dictionaries] (
     [DictionaryId] int NOT NULL IDENTITY,
-    [TenantId] uniqueidentifier NULL,
-    [EntityId] uniqueidentifier NOT NULL,
+    [TenantId] nvarchar(255) NULL,
+    [EntityId] nvarchar(255) NOT NULL,
     [Locale] nvarchar(16) NOT NULL,
     [LocaleNormalized] nvarchar(16) NOT NULL,
     [EntryCount] int NOT NULL,
@@ -83,8 +83,8 @@ CREATE TABLE [Realms] (
 
 CREATE TABLE [Senders] (
     [SenderId] int NOT NULL IDENTITY,
-    [TenantId] uniqueidentifier NULL,
-    [EntityId] uniqueidentifier NOT NULL,
+    [TenantId] nvarchar(255) NULL,
+    [EntityId] nvarchar(255) NOT NULL,
     [IsDefault] bit NOT NULL,
     [EmailAddress] nvarchar(255) NULL,
     [PhoneNumber] nvarchar(20) NULL,
@@ -103,8 +103,8 @@ CREATE TABLE [Senders] (
 
 CREATE TABLE [Templates] (
     [TemplateId] int NOT NULL IDENTITY,
-    [TenantId] uniqueidentifier NULL,
-    [EntityId] uniqueidentifier NOT NULL,
+    [TenantId] nvarchar(255) NULL,
+    [EntityId] nvarchar(255) NOT NULL,
     [UniqueKey] nvarchar(255) NOT NULL,
     [UniqueKeyNormalized] nvarchar(255) NOT NULL,
     [DisplayName] nvarchar(255) NULL,
@@ -145,8 +145,8 @@ CREATE TABLE [LogExceptions] (
 
 CREATE TABLE [Messages] (
     [MessageId] int NOT NULL IDENTITY,
-    [TenantId] uniqueidentifier NULL,
-    [EntityId] uniqueidentifier NOT NULL,
+    [TenantId] nvarchar(255) NULL,
+    [EntityId] nvarchar(255) NOT NULL,
     [Subject] nvarchar(255) NOT NULL,
     [BodyType] nvarchar(10) NOT NULL,
     [BodyText] nvarchar(max) NOT NULL,
@@ -366,7 +366,7 @@ CREATE INDEX [IX_Templates_UpdatedOn] ON [Templates] ([UpdatedOn]);
 CREATE INDEX [IX_Templates_Version] ON [Templates] ([Version]);
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20241224061809_Release_5_0_0', N'9.0.0');
+VALUES (N'20241224073658_Release_5_0_0', N'9.0.0');
 
 COMMIT;
 GO

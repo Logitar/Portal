@@ -43,7 +43,7 @@ internal class SenderQuerier : ISenderQuerier
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (sender == null || sender.TenantId != realm?.GetTenantId().ToGuid())
+    if (sender == null || sender.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -53,7 +53,7 @@ internal class SenderQuerier : ISenderQuerier
 
   public async Task<SenderModel?> ReadDefaultAsync(RealmModel? realm, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
 
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.IsDefault, cancellationToken);

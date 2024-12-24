@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Contracts.Messages;
@@ -27,6 +28,8 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.HasIndex(x => x.IsDemo);
     builder.HasIndex(x => x.Status);
 
+    builder.Property(x => x.TenantId).HasMaxLength(StreamId.MaximumLength);
+    builder.Property(x => x.EntityId).HasMaxLength(StreamId.MaximumLength);
     builder.Property(x => x.Subject).HasMaxLength(Subject.MaximumLength);
     builder.Property(x => x.BodyType).HasMaxLength(TemplateConfiguration.ContentTypeMaximumLength);
     builder.Property(x => x.SenderAddress).HasMaxLength(Email.MaximumLength);

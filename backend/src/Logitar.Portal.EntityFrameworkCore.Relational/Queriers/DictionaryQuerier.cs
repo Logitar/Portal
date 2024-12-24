@@ -44,7 +44,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().ToGuid())
+    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -54,7 +54,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
 
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
     string localeNormalized = Helper.Normalize(locale);
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()

@@ -32,7 +32,7 @@ internal class TemplateRepository : Repository, ITemplateRepository
 
   public async Task<IReadOnlyCollection<Template>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
 
     IEnumerable<StreamId> streamIds = (await _templates.AsNoTracking()
       .Where(x => x.TenantId == tenantIdValue)
@@ -44,7 +44,7 @@ internal class TemplateRepository : Repository, ITemplateRepository
 
   public async Task<Template?> LoadAsync(TenantId? tenantId, Identifier uniqueKey, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
     string uniqueKeyNormalized = Helper.Normalize(uniqueKey.Value);
 
     string? streamId = await _templates.AsNoTracking()

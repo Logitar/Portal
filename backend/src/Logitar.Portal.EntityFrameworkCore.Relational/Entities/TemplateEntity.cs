@@ -9,8 +9,8 @@ internal class TemplateEntity : AggregateEntity
 {
   public int TemplateId { get; private set; }
 
-  public Guid? TenantId { get; private set; }
-  public Guid EntityId { get; private set; }
+  public string? TenantId { get; private set; } = string.Empty;
+  public string EntityId { get; private set; } = string.Empty;
 
   public string UniqueKey { get; private set; } = string.Empty;
   public string UniqueKeyNormalized
@@ -30,8 +30,8 @@ internal class TemplateEntity : AggregateEntity
   public TemplateEntity(TemplateCreated @event) : base(@event)
   {
     TemplateId templateId = new(@event.StreamId);
-    TenantId = templateId.TenantId?.ToGuid();
-    EntityId = templateId.EntityId.ToGuid();
+    TenantId = templateId.TenantId?.Value;
+    EntityId = templateId.EntityId.Value;
 
     UniqueKey = @event.UniqueKey.Value;
 

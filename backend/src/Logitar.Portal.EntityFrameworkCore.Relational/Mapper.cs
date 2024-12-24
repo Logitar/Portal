@@ -102,7 +102,7 @@ internal class Mapper
   {
     DictionaryModel destination = new(new LocaleModel(source.Locale))
     {
-      Id = source.EntityId,
+      Id = new EntityId(source.EntityId).ToGuid(),
       EntryCount = source.EntryCount,
       Realm = realm
     };
@@ -154,7 +154,7 @@ internal class Mapper
 
     MessageModel destination = new(source.Subject, body, sender, template)
     {
-      Id = source.EntityId,
+      Id = new EntityId(source.EntityId).ToGuid(),
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
       Locale = LocaleModel.TryCreate(source.Locale),
@@ -322,7 +322,7 @@ internal class Mapper
   {
     SenderModel destination = new()
     {
-      Id = source.EntityId,
+      Id = new EntityId(source.EntityId).ToGuid(),
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
       PhoneNumber = source.PhoneNumber,
@@ -358,7 +358,7 @@ internal class Mapper
     ContentModel content = new(source.ContentType, source.ContentText);
     TemplateModel destination = new(source.UniqueKey, source.Subject, content)
     {
-      Id = source.EntityId,
+      Id = new EntityId(source.EntityId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       Realm = realm

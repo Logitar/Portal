@@ -27,7 +27,7 @@ internal class MessageRepository : Repository, IMessageRepository
 
   public async Task<IReadOnlyCollection<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
 
     IEnumerable<StreamId> streamIds = (await _messages.AsNoTracking()
       .Where(x => x.TenantId == tenantIdValue)

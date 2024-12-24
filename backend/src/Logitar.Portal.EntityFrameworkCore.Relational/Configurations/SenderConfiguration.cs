@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Contracts.Senders;
@@ -26,6 +27,8 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Provider);
 
+    builder.Property(x => x.TenantId).HasMaxLength(StreamId.MaximumLength);
+    builder.Property(x => x.EntityId).HasMaxLength(StreamId.MaximumLength);
     builder.Property(x => x.EmailAddress).HasMaxLength(Email.MaximumLength);
     builder.Property(x => x.PhoneNumber).HasMaxLength(Phone.NumberMaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);

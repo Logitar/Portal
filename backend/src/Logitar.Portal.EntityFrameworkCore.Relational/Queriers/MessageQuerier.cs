@@ -50,7 +50,7 @@ internal class MessageQuerier : IMessageQuerier
       .Include(x => x.Template)
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (message == null || message.TenantId != realm?.GetTenantId().ToGuid())
+    if (message == null || message.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }

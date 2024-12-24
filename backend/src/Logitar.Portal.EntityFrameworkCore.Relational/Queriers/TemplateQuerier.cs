@@ -44,7 +44,7 @@ internal class TemplateQuerier : ITemplateQuerier
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (template == null || template.TenantId != realm?.GetTenantId().ToGuid())
+    if (template == null || template.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -54,7 +54,7 @@ internal class TemplateQuerier : ITemplateQuerier
 
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
     string uniqueKeyNormalized = Helper.Normalize(uniqueKey);
 
     TemplateEntity? template = await _templates.AsNoTracking()
