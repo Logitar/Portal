@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Messages;
@@ -10,7 +11,8 @@ internal class MessageEntity : AggregateEntity
 {
   public int MessageId { get; private set; }
 
-  public string? TenantId { get; private set; }
+  public Guid? TenantId { get; private set; }
+  public Guid EntityId { get; private set; }
 
   public string Subject { get; private set; } = string.Empty;
   public string BodyType { get; private set; } = string.Empty;
@@ -35,57 +37,29 @@ internal class MessageEntity : AggregateEntity
   public bool IgnoreUserLocale { get; private set; }
   public string? Locale { get; private set; }
 
-  public Dictionary<string, string> Variables { get; private set; } = [];
-  public string? VariablesSerialized
-  {
-    get => Variables.Count == 0 ? null : JsonSerializer.Serialize(Variables);
-    private set
-    {
-      if (value == null)
-      {
-        Variables.Clear();
-      }
-      else
-      {
-        Variables = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? Variables { get; private set; }
 
   public bool IsDemo { get; private set; }
 
   public MessageStatus Status { get; private set; }
-  public Dictionary<string, string> ResultData { get; private set; } = [];
-  public string? ResultDataSerialized
-  {
-    get => ResultData.Count == 0 ? null : JsonSerializer.Serialize(ResultData);
-    private set
-    {
-      if (value == null)
-      {
-        ResultData.Clear();
-      }
-      else
-      {
-        ResultData = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? ResultData { get; private set; }
 
-  public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreatedEvent @event) : base(@event)
+  public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    MessageId messageId = new(@event.StreamId);
+    TenantId = messageId.TenantId?.ToGuid();
+    EntityId = messageId.EntityId.ToGuid();
 
     Subject = @event.Subject.Value;
     BodyType = @event.Body.Type;
     BodyText = @event.Body.Text;
 
-    foreach (RecipientUnit recipient in @event.Recipients)
+    foreach (Recipient recipient in @event.Recipients)
     {
       UserEntity? user = null;
-      if (recipient.UserId != null && !users.TryGetValue(recipient.UserId.Value, out user))
+      if (recipient.UserId != null && !users.TryGetValue(recipient.UserId.Value.Value, out user))
       {
-        throw new InvalidOperationException($"The user entity 'AggregateId={recipient.UserId.Value}' could not be found.");
+        throw new InvalidOperationException($"The user entity 'StreamId={recipient.UserId}' could not be found.");
       }
 
       Recipients.Add(new RecipientEntity(this, user, recipient));
@@ -108,10 +82,12 @@ internal class MessageEntity : AggregateEntity
     IgnoreUserLocale = @event.IgnoreUserLocale;
     Locale = @event.Locale?.Code;
 
-    foreach (KeyValuePair<string, string> variable in @event.Variables)
+    Dictionary<string, string> variables = new(@event.Variables.Count);
+    foreach (KeyValuePair<Identifier, string> variable in @event.Variables)
     {
-      Variables[variable.Key] = variable.Value;
+      variables[variable.Key.Value] = variable.Value;
     }
+    SetVariables(variables);
 
     IsDemo = @event.IsDemo;
 
@@ -122,7 +98,7 @@ internal class MessageEntity : AggregateEntity
   {
   }
 
-  public void Fail(MessageFailedEvent @event)
+  public void Fail(MessageFailed @event)
   {
     Update(@event);
 
@@ -130,7 +106,7 @@ internal class MessageEntity : AggregateEntity
     SetResultData(@event.ResultData);
   }
 
-  public void Succeed(MessageSucceededEvent @event)
+  public void Succeed(MessageSucceeded @event)
   {
     Update(@event);
 
@@ -138,11 +114,23 @@ internal class MessageEntity : AggregateEntity
     SetResultData(@event.ResultData);
   }
 
+  public Dictionary<string, string> GetVariables()
+  {
+    return (Variables == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(Variables)) ?? [];
+  }
+  private void SetVariables(IReadOnlyDictionary<string, string> variables)
+  {
+    Variables = variables.Count < 1 ? null : JsonSerializer.Serialize(variables);
+  }
+
+  public Dictionary<string, string> GetResultData()
+  {
+    return (ResultData == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(ResultData)) ?? [];
+  }
   private void SetResultData(IReadOnlyDictionary<string, string> resultData)
   {
-    foreach (KeyValuePair<string, string> data in resultData)
-    {
-      ResultData[data.Key] = data.Value;
-    }
+    ResultData = resultData.Count < 1 ? null : JsonSerializer.Serialize(resultData);
   }
+
+  public override string ToString() => $"{Subject} | {base.ToString()}";
 }

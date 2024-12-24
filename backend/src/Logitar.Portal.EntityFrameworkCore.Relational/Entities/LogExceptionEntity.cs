@@ -16,24 +16,7 @@ internal class LogExceptionEntity
   public string? StackTrace { get; private set; }
   public string? TargetSite { get; private set; }
 
-  public Dictionary<string, string> Data { get; private set; } = [];
-  public string? DataSerialized
-  {
-    get => Data.Count > 0 ? JsonSerializer.Serialize(Data) : null;
-    private set
-    {
-      Data.Clear();
-
-      if (value != null)
-      {
-        Dictionary<string, string>? data = JsonSerializer.Deserialize<Dictionary<string, string>>(value);
-        if (data != null)
-        {
-          Data.AddRange(data);
-        }
-      }
-    }
-  }
+  public string? Data { get; private set; }
 
   public LogExceptionEntity(LogEntity log, Exception exception, JsonSerializerOptions? serializerOptions = null)
   {
@@ -58,7 +41,7 @@ internal class LogExceptionEntity
         {
           string serializedKey = JsonSerializer.Serialize(key, key.GetType(), serializerOptions).Trim('"');
           string serializedValue = JsonSerializer.Serialize(value, value.GetType(), serializerOptions).Trim('"');
-          Data[serializedKey] = serializedValue;
+          //Data[serializedKey] = serializedValue; // TODO(fpion): implement
         }
       }
       catch (Exception)
@@ -70,4 +53,8 @@ internal class LogExceptionEntity
   private LogExceptionEntity()
   {
   }
+
+  public override bool Equals(object? obj) => obj is LogExceptionEntity entity && entity.LogExceptionId == LogExceptionId;
+  public override int GetHashCode() => LogExceptionId.GetHashCode();
+  public override string ToString() => $"{GetType()} (LogExceptionId={LogExceptionId})";
 }

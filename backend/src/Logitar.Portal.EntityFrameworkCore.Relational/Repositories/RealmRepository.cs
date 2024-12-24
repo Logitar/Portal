@@ -1,56 +1,56 @@
-﻿using Logitar.Data;
-using Logitar.EventSourcing;
-using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.EventSourcing.Infrastructure;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Domain.Realms;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
-internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IRealmRepository
+internal class RealmRepository : Repository, IRealmRepository
 {
-  private static readonly string AggregateType = typeof(Realm).GetNamespaceQualifiedName();
+  private readonly DbSet<RealmEntity> _realms;
 
-  private readonly ISqlHelper _sqlHelper;
-
-  public RealmRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
-    : base(eventBus, eventContext, eventSerializer)
+  public RealmRepository(PortalContext context, IEventStore eventStore) : base(eventStore)
   {
-    _sqlHelper = sqlHelper;
+    _realms = context.Realms;
   }
 
-  public async Task<IEnumerable<Realm>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<Realm>(cancellationToken);
-
-  public async Task<Realm?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await LoadAsync<Realm>(new AggregateId(id), cancellationToken);
+  public async Task<IReadOnlyCollection<Realm>> LoadAsync(CancellationToken cancellationToken)
+  {
+    return await LoadAsync<Realm>(cancellationToken);
+  }
 
   public async Task<Realm?> LoadAsync(RealmId id, CancellationToken cancellationToken)
-    => await LoadAsync(id, version: null, cancellationToken);
-  public async Task<Realm?> LoadAsync(RealmId id, long? version, CancellationToken cancellationToken)
-    => await LoadAsync<Realm>(id.AggregateId, version, cancellationToken);
-
-  public async Task<Realm?> LoadAsync(UniqueSlugUnit uniqueSlug, CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Realms.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlug.Value.ToUpper()))
-      .SelectAll(EventDb.Events.Table)
-      .Build();
+    return await LoadAsync(id, version: null, cancellationToken);
+  }
+  public async Task<Realm?> LoadAsync(RealmId id, long? version, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<Realm>(id.StreamId, version, cancellationToken);
+  }
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
+  public async Task<Realm?> LoadAsync(Slug uniqueSlug, CancellationToken cancellationToken)
+  {
+    string uniqueSlugNormalized = Helper.Normalize(uniqueSlug.Value);
 
-    return Load<Realm>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+    string? streamId = await _realms.AsNoTracking()
+      .Where(x => x.UniqueSlugNormalized == uniqueSlugNormalized)
+      .Select(x => x.StreamId)
+      .SingleOrDefaultAsync(cancellationToken);
+    if (streamId == null)
+    {
+      return null;
+    }
+
+    return await LoadAsync<Realm>(new StreamId(streamId), cancellationToken);
   }
 
   public async Task SaveAsync(Realm realm, CancellationToken cancellationToken)
-    => await base.SaveAsync(realm, cancellationToken);
+  {
+    await base.SaveAsync(realm, cancellationToken);
+  }
   public async Task SaveAsync(IEnumerable<Realm> realms, CancellationToken cancellationToken)
-    => await base.SaveAsync(realms, cancellationToken);
+  {
+    await base.SaveAsync(realms, cancellationToken);
+  }
 }

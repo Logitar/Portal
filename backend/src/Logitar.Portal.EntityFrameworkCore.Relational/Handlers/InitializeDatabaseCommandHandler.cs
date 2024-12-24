@@ -16,7 +16,7 @@ internal class InitializeDatabaseCommandHandler : INotificationHandler<Initializ
 
   public InitializeDatabaseCommandHandler(IConfiguration configuration, EventContext eventContext, IdentityContext identityContext, PortalContext portalContext)
   {
-    _enableMigrations = configuration.GetValue<bool>("EnableMigrations");
+    _enableMigrations = configuration.GetValue<bool>("EnableMigrations"); // TODO(fpion): FeatureManagement
     _eventContext = eventContext;
     _identityContext = identityContext;
     _portalContext = portalContext;

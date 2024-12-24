@@ -26,9 +26,9 @@ public static class DependencyInjectionExtensions
   public static IServiceCollection AddLogitarPortalWithEntityFrameworkCorePostgreSQL(this IServiceCollection services, string connectionString)
   {
     return services
-      .AddDbContext<PortalContext>(options => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.PostgreSQL")))
+      .AddDbContext<PortalContext>(options => options.UseNpgsql(connectionString, builder => builder.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.PostgreSQL")))
       .AddLogitarIdentityWithEntityFrameworkCorePostgreSQL(connectionString)
       .AddLogitarPortalWithEntityFrameworkCoreRelational()
-      .AddSingleton<ISearchHelper, PostgresSearchHelper>();
+      .AddSingleton<IQueryHelper, PostgresQueryHelper>();
   }
 }

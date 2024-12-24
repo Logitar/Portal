@@ -22,7 +22,7 @@ public readonly struct RealmId
 
   public static RealmId NewId() => new(Guid.NewGuid());
 
-  public Guid ToGuid => StreamId.ToGuid();
+  public Guid ToGuid() => StreamId.ToGuid();
 
   public static bool operator ==(RealmId left, RealmId right) => left.Equals(right);
   public static bool operator !=(RealmId left, RealmId right) => !left.Equals(right);

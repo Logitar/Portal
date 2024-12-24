@@ -1,5 +1,6 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
-using Logitar.Portal.Contracts.Templates;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Templates.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -8,12 +9,13 @@ internal class TemplateEntity : AggregateEntity
 {
   public int TemplateId { get; private set; }
 
-  public string? TenantId { get; private set; }
+  public Guid? TenantId { get; private set; }
+  public Guid EntityId { get; private set; }
 
   public string UniqueKey { get; private set; } = string.Empty;
   public string UniqueKeyNormalized
   {
-    get => UniqueKey.ToUpper();
+    get => Helper.Normalize(UniqueKey);
     private set { }
   }
   public string? DisplayName { get; private set; }
@@ -25,9 +27,11 @@ internal class TemplateEntity : AggregateEntity
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
-  public TemplateEntity(TemplateCreatedEvent @event) : base(@event)
+  public TemplateEntity(TemplateCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    TemplateId templateId = new(@event.StreamId);
+    TenantId = templateId.TenantId?.ToGuid();
+    EntityId = templateId.EntityId.ToGuid();
 
     UniqueKey = @event.UniqueKey.Value;
 
@@ -39,14 +43,14 @@ internal class TemplateEntity : AggregateEntity
   {
   }
 
-  public void SetUniqueKey(TemplateUniqueKeyChangedEvent @event)
+  public void SetUniqueKey(TemplateUniqueKeyChanged @event)
   {
     Update(@event);
 
     UniqueKey = @event.UniqueKey.Value;
   }
 
-  public void Update(TemplateUpdatedEvent @event)
+  public void Update(TemplateUpdated @event)
   {
     base.Update(@event);
 
@@ -69,9 +73,11 @@ internal class TemplateEntity : AggregateEntity
     }
   }
 
-  private void SetContent(IContent content)
+  private void SetContent(Content content)
   {
     ContentType = content.Type;
     ContentText = content.Text;
   }
+
+  public override string ToString() => $"{DisplayName ?? UniqueKey} | {base.ToString()}";
 }

@@ -1,6 +1,8 @@
-﻿using Logitar.Identity.Contracts.Settings;
+﻿using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Domain.Realms.Events;
+using Logitar.Portal.Domain.Settings;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 
@@ -11,7 +13,7 @@ internal class RealmEntity : AggregateEntity
   public string UniqueSlug { get; private set; } = string.Empty;
   public string UniqueSlugNormalized
   {
-    get => UniqueSlug.ToUpper();
+    get => Helper.Normalize(UniqueSlug);
     private set { }
   }
   public string? DisplayName { get; private set; }
@@ -31,24 +33,9 @@ internal class RealmEntity : AggregateEntity
   public string PasswordHashingStrategy { get; private set; } = string.Empty;
   public bool RequireUniqueEmail { get; private set; }
 
-  public Dictionary<string, string> CustomAttributes { get; private set; } = [];
-  public string? CustomAttributesSerialized
-  {
-    get => CustomAttributes.Count == 0 ? null : JsonSerializer.Serialize(CustomAttributes);
-    private set
-    {
-      if (value == null)
-      {
-        CustomAttributes.Clear();
-      }
-      else
-      {
-        CustomAttributes = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? CustomAttributes { get; private set; }
 
-  public RealmEntity(RealmCreatedEvent @event) : base(@event)
+  public RealmEntity(RealmCreated @event) : base(@event)
   {
     UniqueSlug = @event.UniqueSlug.Value;
 
@@ -63,14 +50,14 @@ internal class RealmEntity : AggregateEntity
   {
   }
 
-  public void SetUniqueSlug(RealmUniqueSlugChangedEvent @event)
+  public void SetUniqueSlug(RealmUniqueSlugChanged @event)
   {
     Update(@event);
 
     UniqueSlug = @event.UniqueSlug.Value;
   }
 
-  public void Update(RealmUpdatedEvent @event)
+  public void Update(RealmUpdated @event)
   {
     base.Update(@event);
 
@@ -109,24 +96,26 @@ internal class RealmEntity : AggregateEntity
       RequireUniqueEmail = @event.RequireUniqueEmail.Value;
     }
 
-    foreach (KeyValuePair<string, string?> customAttribute in @event.CustomAttributes)
+    Dictionary<string, string> customAttributes = GetCustomAttributes();
+    foreach (KeyValuePair<Identifier, string?> customAttribute in @event.CustomAttributes)
     {
       if (customAttribute.Value == null)
       {
-        CustomAttributes.Remove(customAttribute.Key);
+        customAttributes.Remove(customAttribute.Key.Value);
       }
       else
       {
-        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+        customAttributes[customAttribute.Key.Value] = customAttribute.Value;
       }
     }
+    SetCustomAttributes(customAttributes);
   }
 
-  private void SetUniqueNameSettings(IUniqueNameSettings uniqueName)
+  private void SetUniqueNameSettings(ReadOnlyUniqueNameSettings uniqueName)
   {
     AllowedUniqueNameCharacters = uniqueName.AllowedCharacters;
   }
-  private void SetPasswordSettings(IPasswordSettings password)
+  private void SetPasswordSettings(ReadOnlyPasswordSettings password)
   {
     RequiredPasswordLength = password.RequiredLength;
     RequiredPasswordUniqueChars = password.RequiredUniqueChars;
@@ -136,4 +125,15 @@ internal class RealmEntity : AggregateEntity
     PasswordsRequireDigit = password.RequireDigit;
     PasswordHashingStrategy = password.HashingStrategy;
   }
+
+  public Dictionary<string, string> GetCustomAttributes()
+  {
+    return (CustomAttributes == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(CustomAttributes)) ?? [];
+  }
+  private void SetCustomAttributes(Dictionary<string, string> customAttributes)
+  {
+    CustomAttributes = customAttributes.Count < 1 ? null : JsonSerializer.Serialize(customAttributes);
+  }
+
+  public override string ToString() => $"{DisplayName ?? UniqueSlug} | {base.ToString()}";
 }

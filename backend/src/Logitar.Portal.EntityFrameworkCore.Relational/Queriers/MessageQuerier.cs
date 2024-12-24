@@ -19,37 +19,35 @@ internal class MessageQuerier : IMessageQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<MessageEntity> _messages;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<UserEntity> _users;
 
-  public MessageQuerier(IActorService actorService, IdentityContext identityContext, PortalContext portalContext, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public MessageQuerier(IActorService actorService, IdentityContext identityContext, PortalContext portalContext, IQueryHelper queryHelper)
   {
     _actorService = actorService;
     _messages = portalContext.Messages;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
     _users = identityContext.Users;
   }
 
   public async Task<MessageModel> ReadAsync(RealmModel? realm, Message message, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, message.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The message entity 'AggregateId={message.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The message entity 'StreamId={message.Id}' could not be found.");
   }
   public async Task<MessageModel?> ReadAsync(RealmModel? realm, MessageId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
+    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<MessageModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    string streamId = new StreamId(id).Value;
 
     MessageEntity? message = await _messages.AsNoTracking()
       .Include(x => x.Recipients)
       .Include(x => x.Sender)
       .Include(x => x.Template)
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (message == null || message.TenantId != realm?.GetTenantId().Value)
+    if (message == null || message.TenantId != realm?.GetTenantId().ToGuid())
     {
       return null;
     }
@@ -59,16 +57,16 @@ internal class MessageQuerier : IMessageQuerier
 
   public async Task<SearchResults<MessageModel>> SearchAsync(RealmModel? realm, SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
+    IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
       .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.TemplateId)
       .ApplyRealmFilter(PortalDb.Messages.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Messages.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Messages.Subject);
+      .ApplyIdFilter(PortalDb.Messages.StreamId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Messages.Subject);
 
     if (payload.TemplateId.HasValue)
     {
-      string aggregateId = new AggregateId(payload.TemplateId.Value).Value;
-      builder.Where(PortalDb.Templates.AggregateId, Operators.IsEqualTo(aggregateId));
+      string streamId = new StreamId(payload.TemplateId.Value).Value;
+      builder.Where(PortalDb.Templates.StreamId, Operators.IsEqualTo(streamId));
     }
     if (payload.IsDemo.HasValue)
     {
@@ -123,7 +121,7 @@ internal class MessageQuerier : IMessageQuerier
   private async Task<IEnumerable<MessageModel>> MapAsync(IEnumerable<MessageEntity> messages, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = messages.SelectMany(message => message.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     HashSet<int> userIds = [];

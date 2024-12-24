@@ -31,11 +31,11 @@ internal class LogEntity
   public DateTime? EndedOn { get; private set; }
   public TimeSpan? Duration { get; private set; }
 
-  public string? TenantId { get; private set; }
-  public string ActorId { get; private set; } = EventSourcing.ActorId.DefaultValue;
-  public string? ApiKeyId { get; private set; }
-  public string? UserId { get; private set; }
-  public string? SessionId { get; private set; }
+  public Guid? TenantId { get; private set; }
+  public string? ActorId { get; private set; }
+  public Guid? ApiKeyId { get; private set; }
+  public Guid? UserId { get; private set; }
+  public Guid? SessionId { get; private set; }
 
   public List<LogEventEntity> Events { get; private set; } = [];
   public List<LogExceptionEntity> Exceptions { get; private set; } = [];
@@ -73,11 +73,11 @@ internal class LogEntity
     EndedOn = log.EndedOn?.ToUniversalTime();
     Duration = log.Duration;
 
-    TenantId = log.TenantId?.Value;
-    ActorId = log.ActorId.Value;
-    ApiKeyId = log.ApiKeyId?.Value;
-    UserId = log.UserId?.Value;
-    SessionId = log.SessionId?.Value;
+    TenantId = log.TenantId?.ToGuid();
+    ActorId = log.ActorId?.Value;
+    ApiKeyId = log.ApiKeyId;
+    UserId = log.UserId;
+    SessionId = log.SessionId;
 
     foreach (DomainEvent @event in log.Events)
     {
@@ -92,4 +92,8 @@ internal class LogEntity
   private LogEntity()
   {
   }
+
+  public override bool Equals(object? obj) => obj is LogEntity log && log.UniqueId == UniqueId;
+  public override int GetHashCode() => UniqueId.GetHashCode();
+  public override string ToString() => $"{GetType()} (UniqueId={UniqueId})";
 }

@@ -12,10 +12,14 @@ internal class LogEventEntity
   {
     Log = log;
     LogId = log.LogId;
-    EventId = @event.Id;
+    EventId = @event.Id.ToGuid();
   }
 
   private LogEventEntity()
   {
   }
+
+  public override bool Equals(object? obj) => obj is LogEventEntity log && log.LogId == LogId && log.EventId == EventId;
+  public override int GetHashCode() => HashCode.Combine(LogId, EventId);
+  public override string ToString() => $"{GetType()} (LogId={LogId}, EventId={EventId})";
 }

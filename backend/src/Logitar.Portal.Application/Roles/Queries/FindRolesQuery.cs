@@ -46,7 +46,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
     foreach (Role role in roles)
     {
       rolesById[role.EntityId.ToGuid()] = role;
-      rolesByUniqueName[role.UniqueName.Value.ToUpper()] = role;
+      rolesByUniqueName[role.UniqueName.Value.ToUpperInvariant()] = role;
     }
 
     foreach (RoleModification modification in query.Roles)
@@ -55,7 +55,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
       {
         string trimmed = modification.Role.Trim();
         if (Guid.TryParse(trimmed, out Guid id) && rolesById.TryGetValue(id, out Role? role)
-          || rolesByUniqueName.TryGetValue(trimmed.ToUpper(), out role))
+          || rolesByUniqueName.TryGetValue(trimmed.ToUpperInvariant(), out role))
         {
           foundRoles[role.Id] = new FoundRole(role, modification.Action);
         }

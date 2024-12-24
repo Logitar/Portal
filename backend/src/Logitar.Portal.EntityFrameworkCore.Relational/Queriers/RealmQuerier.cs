@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
@@ -16,37 +16,35 @@ internal class RealmQuerier : IRealmQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<RealmEntity> _realms;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
 
-  public RealmQuerier(IActorService actorService, PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public RealmQuerier(IActorService actorService, PortalContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
     _realms = context.Realms;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
   }
 
   public async Task<RealmModel> ReadAsync(Realm realm, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The realm entity 'AggregateId={realm.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The realm entity 'StreamId={realm.Id}' could not be found.");
   }
   public async Task<RealmModel?> ReadAsync(RealmId id, CancellationToken cancellationToken)
     => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<RealmModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    string streamId = new StreamId(id).Value;
 
     RealmEntity? realm = await _realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     return realm == null ? null : await MapAsync(realm, cancellationToken);
   }
 
   public async Task<RealmModel?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
-    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
+    string uniqueSlugNormalized = Helper.Normalize(uniqueSlug);
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);
@@ -56,9 +54,9 @@ internal class RealmQuerier : IRealmQuerier
 
   public async Task<SearchResults<RealmModel>> SearchAsync(SearchRealmsPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Realms.Table).SelectAll(PortalDb.Realms.Table)
-      .ApplyIdFilter(PortalDb.Realms.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Realms.UniqueSlug, PortalDb.Realms.DisplayName);
+    IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Realms.Table).SelectAll(PortalDb.Realms.Table)
+      .ApplyIdFilter(PortalDb.Realms.StreamId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Realms.UniqueSlug, PortalDb.Realms.DisplayName);
 
     IQueryable<RealmEntity> query = _realms.FromQuery(builder).AsNoTracking();
 
