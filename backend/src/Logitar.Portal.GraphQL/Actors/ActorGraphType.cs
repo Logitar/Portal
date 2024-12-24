@@ -7,7 +7,7 @@ internal class ActorGraphType : ObjectGraphType<ActorModel>
 {
   public ActorGraphType()
   {
-    Name = nameof(ActorModel);
+    Name = "Actor";
     Description = "Represents an actor in the system.";
 
     Field(x => x.Id)

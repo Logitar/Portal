@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Messages;
@@ -15,7 +15,6 @@ using Logitar.Portal.Domain.Messages;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Users;
-using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -23,14 +22,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Logitar.Portal.Web.Filters;
 
-internal class ExceptionHandling : ExceptionFilterAttribute
+internal class ExceptionHandling : ExceptionFilterAttribute // TODO(fpion): ProblemDetails
 {
   private readonly JsonSerializerOptions _serializerOptions;
 
-  public ExceptionHandling(IServiceProvider serviceProvider)
+  public ExceptionHandling()
   {
     _serializerOptions = new JsonSerializerOptions();
-    _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
+    _serializerOptions.Converters.Add(new JsonStringEnumConverter());
   }
 
   public override void OnException(ExceptionContext context)
