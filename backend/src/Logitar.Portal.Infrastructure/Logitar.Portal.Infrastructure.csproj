@@ -64,6 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="System.Collections" />
     <Using Include="System.Net.Mail" />
     <Using Include="System.Net.Mime" />
     <Using Include="System.Reflection" />
