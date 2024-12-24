@@ -304,7 +304,7 @@ internal class Mapper
       Id = new EntityId(source.EntityId).ToGuid(),
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
-      SignedOutBy = FindActor(source.SignedOutBy),
+      SignedOutBy = TryFindActor(source.SignedOutBy),
       SignedOutOn = source.SignedOutOn?.AsUniversalTime()
     };
 
@@ -375,9 +375,9 @@ internal class Mapper
     {
       Id = new EntityId(source.EntityId).ToGuid(),
       HasPassword = source.HasPassword,
-      PasswordChangedBy = FindActor(source.PasswordChangedBy),
+      PasswordChangedBy = TryFindActor(source.PasswordChangedBy),
       PasswordChangedOn = source.PasswordChangedOn?.AsUniversalTime(),
-      DisabledBy = FindActor(source.DisabledBy),
+      DisabledBy = TryFindActor(source.DisabledBy),
       DisabledOn = source.DisabledOn?.AsUniversalTime(),
       IsDisabled = source.IsDisabled,
       IsConfirmed = source.IsConfirmed,
@@ -402,7 +402,7 @@ internal class Mapper
       destination.Address = new AddressModel(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
       {
         IsVerified = source.IsAddressVerified,
-        VerifiedBy = FindActor(source.AddressVerifiedBy),
+        VerifiedBy = TryFindActor(source.AddressVerifiedBy),
         VerifiedOn = source.AddressVerifiedOn?.AsUniversalTime()
       };
     }
@@ -411,7 +411,7 @@ internal class Mapper
       destination.Email = new EmailModel(source.EmailAddress)
       {
         IsVerified = source.IsEmailVerified,
-        VerifiedBy = FindActor(source.EmailVerifiedBy),
+        VerifiedBy = TryFindActor(source.EmailVerifiedBy),
         VerifiedOn = source.EmailVerifiedOn?.AsUniversalTime()
       };
     }
@@ -420,7 +420,7 @@ internal class Mapper
       destination.Phone = new PhoneModel(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
       {
         IsVerified = source.IsPhoneVerified,
-        VerifiedBy = FindActor(source.PhoneVerifiedBy),
+        VerifiedBy = TryFindActor(source.PhoneVerifiedBy),
         VerifiedOn = source.PhoneVerifiedOn?.AsUniversalTime()
       };
     }
@@ -448,31 +448,23 @@ internal class Mapper
   private void MapAggregate(AggregateRoot source, AggregateModel destination)
   {
     destination.Version = source.Version;
-    destination.CreatedBy = FindActor(source.CreatedBy);
+    destination.CreatedBy = TryFindActor(source.CreatedBy) ?? ActorModel.System;
     destination.CreatedOn = source.CreatedOn.AsUniversalTime();
-    destination.UpdatedBy = FindActor(source.UpdatedBy);
+    destination.UpdatedBy = TryFindActor(source.UpdatedBy) ?? ActorModel.System;
     destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
   private void MapAggregate(AggregateEntity source, AggregateModel destination)
   {
     destination.Version = source.Version;
-    destination.CreatedBy = FindActor(source.CreatedBy);
+    destination.CreatedBy = TryFindActor(source.CreatedBy) ?? ActorModel.System;
     destination.CreatedOn = source.CreatedOn.AsUniversalTime();
-    destination.UpdatedBy = FindActor(source.UpdatedBy);
+    destination.UpdatedBy = TryFindActor(source.UpdatedBy) ?? ActorModel.System;
     destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
 
-  private ActorModel FindActor(string? id) => FindActor(id == null ? null : new ActorId(id));
-  private ActorModel FindActor(ActorId? id)
-  {
-    if (id.HasValue)
-    {
-      if (_actors.TryGetValue(id.Value, out ActorModel? actor))
-      {
-        return actor;
-      }
-    }
+  private ActorModel FindActor(string id) => FindActor(new ActorId(id));
+  private ActorModel FindActor(ActorId id) => _actors.TryGetValue(id, out ActorModel? actor) ? actor : ActorModel.System;
 
-    return ActorModel.System;
-  }
+  private ActorModel? TryFindActor(string? id) => id == null ? null : FindActor(id);
+  private ActorModel? TryFindActor(ActorId? id) => id.HasValue ? FindActor(id.Value) : null;
 }

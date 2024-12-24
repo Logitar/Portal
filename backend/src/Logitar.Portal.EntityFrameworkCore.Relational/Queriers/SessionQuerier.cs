@@ -66,7 +66,7 @@ internal class SessionQuerier : ISessionQuerier
 
     if (payload.UserId.HasValue)
     {
-      UserId userId = new(new StreamId(payload.UserId.Value));
+      UserId userId = new(realm?.GetTenantId(), new EntityId(payload.UserId.Value));
       builder.Where(Users.StreamId, Operators.IsEqualTo(userId.Value));
     }
     if (payload.IsActive.HasValue)
