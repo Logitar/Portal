@@ -48,7 +48,7 @@ public class SearchApiKeysQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    const int millisecondsDelay = 50;
+    const int millisecondsDelay = 500;
 
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
     ApiKey notInRealm = new(new DisplayName("Portal API Key"), secret);

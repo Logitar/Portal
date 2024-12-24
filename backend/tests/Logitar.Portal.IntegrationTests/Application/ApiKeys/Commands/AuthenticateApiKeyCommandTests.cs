@@ -62,7 +62,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ApiKeyIsExpiredException when the Api key is expired.")]
   public async Task It_should_throw_ApiKeyIsExpiredException_when_the_Api_key_is_expired()
   {
-    const int millisecondsDelay = 50;
+    const int millisecondsDelay = 500;
 
     ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);

@@ -125,7 +125,7 @@ public class Configuration : AggregateRoot
     _loggingSettings = @event.LoggingSettings;
   }
 
-  public void Update(ActorId actorId)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {

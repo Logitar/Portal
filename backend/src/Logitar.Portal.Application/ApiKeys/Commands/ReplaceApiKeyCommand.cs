@@ -3,6 +3,7 @@ using Logitar.EventSourcing;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.ApiKeys;
 using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Settings;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys.Validators;
 using Logitar.Portal.Application.Roles;
@@ -147,8 +148,8 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     {
       if (!roleIds.Contains(roleId))
       {
-        //Role role = new(roleId.AggregateId);
-        //apiKey.RemoveRole(role, actorId); // TODO(fpion): implement
+        Role role = new(new UniqueName(new UniqueNameSettings(), "TEMP"), actorId: null, roleId);
+        apiKey.RemoveRole(role, actorId);
       }
     }
   }
