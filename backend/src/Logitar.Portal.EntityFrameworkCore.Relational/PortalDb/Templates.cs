@@ -18,6 +18,7 @@ public static class Templates
   public static readonly ColumnId ContentType = new(nameof(TemplateEntity.ContentType), Table);
   public static readonly ColumnId Description = new(nameof(TemplateEntity.Description), Table);
   public static readonly ColumnId DisplayName = new(nameof(TemplateEntity.DisplayName), Table);
+  public static readonly ColumnId EntityId = new(nameof(TemplateEntity.EntityId), Table);
   public static readonly ColumnId Subject = new(nameof(TemplateEntity.Subject), Table);
   public static readonly ColumnId TemplateId = new(nameof(TemplateEntity.TemplateId), Table);
   public static readonly ColumnId TenantId = new(nameof(TemplateEntity.TenantId), Table);

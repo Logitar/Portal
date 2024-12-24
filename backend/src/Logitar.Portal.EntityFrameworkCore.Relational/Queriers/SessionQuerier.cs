@@ -61,7 +61,7 @@ internal class SessionQuerier : ISessionQuerier
     IQueryBuilder builder = _queryHelper.QueryFrom(Sessions.Table).SelectAll(Sessions.Table)
       .Join(Users.UserId, Sessions.UserId)
       .ApplyRealmFilter(Users.TenantId, realm)
-      .ApplyIdFilter(Sessions.StreamId, payload.Ids);
+      .ApplyIdFilter(Sessions.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search);
 
     if (payload.UserId.HasValue)

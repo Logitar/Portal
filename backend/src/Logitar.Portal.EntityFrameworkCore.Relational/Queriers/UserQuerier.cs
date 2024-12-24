@@ -113,7 +113,7 @@ internal class UserQuerier : IUserQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(Users.Table).SelectAll(Users.Table)
       .ApplyRealmFilter(Users.TenantId, realm)
-      .ApplyIdFilter(Users.StreamId, payload.Ids);
+      .ApplyIdFilter(Users.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, Users.UniqueName, Users.AddressFormatted, Users.EmailAddress, Users.PhoneE164Formatted, Users.FirstName, Users.MiddleName, Users.LastName, Users.Nickname);
 
     if (payload.HasAuthenticated.HasValue)

@@ -63,7 +63,7 @@ internal class MessageQuerier : IMessageQuerier
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Messages.Table).SelectAll(PortalDb.Messages.Table)
       .LeftJoin(PortalDb.Templates.TemplateId, PortalDb.Messages.TemplateId)
       .ApplyRealmFilter(PortalDb.Messages.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Messages.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Messages.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Messages.Subject);
 
     if (payload.TemplateId.HasValue)

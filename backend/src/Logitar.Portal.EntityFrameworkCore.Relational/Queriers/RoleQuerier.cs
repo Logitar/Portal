@@ -73,7 +73,7 @@ internal class RoleQuerier : IRoleQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(Roles.Table).SelectAll(Roles.Table)
       .ApplyRealmFilter(Roles.TenantId, realm)
-      .ApplyIdFilter(Roles.StreamId, payload.Ids);
+      .ApplyIdFilter(Roles.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, Roles.UniqueName, Roles.DisplayName);
 
     IQueryable<RoleEntity> query = _roles.FromQuery(builder).AsNoTracking();

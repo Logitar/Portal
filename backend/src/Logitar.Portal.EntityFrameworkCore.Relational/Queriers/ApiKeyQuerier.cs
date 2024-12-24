@@ -58,7 +58,7 @@ internal class ApiKeyQuerier : IApiKeyQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(ApiKeys.Table).SelectAll(ApiKeys.Table)
       .ApplyRealmFilter(ApiKeys.TenantId, realm)
-      .ApplyIdFilter(ApiKeys.StreamId, payload.Ids);
+      .ApplyIdFilter(ApiKeys.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, ApiKeys.DisplayName);
 
     if (payload.HasAuthenticated.HasValue)

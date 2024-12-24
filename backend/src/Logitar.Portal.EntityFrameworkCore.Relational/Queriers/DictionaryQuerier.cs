@@ -72,7 +72,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Dictionaries.Table).SelectAll(PortalDb.Dictionaries.Table)
       .ApplyRealmFilter(PortalDb.Dictionaries.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Dictionaries.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Dictionaries.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Dictionaries.Locale);
 
     if (payload.IsEmpty.HasValue)

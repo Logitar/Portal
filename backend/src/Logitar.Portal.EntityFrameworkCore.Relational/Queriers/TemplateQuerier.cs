@@ -72,7 +72,7 @@ internal class TemplateQuerier : ITemplateQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
       .ApplyRealmFilter(PortalDb.Templates.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Templates.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Templates.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Templates.UniqueKey, PortalDb.Templates.DisplayName, PortalDb.Templates.Subject);
 
     if (!string.IsNullOrWhiteSpace(payload.ContentType))

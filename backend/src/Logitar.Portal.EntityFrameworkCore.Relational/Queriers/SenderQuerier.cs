@@ -70,7 +70,7 @@ internal class SenderQuerier : ISenderQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Senders.Table).SelectAll(PortalDb.Senders.Table)
       .ApplyRealmFilter(PortalDb.Senders.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Senders.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Senders.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Senders.EmailAddress, PortalDb.Senders.DisplayName, PortalDb.Senders.DisplayName);
 
     if (payload.Provider.HasValue)
