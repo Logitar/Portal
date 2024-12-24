@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application.Realms;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Realms;
@@ -43,7 +44,7 @@ internal class RealmQuerier : IRealmQuerier
 
   public async Task<RealmModel?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
-    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
+    string uniqueSlugNormalized = Helper.Normalize(uniqueSlug);
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);

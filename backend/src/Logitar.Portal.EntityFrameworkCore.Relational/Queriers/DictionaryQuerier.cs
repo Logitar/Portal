@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Contracts.Actors;
@@ -51,7 +52,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
   {
     Guid? tenantId = realm?.GetTenantId().ToGuid();
-    string localeNormalized = locale.Trim().ToUpper();
+    string localeNormalized = Helper.Normalize(locale);
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.LocaleNormalized == localeNormalized, cancellationToken);

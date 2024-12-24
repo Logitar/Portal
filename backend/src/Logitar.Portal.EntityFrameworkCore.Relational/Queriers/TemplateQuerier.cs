@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Contracts.Actors;
@@ -51,7 +52,7 @@ internal class TemplateQuerier : ITemplateQuerier
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
     Guid? tenantId = realm?.GetTenantId().ToGuid();
-    string uniqueKeyNormalized = uniqueKey.Trim().ToUpper();
+    string uniqueKeyNormalized = Helper.Normalize(uniqueKey);
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueKeyNormalized == uniqueKeyNormalized, cancellationToken);
