@@ -1,6 +1,7 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Users;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -35,11 +36,13 @@ internal class UserQuerier : IUserQuerier
     return await ReadAsync(realm, user.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The user entity 'StreamId={user.Id.Value}' could not be found.");
   }
-  public async Task<UserModel?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<UserModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new UserId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<UserModel?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)

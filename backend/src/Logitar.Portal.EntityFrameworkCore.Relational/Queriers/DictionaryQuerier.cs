@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Dictionaries;
@@ -32,11 +33,13 @@ internal class DictionaryQuerier : IDictionaryQuerier
     return await ReadAsync(realm, dictionary.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The dictionary entity 'StreamId={dictionary.Id.Value}' could not be found.");
   }
-  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new DictionaryId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);

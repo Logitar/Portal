@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.ApiKeys;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -31,13 +32,15 @@ internal class ApiKeyQuerier : IApiKeyQuerier
   public async Task<ApiKeyModel> ReadAsync(RealmModel? realm, ApiKey apiKey, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, apiKey.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The API key entity 'Strea,Id={apiKey.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The API key entity 'StreamId={apiKey.Id.Value}' could not be found.");
   }
-  public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, ApiKeyId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new ApiKeyId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, ApiKeyId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     ApiKeyEntity? apiKey = await _apiKeys.AsNoTracking()
       .Include(x => x.Roles)

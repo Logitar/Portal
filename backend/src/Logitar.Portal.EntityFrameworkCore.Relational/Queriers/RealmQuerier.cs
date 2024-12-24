@@ -30,11 +30,13 @@ internal class RealmQuerier : IRealmQuerier
     return await ReadAsync(realm.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The realm entity 'StreamId={realm.Id}' could not be found.");
   }
-  public async Task<RealmModel?> ReadAsync(RealmId id, CancellationToken cancellationToken)
-    => await ReadAsync(id.ToGuid(), cancellationToken);
   public async Task<RealmModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(new RealmId(id), cancellationToken);
+  }
+  public async Task<RealmModel?> ReadAsync(RealmId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);

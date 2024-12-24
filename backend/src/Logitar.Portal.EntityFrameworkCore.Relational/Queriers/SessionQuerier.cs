@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Sessions;
 using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
@@ -34,11 +35,13 @@ internal class SessionQuerier : ISessionQuerier
     return await ReadAsync(realm, session.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The session entity 'StreamId={session.Id}' could not be found.");
   }
-  public async Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<SessionModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new SessionId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     SessionEntity? session = await _sessions.AsNoTracking()
       .Include(x => x.User).ThenInclude(x => x!.Identifiers)

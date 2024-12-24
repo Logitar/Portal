@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
@@ -35,11 +36,13 @@ internal class MessageQuerier : IMessageQuerier
     return await ReadAsync(realm, message.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The message entity 'StreamId={message.Id}' could not be found.");
   }
-  public async Task<MessageModel?> ReadAsync(RealmModel? realm, MessageId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<MessageModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new MessageId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<MessageModel?> ReadAsync(RealmModel? realm, MessageId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     MessageEntity? message = await _messages.AsNoTracking()
       .Include(x => x.Recipients)

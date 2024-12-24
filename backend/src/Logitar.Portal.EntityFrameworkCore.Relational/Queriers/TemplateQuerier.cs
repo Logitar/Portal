@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Templates;
@@ -32,11 +33,13 @@ internal class TemplateQuerier : ITemplateQuerier
     return await ReadAsync(realm, template.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The template entity 'StreamId={template.Id}' could not be found.");
   }
-  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new TemplateId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);

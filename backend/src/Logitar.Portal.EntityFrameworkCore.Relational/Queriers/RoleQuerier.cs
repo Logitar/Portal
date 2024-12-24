@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Roles;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -33,11 +34,13 @@ internal class RoleQuerier : IRoleQuerier
     return await ReadAsync(realm, role.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The role entity 'StreamId={role.Id}' could not be found.");
   }
-  public async Task<RoleModel?> ReadAsync(RealmModel? realm, RoleId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<RoleModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new RoleId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<RoleModel?> ReadAsync(RealmModel? realm, RoleId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     RoleEntity? role = await _roles.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
