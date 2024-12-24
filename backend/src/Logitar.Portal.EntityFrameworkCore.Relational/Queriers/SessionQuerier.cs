@@ -1,9 +1,10 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Sessions;
 using Logitar.Portal.Contracts.Actors;
@@ -18,33 +19,31 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class SessionQuerier : ISessionQuerier
 {
   private readonly IActorService _actorService;
-  private readonly ISearchHelper _searchHelper;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<SessionEntity> _sessions;
-  private readonly ISqlHelper _sqlHelper;
 
-  public SessionQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public SessionQuerier(IActorService actorService, IdentityContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
+    _queryHelper = queryHelper;
     _sessions = context.Sessions;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
   }
 
-  public async Task<Session> ReadAsync(RealmModel? realm, SessionAggregate session, CancellationToken cancellationToken)
+  public async Task<SessionModel> ReadAsync(RealmModel? realm, Session session, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, session.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The session entity 'AggregateId={session.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The session entity 'StreamId={session.Id}' could not be found.");
   }
-  public async Task<Session?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Session?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
+  public async Task<SessionModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    string streamId = new StreamId(id).Value;
 
     SessionEntity? session = await _sessions.AsNoTracking()
       .Include(x => x.User).ThenInclude(x => x!.Identifiers)
       .Include(x => x.User).ThenInclude(x => x!.Roles)
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     if (session == null || session.User == null || session.User.TenantId != realm?.GetTenantId().Value)
     {
@@ -54,26 +53,26 @@ internal class SessionQuerier : ISessionQuerier
     return await MapAsync(session, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Session>> SearchAsync(RealmModel? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<SessionModel>> SearchAsync(RealmModel? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Sessions.Table).SelectAll(IdentityDb.Sessions.Table)
-      .Join(IdentityDb.Users.UserId, IdentityDb.Sessions.UserId)
-      .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)
-      .ApplyIdFilter(IdentityDb.Sessions.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search);
+    IQueryBuilder builder = _queryHelper.QueryFrom(Sessions.Table).SelectAll(Sessions.Table)
+      .Join(Users.UserId, Sessions.UserId)
+      .ApplyRealmFilter(Users.TenantId, realm)
+      .ApplyIdFilter(Sessions.StreamId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search);
 
     if (payload.UserId.HasValue)
     {
-      UserId userId = new(new AggregateId(payload.UserId.Value).Value);
-      builder.Where(IdentityDb.Users.AggregateId, Operators.IsEqualTo(userId.Value));
+      UserId userId = new(new StreamId(payload.UserId.Value));
+      builder.Where(Users.StreamId, Operators.IsEqualTo(userId.Value));
     }
     if (payload.IsActive.HasValue)
     {
-      builder.Where(IdentityDb.Sessions.IsActive, Operators.IsEqualTo(payload.IsActive.Value));
+      builder.Where(Sessions.IsActive, Operators.IsEqualTo(payload.IsActive.Value));
     }
     if (payload.IsPersistent.HasValue)
     {
-      builder.Where(IdentityDb.Sessions.IsPersistent, Operators.IsEqualTo(payload.IsPersistent.Value));
+      builder.Where(Sessions.IsPersistent, Operators.IsEqualTo(payload.IsPersistent.Value));
     }
 
     IQueryable<SessionEntity> query = _sessions.FromQuery(builder).AsNoTracking()
@@ -104,14 +103,14 @@ internal class SessionQuerier : ISessionQuerier
     query = query.ApplyPaging(payload);
 
     SessionEntity[] sessions = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<Session> items = await MapAsync(sessions, realm, cancellationToken);
+    IEnumerable<SessionModel> items = await MapAsync(sessions, realm, cancellationToken);
 
-    return new SearchResults<Session>(items, total);
+    return new SearchResults<SessionModel>(items, total);
   }
 
-  private async Task<Session> MapAsync(SessionEntity session, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<SessionModel> MapAsync(SessionEntity session, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([session], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Session>> MapAsync(IEnumerable<SessionEntity> sessions, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<SessionModel>> MapAsync(IEnumerable<SessionEntity> sessions, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = sessions.SelectMany(session => session.GetActorIds());
     IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);

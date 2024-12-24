@@ -1,6 +1,5 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Contracts.Actors;
@@ -18,32 +17,30 @@ internal class DictionaryQuerier : IDictionaryQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<DictionaryEntity> _dictionaries;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
 
-  public DictionaryQuerier(IActorService actorService, PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public DictionaryQuerier(IActorService actorService, PortalContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
     _dictionaries = context.Dictionaries;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
   }
 
-  public async Task<Dictionary> ReadAsync(RealmModel? realm, DictionaryAggregate dictionary, CancellationToken cancellationToken)
+  public async Task<DictionaryModel> ReadAsync(RealmModel? realm, Dictionary dictionary, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, dictionary.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The dictionary entity 'AggregateId={dictionary.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The dictionary entity 'StreamId={dictionary.Id.Value}' could not be found.");
   }
-  public async Task<Dictionary?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Dictionary?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
+    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
+  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    string streamId = new StreamId(id).Value;
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().Value)
+    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().ToGuid())
     {
       return null;
     }
@@ -51,9 +48,9 @@ internal class DictionaryQuerier : IDictionaryQuerier
     return await MapAsync(dictionary, realm, cancellationToken);
   }
 
-  public async Task<Dictionary?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
   {
-    string? tenantId = realm?.GetTenantId().Value;
+    Guid? tenantId = realm?.GetTenantId().ToGuid();
     string localeNormalized = locale.Trim().ToUpper();
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
@@ -67,12 +64,12 @@ internal class DictionaryQuerier : IDictionaryQuerier
     return await MapAsync(dictionary, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Dictionary>> SearchAsync(RealmModel? realm, SearchDictionariesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<DictionaryModel>> SearchAsync(RealmModel? realm, SearchDictionariesPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Dictionaries.Table).SelectAll(PortalDb.Dictionaries.Table)
+    IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Dictionaries.Table).SelectAll(PortalDb.Dictionaries.Table)
       .ApplyRealmFilter(PortalDb.Dictionaries.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Dictionaries.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Dictionaries.Locale);
+      .ApplyIdFilter(PortalDb.Dictionaries.StreamId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Dictionaries.Locale);
 
     if (payload.IsEmpty.HasValue)
     {
@@ -111,14 +108,14 @@ internal class DictionaryQuerier : IDictionaryQuerier
     query = query.ApplyPaging(payload);
 
     DictionaryEntity[] dictionaries = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<Dictionary> items = await MapAsync(dictionaries, realm, cancellationToken);
+    IEnumerable<DictionaryModel> items = await MapAsync(dictionaries, realm, cancellationToken);
 
-    return new SearchResults<Dictionary>(items, total);
+    return new SearchResults<DictionaryModel>(items, total);
   }
 
-  private async Task<Dictionary> MapAsync(DictionaryEntity dictionary, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<DictionaryModel> MapAsync(DictionaryEntity dictionary, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([dictionary], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Dictionary>> MapAsync(IEnumerable<DictionaryEntity> dictionaries, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<DictionaryModel>> MapAsync(IEnumerable<DictionaryEntity> dictionaries, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = dictionaries.SelectMany(dictionary => dictionary.GetActorIds());
     IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);

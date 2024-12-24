@@ -1,5 +1,6 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -8,7 +9,8 @@ internal class SenderEntity : AggregateEntity
 {
   public int SenderId { get; private set; }
 
-  public string? TenantId { get; private set; }
+  public Guid? TenantId { get; private set; }
+  public Guid EntityId { get; private set; }
 
   public bool IsDefault { get; private set; }
 
@@ -18,40 +20,29 @@ internal class SenderEntity : AggregateEntity
   public string? Description { get; private set; }
 
   public SenderProvider Provider { get; private set; }
-  public Dictionary<string, string> Settings { get; private set; } = [];
-  public string? SettingsSerialized
-  {
-    get => Settings.Count == 0 ? null : JsonSerializer.Serialize(Settings);
-    private set
-    {
-      if (value == null)
-      {
-        Settings.Clear();
-      }
-      else
-      {
-        Settings = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? Settings { get; private set; }
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
-  public SenderEntity(EmailSenderCreatedEvent @event) : this((SenderCreatedEvent)@event)
+  public SenderEntity(EmailSenderCreated @event) : this((SenderCreated)@event)
   {
   }
-  public SenderEntity(SenderCreatedEvent @event) : base(@event)
+  public SenderEntity(SenderCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    SenderId senderId = new(@event.StreamId);
+    TenantId = senderId.TenantId?.ToGuid();
+    EntityId = senderId.EntityId.ToGuid();
 
     EmailAddress = @event.Email.Address;
 
     Provider = @event.Provider;
   }
 
-  public SenderEntity(SmsSenderCreatedEvent @event) : base(@event)
+  public SenderEntity(SmsSenderCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    SenderId senderId = new(@event.StreamId);
+    TenantId = senderId.TenantId?.ToGuid();
+    EntityId = senderId.EntityId.ToGuid();
 
     PhoneNumber = @event.Phone.Number;
 
@@ -62,32 +53,40 @@ internal class SenderEntity : AggregateEntity
   {
   }
 
-  public void SetDefault(SenderSetDefaultEvent @event)
+  public void SetDefault(SenderSetDefault @event)
   {
     Update(@event);
 
     IsDefault = @event.IsDefault;
   }
 
-  public void SetMailgunSettings(SenderMailgunSettingsChangedEvent @event)
+  public void SetMailgunSettings(SenderMailgunSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey;
-    Settings[nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName;
+    Dictionary<string, string> settings = GetSettings();
+    settings.Clear();
+    settings[nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey;
+    settings[nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName;
+    SetSettings(settings);
   }
-  public void SetSendGridSettings(SenderSendGridSettingsChangedEvent @event)
+  public void SetSendGridSettings(SenderSendGridSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey;
+    Dictionary<string, string> settings = GetSettings();
+    settings.Clear();
+    settings.Clear();
+    settings[nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey;
+    SetSettings(settings);
   }
-  public void SetTwilioSettings(SenderTwilioSettingsChangedEvent @event)
+  public void SetTwilioSettings(SenderTwilioSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid;
-    Settings[nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken;
+    Dictionary<string, string> settings = GetSettings();
+    settings.Clear();
+    settings.Clear();
+    settings[nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid;
+    settings[nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken;
+    SetSettings(settings);
   }
 
-  public void Update(SenderUpdatedEvent @event)
+  public void Update(SenderUpdated @event)
   {
     base.Update(@event);
 
@@ -107,5 +106,24 @@ internal class SenderEntity : AggregateEntity
     {
       Description = @event.Description.Value?.Value;
     }
+  }
+
+  public Dictionary<string, string> GetSettings()
+  {
+    return (Settings == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(Settings)) ?? [];
+  }
+  private void SetSettings(Dictionary<string, string> settings)
+  {
+    Settings = settings.Count < 1 ? null : JsonSerializer.Serialize(settings);
+  }
+
+  public override string ToString()
+  {
+    if (EmailAddress == null)
+    {
+      return $"{PhoneNumber} | {base.ToString()}";
+    }
+
+    return DisplayName == null ? $"{EmailAddress} | {base.ToString()}" : $"{DisplayName} <{EmailAddress}> | {base.ToString()}";
   }
 }

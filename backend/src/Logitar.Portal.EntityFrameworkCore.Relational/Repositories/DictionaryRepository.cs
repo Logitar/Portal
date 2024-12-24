@@ -1,74 +1,70 @@
-﻿using Logitar.Data;
-using Logitar.EventSourcing;
-using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.EventSourcing.Infrastructure;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
-internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IDictionaryRepository
+internal class DictionaryRepository : Repository, IDictionaryRepository
 {
-  private static readonly string AggregateType = typeof(Dictionary).GetNamespaceQualifiedName();
+  private readonly DbSet<DictionaryEntity> _dictionaries;
 
-  private readonly ISqlHelper _sqlHelper;
-
-  public DictionaryRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
-    : base(eventBus, eventContext, eventSerializer)
+  public DictionaryRepository(PortalContext context, IEventStore eventStore) : base(eventStore)
   {
-    _sqlHelper = sqlHelper;
+    _dictionaries = context.Dictionaries;
   }
 
-  public async Task<Dictionary?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<Dictionary>(new AggregateId(id), cancellationToken);
-
+  public async Task<Dictionary?> LoadAsync(DictionaryId id, CancellationToken cancellationToken)
+  {
+    return await LoadAsync(id, version: null, cancellationToken);
+  }
   public async Task<Dictionary?> LoadAsync(DictionaryId id, long? version, CancellationToken cancellationToken)
-    => await base.LoadAsync<Dictionary>(id.AggregateId, version, cancellationToken);
-
-  public async Task<IEnumerable<Dictionary>> LoadAsync(CancellationToken cancellationToken)
-    => await base.LoadAsync<Dictionary>(cancellationToken);
-
-  public async Task<IEnumerable<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Dictionaries.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Dictionaries.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .SelectAll(EventDb.Events.Table)
-      .Build();
-
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
-
-    return Load<Dictionary>(events.Select(EventSerializer.Deserialize));
+    return await LoadAsync<Dictionary>(id.StreamId, version, cancellationToken);
   }
 
-  public async Task<Dictionary?> LoadAsync(TenantId? tenantId, LocaleUnit locale, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<Dictionary>> LoadAsync(CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Dictionaries.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Dictionaries.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .Where(PortalDb.Dictionaries.Locale, Operators.IsEqualTo(locale.Code))
-      .SelectAll(EventDb.Events.Table)
-      .Build();
+    return await LoadAsync<Dictionary>(cancellationToken);
+  }
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
+  public async Task<IReadOnlyCollection<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  {
+    Guid? tenantIdValue = tenantId?.ToGuid();
 
-    return Load<Dictionary>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+    IEnumerable<StreamId> streamIds = (await _dictionaries.AsNoTracking()
+      .Where(x => x.TenantId == tenantIdValue)
+      .Select(x => x.StreamId)
+      .ToArrayAsync(cancellationToken)).Select(value => new StreamId(value));
+
+    return await LoadAsync<Dictionary>(streamIds, cancellationToken);
+  }
+
+  public async Task<Dictionary?> LoadAsync(TenantId? tenantId, Locale locale, CancellationToken cancellationToken)
+  {
+    Guid? tenantIdValue = tenantId?.ToGuid();
+    string localeNormalized = Helper.Normalize(locale.Code);
+
+    string? streamId = await _dictionaries.AsNoTracking()
+      .Where(x => x.TenantId == tenantIdValue && x.LocaleNormalized == localeNormalized)
+      .Select(x => x.StreamId)
+      .SingleOrDefaultAsync(cancellationToken);
+    if (streamId == null)
+    {
+      return null;
+    }
+
+    return await LoadAsync<Dictionary>(new StreamId(streamId), cancellationToken);
   }
 
   public async Task SaveAsync(Dictionary dictionary, CancellationToken cancellationToken)
-    => await base.SaveAsync(dictionary, cancellationToken);
+  {
+    await base.SaveAsync(dictionary, cancellationToken);
+  }
   public async Task SaveAsync(IEnumerable<Dictionary> dictionaries, CancellationToken cancellationToken)
-    => await base.SaveAsync(dictionaries, cancellationToken);
+  {
+    await base.SaveAsync(dictionaries, cancellationToken);
+  }
 }

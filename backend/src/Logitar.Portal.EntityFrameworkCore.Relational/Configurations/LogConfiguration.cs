@@ -1,5 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -35,16 +35,12 @@ internal class LogConfiguration : IEntityTypeConfiguration<LogEntity>
 
     builder.Property(x => x.CorrelationId).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Method).HasMaxLength(byte.MaxValue);
-    builder.Property(x => x.Destination).HasMaxLength(UrlUnit.MaximumLength);
-    builder.Property(x => x.Source).HasMaxLength(UrlUnit.MaximumLength);
+    builder.Property(x => x.Destination).HasMaxLength(Url.MaximumLength);
+    builder.Property(x => x.Source).HasMaxLength(Url.MaximumLength);
     builder.Property(x => x.OperationType).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.OperationName).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.ActivityType).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.Level).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<LogLevel>());
-    builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.ActorId).HasMaxLength(ActorId.MaximumLength);
-    builder.Property(x => x.ApiKeyId).HasMaxLength(AggregateId.MaximumLength);
-    builder.Property(x => x.UserId).HasMaxLength(AggregateId.MaximumLength);
-    builder.Property(x => x.SessionId).HasMaxLength(AggregateId.MaximumLength);
   }
 }

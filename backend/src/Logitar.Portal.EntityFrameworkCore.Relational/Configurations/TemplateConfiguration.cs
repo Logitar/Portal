@@ -1,5 +1,4 @@
-﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -19,17 +18,18 @@ internal class TemplateConfiguration : AggregateConfiguration<TemplateEntity>, I
     builder.ToTable(nameof(PortalContext.Templates));
     builder.HasKey(x => x.TemplateId);
 
+    builder.HasIndex(x => new { x.TenantId, x.EntityId }).IsUnique();
+    builder.HasIndex(x => x.EntityId);
     builder.HasIndex(x => x.UniqueKey);
     builder.HasIndex(x => new { x.TenantId, x.UniqueKeyNormalized }).IsUnique();
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Subject);
     builder.HasIndex(x => x.ContentType);
 
-    builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
-    builder.Property(x => x.UniqueKey).HasMaxLength(IdentifierValidator.MaximumLength);
-    builder.Property(x => x.UniqueKeyNormalized).HasMaxLength(IdentifierValidator.MaximumLength);
+    builder.Property(x => x.UniqueKey).HasMaxLength(Identifier.MaximumLength);
+    builder.Property(x => x.UniqueKeyNormalized).HasMaxLength(Identifier.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);
-    builder.Property(x => x.Subject).HasMaxLength(SubjectUnit.MaximumLength);
+    builder.Property(x => x.Subject).HasMaxLength(Subject.MaximumLength);
     builder.Property(x => x.ContentType).HasMaxLength(ContentTypeMaximumLength);
   }
 }

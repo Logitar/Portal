@@ -24,7 +24,7 @@ internal class RecipientEntity
   public string? UserFullName { get; private set; }
   public string? UserPicture { get; private set; }
 
-  public RecipientEntity(MessageEntity message, UserEntity? user, RecipientUnit recipient)
+  public RecipientEntity(MessageEntity message, UserEntity? user, Recipient recipient)
   {
     Message = message;
     MessageId = message.MessageId;
@@ -49,4 +49,8 @@ internal class RecipientEntity
   private RecipientEntity()
   {
   }
+
+  public override bool Equals(object? obj) => obj is RecipientEntity recipient && recipient.RecipientId == RecipientId;
+  public override int GetHashCode() => RecipientId.GetHashCode();
+  public override string ToString() => $"{GetType()} (RecipientId={RecipientId})";
 }
