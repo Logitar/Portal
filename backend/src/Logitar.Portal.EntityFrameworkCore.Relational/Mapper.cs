@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
@@ -50,6 +51,7 @@ internal class Mapper
   {
     ApiKeyModel destination = new(source.DisplayName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       Description = source.Description,
       ExpiresOn = source.ExpiresOn?.AsUniversalTime(),
       AuthenticatedOn = source.AuthenticatedOn?.AsUniversalTime(),
@@ -91,6 +93,7 @@ internal class Mapper
   {
     DictionaryModel destination = new(new LocaleModel(source.Locale))
     {
+      Id = source.EntityId,
       EntryCount = source.EntryCount,
       Realm = realm
     };
@@ -142,6 +145,7 @@ internal class Mapper
 
     MessageModel destination = new(source.Subject, body, sender, template)
     {
+      Id = source.EntityId,
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
       Locale = LocaleModel.TryCreate(source.Locale),
@@ -185,6 +189,7 @@ internal class Mapper
   {
     OneTimePasswordModel destination = new()
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       ExpiresOn = source.ExpiresOn?.AsUniversalTime(),
       MaximumAttempts = source.MaximumAttempts,
       AttemptCount = source.AttemptCount,
@@ -206,6 +211,7 @@ internal class Mapper
   {
     RealmModel destination = new(source.UniqueSlug, source.Secret)
     {
+      Id = new StreamId(source.StreamId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale),
@@ -260,6 +266,7 @@ internal class Mapper
   {
     RoleModel destination = new(source.UniqueName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       Realm = realm
@@ -285,9 +292,10 @@ internal class Mapper
     UserModel user = ToUser(source.User, realm);
     SessionModel destination = new(user)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
-      SignedOutBy = TryFindActor(source.SignedOutBy),
+      SignedOutBy = FindActor(source.SignedOutBy),
       SignedOutOn = source.SignedOutOn?.AsUniversalTime()
     };
 
@@ -305,6 +313,7 @@ internal class Mapper
   {
     SenderModel destination = new()
     {
+      Id = source.EntityId,
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
       PhoneNumber = source.PhoneNumber,
@@ -340,6 +349,7 @@ internal class Mapper
     ContentModel content = new(source.ContentType, source.ContentText);
     TemplateModel destination = new(source.UniqueKey, source.Subject, content)
     {
+      Id = source.EntityId,
       DisplayName = source.DisplayName,
       Description = source.Description,
       Realm = realm
@@ -354,10 +364,11 @@ internal class Mapper
   {
     UserModel destination = new(source.UniqueName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       HasPassword = source.HasPassword,
-      PasswordChangedBy = TryFindActor(source.PasswordChangedBy),
+      PasswordChangedBy = FindActor(source.PasswordChangedBy),
       PasswordChangedOn = source.PasswordChangedOn?.AsUniversalTime(),
-      DisabledBy = TryFindActor(source.DisabledBy),
+      DisabledBy = FindActor(source.DisabledBy),
       DisabledOn = source.DisabledOn?.AsUniversalTime(),
       IsDisabled = source.IsDisabled,
       IsConfirmed = source.IsConfirmed,
@@ -382,7 +393,7 @@ internal class Mapper
       destination.Address = new AddressModel(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
       {
         IsVerified = source.IsAddressVerified,
-        VerifiedBy = TryFindActor(source.AddressVerifiedBy),
+        VerifiedBy = FindActor(source.AddressVerifiedBy),
         VerifiedOn = source.AddressVerifiedOn?.AsUniversalTime()
       };
     }
@@ -391,7 +402,7 @@ internal class Mapper
       destination.Email = new EmailModel(source.EmailAddress)
       {
         IsVerified = source.IsEmailVerified,
-        VerifiedBy = TryFindActor(source.EmailVerifiedBy),
+        VerifiedBy = FindActor(source.EmailVerifiedBy),
         VerifiedOn = source.EmailVerifiedOn?.AsUniversalTime()
       };
     }
@@ -400,7 +411,7 @@ internal class Mapper
       destination.Phone = new PhoneModel(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
       {
         IsVerified = source.IsPhoneVerified,
-        VerifiedBy = TryFindActor(source.PhoneVerifiedBy),
+        VerifiedBy = FindActor(source.PhoneVerifiedBy),
         VerifiedOn = source.PhoneVerifiedOn?.AsUniversalTime()
       };
     }
@@ -427,25 +438,32 @@ internal class Mapper
 
   private void MapAggregate(AggregateRoot source, AggregateModel destination)
   {
-    destination.Id = source.Id.ToGuid();
     destination.Version = source.Version;
-    //destination.CreatedBy = TryFindActorModel(source.CreatedBy); // TODO(fpion): implement
+    destination.CreatedBy = FindActor(source.CreatedBy);
     destination.CreatedOn = source.CreatedOn.AsUniversalTime();
-    //destination.UpdatedBy = TryFindActorModel(source.UpdatedBy); // TODO(fpion): implement
+    destination.UpdatedBy = FindActor(source.UpdatedBy);
     destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
   private void MapAggregate(AggregateEntity source, AggregateModel destination)
   {
-    //destination.Id = new AggregateId(source.AggregateId).ToGuid(); // TODO(fpion): complete
     destination.Version = source.Version;
-    //destination.CreatedBy = TryFindActorModel(source.CreatedBy); // TODO(fpion): implement
+    destination.CreatedBy = FindActor(source.CreatedBy);
     destination.CreatedOn = source.CreatedOn.AsUniversalTime();
-    //destination.UpdatedBy = TryFindActorModel(source.UpdatedBy); // TODO(fpion): implement
+    destination.UpdatedBy = FindActor(source.UpdatedBy);
     destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
 
-  private ActorModel? TryFindActor(string? id) => id == null ? null : FindActor(id); // TODO(fpion): implement
-  private ActorModel? TryFindActor(ActorId? id) => id == null ? null : FindActor(id.Value); // TODO(fpion): implement
-  private ActorModel FindActor(string id) => FindActor(new ActorId(id)); // TODO(fpion): implement
-  private ActorModel FindActor(ActorId id) => _actors.TryGetValue(id, out ActorModel? actor) ? actor : ActorModel.System; // TODO(fpion): implement
+  private ActorModel FindActor(string? id) => FindActor(id == null ? null : new ActorId(id));
+  private ActorModel FindActor(ActorId? id)
+  {
+    if (id.HasValue)
+    {
+      if (_actors.TryGetValue(id.Value, out ActorModel? actor))
+      {
+        return actor;
+      }
+    }
+
+    return ActorModel.System;
+  }
 }
