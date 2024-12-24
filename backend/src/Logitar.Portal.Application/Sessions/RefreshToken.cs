@@ -30,7 +30,8 @@ internal record RefreshToken
       throw new ArgumentException($"The value '{value}' is not a valid refresh token.", nameof(value));
     }
 
-    SessionId id = new(values[1]);
+    SessionId id = new();
+    //SessionId id = new(values[1]); // TODO(fpion): implement
     string secret = values[2].FromUriSafeBase64();
     return new RefreshToken(id, secret);
   }

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.Contracts.Messages;
 
-public record Recipient
+public record RecipientModel
 {
   public RecipientType Type { get; set; }
 
@@ -13,11 +13,11 @@ public record Recipient
 
   public UserModel? User { get; set; }
 
-  public Recipient() : this(string.Empty)
+  public RecipientModel() : this(string.Empty)
   {
   }
 
-  public Recipient(string address)
+  public RecipientModel(string address)
   {
     Address = address;
   }

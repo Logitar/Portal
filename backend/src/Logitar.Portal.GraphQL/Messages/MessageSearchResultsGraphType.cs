@@ -3,7 +3,7 @@ using Logitar.Portal.GraphQL.Search;
 
 namespace Logitar.Portal.GraphQL.Messages;
 
-internal class MessageSearchResultsGraphType : SearchResultsGraphType<MessageGraphType, Message>
+internal class MessageSearchResultsGraphType : SearchResultsGraphType<MessageGraphType, MessageModel>
 {
   public MessageSearchResultsGraphType() : base("MessageSearchResults", "Represents the results of a message search.")
   {

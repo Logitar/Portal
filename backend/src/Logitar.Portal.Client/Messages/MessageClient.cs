@@ -14,13 +14,13 @@ internal class MessageClient : BaseClient, IMessageClient
   {
   }
 
-  public async Task<Message?> ReadAsync(Guid id, IRequestContext? context)
+  public async Task<MessageModel?> ReadAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await GetAsync<Message>(uri, context);
+    return await GetAsync<MessageModel>(uri, context);
   }
 
-  public async Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, IRequestContext? context)
+  public async Task<SearchResults<MessageModel>> SearchAsync(SearchMessagesPayload payload, IRequestContext? context)
   {
     IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
     if (payload.TemplateId.HasValue)
@@ -37,7 +37,7 @@ internal class MessageClient : BaseClient, IMessageClient
     }
     Uri uri = builder.BuildUri(UriKind.Relative);
 
-    return await GetAsync<SearchResults<Message>>(uri, context)
+    return await GetAsync<SearchResults<MessageModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 

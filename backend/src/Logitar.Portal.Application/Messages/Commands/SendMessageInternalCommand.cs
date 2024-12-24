@@ -1,5 +1,17 @@
-﻿using Logitar.Portal.Application.Activities;
+﻿using FluentValidation;
+using Logitar.EventSourcing;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
+using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Messages.Validators;
+using Logitar.Portal.Application.Senders;
+using Logitar.Portal.Application.Templates;
+using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts.Messages;
+using Logitar.Portal.Domain.Dictionaries;
+using Logitar.Portal.Domain.Messages;
+using Logitar.Portal.Domain.Senders;
+using Logitar.Portal.Domain.Templates;
 using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Commands;

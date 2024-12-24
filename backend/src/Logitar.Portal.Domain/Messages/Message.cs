@@ -9,7 +9,7 @@ using Logitar.Portal.Domain.Users;
 
 namespace Logitar.Portal.Domain.Messages;
 
-public class MessageAggregate : AggregateRoot
+public class Message : AggregateRoot
 {
   public new MessageId Id => new(base.Id);
   public TenantId? TenantId => Id.TenantId;
@@ -39,11 +39,11 @@ public class MessageAggregate : AggregateRoot
   private readonly Dictionary<string, string> _resultData = [];
   public IReadOnlyDictionary<string, string> ResultData => _resultData.AsReadOnly();
 
-  public MessageAggregate() : base()
+  public Message() : base()
   {
   }
 
-  public MessageAggregate(
+  public Message(
     Subject subject,
     Content body,
     IReadOnlyCollection<Recipient> recipients,
