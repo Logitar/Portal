@@ -13,5 +13,5 @@ public record MessageCreated(
   TemplateSummary Template,
   bool IgnoreUserLocale,
   Locale? Locale,
-  IReadOnlyDictionary<string, string> Variables,
+  IReadOnlyDictionary<Identifier, string> Variables,
   bool IsDemo) : DomainEvent, INotification;

@@ -11,15 +11,10 @@ namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
 internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 {
-  private readonly JsonSerializerOptions _serializerOptions;
-
   private readonly Dictionary<SenderProvider, IProviderStrategy> _strategies = [];
 
-  public SendEmailCommandHandler(IServiceProvider serviceProvider, IEnumerable<IProviderStrategy> strategies)
+  public SendEmailCommandHandler(IEnumerable<IProviderStrategy> strategies)
   {
-    _serializerOptions = new();
-    _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
-
     foreach (IProviderStrategy strategy in strategies)
     {
       _strategies[strategy.Provider] = strategy;
@@ -29,7 +24,7 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
   public async Task Handle(SendEmailCommand command, CancellationToken cancellationToken)
   {
     ActorId actorId = command.ActorId;
-    MessageAggregate message = command.Message;
+    Message message = command.Message;
     Sender sender = command.Sender;
 
     if (!_strategies.TryGetValue(sender.Provider, out IProviderStrategy? strategy))
@@ -60,14 +55,14 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
     }
   }
 
-  private Dictionary<string, string> SerializeData(SendMailResult result)
+  private static Dictionary<string, string> SerializeData(SendMailResult result)
   {
     Dictionary<string, string> resultData = new(capacity: result.Data.Count);
     foreach (KeyValuePair<string, object?> data in result.Data)
     {
       if (data.Value != null)
       {
-        resultData[data.Key] = JsonSerializer.Serialize(data.Value, data.Value.GetType(), _serializerOptions).Trim('"');
+        resultData[data.Key] = JsonSerializer.Serialize(data.Value, data.Value.GetType()).Trim('"');
       }
     }
     return resultData;
@@ -75,18 +70,17 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 
   private static SendMailResult ToResult(Exception exception)
   {
-    ExceptionDetail detail = ExceptionDetail.From(exception);
     return SendMailResult.Failure(new Dictionary<string, object?>
     {
-      [nameof(ExceptionDetail.Type)] = detail.Type,
-      [nameof(ExceptionDetail.Message)] = detail.Message,
-      [nameof(ExceptionDetail.InnerException)] = detail.InnerException,
-      [nameof(ExceptionDetail.HResult)] = detail.HResult,
-      [nameof(ExceptionDetail.HelpLink)] = detail.HelpLink,
-      [nameof(ExceptionDetail.Source)] = detail.Source,
-      [nameof(ExceptionDetail.StackTrace)] = detail.StackTrace,
-      [nameof(ExceptionDetail.TargetSite)] = detail.TargetSite,
-      [nameof(ExceptionDetail.Data)] = detail.Data
+      ["Type"] = exception.GetType().GetNamespaceQualifiedName(),
+      ["Message"] = exception.Message,
+      ["InnerException"] = null, // TODO(fpion): implement
+      ["HResult"] = exception.HResult,
+      ["HelpLink"] = exception.HelpLink,
+      ["Source"] = exception.Source,
+      ["StackTrace"] = exception.StackTrace,
+      ["TargetSite"] = exception.TargetSite?.ToString(),
+      ["Data"] = exception.Data
     });
   }
 }

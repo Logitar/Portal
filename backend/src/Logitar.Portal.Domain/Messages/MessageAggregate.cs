@@ -30,8 +30,8 @@ public class MessageAggregate : AggregateRoot
   public bool IgnoreUserLocale { get; private set; }
   public Locale? Locale { get; private set; }
 
-  private readonly Dictionary<string, string> _variables = [];
-  public IReadOnlyDictionary<string, string> Variables => _variables.AsReadOnly();
+  private readonly Dictionary<Identifier, string> _variables = [];
+  public IReadOnlyDictionary<Identifier, string> Variables => _variables.AsReadOnly();
 
   public bool IsDemo { get; private set; }
 
@@ -51,7 +51,7 @@ public class MessageAggregate : AggregateRoot
     Template template,
     bool ignoreUserLocale = false,
     Locale? locale = null,
-    IReadOnlyDictionary<string, string>? variables = null,
+    IReadOnlyDictionary<Identifier, string>? variables = null,
     bool isDemo = false,
     ActorId actorId = default,
     MessageId? id = null) : base((id ?? MessageId.NewId()).StreamId)
@@ -89,7 +89,7 @@ public class MessageAggregate : AggregateRoot
       throw new TemplateNotInTenantException(template, tenantId);
     }
 
-    Raise(new MessageCreated(subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template), ignoreUserLocale, locale, variables ?? new Dictionary<string, string>(), isDemo), actorId);
+    Raise(new MessageCreated(subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template), ignoreUserLocale, locale, variables ?? new Dictionary<Identifier, string>(), isDemo), actorId);
   }
   protected virtual void Handle(MessageCreated @event)
   {
@@ -105,7 +105,7 @@ public class MessageAggregate : AggregateRoot
     Locale = @event.Locale;
 
     _variables.Clear();
-    foreach (KeyValuePair<string, string> variable in @event.Variables)
+    foreach (KeyValuePair<Identifier, string> variable in @event.Variables)
     {
       _variables[variable.Key] = variable.Value;
     }
