@@ -58,7 +58,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     Dictionaries defaultDictionaries = new(allDictionaries, targetLocale, defaultLocale);
 
     Variables variables = new(payload.Variables);
-    IReadOnlyDictionary<string, string> variableDictionary = variables.AsDictionary();
+    IReadOnlyDictionary<Identifier, string> variableDictionary = variables.AsDictionary();
 
     List<Message> messages = new(capacity: allRecipients.To.Count);
     foreach (Recipient recipient in allRecipients.To)
