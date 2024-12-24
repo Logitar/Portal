@@ -4,6 +4,7 @@ using Logitar.Identity.Contracts.Settings;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.Passwords;
 using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Settings;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
@@ -274,8 +275,8 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       if (!roleIds.Contains(roleId))
       {
-        //Role role = new(roleId.AggregateId);
-        //user.RemoveRole(role, actorId); // TODO(fpion): implement
+        Role role = new(new UniqueName(new UniqueNameSettings(), "TEMP"), actorId: null, roleId);
+        user.RemoveRole(role, actorId);
       }
     }
   }

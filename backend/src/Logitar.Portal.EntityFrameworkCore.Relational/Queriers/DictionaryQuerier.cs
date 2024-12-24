@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Dictionaries;
@@ -32,16 +33,18 @@ internal class DictionaryQuerier : IDictionaryQuerier
     return await ReadAsync(realm, dictionary.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The dictionary entity 'StreamId={dictionary.Id.Value}' could not be found.");
   }
-  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new DictionaryId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, DictionaryId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().ToGuid())
+    if (dictionary == null || dictionary.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -51,7 +54,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
 
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
     string localeNormalized = Helper.Normalize(locale);
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
@@ -69,7 +72,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Dictionaries.Table).SelectAll(PortalDb.Dictionaries.Table)
       .ApplyRealmFilter(PortalDb.Dictionaries.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Dictionaries.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Dictionaries.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Dictionaries.Locale);
 
     if (payload.IsEmpty.HasValue)

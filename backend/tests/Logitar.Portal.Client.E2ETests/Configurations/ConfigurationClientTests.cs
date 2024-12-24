@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Contracts;
+﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
 
 namespace Logitar.Portal.Configurations;
@@ -25,7 +25,7 @@ internal class ConfigurationClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateConfigurationPayload update = new()
       {
-        DefaultLocale = new Modification<string>("fr-CA")
+        DefaultLocale = new ChangeModel<string>("fr-CA")
       };
       configuration = await _client.UpdateAsync(update, context.Request);
       context.Succeed();

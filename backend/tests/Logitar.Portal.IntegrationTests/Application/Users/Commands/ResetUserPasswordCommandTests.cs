@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,10 +19,10 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   {
     const string newPassword = "Test123!";
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     ResetUserPasswordPayload payload = new(newPassword);
-    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
@@ -40,12 +40,12 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 
     ResetUserPasswordPayload payload = new(PasswordString);
-    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

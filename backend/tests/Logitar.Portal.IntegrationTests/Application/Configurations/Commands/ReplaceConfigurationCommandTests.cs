@@ -26,7 +26,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
 
     configuration.Secret = JwtSecret.Generate();
     string newSecret = configuration.Secret.Value;
-    configuration.Update(default);
+    configuration.Update();
     await _configurationRepository.SaveAsync(configuration);
 
     ReplaceConfigurationPayload payload = new(oldSecret)

@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using Logitar.Identity.Contracts;
 using Logitar.Portal.Client;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
@@ -112,10 +111,10 @@ internal class UserClientTests : IClientTests
         {
           Current = _credentials.Password
         },
-        Email = new Modification<EmailPayload>(new EmailPayload(_recipient.Address, isVerified: true)),
-        FirstName = new Modification<string>(firstName),
-        MiddleName = new Modification<string>(middleName),
-        LastName = new Modification<string>(lastName)
+        Email = new ChangeModel<EmailPayload>(new EmailPayload(_recipient.Address, isVerified: true)),
+        FirstName = new ChangeModel<string>(firstName),
+        MiddleName = new ChangeModel<string>(middleName),
+        LastName = new ChangeModel<string>(lastName)
       };
       update.Roles.Add(new RoleModification(context.Role.UniqueName));
       user = await _client.UpdateAsync(user.Id, update, context.Request)

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Messages.Settings;
 using Logitar.Portal.Application.OneTimePasswords.Commands;
 using Logitar.Portal.Application.Senders;
@@ -24,6 +24,7 @@ using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Messages.Commands;
 
@@ -40,7 +41,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private readonly SenderSettings _senderSettings;
 
   private Sender? _sender = null;
-  private TemplateAggregate? _template = null;
+  private Template? _template = null;
 
   public SendMessageInternalCommandTests() : base()
   {
@@ -97,21 +98,21 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.NotNull(_template);
 
     UniqueName uniqueName = new(Realm.UniqueNameSettings, _recipientSettings.Address);
-    UserAggregate user = new(uniqueName, TenantId);
-    user.SetEmail(new EmailUnit(_recipientSettings.Address, isVerified: false));
-    user.SetPhone(new PhoneUnit(_recipientSettings.PhoneNumber, countryCode: null, extension: null, isVerified: false));
+    User user = new(uniqueName, id: UserId.NewId(TenantId));
+    user.SetEmail(new Email(_recipientSettings.Address, isVerified: false));
+    user.SetPhone(new Phone(_recipientSettings.PhoneNumber, countryCode: null, extension: null, isVerified: false));
     string[] names = _recipientSettings.DisplayName?.Split() ?? [];
     if (names.Length > 0)
     {
-      user.FirstName = new PersonNameUnit(names.First());
+      user.FirstName = new PersonName(names.First());
     }
     if (names.Length > 1)
     {
-      user.LastName = new PersonNameUnit(names.Last());
+      user.LastName = new PersonName(names.Last());
     }
     if (names.Length > 2)
     {
-      user.MiddleName = new PersonNameUnit(string.Join(' ', names.Skip(1).Take(names.Length - 2)));
+      user.MiddleName = new PersonName(string.Join(' ', names.Skip(1).Take(names.Length - 2)));
     }
     user.Locale = ignoreUserLocale ? new Locale(Realm.DefaultLocale.Code) : locale;
     user.Update();
@@ -126,7 +127,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     payload.Recipients.Add(new RecipientPayload
     {
       Type = RecipientType.To,
-      UserId = user.Id.ToGuid()
+      UserId = user.EntityId.ToGuid()
     });
 
     switch (type)
@@ -136,7 +137,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
         {
           IsConsumable = true,
           Type = "reset_password+jwt",
-          Subject = user.Id.ToGuid().ToString()
+          Subject = user.EntityId.ToGuid().ToString()
         };
         CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(new CreateTokenCommand(createToken));
         payload.Variables.Add(new Variable("Token", createdToken.Token));
@@ -161,8 +162,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
     SendMessageInternalCommand command = new(payload);
     SentMessages sentMessages = await ActivityPipeline.ExecuteAsync(command);
 
-    Guid id = Assert.Single(sentMessages.Ids);
-    Message? message = await _messageRepository.LoadAsync(id);
+    MessageId messageId = new(TenantId, new EntityId(Assert.Single(sentMessages.Ids)));
+    Message? message = await _messageRepository.LoadAsync(messageId);
     Assert.NotNull(message);
 
     Assert.Equal(TenantId, message.TenantId);
@@ -191,7 +192,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.True(message.IsDemo);
     Assert.Equal(MessageStatus.Succeeded, message.Status);
 
-    RecipientUnit recipient = Assert.Single(message.Recipients);
+    Recipient recipient = Assert.Single(message.Recipients);
     Assert.Equal(RecipientType.To, recipient.Type);
     Assert.Equal(_recipientSettings.Address, recipient.Address);
     Assert.Equal(_recipientSettings.DisplayName, recipient.DisplayName);
@@ -201,7 +202,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.Equal(payload.Variables.Count, message.Variables.Count);
     foreach (Variable variable in payload.Variables)
     {
-      Assert.Contains(message.Variables, v => v.Key == variable.Key && v.Value == variable.Value);
+      Assert.Contains(message.Variables, v => v.Key.Value == variable.Key && v.Value == variable.Value);
     }
   }
 
@@ -228,7 +229,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   {
     await CreateSenderAsync(TenantId, SenderProvider.Twilio);
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), id: UserId.NewId(TenantId));
     await _userRepository.SaveAsync(user);
 
     SetRealm();
@@ -237,11 +238,11 @@ public class SendMessageInternalCommandTests : IntegrationTests
     payload.Recipients.Add(new RecipientPayload
     {
       Type = RecipientType.To,
-      UserId = user.Id.ToGuid()
+      UserId = user.EntityId.ToGuid()
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal([user.Id.ToGuid()], exception.UserIds);
+    Assert.Equal([user.EntityId.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
 
@@ -250,7 +251,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
   {
     await CreateSenderAsync(TenantId);
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), id: UserId.NewId(TenantId));
     await _userRepository.SaveAsync(user);
 
     SetRealm();
@@ -259,11 +260,11 @@ public class SendMessageInternalCommandTests : IntegrationTests
     payload.Recipients.Add(new RecipientPayload
     {
       Type = RecipientType.To,
-      UserId = user.Id.ToGuid()
+      UserId = user.EntityId.ToGuid()
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal([user.Id.ToGuid()], exception.UserIds);
+    Assert.Equal([user.EntityId.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
 
@@ -297,7 +298,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(payload.SenderId, exception.Id);
+    Assert.Equal(payload.SenderId?.ToString(), exception.Id);
     Assert.Equal("SenderId", exception.PropertyName);
   }
 
@@ -312,7 +313,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
 
     SendMessagePayload payload = new("PasswordRecovery")
     {
-      SenderId = _sender.Id.ToGuid()
+      SenderId = _sender.EntityId.ToGuid()
     };
     payload.Recipients.Add(new RecipientPayload
     {
@@ -322,9 +323,9 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SenderNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_sender.Id, exception.SenderId);
-    Assert.Equal(TenantId, exception.ExpectedTenantId);
-    Assert.Equal(_sender.TenantId, exception.ActualTenantId);
+    Assert.Equal(_sender.Id.Value, exception.SenderId);
+    Assert.Equal(TenantId.Value, exception.ExpectedTenantId);
+    Assert.Equal(_sender.TenantId?.Value, exception.ActualTenantId);
   }
 
   [Fact(DisplayName = "It should throw TemplateNotFoundException when the template could not be found.")]
@@ -354,7 +355,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     await CreateTemplateAsync(TenantId);
     Assert.NotNull(_template);
 
-    SendMessagePayload payload = new(_template.Id.ToGuid().ToString());
+    SendMessagePayload payload = new(_template.EntityId.ToGuid().ToString());
     payload.Recipients.Add(new RecipientPayload
     {
       Type = RecipientType.To,
@@ -363,9 +364,9 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<TemplateNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_template.Id, exception.TemplateId);
+    Assert.Equal(_template.Id.Value, exception.TemplateId);
     Assert.Null(exception.ExpectedTenantId);
-    Assert.Equal(_template.TenantId, exception.ActualTenantId);
+    Assert.Equal(_template.TenantId?.Value, exception.ActualTenantId);
   }
 
   [Fact(DisplayName = "It should throw UsersNotFoundException when some users could not be found.")]
@@ -409,16 +410,16 @@ public class SendMessageInternalCommandTests : IntegrationTests
 
     UserId userId = (await _userRepository.LoadAsync()).Single().Id;
 
-    SendMessagePayload payload = new(_template.Id.ToGuid().ToString());
+    SendMessagePayload payload = new(_template.EntityId.ToGuid().ToString());
     payload.Recipients.Add(new RecipientPayload
     {
       Type = RecipientType.To,
-      UserId = userId.ToGuid()
+      UserId = userId.EntityId.ToGuid()
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UsersNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(userId, exception.UserIds.Single());
-    Assert.Equal(TenantId, exception.ExpectedTenantId);
+    Assert.Equal(userId.Value, exception.UserIds.Single());
+    Assert.Equal(TenantId.Value, exception.ExpectedTenantId);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -435,22 +436,22 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private async Task<Locale> CreateDictionariesAsync(TenantId? tenantId = null)
   {
     Locale locale = new("fr-CA");
-    DictionaryAggregate canadianFrench = new(locale, tenantId);
-    canadianFrench.SetEntry("Hello", "Bonjour {name} !");
+    Dictionary canadianFrench = new(locale, actorId: default, DictionaryId.NewId(tenantId));
+    canadianFrench.SetEntry(new Identifier("Hello"), "Bonjour {name} !");
     canadianFrench.Update();
 
-    DictionaryAggregate french = new(new Locale("fr"), tenantId);
-    french.SetEntry("Team", "L'équipe Logitar");
+    Dictionary french = new(new Locale("fr"), actorId: default, DictionaryId.NewId(tenantId));
+    french.SetEntry(new Identifier("Team"), "L'équipe Logitar");
     french.Update();
 
     Assert.NotNull(Realm.DefaultLocale);
-    DictionaryAggregate @default = new(new Locale(Realm.DefaultLocale.Code), tenantId);
-    @default.SetEntry("Cordially", "Cordially,");
-    @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
-    @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");
-    @default.SetEntry("PasswordRecovery_OneTimePassword", "Your password reset code is {code}. This code is only valid for one hour.");
-    @default.SetEntry("PasswordRecovery_Otherwise", "If we've been mistaken, we suggest you to delete this message.");
-    @default.SetEntry("PasswordRecovery_Subject", "Reset your password");
+    Dictionary @default = new(new Locale(Realm.DefaultLocale.Code), actorId: default, DictionaryId.NewId(tenantId));
+    @default.SetEntry(new Identifier("Cordially"), "Cordially,");
+    @default.SetEntry(new Identifier("PasswordRecovery_ClickLink"), "Click on the link below to reset your password.");
+    @default.SetEntry(new Identifier("PasswordRecovery_LostYourPassword"), "It seems you have lost your password...");
+    @default.SetEntry(new Identifier("PasswordRecovery_OneTimePassword"), "Your password reset code is {code}. This code is only valid for one hour.");
+    @default.SetEntry(new Identifier("PasswordRecovery_Otherwise"), "If we've been mistaken, we suggest you to delete this message.");
+    @default.SetEntry(new Identifier("PasswordRecovery_Subject"), "Reset your password");
     @default.Update();
 
     await _dictionaryRepository.SaveAsync([canadianFrench, french, @default]);
@@ -460,8 +461,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
 
   private async Task CreateSenderAsync(TenantId? tenantId = null, SenderProvider provider = SenderProvider.SendGrid, bool isDefault = true)
   {
-    EmailUnit? email = null;
-    PhoneUnit? phone = null;
+    Email? email = null;
+    Phone? phone = null;
     Domain.Senders.SenderSettings settings;
     switch (provider)
     {
@@ -489,7 +490,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
         {
           throw new InvalidOperationException("The sender email address has not been initialized.");
         }
-        _sender = new(email, settings, tenantId)
+        _sender = new(email, settings, actorId: default, SenderId.NewId(tenantId))
         {
           DisplayName = DisplayName.TryCreate(_senderSettings.DisplayName)
         };
@@ -500,7 +501,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
         {
           throw new InvalidOperationException("The sender phone number has not been initialized.");
         }
-        _sender = new(phone, settings, tenantId);
+        _sender = new(phone, settings, actorId: default, SenderId.NewId(tenantId));
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
@@ -515,24 +516,24 @@ public class SendMessageInternalCommandTests : IntegrationTests
 
   private async Task CreateTemplateAsync(TenantId? tenantId = null, SenderProvider provider = SenderProvider.SendGrid)
   {
-    ContentUnit content;
+    Content content;
     SenderType type = provider.GetSenderType();
     switch (type)
     {
       case SenderType.Email:
         string text = await File.ReadAllTextAsync("Templates/PasswordRecovery.html");
-        content = ContentUnit.Html(text);
+        content = Content.Html(text);
         break;
       case SenderType.Sms:
-        content = ContentUnit.PlainText(@"@(Model.Resource(""PasswordRecovery_OneTimePassword"").Replace(""{code}"", Model.Variable(""Code"")))");
+        content = Content.PlainText(@"@(Model.Resource(""PasswordRecovery_OneTimePassword"").Replace(""{code}"", Model.Variable(""Code"")))");
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
     }
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("PasswordRecovery_Subject");
-    _template = new TemplateAggregate(uniqueKey, subject, content, tenantId)
+    Identifier uniqueKey = new("PasswordRecovery");
+    Subject subject = new("PasswordRecovery_Subject");
+    _template = new Template(uniqueKey, subject, content, actorId: default, TemplateId.NewId(tenantId))
     {
       DisplayName = new("Password Recovery")
     };

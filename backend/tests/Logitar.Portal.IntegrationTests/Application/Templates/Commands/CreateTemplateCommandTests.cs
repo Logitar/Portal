@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Portal.Application.Realms;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
@@ -34,7 +34,7 @@ public class CreateTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a new template.")]
   public async Task It_should_create_a_new_template()
   {
-    Content content = Content.PlainText("Hello World!");
+    ContentModel content = ContentModel.PlainText("Hello World!");
     CreateTemplatePayload payload = new("PasswordRecovery", "Reset your password", content)
     {
       DisplayName = " Reset Password ",
@@ -60,21 +60,21 @@ public class CreateTemplateCommandTests : IntegrationTests
   {
     SetRealm();
 
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    Template template = new(new UniqueKeyUnit("PasswordRecovery"), new SubjectUnit("Reset your password"), content, TenantId);
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(new Identifier("PasswordRecovery"), new Subject("Reset your password"), content, id: TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync(template);
 
-    CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new Content(content));
+    CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new ContentModel(content));
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
-    Assert.Equal(template.UniqueKey, exception.UniqueKey);
+    Assert.Equal(TenantId.Value, exception.TenantId);
+    Assert.Equal(template.UniqueKey.Value, exception.UniqueKey);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    Content content = Content.PlainText("Hello World!");
+    ContentModel content = ContentModel.PlainText("Hello World!");
     CreateTemplatePayload payload = new(uniqueKey: "", "Reset your password", content);
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));

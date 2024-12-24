@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
@@ -20,7 +20,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -40,21 +40,21 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace an existing dictionary.")]
   public async Task It_should_replace_an_existing_dictionary()
   {
-    _dictionary.SetEntry("ecarlate", "scarlet");
-    _dictionary.SetEntry("cyan", "cyan");
+    _dictionary.SetEntry(new Identifier("ecarlate"), "scarlet");
+    _dictionary.SetEntry(new Identifier("cyan"), "cyan");
     _dictionary.Update();
     await _dictionaryRepository.SaveAsync(_dictionary);
     long version = _dictionary.Version;
 
-    _dictionary.SetEntry("emeraude", "emerald");
-    _dictionary.SetEntry("cyan", "light blue");
+    _dictionary.SetEntry(new Identifier("emeraude"), "emerald");
+    _dictionary.SetEntry(new Identifier("cyan"), "light blue");
     _dictionary.Update();
     await _dictionaryRepository.SaveAsync(_dictionary);
 
     ReplaceDictionaryPayload payload = new(Faker.Locale);
     payload.Entries.Add(new("cyan", "cyan"));
     payload.Entries.Add(new("or", "golden"));
-    ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, version);
+    ReplaceDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload, version);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 
@@ -82,7 +82,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceDictionaryPayload payload = new(Faker.Locale);
-    ReplaceDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload, Version: null);
+    ReplaceDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload, Version: null);
     DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -90,14 +90,14 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
   public async Task It_should_throw_DictionaryAlreadyExistsException_when_the_dictionary_already_exists()
   {
-    Dictionary dictionary = new(new LocaleUnit("fr"));
+    Dictionary dictionary = new(new Locale("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());
-    ReplaceDictionaryCommand command = new(dictionary.Id.ToGuid(), payload, Version: null);
+    ReplaceDictionaryCommand command = new(dictionary.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Locale, exception.Locale.Code, ignoreCase: true);
+    Assert.Equal(payload.Locale, exception.Locale, ignoreCase: true);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

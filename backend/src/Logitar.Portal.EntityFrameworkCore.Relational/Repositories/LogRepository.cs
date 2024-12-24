@@ -1,6 +1,5 @@
 ﻿using Logitar.Portal.Application.Logging;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
-using System.Text.Json.Serialization;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 

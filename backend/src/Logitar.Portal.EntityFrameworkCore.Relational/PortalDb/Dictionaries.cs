@@ -15,6 +15,7 @@ public static class Dictionaries
   public static readonly ColumnId Version = new(nameof(DictionaryEntity.Version), Table);
 
   public static readonly ColumnId DictionaryId = new(nameof(DictionaryEntity.DictionaryId), Table);
+  public static readonly ColumnId EntityId = new(nameof(DictionaryEntity.EntityId), Table);
   public static readonly ColumnId Entries = new(nameof(DictionaryEntity.Entries), Table);
   public static readonly ColumnId EntryCount = new(nameof(DictionaryEntity.EntryCount), Table);
   public static readonly ColumnId Locale = new(nameof(DictionaryEntity.Locale), Table);

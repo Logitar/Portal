@@ -32,7 +32,7 @@ internal class DictionaryRepository : Repository, IDictionaryRepository
 
   public async Task<IReadOnlyCollection<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
 
     IEnumerable<StreamId> streamIds = (await _dictionaries.AsNoTracking()
       .Where(x => x.TenantId == tenantIdValue)
@@ -44,7 +44,7 @@ internal class DictionaryRepository : Repository, IDictionaryRepository
 
   public async Task<Dictionary?> LoadAsync(TenantId? tenantId, Locale locale, CancellationToken cancellationToken)
   {
-    Guid? tenantIdValue = tenantId?.ToGuid();
+    string? tenantIdValue = tenantId?.Value;
     string localeNormalized = Helper.Normalize(locale.Code);
 
     string? streamId = await _dictionaries.AsNoTracking()

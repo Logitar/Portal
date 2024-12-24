@@ -39,7 +39,7 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
     XApiKey xApiKey;
     try
     {
-      xApiKey = XApiKey.Decode(payload.XApiKey);
+      xApiKey = XApiKey.Decode(command.TenantId, payload.XApiKey);
     }
     catch (Exception innerException)
     {

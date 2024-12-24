@@ -10,8 +10,8 @@ internal class DictionaryEntity : AggregateEntity
 {
   public int DictionaryId { get; private set; }
 
-  public Guid? TenantId { get; private set; }
-  public Guid EntityId { get; private set; }
+  public string? TenantId { get; private set; } = string.Empty;
+  public string EntityId { get; private set; } = string.Empty;
 
   public string Locale { get; private set; } = string.Empty;
   public string LocaleNormalized
@@ -26,8 +26,8 @@ internal class DictionaryEntity : AggregateEntity
   public DictionaryEntity(DictionaryCreated @event) : base(@event)
   {
     DictionaryId dictionaryId = new(@event.StreamId);
-    TenantId = dictionaryId.TenantId?.ToGuid();
-    EntityId = dictionaryId.EntityId.ToGuid();
+    TenantId = dictionaryId.TenantId?.Value;
+    EntityId = dictionaryId.EntityId.Value;
 
     Locale = @event.Locale.Code;
   }

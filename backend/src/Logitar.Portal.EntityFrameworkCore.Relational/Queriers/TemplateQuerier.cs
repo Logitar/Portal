@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Templates;
@@ -32,16 +33,18 @@ internal class TemplateQuerier : ITemplateQuerier
     return await ReadAsync(realm, template.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The template entity 'StreamId={template.Id}' could not be found.");
   }
-  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new TemplateId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (template == null || template.TenantId != realm?.GetTenantId().ToGuid())
+    if (template == null || template.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -51,7 +54,7 @@ internal class TemplateQuerier : ITemplateQuerier
 
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
     string uniqueKeyNormalized = Helper.Normalize(uniqueKey);
 
     TemplateEntity? template = await _templates.AsNoTracking()
@@ -69,7 +72,7 @@ internal class TemplateQuerier : ITemplateQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
       .ApplyRealmFilter(PortalDb.Templates.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Templates.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Templates.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Templates.UniqueKey, PortalDb.Templates.DisplayName, PortalDb.Templates.Subject);
 
     if (!string.IsNullOrWhiteSpace(payload.ContentType))

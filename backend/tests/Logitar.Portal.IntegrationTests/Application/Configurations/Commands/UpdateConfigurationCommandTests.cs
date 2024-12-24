@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Contracts;
+﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Contracts.Settings;
 using Logitar.Portal.Domain.Configurations;
@@ -21,7 +21,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
   {
     UpdateConfigurationPayload payload = new()
     {
-      DefaultLocale = new Modification<string>("test")
+      DefaultLocale = new ChangeModel<string>("test")
     };
     UpdateConfigurationCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
@@ -37,7 +37,7 @@ public class UpdateConfigurationCommandTests : IntegrationTests
 
     UpdateConfigurationPayload payload = new()
     {
-      DefaultLocale = new Modification<string>("fr-CA"),
+      DefaultLocale = new ChangeModel<string>("fr-CA"),
       Secret = "    ",
       UniqueNameSettings = new UniqueNameSettings("abcdeéfghijklmnopqrstuvwxyzABCDEÉFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"),
       PasswordSettings = new PasswordSettings(requiredLength: 7, requiredUniqueChars: 3, requireNonAlphanumeric: false, requireLowercase: true, requireUppercase: true, requireDigit: true, hashingStrategy: "PBKDF2"),

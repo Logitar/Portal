@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
@@ -20,7 +20,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -52,7 +52,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     UpdateDictionaryPayload payload = new();
-    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload);
     DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -60,17 +60,17 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
   public async Task It_should_throw_DictionaryAlreadyExistsException_when_the_dictionary_already_exists()
   {
-    Dictionary dictionary = new(new LocaleUnit("fr-CA"));
+    Dictionary dictionary = new(new Locale("fr-CA"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
     UpdateDictionaryPayload payload = new()
     {
       Locale = Faker.Locale
     };
-    UpdateDictionaryCommand command = new(dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(dictionary.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Locale, exception.Locale.Code);
+    Assert.Equal(payload.Locale, exception.Locale);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -88,9 +88,9 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should update an existing dictionary.")]
   public async Task It_should_update_an_existing_dictionary()
   {
-    _dictionary.SetEntry("bleu", "blue");
-    _dictionary.SetEntry("rouge", "red");
-    _dictionary.SetEntry("vert", "green");
+    _dictionary.SetEntry(new Identifier("bleu"), "blue");
+    _dictionary.SetEntry(new Identifier("rouge"), "red");
+    _dictionary.SetEntry(new Identifier("vert"), "green");
     _dictionary.Update();
     await _dictionaryRepository.SaveAsync(_dictionary);
 
@@ -101,7 +101,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("jaune", "yellow"));
     payload.Entries.Add(new("rouge", "scarlet"));
     payload.Entries.Add(new("vert", value: null));
-    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 

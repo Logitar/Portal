@@ -1,7 +1,7 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
@@ -10,6 +10,7 @@ using Logitar.Portal.Domain.Senders.Twilio;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
@@ -26,12 +27,12 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     _mailgun = new(email, new ReadOnlyMailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName()));
     _sendGrid = new(email, new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()));
     _sendGrid.SetDefault();
 
-    PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
+    Phone phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
     _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()))
     {
       Description = new Description("This is the SMS sender.")
@@ -68,7 +69,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     SetRealm();
 
     UpdateSenderPayload payload = new();
-    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload);
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -80,7 +81,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     {
       EmailAddress = "aa@@bb..cc"
     };
-    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }
@@ -90,10 +91,10 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     UpdateSenderPayload payload = new()
     {
-      DisplayName = new Modification<string>("  Alternative Sender  "),
-      Description = new Modification<string>("  ")
+      DisplayName = new ChangeModel<string>("  Alternative Sender  "),
+      Description = new ChangeModel<string>("  ")
     };
-    UpdateSenderCommand command = new(_mailgun.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_mailgun.EntityId.ToGuid(), payload);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -109,10 +110,10 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     UpdateSenderPayload payload = new()
     {
-      DisplayName = new Modification<string>("  Default Sender  "),
-      Description = new Modification<string>("  ")
+      DisplayName = new ChangeModel<string>("  Default Sender  "),
+      Description = new ChangeModel<string>("  ")
     };
-    UpdateSenderCommand command = new(_sendGrid.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -130,7 +131,7 @@ public class UpdateSenderCommandTests : IntegrationTests
     {
       PhoneNumber = "+15148422112"
     };
-    UpdateSenderCommand command = new(_twilio.Id.ToGuid(), payload);
+    UpdateSenderCommand command = new(_twilio.EntityId.ToGuid(), payload);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 

@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages;
@@ -9,6 +10,7 @@ using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
@@ -49,26 +51,26 @@ public class ReadMessageQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the message when it is found.")]
   public async Task It_should_return_the_message_when_it_is_found()
   {
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    Sender sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, id: SenderId.NewId(TenantId));
     await _senderRepository.SaveAsync(sender);
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(uniqueKey, subject, content, TenantId);
+    Identifier uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(uniqueKey, subject, content, id: TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync(template);
 
-    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
-    Message message = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Recipient[] recipients = [new Recipient(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
+    Message message = new(subject, content, recipients, sender, template);
     await _messageRepository.SaveAsync(message);
 
     SetRealm();
 
-    ReadMessageQuery query = new(message.Id.ToGuid());
+    ReadMessageQuery query = new(message.EntityId.ToGuid());
     MessageModel? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
-    Assert.Equal(message.Id.ToGuid(), result.Id);
+    Assert.Equal(message.EntityId.ToGuid(), result.Id);
   }
 }

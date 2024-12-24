@@ -1,10 +1,10 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
@@ -46,13 +46,13 @@ public class CreateRealmCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
   {
-    Realm realm = new(new UniqueSlugUnit("tests"));
+    Realm realm = new(new Slug("tests"));
     await _realmRepository.SaveAsync(realm);
 
     CreateRealmPayload payload = new(realm.UniqueSlug.Value, secret: string.Empty);
     CreateRealmCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(realm.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(realm.UniqueSlug.Value, exception.UniqueSlug);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

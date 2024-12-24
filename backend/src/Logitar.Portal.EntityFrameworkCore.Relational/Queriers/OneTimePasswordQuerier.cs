@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Passwords;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
@@ -28,11 +29,13 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
     return await ReadAsync(realm, oneTimePassword.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The One-Time Password (OTP) entity 'StreamId={oneTimePassword.Id.Value}' could not be found.");
   }
-  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new OneTimePasswordId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     OneTimePasswordEntity? oneTimePassword = await _oneTimePasswords.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);

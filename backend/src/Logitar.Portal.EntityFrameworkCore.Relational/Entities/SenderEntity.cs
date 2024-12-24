@@ -9,8 +9,8 @@ internal class SenderEntity : AggregateEntity
 {
   public int SenderId { get; private set; }
 
-  public Guid? TenantId { get; private set; }
-  public Guid EntityId { get; private set; }
+  public string? TenantId { get; private set; } = string.Empty;
+  public string EntityId { get; private set; } = string.Empty;
 
   public bool IsDefault { get; private set; }
 
@@ -30,8 +30,8 @@ internal class SenderEntity : AggregateEntity
   public SenderEntity(SenderCreated @event) : base(@event)
   {
     SenderId senderId = new(@event.StreamId);
-    TenantId = senderId.TenantId?.ToGuid();
-    EntityId = senderId.EntityId.ToGuid();
+    TenantId = senderId.TenantId?.Value;
+    EntityId = senderId.EntityId.Value;
 
     EmailAddress = @event.Email.Address;
 
@@ -41,8 +41,8 @@ internal class SenderEntity : AggregateEntity
   public SenderEntity(SmsSenderCreated @event) : base(@event)
   {
     SenderId senderId = new(@event.StreamId);
-    TenantId = senderId.TenantId?.ToGuid();
-    EntityId = senderId.EntityId.ToGuid();
+    TenantId = senderId.TenantId?.Value;
+    EntityId = senderId.EntityId.Value;
 
     PhoneNumber = @event.Phone.Number;
 

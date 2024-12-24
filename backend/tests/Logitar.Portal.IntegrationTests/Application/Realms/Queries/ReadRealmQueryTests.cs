@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
@@ -20,7 +20,7 @@ public class ReadRealmQueryTests : IntegrationTests
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -66,7 +66,7 @@ public class ReadRealmQueryTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    Realm realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
     ReadRealmQuery query = new(_realm.Id.ToGuid(), "  OthEr  ");

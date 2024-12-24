@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Actors;
@@ -31,16 +32,18 @@ internal class SenderQuerier : ISenderQuerier
     return await ReadAsync(realm, sender.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The sender entity 'StreamId={sender.Id}' could not be found.");
   }
-  public async Task<SenderModel?> ReadAsync(RealmModel? realm, SenderId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.EntityId.ToGuid(), cancellationToken);
   public async Task<SenderModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string streamId = new StreamId(id).Value;
+    return await ReadAsync(realm, new SenderId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<SenderModel?> ReadAsync(RealmModel? realm, SenderId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (sender == null || sender.TenantId != realm?.GetTenantId().ToGuid())
+    if (sender == null || sender.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -50,7 +53,7 @@ internal class SenderQuerier : ISenderQuerier
 
   public async Task<SenderModel?> ReadDefaultAsync(RealmModel? realm, CancellationToken cancellationToken)
   {
-    Guid? tenantId = realm?.GetTenantId().ToGuid();
+    string? tenantId = realm?.GetTenantId().Value;
 
     SenderEntity? sender = await _senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.IsDefault, cancellationToken);
@@ -67,7 +70,7 @@ internal class SenderQuerier : ISenderQuerier
   {
     IQueryBuilder builder = _queryHelper.QueryFrom(PortalDb.Senders.Table).SelectAll(PortalDb.Senders.Table)
       .ApplyRealmFilter(PortalDb.Senders.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Senders.StreamId, payload.Ids);
+      .ApplyIdFilter(PortalDb.Senders.EntityId, payload.Ids);
     _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Senders.EmailAddress, PortalDb.Senders.DisplayName, PortalDb.Senders.DisplayName);
 
     if (payload.Provider.HasValue)

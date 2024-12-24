@@ -2,6 +2,7 @@
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 

@@ -72,7 +72,7 @@ public class Template : AggregateRoot
   {
   }
 
-  public Template(Identifier uniqueKey, Subject subject, Content content, ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).StreamId)
+  public Template(Identifier uniqueKey, Subject subject, Content content, ActorId? actorId = null, TemplateId? id = null) : base((id ?? TemplateId.NewId()).StreamId)
   {
     Raise(new TemplateCreated(uniqueKey, subject, content), actorId);
   }
@@ -84,7 +84,7 @@ public class Template : AggregateRoot
     _content = @event.Content;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -92,7 +92,7 @@ public class Template : AggregateRoot
     }
   }
 
-  public void SetUniqueKey(Identifier uniqueKey, ActorId actorId = default)
+  public void SetUniqueKey(Identifier uniqueKey, ActorId? actorId = null)
   {
     if (uniqueKey != _uniqueKey)
     {
@@ -104,7 +104,7 @@ public class Template : AggregateRoot
     _uniqueKey = @event.UniqueKey;
   }
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {

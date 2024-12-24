@@ -1,11 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
@@ -20,9 +21,9 @@ public class ReadTemplateQueryTests : IntegrationTests
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
+    Identifier uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
   }
 
@@ -45,7 +46,7 @@ public class ReadTemplateQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadTemplateQuery query = new(_template.Id.ToGuid(), UniqueKey: null);
+    ReadTemplateQuery query = new(_template.EntityId.ToGuid(), UniqueKey: null);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(template);
   }
@@ -53,10 +54,10 @@ public class ReadTemplateQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the template found by ID.")]
   public async Task It_should_return_the_template_found_by_Id()
   {
-    ReadTemplateQuery query = new(_template.Id.ToGuid(), _template.UniqueKey.Value);
+    ReadTemplateQuery query = new(_template.EntityId.ToGuid(), _template.UniqueKey.Value);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(template);
-    Assert.Equal(_template.Id.ToGuid(), template.Id);
+    Assert.Equal(_template.EntityId.ToGuid(), template.Id);
   }
 
   [Fact(DisplayName = "It should return the template found by unique key.")]
@@ -65,18 +66,18 @@ public class ReadTemplateQueryTests : IntegrationTests
     ReadTemplateQuery query = new(Id: null, _template.UniqueKey.Value);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(template);
-    Assert.Equal(_template.Id.ToGuid(), template.Id);
+    Assert.Equal(_template.EntityId.ToGuid(), template.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    UniqueKeyUnit uniqueKey = new("ConfirmAccount");
-    SubjectUnit subject = new("Confirm your account");
+    Identifier uniqueKey = new("ConfirmAccount");
+    Subject subject = new("Confirm your account");
     Template template = new(uniqueKey, subject, _template.Content);
     await _templateRepository.SaveAsync(template);
 
-    ReadTemplateQuery query = new(_template.Id.ToGuid(), "  CoNFiRMaCCouNT  ");
+    ReadTemplateQuery query = new(_template.EntityId.ToGuid(), "  CoNFiRMaCCouNT  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<TemplateModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

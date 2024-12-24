@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Contracts;
+﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Search;
 
@@ -51,7 +51,7 @@ internal class RoleClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateRolePayload update = new()
       {
-        Description = new Modification<string>("This is the administration role.")
+        Description = new ChangeModel<string>("This is the administration role.")
       };
       role = await _client.UpdateAsync(role.Id, update, context.Request)
         ?? throw new InvalidOperationException("The role should not be null.");

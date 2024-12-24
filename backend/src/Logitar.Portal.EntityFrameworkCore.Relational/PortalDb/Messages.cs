@@ -16,6 +16,7 @@ public static class Messages
 
   public static readonly ColumnId BodyText = new(nameof(MessageEntity.BodyText), Table);
   public static readonly ColumnId BodyType = new(nameof(MessageEntity.BodyType), Table);
+  public static readonly ColumnId EntityId = new(nameof(MessageEntity.EntityId), Table);
   public static readonly ColumnId IgnoreUserLocale = new(nameof(MessageEntity.IgnoreUserLocale), Table);
   public static readonly ColumnId IsDemo = new(nameof(MessageEntity.IsDemo), Table);
   public static readonly ColumnId Locale = new(nameof(MessageEntity.Locale), Table);

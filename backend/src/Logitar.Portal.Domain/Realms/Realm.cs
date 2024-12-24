@@ -127,7 +127,7 @@ public class Realm : AggregateRoot
   {
   }
 
-  public Realm(Slug uniqueSlug, ActorId actorId = default, RealmId? id = null) : base((id ?? RealmId.NewId()).StreamId)
+  public Realm(Slug uniqueSlug, ActorId? actorId = null, RealmId? id = null) : base((id ?? RealmId.NewId()).StreamId)
   {
     JwtSecret secret = JwtSecret.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
@@ -144,7 +144,7 @@ public class Realm : AggregateRoot
     _requireUniqueEmail = @event.RequireUniqueEmail;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -175,7 +175,7 @@ public class Realm : AggregateRoot
     }
   }
 
-  public void SetUniqueSlug(Slug uniqueSlug, ActorId actorId = default)
+  public void SetUniqueSlug(Slug uniqueSlug, ActorId? actorId = null)
   {
     if (_uniqueSlug != uniqueSlug)
     {
@@ -187,7 +187,7 @@ public class Realm : AggregateRoot
     _uniqueSlug = @event.UniqueSlug;
   }
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {

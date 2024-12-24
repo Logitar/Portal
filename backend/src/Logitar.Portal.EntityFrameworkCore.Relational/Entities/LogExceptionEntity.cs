@@ -32,6 +32,7 @@ internal class LogExceptionEntity
     StackTrace = exception.StackTrace;
     TargetSite = exception.TargetSite?.ToString();
 
+    Dictionary<string, string> data = [];
     foreach (object key in exception.Data.Keys)
     {
       try
@@ -41,17 +42,23 @@ internal class LogExceptionEntity
         {
           string serializedKey = JsonSerializer.Serialize(key, key.GetType(), serializerOptions).Trim('"');
           string serializedValue = JsonSerializer.Serialize(value, value.GetType(), serializerOptions).Trim('"');
-          //Data[serializedKey] = serializedValue; // TODO(fpion): implement
+          data[serializedKey] = serializedValue;
         }
       }
       catch (Exception)
       {
       }
     }
+    SetData(data);
   }
 
   private LogExceptionEntity()
   {
+  }
+
+  private void SetData(Dictionary<string, string> data)
+  {
+    Data = data.Count < 1 ? null : JsonSerializer.Serialize(data);
   }
 
   public override bool Equals(object? obj) => obj is LogExceptionEntity entity && entity.LogExceptionId == LogExceptionId;

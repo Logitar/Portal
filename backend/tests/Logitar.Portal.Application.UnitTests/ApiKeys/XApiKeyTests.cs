@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.ApiKeys;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Application.ApiKeys;
@@ -27,14 +28,17 @@ public class XApiKeyTests
     Assert.Equal("secret", exception.ParamName);
   }
 
-  [Fact(DisplayName = "Decode: it should decode the correct X-API-Key.")]
-  public void Decode_it_should_decode_the_correct_X_Api_Key()
+  [Theory(DisplayName = "Decode: it should decode the correct X-API-Key.")]
+  [InlineData(null)]
+  [InlineData("71b5b48a-d3e9-4ee0-9859-aa252778df30")]
+  public void Decode_it_should_decode_the_correct_X_Api_Key(string? tenantIdValue)
   {
-    ApiKeyId id = ApiKeyId.NewId();
+    TenantId? tenantId = tenantIdValue == null ? null : new(tenantIdValue);
+    ApiKeyId id = ApiKeyId.NewId(tenantId);
     string secret = RandomStringGenerator.GetBase64String(XApiKey.SecretLength, out _);
-    string value = $"PT.{id.Value}.{secret.ToUriSafeBase64()}";
+    string value = $"PT.{id.EntityId}.{secret.ToUriSafeBase64()}";
 
-    XApiKey xApiKey = XApiKey.Decode(value);
+    XApiKey xApiKey = XApiKey.Decode(tenantId, value);
     Assert.Equal(id, xApiKey.Id);
     Assert.Equal(secret, xApiKey.Secret);
   }
@@ -44,7 +48,7 @@ public class XApiKeyTests
   [InlineData("abc.123")]
   public void Decode_it_should_throw_ArgumentException_when_the_value_is_not_valid(string value)
   {
-    var exception = Assert.Throws<ArgumentException>(() => XApiKey.Decode(value));
+    var exception = Assert.Throws<ArgumentException>(() => XApiKey.Decode(tenantId: null, value));
     Assert.StartsWith($"The value '{value}' is not a valid X-API-Key.", exception.Message);
     Assert.Equal("value", exception.ParamName);
   }

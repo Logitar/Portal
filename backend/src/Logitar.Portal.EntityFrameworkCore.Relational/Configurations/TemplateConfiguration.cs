@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -26,6 +27,8 @@ internal class TemplateConfiguration : AggregateConfiguration<TemplateEntity>, I
     builder.HasIndex(x => x.Subject);
     builder.HasIndex(x => x.ContentType);
 
+    builder.Property(x => x.TenantId).HasMaxLength(StreamId.MaximumLength);
+    builder.Property(x => x.EntityId).HasMaxLength(StreamId.MaximumLength);
     builder.Property(x => x.UniqueKey).HasMaxLength(Identifier.MaximumLength);
     builder.Property(x => x.UniqueKeyNormalized).HasMaxLength(Identifier.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);

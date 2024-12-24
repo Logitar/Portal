@@ -1,13 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
@@ -55,10 +54,10 @@ public class SearchRolesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Role admin = new(new UniqueName(Realm.UniqueNameSettings, "admin"), TenantId);
-    Role geoGuesser = new(new UniqueName(Realm.UniqueNameSettings, "geo_guesser"), TenantId);
-    Role guest = new(new UniqueName(Realm.UniqueNameSettings, "guest"), TenantId);
-    Role minister = new(new UniqueName(Realm.UniqueNameSettings, "minister"), TenantId);
+    Role admin = new(new UniqueName(Realm.UniqueNameSettings, "admin"), roleId: RoleId.NewId(TenantId));
+    Role geoGuesser = new(new UniqueName(Realm.UniqueNameSettings, "geo_guesser"), roleId: RoleId.NewId(TenantId));
+    Role guest = new(new UniqueName(Realm.UniqueNameSettings, "guest"), roleId: RoleId.NewId(TenantId));
+    Role minister = new(new UniqueName(Realm.UniqueNameSettings, "minister"), roleId: RoleId.NewId(TenantId));
     await _roleRepository.SaveAsync([admin, geoGuesser, guest, minister]);
 
     SetRealm();
@@ -68,10 +67,10 @@ public class SearchRolesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> roleIds = (await _roleRepository.LoadAsync()).Select(role => role.Id.ToGuid());
+    IEnumerable<Guid> roleIds = (await _roleRepository.LoadAsync()).Select(role => role.EntityId.ToGuid());
     payload.Ids.AddRange(roleIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(minister.Id.ToGuid());
+    payload.Ids.Remove(minister.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%min%"));
     payload.Search.Terms.Add(new SearchTerm("gues%"));
     payload.Search.Operator = SearchOperator.Or;
@@ -81,6 +80,6 @@ public class SearchRolesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     RoleModel role = Assert.Single(results.Items);
-    Assert.Equal(guest.Id.ToGuid(), role.Id);
+    Assert.Equal(guest.EntityId.ToGuid(), role.Id);
   }
 }

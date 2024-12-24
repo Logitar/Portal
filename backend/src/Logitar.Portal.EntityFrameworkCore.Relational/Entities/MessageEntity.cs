@@ -11,8 +11,8 @@ internal class MessageEntity : AggregateEntity
 {
   public int MessageId { get; private set; }
 
-  public Guid? TenantId { get; private set; }
-  public Guid EntityId { get; private set; }
+  public string? TenantId { get; private set; } = string.Empty;
+  public string EntityId { get; private set; } = string.Empty;
 
   public string Subject { get; private set; } = string.Empty;
   public string BodyType { get; private set; } = string.Empty;
@@ -47,8 +47,8 @@ internal class MessageEntity : AggregateEntity
   public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreated @event) : base(@event)
   {
     MessageId messageId = new(@event.StreamId);
-    TenantId = messageId.TenantId?.ToGuid();
-    EntityId = messageId.EntityId.ToGuid();
+    TenantId = messageId.TenantId?.Value;
+    EntityId = messageId.EntityId.Value;
 
     Subject = @event.Subject.Value;
     BodyType = @event.Body.Type;
