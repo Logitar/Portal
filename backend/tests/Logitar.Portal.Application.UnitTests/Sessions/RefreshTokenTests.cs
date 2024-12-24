@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Sessions;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Application.Sessions;
@@ -27,14 +28,17 @@ public class RefreshTokenTests
     Assert.Equal("secret", exception.ParamName);
   }
 
-  [Fact(DisplayName = "Decode: it should decode the correct refresh token.")]
-  public void Decode_it_should_decode_the_correct_refresh_token()
+  [Theory(DisplayName = "Decode: it should decode the correct refresh token.")]
+  [InlineData(null)]
+  [InlineData("0ed876c2-667c-4d8d-8356-f17ede5ecee5")]
+  public void Decode_it_should_decode_the_correct_refresh_token(string? tenantIdValue)
   {
-    SessionId id = SessionId.NewId();
+    TenantId? tenantId = tenantIdValue == null ? null : new(tenantIdValue);
+    SessionId id = SessionId.NewId(tenantId);
     string secret = RandomStringGenerator.GetBase64String(RefreshToken.SecretLength, out _);
-    string value = $"RT.{id.Value}.{secret.ToUriSafeBase64()}";
+    string value = $"RT.{id.EntityId}.{secret.ToUriSafeBase64()}";
 
-    RefreshToken refreshToken = RefreshToken.Decode(value);
+    RefreshToken refreshToken = RefreshToken.Decode(tenantId, value);
     Assert.Equal(id, refreshToken.Id);
     Assert.Equal(secret, refreshToken.Secret);
   }
@@ -44,7 +48,7 @@ public class RefreshTokenTests
   [InlineData("abc.123")]
   public void Decode_it_should_throw_ArgumentException_when_the_value_is_not_valid(string value)
   {
-    var exception = Assert.Throws<ArgumentException>(() => RefreshToken.Decode(value));
+    var exception = Assert.Throws<ArgumentException>(() => RefreshToken.Decode(tenantId: null, value));
     Assert.StartsWith($"The value '{value}' is not a valid refresh token.", exception.Message);
     Assert.Equal("value", exception.ParamName);
   }

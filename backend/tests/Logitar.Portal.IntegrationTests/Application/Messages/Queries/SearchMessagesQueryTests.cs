@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Search;
@@ -10,6 +11,7 @@ using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
@@ -54,50 +56,50 @@ public class SearchMessagesQueryTests : IntegrationTests
   {
     SetRealm();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    Sender sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, id: SenderId.NewId(TenantId));
     await _senderRepository.SaveAsync(sender);
 
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery"), subject, content, TenantId);
-    SubjectUnit otherSubject = new("Confirm your account");
-    TemplateAggregate otherTemplate = new(new UniqueKeyUnit("AccountConfirmation"), otherSubject, content, TenantId);
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(new Identifier("PasswordRecovery"), subject, content, id: TemplateId.NewId(TenantId));
+    Subject otherSubject = new("Confirm your account");
+    Template otherTemplate = new(new Identifier("AccountConfirmation"), otherSubject, content, id: TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync([template, otherTemplate]);
 
-    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
+    Recipient[] recipients = [new Recipient(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
 
-    Message notMatching = new(otherSubject, content, recipients, sender, template, tenantId: TenantId);
-    Message notInIds = new(subject, content, recipients, sender, template, tenantId: TenantId);
-    Message notTemplate = new(subject, content, recipients, sender, otherTemplate, tenantId: TenantId);
-    Message demo = new(subject, content, recipients, sender, template, isDemo: true, tenantId: TenantId);
-    Message failed = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Message notMatching = new(otherSubject, content, recipients, sender, template, id: MessageId.NewId(TenantId));
+    Message notInIds = new(subject, content, recipients, sender, template, id: MessageId.NewId(TenantId));
+    Message notTemplate = new(subject, content, recipients, sender, otherTemplate, id: MessageId.NewId(TenantId));
+    Message demo = new(subject, content, recipients, sender, template, isDemo: true, id: MessageId.NewId(TenantId));
+    Message failed = new(subject, content, recipients, sender, template, id: MessageId.NewId(TenantId));
     failed.Fail();
 
-    Message message1 = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Message message1 = new(subject, content, recipients, sender, template, id: MessageId.NewId(TenantId));
 
-    RecipientUnit[] moreRecipients =
+    Recipient[] moreRecipients =
     [
       recipients.Single(),
-      new RecipientUnit(RecipientType.Bcc, Faker.Internet.Email(), Faker.Name.FullName())
+      new Recipient(RecipientType.Bcc, Faker.Internet.Email(), Faker.Name.FullName())
     ];
-    Message message2 = new(subject, content, moreRecipients, sender, template, tenantId: TenantId);
+    Message message2 = new(subject, content, moreRecipients, sender, template, id: MessageId.NewId(TenantId));
 
     await _messageRepository.SaveAsync([notMatching, notInIds, notTemplate, demo, failed, message1, message2]);
 
     SearchMessagesPayload payload = new()
     {
-      TemplateId = template.Id.ToGuid(),
+      TemplateId = template.EntityId.ToGuid(),
       IsDemo = false,
       Status = MessageStatus.Unsent,
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> messageIds = (await _messageRepository.LoadAsync()).Select(message => message.Id.ToGuid());
+    IEnumerable<Guid> messageIds = (await _messageRepository.LoadAsync()).Select(message => message.EntityId.ToGuid());
     payload.Ids.AddRange(messageIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("Reset%"));
     payload.Sort.Add(new MessageSortOption(MessageSort.RecipientCount, isDescending: false));
     SearchMessagesQuery query = new(payload);
@@ -105,6 +107,6 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     MessageModel message = Assert.Single(results.Items);
-    Assert.Equal(message2.Id.ToGuid(), message.Id);
+    Assert.Equal(message2.EntityId.ToGuid(), message.Id);
   }
 }

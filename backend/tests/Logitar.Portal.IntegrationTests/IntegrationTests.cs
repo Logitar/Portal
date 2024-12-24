@@ -4,8 +4,8 @@ using Logitar.Data.PostgreSQL;
 using Logitar.Data.SqlServer;
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Activities;
@@ -26,6 +26,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal;
 
@@ -85,7 +86,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
 
-    Realm = new("tests", JwtSecretUnit.Generate().Value)
+    Realm = new("tests", JwtSecret.Generate().Value)
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",
@@ -110,17 +111,17 @@ public abstract class IntegrationTests : IAsyncLifetime
     await publisher.Publish(new InitializeConfigurationCommand(UsernameString, PasswordString));
 
     IUserRepository userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
-    UserAggregate userAggregate = Assert.Single(await userRepository.LoadAsync());
+    User userAggregate = Assert.Single(await userRepository.LoadAsync());
     ActorId actorId = new(userAggregate.Id.Value);
-    userAggregate.FirstName = new PersonNameUnit(Faker.Person.FirstName);
-    userAggregate.LastName = new PersonNameUnit(Faker.Person.LastName);
+    userAggregate.FirstName = new PersonName(Faker.Person.FirstName);
+    userAggregate.LastName = new PersonName(Faker.Person.LastName);
     userAggregate.Update(actorId);
-    EmailUnit email = new(Faker.Person.Email, isVerified: false);
+    Email email = new(Faker.Person.Email, isVerified: false);
     userAggregate.SetEmail(email, actorId);
     await userRepository.SaveAsync(userAggregate);
 
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.EntityId.ToGuid());
     SetUser(user);
   }
   protected IDeleteBuilder CreateDeleteBuilder(TableId table) => _databaseProvider switch
@@ -142,7 +143,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     _context.User = user;
     _context.Session = null;
   }
-  protected void SetSession(Session? session)
+  protected void SetSession(SessionModel? session)
   {
     _context.User = session?.User;
     _context.Session = session;

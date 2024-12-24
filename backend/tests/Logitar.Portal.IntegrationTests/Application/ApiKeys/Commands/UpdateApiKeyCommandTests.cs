@@ -1,10 +1,8 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
@@ -12,6 +10,7 @@ using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -58,7 +57,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     SetRealm();
 
     UpdateApiKeyPayload payload = new();
-    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload);
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -70,7 +69,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     UpdateApiKeyPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
-    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
@@ -99,8 +98,8 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     ApiKey apiKey = await CreateApiKeyAsync();
 
-    apiKey.SetCustomAttribute("UserId", Guid.NewGuid().ToString());
-    apiKey.SetCustomAttribute("SubSystem", "tests");
+    apiKey.SetCustomAttribute(new Identifier("UserId"), Guid.NewGuid().ToString());
+    apiKey.SetCustomAttribute(new Identifier("SubSystem"), "tests");
     apiKey.Update();
     apiKey.AddRole(admin);
     apiKey.AddRole(reviewer);
@@ -109,7 +108,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     UpdateApiKeyPayload payload = new()
     {
       DisplayName = "Default API Key",
-      Description = new Modification<string>("  This is the default API key.  "),
+      Description = new ChangeModel<string>("  This is the default API key.  "),
       ExpiresOn = DateTime.Now.AddMonths(6)
     };
     payload.CustomAttributes.Add(new("Confidentiality", "Private"));
@@ -117,7 +116,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("UserId", value: null));
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
-    UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
+    UpdateApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload);
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
@@ -130,8 +129,8 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "SubSystem" && c.Value == nameof(IntegrationTests));
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == editor.Id.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == editor.EntityId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.EntityId.ToGuid());
   }
 
   private async Task<ApiKey> CreateApiKeyAsync()

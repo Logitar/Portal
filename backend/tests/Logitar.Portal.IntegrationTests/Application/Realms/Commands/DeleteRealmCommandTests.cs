@@ -1,13 +1,13 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
@@ -24,7 +24,7 @@ public class DeleteRealmCommandTests : IntegrationTests
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -46,7 +46,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   {
     UniqueName uniqueName = new(new ReadOnlyUniqueNameSettings(), UsernameString);
     TenantId tenantId = new(_realm.Id.Value);
-    UserAggregate user = new(uniqueName, tenantId);
+    User user = new(uniqueName, id: UserId.NewId(tenantId));
     await _userRepository.SaveAsync(user);
 
     DeleteRealmCommand command = new(_realm.Id.ToGuid());

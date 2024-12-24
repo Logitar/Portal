@@ -1,11 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
@@ -20,9 +21,9 @@ public class SearchTemplatesQueryTests : IntegrationTests
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
+    Identifier uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
   }
 
@@ -54,13 +55,13 @@ public class SearchTemplatesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    ContentUnit htmlContent = ContentUnit.Html($"<p>{_template.Content.Text}</p>");
+    Content htmlContent = Content.Html($"<p>{_template.Content.Text}</p>");
 
-    Template notInSearch = new(new UniqueKeyUnit("ConfirmAccount"), new SubjectUnit("Confirm your account"), _template.Content, TenantId);
-    Template notInIds = new(new UniqueKeyUnit($"{_template.UniqueKey.Value}_OLD"), _template.Subject, _template.Content, TenantId);
-    Template html = new(new UniqueKeyUnit("PasswordRecoveryHtml"), _template.Subject, htmlContent, TenantId);
-    Template template1 = new(_template.UniqueKey, _template.Subject, _template.Content, TenantId);
-    Template template2 = new(new UniqueKeyUnit("ResetAccount"), new SubjectUnit("Reset your account"), _template.Content, TenantId);
+    Template notInSearch = new(new Identifier("ConfirmAccount"), new Subject("Confirm your account"), _template.Content, id: TemplateId.NewId(TenantId));
+    Template notInIds = new(new Identifier($"{_template.UniqueKey.Value}_OLD"), _template.Subject, _template.Content, id: TemplateId.NewId(TenantId));
+    Template html = new(new Identifier("PasswordRecoveryHtml"), _template.Subject, htmlContent, id: TemplateId.NewId(TenantId));
+    Template template1 = new(_template.UniqueKey, _template.Subject, _template.Content, id: TemplateId.NewId(TenantId));
+    Template template2 = new(new Identifier("ResetAccount"), new Subject("Reset your account"), _template.Content, id: TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync([notInSearch, notInIds, html, template1, template2]);
 
     SetRealm();
@@ -71,10 +72,10 @@ public class SearchTemplatesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> templateIds = (await _templateRepository.LoadAsync()).Select(template => template.Id.ToGuid());
+    IEnumerable<Guid> templateIds = (await _templateRepository.LoadAsync()).Select(template => template.EntityId.ToGuid());
     payload.Ids.AddRange(templateIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("reset%"));
     payload.Sort.Add(new TemplateSortOption(TemplateSort.Subject, isDescending: false));
     SearchTemplatesQuery query = new(payload);
@@ -82,6 +83,6 @@ public class SearchTemplatesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     TemplateModel template = Assert.Single(results.Items);
-    Assert.Equal(template1.Id.ToGuid(), template.Id);
+    Assert.Equal(template1.EntityId.ToGuid(), template.Id);
   }
 }

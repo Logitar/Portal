@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
@@ -43,7 +43,7 @@ public class SignInSessionCommandTests : IntegrationTests
 
     Assert.NotNull(session.RefreshToken);
     RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
-    Assert.Equal(session.Id, refreshToken.Id.ToGuid());
+    Assert.Equal(session.Id, refreshToken.Id.EntityId.ToGuid());
     Assert.Equal(RefreshToken.SecretLength, Convert.FromBase64String(refreshToken.Secret).Length);
   }
 
@@ -52,10 +52,10 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserId userId = UserId.NewId();
+    UserId userId = UserId.NewId(TenantId);
     ActorId actorId = new(userId.Value);
     UniqueName uniqueName = new(Realm.UniqueNameSettings, UsernameString);
-    UserAggregate user = new(uniqueName, TenantId, actorId, userId);
+    User user = new(uniqueName, actorId, userId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
     await _userRepository.SaveAsync(user);
 
@@ -78,8 +78,8 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), id: UserId.NewId(TenantId));
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
@@ -125,14 +125,14 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
   public async Task It_should_throw_TooManyResultsException_when_multiple_users_are_found()
   {
-    UserAggregate user = (await _userRepository.LoadAsync()).Single();
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
-    UserAggregate other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    User user = (await _userRepository.LoadAsync()).Single();
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
+    User other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
     await _userRepository.SaveAsync([user, other]);
 
     SignInSessionPayload payload = new(Faker.Person.Email, PasswordString);
     SignInSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }
@@ -142,14 +142,14 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), id: UserId.NewId(TenantId));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
-    SignInSessionPayload payload = new(user.Id.ToGuid().ToString(), PasswordString);
+    SignInSessionPayload payload = new(user.EntityId.ToGuid().ToString(), PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.Value, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }
@@ -162,7 +162,7 @@ public class SignInSessionCommandTests : IntegrationTests
     SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.Value, exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }

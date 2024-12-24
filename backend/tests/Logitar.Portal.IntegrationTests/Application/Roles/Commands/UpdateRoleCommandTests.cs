@@ -1,13 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
@@ -56,7 +55,7 @@ public class UpdateRoleCommandTests : IntegrationTests
     SetRealm();
 
     UpdateRolePayload payload = new();
-    UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
+    UpdateRoleCommand command = new(_role.EntityId.ToGuid(), payload);
     RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -71,10 +70,10 @@ public class UpdateRoleCommandTests : IntegrationTests
     {
       UniqueName = "AdmIn"
     };
-    UpdateRoleCommand command = new(role.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<Role>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    UpdateRoleCommand command = new(role.EntityId.ToGuid(), payload);
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -92,21 +91,21 @@ public class UpdateRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should update an existing role.")]
   public async Task It_should_update_an_existing_role()
   {
-    _role.SetCustomAttribute("manage_users", bool.TrueString);
-    _role.SetCustomAttribute("manage_realms", bool.FalseString);
-    _role.SetCustomAttribute("configuration", bool.FalseString);
+    _role.SetCustomAttribute(new Identifier("manage_users"), bool.TrueString);
+    _role.SetCustomAttribute(new Identifier("manage_realms"), bool.FalseString);
+    _role.SetCustomAttribute(new Identifier("configuration"), bool.FalseString);
     _role.Update();
     await _roleRepository.SaveAsync(_role);
 
     UpdateRolePayload payload = new()
     {
-      DisplayName = new Modification<string>("  Administrator  "),
-      Description = new Modification<string>("  ")
+      DisplayName = new ChangeModel<string>("  Administrator  "),
+      Description = new ChangeModel<string>("  ")
     };
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
     payload.CustomAttributes.Add(new("manage_realms", bool.TrueString));
     payload.CustomAttributes.Add(new("configuration", value: null));
-    UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
+    UpdateRoleCommand command = new(_role.EntityId.ToGuid(), payload);
     RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 

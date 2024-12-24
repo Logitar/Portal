@@ -39,7 +39,7 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
     RefreshToken refreshToken;
     try
     {
-      refreshToken = RefreshToken.Decode(payload.RefreshToken);
+      refreshToken = RefreshToken.Decode(command.TenantId, payload.RefreshToken);
     }
     catch (Exception innerException)
     {

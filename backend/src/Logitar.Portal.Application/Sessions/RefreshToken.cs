@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core.Sessions;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 
 namespace Logitar.Portal.Application.Sessions;
 
@@ -22,7 +23,7 @@ internal record RefreshToken
     Secret = secret;
   }
 
-  public static RefreshToken Decode(string value)
+  public static RefreshToken Decode(TenantId? tenantId, string value)
   {
     string[] values = value.Split(Separator);
     if (values.Length != 3 || values.First() != Prefix)
@@ -30,8 +31,7 @@ internal record RefreshToken
       throw new ArgumentException($"The value '{value}' is not a valid refresh token.", nameof(value));
     }
 
-    SessionId id = new();
-    //SessionId id = new(values[1]); // TODO(fpion): implement
+    SessionId id = new(tenantId, new EntityId(values[1]));
     string secret = values[2].FromUriSafeBase64();
     return new RefreshToken(id, secret);
   }

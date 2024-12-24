@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
@@ -45,10 +45,10 @@ public class SearchRealmsQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Realm notMatching = new(new UniqueSlugUnit("tests"));
-    Realm notInIds = new(new UniqueSlugUnit("realm-not-in-ids"));
-    Realm realm1 = new(new UniqueSlugUnit("realm-1"));
-    Realm realm2 = new(new UniqueSlugUnit("realm-2"));
+    Realm notMatching = new(new Slug("tests"));
+    Realm notInIds = new(new Slug("realm-not-in-ids"));
+    Realm realm1 = new(new Slug("realm-1"));
+    Realm realm2 = new(new Slug("realm-2"));
     await _realmRepository.SaveAsync([notMatching, notInIds, realm1, realm2]);
 
     SearchRealmsPayload payload = new()

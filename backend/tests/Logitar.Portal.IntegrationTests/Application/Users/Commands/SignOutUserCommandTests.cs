@@ -1,5 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.EntityFrameworkCore;
@@ -38,17 +38,17 @@ public class SignOutUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should sign-out the specified user.")]
   public async Task It_should_sign_out_the_specified_user()
   {
-    UserAggregate aggregate = (await _userRepository.LoadAsync()).Single();
-    SignOutUserCommand command = new(aggregate.Id.ToGuid());
+    User aggregate = (await _userRepository.LoadAsync()).Single();
+    SignOutUserCommand command = new(aggregate.EntityId.ToGuid());
 
     UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(user);
     Assert.Equal(command.Id, user.Id);
 
-    string aggregateId = new AggregateId(command.Id).Value;
+    string aggregateId = new StreamId(command.Id).Value;
     SessionEntity[] sessions = await IdentityContext.Sessions.AsNoTracking()
       .Include(x => x.User)
-      .Where(x => x.User!.AggregateId == aggregateId)
+      .Where(x => x.User!.StreamId == aggregateId)
       .ToArrayAsync();
     foreach (SessionEntity session in sessions)
     {

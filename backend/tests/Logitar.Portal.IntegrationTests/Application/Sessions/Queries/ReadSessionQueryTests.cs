@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Sessions;
 using Microsoft.EntityFrameworkCore;
@@ -31,13 +31,13 @@ public class ReadSessionQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the session when it is found.")]
   public async Task It_should_return_the_session_when_it_is_found()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    SessionAggregate aggregate = new(user);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    Session aggregate = new(user);
     await _sessionRepository.SaveAsync(aggregate);
 
     SessionEntity? entity = await IdentityContext.Sessions.AsNoTracking().SingleOrDefaultAsync();
     Assert.NotNull(entity);
-    Guid id = new AggregateId(entity.AggregateId).ToGuid();
+    Guid id = new StreamId(entity.StreamId).ToGuid();
 
     ReadSessionQuery query = new(id);
     SessionModel? session = await ActivityPipeline.ExecuteAsync(query);

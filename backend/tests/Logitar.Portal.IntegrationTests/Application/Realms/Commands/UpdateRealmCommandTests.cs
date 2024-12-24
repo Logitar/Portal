@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Contracts;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
@@ -20,7 +20,7 @@ public class UpdateRealmCommandTests : IntegrationTests
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -49,7 +49,7 @@ public class UpdateRealmCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
   {
-    Realm realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
     UpdateRealmPayload payload = new()
@@ -58,7 +58,7 @@ public class UpdateRealmCommandTests : IntegrationTests
     };
     UpdateRealmCommand command = new(realm.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_realm.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -78,10 +78,10 @@ public class UpdateRealmCommandTests : IntegrationTests
   {
     UpdateRealmPayload payload = new()
     {
-      DisplayName = new Modification<string>("Tests"),
-      Description = new Modification<string>("  This is a test realm.  "),
-      DefaultLocale = new Modification<string>("fr"),
-      Url = new Modification<string>($"https://www.{Faker.Internet.DomainName()}/")
+      DisplayName = new ChangeModel<string>("Tests"),
+      Description = new ChangeModel<string>("  This is a test realm.  "),
+      DefaultLocale = new ChangeModel<string>("fr"),
+      Url = new ChangeModel<string>($"https://www.{Faker.Internet.DomainName()}/")
     };
     UpdateRealmCommand command = new(_realm.Id.ToGuid(), payload);
     RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);

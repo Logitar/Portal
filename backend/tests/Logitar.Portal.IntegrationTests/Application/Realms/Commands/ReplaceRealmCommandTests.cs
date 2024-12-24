@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
@@ -20,7 +20,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -42,12 +42,12 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     string oldSecret = _realm.Secret.Value;
 
-    _realm.DefaultLocale = new LocaleUnit("fr");
+    _realm.DefaultLocale = new Locale("fr");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
     long version = _realm.Version;
 
-    _realm.DefaultLocale = new LocaleUnit("fr-CA");
+    _realm.DefaultLocale = new Locale("fr-CA");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
 
@@ -84,13 +84,13 @@ public class ReplaceRealmCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueSlugAlreadySlugException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadySlugException_when_the_unique_slug_is_already_used()
   {
-    Realm realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
     ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpper(), secret: string.Empty);
     ReplaceRealmCommand command = new(realm.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug.Value, ignoreCase: true);
+    Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug, ignoreCase: true);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

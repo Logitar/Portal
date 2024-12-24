@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
@@ -20,7 +20,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -59,7 +59,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
     CreateDictionaryCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Locale, exception.Locale.Code);
+    Assert.Equal(payload.Locale, exception.Locale);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
