@@ -1,5 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Microsoft.Extensions.Logging;
 
@@ -44,19 +46,21 @@ public class Log
   public TimeSpan? Duration => EndedOn.HasValue ? EndedOn.Value - StartedOn : null;
 
   public TenantId? TenantId { get; set; }
-  public ActorId ActorId
+  public ActorId? ActorId
   {
     get
     {
       if (UserId.HasValue)
       {
-        return new(UserId.Value);
+        UserId userId = new(TenantId, new EntityId(UserId.Value));
+        return new ActorId(userId.Value);
       }
       else if (ApiKeyId.HasValue)
       {
-        return new(ApiKeyId.Value);
+        ApiKeyId apiKeyId = new(TenantId, new EntityId(ApiKeyId.Value));
+        return new ActorId(apiKeyId.Value);
       }
-      return new ActorId();
+      return null;
     }
   }
   public Guid? ApiKeyId { get; set; }

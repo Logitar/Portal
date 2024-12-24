@@ -11,10 +11,12 @@ namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
 internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 {
+  private readonly JsonSerializerOptions _serializerOptions = new();
   private readonly Dictionary<SenderProvider, IProviderStrategy> _strategies = [];
 
   public SendEmailCommandHandler(IEnumerable<IProviderStrategy> strategies)
   {
+    _serializerOptions.Converters.Add(new JsonStringEnumConverter());
     foreach (IProviderStrategy strategy in strategies)
     {
       _strategies[strategy.Provider] = strategy;
@@ -55,14 +57,14 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
     }
   }
 
-  private static Dictionary<string, string> SerializeData(SendMailResult result)
+  private Dictionary<string, string> SerializeData(SendMailResult result)
   {
     Dictionary<string, string> resultData = new(capacity: result.Data.Count);
     foreach (KeyValuePair<string, object?> data in result.Data)
     {
       if (data.Value != null)
       {
-        resultData[data.Key] = JsonSerializer.Serialize(data.Value, data.Value.GetType()).Trim('"');
+        resultData[data.Key] = JsonSerializer.Serialize(data.Value, data.Value.GetType(), _serializerOptions).Trim('"');
       }
     }
     return resultData;
