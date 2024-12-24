@@ -1,9 +1,16 @@
-﻿namespace Logitar.Portal.Application.Messages;
+﻿using Logitar.Identity.Core;
+
+namespace Logitar.Portal.Application.Messages;
 
 public class MissingRecipientContactsException : Exception
 {
   public const string ErrorMessage = "The specified recipients are missing an email address.";
 
+  public Guid? RealmId
+  {
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
+  }
   public IReadOnlyCollection<Guid> UserIds
   {
     get => (IReadOnlyCollection<Guid>)Data[nameof(UserIds)]!;
@@ -15,16 +22,18 @@ public class MissingRecipientContactsException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public MissingRecipientContactsException(IEnumerable<Guid> userIds, string propertyName) : base(BuildMessage(userIds, propertyName))
+  public MissingRecipientContactsException(TenantId? tenantId, IEnumerable<Guid> userIds, string propertyName) : base(BuildMessage(tenantId, userIds, propertyName))
   {
+    RealmId = tenantId?.ToGuid();
     UserIds = userIds.ToArray();
     PropertyName = propertyName;
   }
 
-  private static string BuildMessage(IEnumerable<Guid> userIds, string propertyName)
+  private static string BuildMessage(TenantId? tenantId, IEnumerable<Guid> userIds, string propertyName)
   {
     StringBuilder message = new();
     message.AppendLine(ErrorMessage);
+    message.Append(nameof(TenantId)).Append(": ").AppendLine(tenantId?.Value ?? "<null>");
     message.Append(nameof(PropertyName)).Append(": ").AppendLine(propertyName ?? "<null>");
     message.Append(nameof(UserIds)).AppendLine(":");
     foreach (Guid userId in userIds)

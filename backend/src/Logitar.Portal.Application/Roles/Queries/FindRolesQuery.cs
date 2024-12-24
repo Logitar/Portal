@@ -68,7 +68,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
 
     if (missingRoles.Count > 0)
     {
-      throw new RolesNotFoundException(missingRoles, query.PropertyName);
+      throw new RolesNotFoundException(query.TenantId, missingRoles, query.PropertyName);
     }
 
     return foundRoles.Values;

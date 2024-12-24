@@ -7,10 +7,10 @@ public class ImpersonifiedUserNotFoundException : Exception
 {
   public const string ErrorMessage = "The specified user could not be found.";
 
-  public string? TenantId
+  public Guid? RealmId
   {
-    get => (string?)Data[nameof(TenantId)];
-    private set => Data[nameof(TenantId)] = value;
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
   }
   public string User
   {
@@ -25,13 +25,13 @@ public class ImpersonifiedUserNotFoundException : Exception
 
   public ImpersonifiedUserNotFoundException(TenantId? tenantId, string user) : base(BuildMessage(tenantId, user))
   {
-    TenantId = tenantId?.Value;
+    RealmId = tenantId?.ToGuid();
     User = user;
     Header = Headers.User;
   }
 
   private static string BuildMessage(TenantId? tenantId, string user) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId, "<null>")
+    .AddData(nameof(RealmId), tenantId?.ToGuid(), "<null>")
     .AddData(nameof(User), user)
     .AddData(nameof(Header), Headers.User)
     .Build();

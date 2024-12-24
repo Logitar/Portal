@@ -98,7 +98,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     ReplaceTemplatePayload payload = new("PaSSWoRDReCoVeRy", _template.Subject.Value, new ContentModel(_template.Content));
     ReplaceTemplateCommand command = new(template.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey);
   }
 

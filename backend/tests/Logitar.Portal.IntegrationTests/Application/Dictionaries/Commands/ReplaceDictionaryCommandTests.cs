@@ -96,7 +96,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());
     ReplaceDictionaryCommand command = new(dictionary.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
     Assert.Equal(payload.Locale, exception.Locale, ignoreCase: true);
   }
 

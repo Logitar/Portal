@@ -7,10 +7,15 @@ public class ApiKeyNotFoundException : InvalidCredentialsException
 {
   private const string ErrorMessage = "The specified API key could not be found.";
 
-  public string Id
+  public Guid? RealmId
   {
-    get => (string)Data[nameof(Id)]!;
-    private set => Data[nameof(Id)] = value;
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
+  }
+  public Guid ApiKeyId
+  {
+    get => (Guid)Data[nameof(ApiKeyId)]!;
+    private set => Data[nameof(ApiKeyId)] = value;
   }
   public string? PropertyName
   {
@@ -20,12 +25,14 @@ public class ApiKeyNotFoundException : InvalidCredentialsException
 
   public ApiKeyNotFoundException(ApiKeyId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id.Value;
+    RealmId = id.TenantId?.ToGuid();
+    ApiKeyId = id.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(ApiKeyId id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(Id), id)
+    .AddData(nameof(RealmId), id.TenantId?.ToGuid())
+    .AddData(nameof(ApiKeyId), id.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

@@ -242,6 +242,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(TenantId.ToGuid(), exception.RealmId);
     Assert.Equal([user.EntityId.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
@@ -264,6 +265,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<MissingRecipientContactsException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(TenantId.ToGuid(), exception.RealmId);
     Assert.Equal([user.EntityId.ToGuid()], exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
@@ -280,7 +282,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<NoDefaultSenderException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
   }
 
   [Fact(DisplayName = "It should throw SenderNotFoundException when the sender could not be found.")]
@@ -298,7 +300,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(payload.SenderId?.ToString(), exception.Id);
+    Assert.Equal(TenantId.ToGuid(), exception.RealmId);
+    Assert.Equal(payload.SenderId.Value, exception.SenderId);
     Assert.Equal("SenderId", exception.PropertyName);
   }
 

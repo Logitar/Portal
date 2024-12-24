@@ -153,7 +153,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     }
     else if (missingContacts.Count > 0)
     {
-      throw new MissingRecipientContactsException(missingContacts, nameof(payload.Recipients));
+      throw new MissingRecipientContactsException(tenantId, missingContacts, nameof(payload.Recipients));
     }
 
     return new Recipients(recipients);
@@ -164,12 +164,10 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     if (payload.SenderId.HasValue)
     {
       SenderId senderId = new(tenantId, new EntityId(payload.SenderId.Value));
-      return await _senderRepository.LoadAsync(senderId, cancellationToken)
-        ?? throw new SenderNotFoundException(senderId.Value, nameof(payload.SenderId));
+      return await _senderRepository.LoadAsync(senderId, cancellationToken) ?? throw new SenderNotFoundException(senderId, nameof(payload.SenderId));
     }
 
-    return await _senderRepository.LoadDefaultAsync(tenantId, cancellationToken)
-      ?? throw new NoDefaultSenderException(tenantId);
+    return await _senderRepository.LoadDefaultAsync(tenantId, cancellationToken) ?? throw new NoDefaultSenderException(tenantId);
   }
 
   private async Task<Template> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)

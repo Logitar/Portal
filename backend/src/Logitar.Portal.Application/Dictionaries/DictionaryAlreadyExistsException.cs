@@ -6,10 +6,10 @@ public class DictionaryAlreadyExistsException : Exception
 {
   public const string ErrorMessage = "The specified dictionary already exists.";
 
-  public string? TenantId
+  public Guid? RealmId
   {
-    get => (string?)Data[nameof(TenantId)];
-    private set => Data[nameof(TenantId)] = value;
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
   }
   public string Locale
   {
@@ -19,12 +19,12 @@ public class DictionaryAlreadyExistsException : Exception
 
   public DictionaryAlreadyExistsException(TenantId? tenantId, Locale locale) : base(BuildMessage(tenantId, locale))
   {
-    TenantId = tenantId?.Value;
+    RealmId = tenantId?.ToGuid();
     Locale = locale.Code;
   }
 
   private static string BuildMessage(TenantId? tenantId, Locale locale) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId, "<null>")
+    .AddData(nameof(RealmId), tenantId?.ToGuid(), "<null>")
     .AddData(nameof(Locale), locale)
     .Build();
 }

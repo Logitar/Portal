@@ -1,13 +1,20 @@
-﻿namespace Logitar.Portal.Application.Senders;
+﻿using Logitar.Portal.Domain.Senders;
+
+namespace Logitar.Portal.Application.Senders;
 
 public class SenderNotFoundException : Exception
 {
   public const string ErrorMessage = "The specified sender could not be found.";
 
-  public string Id
+  public Guid? RealmId
   {
-    get => (string)Data[nameof(Id)]!;
-    private set => Data[nameof(Id)] = value;
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
+  }
+  public Guid SenderId
+  {
+    get => (Guid)Data[nameof(SenderId)]!;
+    private set => Data[nameof(SenderId)] = value;
   }
   public string? PropertyName
   {
@@ -15,14 +22,16 @@ public class SenderNotFoundException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public SenderNotFoundException(string id, string? propertyName = null) : base(BuildMessage(id, propertyName))
+  public SenderNotFoundException(SenderId senderId, string? propertyName = null) : base(BuildMessage(senderId, propertyName))
   {
-    Id = id;
+    RealmId = senderId.TenantId?.ToGuid();
+    SenderId = senderId.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
-  private static string BuildMessage(string id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(Id), id)
+  private static string BuildMessage(SenderId senderId, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
+    .AddData(nameof(RealmId), senderId.TenantId?.ToGuid())
+    .AddData(nameof(SenderId), senderId.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

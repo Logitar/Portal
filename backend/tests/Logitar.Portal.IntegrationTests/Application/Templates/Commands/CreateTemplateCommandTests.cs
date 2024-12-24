@@ -67,7 +67,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new ContentModel(content));
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId.Value, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.RealmId);
     Assert.Equal(template.UniqueKey.Value, exception.UniqueKey);
   }
 

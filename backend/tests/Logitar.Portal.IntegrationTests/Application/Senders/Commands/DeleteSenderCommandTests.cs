@@ -77,6 +77,7 @@ public class DeleteSenderCommandTests : IntegrationTests
 
     DeleteSenderCommand command = new(_sender.EntityId.ToGuid());
     var exception = await Assert.ThrowsAsync<CannotDeleteDefaultSenderException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_sender.Id.Value, exception.SenderId);
+    Assert.Equal(_sender.TenantId?.ToGuid(), exception.RealmId);
+    Assert.Equal(_sender.EntityId.ToGuid(), exception.SenderId);
   }
 }

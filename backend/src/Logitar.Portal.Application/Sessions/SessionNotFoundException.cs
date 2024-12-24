@@ -7,10 +7,15 @@ public class SessionNotFoundException : InvalidCredentialsException
 {
   private const string ErrorMessage = "The specified session could not be found.";
 
-  public string Id
+  public Guid? TenantId
   {
-    get => (string)Data[nameof(Id)]!;
-    private set => Data[nameof(Id)] = value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid SessionId
+  {
+    get => (Guid)Data[nameof(SessionId)]!;
+    private set => Data[nameof(SessionId)] = value;
   }
   public string? PropertyName
   {
@@ -20,12 +25,14 @@ public class SessionNotFoundException : InvalidCredentialsException
 
   public SessionNotFoundException(SessionId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id.Value;
+    TenantId = id.TenantId?.ToGuid();
+    SessionId = id.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(SessionId id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(Id), id)
+    .AddData(nameof(TenantId), id.TenantId?.ToGuid())
+    .AddData(nameof(SessionId), id.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

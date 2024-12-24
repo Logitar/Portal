@@ -69,7 +69,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     };
     UpdateDictionaryCommand command = new(dictionary.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
     Assert.Equal(payload.Locale, exception.Locale);
   }
 

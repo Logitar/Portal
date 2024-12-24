@@ -58,7 +58,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
     CreateDictionaryPayload payload = new(Faker.Locale);
     CreateDictionaryCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
     Assert.Equal(payload.Locale, exception.Locale);
   }
 

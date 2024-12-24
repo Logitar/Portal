@@ -6,18 +6,18 @@ public class NoDefaultSenderException : Exception
 {
   public const string ErrorMessage = "The specified tenant has no default sender.";
 
-  public string? TenantId
+  public Guid? RealmId
   {
-    get => (string?)Data[nameof(TenantId)];
-    private set => Data[nameof(TenantId)] = value;
+    get => (Guid?)Data[nameof(RealmId)];
+    private set => Data[nameof(RealmId)] = value;
   }
 
   public NoDefaultSenderException(TenantId? tenantId) : base(BuildMessage(tenantId))
   {
-    TenantId = tenantId?.Value;
+    RealmId = tenantId?.ToGuid();
   }
 
   private static string BuildMessage(TenantId? tenantId) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId, "<null>")
+    .AddData(nameof(RealmId), tenantId?.ToGuid(), "<null>")
     .Build();
 }

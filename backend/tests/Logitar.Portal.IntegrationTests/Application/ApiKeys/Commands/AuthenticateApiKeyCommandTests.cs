@@ -86,7 +86,8 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyPayload payload = new(xApiKey.Encode());
     AuthenticateApiKeyCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(xApiKey.Id.Value, exception.Id);
+    Assert.Equal(xApiKey.Id.TenantId?.ToGuid(), exception.RealmId);
+    Assert.Equal(xApiKey.Id.EntityId.ToGuid(), exception.ApiKeyId);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
 
@@ -103,7 +104,8 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyCommand command = new(payload);
 
     var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(apiKey.Id.Value, exception.Id);
+    Assert.Equal(apiKey.Id.TenantId?.ToGuid(), exception.RealmId);
+    Assert.Equal(apiKey.Id.EntityId.ToGuid(), exception.ApiKeyId);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
 

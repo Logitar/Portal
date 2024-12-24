@@ -73,7 +73,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
     };
     UpdateTemplateCommand command = new(template.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Null(exception.TenantId);
+    Assert.Null(exception.RealmId);
     Assert.Equal(payload.UniqueKey, exception.UniqueKey);
   }
 
