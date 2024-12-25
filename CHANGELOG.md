@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [4.1.3] - 2024-12-24
+
 ### Changed
 
 - Upgraded build pipelines.
@@ -194,7 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Final V1 release.
 
-[unreleased]: https://github.com/Logitar/Portal/compare/v4.1.2...HEAD
+[unreleased]: https://github.com/Logitar/Portal/compare/v4.1.3...HEAD
+[4.1.3]: https://github.com/Logitar/Portal/compare/v4.1.2...v4.1.3
 [4.1.2]: https://github.com/Logitar/Portal/compare/v4.1.1...v4.1.2
 [4.1.1]: https://github.com/Logitar/Portal/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/Logitar/Portal/compare/v4.0.1...v4.1.0
