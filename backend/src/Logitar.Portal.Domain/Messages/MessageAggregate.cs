@@ -154,35 +154,5 @@ public class MessageAggregate : AggregateRoot
     }
   }
 
-  public MailMessage ToMailMessage() // ISSUE #467: move to Logitar.Portal.Infrastructure.Messages.MessageExtensions and remove System usings
-  {
-    MailMessage message = new()
-    {
-      From = Sender.ToMailAddress(),
-      Subject = Subject.Value,
-      Body = Body.Text,
-      IsBodyHtml = Body.Type == MediaTypeNames.Text.Html
-    };
-
-    foreach (RecipientUnit recipient in Recipients)
-    {
-      MailAddress address = recipient.ToMailAddress();
-      switch (recipient.Type)
-      {
-        case RecipientType.Bcc:
-          message.Bcc.Add(address);
-          break;
-        case RecipientType.CC:
-          message.CC.Add(address);
-          break;
-        case RecipientType.To:
-          message.To.Add(address);
-          break;
-      }
-    }
-
-    return message;
-  }
-
   public override string ToString() => $"{Subject.Value} | {base.ToString()}";
 }

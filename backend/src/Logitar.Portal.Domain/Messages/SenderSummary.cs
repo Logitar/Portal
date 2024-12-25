@@ -32,13 +32,4 @@ public record SenderSummary
   public SenderSummary(SenderAggregate sender) : this(sender.Id, sender.IsDefault, sender.Email, sender.Phone, sender.DisplayName, sender.Provider)
   {
   }
-
-  public MailAddress ToMailAddress() // ISSUE #467: move to Logitar.Portal.Infrastructure.Messages.MessageExtensions and remove System usings
-  {
-    if (Email == null)
-    {
-      throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to be converted into a {nameof(MailAddress)}.");
-    }
-    return new(Email.Address, DisplayName?.Value);
-  }
 }

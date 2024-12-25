@@ -34,13 +34,4 @@ public record RecipientUnit
   {
     User = user;
   }
-
-  public MailAddress ToMailAddress() // ISSUE #467: move to Logitar.Portal.Infrastructure.Messages.MessageExtensions and remove System usings
-  {
-    if (Address == null)
-    {
-      throw new InvalidOperationException($"A recipient requires an email address in order to be converted into a {nameof(MailAddress)}.");
-    }
-    return new(Address, DisplayName);
-  }
 }
