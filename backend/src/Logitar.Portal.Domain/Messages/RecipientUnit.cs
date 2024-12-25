@@ -18,12 +18,6 @@ public record RecipientUnit
   [JsonIgnore]
   public UserAggregate? User { get; }
 
-  [Obsolete("Do not use this constructor. It will be removed in the next major release.")]
-  public RecipientUnit(string address, string? displayName = null, RecipientType type = RecipientType.To, UserId? userId = null)
-    : this(type, address, displayName, phoneNumber: null, userId)
-  {
-  }
-
   [JsonConstructor]
   public RecipientUnit(RecipientType type = RecipientType.To, string? address = null, string? displayName = null, string? phoneNumber = null, UserId? userId = null)
   {
