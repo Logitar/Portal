@@ -18,13 +18,13 @@ public class TokenController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult<CreatedToken>> CreateAsync([FromBody] CreateTokenPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<CreatedTokenModel>> CreateAsync([FromBody] CreateTokenPayload payload, CancellationToken cancellationToken)
   {
     return Ok(await _tokenService.CreateAsync(payload, cancellationToken));
   }
 
   [HttpPut]
-  public async Task<ActionResult<ValidatedToken>> ValidateAsync([FromBody] ValidateTokenPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<ValidatedTokenModel>> ValidateAsync([FromBody] ValidateTokenPayload payload, CancellationToken cancellationToken)
   {
     return Ok(await _tokenService.ValidateAsync(payload, cancellationToken));
   }

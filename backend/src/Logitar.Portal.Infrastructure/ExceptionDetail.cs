@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Logitar.Portal.Infrastructure;
+﻿namespace Logitar.Portal.Infrastructure;
 
 public record ExceptionDetail
 {
