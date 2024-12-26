@@ -79,10 +79,10 @@ public class MessageAggregate : AggregateRoot
       throw new TemplateNotInTenantException(template, tenantId);
     }
 
-    Raise(new MessageCreatedEvent(tenantId, subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template),
+    Raise(new MessageCreated(tenantId, subject, body, recipients, new SenderSummary(sender), new TemplateSummary(template),
       ignoreUserLocale, locale, variables ?? new Dictionary<string, string>(), isDemo), actorId);
   }
-  protected virtual void Apply(MessageCreatedEvent @event)
+  protected virtual void Apply(MessageCreated @event)
   {
     TenantId = @event.TenantId;
 
@@ -112,7 +112,7 @@ public class MessageAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new MessageDeletedEvent(), actorId);
+      Raise(new MessageDeleted(), actorId);
     }
   }
 
@@ -121,10 +121,10 @@ public class MessageAggregate : AggregateRoot
   {
     if (Status == MessageStatus.Unsent)
     {
-      Raise(new MessageFailedEvent(resultData), actorId);
+      Raise(new MessageFailed(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageFailedEvent @event)
+  protected virtual void Apply(MessageFailed @event)
   {
     Status = MessageStatus.Failed;
 
@@ -140,10 +140,10 @@ public class MessageAggregate : AggregateRoot
   {
     if (Status == MessageStatus.Unsent)
     {
-      Raise(new MessageSucceededEvent(resultData), actorId);
+      Raise(new MessageSucceeded(resultData), actorId);
     }
   }
-  protected virtual void Apply(MessageSucceededEvent @event)
+  protected virtual void Apply(MessageSucceeded @event)
   {
     Status = MessageStatus.Succeeded;
 

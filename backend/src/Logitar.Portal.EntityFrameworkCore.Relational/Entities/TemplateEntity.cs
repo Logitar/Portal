@@ -25,7 +25,7 @@ internal class TemplateEntity : AggregateEntity
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
-  public TemplateEntity(TemplateCreatedEvent @event) : base(@event)
+  public TemplateEntity(TemplateCreated @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
@@ -39,14 +39,14 @@ internal class TemplateEntity : AggregateEntity
   {
   }
 
-  public void SetUniqueKey(TemplateUniqueKeyChangedEvent @event)
+  public void SetUniqueKey(TemplateUniqueKeyChanged @event)
   {
     Update(@event);
 
     UniqueKey = @event.UniqueKey.Value;
   }
 
-  public void Update(TemplateUpdatedEvent @event)
+  public void Update(TemplateUpdated @event)
   {
     base.Update(@event);
 

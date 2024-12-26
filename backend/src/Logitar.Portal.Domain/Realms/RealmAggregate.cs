@@ -8,7 +8,7 @@ namespace Logitar.Portal.Domain.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
-  private RealmUpdatedEvent _updatedEvent = new();
+  private RealmUpdated _updatedEvent = new();
 
   public new RealmId Id => new(base.Id);
 
@@ -134,9 +134,9 @@ public class RealmAggregate : AggregateRoot
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passwordSettings = new();
     bool requireUniqueEmail = true;
-    Raise(new RealmCreatedEvent(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
+    Raise(new RealmCreated(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
   }
-  protected virtual void Apply(RealmCreatedEvent @event)
+  protected virtual void Apply(RealmCreated @event)
   {
     _uniqueSlug = @event.UniqueSlug;
     _secret = @event.Secret;
@@ -149,7 +149,7 @@ public class RealmAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new RealmDeletedEvent(), actorId);
+      Raise(new RealmDeleted(), actorId);
     }
   }
 
@@ -180,9 +180,9 @@ public class RealmAggregate : AggregateRoot
 
   public void SetUniqueSlug(UniqueSlugUnit uniqueSlug, ActorId actorId = default)
   {
-    Raise(new RealmUniqueSlugChangedEvent(uniqueSlug), actorId);
+    Raise(new RealmUniqueSlugChanged(uniqueSlug), actorId);
   }
-  protected virtual void Apply(RealmUniqueSlugChangedEvent @event)
+  protected virtual void Apply(RealmUniqueSlugChanged @event)
   {
     _uniqueSlug = @event.UniqueSlug;
   }
@@ -195,7 +195,7 @@ public class RealmAggregate : AggregateRoot
       _updatedEvent = new();
     }
   }
-  protected virtual void Apply(RealmUpdatedEvent @event)
+  protected virtual void Apply(RealmUpdated @event)
   {
     if (@event.DisplayName != null)
     {

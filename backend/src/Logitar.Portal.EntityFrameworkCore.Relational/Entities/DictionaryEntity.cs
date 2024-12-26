@@ -38,7 +38,7 @@ internal class DictionaryEntity : AggregateEntity
     }
   }
 
-  public DictionaryEntity(DictionaryCreatedEvent @event) : base(@event)
+  public DictionaryEntity(DictionaryCreated @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
@@ -49,14 +49,14 @@ internal class DictionaryEntity : AggregateEntity
   {
   }
 
-  public void SetLocale(DictionaryLocaleChangedEvent @event)
+  public void SetLocale(DictionaryLocaleChanged @event)
   {
     Update(@event);
 
     Locale = @event.Locale.Code;
   }
 
-  public void Update(DictionaryUpdatedEvent @event)
+  public void Update(DictionaryUpdated @event)
   {
     base.Update(@event);
 

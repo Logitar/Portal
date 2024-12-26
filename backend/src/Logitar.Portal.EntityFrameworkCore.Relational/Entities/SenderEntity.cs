@@ -37,10 +37,10 @@ internal class SenderEntity : AggregateEntity
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
-  public SenderEntity(EmailSenderCreatedEvent @event) : this((SenderCreatedEvent)@event)
+  public SenderEntity(EmailSenderCreated @event) : this((SenderCreated)@event)
   {
   }
-  public SenderEntity(SenderCreatedEvent @event) : base(@event)
+  public SenderEntity(SenderCreated @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
@@ -49,7 +49,7 @@ internal class SenderEntity : AggregateEntity
     Provider = @event.Provider;
   }
 
-  public SenderEntity(SmsSenderCreatedEvent @event) : base(@event)
+  public SenderEntity(SmsSenderCreated @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
@@ -62,32 +62,32 @@ internal class SenderEntity : AggregateEntity
   {
   }
 
-  public void SetDefault(SenderSetDefaultEvent @event)
+  public void SetDefault(SenderSetDefault @event)
   {
     Update(@event);
 
     IsDefault = @event.IsDefault;
   }
 
-  public void SetMailgunSettings(SenderMailgunSettingsChangedEvent @event)
+  public void SetMailgunSettings(SenderMailgunSettingsChanged @event)
   {
     Settings.Clear();
     Settings[nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey;
     Settings[nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName;
   }
-  public void SetSendGridSettings(SenderSendGridSettingsChangedEvent @event)
+  public void SetSendGridSettings(SenderSendGridSettingsChanged @event)
   {
     Settings.Clear();
     Settings[nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey;
   }
-  public void SetTwilioSettings(SenderTwilioSettingsChangedEvent @event)
+  public void SetTwilioSettings(SenderTwilioSettingsChanged @event)
   {
     Settings.Clear();
     Settings[nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid;
     Settings[nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken;
   }
 
-  public void Update(SenderUpdatedEvent @event)
+  public void Update(SenderUpdated @event)
   {
     base.Update(@event);
 

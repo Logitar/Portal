@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Templates;
 
 public class TemplateAggregate : AggregateRoot
 {
-  private TemplateUpdatedEvent _updatedEvent = new();
+  private TemplateUpdated _updatedEvent = new();
 
   public new TemplateId Id => new(base.Id);
 
@@ -76,9 +76,9 @@ public class TemplateAggregate : AggregateRoot
   public TemplateAggregate(UniqueKeyUnit uniqueKey, SubjectUnit subject, ContentUnit content, TenantId? tenantId = null,
     ActorId actorId = default, TemplateId? id = null) : base((id ?? TemplateId.NewId()).AggregateId)
   {
-    Raise(new TemplateCreatedEvent(tenantId, uniqueKey, subject, content), actorId);
+    Raise(new TemplateCreated(tenantId, uniqueKey, subject, content), actorId);
   }
-  protected virtual void Apply(TemplateCreatedEvent @event)
+  protected virtual void Apply(TemplateCreated @event)
   {
     TenantId = @event.TenantId;
 
@@ -92,7 +92,7 @@ public class TemplateAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new TemplateDeletedEvent(), actorId);
+      Raise(new TemplateDeleted(), actorId);
     }
   }
 
@@ -100,10 +100,10 @@ public class TemplateAggregate : AggregateRoot
   {
     if (uniqueKey != _uniqueKey)
     {
-      Raise(new TemplateUniqueKeyChangedEvent(uniqueKey), actorId);
+      Raise(new TemplateUniqueKeyChanged(uniqueKey), actorId);
     }
   }
-  protected virtual void Apply(TemplateUniqueKeyChangedEvent @event)
+  protected virtual void Apply(TemplateUniqueKeyChanged @event)
   {
     _uniqueKey = @event.UniqueKey;
   }
@@ -116,7 +116,7 @@ public class TemplateAggregate : AggregateRoot
       _updatedEvent = new();
     }
   }
-  protected virtual void Apply(TemplateUpdatedEvent @event)
+  protected virtual void Apply(TemplateUpdated @event)
   {
     if (@event.DisplayName != null)
     {

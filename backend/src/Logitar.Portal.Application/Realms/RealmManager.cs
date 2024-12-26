@@ -23,11 +23,11 @@ internal class RealmManager : IRealmManager
     bool hasUniqueNameChanged = false;
     foreach (DomainEvent change in realm.Changes)
     {
-      if (change is RealmCreatedEvent || change is RealmUniqueSlugChangedEvent)
+      if (change is RealmCreated || change is RealmUniqueSlugChanged)
       {
         hasUniqueNameChanged = true;
       }
-      else if (change is RealmDeletedEvent)
+      else if (change is RealmDeleted)
       {
         hasBeenDeleted = true;
       }

@@ -19,7 +19,7 @@ internal class TemplateManager : ITemplateManager
     bool hasUniqueKeyChanged = false;
     foreach (DomainEvent change in template.Changes)
     {
-      if (change is TemplateCreatedEvent || change is TemplateUniqueKeyChangedEvent)
+      if (change is TemplateCreated || change is TemplateUniqueKeyChanged)
       {
         hasUniqueKeyChanged = true;
       }
