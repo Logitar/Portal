@@ -8,7 +8,7 @@ namespace Logitar.Portal.Domain.Realms;
 
 public class RealmAggregate : AggregateRoot
 {
-  private RealmUpdatedEvent _updatedEvent = new();
+  private RealmUpdated _updated = new();
 
   public new RealmId Id => new(base.Id);
 
@@ -20,10 +20,10 @@ public class RealmAggregate : AggregateRoot
     get => _displayName;
     set
     {
-      if (value != _displayName)
+      if (_displayName != value)
       {
         _displayName = value;
-        _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Modification<DisplayNameUnit>(value);
       }
     }
   }
@@ -33,10 +33,10 @@ public class RealmAggregate : AggregateRoot
     get => _description;
     set
     {
-      if (value != _description)
+      if (_description != value)
       {
         _description = value;
-        _updatedEvent.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Modification<DescriptionUnit>(value);
       }
     }
   }
@@ -47,10 +47,10 @@ public class RealmAggregate : AggregateRoot
     get => _defaultLocale;
     set
     {
-      if (value != _defaultLocale)
+      if (_defaultLocale != value)
       {
         _defaultLocale = value;
-        _updatedEvent.DefaultLocale = new Modification<LocaleUnit>(value);
+        _updated.DefaultLocale = new Modification<LocaleUnit>(value);
       }
     }
   }
@@ -60,10 +60,10 @@ public class RealmAggregate : AggregateRoot
     get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
     {
-      if (value != _secret)
+      if (_secret != value)
       {
         _secret = value;
-        _updatedEvent.Secret = value;
+        _updated.Secret = value;
       }
     }
   }
@@ -73,10 +73,10 @@ public class RealmAggregate : AggregateRoot
     get => _url;
     set
     {
-      if (value != _url)
+      if (_url != value)
       {
         _url = value;
-        _updatedEvent.Url = new Modification<UrlUnit>(value);
+        _updated.Url = new Modification<UrlUnit>(value);
       }
     }
   }
@@ -87,10 +87,10 @@ public class RealmAggregate : AggregateRoot
     get => _uniqueNameSettings ?? throw new InvalidOperationException($"The {nameof(UniqueNameSettings)} have not been initialized yet.");
     set
     {
-      if (value != _uniqueNameSettings)
+      if (_uniqueNameSettings != value)
       {
         _uniqueNameSettings = value;
-        _updatedEvent.UniqueNameSettings = value;
+        _updated.UniqueNameSettings = value;
       }
     }
   }
@@ -100,10 +100,10 @@ public class RealmAggregate : AggregateRoot
     get => _passwordSettings ?? throw new InvalidOperationException($"The {nameof(PasswordSettings)} have not been initialized yet.");
     set
     {
-      if (value != _passwordSettings)
+      if (_passwordSettings != value)
       {
         _passwordSettings = value;
-        _updatedEvent.PasswordSettings = value;
+        _updated.PasswordSettings = value;
       }
     }
   }
@@ -113,10 +113,10 @@ public class RealmAggregate : AggregateRoot
     get => _requireUniqueEmail ?? throw new InvalidOperationException($"The {nameof(RequireUniqueEmail)} have not been initialized yet.");
     set
     {
-      if (value != _requireUniqueEmail)
+      if (_requireUniqueEmail != value)
       {
         _requireUniqueEmail = value;
-        _updatedEvent.RequireUniqueEmail = value;
+        _updated.RequireUniqueEmail = value;
       }
     }
   }
@@ -134,9 +134,9 @@ public class RealmAggregate : AggregateRoot
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passwordSettings = new();
     bool requireUniqueEmail = true;
-    Raise(new RealmCreatedEvent(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
+    Raise(new RealmCreated(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
   }
-  protected virtual void Apply(RealmCreatedEvent @event)
+  protected virtual void Apply(RealmCreated @event)
   {
     _uniqueSlug = @event.UniqueSlug;
     _secret = @event.Secret;
@@ -149,7 +149,7 @@ public class RealmAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new RealmDeletedEvent(), actorId);
+      Raise(new RealmDeleted(), actorId);
     }
   }
 
@@ -159,7 +159,7 @@ public class RealmAggregate : AggregateRoot
 
     if (_customAttributes.ContainsKey(key))
     {
-      _updatedEvent.CustomAttributes[key] = null;
+      _updated.CustomAttributes[key] = null;
       _customAttributes.Remove(key);
     }
   }
@@ -173,29 +173,29 @@ public class RealmAggregate : AggregateRoot
 
     if (!_customAttributes.TryGetValue(key, out string? existingValue) || existingValue != value)
     {
-      _updatedEvent.CustomAttributes[key] = value;
+      _updated.CustomAttributes[key] = value;
       _customAttributes[key] = value;
     }
   }
 
   public void SetUniqueSlug(UniqueSlugUnit uniqueSlug, ActorId actorId = default)
   {
-    Raise(new RealmUniqueSlugChangedEvent(uniqueSlug), actorId);
+    Raise(new RealmUniqueSlugChanged(uniqueSlug), actorId);
   }
-  protected virtual void Apply(RealmUniqueSlugChangedEvent @event)
+  protected virtual void Apply(RealmUniqueSlugChanged @event)
   {
     _uniqueSlug = @event.UniqueSlug;
   }
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
-  protected virtual void Apply(RealmUpdatedEvent @event)
+  protected virtual void Apply(RealmUpdated @event)
   {
     if (@event.DisplayName != null)
     {

@@ -18,7 +18,7 @@ internal class DictionaryManager : IDictionaryManager
     bool hasLocaleChanged = false;
     foreach (DomainEvent change in dictionary.Changes)
     {
-      if (change is DictionaryCreatedEvent || change is DictionaryLocaleChangedEvent)
+      if (change is DictionaryCreated || change is DictionaryLocaleChanged)
       {
         hasLocaleChanged = true;
       }

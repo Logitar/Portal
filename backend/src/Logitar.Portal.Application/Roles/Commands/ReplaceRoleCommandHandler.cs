@@ -92,7 +92,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
-        if (!reference.CustomAttributes.TryGetValue(key, out string? existingValue) || value != existingValue)
+        if (!reference.CustomAttributes.TryGetValue(key, out string? existingValue) || existingValue != value)
         {
           role.SetCustomAttribute(key, value);
         }

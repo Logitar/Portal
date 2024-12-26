@@ -72,7 +72,7 @@ internal class MessageEntity : AggregateEntity
     }
   }
 
-  public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreatedEvent @event) : base(@event)
+  public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreated @event) : base(@event)
   {
     TenantId = @event.TenantId?.Value;
 
@@ -122,7 +122,7 @@ internal class MessageEntity : AggregateEntity
   {
   }
 
-  public void Fail(MessageFailedEvent @event)
+  public void Fail(MessageFailed @event)
   {
     Update(@event);
 
@@ -130,7 +130,7 @@ internal class MessageEntity : AggregateEntity
     SetResultData(@event.ResultData);
   }
 
-  public void Succeed(MessageSucceededEvent @event)
+  public void Succeed(MessageSucceeded @event)
   {
     Update(@event);
 

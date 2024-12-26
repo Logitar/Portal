@@ -8,7 +8,9 @@ namespace Logitar.Portal.Domain.Configurations;
 
 public class ConfigurationAggregate : AggregateRoot
 {
-  private ConfigurationUpdatedEvent _updatedEvent = new();
+  private ConfigurationUpdated _updated = new();
+
+  public new ConfigurationId Id => new();
 
   private LocaleUnit? _defaultLocale = null;
   public LocaleUnit? DefaultLocale
@@ -16,10 +18,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _defaultLocale;
     set
     {
-      if (value != _defaultLocale)
+      if (_defaultLocale != value)
       {
         _defaultLocale = value;
-        _updatedEvent.DefaultLocale = new Modification<LocaleUnit>(value);
+        _updated.DefaultLocale = new Modification<LocaleUnit>(value);
       }
     }
   }
@@ -29,10 +31,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
     {
-      if (value != _secret)
+      if (_secret != value)
       {
         _secret = value;
-        _updatedEvent.Secret = value;
+        _updated.Secret = value;
       }
     }
   }
@@ -43,10 +45,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _uniqueNameSettings ?? throw new InvalidOperationException($"The {nameof(UniqueNameSettings)} have not been initialized yet.");
     set
     {
-      if (value != _uniqueNameSettings)
+      if (_uniqueNameSettings != value)
       {
         _uniqueNameSettings = value;
-        _updatedEvent.UniqueNameSettings = value;
+        _updated.UniqueNameSettings = value;
       }
     }
   }
@@ -56,10 +58,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _passwordSettings ?? throw new InvalidOperationException($"The {nameof(PasswordSettings)} have not been initialized yet.");
     set
     {
-      if (value != _passwordSettings)
+      if (_passwordSettings != value)
       {
         _passwordSettings = value;
-        _updatedEvent.PasswordSettings = value;
+        _updated.PasswordSettings = value;
       }
     }
   }
@@ -69,10 +71,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _requireUniqueEmail;
     set
     {
-      if (value != _requireUniqueEmail)
+      if (_requireUniqueEmail != value)
       {
         _requireUniqueEmail = value;
-        _updatedEvent.RequireUniqueEmail = value;
+        _updated.RequireUniqueEmail = value;
       }
     }
   }
@@ -83,10 +85,10 @@ public class ConfigurationAggregate : AggregateRoot
     get => _loggingSettings ?? throw new InvalidOperationException($"The {nameof(LoggingSettings)} have not been initialized yet.");
     set
     {
-      if (value != _loggingSettings)
+      if (_loggingSettings != value)
       {
         _loggingSettings = value;
-        _updatedEvent.LoggingSettings = value;
+        _updated.LoggingSettings = value;
       }
     }
   }
@@ -106,11 +108,11 @@ public class ConfigurationAggregate : AggregateRoot
     ReadOnlyPasswordSettings passordSettings = new();
     bool requireUniqueEmail = true;
     ReadOnlyLoggingSettings loggingSettings = new();
-    configuration.Raise(new ConfigurationInitializedEvent(defaultLocale, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings), actorId);
+    configuration.Raise(new ConfigurationInitialized(defaultLocale, secret, uniqueNameSettings, passordSettings, requireUniqueEmail, loggingSettings), actorId);
 
     return configuration;
   }
-  protected virtual void Apply(ConfigurationInitializedEvent @event)
+  protected virtual void Apply(ConfigurationInitialized @event)
   {
     _defaultLocale = @event.DefaultLocale;
     _secret = @event.Secret;
@@ -124,13 +126,13 @@ public class ConfigurationAggregate : AggregateRoot
 
   public void Update(ActorId actorId)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
-  protected virtual void Apply(ConfigurationUpdatedEvent @event)
+  protected virtual void Apply(ConfigurationUpdated @event)
   {
     if (@event.DefaultLocale != null)
     {

@@ -197,7 +197,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
-        if (!reference.CustomAttributes.TryGetValue(key, out string? existingValue) || value != existingValue)
+        if (!reference.CustomAttributes.TryGetValue(key, out string? existingValue) || existingValue != value)
         {
           user.SetCustomAttribute(key, value);
         }

@@ -48,7 +48,7 @@ internal class RealmEntity : AggregateEntity
     }
   }
 
-  public RealmEntity(RealmCreatedEvent @event) : base(@event)
+  public RealmEntity(RealmCreated @event) : base(@event)
   {
     UniqueSlug = @event.UniqueSlug.Value;
 
@@ -63,14 +63,14 @@ internal class RealmEntity : AggregateEntity
   {
   }
 
-  public void SetUniqueSlug(RealmUniqueSlugChangedEvent @event)
+  public void SetUniqueSlug(RealmUniqueSlugChanged @event)
   {
     Update(@event);
 
     UniqueSlug = @event.UniqueSlug.Value;
   }
 
-  public void Update(RealmUpdatedEvent @event)
+  public void Update(RealmUpdated @event)
   {
     base.Update(@event);
 

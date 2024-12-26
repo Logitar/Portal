@@ -12,7 +12,7 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderAggregate : AggregateRoot
 {
-  private SenderUpdatedEvent _updatedEvent = new();
+  private SenderUpdated _updated = new();
 
   public new SenderId Id => new(base.Id);
 
@@ -30,10 +30,10 @@ public class SenderAggregate : AggregateRoot
       {
         throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to set its email address.");
       }
-      else if (value != _email)
+      else if (_email != value)
       {
         _email = value;
-        _updatedEvent.Email = value;
+        _updated.Email = value;
       }
     }
   }
@@ -47,10 +47,10 @@ public class SenderAggregate : AggregateRoot
       {
         throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Sms)} sender in order to set its phone number.");
       }
-      else if (value != _phone)
+      else if (_phone != value)
       {
         _phone = value;
-        _updatedEvent.Phone = value;
+        _updated.Phone = value;
       }
     }
   }
@@ -64,10 +64,10 @@ public class SenderAggregate : AggregateRoot
       {
         throw new InvalidOperationException($"The sender must be an {nameof(SenderType.Email)} sender in order to set its display name.");
       }
-      else if (value != _displayName)
+      else if (_displayName != value)
       {
         _displayName = value;
-        _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Modification<DisplayNameUnit>(value);
       }
     }
   }
@@ -77,10 +77,10 @@ public class SenderAggregate : AggregateRoot
     get => _description;
     set
     {
-      if (value != _description)
+      if (_description != value)
       {
         _description = value;
-        _updatedEvent.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Modification<DescriptionUnit>(value);
       }
     }
   }
@@ -111,11 +111,11 @@ public class SenderAggregate : AggregateRoot
     {
       case SenderType.Email:
         ArgumentNullException.ThrowIfNull(email);
-        Raise(new EmailSenderCreatedEvent(tenantId, email, provider), actorId);
+        Raise(new EmailSenderCreated(tenantId, email, provider), actorId);
         break;
       case SenderType.Sms:
         ArgumentNullException.ThrowIfNull(phone);
-        Raise(new SmsSenderCreatedEvent(tenantId, phone, provider), actorId);
+        Raise(new SmsSenderCreated(tenantId, phone, provider), actorId);
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
@@ -136,11 +136,11 @@ public class SenderAggregate : AggregateRoot
         throw new SenderProviderNotSupportedException(provider);
     }
   }
-  protected virtual void Apply(EmailSenderCreatedEvent @event)
+  protected virtual void Apply(EmailSenderCreated @event)
   {
-    Apply((SenderCreatedEvent)@event);
+    Apply((SenderCreated)@event);
   }
-  protected virtual void Apply(SenderCreatedEvent @event)
+  protected virtual void Apply(SenderCreated @event)
   {
     TenantId = @event.TenantId;
 
@@ -149,7 +149,7 @@ public class SenderAggregate : AggregateRoot
     Type = @event.Provider.GetSenderType();
     Provider = @event.Provider;
   }
-  protected virtual void Apply(SmsSenderCreatedEvent @event)
+  protected virtual void Apply(SmsSenderCreated @event)
   {
     TenantId = @event.TenantId;
 
@@ -163,7 +163,7 @@ public class SenderAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new SenderDeletedEvent(), actorId);
+      Raise(new SenderDeleted(), actorId);
     }
   }
 
@@ -172,10 +172,10 @@ public class SenderAggregate : AggregateRoot
   {
     if (isDefault != IsDefault)
     {
-      Raise(new SenderSetDefaultEvent(isDefault), actorId);
+      Raise(new SenderSetDefault(isDefault), actorId);
     }
   }
-  protected virtual void Apply(SenderSetDefaultEvent @event)
+  protected virtual void Apply(SenderSetDefault @event)
   {
     IsDefault = @event.IsDefault;
   }
@@ -188,10 +188,10 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderMailgunSettingsChangedEvent(settings), actorId);
+      Raise(new SenderMailgunSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderMailgunSettingsChangedEvent @event)
+  protected virtual void Apply(SenderMailgunSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
@@ -204,10 +204,10 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderSendGridSettingsChangedEvent(settings), actorId);
+      Raise(new SenderSendGridSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderSendGridSettingsChangedEvent @event)
+  protected virtual void Apply(SenderSendGridSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
@@ -220,23 +220,23 @@ public class SenderAggregate : AggregateRoot
     }
     else if (settings != _settings)
     {
-      Raise(new SenderTwilioSettingsChangedEvent(settings), actorId);
+      Raise(new SenderTwilioSettingsChanged(settings), actorId);
     }
   }
-  protected virtual void Apply(SenderTwilioSettingsChangedEvent @event)
+  protected virtual void Apply(SenderTwilioSettingsChanged @event)
   {
     _settings = @event.Settings;
   }
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
-  protected virtual void Apply(SenderUpdatedEvent @event)
+  protected virtual void Apply(SenderUpdated @event)
   {
     if (@event.Email != null)
     {

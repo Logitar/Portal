@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Dictionaries;
 
 public class DictionaryAggregate : AggregateRoot
 {
-  private DictionaryUpdatedEvent _updatedEvent = new();
+  private DictionaryUpdated _updated = new();
 
   public new DictionaryId Id => new(base.Id);
 
@@ -26,9 +26,9 @@ public class DictionaryAggregate : AggregateRoot
   public DictionaryAggregate(LocaleUnit locale, TenantId? tenantId = null, ActorId actorId = default, DictionaryId? id = null)
     : base((id ?? DictionaryId.NewId()).AggregateId)
   {
-    Raise(new DictionaryCreatedEvent(tenantId, locale), actorId);
+    Raise(new DictionaryCreated(tenantId, locale), actorId);
   }
-  protected virtual void Apply(DictionaryCreatedEvent @event)
+  protected virtual void Apply(DictionaryCreated @event)
   {
     TenantId = @event.TenantId;
 
@@ -39,7 +39,7 @@ public class DictionaryAggregate : AggregateRoot
   {
     if (!IsDeleted)
     {
-      Raise(new DictionaryDeletedEvent(), actorId);
+      Raise(new DictionaryDeleted(), actorId);
     }
   }
 
@@ -48,7 +48,7 @@ public class DictionaryAggregate : AggregateRoot
     key = key.Trim();
     if (_entries.ContainsKey(key))
     {
-      _updatedEvent.Entries[key] = null;
+      _updated.Entries[key] = null;
       _entries.Remove(key);
     }
   }
@@ -62,7 +62,7 @@ public class DictionaryAggregate : AggregateRoot
 
     if (!_entries.TryGetValue(key, out string? existingValue) || existingValue != value)
     {
-      _updatedEvent.Entries[key] = value;
+      _updated.Entries[key] = value;
       _entries[key] = value;
     }
   }
@@ -71,10 +71,10 @@ public class DictionaryAggregate : AggregateRoot
   {
     if (locale != _locale)
     {
-      Raise(new DictionaryLocaleChangedEvent(locale), actorId);
+      Raise(new DictionaryLocaleChanged(locale), actorId);
     }
   }
-  protected virtual void Apply(DictionaryLocaleChangedEvent @event)
+  protected virtual void Apply(DictionaryLocaleChanged @event)
   {
     _locale = @event.Locale;
   }
@@ -83,13 +83,13 @@ public class DictionaryAggregate : AggregateRoot
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
-  protected virtual void Apply(DictionaryUpdatedEvent @event)
+  protected virtual void Apply(DictionaryUpdated @event)
   {
     foreach (KeyValuePair<string, string?> entry in @event.Entries)
     {
