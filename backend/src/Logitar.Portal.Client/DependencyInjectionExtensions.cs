@@ -31,7 +31,7 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalClient(this IServiceCollection services, IConfiguration configuration)
   {
-    PortalSettings settings = configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
+    PortalSettings settings = configuration.GetSection(PortalSettings.SectionKey).Get<PortalSettings>() ?? new();
     return services.AddLogitarPortalClient(settings);
   }
   public static IServiceCollection AddLogitarPortalClient(this IServiceCollection services, IPortalSettings settings)

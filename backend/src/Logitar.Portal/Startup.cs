@@ -44,7 +44,7 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
 
-    CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    CorsSettings corsSettings = _configuration.GetSection(CorsSettings.SectionKey).Get<CorsSettings>() ?? new();
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
@@ -72,7 +72,7 @@ internal class Startup : StartupBase
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
 
-    CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    CookiesSettings cookiesSettings = _configuration.GetSection(CookiesSettings.SectionKey).Get<CookiesSettings>() ?? new();
     services.AddSingleton(cookiesSettings);
     services.AddSession(options =>
     {

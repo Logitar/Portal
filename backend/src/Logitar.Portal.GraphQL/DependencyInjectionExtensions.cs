@@ -9,7 +9,7 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalGraphQL(this IServiceCollection services, IConfiguration configuration)
   {
-    GraphQLSettings settings = configuration.GetSection("GraphQL").Get<GraphQLSettings>() ?? new();
+    GraphQLSettings settings = configuration.GetSection(GraphQLSettings.SectionKey).Get<GraphQLSettings>() ?? new();
     return services.AddLogitarPortalGraphQL(settings);
   }
   public static IServiceCollection AddLogitarPortalGraphQL(this IServiceCollection services, IGraphQLSettings settings)

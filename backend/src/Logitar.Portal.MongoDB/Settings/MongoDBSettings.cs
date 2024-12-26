@@ -2,6 +2,8 @@
 
 public record MongoDBSettings
 {
+  public const string SectionKey = "MongoDB";
+
   public string ConnectionString { get; set; }
   public string DatabaseName { get; set; }
 

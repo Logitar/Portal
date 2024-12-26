@@ -63,6 +63,6 @@ public static class DependencyInjectionExtensions
   private static CachingSettings InitializeCachingSettings(IServiceProvider serviceProvider)
   {
     IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    return configuration.GetSection("Caching").Get<CachingSettings>() ?? new();
+    return configuration.GetSection(CachingSettings.SectionKey).Get<CachingSettings>() ?? new();
   }
 }

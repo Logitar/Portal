@@ -17,7 +17,7 @@ internal class RealmClientTests : IClientTests
   {
     _client = client;
 
-    PortalSettings settings = configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
+    PortalSettings settings = configuration.GetSection(PortalSettings.SectionKey).Get<PortalSettings>() ?? new();
     if (string.IsNullOrWhiteSpace(settings.Realm))
     {
       throw new ArgumentException("The configuration 'Portal.Realm' is required.", nameof(configuration));

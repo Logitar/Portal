@@ -21,7 +21,7 @@ internal class UserClientTests : IClientTests
   {
     _client = client;
 
-    PortalSettings portalSettings = configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
+    PortalSettings portalSettings = configuration.GetSection(PortalSettings.SectionKey).Get<PortalSettings>() ?? new();
     _credentials = portalSettings.Basic ?? throw new ArgumentException("The configuration 'Portal.Basic' is required.", nameof(configuration));
 
     _recipient = configuration.GetSection("Recipient").Get<RecipientSettings>() ?? new();
