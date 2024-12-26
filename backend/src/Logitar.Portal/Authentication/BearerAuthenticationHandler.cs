@@ -44,7 +44,7 @@ internal class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthent
               Type = "at+jwt"
             };
             ValidateTokenCommand command = new(payload);
-            ValidatedToken validatedToken = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
+            ValidatedTokenModel validatedToken = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
             if (string.IsNullOrWhiteSpace(validatedToken.Subject))
             {
               return AuthenticateResult.Fail($"The '{nameof(validatedToken.Subject)}' claim is required.");

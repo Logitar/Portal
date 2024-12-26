@@ -138,7 +138,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
           Type = "reset_password+jwt",
           Subject = user.Id.ToGuid().ToString()
         };
-        CreatedToken createdToken = await ActivityPipeline.ExecuteAsync(new CreateTokenCommand(createToken));
+        CreatedTokenModel createdToken = await ActivityPipeline.ExecuteAsync(new CreateTokenCommand(createToken));
         payload.Variables.Add(new Variable("Token", createdToken.Token));
         break;
       case SenderType.Sms:

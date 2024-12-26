@@ -13,12 +13,12 @@ internal class TokenFacade : ITokenService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<CreatedToken> CreateAsync(CreateTokenPayload payload, CancellationToken cancellationToken)
+  public async Task<CreatedTokenModel> CreateAsync(CreateTokenPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new CreateTokenCommand(payload), cancellationToken);
   }
 
-  public async Task<ValidatedToken> ValidateAsync(ValidateTokenPayload payload, CancellationToken cancellationToken)
+  public async Task<ValidatedTokenModel> ValidateAsync(ValidateTokenPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ValidateTokenCommand(payload), cancellationToken);
   }

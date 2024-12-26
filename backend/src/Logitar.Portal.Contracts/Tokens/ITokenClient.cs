@@ -2,6 +2,6 @@
 
 public interface ITokenClient
 {
-  Task<CreatedToken> CreateAsync(CreateTokenPayload payload, IRequestContext? context = null);
-  Task<ValidatedToken> ValidateAsync(ValidateTokenPayload payload, IRequestContext? context = null);
+  Task<CreatedTokenModel> CreateAsync(CreateTokenPayload payload, IRequestContext? context = null);
+  Task<ValidatedTokenModel> ValidateAsync(ValidateTokenPayload payload, IRequestContext? context = null);
 }

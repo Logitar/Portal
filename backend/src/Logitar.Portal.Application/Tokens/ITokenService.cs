@@ -4,6 +4,6 @@ namespace Logitar.Portal.Application.Tokens;
 
 public interface ITokenService
 {
-  Task<CreatedToken> CreateAsync(CreateTokenPayload payload, CancellationToken cancellationToken = default);
-  Task<ValidatedToken> ValidateAsync(ValidateTokenPayload payload, CancellationToken cancellationToken = default);
+  Task<CreatedTokenModel> CreateAsync(CreateTokenPayload payload, CancellationToken cancellationToken = default);
+  Task<ValidatedTokenModel> ValidateAsync(ValidateTokenPayload payload, CancellationToken cancellationToken = default);
 }

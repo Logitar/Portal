@@ -8,7 +8,7 @@ internal abstract class ContactGraphType<T> : ObjectGraphType<T> where T : Conta
 {
   protected ContactGraphType(string? description = null)
   {
-    Name = typeof(T).Name;
+    Name = typeof(T).Name.Remove("Model");
     Description = description;
 
     Field(x => x.IsVerified)
