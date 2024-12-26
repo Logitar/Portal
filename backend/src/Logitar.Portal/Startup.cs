@@ -128,10 +128,12 @@ internal class Startup : StartupBase
     {
       builder.UseGraphQLGraphiQL();
     }
+#pragma warning disable CS0618
     if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
     {
       builder.UseGraphQLPlayground();
     }
+#pragma warning restore
     if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
     {
       builder.UseGraphQLVoyager();
