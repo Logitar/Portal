@@ -20,7 +20,7 @@ public class RealmAggregate : AggregateRoot
     get => _displayName;
     set
     {
-      if (value != _displayName)
+      if (_displayName != value)
       {
         _displayName = value;
         _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
@@ -33,7 +33,7 @@ public class RealmAggregate : AggregateRoot
     get => _description;
     set
     {
-      if (value != _description)
+      if (_description != value)
       {
         _description = value;
         _updatedEvent.Description = new Modification<DescriptionUnit>(value);
@@ -47,7 +47,7 @@ public class RealmAggregate : AggregateRoot
     get => _defaultLocale;
     set
     {
-      if (value != _defaultLocale)
+      if (_defaultLocale != value)
       {
         _defaultLocale = value;
         _updatedEvent.DefaultLocale = new Modification<LocaleUnit>(value);
@@ -60,7 +60,7 @@ public class RealmAggregate : AggregateRoot
     get => _secret ?? throw new InvalidOperationException($"The {nameof(Secret)} has not been initialized yet.");
     set
     {
-      if (value != _secret)
+      if (_secret != value)
       {
         _secret = value;
         _updatedEvent.Secret = value;
@@ -73,7 +73,7 @@ public class RealmAggregate : AggregateRoot
     get => _url;
     set
     {
-      if (value != _url)
+      if (_url != value)
       {
         _url = value;
         _updatedEvent.Url = new Modification<UrlUnit>(value);
@@ -87,7 +87,7 @@ public class RealmAggregate : AggregateRoot
     get => _uniqueNameSettings ?? throw new InvalidOperationException($"The {nameof(UniqueNameSettings)} have not been initialized yet.");
     set
     {
-      if (value != _uniqueNameSettings)
+      if (_uniqueNameSettings != value)
       {
         _uniqueNameSettings = value;
         _updatedEvent.UniqueNameSettings = value;
@@ -100,7 +100,7 @@ public class RealmAggregate : AggregateRoot
     get => _passwordSettings ?? throw new InvalidOperationException($"The {nameof(PasswordSettings)} have not been initialized yet.");
     set
     {
-      if (value != _passwordSettings)
+      if (_passwordSettings != value)
       {
         _passwordSettings = value;
         _updatedEvent.PasswordSettings = value;
@@ -113,7 +113,7 @@ public class RealmAggregate : AggregateRoot
     get => _requireUniqueEmail ?? throw new InvalidOperationException($"The {nameof(RequireUniqueEmail)} have not been initialized yet.");
     set
     {
-      if (value != _requireUniqueEmail)
+      if (_requireUniqueEmail != value)
       {
         _requireUniqueEmail = value;
         _updatedEvent.RequireUniqueEmail = value;

@@ -21,7 +21,7 @@ public class TemplateAggregate : AggregateRoot
     get => _displayName;
     set
     {
-      if (value != _displayName)
+      if (_displayName != value)
       {
         _displayName = value;
         _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
@@ -34,7 +34,7 @@ public class TemplateAggregate : AggregateRoot
     get => _description;
     set
     {
-      if (value != _description)
+      if (_description != value)
       {
         _description = value;
         _updatedEvent.Description = new Modification<DescriptionUnit>(value);
@@ -48,7 +48,7 @@ public class TemplateAggregate : AggregateRoot
     get => _subject ?? throw new InvalidOperationException($"The {nameof(Subject)} has not been initialized yet.");
     set
     {
-      if (value != _subject)
+      if (_subject != value)
       {
         _subject = value;
         _updatedEvent.Subject = value;
@@ -61,7 +61,7 @@ public class TemplateAggregate : AggregateRoot
     get => _content ?? throw new InvalidOperationException($"The {nameof(Content)} has not been initialized yet.");
     set
     {
-      if (value != _content)
+      if (_content != value)
       {
         _content = value;
         _updatedEvent.Content = value;

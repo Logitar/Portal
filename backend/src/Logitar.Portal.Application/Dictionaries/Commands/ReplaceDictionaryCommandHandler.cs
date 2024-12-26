@@ -78,7 +78,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
-        if (!reference.Entries.TryGetValue(key, out string? existingValue) || value != existingValue)
+        if (!reference.Entries.TryGetValue(key, out string? existingValue) || existingValue != value)
         {
           dictionary.SetEntry(key, value);
         }
