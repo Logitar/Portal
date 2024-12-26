@@ -74,7 +74,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(user, realm, cancellationToken);
   }
 
-  public async Task<IEnumerable<UserModel>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<UserModel>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string emailAddressNormalized = email.Address.Trim().ToUpper();
@@ -223,12 +223,12 @@ internal class UserQuerier : IUserQuerier
 
   private async Task<UserModel> MapAsync(UserEntity user, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([user], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<UserModel>> MapAsync(IEnumerable<UserEntity> users, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<UserModel>> MapAsync(IEnumerable<UserEntity> users, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = users.SelectMany(user => user.GetActorIds());
     IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return users.Select(user => mapper.ToUser(user, realm));
+    return users.Select(user => mapper.ToUser(user, realm)).ToArray();
   }
 }

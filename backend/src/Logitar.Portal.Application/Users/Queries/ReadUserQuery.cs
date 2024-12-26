@@ -42,8 +42,8 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, UserModel?>
       else if (query.RequireUniqueEmail)
       {
         EmailModel email = new(query.UniqueName);
-        IEnumerable<UserModel> usersByEmail = await _userQuerier.ReadAsync(realm, email, cancellationToken);
-        if (usersByEmail.Count() == 1)
+        IReadOnlyCollection<UserModel> usersByEmail = await _userQuerier.ReadAsync(realm, email, cancellationToken);
+        if (usersByEmail.Count == 1)
         {
           user = usersByEmail.Single();
           users[user.Id] = user;
