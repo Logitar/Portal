@@ -7,7 +7,7 @@ internal class ContentGraphType : ObjectGraphType<ContentModel>
 {
   public ContentGraphType()
   {
-    Name = nameof(ContentModel);
+    Name = "Content";
     Description = "Represents message contents.";
 
     Field(x => x.Type)

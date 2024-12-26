@@ -7,7 +7,7 @@ internal class LocaleGraphType : ObjectGraphType<LocaleModel>
 {
   public LocaleGraphType()
   {
-    Name = nameof(LocaleModel);
+    Name = "Locale";
     Description = "Represents a language in the system.";
 
     Field(x => x.Id)
