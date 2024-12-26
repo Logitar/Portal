@@ -18,7 +18,7 @@ internal class ActorService : IActorService
     _cacheService = cacheService;
   }
 
-  public async Task<IEnumerable<ActorModel>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<ActorModel>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken)
   {
     int capacity = ids.Count();
     Dictionary<ActorId, ActorModel> actors = new(capacity);

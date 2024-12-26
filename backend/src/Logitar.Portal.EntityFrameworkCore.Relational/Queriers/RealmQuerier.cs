@@ -91,19 +91,19 @@ internal class RealmQuerier : IRealmQuerier
     query = query.ApplyPaging(payload);
 
     RealmEntity[] realms = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<RealmModel> items = await MapAsync(realms, cancellationToken);
+    IReadOnlyCollection<RealmModel> items = await MapAsync(realms, cancellationToken);
 
     return new SearchResults<RealmModel>(items, total);
   }
 
   private async Task<RealmModel> MapAsync(RealmEntity realm, CancellationToken cancellationToken = default)
     => (await MapAsync([realm], cancellationToken)).Single();
-  private async Task<IEnumerable<RealmModel>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<RealmModel>> MapAsync(IEnumerable<RealmEntity> realms, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = realms.SelectMany(user => user.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = realms.SelectMany(user => user.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return realms.Select(mapper.ToRealm);
+    return realms.Select(mapper.ToRealm).ToArray();
   }
 }

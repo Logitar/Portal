@@ -104,19 +104,19 @@ internal class SessionQuerier : ISessionQuerier
     query = query.ApplyPaging(payload);
 
     SessionEntity[] sessions = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<SessionModel> items = await MapAsync(sessions, realm, cancellationToken);
+    IReadOnlyCollection<SessionModel> items = await MapAsync(sessions, realm, cancellationToken);
 
     return new SearchResults<SessionModel>(items, total);
   }
 
   private async Task<SessionModel> MapAsync(SessionEntity session, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([session], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<SessionModel>> MapAsync(IEnumerable<SessionEntity> sessions, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<SessionModel>> MapAsync(IEnumerable<SessionEntity> sessions, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = sessions.SelectMany(session => session.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = sessions.SelectMany(session => session.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return sessions.Select(session => mapper.ToSession(session, realm));
+    return sessions.Select(session => mapper.ToSession(session, realm)).ToArray();
   }
 }

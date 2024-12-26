@@ -105,19 +105,19 @@ internal class RoleQuerier : IRoleQuerier
     query = query.ApplyPaging(payload);
 
     RoleEntity[] roles = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<RoleModel> items = await MapAsync(roles, realm, cancellationToken);
+    IReadOnlyCollection<RoleModel> items = await MapAsync(roles, realm, cancellationToken);
 
     return new SearchResults<RoleModel>(items, total);
   }
 
   private async Task<RoleModel> MapAsync(RoleEntity role, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([role], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<RoleModel>> MapAsync(IEnumerable<RoleEntity> roles, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<RoleModel>> MapAsync(IEnumerable<RoleEntity> roles, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = roles.SelectMany(role => role.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = roles.SelectMany(role => role.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return roles.Select(role => mapper.ToRole(role, realm));
+    return roles.Select(role => mapper.ToRole(role, realm)).ToArray();
   }
 }

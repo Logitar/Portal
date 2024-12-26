@@ -216,7 +216,7 @@ internal class UserQuerier : IUserQuerier
     query = query.ApplyPaging(payload);
 
     UserEntity[] users = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<UserModel> items = await MapAsync(users, realm, cancellationToken);
+    IReadOnlyCollection<UserModel> items = await MapAsync(users, realm, cancellationToken);
 
     return new SearchResults<UserModel>(items, total);
   }
@@ -225,8 +225,8 @@ internal class UserQuerier : IUserQuerier
     => (await MapAsync([user], realm, cancellationToken)).Single();
   private async Task<IReadOnlyCollection<UserModel>> MapAsync(IEnumerable<UserEntity> users, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = users.SelectMany(user => user.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = users.SelectMany(user => user.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return users.Select(user => mapper.ToUser(user, realm)).ToArray();

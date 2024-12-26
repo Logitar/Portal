@@ -111,19 +111,19 @@ internal class DictionaryQuerier : IDictionaryQuerier
     query = query.ApplyPaging(payload);
 
     DictionaryEntity[] dictionaries = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<DictionaryModel> items = await MapAsync(dictionaries, realm, cancellationToken);
+    IReadOnlyCollection<DictionaryModel> items = await MapAsync(dictionaries, realm, cancellationToken);
 
     return new SearchResults<DictionaryModel>(items, total);
   }
 
   private async Task<DictionaryModel> MapAsync(DictionaryEntity dictionary, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([dictionary], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<DictionaryModel>> MapAsync(IEnumerable<DictionaryEntity> dictionaries, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<DictionaryModel>> MapAsync(IEnumerable<DictionaryEntity> dictionaries, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = dictionaries.SelectMany(dictionary => dictionary.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = dictionaries.SelectMany(dictionary => dictionary.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return dictionaries.Select(dictionary => mapper.ToDictionary(dictionary, realm));
+    return dictionaries.Select(dictionary => mapper.ToDictionary(dictionary, realm)).ToArray();
   }
 }
