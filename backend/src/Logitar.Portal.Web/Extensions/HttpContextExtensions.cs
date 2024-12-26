@@ -19,7 +19,7 @@ public static class HttpContextExtensions
 
   public static Uri GetBaseUri(this HttpContext context)
   {
-    string host = context.Request.Host.Value;
+    string host = context.Request.Host.Value ?? string.Empty;
     int index = host.IndexOf(':');
 
     IUrlBuilder builder = new UrlBuilder().SetScheme(context.Request.Scheme, inferPort: true);

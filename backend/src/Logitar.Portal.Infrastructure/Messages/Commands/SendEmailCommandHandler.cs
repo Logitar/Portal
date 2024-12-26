@@ -75,7 +75,7 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 
   private static SendMailResult ToResult(Exception exception)
   {
-    ExceptionDetail detail = ExceptionDetail.From(exception);
+    ExceptionDetail detail = new(exception);
     return SendMailResult.Failure(new Dictionary<string, object?>
     {
       [nameof(ExceptionDetail.Type)] = detail.Type,
