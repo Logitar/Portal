@@ -115,19 +115,19 @@ internal class TemplateQuerier : ITemplateQuerier
     query = query.ApplyPaging(payload);
 
     TemplateEntity[] templates = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<TemplateModel> items = await MapAsync(templates, realm, cancellationToken);
+    IReadOnlyCollection<TemplateModel> items = await MapAsync(templates, realm, cancellationToken);
 
     return new SearchResults<TemplateModel>(items, total);
   }
 
   private async Task<TemplateModel> MapAsync(TemplateEntity template, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([template], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<TemplateModel>> MapAsync(IEnumerable<TemplateEntity> templates, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<TemplateModel>> MapAsync(IEnumerable<TemplateEntity> templates, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = templates.SelectMany(template => template.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = templates.SelectMany(template => template.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return templates.Select(template => mapper.ToTemplate(template, realm));
+    return templates.Select(template => mapper.ToTemplate(template, realm)).ToArray();
   }
 }

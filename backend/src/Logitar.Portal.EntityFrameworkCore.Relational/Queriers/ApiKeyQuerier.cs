@@ -107,19 +107,19 @@ internal class ApiKeyQuerier : IApiKeyQuerier
     query = query.ApplyPaging(payload);
 
     ApiKeyEntity[] apiKeys = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<ApiKeyModel> items = await MapAsync(apiKeys, realm, cancellationToken);
+    IReadOnlyCollection<ApiKeyModel> items = await MapAsync(apiKeys, realm, cancellationToken);
 
     return new SearchResults<ApiKeyModel>(items, total);
   }
 
   private async Task<ApiKeyModel> MapAsync(ApiKeyEntity apiKey, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([apiKey], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<ApiKeyModel>> MapAsync(IEnumerable<ApiKeyEntity> apiKeys, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<ApiKeyModel>> MapAsync(IEnumerable<ApiKeyEntity> apiKeys, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = apiKeys.SelectMany(apiKey => apiKey.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = apiKeys.SelectMany(apiKey => apiKey.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return apiKeys.Select(apiKey => mapper.ToApiKey(apiKey, realm));
+    return apiKeys.Select(apiKey => mapper.ToApiKey(apiKey, realm)).ToArray();
   }
 }

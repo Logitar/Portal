@@ -113,8 +113,8 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
 
   private async Task ReplaceRolesAsync(ReplaceApiKeyPayload payload, ApiKeyAggregate apiKey, ApiKeyAggregate? reference, ActorId actorId, CancellationToken cancellationToken)
   {
-    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
-    HashSet<RoleId> roleIds = new(capacity: roles.Count());
+    IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    HashSet<RoleId> roleIds = new(capacity: roles.Count);
 
     IEnumerable<RoleId> referenceRoles;
     if (reference == null)

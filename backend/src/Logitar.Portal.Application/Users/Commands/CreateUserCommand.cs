@@ -106,7 +106,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
       user.SetCustomIdentifier(customIdentifier.Key, customIdentifier.Value, actorId);
     }
 
-    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
     foreach (FoundRole found in roles)
     {
       user.AddRole(found.Role, actorId);

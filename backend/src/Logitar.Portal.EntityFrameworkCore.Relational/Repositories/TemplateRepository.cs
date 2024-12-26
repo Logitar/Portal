@@ -29,10 +29,10 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
   public async Task<Template?> LoadAsync(TemplateId id, long? version, CancellationToken cancellationToken)
     => await LoadAsync<Template>(id.AggregateId, version, cancellationToken);
 
-  public async Task<IEnumerable<Template>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<Template>(cancellationToken);
+  public async Task<IReadOnlyCollection<Template>> LoadAsync(CancellationToken cancellationToken)
+    => (await LoadAsync<Template>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
 
-  public async Task<IEnumerable<Template>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<Template>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
@@ -47,7 +47,7 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<Template>(events.Select(EventSerializer.Deserialize));
+    return Load<Template>(events.Select(EventSerializer.Deserialize)).ToArray(); // ISSUE #528: remove ToArray
   }
 
   public async Task<Template?> LoadAsync(TenantId? tenantId, UniqueKey uniqueKey, CancellationToken cancellationToken)

@@ -113,17 +113,17 @@ internal class MessageQuerier : IMessageQuerier
     query = query.ApplyPaging(payload);
 
     MessageEntity[] messages = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<MessageModel> items = await MapAsync(messages, realm, cancellationToken);
+    IReadOnlyCollection<MessageModel> items = await MapAsync(messages, realm, cancellationToken);
 
     return new SearchResults<MessageModel>(items, total);
   }
 
   private async Task<MessageModel> MapAsync(MessageEntity message, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([message], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<MessageModel>> MapAsync(IEnumerable<MessageEntity> messages, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<MessageModel>> MapAsync(IEnumerable<MessageEntity> messages, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = messages.SelectMany(message => message.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = messages.SelectMany(message => message.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     HashSet<int> userIds = [];
@@ -141,6 +141,6 @@ internal class MessageQuerier : IMessageQuerier
       .Where(u => userIds.Contains(u.UserId))
       .ToArrayAsync(cancellationToken);
 
-    return messages.Select(message => mapper.ToMessage(message, realm, users));
+    return messages.Select(message => mapper.ToMessage(message, realm, users)).ToArray();
   }
 }

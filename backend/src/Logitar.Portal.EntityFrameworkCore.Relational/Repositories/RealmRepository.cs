@@ -20,8 +20,8 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<IEnumerable<Realm>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<Realm>(cancellationToken);
+  public async Task<IReadOnlyCollection<Realm>> LoadAsync(CancellationToken cancellationToken)
+    => (await LoadAsync<Realm>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
 
   public async Task<Realm?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await LoadAsync<Realm>(new AggregateId(id), cancellationToken);

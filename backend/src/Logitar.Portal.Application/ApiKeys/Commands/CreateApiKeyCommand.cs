@@ -54,7 +54,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
       apiKey.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
     }
 
-    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
     foreach (FoundRole found in roles)
     {
       apiKey.AddRole(found.Role, actorId);

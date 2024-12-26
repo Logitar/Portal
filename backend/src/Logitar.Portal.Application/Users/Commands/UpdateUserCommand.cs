@@ -86,7 +86,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
       }
     }
 
-    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
     foreach (FoundRole found in roles)
     {
       switch (found.Action)

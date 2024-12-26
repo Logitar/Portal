@@ -5,5 +5,5 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 
 internal interface IActorService
 {
-  Task<IEnumerable<ActorModel>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken = default);
+  Task<IReadOnlyCollection<ActorModel>> FindAsync(IEnumerable<ActorId> ids, CancellationToken cancellationToken = default);
 }

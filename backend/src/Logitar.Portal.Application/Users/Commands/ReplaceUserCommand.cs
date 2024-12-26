@@ -232,8 +232,8 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
   private async Task ReplaceRolesAsync(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId, CancellationToken cancellationToken)
   {
-    IEnumerable<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
-    HashSet<RoleId> roleIds = new(capacity: roles.Count());
+    IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
+    HashSet<RoleId> roleIds = new(capacity: roles.Count);
 
     IEnumerable<RoleId> referenceRoles;
     if (reference == null)

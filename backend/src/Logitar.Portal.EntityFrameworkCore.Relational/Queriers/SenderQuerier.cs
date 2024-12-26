@@ -114,19 +114,19 @@ internal class SenderQuerier : ISenderQuerier
     query = query.ApplyPaging(payload);
 
     SenderEntity[] senders = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<SenderModel> items = await MapAsync(senders, realm, cancellationToken);
+    IReadOnlyCollection<SenderModel> items = await MapAsync(senders, realm, cancellationToken);
 
     return new SearchResults<SenderModel>(items, total);
   }
 
   private async Task<SenderModel> MapAsync(SenderEntity sender, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([sender], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<SenderModel>> MapAsync(IEnumerable<SenderEntity> senders, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<SenderModel>> MapAsync(IEnumerable<SenderEntity> senders, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = senders.SelectMany(sender => sender.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = senders.SelectMany(sender => sender.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return senders.Select(sender => mapper.ToSender(sender, realm));
+    return senders.Select(sender => mapper.ToSender(sender, realm)).ToArray();
   }
 }

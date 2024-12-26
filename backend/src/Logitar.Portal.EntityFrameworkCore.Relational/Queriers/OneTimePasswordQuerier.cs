@@ -47,12 +47,12 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
 
   private async Task<OneTimePasswordModel> MapAsync(OneTimePasswordEntity oneTimePassword, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([oneTimePassword], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<OneTimePasswordModel>> MapAsync(IEnumerable<OneTimePasswordEntity> oneTimePasswords, RealmModel? realm, CancellationToken cancellationToken = default)
+  private async Task<IReadOnlyCollection<OneTimePasswordModel>> MapAsync(IEnumerable<OneTimePasswordEntity> oneTimePasswords, RealmModel? realm, CancellationToken cancellationToken = default)
   {
-    IEnumerable<ActorId> actorIds = oneTimePasswords.SelectMany(oneTimePassword => oneTimePassword.GetActorIds());
-    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IReadOnlyCollection<ActorId> actorIds = oneTimePasswords.SelectMany(oneTimePassword => oneTimePassword.GetActorIds()).ToArray();
+    IReadOnlyCollection<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
-    return oneTimePasswords.Select(oneTimePassword => mapper.ToOneTimePassword(oneTimePassword, realm));
+    return oneTimePasswords.Select(oneTimePassword => mapper.ToOneTimePassword(oneTimePassword, realm)).ToArray();
   }
 }
