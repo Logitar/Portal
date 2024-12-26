@@ -2,6 +2,6 @@
 using Logitar.Portal.Contracts.Passwords;
 using MediatR;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Queries;
+namespace Logitar.Portal.Application.Passwords.Queries;
 
 internal record ReadOneTimePasswordQuery(Guid Id) : Activity, IRequest<OneTimePasswordModel?>;

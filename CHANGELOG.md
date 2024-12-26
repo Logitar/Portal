@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to .NET9 and NuGet packages.
 - Renamed Events and refactored Handlers.
 - Renamed Contract models and Domain aggregates.
+- Synchronized One-Time Password (OTP) namespaces.
 
 ### Removed
 

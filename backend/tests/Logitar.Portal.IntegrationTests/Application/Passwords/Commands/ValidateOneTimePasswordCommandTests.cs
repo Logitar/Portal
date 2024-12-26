@@ -1,12 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Commands;
+namespace Logitar.Portal.Application.Passwords.Commands;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class ValidateOneTimePasswordCommandTests : IntegrationTests

@@ -1,4 +1,4 @@
-﻿using Logitar.Portal.Application.OneTimePasswords;
+﻿using Logitar.Portal.Application.Passwords;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;

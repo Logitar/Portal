@@ -1,7 +1,7 @@
 ﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Passwords;
 
-namespace Logitar.Portal.OneTimePasswords;
+namespace Logitar.Portal.Passwords;
 
 internal class OneTimePasswordClientTests : IClientTests
 {

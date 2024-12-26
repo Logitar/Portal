@@ -3,7 +3,7 @@ using Logitar.Identity.Domain.Shared.Validators;
 using Logitar.Portal.Application.Validators;
 using Logitar.Portal.Contracts.Passwords;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Validators;
+namespace Logitar.Portal.Application.Passwords.Validators;
 
 internal class CreateOneTimePasswordValidator : AbstractValidator<CreateOneTimePasswordPayload>
 {

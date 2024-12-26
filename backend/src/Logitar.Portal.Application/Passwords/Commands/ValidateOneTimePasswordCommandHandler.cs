@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Passwords;
-using Logitar.Portal.Application.OneTimePasswords.Validators;
+using Logitar.Portal.Application.Passwords.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Passwords;
 using MediatR;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Commands;
+namespace Logitar.Portal.Application.Passwords.Commands;
 
 internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateOneTimePasswordCommand, OneTimePasswordModel?>
 {

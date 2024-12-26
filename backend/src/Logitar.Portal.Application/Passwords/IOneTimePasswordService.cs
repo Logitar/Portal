@@ -1,6 +1,6 @@
 ﻿using Logitar.Portal.Contracts.Passwords;
 
-namespace Logitar.Portal.Application.OneTimePasswords;
+namespace Logitar.Portal.Application.Passwords;
 
 public interface IOneTimePasswordService
 {
