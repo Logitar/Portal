@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Dictionaries;
 
 public class DictionaryAggregate : AggregateRoot
 {
-  private DictionaryUpdated _updatedEvent = new();
+  private DictionaryUpdated _updated = new();
 
   public new DictionaryId Id => new(base.Id);
 
@@ -48,7 +48,7 @@ public class DictionaryAggregate : AggregateRoot
     key = key.Trim();
     if (_entries.ContainsKey(key))
     {
-      _updatedEvent.Entries[key] = null;
+      _updated.Entries[key] = null;
       _entries.Remove(key);
     }
   }
@@ -62,7 +62,7 @@ public class DictionaryAggregate : AggregateRoot
 
     if (!_entries.TryGetValue(key, out string? existingValue) || existingValue != value)
     {
-      _updatedEvent.Entries[key] = value;
+      _updated.Entries[key] = value;
       _entries[key] = value;
     }
   }
@@ -83,10 +83,10 @@ public class DictionaryAggregate : AggregateRoot
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
   protected virtual void Apply(DictionaryUpdated @event)

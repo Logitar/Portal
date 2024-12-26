@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Templates;
 
 public class TemplateAggregate : AggregateRoot
 {
-  private TemplateUpdated _updatedEvent = new();
+  private TemplateUpdated _updated = new();
 
   public new TemplateId Id => new(base.Id);
 
@@ -24,7 +24,7 @@ public class TemplateAggregate : AggregateRoot
       if (_displayName != value)
       {
         _displayName = value;
-        _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Modification<DisplayNameUnit>(value);
       }
     }
   }
@@ -37,7 +37,7 @@ public class TemplateAggregate : AggregateRoot
       if (_description != value)
       {
         _description = value;
-        _updatedEvent.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Modification<DescriptionUnit>(value);
       }
     }
   }
@@ -51,7 +51,7 @@ public class TemplateAggregate : AggregateRoot
       if (_subject != value)
       {
         _subject = value;
-        _updatedEvent.Subject = value;
+        _updated.Subject = value;
       }
     }
   }
@@ -64,7 +64,7 @@ public class TemplateAggregate : AggregateRoot
       if (_content != value)
       {
         _content = value;
-        _updatedEvent.Content = value;
+        _updated.Content = value;
       }
     }
   }
@@ -110,10 +110,10 @@ public class TemplateAggregate : AggregateRoot
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
   protected virtual void Apply(TemplateUpdated @event)

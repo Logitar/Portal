@@ -12,7 +12,7 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderAggregate : AggregateRoot
 {
-  private SenderUpdated _updatedEvent = new();
+  private SenderUpdated _updated = new();
 
   public new SenderId Id => new(base.Id);
 
@@ -33,7 +33,7 @@ public class SenderAggregate : AggregateRoot
       else if (_email != value)
       {
         _email = value;
-        _updatedEvent.Email = value;
+        _updated.Email = value;
       }
     }
   }
@@ -50,7 +50,7 @@ public class SenderAggregate : AggregateRoot
       else if (_phone != value)
       {
         _phone = value;
-        _updatedEvent.Phone = value;
+        _updated.Phone = value;
       }
     }
   }
@@ -67,7 +67,7 @@ public class SenderAggregate : AggregateRoot
       else if (_displayName != value)
       {
         _displayName = value;
-        _updatedEvent.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Modification<DisplayNameUnit>(value);
       }
     }
   }
@@ -80,7 +80,7 @@ public class SenderAggregate : AggregateRoot
       if (_description != value)
       {
         _description = value;
-        _updatedEvent.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Modification<DescriptionUnit>(value);
       }
     }
   }
@@ -230,10 +230,10 @@ public class SenderAggregate : AggregateRoot
 
   public void Update(ActorId actorId = default)
   {
-    if (_updatedEvent.HasChanges)
+    if (_updated.HasChanges)
     {
-      Raise(_updatedEvent, actorId, DateTime.Now);
-      _updatedEvent = new();
+      Raise(_updated, actorId, DateTime.Now);
+      _updated = new();
     }
   }
   protected virtual void Apply(SenderUpdated @event)
