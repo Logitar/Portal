@@ -5,7 +5,7 @@ using Logitar.Portal.Configurations;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Dictionaries;
 using Logitar.Portal.Messages;
-using Logitar.Portal.OneTimePasswords;
+using Logitar.Portal.Passwords;
 using Logitar.Portal.Realms;
 using Logitar.Portal.Roles;
 using Logitar.Portal.Senders;

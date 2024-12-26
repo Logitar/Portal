@@ -2,7 +2,7 @@
 using Logitar.Portal.Contracts.Passwords;
 using MediatR;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Commands;
+namespace Logitar.Portal.Application.Passwords.Commands;
 
 internal class DeleteOneTimePasswordCommandHandler : IRequestHandler<DeleteOneTimePasswordCommand, OneTimePasswordModel?>
 {

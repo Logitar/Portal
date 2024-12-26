@@ -1,9 +1,9 @@
 ﻿using Logitar.Portal.Application.Activities;
-using Logitar.Portal.Application.OneTimePasswords.Commands;
-using Logitar.Portal.Application.OneTimePasswords.Queries;
+using Logitar.Portal.Application.Passwords.Commands;
+using Logitar.Portal.Application.Passwords.Queries;
 using Logitar.Portal.Contracts.Passwords;
 
-namespace Logitar.Portal.Application.OneTimePasswords;
+namespace Logitar.Portal.Application.Passwords;
 
 internal class OneTimePasswordFacade : IOneTimePasswordService
 {

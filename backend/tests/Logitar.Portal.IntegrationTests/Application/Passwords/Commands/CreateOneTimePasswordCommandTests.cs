@@ -3,7 +3,7 @@ using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 
-namespace Logitar.Portal.Application.OneTimePasswords.Commands;
+namespace Logitar.Portal.Application.Passwords.Commands;
 
 [Trait(Traits.Category, Categories.Integration)]
 public class CreateOneTimePasswordCommandTests : IntegrationTests

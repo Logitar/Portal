@@ -3,7 +3,7 @@ using Logitar.Data;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Application.Messages.Settings;
-using Logitar.Portal.Application.OneTimePasswords.Commands;
+using Logitar.Portal.Application.Passwords.Commands;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Application.Tokens.Commands;

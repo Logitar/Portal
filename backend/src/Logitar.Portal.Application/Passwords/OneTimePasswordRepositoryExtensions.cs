@@ -1,6 +1,6 @@
 ﻿using Logitar.Identity.Domain.Passwords;
 
-namespace Logitar.Portal.Application.OneTimePasswords;
+namespace Logitar.Portal.Application.Passwords;
 
 internal static class OneTimePasswordRepositoryExtensions
 {

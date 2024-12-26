@@ -3,7 +3,7 @@ using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
-using Logitar.Portal.Application.OneTimePasswords;
+using Logitar.Portal.Application.Passwords;
 using Logitar.Portal.Contracts.Actors;
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;

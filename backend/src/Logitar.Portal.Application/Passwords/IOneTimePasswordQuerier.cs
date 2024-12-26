@@ -2,7 +2,7 @@
 using Logitar.Portal.Contracts.Passwords;
 using Logitar.Portal.Contracts.Realms;
 
-namespace Logitar.Portal.Application.OneTimePasswords;
+namespace Logitar.Portal.Application.Passwords;
 
 public interface IOneTimePasswordQuerier
 {
