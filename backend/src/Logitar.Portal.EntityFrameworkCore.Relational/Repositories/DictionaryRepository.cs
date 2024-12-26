@@ -27,10 +27,10 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
   public async Task<Dictionary?> LoadAsync(DictionaryId id, long? version, CancellationToken cancellationToken)
     => await base.LoadAsync<Dictionary>(id.AggregateId, version, cancellationToken);
 
-  public async Task<IEnumerable<Dictionary>> LoadAsync(CancellationToken cancellationToken)
-    => await base.LoadAsync<Dictionary>(cancellationToken);
+  public async Task<IReadOnlyCollection<Dictionary>> LoadAsync(CancellationToken cancellationToken)
+    => (await base.LoadAsync<Dictionary>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
 
-  public async Task<IEnumerable<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<Dictionary>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Dictionaries.AggregateId, EventDb.Events.AggregateId,
@@ -45,7 +45,7 @@ internal class DictionaryRepository : EventSourcing.EntityFrameworkCore.Relation
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<Dictionary>(events.Select(EventSerializer.Deserialize));
+    return Load<Dictionary>(events.Select(EventSerializer.Deserialize)).ToArray(); // ISSUE #528: remove ToArray
   }
 
   public async Task<Dictionary?> LoadAsync(TenantId? tenantId, LocaleUnit locale, CancellationToken cancellationToken)
