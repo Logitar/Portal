@@ -8,8 +8,8 @@ public class JwtSecretValidator : AbstractValidator<string>
   public JwtSecretValidator(string? propertyName = null)
   {
     RuleFor(x => x).NotEmpty()
-      .MaximumLength(JwtSecretUnit.MaximumLength)
-      .MinimumLength(JwtSecretUnit.MinimumLength)
+      .MaximumLength(JwtSecret.MaximumLength)
+      .MinimumLength(JwtSecret.MinimumLength)
       .WithPropertyName(propertyName);
   }
 }

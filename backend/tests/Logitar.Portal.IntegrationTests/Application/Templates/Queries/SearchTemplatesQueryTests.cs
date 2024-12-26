@@ -14,15 +14,15 @@ public class SearchTemplatesQueryTests : IntegrationTests
 {
   private readonly ITemplateRepository _templateRepository;
 
-  private readonly TemplateAggregate _template;
+  private readonly Template _template;
 
   public SearchTemplatesQueryTests() : base()
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
+    UniqueKey uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
   }
 
@@ -46,7 +46,7 @@ public class SearchTemplatesQueryTests : IntegrationTests
     SearchTemplatesPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchTemplatesQuery query = new(payload);
-    SearchResults<Template> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<TemplateModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -54,13 +54,13 @@ public class SearchTemplatesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    ContentUnit htmlContent = ContentUnit.Html($"<p>{_template.Content.Text}</p>");
+    Content htmlContent = Content.Html($"<p>{_template.Content.Text}</p>");
 
-    TemplateAggregate notInSearch = new(new UniqueKeyUnit("ConfirmAccount"), new SubjectUnit("Confirm your account"), _template.Content, TenantId);
-    TemplateAggregate notInIds = new(new UniqueKeyUnit($"{_template.UniqueKey.Value}_OLD"), _template.Subject, _template.Content, TenantId);
-    TemplateAggregate html = new(new UniqueKeyUnit("PasswordRecoveryHtml"), _template.Subject, htmlContent, TenantId);
-    TemplateAggregate template1 = new(_template.UniqueKey, _template.Subject, _template.Content, TenantId);
-    TemplateAggregate template2 = new(new UniqueKeyUnit("ResetAccount"), new SubjectUnit("Reset your account"), _template.Content, TenantId);
+    Template notInSearch = new(new UniqueKey("ConfirmAccount"), new Subject("Confirm your account"), _template.Content, TenantId);
+    Template notInIds = new(new UniqueKey($"{_template.UniqueKey.Value}_OLD"), _template.Subject, _template.Content, TenantId);
+    Template html = new(new UniqueKey("PasswordRecoveryHtml"), _template.Subject, htmlContent, TenantId);
+    Template template1 = new(_template.UniqueKey, _template.Subject, _template.Content, TenantId);
+    Template template2 = new(new UniqueKey("ResetAccount"), new Subject("Reset your account"), _template.Content, TenantId);
     await _templateRepository.SaveAsync([notInSearch, notInIds, html, template1, template2]);
 
     SetRealm();
@@ -78,10 +78,10 @@ public class SearchTemplatesQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("reset%"));
     payload.Sort.Add(new TemplateSortOption(TemplateSort.Subject, isDescending: false));
     SearchTemplatesQuery query = new(payload);
-    SearchResults<Template> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<TemplateModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Template template = Assert.Single(results.Items);
+    TemplateModel template = Assert.Single(results.Items);
     Assert.Equal(template1.Id.ToGuid(), template.Id);
   }
 }

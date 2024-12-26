@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Queries;
 
-public record ReadSessionQuery(Guid Id) : Activity, IRequest<Session?>;
+public record ReadSessionQuery(Guid Id) : Activity, IRequest<SessionModel?>;

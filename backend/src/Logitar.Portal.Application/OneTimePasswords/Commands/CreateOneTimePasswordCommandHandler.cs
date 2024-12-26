@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
-internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTimePasswordCommand, OneTimePassword>
+internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTimePasswordCommand, OneTimePasswordModel>
 {
   private readonly IOneTimePasswordQuerier _oneTimePasswordQuerier;
   private readonly IOneTimePasswordRepository _oneTimePasswordRepository;
@@ -22,7 +22,7 @@ internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTi
     _passwordManager = passwordManager;
   }
 
-  public async Task<OneTimePassword> Handle(CreateOneTimePasswordCommand command, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel> Handle(CreateOneTimePasswordCommand command, CancellationToken cancellationToken)
   {
     CreateOneTimePasswordPayload payload = command.Payload;
     new CreateOneTimePasswordValidator().ValidateAndThrow(payload);
@@ -40,7 +40,7 @@ internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTi
     oneTimePassword.Update(actorId);
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword, cancellationToken);
 
-    OneTimePassword result = await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
+    OneTimePasswordModel result = await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
     result.Password = passwordString;
     return result;
   }

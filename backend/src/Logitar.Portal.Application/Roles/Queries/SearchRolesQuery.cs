@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
-internal record SearchRolesQuery(SearchRolesPayload Payload) : Activity, IRequest<SearchResults<Role>>;
+internal record SearchRolesQuery(SearchRolesPayload Payload) : Activity, IRequest<SearchResults<RoleModel>>;

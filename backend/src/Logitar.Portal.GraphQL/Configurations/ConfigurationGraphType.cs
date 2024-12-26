@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Settings;
 
 namespace Logitar.Portal.GraphQL.Configurations;
 
-internal class ConfigurationGraphType : AggregateGraphType<Configuration>
+internal class ConfigurationGraphType : AggregateGraphType<ConfigurationModel>
 {
   public ConfigurationGraphType() : base("Represents the configuration of the system.")
   {

@@ -24,7 +24,7 @@ internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthe
     if (sessionId.HasValue)
     {
       ReadSessionQuery query = new(sessionId.Value);
-      Session? session = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
+      SessionModel? session = await _activityPipeline.ExecuteAsync(query, new ContextParameters());
       if (session == null)
       {
         return Fail($"The session 'Id={sessionId}' could not be found.");

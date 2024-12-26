@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Templates;
 
-internal class TemplateGraphType : AggregateGraphType<Template>
+internal class TemplateGraphType : AggregateGraphType<TemplateModel>
 {
   public TemplateGraphType() : base("Represents a template in a mailing system. The template is the contents that will be rendered into a message.")
   {

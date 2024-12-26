@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
-internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateOneTimePasswordCommand, OneTimePassword?>
+internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateOneTimePasswordCommand, OneTimePasswordModel?>
 {
   private readonly IOneTimePasswordQuerier _oneTimePasswordQuerier;
   private readonly IOneTimePasswordRepository _oneTimePasswordRepository;
@@ -19,7 +19,7 @@ internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateO
     _oneTimePasswordRepository = oneTimePasswordRepository;
   }
 
-  public async Task<OneTimePassword?> Handle(ValidateOneTimePasswordCommand command, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> Handle(ValidateOneTimePasswordCommand command, CancellationToken cancellationToken)
   {
     ValidateOneTimePasswordPayload payload = command.Payload;
     new ValidateOneTimePasswordValidator().ValidateAndThrow(payload);

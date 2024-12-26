@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUserCommand, User>
+internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUserCommand, UserModel>
 {
   private readonly IMediator _mediator;
   private readonly IUserManager _userManager;
@@ -21,7 +21,7 @@ internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUser
     _userQuerier = userQuerier;
   }
 
-  public async Task<User> Handle(AuthenticateUserCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel> Handle(AuthenticateUserCommand command, CancellationToken cancellationToken)
   {
     AuthenticateUserPayload payload = command.Payload;
     new AuthenticateUserValidator().ValidateAndThrow(payload);

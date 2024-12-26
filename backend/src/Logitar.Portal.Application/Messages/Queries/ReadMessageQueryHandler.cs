@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
-internal class ReadMessageQueryHandler : IRequestHandler<ReadMessageQuery, Message?>
+internal class ReadMessageQueryHandler : IRequestHandler<ReadMessageQuery, MessageModel?>
 {
   private readonly IMessageQuerier _messageQuerier;
 
@@ -12,7 +12,7 @@ internal class ReadMessageQueryHandler : IRequestHandler<ReadMessageQuery, Messa
     _messageQuerier = messageQuerier;
   }
 
-  public async Task<Message?> Handle(ReadMessageQuery query, CancellationToken cancellationToken)
+  public async Task<MessageModel?> Handle(ReadMessageQuery query, CancellationToken cancellationToken)
   {
     return await _messageQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }

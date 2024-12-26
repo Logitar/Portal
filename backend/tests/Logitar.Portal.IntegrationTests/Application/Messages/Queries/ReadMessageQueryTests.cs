@@ -42,7 +42,7 @@ public class ReadMessageQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_message_cannot_be_found()
   {
     ReadMessageQuery query = new(Guid.NewGuid());
-    Message? message = await ActivityPipeline.ExecuteAsync(query);
+    MessageModel? message = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(message);
   }
 
@@ -51,23 +51,23 @@ public class ReadMessageQueryTests : IntegrationTests
   {
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    SenderAggregate sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(uniqueKey, subject, content, TenantId);
+    UniqueKey uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(uniqueKey, subject, content, TenantId);
     await _templateRepository.SaveAsync(template);
 
-    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
-    MessageAggregate message = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Recipient[] recipients = [new Recipient(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
+    Message message = new(subject, content, recipients, sender, template, tenantId: TenantId);
     await _messageRepository.SaveAsync(message);
 
     SetRealm();
 
     ReadMessageQuery query = new(message.Id.ToGuid());
-    Message? result = await ActivityPipeline.ExecuteAsync(query);
+    MessageModel? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(message.Id.ToGuid(), result.Id);
   }

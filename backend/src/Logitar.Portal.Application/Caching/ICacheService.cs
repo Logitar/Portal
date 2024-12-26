@@ -6,9 +6,9 @@ namespace Logitar.Portal.Application.Caching;
 
 public interface ICacheService
 {
-  Configuration? Configuration { get; set; }
+  ConfigurationModel? Configuration { get; set; }
 
-  Actor? GetActor(ActorId id);
+  ActorModel? GetActor(ActorId id);
   void RemoveActor(ActorId id);
-  void SetActor(Actor actor);
+  void SetActor(ActorModel actor);
 }

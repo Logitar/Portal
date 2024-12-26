@@ -12,7 +12,7 @@ public record RealmUpdated : DomainEvent, INotification
   public Modification<DescriptionUnit>? Description { get; set; }
 
   public Modification<LocaleUnit>? DefaultLocale { get; set; }
-  public JwtSecretUnit? Secret { get; set; }
+  public JwtSecret? Secret { get; set; }
   public Modification<UrlUnit>? Url { get; set; }
 
   public ReadOnlyUniqueNameSettings? UniqueNameSettings { get; set; }

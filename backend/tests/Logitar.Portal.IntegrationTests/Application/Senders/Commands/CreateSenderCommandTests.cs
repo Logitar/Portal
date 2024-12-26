@@ -30,7 +30,7 @@ public class CreateSenderCommandTests : IntegrationTests
       Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
     };
     CreateSenderCommand command = new(payload);
-    Sender sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel sender = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(sender.IsDefault);
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -42,11 +42,11 @@ public class CreateSenderCommandTests : IntegrationTests
     Assert.Null(sender.Realm);
 
     SetRealm();
-    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other1 = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other1.Realm);
     Assert.True(other1.IsDefault);
 
-    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other2 = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotEqual(other1, other2);
     Assert.Same(Realm, other1.Realm);
     Assert.False(other2.IsDefault);
@@ -62,7 +62,7 @@ public class CreateSenderCommandTests : IntegrationTests
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
     CreateSenderCommand command = new(payload);
-    Sender sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel sender = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(sender.IsDefault);
     Assert.Equal(payload.EmailAddress, sender.EmailAddress);
@@ -74,11 +74,11 @@ public class CreateSenderCommandTests : IntegrationTests
     Assert.Null(sender.Realm);
 
     SetRealm();
-    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other1 = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other1.Realm);
     Assert.True(other1.IsDefault);
 
-    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other2 = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotEqual(other1, other2);
     Assert.Same(Realm, other1.Realm);
     Assert.False(other2.IsDefault);
@@ -94,7 +94,7 @@ public class CreateSenderCommandTests : IntegrationTests
       Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
     };
     CreateSenderCommand command = new(payload);
-    Sender sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel sender = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(sender.IsDefault);
     Assert.Null(sender.EmailAddress);
@@ -106,11 +106,11 @@ public class CreateSenderCommandTests : IntegrationTests
     Assert.Null(sender.Realm);
 
     SetRealm();
-    Sender other1 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other1 = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other1.Realm);
     Assert.True(other1.IsDefault);
 
-    Sender other2 = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel other2 = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotEqual(other1, other2);
     Assert.Same(Realm, other1.Realm);
     Assert.False(other2.IsDefault);

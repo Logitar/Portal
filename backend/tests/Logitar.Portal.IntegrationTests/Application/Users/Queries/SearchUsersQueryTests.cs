@@ -27,7 +27,7 @@ public class SearchUsersQueryTests : IntegrationTests
       IsConfirmed = true
     };
     SearchUsersQuery query = new(payload);
-    SearchResults<User> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<UserModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -88,10 +88,10 @@ public class SearchUsersQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm(nickname.Value));
     payload.Sort.Add(new UserSortOption(UserSort.Birthdate, isDescending: false));
     SearchUsersQuery query = new(payload);
-    SearchResults<User> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<UserModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    User result = Assert.Single(results.Items);
+    UserModel result = Assert.Single(results.Items);
     Assert.Equal(youngest.Id.ToGuid(), result.Id);
   }
 }

@@ -7,8 +7,8 @@ namespace Logitar.Portal.Application.Sessions;
 
 public interface ISessionQuerier
 {
-  Task<Session> ReadAsync(Realm? realm, SessionAggregate session, CancellationToken cancellationToken = default);
-  Task<Session?> ReadAsync(Realm? realm, SessionId id, CancellationToken cancellationToken = default);
-  Task<Session?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken = default);
-  Task<SearchResults<Session>> SearchAsync(Realm? realm, SearchSessionsPayload payload, CancellationToken cancellationToken = default);
+  Task<SessionModel> ReadAsync(RealmModel? realm, SessionAggregate session, CancellationToken cancellationToken = default);
+  Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken = default);
+  Task<SessionModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<SearchResults<SessionModel>> SearchAsync(RealmModel? realm, SearchSessionsPayload payload, CancellationToken cancellationToken = default);
 }

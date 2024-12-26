@@ -14,26 +14,26 @@ internal class RoleClient : BaseClient, IRoleClient
   {
   }
 
-  public async Task<Role> CreateAsync(CreateRolePayload payload, IRequestContext? context)
+  public async Task<RoleModel> CreateAsync(CreateRolePayload payload, IRequestContext? context)
   {
-    return await PostAsync<Role>(UriPath, payload, context)
+    return await PostAsync<RoleModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<Role?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<RoleModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<Role>(uri, context);
+    return await DeleteAsync<RoleModel>(uri, context);
   }
 
-  public async Task<Role?> ReadAsync(Guid? id, string? uniqueName, IRequestContext? context)
+  public async Task<RoleModel?> ReadAsync(Guid? id, string? uniqueName, IRequestContext? context)
   {
-    Dictionary<Guid, Role> roles = new(capacity: 2);
+    Dictionary<Guid, RoleModel> roles = new(capacity: 2);
 
     if (id.HasValue)
     {
       Uri uri = new($"{Path}/{id}", UriKind.Relative);
-      Role? role = await GetAsync<Role>(uri, context);
+      RoleModel? role = await GetAsync<RoleModel>(uri, context);
       if (role != null)
       {
         roles[role.Id] = role;
@@ -43,7 +43,7 @@ internal class RoleClient : BaseClient, IRoleClient
     if (!string.IsNullOrWhiteSpace(uniqueName))
     {
       Uri uri = new($"{Path}/unique-name:{uniqueName}", UriKind.Relative);
-      Role? role = await GetAsync<Role>(uri, context);
+      RoleModel? role = await GetAsync<RoleModel>(uri, context);
       if (role != null)
       {
         roles[role.Id] = role;
@@ -52,28 +52,28 @@ internal class RoleClient : BaseClient, IRoleClient
 
     if (roles.Count > 1)
     {
-      throw new TooManyResultsException<Role>(expectedCount: 1, actualCount: roles.Count);
+      throw new TooManyResultsException<RoleModel>(expectedCount: 1, actualCount: roles.Count);
     }
 
     return roles.Values.SingleOrDefault();
   }
 
-  public async Task<Role?> ReplaceAsync(Guid id, ReplaceRolePayload payload, long? version, IRequestContext? context)
+  public async Task<RoleModel?> ReplaceAsync(Guid id, ReplaceRolePayload payload, long? version, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath($"{Path}/{id}").SetVersion(version).BuildUri(UriKind.Relative);
-    return await PutAsync<Role>(uri, payload, context);
+    return await PutAsync<RoleModel>(uri, payload, context);
   }
 
-  public async Task<SearchResults<Role>> SearchAsync(SearchRolesPayload payload, IRequestContext? context)
+  public async Task<SearchResults<RoleModel>> SearchAsync(SearchRolesPayload payload, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath(Path).SetQuery(payload).BuildUri(UriKind.Relative);
-    return await GetAsync<SearchResults<Role>>(uri, context)
+    return await GetAsync<SearchResults<RoleModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 
-  public async Task<Role?> UpdateAsync(Guid id, UpdateRolePayload payload, IRequestContext? context)
+  public async Task<RoleModel?> UpdateAsync(Guid id, UpdateRolePayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await PatchAsync<Role>(uri, payload, context);
+    return await PatchAsync<RoleModel>(uri, payload, context);
   }
 }

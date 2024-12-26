@@ -42,13 +42,13 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     LocaleUnit? defaultLocale = command.DefaultLocale;
 
     SendMessagePayload payload = command.Payload;
-    SenderAggregate sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
+    Sender sender = await ResolveSenderAsync(tenantId, payload, cancellationToken);
     new SendMessageValidator(sender.Type).ValidateAndThrow(payload);
 
     Recipients allRecipients = await ResolveRecipientsAsync(payload, sender.Type, cancellationToken);
-    TemplateAggregate template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
+    Template template = await ResolveTemplateAsync(tenantId, payload, sender.Type, cancellationToken);
 
-    Dictionary<LocaleUnit, DictionaryAggregate> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
+    Dictionary<LocaleUnit, Dictionary> allDictionaries = (await _dictionaryRepository.LoadAsync(tenantId, cancellationToken))
       .ToDictionary(x => x.Locale, x => x);
     bool ignoreUserLocale = payload.IgnoreUserLocale;
     LocaleUnit? targetLocale = LocaleUnit.TryCreate(payload.Locale);
@@ -57,20 +57,20 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     Variables variables = new(payload.Variables);
     IReadOnlyDictionary<string, string> variableDictionary = variables.AsDictionary();
 
-    List<MessageAggregate> messages = new(capacity: allRecipients.To.Count);
-    foreach (RecipientUnit recipient in allRecipients.To)
+    List<Message> messages = new(capacity: allRecipients.To.Count);
+    foreach (Recipient recipient in allRecipients.To)
     {
       MessageId id = MessageId.NewId();
 
       Dictionaries dictionaries = (payload.IgnoreUserLocale || recipient.User?.Locale == null)
         ? defaultDictionaries : new(allDictionaries, recipient.User.Locale, defaultLocale);
 
-      SubjectUnit subject = new(dictionaries.Translate(template.Subject.Value));
+      Subject subject = new(dictionaries.Translate(template.Subject.Value));
       LocaleUnit? locale = dictionaries.Target?.Locale ?? dictionaries.Default?.Locale;
-      ContentUnit body = await _sender.Send(new CompileTemplateCommand(id, template, dictionaries, locale, recipient.User, variables), cancellationToken);
-      IReadOnlyCollection<RecipientUnit> recipients = [recipient, .. allRecipients.CC, .. allRecipients.Bcc];
+      Content body = await _sender.Send(new CompileTemplateCommand(id, template, dictionaries, locale, recipient.User, variables), cancellationToken);
+      IReadOnlyCollection<Recipient> recipients = [recipient, .. allRecipients.CC, .. allRecipients.Bcc];
 
-      MessageAggregate message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
+      Message message = new(subject, body, recipients, sender, template, ignoreUserLocale, locale, variableDictionary, payload.IsDemo, tenantId, actorId, id);
       messages.Add(message);
 
       await _sender.Send(new SendEmailCommand(actorId, message, sender), cancellationToken);
@@ -82,7 +82,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
 
   private async Task<Recipients> ResolveRecipientsAsync(SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
-    List<RecipientUnit> recipients = new(capacity: payload.Recipients.Count);
+    List<Recipient> recipients = new(capacity: payload.Recipients.Count);
 
     HashSet<UserId> userIds = new(recipients.Capacity);
     foreach (RecipientPayload recipient in payload.Recipients)
@@ -131,7 +131,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
               throw new SenderTypeNotSupportedException(senderType);
           }
 
-          recipients.Add(new RecipientUnit(user, recipient.Type));
+          recipients.Add(new Recipient(user, recipient.Type));
         }
         else
         {
@@ -140,7 +140,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       }
       else
       {
-        recipients.Add(new RecipientUnit(recipient.Type, recipient.Address, recipient.DisplayName, recipient.PhoneNumber));
+        recipients.Add(new Recipient(recipient.Type, recipient.Address, recipient.DisplayName, recipient.PhoneNumber));
       }
     }
     if (missingUsers.Count > 0)
@@ -155,7 +155,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     return new Recipients(recipients);
   }
 
-  private async Task<SenderAggregate> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
+  private async Task<Sender> ResolveSenderAsync(TenantId? tenantId, SendMessagePayload payload, CancellationToken cancellationToken)
   {
     if (payload.SenderId.HasValue)
     {
@@ -167,9 +167,9 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
       ?? throw new NoDefaultSenderException(tenantId);
   }
 
-  private async Task<TemplateAggregate> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
+  private async Task<Template> ResolveTemplateAsync(TenantId? tenantId, SendMessagePayload payload, SenderType senderType, CancellationToken cancellationToken)
   {
-    TemplateAggregate? template = null;
+    Template? template = null;
     if (Guid.TryParse(payload.Template, out Guid id))
     {
       template = await _templateRepository.LoadAsync(id, cancellationToken);
@@ -179,7 +179,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     {
       try
       {
-        UniqueKeyUnit uniqueKey = new(payload.Template);
+        UniqueKey uniqueKey = new(payload.Template);
         template = await _templateRepository.LoadAsync(tenantId, uniqueKey, cancellationToken);
       }
       catch (ValidationException)

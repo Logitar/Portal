@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Templates.Events;
 
-public record TemplateUniqueKeyChanged(UniqueKeyUnit UniqueKey) : DomainEvent, INotification;
+public record TemplateUniqueKeyChanged(UniqueKey UniqueKey) : DomainEvent, INotification;

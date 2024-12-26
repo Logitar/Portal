@@ -4,7 +4,7 @@ namespace Logitar.Portal.Application.Tokens;
 
 internal static class TokenHelper
 {
-  public static string ResolveAudience(string? audience, Realm? realm, string baseUrl)
+  public static string ResolveAudience(string? audience, RealmModel? realm, string baseUrl)
   {
     if (!string.IsNullOrWhiteSpace(audience))
     {
@@ -17,7 +17,7 @@ internal static class TokenHelper
 
     return baseUrl;
   }
-  public static string ResolveIssuer(string? issuer, Realm? realm, string baseUrl)
+  public static string ResolveIssuer(string? issuer, RealmModel? realm, string baseUrl)
   {
     if (!string.IsNullOrWhiteSpace(issuer))
     {
@@ -31,7 +31,7 @@ internal static class TokenHelper
     return baseUrl;
   }
 
-  private static string FormatAudienceOrIssuer(string format, Realm? realm, string baseUrl)
+  private static string FormatAudienceOrIssuer(string format, RealmModel? realm, string baseUrl)
   {
     if (realm != null)
     {

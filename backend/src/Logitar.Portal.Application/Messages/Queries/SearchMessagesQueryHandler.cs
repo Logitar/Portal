@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
-internal class SearchMessagesQueryHandler : IRequestHandler<SearchMessagesQuery, SearchResults<Message>>
+internal class SearchMessagesQueryHandler : IRequestHandler<SearchMessagesQuery, SearchResults<MessageModel>>
 {
   private readonly IMessageQuerier _messageQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchMessagesQueryHandler : IRequestHandler<SearchMessagesQuery,
     _messageQuerier = messageQuerier;
   }
 
-  public async Task<SearchResults<Message>> Handle(SearchMessagesQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<MessageModel>> Handle(SearchMessagesQuery query, CancellationToken cancellationToken)
   {
     return await _messageQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }

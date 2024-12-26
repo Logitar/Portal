@@ -22,14 +22,14 @@ public class SenderProviderMismatchException : Exception
     private set => Data[nameof(ActualProvider)] = value;
   }
 
-  public SenderProviderMismatchException(SenderAggregate sender, SenderProvider actualProvider) : base(BuildMessage(sender, actualProvider))
+  public SenderProviderMismatchException(Sender sender, SenderProvider actualProvider) : base(BuildMessage(sender, actualProvider))
   {
     SenderId = sender.Id;
     ExpectedProvider = sender.Provider;
     ActualProvider = actualProvider;
   }
 
-  private static string BuildMessage(SenderAggregate sender, SenderProvider actualProvider) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(Sender sender, SenderProvider actualProvider) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(SenderId), sender.Id.Value)
     .AddData(nameof(ExpectedProvider), sender.Provider)
     .AddData(nameof(ActualProvider), actualProvider)

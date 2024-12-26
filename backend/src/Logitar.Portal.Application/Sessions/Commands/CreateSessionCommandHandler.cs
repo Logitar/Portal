@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, Session>
+internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, SessionModel>
 {
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
@@ -30,7 +30,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     _userManager = userManager;
   }
 
-  public async Task<Session> Handle(CreateSessionCommand command, CancellationToken cancellationToken)
+  public async Task<SessionModel> Handle(CreateSessionCommand command, CancellationToken cancellationToken)
   {
     IUserSettings userSettings = command.UserSettings;
 
@@ -58,7 +58,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     await _userManager.SaveAsync(user, userSettings, actorId, cancellationToken);
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
-    Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
+    SessionModel result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
     if (secretString != null)
     {
       result.RefreshToken = RefreshToken.Encode(session.Id, secretString);

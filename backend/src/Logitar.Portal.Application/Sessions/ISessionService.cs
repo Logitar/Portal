@@ -5,10 +5,10 @@ namespace Logitar.Portal.Application.Sessions;
 
 public interface ISessionService
 {
-  Task<Session> CreateAsync(CreateSessionPayload payload, CancellationToken cancellationToken = default);
-  Task<Session?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
-  Task<Session> RenewAsync(RenewSessionPayload payload, CancellationToken cancellationToken = default);
-  Task<SearchResults<Session>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken = default);
-  Task<Session> SignInAsync(SignInSessionPayload payload, CancellationToken cancellationToken = default);
-  Task<Session?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<SessionModel> CreateAsync(CreateSessionPayload payload, CancellationToken cancellationToken = default);
+  Task<SessionModel?> ReadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<SessionModel> RenewAsync(RenewSessionPayload payload, CancellationToken cancellationToken = default);
+  Task<SearchResults<SessionModel>> SearchAsync(SearchSessionsPayload payload, CancellationToken cancellationToken = default);
+  Task<SessionModel> SignInAsync(SignInSessionPayload payload, CancellationToken cancellationToken = default);
+  Task<SessionModel?> SignOutAsync(Guid id, CancellationToken cancellationToken = default);
 }

@@ -17,29 +17,29 @@ public abstract record Activity : IActivity
   protected ActivityContext Context => _context ?? throw new InvalidOperationException($"The request has not been contextualized yet. You must call the '{nameof(Contextualize)}' method before executing the request.");
 
   [JsonIgnore]
-  public Actor Actor
+  public ActorModel Actor
   {
     get
     {
       if (Context.User != null)
       {
-        return new Actor(Context.User);
+        return new ActorModel(Context.User);
       }
       else if (Context.ApiKey != null)
       {
-        return new Actor(Context.ApiKey);
+        return new ActorModel(Context.ApiKey);
       }
-      return Actor.System;
+      return ActorModel.System;
     }
   }
   [JsonIgnore]
   public ActorId ActorId => new(Actor.Id);
 
   [JsonIgnore]
-  private Configuration Configuration => Context.Configuration;
+  private ConfigurationModel Configuration => Context.Configuration;
 
   [JsonIgnore]
-  public Realm? Realm => Context.Realm;
+  public RealmModel? Realm => Context.Realm;
   [JsonIgnore]
   public TenantId? TenantId => Realm?.GetTenantId();
 
@@ -48,7 +48,7 @@ public abstract record Activity : IActivity
   {
     get
     {
-      Locale? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
+      LocaleModel? defaultLocale = Realm?.DefaultLocale ?? Configuration.DefaultLocale;
       return defaultLocale == null ? null : new LocaleUnit(defaultLocale.Code);
     }
   }

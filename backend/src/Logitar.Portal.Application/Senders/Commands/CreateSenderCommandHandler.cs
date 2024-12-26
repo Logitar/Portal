@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand, Sender>
+internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand, SenderModel>
 {
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
@@ -23,14 +23,14 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     _senderRepository = senderRepository;
   }
 
-  public async Task<Sender> Handle(CreateSenderCommand command, CancellationToken cancellationToken)
+  public async Task<SenderModel> Handle(CreateSenderCommand command, CancellationToken cancellationToken)
   {
     CreateSenderPayload payload = command.Payload;
     new CreateSenderValidator().ValidateAndThrow(payload);
 
     ActorId actorId = command.ActorId;
 
-    SenderAggregate sender;
+    Sender sender;
     SenderSettings settings = GetSettings(payload);
     SenderType type = settings.Provider.GetSenderType();
     switch (type)
@@ -61,7 +61,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     sender.Description = DescriptionUnit.TryCreate(payload.Description);
     sender.Update(actorId);
 
-    IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
+    IEnumerable<Sender> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
     if (!senders.Any())
     {
       sender.SetDefault(actorId);

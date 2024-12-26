@@ -13,22 +13,22 @@ internal class ConfigurationClient : BaseClient, IConfigurationClient
   {
   }
 
-  public async Task<Configuration> ReadAsync(IRequestContext? context)
+  public async Task<ConfigurationModel> ReadAsync(IRequestContext? context)
   {
-    return await GetAsync<Configuration>(UriPath, context)
+    return await GetAsync<ConfigurationModel>(UriPath, context)
       ?? throw CreateInvalidApiResponseException(nameof(ReadAsync), HttpMethod.Get, UriPath, content: null, context);
   }
 
-  public async Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, IRequestContext? context)
+  public async Task<ConfigurationModel> ReplaceAsync(ReplaceConfigurationPayload payload, long? version, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath(Path).SetVersion(version).BuildUri(UriKind.Relative);
-    return await PutAsync<Configuration>(uri, payload, context)
+    return await PutAsync<ConfigurationModel>(uri, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(ReplaceAsync), HttpMethod.Put, uri, payload, context);
   }
 
-  public async Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, IRequestContext? context)
+  public async Task<ConfigurationModel> UpdateAsync(UpdateConfigurationPayload payload, IRequestContext? context)
   {
-    return await PatchAsync<Configuration>(UriPath, payload, context)
+    return await PatchAsync<ConfigurationModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(UpdateAsync), HttpMethod.Patch, UriPath, payload, context);
   }
 }

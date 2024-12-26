@@ -25,7 +25,7 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
     ValidateTokenPayload payload = command.Payload;
     new ValidateTokenValidator().ValidateAndThrow(payload);
 
-    Realm? realm = command.Realm;
+    RealmModel? realm = command.Realm;
     string baseUrl = _baseUrl.Value;
 
     string secret = payload.Secret?.CleanTrim() ?? command.Secret;
@@ -71,7 +71,7 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
     }
     if (emailAddress != null)
     {
-      result.Email = new Email(emailAddress)
+      result.Email = new EmailModel(emailAddress)
       {
         IsVerified = isEmailVerified ?? false
       };

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
-internal record ReadTemplateQuery(Guid? Id, string? UniqueKey) : Activity, IRequest<Template?>;
+internal record ReadTemplateQuery(Guid? Id, string? UniqueKey) : Activity, IRequest<TemplateModel?>;

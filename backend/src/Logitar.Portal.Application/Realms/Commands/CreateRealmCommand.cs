@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal record CreateRealmCommand(CreateRealmPayload Payload) : Activity, IRequest<Realm>;
+internal record CreateRealmCommand(CreateRealmPayload Payload) : Activity, IRequest<RealmModel>;

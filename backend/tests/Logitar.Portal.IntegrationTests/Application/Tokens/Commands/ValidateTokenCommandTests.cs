@@ -54,7 +54,7 @@ public class ValidateTokenCommandTests : IntegrationTests
   {
     SetRealm();
 
-    JwtSecretUnit secret = JwtSecretUnit.Generate(512 / 8);
+    JwtSecret secret = JwtSecret.Generate(512 / 8);
 
     string tokenId = Guid.NewGuid().ToString();
     const string tokenType = "Custom+JWT";
@@ -89,7 +89,7 @@ public class ValidateTokenCommandTests : IntegrationTests
   [Fact(DisplayName = "It should validate a Portal token.")]
   public async Task It_should_validate_a_Portal_token()
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
+    Configuration? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
 
     string baseUrl = _baseUrl.Value.TrimEnd('/');

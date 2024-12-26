@@ -4,7 +4,7 @@ namespace Logitar.Portal.Contracts.Messages;
 
 public interface IMessageClient
 {
-  Task<Message?> ReadAsync(Guid id, IRequestContext? context = null);
-  Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, IRequestContext? context = null);
+  Task<MessageModel?> ReadAsync(Guid id, IRequestContext? context = null);
+  Task<SearchResults<MessageModel>> SearchAsync(SearchMessagesPayload payload, IRequestContext? context = null);
   Task<SentMessages> SendAsync(SendMessagePayload payload, IRequestContext? context = null);
 }

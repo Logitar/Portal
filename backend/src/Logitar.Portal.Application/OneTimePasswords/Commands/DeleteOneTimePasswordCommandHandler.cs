@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.OneTimePasswords.Commands;
 
-internal class DeleteOneTimePasswordCommandHandler : IRequestHandler<DeleteOneTimePasswordCommand, OneTimePassword?>
+internal class DeleteOneTimePasswordCommandHandler : IRequestHandler<DeleteOneTimePasswordCommand, OneTimePasswordModel?>
 {
   private readonly IOneTimePasswordQuerier _oneTimePasswordQuerier;
   private readonly IOneTimePasswordRepository _oneTimePasswordRepository;
@@ -15,14 +15,14 @@ internal class DeleteOneTimePasswordCommandHandler : IRequestHandler<DeleteOneTi
     _oneTimePasswordRepository = oneTimePasswordRepository;
   }
 
-  public async Task<OneTimePassword?> Handle(DeleteOneTimePasswordCommand command, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> Handle(DeleteOneTimePasswordCommand command, CancellationToken cancellationToken)
   {
     OneTimePasswordAggregate? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(command.Id, cancellationToken);
     if (oneTimePassword == null || oneTimePassword.TenantId != command.TenantId)
     {
       return null;
     }
-    OneTimePassword result = await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
+    OneTimePasswordModel result = await _oneTimePasswordQuerier.ReadAsync(command.Realm, oneTimePassword, cancellationToken);
 
     oneTimePassword.Delete(command.ActorId);
 

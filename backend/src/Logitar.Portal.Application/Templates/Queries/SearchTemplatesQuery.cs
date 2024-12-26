@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
-internal record SearchTemplatesQuery(SearchTemplatesPayload Payload) : Activity, IRequest<SearchResults<Template>>;
+internal record SearchTemplatesQuery(SearchTemplatesPayload Payload) : Activity, IRequest<SearchResults<TemplateModel>>;

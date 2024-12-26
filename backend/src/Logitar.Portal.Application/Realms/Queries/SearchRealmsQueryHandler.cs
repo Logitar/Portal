@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
-internal class SearchRealmsQueryHandler : IRequestHandler<SearchRealmsQuery, SearchResults<Realm>>
+internal class SearchRealmsQueryHandler : IRequestHandler<SearchRealmsQuery, SearchResults<RealmModel>>
 {
   private readonly IRealmQuerier _realmQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchRealmsQueryHandler : IRequestHandler<SearchRealmsQuery, Sea
     _realmQuerier = realmQuerier;
   }
 
-  public async Task<SearchResults<Realm>> Handle(SearchRealmsQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<RealmModel>> Handle(SearchRealmsQuery query, CancellationToken cancellationToken)
   {
     return await _realmQuerier.SearchAsync(query.Payload, cancellationToken);
   }

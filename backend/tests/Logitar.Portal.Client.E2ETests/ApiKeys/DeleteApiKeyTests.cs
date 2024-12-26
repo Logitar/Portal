@@ -22,7 +22,7 @@ internal class DeleteApiKeyTests : IClientTests
       }
       string[] parts = StaticPortalSettings.Instance.ApiKey.Split('.');
       Guid id = new(Convert.FromBase64String(parts[1].FromUriSafeBase64()));
-      ApiKey apiKey = await _client.DeleteAsync(id, context.Request)
+      ApiKeyModel apiKey = await _client.DeleteAsync(id, context.Request)
         ?? throw new InvalidOperationException("The API key should not be null.");
       context.Succeed();
     }

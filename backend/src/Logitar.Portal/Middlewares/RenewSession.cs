@@ -25,7 +25,7 @@ internal class RenewSession
         {
           RenewSessionPayload payload = new(refreshToken, context.GetSessionCustomAttributes());
           RenewSessionCommand command = new(payload);
-          Session session = await activityPipeline.ExecuteAsync(command, new ContextParameters());
+          SessionModel session = await activityPipeline.ExecuteAsync(command, new ContextParameters());
           context.SignIn(session);
         }
         catch (Exception)

@@ -29,8 +29,8 @@ internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
   public async Task Handle(SendEmailCommand command, CancellationToken cancellationToken)
   {
     ActorId actorId = command.ActorId;
-    MessageAggregate message = command.Message;
-    SenderAggregate sender = command.Sender;
+    Message message = command.Message;
+    Sender sender = command.Sender;
 
     if (!_strategies.TryGetValue(sender.Provider, out IProviderStrategy? strategy))
     {

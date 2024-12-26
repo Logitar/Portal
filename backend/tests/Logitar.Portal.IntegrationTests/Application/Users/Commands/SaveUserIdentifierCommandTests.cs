@@ -30,7 +30,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Contains(result.CustomIdentifiers, id => id.Key == command.Key && id.Value == payload.Value);
   }
@@ -40,7 +40,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   {
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(Guid.NewGuid(), Key, payload);
-    User? user = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -53,7 +53,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
     SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

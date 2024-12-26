@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSenderCommand, Sender?>
+internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSenderCommand, SenderModel?>
 {
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
@@ -16,9 +16,9 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
     _senderRepository = senderRepository;
   }
 
-  public async Task<Sender?> Handle(SetDefaultSenderCommand command, CancellationToken cancellationToken)
+  public async Task<SenderModel?> Handle(SetDefaultSenderCommand command, CancellationToken cancellationToken)
   {
-    SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
@@ -26,11 +26,11 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
 
     if (!sender.IsDefault)
     {
-      List<SenderAggregate> senders = new(capacity: 2);
+      List<Sender> senders = new(capacity: 2);
 
       ActorId actorId = command.ActorId;
 
-      SenderAggregate? @default = await _senderRepository.LoadDefaultAsync(sender.TenantId, cancellationToken);
+      Sender? @default = await _senderRepository.LoadDefaultAsync(sender.TenantId, cancellationToken);
       if (@default != null)
       {
         @default.SetDefault(isDefault: false, actorId);

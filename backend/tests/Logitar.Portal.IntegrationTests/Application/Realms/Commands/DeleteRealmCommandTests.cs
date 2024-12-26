@@ -17,14 +17,14 @@ public class DeleteRealmCommandTests : IntegrationTests
   private readonly IRealmRepository _realmRepository;
   private readonly IUserRepository _userRepository;
 
-  private readonly RealmAggregate _realm;
+  private readonly Realm _realm;
 
   public DeleteRealmCommandTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -50,7 +50,7 @@ public class DeleteRealmCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     DeleteRealmCommand command = new(_realm.Id.ToGuid());
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
 
@@ -61,7 +61,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     DeleteRealmCommand command = new(Guid.NewGuid());
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 }

@@ -2,7 +2,7 @@
 
 namespace Logitar.Portal.GraphQL.Users;
 
-internal class PhoneGraphType : ContactGraphType<Phone>
+internal class PhoneGraphType : ContactGraphType<PhoneModel>
 {
   public PhoneGraphType() : base("Represents a phone number.")
   {

@@ -32,7 +32,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
 
     AuthenticateUserPayload payload = new(Faker.Person.Email, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    User result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(user.Id.ToGuid(), result.Id);
   }
@@ -42,7 +42,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    User result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel result = await ActivityPipeline.ExecuteAsync(command);
 
     UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Equal(user.Id.ToGuid(), result.Id);

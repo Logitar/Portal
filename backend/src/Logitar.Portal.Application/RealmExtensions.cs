@@ -6,5 +6,5 @@ namespace Logitar.Portal.Application;
 
 public static class RealmExtensions
 {
-  public static TenantId GetTenantId(this Realm realm) => new(new RealmId(realm.Id).Value);
+  public static TenantId GetTenantId(this RealmModel realm) => new(new RealmId(realm.Id).Value);
 }

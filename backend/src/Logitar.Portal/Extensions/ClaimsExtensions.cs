@@ -8,7 +8,7 @@ namespace Logitar.Portal.Extensions;
 
 internal static class ClaimsExtensions
 {
-  public static ClaimsIdentity CreateClaimsIdentity(this ApiKey apiKey, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this ApiKeyModel apiKey, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
 
@@ -24,7 +24,7 @@ internal static class ClaimsExtensions
     return identity;
   }
 
-  public static ClaimsIdentity CreateClaimsIdentity(this Session session, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this SessionModel session, string? authenticationType = null)
   {
     ClaimsIdentity identity = session.User.CreateClaimsIdentity(authenticationType);
 
@@ -32,7 +32,7 @@ internal static class ClaimsExtensions
 
     return identity;
   }
-  public static ClaimsIdentity CreateClaimsIdentity(this User user, string? authenticationType = null)
+  public static ClaimsIdentity CreateClaimsIdentity(this UserModel user, string? authenticationType = null)
   {
     ClaimsIdentity identity = new(authenticationType);
 
@@ -115,7 +115,7 @@ internal static class ClaimsExtensions
       identity.AddClaim(ClaimHelper.Create(Rfc7519ClaimNames.AuthenticationTime, user.AuthenticatedOn.Value));
     }
 
-    foreach (Role role in user.Roles)
+    foreach (RoleModel role in user.Roles)
     {
       identity.AddClaim(new(Rfc7519ClaimNames.Roles, role.UniqueName));
     }
@@ -123,7 +123,7 @@ internal static class ClaimsExtensions
     return identity;
   }
 
-  private static Claim CreateClaim(this Address address, string name)
+  private static Claim CreateClaim(this AddressModel address, string name)
   {
     Rfc7519PostalAddress postalAddress = new()
     {

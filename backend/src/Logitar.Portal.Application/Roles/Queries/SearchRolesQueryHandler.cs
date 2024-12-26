@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
-internal class SearchRolesQueryHandler : IRequestHandler<SearchRolesQuery, SearchResults<Role>>
+internal class SearchRolesQueryHandler : IRequestHandler<SearchRolesQuery, SearchResults<RoleModel>>
 {
   private readonly IRoleQuerier _roleQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchRolesQueryHandler : IRequestHandler<SearchRolesQuery, Searc
     _roleQuerier = roleQuerier;
   }
 
-  public async Task<SearchResults<Role>> Handle(SearchRolesQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<RoleModel>> Handle(SearchRolesQuery query, CancellationToken cancellationToken)
   {
     return await _roleQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }

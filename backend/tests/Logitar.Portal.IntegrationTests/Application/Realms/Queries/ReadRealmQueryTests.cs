@@ -14,13 +14,13 @@ public class ReadRealmQueryTests : IntegrationTests
 {
   private readonly IRealmRepository _realmRepository;
 
-  private readonly RealmAggregate _realm;
+  private readonly Realm _realm;
 
   public ReadRealmQueryTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -41,7 +41,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     ReadRealmQuery query = new(Guid.NewGuid(), UniqueSlug: null);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(realm);
   }
 
@@ -49,7 +49,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_the_realm_found_by_Id()
   {
     ReadRealmQuery query = new(_realm.Id.ToGuid(), _realm.UniqueSlug.Value);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
@@ -58,7 +58,7 @@ public class ReadRealmQueryTests : IntegrationTests
   public async Task It_should_return_the_realm_found_by_unique_slug()
   {
     ReadRealmQuery query = new(Id: null, _realm.UniqueSlug.Value);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(query);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(realm);
     Assert.Equal(_realm.Id.ToGuid(), realm.Id);
   }
@@ -66,11 +66,11 @@ public class ReadRealmQueryTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
   public async Task It_should_throw_TooManyResultsException_when_there_are_too_many_results()
   {
-    RealmAggregate realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
     ReadRealmQuery query = new(_realm.Id.ToGuid(), "  OthEr  ");
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<Realm>>(async () => await ActivityPipeline.ExecuteAsync(query));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<RealmModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }

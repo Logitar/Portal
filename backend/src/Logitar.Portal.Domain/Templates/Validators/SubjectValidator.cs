@@ -8,7 +8,7 @@ public class SubjectValidator : AbstractValidator<string>
   public SubjectValidator(string? propertyName = null)
   {
     RuleFor(x => x).NotEmpty()
-      .MaximumLength(SubjectUnit.MaximumLength)
+      .MaximumLength(Subject.MaximumLength)
       .WithPropertyName(propertyName);
   }
 }

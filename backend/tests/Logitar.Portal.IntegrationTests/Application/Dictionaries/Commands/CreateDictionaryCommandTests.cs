@@ -14,7 +14,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
 {
   private readonly IDictionaryRepository _dictionaryRepository;
 
-  private readonly DictionaryAggregate _dictionary;
+  private readonly Dictionary _dictionary;
 
   public CreateDictionaryCommandTests() : base()
   {
@@ -44,7 +44,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
 
     CreateDictionaryPayload payload = new(Faker.Locale);
     CreateDictionaryCommand command = new(payload);
-    Dictionary dictionary = await ActivityPipeline.ExecuteAsync(command);
+    DictionaryModel dictionary = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
     Assert.Equal(0, dictionary.EntryCount);

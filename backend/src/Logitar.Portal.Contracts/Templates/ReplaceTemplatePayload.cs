@@ -7,13 +7,13 @@ public record ReplaceTemplatePayload
   public string? Description { get; set; }
 
   public string Subject { get; set; }
-  public Content Content { get; set; }
+  public ContentModel Content { get; set; }
 
-  public ReplaceTemplatePayload() : this(string.Empty, string.Empty, new Content())
+  public ReplaceTemplatePayload() : this(string.Empty, string.Empty, new ContentModel())
   {
   }
 
-  public ReplaceTemplatePayload(string uniqueKey, string subject, Content content)
+  public ReplaceTemplatePayload(string uniqueKey, string subject, ContentModel content)
   {
     UniqueKey = uniqueKey;
     Subject = subject;

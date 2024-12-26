@@ -6,7 +6,7 @@ using Logitar.Portal.GraphQL.Roles;
 
 namespace Logitar.Portal.GraphQL.Users;
 
-internal class UserGraphType : AggregateGraphType<User>
+internal class UserGraphType : AggregateGraphType<UserModel>
 {
   public UserGraphType() : base("Represents an user into the identity system. Users are actors used to represent people.")
   {

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Queries;
 
-internal record ReadDefaultSenderQuery : Activity, IRequest<Sender?>;
+internal record ReadDefaultSenderQuery : Activity, IRequest<SenderModel?>;

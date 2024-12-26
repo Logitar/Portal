@@ -62,7 +62,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_users", bool.FalseString));
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, version);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
@@ -80,7 +80,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
   {
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -91,7 +91,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
 
     ReplaceRolePayload payload = new("admin");
     ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, Version: null);
-    Role? result = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

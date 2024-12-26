@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Passwords;
 
-internal class OneTimePasswordGraphType : AggregateGraphType<OneTimePassword>
+internal class OneTimePasswordGraphType : AggregateGraphType<OneTimePasswordModel>
 {
   public OneTimePasswordGraphType() : base("Represents a One-Time Password (OTP). These passwords are used to authenticate an user when their default password is unavailable, or in Multi-Factor Authentication (MFA) contexts.")
   {

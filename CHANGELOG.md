@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored sender & message management.
 - Upgraded to .NET9 and NuGet packages.
 - Renamed Events and refactored Handlers.
+- Renamed Contract models and Domain aggregates.
 
 ### Removed
 

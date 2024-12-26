@@ -39,8 +39,8 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private readonly RecipientSettings _recipientSettings;
   private readonly SenderSettings _senderSettings;
 
-  private SenderAggregate? _sender = null;
-  private TemplateAggregate? _template = null;
+  private Sender? _sender = null;
+  private Template? _template = null;
 
   public SendMessageInternalCommandTests() : base()
   {
@@ -149,7 +149,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
         };
         createOneTimePassword.CustomAttributes.Add(new("Purpose", "PasswordRecovery"));
         createOneTimePassword.CustomAttributes.Add(new("UserId", user.Id.Value));
-        OneTimePassword oneTimePassword = await ActivityPipeline.ExecuteAsync(new CreateOneTimePasswordCommand(createOneTimePassword));
+        OneTimePasswordModel oneTimePassword = await ActivityPipeline.ExecuteAsync(new CreateOneTimePasswordCommand(createOneTimePassword));
         Assert.NotNull(oneTimePassword.Password);
         payload.Variables.Add(new Variable("Code", oneTimePassword.Password));
         break;
@@ -162,7 +162,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     SentMessages sentMessages = await ActivityPipeline.ExecuteAsync(command);
 
     Guid id = Assert.Single(sentMessages.Ids);
-    MessageAggregate? message = await _messageRepository.LoadAsync(id);
+    Message? message = await _messageRepository.LoadAsync(id);
     Assert.NotNull(message);
 
     Assert.Equal(TenantId, message.TenantId);
@@ -191,7 +191,7 @@ public class SendMessageInternalCommandTests : IntegrationTests
     Assert.True(message.IsDemo);
     Assert.Equal(MessageStatus.Succeeded, message.Status);
 
-    RecipientUnit recipient = Assert.Single(message.Recipients);
+    Recipient recipient = Assert.Single(message.Recipients);
     Assert.Equal(RecipientType.To, recipient.Type);
     Assert.Equal(_recipientSettings.Address, recipient.Address);
     Assert.Equal(_recipientSettings.DisplayName, recipient.DisplayName);
@@ -435,16 +435,16 @@ public class SendMessageInternalCommandTests : IntegrationTests
   private async Task<LocaleUnit> CreateDictionariesAsync(TenantId? tenantId = null)
   {
     LocaleUnit locale = new("fr-CA");
-    DictionaryAggregate canadianFrench = new(locale, tenantId);
+    Dictionary canadianFrench = new(locale, tenantId);
     canadianFrench.SetEntry("Hello", "Bonjour {name} !");
     canadianFrench.Update();
 
-    DictionaryAggregate french = new(new LocaleUnit("fr"), tenantId);
+    Dictionary french = new(new LocaleUnit("fr"), tenantId);
     french.SetEntry("Team", "L'équipe Logitar");
     french.Update();
 
     Assert.NotNull(Realm.DefaultLocale);
-    DictionaryAggregate @default = new(new LocaleUnit(Realm.DefaultLocale.Code), tenantId);
+    Dictionary @default = new(new LocaleUnit(Realm.DefaultLocale.Code), tenantId);
     @default.SetEntry("Cordially", "Cordially,");
     @default.SetEntry("PasswordRecovery_ClickLink", "Click on the link below to reset your password.");
     @default.SetEntry("PasswordRecovery_LostYourPassword", "It seems you have lost your password...");
@@ -515,24 +515,24 @@ public class SendMessageInternalCommandTests : IntegrationTests
 
   private async Task CreateTemplateAsync(TenantId? tenantId = null, SenderProvider provider = SenderProvider.SendGrid)
   {
-    ContentUnit content;
+    Content content;
     SenderType type = provider.GetSenderType();
     switch (type)
     {
       case SenderType.Email:
         string text = await File.ReadAllTextAsync("Templates/PasswordRecovery.html");
-        content = ContentUnit.Html(text);
+        content = Content.Html(text);
         break;
       case SenderType.Sms:
-        content = ContentUnit.PlainText(@"@(Model.Resource(""PasswordRecovery_OneTimePassword"").Replace(""{code}"", Model.Variable(""Code"")))");
+        content = Content.PlainText(@"@(Model.Resource(""PasswordRecovery_OneTimePassword"").Replace(""{code}"", Model.Variable(""Code"")))");
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
     }
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("PasswordRecovery_Subject");
-    _template = new TemplateAggregate(uniqueKey, subject, content, tenantId)
+    UniqueKey uniqueKey = new("PasswordRecovery");
+    Subject subject = new("PasswordRecovery_Subject");
+    _template = new Template(uniqueKey, subject, content, tenantId)
     {
       DisplayName = new("Password Recovery")
     };

@@ -14,7 +14,7 @@ internal class TemplateManager : ITemplateManager
     _templateRepository = templateRepository;
   }
 
-  public async Task SaveAsync(TemplateAggregate template, ActorId actorId, CancellationToken cancellationToken)
+  public async Task SaveAsync(Template template, ActorId actorId, CancellationToken cancellationToken)
   {
     bool hasUniqueKeyChanged = false;
     foreach (DomainEvent change in template.Changes)
@@ -27,7 +27,7 @@ internal class TemplateManager : ITemplateManager
 
     if (hasUniqueKeyChanged)
     {
-      TemplateAggregate? other = await _templateRepository.LoadAsync(template.TenantId, template.UniqueKey, cancellationToken);
+      Template? other = await _templateRepository.LoadAsync(template.TenantId, template.UniqueKey, cancellationToken);
       if (other?.Equals(template) == false)
       {
         throw new UniqueKeyAlreadyUsedException(template.TenantId, template.UniqueKey);

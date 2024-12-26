@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Roles;
 
-internal class RoleGraphType : AggregateGraphType<Role>
+internal class RoleGraphType : AggregateGraphType<RoleModel>
 {
   public RoleGraphType() : base("Represents a role into the identity system. Roles are typically used to assign permissions to actors.")
   {

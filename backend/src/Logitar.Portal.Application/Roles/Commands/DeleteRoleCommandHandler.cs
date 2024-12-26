@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
-internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Role?>
+internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, RoleModel?>
 {
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
@@ -18,14 +18,14 @@ internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Rol
     _roleRepository = roleRepository;
   }
 
-  public async Task<Role?> Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
+  public async Task<RoleModel?> Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
   {
     RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
     if (role == null || role.TenantId != command.TenantId)
     {
       return null;
     }
-    Role result = await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
+    RoleModel result = await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
 
     ActorId actorId = command.ActorId;
     role.Delete(actorId);

@@ -74,7 +74,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(sendMessages.UniqueName.Value);
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, version);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);
@@ -96,7 +96,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   {
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
@@ -109,7 +109,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
 
     ReplaceApiKeyPayload payload = new("admin");
     ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

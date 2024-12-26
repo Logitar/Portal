@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Realms;
 
 namespace Logitar.Portal.GraphQL.Senders;
 
-internal class SenderGraphType : AggregateGraphType<Sender>
+internal class SenderGraphType : AggregateGraphType<SenderModel>
 {
   public SenderGraphType() : base("Represents a sender in a mailing system. The sender is the actor who sends the message.")
   {

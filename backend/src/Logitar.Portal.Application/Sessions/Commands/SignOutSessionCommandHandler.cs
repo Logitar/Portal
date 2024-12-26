@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal class SignOutSessionCommandHandler : IRequestHandler<SignOutSessionCommand, Session?>
+internal class SignOutSessionCommandHandler : IRequestHandler<SignOutSessionCommand, SessionModel?>
 {
   private readonly ISessionQuerier _sessionQuerier;
   private readonly ISessionRepository _sessionRepository;
@@ -18,7 +18,7 @@ internal class SignOutSessionCommandHandler : IRequestHandler<SignOutSessionComm
     _userRepository = userRepository;
   }
 
-  public async Task<Session?> Handle(SignOutSessionCommand command, CancellationToken cancellationToken)
+  public async Task<SessionModel?> Handle(SignOutSessionCommand command, CancellationToken cancellationToken)
   {
     SessionAggregate? session = await _sessionRepository.LoadAsync(command.Id, cancellationToken);
     if (session == null)

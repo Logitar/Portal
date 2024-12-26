@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Commands;
 
-internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand, Session>
+internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand, SessionModel>
 {
   private readonly IPasswordManager _passwordManager;
   private readonly ISessionQuerier _sessionQuerier;
@@ -27,7 +27,7 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
     _userRepository = userRepository;
   }
 
-  public async Task<Session> Handle(RenewSessionCommand command, CancellationToken cancellationToken)
+  public async Task<SessionModel> Handle(RenewSessionCommand command, CancellationToken cancellationToken)
   {
     RenewSessionPayload payload = command.Payload;
     new RenewSessionValidator().ValidateAndThrow(payload);
@@ -64,7 +64,7 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
 
     await _sessionRepository.SaveAsync(session, cancellationToken);
 
-    Session result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
+    SessionModel result = await _sessionQuerier.ReadAsync(command.Realm, session, cancellationToken);
     result.RefreshToken = RefreshToken.Encode(session.Id, secretString);
     return result;
   }

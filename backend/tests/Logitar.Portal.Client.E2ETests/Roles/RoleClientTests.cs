@@ -19,7 +19,7 @@ internal class RoleClientTests : IClientTests
     {
       context.SetName(_client.GetType(), nameof(_client.CreateAsync));
       CreateRolePayload create = new("admin");
-      Role role = await _client.CreateAsync(create, context.Request);
+      RoleModel role = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -30,7 +30,7 @@ internal class RoleClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      Role? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueName: null, context.Request);
+      RoleModel? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueName: null, context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The role should not be found.");
@@ -42,7 +42,7 @@ internal class RoleClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.SearchAsync));
       SearchRolesPayload search = new();
       search.Search.Terms.Add(new SearchTerm(role.UniqueName));
-      SearchResults<Role> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<RoleModel> results = await _client.SearchAsync(search, context.Request);
       role = results.Items.Single();
       context.Succeed();
 

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
-internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCommand, Template?>
+internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCommand, TemplateModel?>
 {
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
@@ -21,17 +21,17 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     _templateRepository = templateRepository;
   }
 
-  public async Task<Template?> Handle(ReplaceTemplateCommand command, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> Handle(ReplaceTemplateCommand command, CancellationToken cancellationToken)
   {
     ReplaceTemplatePayload payload = command.Payload;
     new ReplaceTemplateValidator().ValidateAndThrow(payload);
 
-    TemplateAggregate? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
+    Template? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
     if (template == null || template.TenantId != command.TenantId)
     {
       return null;
     }
-    TemplateAggregate? reference = null;
+    Template? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _templateRepository.LoadAsync(template.Id, command.Version.Value, cancellationToken);
@@ -39,7 +39,7 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
 
     ActorId actorId = command.ActorId;
 
-    UniqueKeyUnit uniqueKey = new(payload.UniqueKey);
+    UniqueKey uniqueKey = new(payload.UniqueKey);
     if (reference == null || uniqueKey != reference.UniqueKey)
     {
       template.SetUniqueKey(uniqueKey, actorId);
@@ -55,12 +55,12 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
       template.Description = description;
     }
 
-    SubjectUnit subject = new(payload.Subject);
+    Subject subject = new(payload.Subject);
     if (reference == null || subject != reference.Subject)
     {
       template.Subject = subject;
     }
-    ContentUnit content = new(payload.Content);
+    Content content = new(payload.Content);
     if (reference == null || content != reference.Content)
     {
       template.Content = content;

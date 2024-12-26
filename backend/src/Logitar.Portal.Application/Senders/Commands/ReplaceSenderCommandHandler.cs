@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderCommand, Sender?>
+internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderCommand, SenderModel?>
 {
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
@@ -23,9 +23,9 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     _senderRepository = senderRepository;
   }
 
-  public async Task<Sender?> Handle(ReplaceSenderCommand command, CancellationToken cancellationToken)
+  public async Task<SenderModel?> Handle(ReplaceSenderCommand command, CancellationToken cancellationToken)
   {
-    SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
@@ -34,7 +34,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     ReplaceSenderPayload payload = command.Payload;
     new ReplaceSenderValidator(sender.Provider).ValidateAndThrow(payload);
 
-    SenderAggregate? reference = null;
+    Sender? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _senderRepository.LoadAsync(sender.Id, command.Version.Value, cancellationToken);
@@ -89,7 +89,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
     return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 
-  private static void SetSettings(ReplaceSenderPayload payload, SenderAggregate sender, SenderAggregate? reference, ActorId actorId)
+  private static void SetSettings(ReplaceSenderPayload payload, Sender sender, Sender? reference, ActorId actorId)
   {
     if (payload.SendGrid != null)
     {

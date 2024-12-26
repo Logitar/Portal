@@ -14,22 +14,22 @@ internal class OneTimePasswordFacade : IOneTimePasswordService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<OneTimePassword> CreateAsync(CreateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel> CreateAsync(CreateOneTimePasswordPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new CreateOneTimePasswordCommand(payload), cancellationToken);
   }
 
-  public async Task<OneTimePassword?> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new DeleteOneTimePasswordCommand(id), cancellationToken);
   }
 
-  public async Task<OneTimePassword?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadOneTimePasswordQuery(id), cancellationToken);
   }
 
-  public async Task<OneTimePassword?> ValidateAsync(Guid id, ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> ValidateAsync(Guid id, ValidateOneTimePasswordPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ValidateOneTimePasswordCommand(id, payload), cancellationToken);
   }

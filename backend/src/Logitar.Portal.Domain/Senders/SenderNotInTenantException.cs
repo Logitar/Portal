@@ -22,14 +22,14 @@ public class SenderNotInTenantException : Exception
     private set => Data[nameof(ActualTenantId)] = value?.Value;
   }
 
-  public SenderNotInTenantException(SenderAggregate sender, TenantId? expectedTenant) : base(BuildMessage(sender, expectedTenant))
+  public SenderNotInTenantException(Sender sender, TenantId? expectedTenant) : base(BuildMessage(sender, expectedTenant))
   {
     SenderId = sender.Id;
     ExpectedTenantId = expectedTenant;
     ActualTenantId = sender.TenantId;
   }
 
-  private static string BuildMessage(SenderAggregate sender, TenantId? expectedTenant) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(Sender sender, TenantId? expectedTenant) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(SenderId), sender.Id.Value)
     .AddData(nameof(ExpectedTenantId), expectedTenant?.Value, "<null>")
     .AddData(nameof(ActualTenantId), sender.TenantId?.Value, "<null>")

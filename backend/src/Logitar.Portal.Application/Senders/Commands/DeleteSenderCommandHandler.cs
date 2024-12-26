@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal class DeleteSenderCommandHandler : IRequestHandler<DeleteSenderCommand, Sender?>
+internal class DeleteSenderCommandHandler : IRequestHandler<DeleteSenderCommand, SenderModel?>
 {
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
@@ -15,22 +15,22 @@ internal class DeleteSenderCommandHandler : IRequestHandler<DeleteSenderCommand,
     _senderRepository = senderRepository;
   }
 
-  public async Task<Sender?> Handle(DeleteSenderCommand command, CancellationToken cancellationToken)
+  public async Task<SenderModel?> Handle(DeleteSenderCommand command, CancellationToken cancellationToken)
   {
-    SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
     }
     else if (sender.IsDefault)
     {
-      IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
+      IEnumerable<Sender> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);
       if (senders.Count() > 1)
       {
         throw new CannotDeleteDefaultSenderException(sender);
       }
     }
-    Sender result = await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
+    SenderModel result = await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
 
     sender.Delete(command.ActorId);
     await _senderRepository.SaveAsync(sender, cancellationToken);

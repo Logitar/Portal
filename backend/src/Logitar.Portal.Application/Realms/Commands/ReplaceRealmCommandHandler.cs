@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand, Realm?>
+internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand, RealmModel?>
 {
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
@@ -23,17 +23,17 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     _realmRepository = realmRepository;
   }
 
-  public async Task<Realm?> Handle(ReplaceRealmCommand command, CancellationToken cancellationToken)
+  public async Task<RealmModel?> Handle(ReplaceRealmCommand command, CancellationToken cancellationToken)
   {
     ReplaceRealmPayload payload = command.Payload;
     new ReplaceRealmValidator().ValidateAndThrow(payload);
 
-    RealmAggregate? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
     if (realm == null)
     {
       return null;
     }
-    RealmAggregate? reference = null;
+    Realm? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _realmRepository.LoadAsync(realm.Id, command.Version.Value, cancellationToken);
@@ -41,7 +41,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
 
     ActorId actorId = command.ActorId;
 
-    UniqueSlugUnit uniqueSlug = new(payload.UniqueSlug);
+    Slug uniqueSlug = new(payload.UniqueSlug);
     if (reference == null || uniqueSlug != reference.UniqueSlug)
     {
       realm.SetUniqueSlug(uniqueSlug, actorId);
@@ -62,7 +62,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     {
       realm.DefaultLocale = defaultLocale;
     }
-    JwtSecretUnit secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+    JwtSecret secret = JwtSecret.CreateOrGenerate(payload.Secret);
     if (reference == null || secret != reference.Secret)
     {
       realm.Secret = secret;
@@ -96,7 +96,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     return await _realmQuerier.ReadAsync(realm, cancellationToken);
   }
 
-  private static void ReplaceCustomAttributes(ReplaceRealmPayload payload, RealmAggregate role, RealmAggregate? reference)
+  private static void ReplaceCustomAttributes(ReplaceRealmPayload payload, Realm role, Realm? reference)
   {
     HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
 

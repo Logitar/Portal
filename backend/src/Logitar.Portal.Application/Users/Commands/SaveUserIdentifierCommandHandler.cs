@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdentifierCommand, User?>
+internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdentifierCommand, UserModel?>
 {
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
@@ -21,7 +21,7 @@ internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdenti
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(SaveUserIdentifierCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel?> Handle(SaveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
     CustomIdentifier identifier = new(command.Key, command.Payload.Value);
     new CustomIdentifierContractValidator().ValidateAndThrow(identifier);

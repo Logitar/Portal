@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Queries;
 
-internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
+internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, RoleModel?>
 {
   private readonly IRoleQuerier _roleQuerier;
 
@@ -13,13 +13,13 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
     _roleQuerier = roleQuerier;
   }
 
-  public async Task<Role?> Handle(ReadRoleQuery query, CancellationToken cancellationToken)
+  public async Task<RoleModel?> Handle(ReadRoleQuery query, CancellationToken cancellationToken)
   {
-    Dictionary<Guid, Role> roles = new(capacity: 2);
+    Dictionary<Guid, RoleModel> roles = new(capacity: 2);
 
     if (query.Id.HasValue)
     {
-      Role? role = await _roleQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
+      RoleModel? role = await _roleQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (role != null)
       {
         roles[role.Id] = role;
@@ -28,7 +28,7 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
 
     if (!string.IsNullOrWhiteSpace(query.UniqueName))
     {
-      Role? role = await _roleQuerier.ReadAsync(query.Realm, query.UniqueName, cancellationToken);
+      RoleModel? role = await _roleQuerier.ReadAsync(query.Realm, query.UniqueName, cancellationToken);
       if (role != null)
       {
         roles[role.Id] = role;
@@ -37,7 +37,7 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, Role?>
 
     if (roles.Count > 1)
     {
-      throw new TooManyResultsException<Role>(expectedCount: 1, actualCount: roles.Count);
+      throw new TooManyResultsException<RoleModel>(expectedCount: 1, actualCount: roles.Count);
     }
 
     return roles.Values.SingleOrDefault();

@@ -12,12 +12,12 @@ public class CannotDeleteDefaultSenderException : Exception
     private set => Data[nameof(SenderId)] = value.Value;
   }
 
-  public CannotDeleteDefaultSenderException(SenderAggregate sender) : base(BuildMessage(sender))
+  public CannotDeleteDefaultSenderException(Sender sender) : base(BuildMessage(sender))
   {
     SenderId = sender.Id;
   }
 
-  private static string BuildMessage(SenderAggregate sender) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(Sender sender) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(SenderId), sender.Id.Value)
     .Build();
 }

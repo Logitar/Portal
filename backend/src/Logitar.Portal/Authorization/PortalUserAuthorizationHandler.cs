@@ -18,7 +18,7 @@ internal class PortalUserAuthorizationHandler : AuthorizationHandler<PortalUserA
     HttpContext? httpContext = _httpContextAccessor.HttpContext;
     if (httpContext != null)
     {
-      User? user = httpContext.GetUser();
+      UserModel? user = httpContext.GetUser();
       if (user != null)
       {
         if (user.Realm == null)

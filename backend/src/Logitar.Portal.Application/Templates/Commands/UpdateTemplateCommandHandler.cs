@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
-internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateCommand, Template?>
+internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateCommand, TemplateModel?>
 {
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
@@ -21,12 +21,12 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
     _templateRepository = templateRepository;
   }
 
-  public async Task<Template?> Handle(UpdateTemplateCommand command, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> Handle(UpdateTemplateCommand command, CancellationToken cancellationToken)
   {
     UpdateTemplatePayload payload = command.Payload;
     new UpdateTemplateValidator().ValidateAndThrow(payload);
 
-    TemplateAggregate? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
+    Template? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
     if (template == null || template.TenantId != command.TenantId)
     {
       return null;
@@ -34,7 +34,7 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
 
     ActorId actorId = command.ActorId;
 
-    UniqueKeyUnit? uniqueKey = UniqueKeyUnit.TryCreate(payload.UniqueKey);
+    UniqueKey? uniqueKey = UniqueKey.TryCreate(payload.UniqueKey);
     if (uniqueKey != null)
     {
       template.SetUniqueKey(uniqueKey, actorId);
@@ -48,14 +48,14 @@ internal class UpdateTemplateCommandHandler : IRequestHandler<UpdateTemplateComm
       template.Description = DescriptionUnit.TryCreate(payload.Description.Value);
     }
 
-    SubjectUnit? subject = SubjectUnit.TryCreate(payload.Subject);
+    Subject? subject = Subject.TryCreate(payload.Subject);
     if (subject != null)
     {
       template.Subject = subject;
     }
     if (payload.Content != null)
     {
-      template.Content = new ContentUnit(payload.Content);
+      template.Content = new Content(payload.Content);
     }
 
     template.Update(actorId);

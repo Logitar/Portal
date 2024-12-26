@@ -37,7 +37,7 @@ public class CreateRealmCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("MfaMode", "MagicLink"));
     CreateRealmCommand command = new(payload);
 
-    Realm realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(payload.UniqueSlug, realm.UniqueSlug);
     Assert.NotEmpty(realm.Secret);
     Assert.Equal(payload.CustomAttributes, realm.CustomAttributes);
@@ -46,7 +46,7 @@ public class CreateRealmCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
   {
-    RealmAggregate realm = new(new UniqueSlugUnit("tests"));
+    Realm realm = new(new Slug("tests"));
     await _realmRepository.SaveAsync(realm);
 
     CreateRealmPayload payload = new(realm.UniqueSlug.Value, secret: string.Empty);

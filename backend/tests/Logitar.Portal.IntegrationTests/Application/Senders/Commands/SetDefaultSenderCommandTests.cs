@@ -15,7 +15,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _sender;
+  private readonly Sender _sender;
 
   public SetDefaultSenderCommandTests() : base()
   {
@@ -45,7 +45,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_sender_cannot_be_found()
   {
     SetDefaultSenderCommand command = new(Guid.NewGuid());
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -55,7 +55,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
     SetRealm();
 
     SetDefaultSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? result = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -63,16 +63,16 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   public async Task It_should_set_the_default_sender()
   {
     Assert.NotNull(_sender.Email);
-    SenderAggregate sender = new(_sender.Email, _sender.Settings);
+    Sender sender = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(sender);
 
     SetDefaultSenderCommand command = new(sender.Id.ToGuid());
-    Sender? result = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
     Assert.True(result.IsDefault);
 
-    SenderAggregate? oldDefault = await _senderRepository.LoadAsync(_sender.Id, version: null);
+    Sender? oldDefault = await _senderRepository.LoadAsync(_sender.Id, version: null);
     Assert.NotNull(oldDefault);
     Assert.False(oldDefault.IsDefault);
   }

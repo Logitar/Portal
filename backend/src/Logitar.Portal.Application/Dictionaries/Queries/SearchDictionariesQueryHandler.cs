@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Queries;
 
-internal class SearchDictionariesQueryHandler : IRequestHandler<SearchDictionariesQuery, SearchResults<Dictionary>>
+internal class SearchDictionariesQueryHandler : IRequestHandler<SearchDictionariesQuery, SearchResults<DictionaryModel>>
 {
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchDictionariesQueryHandler : IRequestHandler<SearchDictionari
     _dictionaryQuerier = dictionaryQuerier;
   }
 
-  public async Task<SearchResults<Dictionary>> Handle(SearchDictionariesQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<DictionaryModel>> Handle(SearchDictionariesQuery query, CancellationToken cancellationToken)
   {
     return await _dictionaryQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }

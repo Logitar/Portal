@@ -3,7 +3,7 @@ using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain.Messages.Validators;
 
-internal class RecipientValidator : AbstractValidator<RecipientUnit>
+internal class RecipientValidator : AbstractValidator<Recipient>
 {
   public RecipientValidator()
   {

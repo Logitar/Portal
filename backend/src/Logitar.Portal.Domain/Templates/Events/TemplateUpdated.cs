@@ -10,8 +10,8 @@ public record TemplateUpdated : DomainEvent, INotification
   public Modification<DisplayNameUnit>? DisplayName { get; set; }
   public Modification<DescriptionUnit>? Description { get; set; }
 
-  public SubjectUnit? Subject { get; set; }
-  public ContentUnit? Content { get; set; }
+  public Subject? Subject { get; set; }
+  public Content? Content { get; set; }
 
   [JsonIgnore]
   public bool HasChanges => DisplayName != null || Description != null || Subject != null || Content != null;

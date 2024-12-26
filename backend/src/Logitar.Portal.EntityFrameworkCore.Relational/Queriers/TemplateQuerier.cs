@@ -29,14 +29,14 @@ internal class TemplateQuerier : ITemplateQuerier
     _templates = context.Templates;
   }
 
-  public async Task<Template> ReadAsync(Realm? realm, TemplateAggregate template, CancellationToken cancellationToken)
+  public async Task<TemplateModel> ReadAsync(RealmModel? realm, Template template, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, template.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The template entity 'AggregateId={template.Id.Value}' could not be found.");
   }
-  public async Task<Template?> ReadAsync(Realm? realm, TemplateId id, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Template?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -51,7 +51,7 @@ internal class TemplateQuerier : ITemplateQuerier
     return await MapAsync(template, realm, cancellationToken);
   }
 
-  public async Task<Template?> ReadAsync(Realm? realm, string uniqueKey, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string uniqueKeyNormalized = uniqueKey.Trim().ToUpper();
@@ -67,7 +67,7 @@ internal class TemplateQuerier : ITemplateQuerier
     return await MapAsync(template, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Template>> SearchAsync(Realm? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<TemplateModel>> SearchAsync(RealmModel? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
       .ApplyRealmFilter(PortalDb.Templates.TenantId, realm)
@@ -115,17 +115,17 @@ internal class TemplateQuerier : ITemplateQuerier
     query = query.ApplyPaging(payload);
 
     TemplateEntity[] templates = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<Template> items = await MapAsync(templates, realm, cancellationToken);
+    IEnumerable<TemplateModel> items = await MapAsync(templates, realm, cancellationToken);
 
-    return new SearchResults<Template>(items, total);
+    return new SearchResults<TemplateModel>(items, total);
   }
 
-  private async Task<Template> MapAsync(TemplateEntity template, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<TemplateModel> MapAsync(TemplateEntity template, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([template], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Template>> MapAsync(IEnumerable<TemplateEntity> templates, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<TemplateModel>> MapAsync(IEnumerable<TemplateEntity> templates, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = templates.SelectMany(template => template.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return templates.Select(template => mapper.ToTemplate(template, realm));

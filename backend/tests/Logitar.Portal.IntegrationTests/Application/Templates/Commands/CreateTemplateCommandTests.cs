@@ -34,14 +34,14 @@ public class CreateTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should create a new template.")]
   public async Task It_should_create_a_new_template()
   {
-    Content content = Content.PlainText("Hello World!");
+    ContentModel content = ContentModel.PlainText("Hello World!");
     CreateTemplatePayload payload = new("PasswordRecovery", "Reset your password", content)
     {
       DisplayName = " Reset Password ",
       Description = "This is the password recovery message template."
     };
     CreateTemplateCommand command = new(payload);
-    Template template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel template = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
     Assert.Equal(payload.DisplayName.Trim(), template.DisplayName);
@@ -51,7 +51,7 @@ public class CreateTemplateCommandTests : IntegrationTests
     Assert.Null(template.Realm);
 
     SetRealm();
-    Template other = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 
@@ -60,11 +60,11 @@ public class CreateTemplateCommandTests : IntegrationTests
   {
     SetRealm();
 
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery"), new SubjectUnit("Reset your password"), content, TenantId);
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(new UniqueKey("PasswordRecovery"), new Subject("Reset your password"), content, TenantId);
     await _templateRepository.SaveAsync(template);
 
-    CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new Content(content));
+    CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new ContentModel(content));
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
@@ -74,7 +74,7 @@ public class CreateTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    Content content = Content.PlainText("Hello World!");
+    ContentModel content = ContentModel.PlainText("Hello World!");
     CreateTemplatePayload payload = new(uniqueKey: "", "Reset your password", content);
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));

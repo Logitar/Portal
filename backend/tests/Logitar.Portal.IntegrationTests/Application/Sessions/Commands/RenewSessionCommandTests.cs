@@ -34,7 +34,7 @@ public class RenewSessionCommandTests : IntegrationTests
     ApiKeyAggregate apiKeyAggregate = new(new DisplayNameUnit("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
     await _apiKeyRepository.SaveAsync(apiKeyAggregate);
 
-    ApiKey apiKey = new(apiKeyAggregate.DisplayName.Value)
+    ApiKeyModel apiKey = new(apiKeyAggregate.DisplayName.Value)
     {
       Id = apiKeyAggregate.Id.ToGuid(),
       Version = apiKeyAggregate.Version,
@@ -60,7 +60,7 @@ public class RenewSessionCommandTests : IntegrationTests
     ];
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, currentSecret), customAttributes);
     RenewSessionCommand command = new(payload);
-    Session result = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.True(result.IsPersistent);
     Assert.NotNull(result.RefreshToken);
@@ -85,7 +85,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, currentSecret));
     RenewSessionCommand command = new(payload);
-    Session result = await ActivityPipeline.ExecuteAsync(command);
+    SessionModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Guid actorId = new ActorId(user.Id.Value).ToGuid();
     Assert.Equal(session.Id.ToGuid(), result.Id);

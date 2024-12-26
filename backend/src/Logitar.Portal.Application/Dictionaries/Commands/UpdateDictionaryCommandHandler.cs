@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
-internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionaryCommand, Dictionary?>
+internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionaryCommand, DictionaryModel?>
 {
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
@@ -21,12 +21,12 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
     _dictionaryQuerier = dictionaryQuerier;
   }
 
-  public async Task<Dictionary?> Handle(UpdateDictionaryCommand command, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> Handle(UpdateDictionaryCommand command, CancellationToken cancellationToken)
   {
     UpdateDictionaryPayload payload = command.Payload;
     new UpdateDictionaryValidator().ValidateAndThrow(payload);
 
-    DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;

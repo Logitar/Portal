@@ -9,11 +9,11 @@ namespace Logitar.Portal.Application.Users;
 
 public interface IUserQuerier
 {
-  Task<User> ReadAsync(Realm? realm, UserAggregate session, CancellationToken cancellationToken = default);
-  Task<User?> ReadAsync(Realm? realm, UserId id, CancellationToken cancellationToken = default);
-  Task<User?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken = default);
-  Task<User?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken = default);
-  Task<IEnumerable<User>> ReadAsync(Realm? realm, IEmail email, CancellationToken cancellationToken = default);
-  Task<User?> ReadAsync(Realm? realm, CustomIdentifier identifier, CancellationToken cancellationToken = default);
-  Task<SearchResults<User>> SearchAsync(Realm? realm, SearchUsersPayload payload, CancellationToken cancellationToken = default);
+  Task<UserModel> ReadAsync(RealmModel? realm, UserAggregate session, CancellationToken cancellationToken = default);
+  Task<UserModel?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken = default);
+  Task<UserModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<UserModel?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken = default);
+  Task<IEnumerable<UserModel>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken = default);
+  Task<UserModel?> ReadAsync(RealmModel? realm, CustomIdentifier identifier, CancellationToken cancellationToken = default);
+  Task<SearchResults<UserModel>> SearchAsync(RealmModel? realm, SearchUsersPayload payload, CancellationToken cancellationToken = default);
 }

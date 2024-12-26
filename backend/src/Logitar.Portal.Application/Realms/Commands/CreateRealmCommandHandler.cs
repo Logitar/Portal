@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, Realm>
+internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, RealmModel>
 {
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
@@ -21,15 +21,15 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     _realmQuerier = realmQuerier;
   }
 
-  public async Task<Realm> Handle(CreateRealmCommand command, CancellationToken cancellationToken)
+  public async Task<RealmModel> Handle(CreateRealmCommand command, CancellationToken cancellationToken)
   {
     CreateRealmPayload payload = command.Payload;
     new CreateRealmValidator().ValidateAndThrow(payload);
 
     ActorId actorId = command.ActorId;
 
-    UniqueSlugUnit uniqueSlug = new(payload.UniqueSlug);
-    RealmAggregate realm = new(uniqueSlug, actorId)
+    Slug uniqueSlug = new(payload.UniqueSlug);
+    Realm realm = new(uniqueSlug, actorId)
     {
       DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
       Description = DescriptionUnit.TryCreate(payload.Description),
@@ -41,7 +41,7 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     };
     if (!string.IsNullOrWhiteSpace(payload.Secret))
     {
-      realm.Secret = new JwtSecretUnit(payload.Secret);
+      realm.Secret = new JwtSecret(payload.Secret);
     }
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)

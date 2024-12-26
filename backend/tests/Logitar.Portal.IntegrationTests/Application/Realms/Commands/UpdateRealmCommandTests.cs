@@ -14,13 +14,13 @@ public class UpdateRealmCommandTests : IntegrationTests
 {
   private readonly IRealmRepository _realmRepository;
 
-  private readonly RealmAggregate _realm;
+  private readonly Realm _realm;
 
   public UpdateRealmCommandTests() : base()
   {
     _realmRepository = ServiceProvider.GetRequiredService<IRealmRepository>();
 
-    _realm = new(new UniqueSlugUnit("tests"));
+    _realm = new(new Slug("tests"));
   }
 
   public override async Task InitializeAsync()
@@ -42,14 +42,14 @@ public class UpdateRealmCommandTests : IntegrationTests
   {
     UpdateRealmPayload payload = new();
     UpdateRealmCommand command = new(Guid.NewGuid(), payload);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
 
   [Fact(DisplayName = "It should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]
   public async Task It_should_throw_UniqueSlugAlreadyUsedException_when_the_unique_slug_is_already_used()
   {
-    RealmAggregate realm = new(new UniqueSlugUnit("other"));
+    Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
     UpdateRealmPayload payload = new()
@@ -84,7 +84,7 @@ public class UpdateRealmCommandTests : IntegrationTests
       Url = new Modification<string>($"https://www.{Faker.Internet.DomainName()}/")
     };
     UpdateRealmCommand command = new(_realm.Id.ToGuid(), payload);
-    Realm? realm = await ActivityPipeline.ExecuteAsync(command);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(realm);
 
     Assert.Equal(command.Id, realm.Id);

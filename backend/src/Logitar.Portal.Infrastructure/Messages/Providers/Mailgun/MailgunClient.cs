@@ -19,7 +19,7 @@ internal class MailgunHandler : IMessageHandler
     _client.Dispose();
   }
 
-  public async Task<SendMailResult> SendAsync(MessageAggregate aggregate, CancellationToken cancellationToken)
+  public async Task<SendMailResult> SendAsync(Message aggregate, CancellationToken cancellationToken)
   {
     MailMessage message = aggregate.ToMailMessage();
     SendMailResult result = await _client.SendAsync(message, cancellationToken);

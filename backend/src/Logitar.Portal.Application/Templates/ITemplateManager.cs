@@ -5,5 +5,5 @@ namespace Logitar.Portal.Application.Templates;
 
 public interface ITemplateManager
 {
-  Task SaveAsync(TemplateAggregate template, ActorId actorId = default, CancellationToken cancellationToken = default);
+  Task SaveAsync(Template template, ActorId actorId = default, CancellationToken cancellationToken = default);
 }
