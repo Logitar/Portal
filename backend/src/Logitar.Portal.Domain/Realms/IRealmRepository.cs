@@ -2,7 +2,7 @@
 
 public interface IRealmRepository
 {
-  Task<IEnumerable<Realm>> LoadAsync(CancellationToken cancellationToken = default);
+  Task<IReadOnlyCollection<Realm>> LoadAsync(CancellationToken cancellationToken = default);
   Task<Realm?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
   Task<Realm?> LoadAsync(RealmId id, CancellationToken cancellationToken = default);
   Task<Realm?> LoadAsync(RealmId id, long? version, CancellationToken cancellationToken = default);
