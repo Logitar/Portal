@@ -24,10 +24,10 @@ internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.
   public async Task<Message?> LoadAsync(Guid id, CancellationToken cancellationToken)
     => await base.LoadAsync<Message>(new AggregateId(id), cancellationToken);
 
-  public async Task<IEnumerable<Message>> LoadAsync(CancellationToken cancellationToken)
-    => await base.LoadAsync<Message>(cancellationToken);
+  public async Task<IReadOnlyCollection<Message>> LoadAsync(CancellationToken cancellationToken)
+    => (await base.LoadAsync<Message>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
 
-  public async Task<IEnumerable<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Messages.AggregateId, EventDb.Events.AggregateId,
@@ -42,7 +42,7 @@ internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<Message>(events.Select(EventSerializer.Deserialize));
+    return (Load<Message>(events.Select(EventSerializer.Deserialize))).ToArray(); // ISSUE #528: remove ToArray
   }
 
   public async Task SaveAsync(Message message, CancellationToken cancellationToken)
