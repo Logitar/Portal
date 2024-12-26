@@ -25,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.2.0" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="8.2.0" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="8.2.0" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="8.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">

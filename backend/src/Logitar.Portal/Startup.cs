@@ -120,20 +120,10 @@ internal class Startup : StartupBase
       builder.UseOpenApi();
     }
 
-    if (_configuration.GetValue<bool>("UseGraphQLAltair"))
-    {
-      builder.UseGraphQLAltair();
-    }
     if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
     {
       builder.UseGraphQLGraphiQL();
     }
-#pragma warning disable CS0618
-    if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
-    {
-      builder.UseGraphQLPlayground();
-    }
-#pragma warning restore
     if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
     {
       builder.UseGraphQLVoyager();
