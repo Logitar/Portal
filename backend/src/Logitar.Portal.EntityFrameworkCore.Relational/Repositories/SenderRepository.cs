@@ -29,10 +29,10 @@ internal class SenderRepository : EventSourcing.EntityFrameworkCore.Relational.A
   public async Task<Sender?> LoadAsync(SenderId id, long? version, CancellationToken cancellationToken)
     => await LoadAsync<Sender>(id.AggregateId, version, cancellationToken);
 
-  public async Task<IEnumerable<Sender>> LoadAsync(CancellationToken cancellationToken)
-    => await LoadAsync<Sender>(cancellationToken);
+  public async Task<IReadOnlyCollection<Sender>> LoadAsync(CancellationToken cancellationToken)
+    => (await LoadAsync<Sender>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
 
-  public async Task<IEnumerable<Sender>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
+  public async Task<IReadOnlyCollection<Sender>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
     IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
       .Join(PortalDb.Senders.AggregateId, EventDb.Events.AggregateId,
@@ -47,7 +47,7 @@ internal class SenderRepository : EventSourcing.EntityFrameworkCore.Relational.A
       .OrderBy(e => e.Version)
       .ToArrayAsync(cancellationToken);
 
-    return Load<Sender>(events.Select(EventSerializer.Deserialize));
+    return Load<Sender>(events.Select(EventSerializer.Deserialize)).ToArray(); // ISSUE #528: remove ToArray
   }
 
   public async Task<Sender?> LoadDefaultAsync(TenantId? tenantId, CancellationToken cancellationToken)
