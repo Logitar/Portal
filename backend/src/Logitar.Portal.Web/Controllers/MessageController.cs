@@ -20,14 +20,14 @@ public class MessageController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult<Message>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<MessageModel>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    Message? message = await _messageService.ReadAsync(id, cancellationToken);
+    MessageModel? message = await _messageService.ReadAsync(id, cancellationToken);
     return message == null ? NotFound() : Ok(message);
   }
 
   [HttpGet]
-  public async Task<ActionResult<SearchResults<Message>>> SearchAsync([FromQuery] SearchMessagesModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<SearchResults<MessageModel>>> SearchAsync([FromQuery] SearchMessagesModel model, CancellationToken cancellationToken)
   {
     SearchMessagesPayload payload = model.ToPayload();
     return Ok(await _messageService.SearchAsync(payload, cancellationToken));

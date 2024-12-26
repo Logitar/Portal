@@ -46,7 +46,7 @@ public class UpdateRoleCommandTests : IntegrationTests
   {
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(Guid.NewGuid(), payload);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
   }
 
@@ -57,7 +57,7 @@ public class UpdateRoleCommandTests : IntegrationTests
 
     UpdateRolePayload payload = new();
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? result = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -107,7 +107,7 @@ public class UpdateRoleCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("manage_realms", bool.TrueString));
     payload.CustomAttributes.Add(new("configuration", value: null));
     UpdateRoleCommand command = new(_role.Id.ToGuid(), payload);
-    Role? role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
     Assert.Equal(_role.UniqueName.Value, role.UniqueName);

@@ -7,7 +7,7 @@ namespace Logitar.Portal.Domain.Configurations.Events;
 
 public record ConfigurationInitialized(
   LocaleUnit? DefaultLocale,
-  JwtSecretUnit Secret,
+  JwtSecret Secret,
   ReadOnlyUniqueNameSettings UniqueNameSettings,
   ReadOnlyPasswordSettings PasswordSettings,
   bool RequireUniqueEmail,

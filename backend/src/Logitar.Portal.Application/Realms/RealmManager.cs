@@ -17,7 +17,7 @@ internal class RealmManager : IRealmManager
     _realmRepository = realmRepository;
   }
 
-  public async Task SaveAsync(RealmAggregate realm, ActorId actorId, CancellationToken cancellationToken)
+  public async Task SaveAsync(Realm realm, ActorId actorId, CancellationToken cancellationToken)
   {
     bool hasBeenDeleted = false;
     bool hasUniqueNameChanged = false;
@@ -35,7 +35,7 @@ internal class RealmManager : IRealmManager
 
     if (hasUniqueNameChanged)
     {
-      RealmAggregate? other = await _realmRepository.LoadAsync(realm.UniqueSlug, cancellationToken);
+      Realm? other = await _realmRepository.LoadAsync(realm.UniqueSlug, cancellationToken);
       if (other?.Equals(realm) == false)
       {
         throw new UniqueSlugAlreadyUsedException(realm.UniqueSlug);

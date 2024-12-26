@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
-internal class SearchTemplatesQueryHandler : IRequestHandler<SearchTemplatesQuery, SearchResults<Template>>
+internal class SearchTemplatesQueryHandler : IRequestHandler<SearchTemplatesQuery, SearchResults<TemplateModel>>
 {
   private readonly ITemplateQuerier _templateQuerier;
 
@@ -13,7 +13,7 @@ internal class SearchTemplatesQueryHandler : IRequestHandler<SearchTemplatesQuer
     _templateQuerier = templateQuerier;
   }
 
-  public async Task<SearchResults<Template>> Handle(SearchTemplatesQuery query, CancellationToken cancellationToken)
+  public async Task<SearchResults<TemplateModel>> Handle(SearchTemplatesQuery query, CancellationToken cancellationToken)
   {
     return await _templateQuerier.SearchAsync(query.Realm, query.Payload, cancellationToken);
   }

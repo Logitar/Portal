@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
-internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, Role?>
+internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, RoleModel?>
 {
   private readonly IRoleManager _roleManager;
   private readonly IRoleQuerier _roleQuerier;
@@ -23,7 +23,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     _roleRepository = roleRepository;
   }
 
-  public async Task<Role?> Handle(ReplaceRoleCommand command, CancellationToken cancellationToken)
+  public async Task<RoleModel?> Handle(ReplaceRoleCommand command, CancellationToken cancellationToken)
   {
     IRoleSettings roleSettings = command.RoleSettings;
 

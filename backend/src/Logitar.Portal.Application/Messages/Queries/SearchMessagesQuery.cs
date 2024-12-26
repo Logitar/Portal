@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Messages.Queries;
 
-internal record SearchMessagesQuery(SearchMessagesPayload Payload) : Activity, IRequest<SearchResults<Message>>;
+internal record SearchMessagesQuery(SearchMessagesPayload Payload) : Activity, IRequest<SearchResults<MessageModel>>;

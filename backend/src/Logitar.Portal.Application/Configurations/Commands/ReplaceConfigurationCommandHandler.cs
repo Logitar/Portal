@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfigurationCommand, Configuration>
+internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfigurationCommand, ConfigurationModel>
 {
   private readonly ICacheService _cacheService;
   private readonly IConfigurationRepository _configurationRepository;
@@ -20,14 +20,14 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
     _configurationRepository = configurationRepository;
   }
 
-  public async Task<Configuration> Handle(ReplaceConfigurationCommand command, CancellationToken cancellationToken)
+  public async Task<ConfigurationModel> Handle(ReplaceConfigurationCommand command, CancellationToken cancellationToken)
   {
     ReplaceConfigurationPayload payload = command.Payload;
     new ReplaceConfigurationValidator().ValidateAndThrow(payload);
 
-    ConfigurationAggregate configuration = await _configurationRepository.LoadAsync(cancellationToken)
+    Configuration configuration = await _configurationRepository.LoadAsync(cancellationToken)
       ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
-    ConfigurationAggregate? reference = null;
+    Configuration? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _configurationRepository.LoadAsync(command.Version.Value, cancellationToken);
@@ -38,7 +38,7 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
     {
       configuration.DefaultLocale = defaultLocale;
     }
-    JwtSecretUnit secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+    JwtSecret secret = JwtSecret.CreateOrGenerate(payload.Secret);
     if (reference == null || secret != reference.Secret)
     {
       configuration.Secret = secret;

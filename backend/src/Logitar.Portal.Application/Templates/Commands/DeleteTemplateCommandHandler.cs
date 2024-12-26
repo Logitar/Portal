@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Commands;
 
-internal class DeleteTemplateCommandHandler : IRequestHandler<DeleteTemplateCommand, Template?>
+internal class DeleteTemplateCommandHandler : IRequestHandler<DeleteTemplateCommand, TemplateModel?>
 {
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
@@ -18,14 +18,14 @@ internal class DeleteTemplateCommandHandler : IRequestHandler<DeleteTemplateComm
     _templateRepository = templateRepository;
   }
 
-  public async Task<Template?> Handle(DeleteTemplateCommand command, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> Handle(DeleteTemplateCommand command, CancellationToken cancellationToken)
   {
-    TemplateAggregate? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
+    Template? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
     if (template == null || template.TenantId != command.TenantId)
     {
       return null;
     }
-    Template result = await _templateQuerier.ReadAsync(command.Realm, template, cancellationToken);
+    TemplateModel result = await _templateQuerier.ReadAsync(command.Realm, template, cancellationToken);
 
     ActorId actorId = command.ActorId;
     template.Delete(actorId);

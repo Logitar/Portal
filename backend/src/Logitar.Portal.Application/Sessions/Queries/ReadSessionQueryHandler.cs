@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Sessions.Queries;
 
-internal class ReadSessionQueryHandler : IRequestHandler<ReadSessionQuery, Session?>
+internal class ReadSessionQueryHandler : IRequestHandler<ReadSessionQuery, SessionModel?>
 {
   private readonly ISessionQuerier _sessionQuerier;
 
@@ -12,7 +12,7 @@ internal class ReadSessionQueryHandler : IRequestHandler<ReadSessionQuery, Sessi
     _sessionQuerier = sessionQuerier;
   }
 
-  public async Task<Session?> Handle(ReadSessionQuery query, CancellationToken cancellationToken)
+  public async Task<SessionModel?> Handle(ReadSessionQuery query, CancellationToken cancellationToken)
   {
     return await _sessionQuerier.ReadAsync(query.Realm, query.Id, cancellationToken);
   }

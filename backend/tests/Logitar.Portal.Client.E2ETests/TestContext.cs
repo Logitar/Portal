@@ -29,26 +29,26 @@ internal class TestContext
 
   public IRequestContext Request => new RequestContext(_user?.UniqueName, CancellationToken);
 
-  private Realm? _realm = null;
-  public Realm Realm => _realm ?? throw new InvalidOperationException($"The {nameof(Realm)} has not been initialized yet.");
-  public void SetRealm(Realm realm)
+  private RealmModel? _realm = null;
+  public RealmModel Realm => _realm ?? throw new InvalidOperationException($"The {nameof(Realm)} has not been initialized yet.");
+  public void SetRealm(RealmModel realm)
   {
     AssertHasNotEnded();
     _realm = realm;
     StaticPortalSettings.Instance.Realm = realm.UniqueSlug;
   }
 
-  private Role? _role = null;
-  public Role Role => _role ?? throw new InvalidOperationException($"The {nameof(Role)} has not been initialized yet.");
-  public void SetRole(Role role)
+  private RoleModel? _role = null;
+  public RoleModel Role => _role ?? throw new InvalidOperationException($"The {nameof(Role)} has not been initialized yet.");
+  public void SetRole(RoleModel role)
   {
     AssertHasNotEnded();
     _role = role;
   }
 
-  private User? _user = null;
-  public User User => _user ?? throw new InvalidOperationException($"The {nameof(User)} has not been initialized yet.");
-  public void SetUser(User user)
+  private UserModel? _user = null;
+  public UserModel User => _user ?? throw new InvalidOperationException($"The {nameof(User)} has not been initialized yet.");
+  public void SetUser(UserModel user)
   {
     AssertHasNotEnded();
     _user = user;
@@ -62,9 +62,9 @@ internal class TestContext
     _token = token;
   }
 
-  private Template? _template = null;
-  public Template Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
-  public void SetTemplate(Template template)
+  private TemplateModel? _template = null;
+  public TemplateModel Template => _template ?? throw new InvalidOperationException($"The {nameof(Template)} has not been initialized yet.");
+  public void SetTemplate(TemplateModel template)
   {
     AssertHasNotEnded();
     _template = template;

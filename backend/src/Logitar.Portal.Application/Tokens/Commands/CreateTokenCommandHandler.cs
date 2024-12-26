@@ -26,7 +26,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
     CreateTokenPayload payload = command.Payload;
     new CreateTokenValidator().ValidateAndThrow(payload);
 
-    Realm? realm = command.Realm;
+    RealmModel? realm = command.Realm;
     string baseUrl = _baseUrl.Value;
 
     ClaimsIdentity subject = CreateSubject(payload);

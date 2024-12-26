@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, Realm?>
+internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, RealmModel?>
 {
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
@@ -23,12 +23,12 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     _realmRepository = realmRepository;
   }
 
-  public async Task<Realm?> Handle(UpdateRealmCommand command, CancellationToken cancellationToken)
+  public async Task<RealmModel?> Handle(UpdateRealmCommand command, CancellationToken cancellationToken)
   {
     UpdateRealmPayload payload = command.Payload;
     new UpdateRealmValidator().ValidateAndThrow(payload);
 
-    RealmAggregate? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
     if (realm == null)
     {
       return null;
@@ -36,7 +36,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     ActorId actorId = command.ActorId;
 
-    UniqueSlugUnit? uniqueSlug = UniqueSlugUnit.TryCreate(payload.UniqueSlug);
+    Slug? uniqueSlug = Slug.TryCreate(payload.UniqueSlug);
     if (uniqueSlug != null)
     {
       realm.SetUniqueSlug(uniqueSlug, actorId);
@@ -56,7 +56,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     }
     if (payload.Secret != null)
     {
-      realm.Secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+      realm.Secret = JwtSecret.CreateOrGenerate(payload.Secret);
     }
     if (payload.Url != null)
     {

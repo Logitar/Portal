@@ -58,11 +58,11 @@ internal class ActivityPipeline : IActivityPipeline
 
   private async Task<ActivityContext> GetContextAsync(IContextParameters parameters, CancellationToken cancellationToken)
   {
-    Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
-    Realm? realm = parameters.Realm;
-    ApiKey? apiKey = parameters.ApiKey;
-    User? user = parameters.User;
-    Session? session = parameters.Session;
+    ConfigurationModel configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
+    RealmModel? realm = parameters.Realm;
+    ApiKeyModel? apiKey = parameters.ApiKey;
+    UserModel? user = parameters.User;
+    SessionModel? session = parameters.Session;
 
     if (!string.IsNullOrWhiteSpace(parameters.RealmOverride))
     {
@@ -78,14 +78,14 @@ internal class ActivityPipeline : IActivityPipeline
 
     return new ActivityContext(configuration, realm, apiKey, user, session);
   }
-  private async Task<Realm> ResolveRealmAsync(string idOrUniqueSlug, CancellationToken cancellationToken)
+  private async Task<RealmModel> ResolveRealmAsync(string idOrUniqueSlug, CancellationToken cancellationToken)
   {
     bool isId = Guid.TryParse(idOrUniqueSlug, out Guid id);
 
     ReadRealmQuery query = new(isId ? id : null, idOrUniqueSlug);
     return await _mediator.Send(query, cancellationToken) ?? throw new RealmNotFoundException(idOrUniqueSlug);
   }
-  private async Task<User> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, Configuration configuration, Realm? realm, CancellationToken cancellationToken)
+  private async Task<UserModel> ResolveUserAsync(string idOrUniqueNameOrCustomIdentifier, ConfigurationModel configuration, RealmModel? realm, CancellationToken cancellationToken)
   {
     bool isId = Guid.TryParse(idOrUniqueNameOrCustomIdentifier, out Guid id);
     CustomIdentifier? identifier = ParseCustomIdentifier(idOrUniqueNameOrCustomIdentifier);

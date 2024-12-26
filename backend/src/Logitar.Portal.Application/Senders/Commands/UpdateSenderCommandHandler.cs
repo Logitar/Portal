@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand, Sender?>
+internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand, SenderModel?>
 {
   private readonly ISenderQuerier _senderQuerier;
   private readonly ISenderRepository _senderRepository;
@@ -23,9 +23,9 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     _senderRepository = senderRepository;
   }
 
-  public async Task<Sender?> Handle(UpdateSenderCommand command, CancellationToken cancellationToken)
+  public async Task<SenderModel?> Handle(UpdateSenderCommand command, CancellationToken cancellationToken)
   {
-    SenderAggregate? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
@@ -61,7 +61,7 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
     return await _senderQuerier.ReadAsync(command.Realm, sender, cancellationToken);
   }
 
-  private static void SetSettings(UpdateSenderPayload payload, SenderAggregate sender, ActorId actorId)
+  private static void SetSettings(UpdateSenderPayload payload, Sender sender, ActorId actorId)
   {
     if (payload.SendGrid != null)
     {

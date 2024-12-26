@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Queries;
 
-internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfigurationQuery, Configuration>
+internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfigurationQuery, ConfigurationModel>
 {
   private readonly ICacheService _cacheService;
 
@@ -13,9 +13,9 @@ internal class ReadConfigurationQueryHandler : IRequestHandler<ReadConfiguration
     _cacheService = cacheService;
   }
 
-  public Task<Configuration> Handle(ReadConfigurationQuery _, CancellationToken cancellationToken)
+  public Task<ConfigurationModel> Handle(ReadConfigurationQuery _, CancellationToken cancellationToken)
   {
-    Configuration configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration should be in the cache.");
+    ConfigurationModel configuration = _cacheService.Configuration ?? throw new InvalidOperationException("The configuration should be in the cache.");
     return Task.FromResult(configuration);
   }
 }

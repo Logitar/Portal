@@ -46,7 +46,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   {
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(Guid.NewGuid(), payload);
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
@@ -59,7 +59,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
 
     UpdateApiKeyPayload payload = new();
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -118,7 +118,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
     UpdateApiKeyCommand command = new(apiKey.Id.ToGuid(), payload);
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.DisplayName, result.DisplayName);

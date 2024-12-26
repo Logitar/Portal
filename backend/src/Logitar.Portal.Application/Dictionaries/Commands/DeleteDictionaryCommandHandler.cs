@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
-internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionaryCommand, Dictionary?>
+internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionaryCommand, DictionaryModel?>
 {
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
@@ -18,14 +18,14 @@ internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionary
     _dictionaryQuerier = dictionaryQuerier;
   }
 
-  public async Task<Dictionary?> Handle(DeleteDictionaryCommand command, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> Handle(DeleteDictionaryCommand command, CancellationToken cancellationToken)
   {
-    DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
     }
-    Dictionary result = await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
+    DictionaryModel result = await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
 
     ActorId actorId = command.ActorId;
     dictionary.Delete(actorId);

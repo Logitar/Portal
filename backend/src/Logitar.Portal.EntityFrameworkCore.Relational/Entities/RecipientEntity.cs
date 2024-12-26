@@ -24,7 +24,7 @@ internal class RecipientEntity
   public string? UserFullName { get; private set; }
   public string? UserPicture { get; private set; }
 
-  public RecipientEntity(MessageEntity message, UserEntity? user, RecipientUnit recipient)
+  public RecipientEntity(MessageEntity message, UserEntity? user, Recipient recipient)
   {
     Message = message;
     MessageId = message.MessageId;

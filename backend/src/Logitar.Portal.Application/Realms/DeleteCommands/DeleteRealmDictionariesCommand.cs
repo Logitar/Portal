@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.DeleteCommands;
 
-internal record DeleteRealmDictionariesCommand(RealmAggregate Realm, ActorId ActorId) : INotification;
+internal record DeleteRealmDictionariesCommand(Realm Realm, ActorId ActorId) : INotification;

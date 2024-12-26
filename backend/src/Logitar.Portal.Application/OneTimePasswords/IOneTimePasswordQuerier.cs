@@ -6,7 +6,7 @@ namespace Logitar.Portal.Application.OneTimePasswords;
 
 public interface IOneTimePasswordQuerier
 {
-  Task<OneTimePassword> ReadAsync(Realm? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken = default);
-  Task<OneTimePassword?> ReadAsync(Realm? realm, OneTimePasswordId id, CancellationToken cancellationToken = default);
-  Task<OneTimePassword?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken = default);
+  Task<OneTimePasswordModel> ReadAsync(RealmModel? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken = default);
+  Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken = default);
+  Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken = default);
 }

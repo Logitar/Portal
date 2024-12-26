@@ -43,7 +43,7 @@ public class CreateUserCommandTests : IntegrationTests
     payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", Faker.Person.BuildHealthInsuranceNumber()));
     payload.Roles.Add("  Manage_Sales  ");
     CreateUserCommand command = new(payload);
-    User user = await ActivityPipeline.ExecuteAsync(command);
+    UserModel user = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueName, user.UniqueName);
     Assert.True(user.HasPassword);
@@ -60,7 +60,7 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.Equal(payload.CustomIdentifiers, user.CustomIdentifiers);
     Assert.Same(Realm, user.Realm);
 
-    Role userRole = Assert.Single(user.Roles);
+    RoleModel userRole = Assert.Single(user.Roles);
     Assert.Equal(role.Id.ToGuid(), userRole.Id);
   }
 

@@ -19,12 +19,12 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace the configuration.")]
   public async Task It_should_replace_the_configuration()
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync();
+    Configuration? configuration = await _configurationRepository.LoadAsync();
     Assert.NotNull(configuration);
     string oldSecret = configuration.Secret.Value;
     long version = configuration.Version;
 
-    configuration.Secret = JwtSecretUnit.Generate();
+    configuration.Secret = JwtSecret.Generate();
     string newSecret = configuration.Secret.Value;
     configuration.Update(default);
     await _configurationRepository.SaveAsync(configuration);
@@ -38,7 +38,7 @@ public class ReplaceConfigurationCommandTests : IntegrationTests
       LoggingSettings = new LoggingSettings(LoggingExtent.Full, onlyErrors: true)
     };
     ReplaceConfigurationCommand command = new(payload, version);
-    Configuration result = await ActivityPipeline.ExecuteAsync(command);
+    ConfigurationModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.DefaultLocale, result.DefaultLocale?.Code);
     Assert.Equal(newSecret, result.Secret);

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal class DeleteApiKeyCommandHandler : IRequestHandler<DeleteApiKeyCommand, ApiKey?>
+internal class DeleteApiKeyCommandHandler : IRequestHandler<DeleteApiKeyCommand, ApiKeyModel?>
 {
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
@@ -15,14 +15,14 @@ internal class DeleteApiKeyCommandHandler : IRequestHandler<DeleteApiKeyCommand,
     _apiKeyRepository = apiKeyRepository;
   }
 
-  public async Task<ApiKey?> Handle(DeleteApiKeyCommand command, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> Handle(DeleteApiKeyCommand command, CancellationToken cancellationToken)
   {
     ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
     if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;
     }
-    ApiKey result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
+    ApiKeyModel result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
 
     apiKey.Delete(command.ActorId);
 

@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Queries;
 
-internal record SearchApiKeysQuery(SearchApiKeysPayload Payload) : Activity, IRequest<SearchResults<ApiKey>>;
+internal record SearchApiKeysQuery(SearchApiKeysPayload Payload) : Activity, IRequest<SearchResults<ApiKeyModel>>;

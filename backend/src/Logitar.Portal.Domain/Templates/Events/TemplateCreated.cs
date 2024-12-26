@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Templates.Events;
 
-public record TemplateCreated(TenantId? TenantId, UniqueKeyUnit UniqueKey, SubjectUnit Subject, ContentUnit Content) : DomainEvent, INotification;
+public record TemplateCreated(TenantId? TenantId, UniqueKey UniqueKey, Subject Subject, Content Content) : DomainEvent, INotification;

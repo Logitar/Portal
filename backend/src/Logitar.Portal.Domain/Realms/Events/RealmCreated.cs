@@ -5,8 +5,8 @@ using MediatR;
 namespace Logitar.Portal.Domain.Realms.Events;
 
 public record RealmCreated(
-  UniqueSlugUnit UniqueSlug,
-  JwtSecretUnit Secret,
+  Slug UniqueSlug,
+  JwtSecret Secret,
   ReadOnlyUniqueNameSettings UniqueNameSettings,
   ReadOnlyPasswordSettings PasswordSettings,
   bool RequireUniqueEmail) : DomainEvent, INotification;

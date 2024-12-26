@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand, ApiKey>
+internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand, ApiKeyModel>
 {
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
@@ -28,7 +28,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     _passwordManager = passwordManager;
   }
 
-  public async Task<ApiKey> Handle(CreateApiKeyCommand command, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> Handle(CreateApiKeyCommand command, CancellationToken cancellationToken)
   {
     CreateApiKeyPayload payload = command.Payload;
     new CreateApiKeyValidator().ValidateAndThrow(payload);
@@ -60,7 +60,7 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     apiKey.Update(actorId);
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    ApiKey result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
+    ApiKeyModel result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
     result.XApiKey = XApiKey.Encode(apiKey.Id, secretString);
     return result;
   }

@@ -29,13 +29,13 @@ internal class InitializeConfigurationCommandHandler : INotificationHandler<Init
 
   public async Task Handle(InitializeConfigurationCommand command, CancellationToken cancellationToken)
   {
-    ConfigurationAggregate? configuration = await _configurationRepository.LoadAsync(cancellationToken);
+    Configuration? configuration = await _configurationRepository.LoadAsync(cancellationToken);
     if (configuration == null)
     {
       UserId userId = UserId.NewId();
       ActorId actorId = new(userId.Value);
 
-      configuration = ConfigurationAggregate.Initialize(actorId);
+      configuration = Configuration.Initialize(actorId);
       UserSettings userSettings = new()
       {
         UniqueName = configuration.UniqueNameSettings,

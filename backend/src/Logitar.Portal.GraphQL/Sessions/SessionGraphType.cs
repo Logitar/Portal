@@ -5,7 +5,7 @@ using Logitar.Portal.GraphQL.Users;
 
 namespace Logitar.Portal.GraphQL.Sessions;
 
-internal class SessionGraphType : AggregateGraphType<Session>
+internal class SessionGraphType : AggregateGraphType<SessionModel>
 {
   public SessionGraphType() : base("Represents an user session. Sessions are used to control & audit user access to resources.")
   {

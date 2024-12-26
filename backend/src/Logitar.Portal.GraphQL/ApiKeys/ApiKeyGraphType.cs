@@ -5,7 +5,7 @@ using Logitar.Portal.GraphQL.Roles;
 
 namespace Logitar.Portal.GraphQL.ApiKeys;
 
-internal class ApiKeyGraphType : AggregateGraphType<ApiKey>
+internal class ApiKeyGraphType : AggregateGraphType<ApiKeyModel>
 {
   public ApiKeyGraphType() : base("Represents an API key into the identity system. API keys are actors used to represent systems.")
   {

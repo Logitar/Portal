@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Commands;
 
-internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, Configuration>
+internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigurationCommand, ConfigurationModel>
 {
   private readonly ICacheService _cacheService;
   private readonly IConfigurationRepository _configurationRepository;
@@ -20,12 +20,12 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
     _configurationRepository = configurationRepository;
   }
 
-  public async Task<Configuration> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
+  public async Task<ConfigurationModel> Handle(UpdateConfigurationCommand command, CancellationToken cancellationToken)
   {
     UpdateConfigurationPayload payload = command.Payload;
     new UpdateConfigurationValidator().ValidateAndThrow(payload);
 
-    ConfigurationAggregate configuration = await _configurationRepository.LoadAsync(cancellationToken)
+    Configuration configuration = await _configurationRepository.LoadAsync(cancellationToken)
       ?? throw new InvalidOperationException("The configuration has not been initialized yet.");
 
     if (payload.DefaultLocale != null)
@@ -34,7 +34,7 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
     }
     if (payload.Secret != null)
     {
-      configuration.Secret = JwtSecretUnit.CreateOrGenerate(payload.Secret);
+      configuration.Secret = JwtSecret.CreateOrGenerate(payload.Secret);
     }
 
     if (payload.UniqueNameSettings != null)

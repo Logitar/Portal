@@ -22,22 +22,22 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
 internal class Mapper
 {
-  private readonly Dictionary<ActorId, Actor> _actors = [];
+  private readonly Dictionary<ActorId, ActorModel> _actors = [];
 
   public Mapper()
   {
   }
 
-  public Mapper(IEnumerable<Actor> actors)
+  public Mapper(IEnumerable<ActorModel> actors)
   {
-    foreach (Actor actor in actors)
+    foreach (ActorModel actor in actors)
     {
       ActorId id = new(actor.Id);
       _actors[id] = actor;
     }
   }
 
-  public static Actor ToActor(ActorEntity actor) => new(actor.DisplayName)
+  public static ActorModel ToActor(ActorEntity actor) => new(actor.DisplayName)
   {
     Id = new ActorId(actor.Id).ToGuid(),
     Type = Enum.Parse<ActorType>(actor.Type),
@@ -46,9 +46,9 @@ internal class Mapper
     PictureUrl = actor.PictureUrl
   };
 
-  public ApiKey ToApiKey(ApiKeyEntity source, Realm? realm)
+  public ApiKeyModel ToApiKey(ApiKeyEntity source, RealmModel? realm)
   {
-    ApiKey destination = new(source.DisplayName)
+    ApiKeyModel destination = new(source.DisplayName)
     {
       Description = source.Description,
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
@@ -71,11 +71,11 @@ internal class Mapper
     return destination;
   }
 
-  public Configuration ToConfiguration(ConfigurationAggregate source)
+  public ConfigurationModel ToConfiguration(Configuration source)
   {
-    Configuration destination = new(source.Secret.Value)
+    ConfigurationModel destination = new(source.Secret.Value)
     {
-      DefaultLocale = Locale.TryCreate(source.DefaultLocale?.Code),
+      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale?.Code),
       UniqueNameSettings = new UniqueNameSettings(source.UniqueNameSettings),
       PasswordSettings = new PasswordSettings(source.PasswordSettings),
       RequireUniqueEmail = source.RequireUniqueEmail,
@@ -87,9 +87,9 @@ internal class Mapper
     return destination;
   }
 
-  public Dictionary ToDictionary(DictionaryEntity source, Realm? realm)
+  public DictionaryModel ToDictionary(DictionaryEntity source, RealmModel? realm)
   {
-    Dictionary destination = new(new Locale(source.Locale))
+    DictionaryModel destination = new(new LocaleModel(source.Locale))
     {
       EntryCount = source.EntryCount,
       Realm = realm
@@ -105,11 +105,11 @@ internal class Mapper
     return destination;
   }
 
-  public Message ToMessage(MessageEntity source, Realm? realm, IEnumerable<UserEntity> users)
+  public MessageModel ToMessage(MessageEntity source, RealmModel? realm, IEnumerable<UserEntity> users)
   {
-    Content body = new(source.BodyType, source.BodyText);
+    ContentModel body = new(source.BodyType, source.BodyText);
 
-    Sender sender;
+    SenderModel sender;
     if (source.Sender == null)
     {
       sender = new()
@@ -126,7 +126,7 @@ internal class Mapper
       sender = ToSender(source.Sender, realm);
     }
 
-    Template template;
+    TemplateModel template;
     if (source.Template == null)
     {
       template = new()
@@ -140,24 +140,24 @@ internal class Mapper
       template = ToTemplate(source.Template, realm);
     }
 
-    Message destination = new(source.Subject, body, sender, template)
+    MessageModel destination = new(source.Subject, body, sender, template)
     {
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
-      Locale = Locale.TryCreate(source.Locale),
+      Locale = LocaleModel.TryCreate(source.Locale),
       IsDemo = source.IsDemo,
       Status = source.Status,
       Realm = realm
     };
 
-    Dictionary<int, User> usersById = new(capacity: users.Count());
+    Dictionary<int, UserModel> usersById = new(capacity: users.Count());
     foreach (UserEntity user in users)
     {
       usersById[user.UserId] = ToUser(user, realm);
     }
     foreach (RecipientEntity recipient in source.Recipients)
     {
-      User? user = null;
+      UserModel? user = null;
       if (recipient.UserId.HasValue)
       {
         _ = usersById.TryGetValue(recipient.UserId.Value, out user);
@@ -181,9 +181,9 @@ internal class Mapper
     return destination;
   }
 
-  public OneTimePassword ToOneTimePassword(OneTimePasswordEntity source, Realm? realm)
+  public OneTimePasswordModel ToOneTimePassword(OneTimePasswordEntity source, RealmModel? realm)
   {
-    OneTimePassword destination = new()
+    OneTimePasswordModel destination = new()
     {
       ExpiresOn = AsUniversalTime(source.ExpiresOn),
       MaximumAttempts = source.MaximumAttempts,
@@ -202,13 +202,13 @@ internal class Mapper
     return destination;
   }
 
-  public Realm ToRealm(RealmEntity source)
+  public RealmModel ToRealm(RealmEntity source)
   {
-    Realm destination = new(source.UniqueSlug, source.Secret)
+    RealmModel destination = new(source.UniqueSlug, source.Secret)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
-      DefaultLocale = Locale.TryCreate(source.DefaultLocale),
+      DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale),
       Url = source.Url,
       UniqueNameSettings = new UniqueNameSettings(source.AllowedUniqueNameCharacters),
       PasswordSettings = new PasswordSettings(source.RequiredPasswordLength, source.RequiredPasswordUniqueChars, source.PasswordsRequireNonAlphanumeric,
@@ -226,9 +226,9 @@ internal class Mapper
     return destination;
   }
 
-  public static Recipient ToRecipient(RecipientEntity source, User? user)
+  public static RecipientModel ToRecipient(RecipientEntity source, UserModel? user)
   {
-    Recipient destination = new()
+    RecipientModel destination = new()
     {
       Type = source.Type,
       Address = source.Address,
@@ -249,16 +249,16 @@ internal class Mapper
       };
       if (source.UserEmailAddress != null)
       {
-        destination.User.Email = new Email(source.UserEmailAddress);
+        destination.User.Email = new EmailModel(source.UserEmailAddress);
       }
     }
 
     return destination;
   }
 
-  public Role ToRole(RoleEntity source, Realm? realm)
+  public RoleModel ToRole(RoleEntity source, RealmModel? realm)
   {
-    Role destination = new(source.UniqueName)
+    RoleModel destination = new(source.UniqueName)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
@@ -275,15 +275,15 @@ internal class Mapper
     return destination;
   }
 
-  public Session ToSession(SessionEntity source, Realm? realm)
+  public SessionModel ToSession(SessionEntity source, RealmModel? realm)
   {
     if (source.User == null)
     {
       throw new ArgumentException($"The {nameof(source.User)} is required.", nameof(source));
     }
 
-    User user = ToUser(source.User, realm);
-    Session destination = new(user)
+    UserModel user = ToUser(source.User, realm);
+    SessionModel destination = new(user)
     {
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
@@ -301,9 +301,9 @@ internal class Mapper
     return destination;
   }
 
-  public Sender ToSender(SenderEntity source, Realm? realm)
+  public SenderModel ToSender(SenderEntity source, RealmModel? realm)
   {
-    Sender destination = new()
+    SenderModel destination = new()
     {
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
@@ -334,10 +334,10 @@ internal class Mapper
     return destination;
   }
 
-  public Template ToTemplate(TemplateEntity source, Realm? realm)
+  public TemplateModel ToTemplate(TemplateEntity source, RealmModel? realm)
   {
-    Content content = new(source.ContentType, source.ContentText);
-    Template destination = new(source.UniqueKey, source.Subject, content)
+    ContentModel content = new(source.ContentType, source.ContentText);
+    TemplateModel destination = new(source.UniqueKey, source.Subject, content)
     {
       DisplayName = source.DisplayName,
       Description = source.Description,
@@ -349,9 +349,9 @@ internal class Mapper
     return destination;
   }
 
-  public User ToUser(UserEntity source, Realm? realm)
+  public UserModel ToUser(UserEntity source, RealmModel? realm)
   {
-    User destination = new(source.UniqueName)
+    UserModel destination = new(source.UniqueName)
     {
       HasPassword = source.HasPassword,
       PasswordChangedBy = TryFindActor(source.PasswordChangedBy),
@@ -367,7 +367,7 @@ internal class Mapper
       Nickname = source.Nickname,
       Birthdate = AsUniversalTime(source.Birthdate),
       Gender = source.Gender,
-      Locale = Locale.TryCreate(source.Locale),
+      Locale = LocaleModel.TryCreate(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,
@@ -378,7 +378,7 @@ internal class Mapper
 
     if (source.AddressStreet != null && source.AddressLocality != null && source.AddressCountry != null && source.AddressFormatted != null)
     {
-      destination.Address = new Address(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
+      destination.Address = new AddressModel(source.AddressStreet, source.AddressLocality, source.AddressPostalCode, source.AddressRegion, source.AddressCountry, source.AddressFormatted)
       {
         IsVerified = source.IsAddressVerified,
         VerifiedBy = TryFindActor(source.AddressVerifiedBy),
@@ -387,7 +387,7 @@ internal class Mapper
     }
     if (source.EmailAddress != null)
     {
-      destination.Email = new Email(source.EmailAddress)
+      destination.Email = new EmailModel(source.EmailAddress)
       {
         IsVerified = source.IsEmailVerified,
         VerifiedBy = TryFindActor(source.EmailVerifiedBy),
@@ -396,7 +396,7 @@ internal class Mapper
     }
     if (source.PhoneNumber != null && source.PhoneE164Formatted != null)
     {
-      destination.Phone = new Phone(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
+      destination.Phone = new PhoneModel(source.PhoneCountryCode, source.PhoneNumber, source.PhoneExtension, source.PhoneE164Formatted)
       {
         IsVerified = source.IsPhoneVerified,
         VerifiedBy = TryFindActor(source.PhoneVerifiedBy),
@@ -424,7 +424,7 @@ internal class Mapper
     return destination;
   }
 
-  private void MapAggregate(AggregateRoot source, Aggregate destination)
+  private void MapAggregate(AggregateRoot source, AggregateModel destination)
   {
     destination.Id = source.Id.ToGuid();
     destination.Version = source.Version;
@@ -433,7 +433,7 @@ internal class Mapper
     destination.UpdatedBy = FindActor(source.UpdatedBy);
     destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
   }
-  private void MapAggregate(AggregateEntity source, Aggregate destination)
+  private void MapAggregate(AggregateEntity source, AggregateModel destination)
   {
     destination.Id = new AggregateId(source.AggregateId).ToGuid();
     destination.Version = source.Version;
@@ -443,9 +443,9 @@ internal class Mapper
     destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
   }
 
-  private Actor? TryFindActor(string? id) => id == null ? null : FindActor(id);
-  private Actor FindActor(string id) => FindActor(new ActorId(id));
-  private Actor FindActor(ActorId id) => _actors.TryGetValue(id, out Actor? actor) ? actor : Actor.System;
+  private ActorModel? TryFindActor(string? id) => id == null ? null : FindActor(id);
+  private ActorModel FindActor(string id) => FindActor(new ActorId(id));
+  private ActorModel FindActor(ActorId id) => _actors.TryGetValue(id, out ActorModel? actor) ? actor : ActorModel.System;
 
   private static DateTime? AsUniversalTime(DateTime? value) => value.HasValue ? AsUniversalTime(value.Value) : null;
   private static DateTime AsUniversalTime(DateTime value) => value.Kind switch

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, Realm?>
+internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, RealmModel?>
 {
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
@@ -18,14 +18,14 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
     _realmRepository = realmRepository;
   }
 
-  public async Task<Realm?> Handle(DeleteRealmCommand command, CancellationToken cancellationToken)
+  public async Task<RealmModel?> Handle(DeleteRealmCommand command, CancellationToken cancellationToken)
   {
-    RealmAggregate? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
     if (realm == null)
     {
       return null;
     }
-    Realm result = await _realmQuerier.ReadAsync(realm, cancellationToken);
+    RealmModel result = await _realmQuerier.ReadAsync(realm, cancellationToken);
 
     ActorId actorId = command.ActorId;
     realm.Delete(actorId);

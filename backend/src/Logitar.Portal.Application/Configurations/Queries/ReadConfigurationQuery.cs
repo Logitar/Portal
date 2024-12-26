@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Configurations.Queries;
 
-internal record ReadConfigurationQuery : Activity, IRequest<Configuration>;
+internal record ReadConfigurationQuery : Activity, IRequest<ConfigurationModel>;

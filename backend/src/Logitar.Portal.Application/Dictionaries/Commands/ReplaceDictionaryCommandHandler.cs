@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
-internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictionaryCommand, Dictionary?>
+internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictionaryCommand, DictionaryModel?>
 {
   private readonly IDictionaryManager _dictionaryManager;
   private readonly IDictionaryRepository _dictionaryRepository;
@@ -21,17 +21,17 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
     _dictionaryQuerier = dictionaryQuerier;
   }
 
-  public async Task<Dictionary?> Handle(ReplaceDictionaryCommand command, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> Handle(ReplaceDictionaryCommand command, CancellationToken cancellationToken)
   {
     ReplaceDictionaryPayload payload = command.Payload;
     new ReplaceDictionaryValidator().ValidateAndThrow(payload);
 
-    DictionaryAggregate? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
     }
-    DictionaryAggregate? reference = null;
+    Dictionary? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _dictionaryRepository.LoadAsync(dictionary.Id, command.Version.Value, cancellationToken);
@@ -53,7 +53,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
     return await _dictionaryQuerier.ReadAsync(command.Realm, dictionary, cancellationToken);
   }
 
-  private static void ReplaceDictionaryEntries(ReplaceDictionaryPayload payload, DictionaryAggregate dictionary, DictionaryAggregate? reference)
+  private static void ReplaceDictionaryEntries(ReplaceDictionaryPayload payload, Dictionary dictionary, Dictionary? reference)
   {
     HashSet<string> payloadKeys = new(capacity: payload.Entries.Count);
 

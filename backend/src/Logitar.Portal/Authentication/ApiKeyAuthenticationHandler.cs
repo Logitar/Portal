@@ -31,7 +31,7 @@ internal class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthent
         {
           AuthenticateApiKeyPayload payload = new(value);
           AuthenticateApiKeyCommand command = new(payload);
-          ApiKey apiKey = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
+          ApiKeyModel apiKey = await _activityPipeline.ExecuteAsync(command, new ContextParameters());
 
           Context.SetApiKey(apiKey);
 

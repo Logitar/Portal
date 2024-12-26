@@ -42,7 +42,7 @@ public class CreateRoleCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("root", bool.TrueString));
     CreateRoleCommand command = new(payload);
-    Role role = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel role = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.UniqueName, role.UniqueName);
     Assert.Equal(payload.DisplayName, role.DisplayName);
@@ -51,7 +51,7 @@ public class CreateRoleCommandTests : IntegrationTests
     Assert.Null(role.Realm);
 
     SetRealm();
-    Role other = await ActivityPipeline.ExecuteAsync(command);
+    RoleModel other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
   }
 

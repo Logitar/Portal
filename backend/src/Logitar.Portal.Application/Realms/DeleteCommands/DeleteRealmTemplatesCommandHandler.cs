@@ -16,9 +16,9 @@ internal class DeleteRealmTemplatesCommandHandler : INotificationHandler<DeleteR
   public async Task Handle(DeleteRealmTemplatesCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<TemplateAggregate> templates = await _templateRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<Template> templates = await _templateRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (TemplateAggregate template in templates)
+    foreach (Template template in templates)
     {
       template.Delete(command.ActorId);
     }

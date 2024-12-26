@@ -38,7 +38,7 @@ public class ReadApiKeyQueryTests : IntegrationTests
   public async Task It_should_return_null_when_the_Api_key_cannot_be_found()
   {
     ReadApiKeyQuery query = new(Guid.NewGuid());
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(query);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(apiKey);
   }
 
@@ -48,7 +48,7 @@ public class ReadApiKeyQueryTests : IntegrationTests
     ApiKeyAggregate apiKey = await CreateApiKeyAsync();
 
     ReadApiKeyQuery query = new(apiKey.Id.ToGuid());
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(query);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);
   }

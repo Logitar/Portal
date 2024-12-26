@@ -3,11 +3,11 @@ using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.GraphQL;
 
-internal class LocaleGraphType : ObjectGraphType<Locale>
+internal class LocaleGraphType : ObjectGraphType<LocaleModel>
 {
   public LocaleGraphType()
   {
-    Name = nameof(Locale);
+    Name = nameof(LocaleModel);
     Description = "Represents a language in the system.";
 
     Field(x => x.Id)

@@ -80,7 +80,7 @@ internal class MessageEntity : AggregateEntity
     BodyType = @event.Body.Type;
     BodyText = @event.Body.Text;
 
-    foreach (RecipientUnit recipient in @event.Recipients)
+    foreach (Recipient recipient in @event.Recipients)
     {
       UserEntity? user = null;
       if (recipient.UserId != null && !users.TryGetValue(recipient.UserId.Value, out user))

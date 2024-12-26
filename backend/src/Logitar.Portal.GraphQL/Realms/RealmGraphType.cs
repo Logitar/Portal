@@ -4,7 +4,7 @@ using Logitar.Portal.GraphQL.Settings;
 
 namespace Logitar.Portal.GraphQL.Realms;
 
-internal class RealmGraphType : AggregateGraphType<Realm>
+internal class RealmGraphType : AggregateGraphType<RealmModel>
 {
   public RealmGraphType() : base("Represents a hard tenant into the identity system.")
   {

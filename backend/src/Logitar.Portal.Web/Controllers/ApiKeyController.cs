@@ -21,52 +21,52 @@ public class ApiKeyController : ControllerBase
   }
 
   [HttpPatch("authenticate")]
-  public async Task<ActionResult<ApiKey>> AuthenticateAsync([FromBody] AuthenticateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> AuthenticateAsync([FromBody] AuthenticateApiKeyPayload payload, CancellationToken cancellationToken)
   {
     return Ok(await _apiKeyService.AuthenticateAsync(payload, cancellationToken));
   }
 
   [HttpPost]
-  public async Task<ActionResult<ApiKey>> CreateAsync([FromBody] CreateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> CreateAsync([FromBody] CreateApiKeyPayload payload, CancellationToken cancellationToken)
   {
-    ApiKey apiKey = await _apiKeyService.CreateAsync(payload, cancellationToken);
+    ApiKeyModel apiKey = await _apiKeyService.CreateAsync(payload, cancellationToken);
     return Created(BuildLocation(apiKey), apiKey);
   }
 
   [HttpDelete("{id}")]
-  public async Task<ActionResult<ApiKey>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    ApiKey? apiKey = await _apiKeyService.DeleteAsync(id, cancellationToken);
+    ApiKeyModel? apiKey = await _apiKeyService.DeleteAsync(id, cancellationToken);
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult<ApiKey>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    ApiKey? apiKey = await _apiKeyService.ReadAsync(id: id, cancellationToken: cancellationToken);
+    ApiKeyModel? apiKey = await _apiKeyService.ReadAsync(id: id, cancellationToken: cancellationToken);
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
   [HttpPut("{id}")]
-  public async Task<ActionResult<ApiKey>> ReplaceAsync(Guid id, [FromBody] ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> ReplaceAsync(Guid id, [FromBody] ReplaceApiKeyPayload payload, long? version, CancellationToken cancellationToken)
   {
-    ApiKey? apiKey = await _apiKeyService.ReplaceAsync(id, payload, version, cancellationToken);
+    ApiKeyModel? apiKey = await _apiKeyService.ReplaceAsync(id, payload, version, cancellationToken);
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
   [HttpGet]
-  public async Task<ActionResult<SearchResults<ApiKey>>> SearchAsync([FromQuery] SearchApiKeysModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<SearchResults<ApiKeyModel>>> SearchAsync([FromQuery] SearchApiKeysModel model, CancellationToken cancellationToken)
   {
     SearchApiKeysPayload payload = model.ToPayload();
     return Ok(await _apiKeyService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPatch("{id}")]
-  public async Task<ActionResult<ApiKey>> UpdateAsync(Guid id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<ApiKeyModel>> UpdateAsync(Guid id, [FromBody] UpdateApiKeyPayload payload, CancellationToken cancellationToken)
   {
-    ApiKey? apiKey = await _apiKeyService.UpdateAsync(id, payload, cancellationToken);
+    ApiKeyModel? apiKey = await _apiKeyService.UpdateAsync(id, payload, cancellationToken);
     return apiKey == null ? NotFound() : Ok(apiKey);
   }
 
-  private Uri BuildLocation(ApiKey apiKey) => HttpContext.BuildLocation("keys/{id}", new Dictionary<string, string> { ["id"] = apiKey.Id.ToString() });
+  private Uri BuildLocation(ApiKeyModel apiKey) => HttpContext.BuildLocation("keys/{id}", new Dictionary<string, string> { ["id"] = apiKey.Id.ToString() });
 }

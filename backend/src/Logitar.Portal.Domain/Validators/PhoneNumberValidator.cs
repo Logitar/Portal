@@ -19,7 +19,7 @@ public class PhoneNumberValidator : AbstractValidator<string>
 
   private static bool BeAValidPhoneNumber(string phoneNumber)
   {
-    Phone phone = new(countryCode: null, phoneNumber, extension: null, phoneNumber);
+    PhoneModel phone = new(countryCode: null, phoneNumber, extension: null, phoneNumber);
     return phone.IsValid();
   }
 }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Queries;
 
-internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery, Dictionary?>
+internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery, DictionaryModel?>
 {
   private readonly IDictionaryQuerier _dictionaryQuerier;
 
@@ -13,13 +13,13 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
     _dictionaryQuerier = dictionaryQuerier;
   }
 
-  public async Task<Dictionary?> Handle(ReadDictionaryQuery query, CancellationToken cancellationToken)
+  public async Task<DictionaryModel?> Handle(ReadDictionaryQuery query, CancellationToken cancellationToken)
   {
-    Dictionary<Guid, Dictionary> dictionaries = new(capacity: 2);
+    Dictionary<Guid, DictionaryModel> dictionaries = new(capacity: 2);
 
     if (query.Id.HasValue)
     {
-      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
+      DictionaryModel? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;
@@ -28,7 +28,7 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
 
     if (!string.IsNullOrWhiteSpace(query.Locale))
     {
-      Dictionary? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Locale, cancellationToken);
+      DictionaryModel? dictionary = await _dictionaryQuerier.ReadAsync(query.Realm, query.Locale, cancellationToken);
       if (dictionary != null)
       {
         dictionaries[dictionary.Id] = dictionary;
@@ -37,7 +37,7 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
 
     if (dictionaries.Count > 1)
     {
-      throw new TooManyResultsException<Dictionary>(expectedCount: 1, actualCount: dictionaries.Count);
+      throw new TooManyResultsException<DictionaryModel>(expectedCount: 1, actualCount: dictionaries.Count);
     }
 
     return dictionaries.Values.SingleOrDefault();

@@ -29,14 +29,14 @@ internal class RoleQuerier : IRoleQuerier
     _sqlHelper = sqlHelper;
   }
 
-  public async Task<Role> ReadAsync(Realm? realm, RoleAggregate role, CancellationToken cancellationToken)
+  public async Task<RoleModel> ReadAsync(RealmModel? realm, RoleAggregate role, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, role.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The role entity 'AggregateId={role.Id.Value}' could not be found.");
   }
-  public async Task<Role?> ReadAsync(Realm? realm, RoleId id, CancellationToken cancellationToken)
+  public async Task<RoleModel?> ReadAsync(RealmModel? realm, RoleId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<Role?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<RoleModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -51,7 +51,7 @@ internal class RoleQuerier : IRoleQuerier
     return await MapAsync(role, realm, cancellationToken);
   }
 
-  public async Task<Role?> ReadAsync(Realm? realm, string uniqueName, CancellationToken cancellationToken)
+  public async Task<RoleModel?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string uniqueNameNormalized = uniqueName.Trim().ToUpper();
@@ -67,7 +67,7 @@ internal class RoleQuerier : IRoleQuerier
     return await MapAsync(role, realm, cancellationToken);
   }
 
-  public async Task<SearchResults<Role>> SearchAsync(Realm? realm, SearchRolesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<RoleModel>> SearchAsync(RealmModel? realm, SearchRolesPayload payload, CancellationToken cancellationToken)
   {
     IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Roles.Table).SelectAll(IdentityDb.Roles.Table)
       .ApplyRealmFilter(IdentityDb.Roles.TenantId, realm)
@@ -105,17 +105,17 @@ internal class RoleQuerier : IRoleQuerier
     query = query.ApplyPaging(payload);
 
     RoleEntity[] roles = await query.ToArrayAsync(cancellationToken);
-    IEnumerable<Role> items = await MapAsync(roles, realm, cancellationToken);
+    IEnumerable<RoleModel> items = await MapAsync(roles, realm, cancellationToken);
 
-    return new SearchResults<Role>(items, total);
+    return new SearchResults<RoleModel>(items, total);
   }
 
-  private async Task<Role> MapAsync(RoleEntity role, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<RoleModel> MapAsync(RoleEntity role, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([role], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<Role>> MapAsync(IEnumerable<RoleEntity> roles, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<RoleModel>> MapAsync(IEnumerable<RoleEntity> roles, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = roles.SelectMany(role => role.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return roles.Select(role => mapper.ToRole(role, realm));

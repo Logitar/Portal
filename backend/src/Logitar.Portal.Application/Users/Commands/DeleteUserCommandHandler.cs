@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, User?>
+internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, UserModel?>
 {
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
@@ -18,14 +18,14 @@ internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Use
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(DeleteUserCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel?> Handle(DeleteUserCommand command, CancellationToken cancellationToken)
   {
     UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
-    User result = await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
+    UserModel result = await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
 
     ActorId actorId = command.ActorId;
     user.Delete(actorId);

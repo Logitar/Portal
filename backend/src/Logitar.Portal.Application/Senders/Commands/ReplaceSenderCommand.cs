@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 
-internal record ReplaceSenderCommand(Guid Id, ReplaceSenderPayload Payload, long? Version) : Activity, IRequest<Sender?>;
+internal record ReplaceSenderCommand(Guid Id, ReplaceSenderPayload Payload, long? Version) : Activity, IRequest<SenderModel?>;

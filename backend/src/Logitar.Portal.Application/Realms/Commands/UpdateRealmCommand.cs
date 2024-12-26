@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
-internal record UpdateRealmCommand(Guid Id, UpdateRealmPayload Payload) : Activity, IRequest<Realm?>;
+internal record UpdateRealmCommand(Guid Id, UpdateRealmPayload Payload) : Activity, IRequest<RealmModel?>;

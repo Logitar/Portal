@@ -22,14 +22,14 @@ public class TemplateNotInTenantException : Exception
     private set => Data[nameof(ActualTenantId)] = value?.Value;
   }
 
-  public TemplateNotInTenantException(TemplateAggregate template, TenantId? expectedTenant) : base(BuildMessage(template, expectedTenant))
+  public TemplateNotInTenantException(Template template, TenantId? expectedTenant) : base(BuildMessage(template, expectedTenant))
   {
     TemplateId = template.Id;
     ExpectedTenantId = expectedTenant;
     ActualTenantId = template.TenantId;
   }
 
-  private static string BuildMessage(TemplateAggregate template, TenantId? expectedTenant) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(Template template, TenantId? expectedTenant) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(TemplateId), template.Id.Value)
     .AddData(nameof(ExpectedTenantId), expectedTenant?.Value, "<null>")
     .AddData(nameof(ActualTenantId), template.TenantId?.Value, "<null>")

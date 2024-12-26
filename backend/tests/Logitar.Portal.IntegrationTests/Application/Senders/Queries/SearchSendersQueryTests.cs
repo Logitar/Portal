@@ -16,7 +16,7 @@ public class SearchSendersQueryTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _sender;
+  private readonly Sender _sender;
 
   public SearchSendersQueryTests() : base()
   {
@@ -48,7 +48,7 @@ public class SearchSendersQueryTests : IntegrationTests
     SearchSendersPayload payload = new();
     payload.Search.Terms.Add(new SearchTerm("%test%"));
     SearchSendersQuery query = new(payload);
-    SearchResults<Sender> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<SenderModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -56,22 +56,22 @@ public class SearchSendersQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    SenderAggregate notInSearch = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInSearch = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
       DisplayName = new DisplayNameUnit(Faker.Name.FullName())
     };
     notInSearch.Update();
-    SenderAggregate notInIds = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInIds = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
       DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     notInIds.Update();
-    SenderAggregate sender1 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender1 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
       DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     sender1.Update();
-    SenderAggregate sender2 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender2 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
       DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
@@ -93,11 +93,11 @@ public class SearchSendersQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("%sender%"));
     payload.Sort.Add(new SenderSortOption(SenderSort.EmailAddress, isDescending: false));
     SearchSendersQuery query = new(payload);
-    SearchResults<Sender> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<SenderModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Sender sender = Assert.Single(results.Items);
-    SenderAggregate expected = new[] { sender1, sender2 }.OrderBy(s => s.Email?.Address).Skip(1).Single();
+    SenderModel sender = Assert.Single(results.Items);
+    Sender expected = new[] { sender1, sender2 }.OrderBy(s => s.Email?.Address).Skip(1).Single();
     Assert.Equal(expected.Id.ToGuid(), sender.Id);
   }
 }

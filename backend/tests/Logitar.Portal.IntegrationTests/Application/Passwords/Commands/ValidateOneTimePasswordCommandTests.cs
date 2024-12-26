@@ -39,7 +39,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   {
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(Guid.NewGuid(), payload);
-    OneTimePassword? oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
+    OneTimePasswordModel? oneTimePassword = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(oneTimePassword);
   }
 
@@ -52,7 +52,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(command);
+    OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -131,7 +131,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("ValidatedBy", UsernameString));
     payload.CustomAttributes.Add(new("ValidatedOn", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
-    OneTimePassword? result = await ActivityPipeline.ExecuteAsync(command);
+    OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(1, result.AttemptCount);
     Assert.True(result.HasValidationSucceeded);

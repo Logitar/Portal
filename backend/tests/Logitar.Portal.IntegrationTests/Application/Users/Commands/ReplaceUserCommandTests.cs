@@ -109,7 +109,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(reviewer.UniqueName.Value);
     ReplaceUserCommand command = new(user.Id.ToGuid(), payload, version);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.Equal(payload.UniqueName, result.UniqueName);
@@ -156,7 +156,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   {
     ReplaceUserPayload payload = new("admin");
     ReplaceUserCommand command = new(Guid.NewGuid(), payload, Version: null);
-    User? user = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
   }
 
@@ -169,7 +169,7 @@ public class ReplaceUserCommandTests : IntegrationTests
 
     ReplaceUserPayload payload = new("admin");
     ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
-    User? result = await ActivityPipeline.ExecuteAsync(command);
+    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

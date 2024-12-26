@@ -15,15 +15,15 @@ public class UpdateTemplateCommandTests : IntegrationTests
 {
   private readonly ITemplateRepository _templateRepository;
 
-  private readonly TemplateAggregate _template;
+  private readonly Template _template;
 
   public UpdateTemplateCommandTests() : base()
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKeyUnit uniqueKey = new("PasswordRecovery");
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
+    UniqueKey uniqueKey = new("PasswordRecovery");
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
   }
 
@@ -46,7 +46,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
   {
     UpdateTemplatePayload payload = new();
     UpdateTemplateCommand command = new(Guid.NewGuid(), payload);
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
   }
 
@@ -57,14 +57,14 @@ public class UpdateTemplateCommandTests : IntegrationTests
 
     UpdateTemplatePayload payload = new();
     UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
-    Template? result = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueKeyAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    TemplateAggregate template = new(new UniqueKeyUnit("ConfirmAccount"), new SubjectUnit("Confirm your account"), _template.Content);
+    Template template = new(new UniqueKey("ConfirmAccount"), new Subject("Confirm your account"), _template.Content);
     await _templateRepository.SaveAsync(template);
 
     UpdateTemplatePayload payload = new()
@@ -98,7 +98,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
       Description = new Modification<string>("  ")
     };
     UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
-    Template? template = await ActivityPipeline.ExecuteAsync(command);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 
     Assert.Equal(_template.UniqueKey.Value, template.UniqueKey);

@@ -44,7 +44,7 @@ public class SearchMessagesQueryTests : IntegrationTests
   {
     SearchMessagesPayload payload = new();
     SearchMessagesQuery query = new(payload);
-    SearchResults<Message> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<MessageModel> results = await ActivityPipeline.ExecuteAsync(query);
     Assert.Empty(results.Items);
     Assert.Equal(0, results.Total);
   }
@@ -56,33 +56,33 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    SenderAggregate sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);
 
-    SubjectUnit subject = new("Reset your password");
-    ContentUnit content = ContentUnit.PlainText("Hello World!");
-    TemplateAggregate template = new(new UniqueKeyUnit("PasswordRecovery"), subject, content, TenantId);
-    SubjectUnit otherSubject = new("Confirm your account");
-    TemplateAggregate otherTemplate = new(new UniqueKeyUnit("AccountConfirmation"), otherSubject, content, TenantId);
+    Subject subject = new("Reset your password");
+    Content content = Content.PlainText("Hello World!");
+    Template template = new(new UniqueKey("PasswordRecovery"), subject, content, TenantId);
+    Subject otherSubject = new("Confirm your account");
+    Template otherTemplate = new(new UniqueKey("AccountConfirmation"), otherSubject, content, TenantId);
     await _templateRepository.SaveAsync([template, otherTemplate]);
 
-    RecipientUnit[] recipients = [new RecipientUnit(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
+    Recipient[] recipients = [new Recipient(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
 
-    MessageAggregate notMatching = new(otherSubject, content, recipients, sender, template, tenantId: TenantId);
-    MessageAggregate notInIds = new(subject, content, recipients, sender, template, tenantId: TenantId);
-    MessageAggregate notTemplate = new(subject, content, recipients, sender, otherTemplate, tenantId: TenantId);
-    MessageAggregate demo = new(subject, content, recipients, sender, template, isDemo: true, tenantId: TenantId);
-    MessageAggregate failed = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Message notMatching = new(otherSubject, content, recipients, sender, template, tenantId: TenantId);
+    Message notInIds = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Message notTemplate = new(subject, content, recipients, sender, otherTemplate, tenantId: TenantId);
+    Message demo = new(subject, content, recipients, sender, template, isDemo: true, tenantId: TenantId);
+    Message failed = new(subject, content, recipients, sender, template, tenantId: TenantId);
     failed.Fail();
 
-    MessageAggregate message1 = new(subject, content, recipients, sender, template, tenantId: TenantId);
+    Message message1 = new(subject, content, recipients, sender, template, tenantId: TenantId);
 
-    RecipientUnit[] moreRecipients =
+    Recipient[] moreRecipients =
     [
       recipients.Single(),
-      new RecipientUnit(RecipientType.Bcc, Faker.Internet.Email(), Faker.Name.FullName())
+      new Recipient(RecipientType.Bcc, Faker.Internet.Email(), Faker.Name.FullName())
     ];
-    MessageAggregate message2 = new(subject, content, moreRecipients, sender, template, tenantId: TenantId);
+    Message message2 = new(subject, content, moreRecipients, sender, template, tenantId: TenantId);
 
     await _messageRepository.SaveAsync([notMatching, notInIds, notTemplate, demo, failed, message1, message2]);
 
@@ -101,10 +101,10 @@ public class SearchMessagesQueryTests : IntegrationTests
     payload.Search.Terms.Add(new SearchTerm("Reset%"));
     payload.Sort.Add(new MessageSortOption(MessageSort.RecipientCount, isDescending: false));
     SearchMessagesQuery query = new(payload);
-    SearchResults<Message> results = await ActivityPipeline.ExecuteAsync(query);
+    SearchResults<MessageModel> results = await ActivityPipeline.ExecuteAsync(query);
 
     Assert.Equal(2, results.Total);
-    Message message = Assert.Single(results.Items);
+    MessageModel message = Assert.Single(results.Items);
     Assert.Equal(message2.Id.ToGuid(), message.Id);
   }
 }

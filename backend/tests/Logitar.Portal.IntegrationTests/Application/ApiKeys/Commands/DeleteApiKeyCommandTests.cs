@@ -40,7 +40,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
     ApiKeyAggregate apiKey = await CreateApiKeyAsync();
 
     DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
-    ApiKey? deleted = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
   }
@@ -49,7 +49,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_Api_key_cannot_be_found()
   {
     DeleteApiKeyCommand command = new(Guid.NewGuid());
-    ApiKey? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
   }
 
@@ -61,7 +61,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
     SetRealm();
 
     DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
-    ApiKey? result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 

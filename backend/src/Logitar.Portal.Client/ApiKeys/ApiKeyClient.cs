@@ -14,38 +14,38 @@ internal class ApiKeyClient : BaseClient, IApiKeyClient
   {
   }
 
-  public async Task<ApiKey> AuthenticateAsync(AuthenticateApiKeyPayload payload, IRequestContext? context)
+  public async Task<ApiKeyModel> AuthenticateAsync(AuthenticateApiKeyPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/authenticate", UriKind.Relative);
-    return await PatchAsync<ApiKey>(uri, payload, context)
+    return await PatchAsync<ApiKeyModel>(uri, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(AuthenticateAsync), HttpMethod.Patch, uri, payload, context);
   }
 
-  public async Task<ApiKey> CreateAsync(CreateApiKeyPayload payload, IRequestContext? context)
+  public async Task<ApiKeyModel> CreateAsync(CreateApiKeyPayload payload, IRequestContext? context)
   {
-    return await PostAsync<ApiKey>(UriPath, payload, context)
+    return await PostAsync<ApiKeyModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<ApiKey?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<ApiKeyModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<ApiKey>(uri, context);
+    return await DeleteAsync<ApiKeyModel>(uri, context);
   }
 
-  public async Task<ApiKey?> ReadAsync(Guid id, IRequestContext? context)
+  public async Task<ApiKeyModel?> ReadAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await GetAsync<ApiKey>(uri, context);
+    return await GetAsync<ApiKeyModel>(uri, context);
   }
 
-  public async Task<ApiKey?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, IRequestContext? context)
+  public async Task<ApiKeyModel?> ReplaceAsync(Guid id, ReplaceApiKeyPayload payload, long? version, IRequestContext? context)
   {
     Uri uri = new UrlBuilder().SetPath($"{Path}/{id}").SetVersion(version).BuildUri(UriKind.Relative);
-    return await PutAsync<ApiKey>(uri, payload, context);
+    return await PutAsync<ApiKeyModel>(uri, payload, context);
   }
 
-  public async Task<SearchResults<ApiKey>> SearchAsync(SearchApiKeysPayload payload, IRequestContext? context)
+  public async Task<SearchResults<ApiKeyModel>> SearchAsync(SearchApiKeysPayload payload, IRequestContext? context)
   {
     IUrlBuilder builder = new UrlBuilder().SetPath(Path).SetQuery(payload);
     if (payload.HasAuthenticated.HasValue)
@@ -63,13 +63,13 @@ internal class ApiKeyClient : BaseClient, IApiKeyClient
     }
     Uri uri = builder.BuildUri(UriKind.Relative);
 
-    return await GetAsync<SearchResults<ApiKey>>(uri, context)
+    return await GetAsync<SearchResults<ApiKeyModel>>(uri, context)
       ?? throw CreateInvalidApiResponseException(nameof(SearchAsync), HttpMethod.Get, uri, payload, context);
   }
 
-  public async Task<ApiKey?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, IRequestContext? context)
+  public async Task<ApiKeyModel?> UpdateAsync(Guid id, UpdateApiKeyPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await PatchAsync<ApiKey>(uri, payload, context);
+    return await PatchAsync<ApiKeyModel>(uri, payload, context);
   }
 }

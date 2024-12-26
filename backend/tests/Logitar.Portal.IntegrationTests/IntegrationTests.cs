@@ -45,7 +45,7 @@ public abstract class IntegrationTests : IAsyncLifetime
   protected IdentityContext IdentityContext { get; }
   protected PortalContext PortalContext { get; }
 
-  protected Realm Realm { get; }
+  protected RealmModel Realm { get; }
   protected TenantId TenantId => Realm.GetTenantId();
 
   protected IntegrationTests()
@@ -85,11 +85,11 @@ public abstract class IntegrationTests : IAsyncLifetime
     IdentityContext = ServiceProvider.GetRequiredService<IdentityContext>();
     PortalContext = ServiceProvider.GetRequiredService<PortalContext>();
 
-    Realm = new("tests", JwtSecretUnit.Generate().Value)
+    Realm = new("tests", JwtSecret.Generate().Value)
     {
       Id = Guid.NewGuid(),
       DisplayName = "Tests",
-      DefaultLocale = new Locale(Faker.Locale),
+      DefaultLocale = new LocaleModel(Faker.Locale),
       Url = $"https://www.{Faker.Internet.DomainName()}",
       RequireUniqueEmail = true
     };
@@ -120,7 +120,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     await userRepository.SaveAsync(userAggregate);
 
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    User? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
     SetUser(user);
   }
   protected IDeleteBuilder CreateDeleteBuilder(TableId table) => _databaseProvider switch
@@ -133,16 +133,16 @@ public abstract class IntegrationTests : IAsyncLifetime
   public virtual Task DisposeAsync() => Task.CompletedTask;
 
   protected void SetRealm() => _context.Realm = Realm;
-  protected void SetApiKey(ApiKey? apiKey)
+  protected void SetApiKey(ApiKeyModel? apiKey)
   {
     _context.ApiKey = apiKey;
   }
-  protected void SetUser(User? user)
+  protected void SetUser(UserModel? user)
   {
     _context.User = user;
     _context.Session = null;
   }
-  protected void SetSession(Session? session)
+  protected void SetSession(SessionModel? session)
   {
     _context.User = session?.User;
     _context.Session = session;

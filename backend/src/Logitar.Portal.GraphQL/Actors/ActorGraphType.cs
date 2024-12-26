@@ -3,11 +3,11 @@ using Logitar.Portal.Contracts.Actors;
 
 namespace Logitar.Portal.GraphQL.Actors;
 
-internal class ActorGraphType : ObjectGraphType<Actor>
+internal class ActorGraphType : ObjectGraphType<ActorModel>
 {
   public ActorGraphType()
   {
-    Name = nameof(Actor);
+    Name = nameof(ActorModel);
     Description = "Represents an actor in the system.";
 
     Field(x => x.Id)

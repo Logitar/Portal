@@ -12,27 +12,27 @@ internal class OneTimePasswordClient : BaseClient, IOneTimePasswordClient
   {
   }
 
-  public async Task<OneTimePassword> CreateAsync(CreateOneTimePasswordPayload payload, IRequestContext? context)
+  public async Task<OneTimePasswordModel> CreateAsync(CreateOneTimePasswordPayload payload, IRequestContext? context)
   {
-    return await PostAsync<OneTimePassword>(UriPath, payload, context)
+    return await PostAsync<OneTimePasswordModel>(UriPath, payload, context)
       ?? throw CreateInvalidApiResponseException(nameof(CreateAsync), HttpMethod.Post, UriPath, payload, context);
   }
 
-  public async Task<OneTimePassword?> DeleteAsync(Guid id, IRequestContext? context)
+  public async Task<OneTimePasswordModel?> DeleteAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await DeleteAsync<OneTimePassword>(uri, context);
+    return await DeleteAsync<OneTimePasswordModel>(uri, context);
   }
 
-  public async Task<OneTimePassword?> ReadAsync(Guid id, IRequestContext? context)
+  public async Task<OneTimePasswordModel?> ReadAsync(Guid id, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await GetAsync<OneTimePassword>(uri, context);
+    return await GetAsync<OneTimePasswordModel>(uri, context);
   }
 
-  public async Task<OneTimePassword?> ValidateAsync(Guid id, ValidateOneTimePasswordPayload payload, IRequestContext? context)
+  public async Task<OneTimePasswordModel?> ValidateAsync(Guid id, ValidateOneTimePasswordPayload payload, IRequestContext? context)
   {
     Uri uri = new($"{Path}/{id}", UriKind.Relative);
-    return await PatchAsync<OneTimePassword>(uri, payload, context);
+    return await PatchAsync<OneTimePasswordModel>(uri, payload, context);
   }
 }

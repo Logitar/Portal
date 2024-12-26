@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
-internal record CreateDictionaryCommand(CreateDictionaryPayload Payload) : Activity, IRequest<Dictionary>;
+internal record CreateDictionaryCommand(CreateDictionaryPayload Payload) : Activity, IRequest<DictionaryModel>;

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Templates.Queries;
 
-internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Template?>
+internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, TemplateModel?>
 {
   private readonly ITemplateQuerier _templateQuerier;
 
@@ -13,13 +13,13 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
     _templateQuerier = templateQuerier;
   }
 
-  public async Task<Template?> Handle(ReadTemplateQuery query, CancellationToken cancellationToken)
+  public async Task<TemplateModel?> Handle(ReadTemplateQuery query, CancellationToken cancellationToken)
   {
-    Dictionary<Guid, Template> templates = new(capacity: 2);
+    Dictionary<Guid, TemplateModel> templates = new(capacity: 2);
 
     if (query.Id.HasValue)
     {
-      Template? template = await _templateQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
+      TemplateModel? template = await _templateQuerier.ReadAsync(query.Realm, query.Id.Value, cancellationToken);
       if (template != null)
       {
         templates[template.Id] = template;
@@ -28,7 +28,7 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
 
     if (!string.IsNullOrWhiteSpace(query.UniqueKey))
     {
-      Template? template = await _templateQuerier.ReadAsync(query.Realm, query.UniqueKey, cancellationToken);
+      TemplateModel? template = await _templateQuerier.ReadAsync(query.Realm, query.UniqueKey, cancellationToken);
       if (template != null)
       {
         templates[template.Id] = template;
@@ -37,7 +37,7 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
 
     if (templates.Count > 1)
     {
-      throw new TooManyResultsException<Template>(expectedCount: 1, actualCount: templates.Count);
+      throw new TooManyResultsException<TemplateModel>(expectedCount: 1, actualCount: templates.Count);
     }
 
     return templates.Values.SingleOrDefault();

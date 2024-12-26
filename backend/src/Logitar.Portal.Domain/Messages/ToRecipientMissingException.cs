@@ -17,13 +17,13 @@ public class ToRecipientMissingException : Exception
     private set => Data[nameof(PropertyName)] = value;
   }
 
-  public ToRecipientMissingException(MessageAggregate message, string? propertyName = null) : base(BuildMessage(message, propertyName))
+  public ToRecipientMissingException(Message message, string? propertyName = null) : base(BuildMessage(message, propertyName))
   {
     MessageId = message.Id;
     PropertyName = propertyName;
   }
 
-  private static string BuildMessage(MessageAggregate message, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
+  private static string BuildMessage(Message message, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(MessageId), message.Id.Value)
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();

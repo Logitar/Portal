@@ -29,7 +29,7 @@ internal class TemplateConfiguration : AggregateConfiguration<TemplateEntity>, I
     builder.Property(x => x.UniqueKey).HasMaxLength(IdentifierValidator.MaximumLength);
     builder.Property(x => x.UniqueKeyNormalized).HasMaxLength(IdentifierValidator.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
-    builder.Property(x => x.Subject).HasMaxLength(SubjectUnit.MaximumLength);
+    builder.Property(x => x.Subject).HasMaxLength(Subject.MaximumLength);
     builder.Property(x => x.ContentType).HasMaxLength(ContentTypeMaximumLength);
   }
 }

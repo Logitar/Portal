@@ -55,7 +55,7 @@ internal class LoggingService : ILoggingService
     _log?.SetOperation(operation);
   }
 
-  public void SetRealm(Realm? realm)
+  public void SetRealm(RealmModel? realm)
   {
     if (_log != null)
     {
@@ -63,7 +63,7 @@ internal class LoggingService : ILoggingService
     }
   }
 
-  public void SetApiKey(ApiKey? apiKey)
+  public void SetApiKey(ApiKeyModel? apiKey)
   {
     if (_log != null)
     {
@@ -71,7 +71,7 @@ internal class LoggingService : ILoggingService
     }
   }
 
-  public void SetSession(Session? session)
+  public void SetSession(SessionModel? session)
   {
     if (_log != null)
     {
@@ -79,7 +79,7 @@ internal class LoggingService : ILoggingService
     }
   }
 
-  public void SetUser(User? user)
+  public void SetUser(UserModel? user)
   {
     if (_log != null)
     {

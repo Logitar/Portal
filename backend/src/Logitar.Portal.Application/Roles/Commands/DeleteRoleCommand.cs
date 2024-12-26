@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
-internal record DeleteRoleCommand(Guid Id) : Activity, IRequest<Role?>;
+internal record DeleteRoleCommand(Guid Id) : Activity, IRequest<RoleModel?>;

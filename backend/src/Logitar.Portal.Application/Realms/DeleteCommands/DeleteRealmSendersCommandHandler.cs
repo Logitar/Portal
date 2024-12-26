@@ -16,9 +16,9 @@ internal class DeleteRealmSendersCommandHandler : INotificationHandler<DeleteRea
   public async Task Handle(DeleteRealmSendersCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<SenderAggregate> senders = await _senderRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<Sender> senders = await _senderRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (SenderAggregate sender in senders)
+    foreach (Sender sender in senders)
     {
       sender.Delete(command.ActorId);
     }

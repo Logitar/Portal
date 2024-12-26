@@ -7,9 +7,9 @@ namespace Logitar.Portal.Domain.Messages.Events;
 
 public record MessageCreated(
   TenantId? TenantId,
-  SubjectUnit Subject,
-  ContentUnit Body,
-  IReadOnlyCollection<RecipientUnit> Recipients,
+  Subject Subject,
+  Content Body,
+  IReadOnlyCollection<Recipient> Recipients,
   SenderSummary Sender,
   TemplateSummary Template,
   bool IgnoreUserLocale,

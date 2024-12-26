@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Realms.Queries;
 
-internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, Realm?>
+internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, RealmModel?>
 {
   private readonly IRealmQuerier _realmQuerier;
 
@@ -13,13 +13,13 @@ internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, Realm?>
     _realmQuerier = realmQuerier;
   }
 
-  public async Task<Realm?> Handle(ReadRealmQuery query, CancellationToken cancellationToken)
+  public async Task<RealmModel?> Handle(ReadRealmQuery query, CancellationToken cancellationToken)
   {
-    Dictionary<Guid, Realm> realms = new(capacity: 2);
+    Dictionary<Guid, RealmModel> realms = new(capacity: 2);
 
     if (query.Id.HasValue)
     {
-      Realm? realm = await _realmQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      RealmModel? realm = await _realmQuerier.ReadAsync(query.Id.Value, cancellationToken);
       if (realm != null)
       {
         realms[realm.Id] = realm;
@@ -28,7 +28,7 @@ internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, Realm?>
 
     if (!string.IsNullOrWhiteSpace(query.UniqueSlug))
     {
-      Realm? realm = await _realmQuerier.ReadAsync(query.UniqueSlug, cancellationToken);
+      RealmModel? realm = await _realmQuerier.ReadAsync(query.UniqueSlug, cancellationToken);
       if (realm != null)
       {
         realms[realm.Id] = realm;
@@ -37,7 +37,7 @@ internal class ReadRealmQueryHandler : IRequestHandler<ReadRealmQuery, Realm?>
 
     if (realms.Count > 1)
     {
-      throw new TooManyResultsException<Realm>(expectedCount: 1, actualCount: realms.Count);
+      throw new TooManyResultsException<RealmModel>(expectedCount: 1, actualCount: realms.Count);
     }
 
     return realms.Values.SingleOrDefault();

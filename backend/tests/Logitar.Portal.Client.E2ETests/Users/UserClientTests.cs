@@ -41,7 +41,7 @@ internal class UserClientTests : IClientTests
       {
         Password = password
       };
-      User user = await _client.CreateAsync(create, context.Request);
+      UserModel user = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
@@ -78,7 +78,7 @@ internal class UserClientTests : IClientTests
       context.Succeed();
 
       context.SetName(_client.GetType(), nameof(_client.ReadAsync));
-      User? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueName: null, identifier: null, context.Request);
+      UserModel? notFound = await _client.ReadAsync(Guid.NewGuid(), uniqueName: null, identifier: null, context.Request);
       if (notFound != null)
       {
         throw new InvalidOperationException("The user should not be found.");
@@ -132,7 +132,7 @@ internal class UserClientTests : IClientTests
       };
       search.Search.Terms.Add(new SearchTerm(firstName));
       search.Search.Terms.Add(new SearchTerm(lastName));
-      SearchResults<User> results = await _client.SearchAsync(search, context.Request);
+      SearchResults<UserModel> results = await _client.SearchAsync(search, context.Request);
       user = results.Items.Single();
       context.Succeed();
 

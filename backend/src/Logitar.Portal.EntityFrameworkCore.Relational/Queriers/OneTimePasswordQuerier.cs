@@ -23,14 +23,14 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
     _oneTimePasswords = context.OneTimePasswords;
   }
 
-  public async Task<OneTimePassword> ReadAsync(Realm? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel> ReadAsync(RealmModel? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, oneTimePassword.Id, cancellationToken)
       ?? throw new InvalidOperationException($"The One-Time Password entity 'AggregateId={oneTimePassword.Id.Value}' could not be found.");
   }
-  public async Task<OneTimePassword?> ReadAsync(Realm? realm, OneTimePasswordId id, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken)
     => await ReadAsync(realm, id.ToGuid(), cancellationToken);
-  public async Task<OneTimePassword?> ReadAsync(Realm? realm, Guid id, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
     string aggregateId = new AggregateId(id).Value;
 
@@ -45,12 +45,12 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
     return await MapAsync(oneTimePassword, realm, cancellationToken);
   }
 
-  private async Task<OneTimePassword> MapAsync(OneTimePasswordEntity oneTimePassword, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<OneTimePasswordModel> MapAsync(OneTimePasswordEntity oneTimePassword, RealmModel? realm, CancellationToken cancellationToken = default)
     => (await MapAsync([oneTimePassword], realm, cancellationToken)).Single();
-  private async Task<IEnumerable<OneTimePassword>> MapAsync(IEnumerable<OneTimePasswordEntity> oneTimePasswords, Realm? realm, CancellationToken cancellationToken = default)
+  private async Task<IEnumerable<OneTimePasswordModel>> MapAsync(IEnumerable<OneTimePasswordEntity> oneTimePasswords, RealmModel? realm, CancellationToken cancellationToken = default)
   {
     IEnumerable<ActorId> actorIds = oneTimePasswords.SelectMany(oneTimePassword => oneTimePassword.GetActorIds());
-    IEnumerable<Actor> actors = await _actorService.FindAsync(actorIds, cancellationToken);
+    IEnumerable<ActorModel> actors = await _actorService.FindAsync(actorIds, cancellationToken);
     Mapper mapper = new(actors);
 
     return oneTimePasswords.Select(oneTimePassword => mapper.ToOneTimePassword(oneTimePassword, realm));

@@ -37,7 +37,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
 
       int capacity = @event.Recipients.Count;
       HashSet<string> userIds = new(capacity);
-      foreach (RecipientUnit recipient in @event.Recipients)
+      foreach (Recipient recipient in @event.Recipients)
       {
         if (recipient.UserId != null)
         {

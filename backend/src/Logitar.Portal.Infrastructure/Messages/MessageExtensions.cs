@@ -17,17 +17,17 @@ internal static class MessageExtensions
     return sender.Phone.FormatToE164();
   }
 
-  public static SmsMessage ToSmsMessage(this MessageAggregate aggregate)
+  public static SmsMessage ToSmsMessage(this Message aggregate)
   {
-    RecipientUnit[] recipients = aggregate.Recipients.Where(recipient => recipient.Type == RecipientType.To).ToArray();
+    Recipient[] recipients = aggregate.Recipients.Where(recipient => recipient.Type == RecipientType.To).ToArray();
     if (recipients.Length != 1)
     {
       throw new ArgumentException($"Exactly one {nameof(RecipientType.To)} recipient must be provided.", nameof(aggregate));
     }
-    RecipientUnit recipient = recipients.Single();
+    Recipient recipient = recipients.Single();
     if (recipient.PhoneNumber == null)
     {
-      throw new ArgumentException($"The recipient requires a {nameof(RecipientUnit.PhoneNumber)} to receive a SMS message.", nameof(aggregate));
+      throw new ArgumentException($"The recipient requires a {nameof(Recipient.PhoneNumber)} to receive a SMS message.", nameof(aggregate));
     }
 
     if (aggregate.Body.Type != MediaTypeNames.Text.Plain)
@@ -38,7 +38,7 @@ internal static class MessageExtensions
     return new SmsMessage(from: aggregate.Sender.ToE164PhoneNumber(), to: recipient.PhoneNumber, body: aggregate.Body.Text);
   }
 
-  public static MailMessage ToMailMessage(this MessageAggregate message)
+  public static MailMessage ToMailMessage(this Message message)
   {
     MailMessage mailMessage = new()
     {
@@ -48,7 +48,7 @@ internal static class MessageExtensions
       IsBodyHtml = message.Body.Type == MediaTypeNames.Text.Html
     };
 
-    foreach (RecipientUnit recipient in message.Recipients)
+    foreach (Recipient recipient in message.Recipients)
     {
       MailAddress address = recipient.ToMailAddress();
       switch (recipient.Type)
@@ -77,7 +77,7 @@ internal static class MessageExtensions
     return new(sender.Email.Address, sender.DisplayName?.Value);
   }
 
-  public static MailAddress ToMailAddress(this RecipientUnit recipient)
+  public static MailAddress ToMailAddress(this Recipient recipient)
   {
     if (recipient.Address == null)
     {

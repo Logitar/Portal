@@ -20,7 +20,7 @@ internal static class QueryingExtensions
     return builder.Where(column, Operators.IsIn(aggregateIds));
   }
 
-  public static IQueryBuilder ApplyRealmFilter(this IQueryBuilder builder, ColumnId column, Realm? realm)
+  public static IQueryBuilder ApplyRealmFilter(this IQueryBuilder builder, ColumnId column, RealmModel? realm)
   {
     if (realm == null)
     {

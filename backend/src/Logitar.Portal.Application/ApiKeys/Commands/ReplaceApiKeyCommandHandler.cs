@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyCommand, ApiKey?>
+internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyCommand, ApiKeyModel?>
 {
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
@@ -25,7 +25,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     _mediator = mediator;
   }
 
-  public async Task<ApiKey?> Handle(ReplaceApiKeyCommand command, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel?> Handle(ReplaceApiKeyCommand command, CancellationToken cancellationToken)
   {
     ReplaceApiKeyPayload payload = command.Payload;
     new ReplaceApiKeyValidator().ValidateAndThrow(payload);

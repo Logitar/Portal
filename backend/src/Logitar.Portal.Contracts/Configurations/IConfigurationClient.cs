@@ -2,7 +2,7 @@
 
 public interface IConfigurationClient
 {
-  Task<Configuration> ReadAsync(IRequestContext? context = null);
-  Task<Configuration> ReplaceAsync(ReplaceConfigurationPayload payload, long? version = null, IRequestContext? context = null);
-  Task<Configuration> UpdateAsync(UpdateConfigurationPayload payload, IRequestContext? context = null);
+  Task<ConfigurationModel> ReadAsync(IRequestContext? context = null);
+  Task<ConfigurationModel> ReplaceAsync(ReplaceConfigurationPayload payload, long? version = null, IRequestContext? context = null);
+  Task<ConfigurationModel> UpdateAsync(UpdateConfigurationPayload payload, IRequestContext? context = null);
 }

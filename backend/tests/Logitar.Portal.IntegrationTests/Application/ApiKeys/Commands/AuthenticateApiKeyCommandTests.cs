@@ -50,7 +50,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, _secret));
     AuthenticateApiKeyCommand command = new(payload);
-    ApiKey result = await ActivityPipeline.ExecuteAsync(command);
+    ApiKeyModel result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Equal(apiKey.Id.ToGuid(), result.Id);
 
     apiKey = Assert.Single(await _apiKeyRepository.LoadAsync());

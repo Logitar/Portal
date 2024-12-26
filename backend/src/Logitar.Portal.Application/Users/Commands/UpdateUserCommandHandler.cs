@@ -13,7 +13,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
-internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, User?>
+internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserModel?>
 {
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
@@ -31,7 +31,7 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     _userRepository = userRepository;
   }
 
-  public async Task<User?> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
+  public async Task<UserModel?> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
   {
     IUserSettings userSettings = command.UserSettings;
 

@@ -5,5 +5,5 @@ namespace Logitar.Portal.Application.Configurations;
 
 public interface IConfigurationQuerier
 {
-  Task<Configuration> ReadAsync(ConfigurationAggregate configuration, CancellationToken cancellationToken = default);
+  Task<ConfigurationModel> ReadAsync(Configuration configuration, CancellationToken cancellationToken = default);
 }

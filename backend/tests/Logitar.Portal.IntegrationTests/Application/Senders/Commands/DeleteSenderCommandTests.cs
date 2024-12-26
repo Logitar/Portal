@@ -14,7 +14,7 @@ public class DeleteSenderCommandTests : IntegrationTests
 {
   private readonly ISenderRepository _senderRepository;
 
-  private readonly SenderAggregate _sender;
+  private readonly Sender _sender;
 
   public DeleteSenderCommandTests() : base()
   {
@@ -44,7 +44,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   public async Task It_should_delete_an_existing_sender()
   {
     DeleteSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
     Assert.Equal(command.Id, sender.Id);
   }
@@ -53,7 +53,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_sender_cannot_be_found()
   {
     DeleteSenderCommand command = new(Guid.NewGuid());
-    Sender? sender = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(sender);
   }
 
@@ -63,7 +63,7 @@ public class DeleteSenderCommandTests : IntegrationTests
     SetRealm();
 
     DeleteSenderCommand command = new(_sender.Id.ToGuid());
-    Sender? result = await ActivityPipeline.ExecuteAsync(command);
+    SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
@@ -71,7 +71,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   public async Task It_should_throw_CannotDeleteDefaultSenderException_when_the_default_sender_is_not_unique_in_its_realm()
   {
     Assert.NotNull(_sender.Email);
-    SenderAggregate other = new(_sender.Email, _sender.Settings);
+    Sender other = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(other);
 
     DeleteSenderCommand command = new(_sender.Id.ToGuid());

@@ -15,12 +15,12 @@ internal class MessageFacade : IMessageService
     _activityPipeline = activityPipeline;
   }
 
-  public async Task<Message?> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<MessageModel?> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new ReadMessageQuery(id), cancellationToken);
   }
 
-  public async Task<SearchResults<Message>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<MessageModel>> SearchAsync(SearchMessagesPayload payload, CancellationToken cancellationToken)
   {
     return await _activityPipeline.ExecuteAsync(new SearchMessagesQuery(payload), cancellationToken);
   }

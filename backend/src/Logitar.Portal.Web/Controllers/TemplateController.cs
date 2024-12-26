@@ -21,53 +21,53 @@ public class TemplateController : ControllerBase
   }
 
   [HttpPost]
-  public async Task<ActionResult<Template>> CreateAsync([FromBody] CreateTemplatePayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> CreateAsync([FromBody] CreateTemplatePayload payload, CancellationToken cancellationToken)
   {
-    Template template = await _templateService.CreateAsync(payload, cancellationToken);
+    TemplateModel template = await _templateService.CreateAsync(payload, cancellationToken);
     return Created(BuildLocation(template), template);
   }
 
   [HttpDelete("{id}")]
-  public async Task<ActionResult<Template>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.DeleteAsync(id, cancellationToken);
+    TemplateModel? template = await _templateService.DeleteAsync(id, cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult<Template>> ReadAsync(Guid id, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.ReadAsync(id: id, cancellationToken: cancellationToken);
+    TemplateModel? template = await _templateService.ReadAsync(id: id, cancellationToken: cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 
   [HttpGet("unique-key:{uniqueKey}")]
-  public async Task<ActionResult<Template>> ReadByUniqueKeyAsync(string uniqueKey, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> ReadByUniqueKeyAsync(string uniqueKey, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.ReadAsync(uniqueKey: uniqueKey, cancellationToken: cancellationToken);
+    TemplateModel? template = await _templateService.ReadAsync(uniqueKey: uniqueKey, cancellationToken: cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 
   [HttpPut("{id}")]
-  public async Task<ActionResult<Template>> ReplaceAsync(Guid id, [FromBody] ReplaceTemplatePayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> ReplaceAsync(Guid id, [FromBody] ReplaceTemplatePayload payload, long? version, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.ReplaceAsync(id, payload, version, cancellationToken);
+    TemplateModel? template = await _templateService.ReplaceAsync(id, payload, version, cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 
   [HttpGet]
-  public async Task<ActionResult<SearchResults<Template>>> SearchAsync([FromQuery] SearchTemplatesModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<SearchResults<TemplateModel>>> SearchAsync([FromQuery] SearchTemplatesModel model, CancellationToken cancellationToken)
   {
     SearchTemplatesPayload payload = model.ToPayload();
     return Ok(await _templateService.SearchAsync(payload, cancellationToken));
   }
 
   [HttpPatch("{id}")]
-  public async Task<ActionResult<Template>> UpdateAsync(Guid id, [FromBody] UpdateTemplatePayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult<TemplateModel>> UpdateAsync(Guid id, [FromBody] UpdateTemplatePayload payload, CancellationToken cancellationToken)
   {
-    Template? template = await _templateService.UpdateAsync(id, payload, cancellationToken);
+    TemplateModel? template = await _templateService.UpdateAsync(id, payload, cancellationToken);
     return template == null ? NotFound() : Ok(template);
   }
 
-  private Uri BuildLocation(Template template) => HttpContext.BuildLocation("templates/{id}", new Dictionary<string, string> { ["id"] = template.Id.ToString() });
+  private Uri BuildLocation(TemplateModel template) => HttpContext.BuildLocation("templates/{id}", new Dictionary<string, string> { ["id"] = template.Id.ToString() });
 }

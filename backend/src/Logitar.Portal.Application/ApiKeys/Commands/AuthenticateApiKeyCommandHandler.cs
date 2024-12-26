@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
-internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateApiKeyCommand, ApiKey>
+internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateApiKeyCommand, ApiKeyModel>
 {
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
@@ -19,7 +19,7 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
     _apiKeyRepository = apiKeyRepository;
   }
 
-  public async Task<ApiKey> Handle(AuthenticateApiKeyCommand command, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> Handle(AuthenticateApiKeyCommand command, CancellationToken cancellationToken)
   {
     AuthenticateApiKeyPayload payload = command.Payload;
     new AuthenticateApiKeyValidator().ValidateAndThrow(payload);
