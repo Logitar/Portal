@@ -3,11 +3,11 @@ using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.GraphQL;
 
-internal class CustomIdentifierGraphType : ObjectGraphType<CustomIdentifier>
+internal class CustomIdentifierGraphType : ObjectGraphType<CustomIdentifierModel>
 {
   public CustomIdentifierGraphType()
   {
-    Name = nameof(CustomIdentifier);
+    Name = "CustomIdentifier";
     Description = "Represents an user-defined identifier of a resource.";
 
     Field(x => x.Key)

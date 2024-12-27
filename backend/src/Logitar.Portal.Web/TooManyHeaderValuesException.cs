@@ -2,7 +2,7 @@
 
 public class TooManyHeaderValuesException : Exception
 {
-  public const string ErrorMessage = "There are too many header values.";
+  private const string ErrorMessage = "There are too many header values.";
 
   public string Header
   {

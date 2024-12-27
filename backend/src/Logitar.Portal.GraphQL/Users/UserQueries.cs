@@ -21,7 +21,7 @@ internal static class UserQueries
       .ResolveAsync(async context => await context.GetQueryService<IUserService, object?>().ReadAsync(
         context.GetArgument<Guid?>("id"),
         context.GetArgument<string?>("uniqueName"),
-        context.GetArgument<CustomIdentifier?>("identifier"),
+        context.GetArgument<CustomIdentifierModel?>("identifier"),
         context.CancellationToken
       ));
 
