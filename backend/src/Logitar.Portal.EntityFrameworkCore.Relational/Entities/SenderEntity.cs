@@ -18,22 +18,7 @@ internal class SenderEntity : AggregateEntity
   public string? Description { get; private set; }
 
   public SenderProvider Provider { get; private set; }
-  public Dictionary<string, string> Settings { get; private set; } = [];
-  public string? SettingsSerialized
-  {
-    get => Settings.Count == 0 ? null : JsonSerializer.Serialize(Settings);
-    private set
-    {
-      if (value == null)
-      {
-        Settings.Clear();
-      }
-      else
-      {
-        Settings = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? Settings { get; private set; }
 
   public List<MessageEntity> Messages { get; private set; } = [];
 
@@ -71,20 +56,26 @@ internal class SenderEntity : AggregateEntity
 
   public void SetMailgunSettings(SenderMailgunSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey;
-    Settings[nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName;
+    SetSettings(new Dictionary<string, string>
+    {
+      [nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey,
+      [nameof(IMailgunSettings.DomainName)] = @event.Settings.DomainName
+    });
   }
   public void SetSendGridSettings(SenderSendGridSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey;
+    SetSettings(new Dictionary<string, string>
+    {
+      [nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey
+    });
   }
   public void SetTwilioSettings(SenderTwilioSettingsChanged @event)
   {
-    Settings.Clear();
-    Settings[nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid;
-    Settings[nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken;
+    SetSettings(new Dictionary<string, string>
+    {
+      [nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid,
+      [nameof(ITwilioSettings.AuthenticationToken)] = @event.Settings.AuthenticationToken
+    });
   }
 
   public void Update(SenderUpdated @event)
@@ -107,5 +98,14 @@ internal class SenderEntity : AggregateEntity
     {
       Description = @event.Description.Value?.Value;
     }
+  }
+
+  public Dictionary<string, string> GetSettings()
+  {
+    return (Settings == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(Settings)) ?? [];
+  }
+  private void SetSettings(Dictionary<string, string> settings)
+  {
+    Settings = settings.Count < 1 ? null : JsonSerializer.Serialize(settings);
   }
 }

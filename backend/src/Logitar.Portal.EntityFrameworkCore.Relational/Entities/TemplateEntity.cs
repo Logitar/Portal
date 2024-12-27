@@ -13,7 +13,7 @@ internal class TemplateEntity : AggregateEntity
   public string UniqueKey { get; private set; } = string.Empty;
   public string UniqueKeyNormalized
   {
-    get => UniqueKey.ToUpper();
+    get => UniqueKey.ToUpper(); // ISSUE #528: use Helper
     private set { }
   }
   public string? DisplayName { get; private set; }

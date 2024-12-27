@@ -59,7 +59,7 @@ internal class UserQuerier : IUserQuerier
   public async Task<UserModel?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string uniqueNameNormalized = uniqueName.Trim().ToUpper();
+    string uniqueNameNormalized = uniqueName.Trim().ToUpper(); // ISSUE #528: use Helper
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
@@ -77,7 +77,7 @@ internal class UserQuerier : IUserQuerier
   public async Task<IReadOnlyCollection<UserModel>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string emailAddressNormalized = email.Address.Trim().ToUpper();
+    string emailAddressNormalized = email.Address.Trim().ToUpper(); // ISSUE #528: use Helper
 
     UserEntity[] users = await _users.AsNoTracking()
       .Include(x => x.Identifiers)

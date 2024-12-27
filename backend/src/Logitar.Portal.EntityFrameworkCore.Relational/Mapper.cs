@@ -95,7 +95,7 @@ internal class Mapper
       Realm = realm
     };
 
-    foreach (KeyValuePair<string, string> entry in source.Entries)
+    foreach (KeyValuePair<string, string> entry in source.GetEntries())
     {
       destination.Entries.Add(new DictionaryEntry(entry));
     }
@@ -166,12 +166,12 @@ internal class Mapper
       destination.Recipients.Add(ToRecipient(recipient, user));
     }
 
-    foreach (KeyValuePair<string, string> variable in source.Variables)
+    foreach (KeyValuePair<string, string> variable in source.GetVariables())
     {
       destination.Variables.Add(new Variable(variable));
     }
 
-    foreach (KeyValuePair<string, string> data in source.ResultData)
+    foreach (KeyValuePair<string, string> data in source.GetResultData())
     {
       destination.ResultData.Add(new ResultData(data));
     }
@@ -216,7 +216,7 @@ internal class Mapper
       RequireUniqueEmail = source.RequireUniqueEmail
     };
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
@@ -314,16 +314,17 @@ internal class Mapper
       Realm = realm
     };
 
+    Dictionary<string, string> settings = source.GetSettings();
     switch (source.Provider)
     {
       case SenderProvider.Mailgun:
-        destination.Mailgun = new MailgunSettings(source.Settings[nameof(IMailgunSettings.ApiKey)], source.Settings[nameof(IMailgunSettings.DomainName)]);
+        destination.Mailgun = new MailgunSettings(settings[nameof(IMailgunSettings.ApiKey)], settings[nameof(IMailgunSettings.DomainName)]);
         break;
       case SenderProvider.SendGrid:
-        destination.SendGrid = new SendGridSettings(source.Settings[nameof(ISendGridSettings.ApiKey)]);
+        destination.SendGrid = new SendGridSettings(settings[nameof(ISendGridSettings.ApiKey)]);
         break;
       case SenderProvider.Twilio:
-        destination.Twilio = new TwilioSettings(source.Settings[nameof(ITwilioSettings.AccountSid)], source.Settings[nameof(ITwilioSettings.AuthenticationToken)]);
+        destination.Twilio = new TwilioSettings(settings[nameof(ITwilioSettings.AccountSid)], settings[nameof(ITwilioSettings.AuthenticationToken)]);
         break;
       default:
         throw new SenderProviderNotSupportedException(source.Provider);

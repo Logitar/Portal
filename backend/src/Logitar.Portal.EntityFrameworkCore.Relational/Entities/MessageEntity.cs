@@ -35,42 +35,12 @@ internal class MessageEntity : AggregateEntity
   public bool IgnoreUserLocale { get; private set; }
   public string? Locale { get; private set; }
 
-  public Dictionary<string, string> Variables { get; private set; } = [];
-  public string? VariablesSerialized
-  {
-    get => Variables.Count == 0 ? null : JsonSerializer.Serialize(Variables);
-    private set
-    {
-      if (value == null)
-      {
-        Variables.Clear();
-      }
-      else
-      {
-        Variables = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? Variables { get; private set; }
 
   public bool IsDemo { get; private set; }
 
   public MessageStatus Status { get; private set; }
-  public Dictionary<string, string> ResultData { get; private set; } = [];
-  public string? ResultDataSerialized
-  {
-    get => ResultData.Count == 0 ? null : JsonSerializer.Serialize(ResultData);
-    private set
-    {
-      if (value == null)
-      {
-        ResultData.Clear();
-      }
-      else
-      {
-        ResultData = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? ResultData { get; private set; }
 
   public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreated @event) : base(@event)
   {
@@ -108,10 +78,12 @@ internal class MessageEntity : AggregateEntity
     IgnoreUserLocale = @event.IgnoreUserLocale;
     Locale = @event.Locale?.Code;
 
+    Dictionary<string, string> variables = GetVariables();
     foreach (KeyValuePair<string, string> variable in @event.Variables)
     {
-      Variables[variable.Key] = variable.Value;
+      variables[variable.Key] = variable.Value;
     }
+    SetVariables(variables);
 
     IsDemo = @event.IsDemo;
 
@@ -138,11 +110,21 @@ internal class MessageEntity : AggregateEntity
     SetResultData(@event.ResultData);
   }
 
+  public Dictionary<string, string> GetVariables()
+  {
+    return (Variables == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(Variables)) ?? [];
+  }
+  private void SetVariables(Dictionary<string, string> variables)
+  {
+    Variables = variables.Count < 1 ? null : JsonSerializer.Serialize(variables);
+  }
+
+  public Dictionary<string, string> GetResultData()
+  {
+    return (ResultData == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(ResultData)) ?? [];
+  }
   private void SetResultData(IReadOnlyDictionary<string, string> resultData)
   {
-    foreach (KeyValuePair<string, string> data in resultData)
-    {
-      ResultData[data.Key] = data.Value;
-    }
+    ResultData = resultData.Count < 1 ? null : JsonSerializer.Serialize(resultData);
   }
 }

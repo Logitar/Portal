@@ -46,7 +46,7 @@ internal class RealmQuerier : IRealmQuerier
 
   public async Task<RealmModel?> ReadAsync(string uniqueSlug, CancellationToken cancellationToken)
   {
-    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper();
+    string uniqueSlugNormalized = uniqueSlug.Trim().ToUpper(); // ISSUE #528: use Helper
 
     RealmEntity? realm = await _realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.UniqueSlugNormalized == uniqueSlugNormalized, cancellationToken);

@@ -54,7 +54,7 @@ internal class TemplateQuerier : ITemplateQuerier
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string uniqueKeyNormalized = uniqueKey.Trim().ToUpper();
+    string uniqueKeyNormalized = uniqueKey.Trim().ToUpper(); // ISSUE #528: use Helper
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueKeyNormalized == uniqueKeyNormalized, cancellationToken);
