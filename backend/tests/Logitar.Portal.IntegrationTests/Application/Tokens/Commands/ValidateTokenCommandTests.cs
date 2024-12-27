@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Tokens;
