@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `IEnumerable<T>` by `IReadOnlyCollection<T>`.
 - Refactored validators.
 - Refactored database entities & `PortalDb`.
+- Upgraded Identity NuGet packages.
 
 ### Removed
 
