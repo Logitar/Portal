@@ -37,7 +37,7 @@ public class DictionaryAlreadyExistsException : Exception
     TenantId = dictionary.TenantId?.ToGuid();
     DictionaryId = dictionary.EntityId.ToGuid();
     ConflictId = conflictId.EntityId.ToGuid();
-    Locale = dictionary.Locale.ToString();
+    Locale = dictionary.Locale.Code;
     PropertyName = nameof(Dictionary.Locale);
   }
 
@@ -45,7 +45,7 @@ public class DictionaryAlreadyExistsException : Exception
     .AddData(nameof(TenantId), dictionary.TenantId?.ToGuid(), "<null>")
     .AddData(nameof(DictionaryId), dictionary.EntityId.ToGuid())
     .AddData(nameof(ConflictId), conflictId.EntityId.ToGuid())
-    .AddData(nameof(Locale), dictionary.Locale)
+    .AddData(nameof(Locale), dictionary.Locale.Code)
     .AddData(nameof(PropertyName), nameof(Dictionary.Locale))
     .Build();
 }

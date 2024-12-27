@@ -29,6 +29,10 @@ public class UniqueSlugAlreadyUsedException : Exception
 
   public UniqueSlugAlreadyUsedException(Realm realm, RealmId conflictId) : base(BuildMessage(realm, conflictId))
   {
+    RealmId = realm.Id.ToGuid();
+    ConflictId = conflictId.ToGuid();
+    Slug = realm.UniqueSlug.Value;
+    PropertyName = nameof(Realm.UniqueSlug);
   }
 
   private static string BuildMessage(Realm realm, RealmId conflictId) => new ErrorMessageBuilder(ErrorMessage)
