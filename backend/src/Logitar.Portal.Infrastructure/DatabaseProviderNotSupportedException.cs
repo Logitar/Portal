@@ -2,7 +2,7 @@
 
 public class DatabaseProviderNotSupportedException : NotSupportedException
 {
-  public const string ErrorMessage = "The specified database provider is not supported.";
+  private const string ErrorMessage = "The specified database provider is not supported.";
 
   public DatabaseProvider DatabaseProvider
   {

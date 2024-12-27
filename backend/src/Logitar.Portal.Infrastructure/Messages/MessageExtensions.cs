@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core.Users;
 using Logitar.Net.Sms;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages;

@@ -2,15 +2,15 @@
 
 namespace Logitar.Portal.Infrastructure.Converters;
 
-internal class UniqueSlugConverter : JsonConverter<Slug>
+internal class SlugConverter : JsonConverter<Slug>
 {
   public override Slug? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
   {
     return Slug.TryCreate(reader.GetString());
   }
 
-  public override void Write(Utf8JsonWriter writer, Slug uniqueSlug, JsonSerializerOptions options)
+  public override void Write(Utf8JsonWriter writer, Slug slug, JsonSerializerOptions options)
   {
-    writer.WriteStringValue(uniqueSlug.Value);
+    writer.WriteStringValue(slug.Value);
   }
 }

@@ -1,38 +1,38 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Infrastructure;
-using Logitar.Identity.Infrastructure.Handlers;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Logging;
 using MediatR;
 
 namespace Logitar.Portal.Infrastructure;
 
-internal class PortalEventBus : EventBus
+internal class EventBus : Identity.Infrastructure.EventBus
 {
   private readonly ICacheService _cacheService;
   private readonly ILoggingService _loggingService;
 
-  public PortalEventBus(ICacheService cacheService, ILoggingService loggingService, IPublisher publisher, IApiKeyEventHandler apiKeyEventHandler, IOneTimePasswordEventHandler oneTimePasswordEventHandler, IRoleEventHandler roleEventHandler, ISessionEventHandler sessionEventHandler, IUserEventHandler userEventHandler)
-    : base(publisher, apiKeyEventHandler, oneTimePasswordEventHandler, roleEventHandler, sessionEventHandler, userEventHandler)
+  public EventBus(ICacheService cacheService, ILoggingService loggingService, IMediator mediator) : base(mediator)
   {
     _cacheService = cacheService;
     _loggingService = loggingService;
   }
 
-  public override async Task PublishAsync(DomainEvent @event, CancellationToken cancellationToken)
+  public override async Task PublishAsync(IEvent @event, CancellationToken cancellationToken)
   {
-    _loggingService.Report(@event);
-
     await base.PublishAsync(@event, cancellationToken);
 
-    string? @namespace = @event.GetType().Namespace;
-    switch (@namespace)
+    if (@event is DomainEvent domainEvent)
     {
-      case "Logitar.Identity.Domain.ApiKeys.Events":
-      case "Logitar.Identity.Domain.Users.Events":
-        ActorId actorId = new(@event.AggregateId.Value);
-        _cacheService.RemoveActor(actorId);
-        break;
+      _loggingService.Report(domainEvent);
+
+      string? @namespace = @event.GetType().Namespace;
+      switch (@namespace)
+      {
+        case "Logitar.Identity.Core.ApiKeys.Events":
+        case "Logitar.Identity.Core.Users.Events":
+          ActorId actorId = new(domainEvent.StreamId.Value);
+          _cacheService.RemoveActor(actorId);
+          break;
+      }
     }
   }
 }

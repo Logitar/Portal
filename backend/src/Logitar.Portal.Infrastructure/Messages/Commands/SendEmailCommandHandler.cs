@@ -11,19 +11,17 @@ namespace Logitar.Portal.Infrastructure.Messages.Commands;
 
 internal class SendEmailCommandHandler : IRequestHandler<SendEmailCommand>
 {
-  private readonly JsonSerializerOptions _serializerOptions;
-
+  private readonly JsonSerializerOptions _serializerOptions = new();
   private readonly Dictionary<SenderProvider, IProviderStrategy> _strategies = [];
 
-  public SendEmailCommandHandler(IServiceProvider serviceProvider, IEnumerable<IProviderStrategy> strategies)
+  public SendEmailCommandHandler(IEnumerable<IProviderStrategy> strategies)
   {
-    _serializerOptions = new();
-    _serializerOptions.Converters.AddRange(serviceProvider.GetLogitarPortalJsonConverters());
-
     foreach (IProviderStrategy strategy in strategies)
     {
       _strategies[strategy.Provider] = strategy;
     }
+
+    _serializerOptions.Converters.Add(new JsonStringEnumConverter());
   }
 
   public async Task Handle(SendEmailCommand command, CancellationToken cancellationToken)
