@@ -1,5 +1,4 @@
 ﻿using Logitar.Portal.Application.Logging;
-using Logitar.Portal.Infrastructure;
 using Logitar.Portal.MongoDB.Repositories;
 using Logitar.Portal.MongoDB.Settings;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +23,6 @@ public static class DependencyInjectionExtensions
       services.AddSingleton(database).AddTransient<ILogRepository, LogRepository>();
     }
 
-    return services.AddLogitarPortalInfrastructure();
+    return services;
   }
 }

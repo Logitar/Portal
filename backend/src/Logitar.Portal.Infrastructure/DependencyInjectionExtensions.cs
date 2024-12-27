@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing.Infrastructure;
 using Logitar.Identity.Infrastructure;
-using Logitar.Portal.Application;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Infrastructure.Caching;
 using Logitar.Portal.Infrastructure.Messages.Providers;
@@ -20,7 +19,6 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddLogitarIdentityInfrastructure()
-      .AddLogitarPortalApplication()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddMemoryCache()
       .AddSenderProviders()

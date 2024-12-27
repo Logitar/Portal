@@ -62,6 +62,10 @@ public abstract class IntegrationTests : IAsyncLifetime
     services.AddScoped<IBaseUrl, TestBaseUrl>();
     services.AddScoped<TestContext>();
 
+    services.AddLogitarPortalApplication();
+    services.AddLogitarPortalInfrastructure();
+    services.AddLogitarPortalWithEntityFrameworkCoreRelational();
+
     string connectionString;
     _databaseProvider = configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (_databaseProvider)

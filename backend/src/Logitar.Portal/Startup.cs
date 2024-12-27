@@ -39,6 +39,8 @@ internal class Startup : StartupBase
   {
     base.ConfigureServices(services);
 
+    services.AddLogitarPortalApplication();
+    services.AddLogitarPortalInfrastructure();
     services.AddLogitarPortalGraphQL(_configuration);
     services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
@@ -84,6 +86,7 @@ internal class Startup : StartupBase
 
     services.AddOpenApi();
 
+    services.AddLogitarPortalWithEntityFrameworkCoreRelational();
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
     {
