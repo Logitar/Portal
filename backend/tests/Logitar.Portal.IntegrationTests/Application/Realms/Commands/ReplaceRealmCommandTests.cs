@@ -42,12 +42,12 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     string oldSecret = _realm.Secret.Value;
 
-    _realm.DefaultLocale = new LocaleUnit("fr");
+    _realm.DefaultLocale = new Locale("fr");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
     long version = _realm.Version;
 
-    _realm.DefaultLocale = new LocaleUnit("fr-CA");
+    _realm.DefaultLocale = new Locale("fr-CA");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
 

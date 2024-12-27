@@ -25,8 +25,8 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
@@ -44,14 +44,14 @@ public class AuthenticateUserCommandTests : IntegrationTests
     AuthenticateUserCommand command = new(payload);
     UserModel result = await ActivityPipeline.ExecuteAsync(command);
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Equal(user.Id.ToGuid(), result.Id);
   }
 
   [Fact(DisplayName = "It should throw IncorrectUserPasswordException when the password is incorrect.")]
   public async Task It_should_throw_IncorrectUserPasswordException_when_the_password_is_incorrect()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     AuthenticateUserPayload payload = new(UsernameString, PasswordString[..^1]);
     AuthenticateUserCommand command = new(payload);
@@ -63,14 +63,14 @@ public class AuthenticateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
   public async Task It_should_throw_TooManyResultsException_when_multiple_users_are_found()
   {
-    UserAggregate user = (await _userRepository.LoadAsync()).Single();
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
-    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    User user = (await _userRepository.LoadAsync()).Single();
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
+    User other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
     await _userRepository.SaveAsync([user, other]);
 
     AuthenticateUserPayload payload = new(Faker.Person.Email, PasswordString);
     AuthenticateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }
@@ -80,8 +80,8 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    UserAggregate other = new(user.UniqueName, TenantId);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    User other = new(user.UniqueName, TenantId);
     await _userRepository.SaveAsync(other);
 
     AuthenticateUserPayload payload = new(other.UniqueName.Value, PasswordString);
@@ -95,8 +95,8 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    UserAggregate disabled = new(user.UniqueName, TenantId);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    User disabled = new(user.UniqueName, TenantId);
     disabled.Disable();
     await _userRepository.SaveAsync(disabled);
 
@@ -111,7 +111,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 

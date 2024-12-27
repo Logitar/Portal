@@ -41,7 +41,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     SetUser(user: null);
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
     apiKey.SetExpiration(DateTime.Now.AddDays(1));
@@ -64,7 +64,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     const int millisecondsDelay = 50;
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
     apiKey.SetExpiration(DateTime.Now.AddMilliseconds(millisecondsDelay));
@@ -95,7 +95,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     SetRealm();
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
     string xApiKey = XApiKey.Encode(apiKey.Id, _secret);
@@ -110,7 +110,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw IncorrectApiKeySecretException when the secret is incorrect.")]
   public async Task It_should_throw_IncorrectApiKeySecretException_when_the_secret_is_incorrect()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     _ = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secret);
     Assert.NotEqual(_secret, secret);
 
@@ -141,10 +141,10 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     Assert.Equal("XApiKey", exception.Errors.Single().PropertyName);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _secret);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

@@ -21,7 +21,7 @@ public class ReadDefaultSenderQueryTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     _sender = new(email, settings);
     _sender.SetDefault();

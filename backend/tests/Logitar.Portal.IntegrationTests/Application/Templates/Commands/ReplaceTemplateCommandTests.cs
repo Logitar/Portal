@@ -44,12 +44,12 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace an existing template.")]
   public async Task It_should_replace_an_existing_template()
   {
-    _template.DisplayName = new DisplayNameUnit("Reset Password");
+    _template.DisplayName = new DisplayName("Reset Password");
     _template.Update();
     await _templateRepository.SaveAsync(_template);
     long version = _template.Version;
 
-    DisplayNameUnit displayName = new("Password Recovery");
+    DisplayName displayName = new("Password Recovery");
     _template.DisplayName = displayName;
     _template.Update();
     await _templateRepository.SaveAsync(_template);

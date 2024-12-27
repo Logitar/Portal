@@ -23,7 +23,7 @@ public class SearchSendersQueryTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     _sender = new(email, settings);
     _sender.SetDefault();
@@ -57,24 +57,24 @@ public class SearchSendersQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Sender notInSearch = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInSearch = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
-      DisplayName = new DisplayNameUnit(Faker.Name.FullName())
+      DisplayName = new DisplayName(Faker.Name.FullName())
     };
     notInSearch.Update();
-    Sender notInIds = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInIds = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
-      DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
+      DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     notInIds.Update();
-    Sender sender1 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender1 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
-      DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
+      DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     sender1.Update();
-    Sender sender2 = new(new EmailUnit(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender2 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
     {
-      DisplayName = new DisplayNameUnit(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
+      DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     sender2.Update();
     await _senderRepository.SaveAsync([notInSearch, notInIds, sender1, sender2]);

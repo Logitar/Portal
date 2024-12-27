@@ -34,7 +34,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing One-Time Password.")]
   public async Task It_should_delete_an_existing_One_Time_Password()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
     DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
     OneTimePasswordModel? deleted = await ActivityPipeline.ExecuteAsync(command);
@@ -53,7 +53,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the One-Time Password is in another tenant.")]
   public async Task It_should_return_null_when_the_One_Time_Password_is_in_another_tenant()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
     SetRealm();
 
@@ -62,10 +62,10 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
     Assert.Null(result);
   }
 
-  private async Task<OneTimePasswordAggregate> CreateOneTimePasswordAsync()
+  private async Task<OneTimePassword> CreateOneTimePasswordAsync()
   {
     Password password = _passwordManager.Generate("0123456789", 6, out _);
-    OneTimePasswordAggregate oneTimePassword = new(password);
+    OneTimePassword oneTimePassword = new(password);
 
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword);
 

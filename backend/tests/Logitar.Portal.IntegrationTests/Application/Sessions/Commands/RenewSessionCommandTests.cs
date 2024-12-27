@@ -31,7 +31,7 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should renew the session using the provided actor ID.")]
   public async Task It_should_renew_the_session_using_the_provided_actor_Id()
   {
-    ApiKeyAggregate apiKeyAggregate = new(new DisplayNameUnit("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
+    ApiKey apiKeyAggregate = new(new DisplayName("Default API key"), _passwordManager.GenerateBase64(256 / 8, out _));
     await _apiKeyRepository.SaveAsync(apiKeyAggregate);
 
     ApiKeyModel apiKey = new(apiKeyAggregate.DisplayName.Value)
@@ -46,10 +46,10 @@ public class RenewSessionCommandTests : IntegrationTests
 
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
     ActorId actorId = new(apiKey.Id);
-    SessionAggregate session = user.SignIn(secret, actorId);
+    Session session = user.SignIn(secret, actorId);
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
 
@@ -77,9 +77,9 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should renew the session using the user ID when no actor.")]
   public async Task It_should_renew_the_session_using_the_user_Id_when_no_actor()
   {
-    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    User user = (await _userRepository.LoadAsync(tenantId: null)).Single();
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
-    SessionAggregate session = user.SignIn(secret);
+    Session session = user.SignIn(secret);
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
 
@@ -96,9 +96,9 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw IncorrectSessionSecretException when the secret is not correct.")]
   public async Task It_should_throw_IncorrectSessionSecretException_when_the_secret_is_not_correct()
   {
-    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    User user = (await _userRepository.LoadAsync(tenantId: null)).Single();
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out _);
-    SessionAggregate session = user.SignIn(secret);
+    Session session = user.SignIn(secret);
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
 
@@ -124,9 +124,9 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw SessionIsNotActiveException when the session is not active.")]
   public async Task It_should_throw_SessionIsNotActiveException_when_the_session_is_not_active()
   {
-    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    User user = (await _userRepository.LoadAsync(tenantId: null)).Single();
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secretString);
-    SessionAggregate session = user.SignIn(secret);
+    Session session = user.SignIn(secret);
     session.SignOut();
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
@@ -140,8 +140,8 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw SessionIsNotPersistentException when the session is not persistent.")]
   public async Task It_should_throw_SessionIsNotPersistentException_when_the_session_is_not_persistent()
   {
-    UserAggregate user = (await _userRepository.LoadAsync(tenantId: null)).Single();
-    SessionAggregate session = user.SignIn();
+    User user = (await _userRepository.LoadAsync(tenantId: null)).Single();
+    Session session = user.SignIn();
     await _userRepository.SaveAsync(user);
     await _sessionRepository.SaveAsync(session);
 
@@ -166,8 +166,8 @@ public class RenewSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw SessionNotFoundException when the session is in another realm.")]
   public async Task It_should_throw_SessionNotFoundException_when_the_session_is_in_another_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    SessionAggregate session = new(user);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    Session session = new(user);
     await _sessionRepository.SaveAsync(session);
     _ = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string secret);
 

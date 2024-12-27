@@ -21,7 +21,7 @@ public class SearchDictionariesQueryTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -52,10 +52,10 @@ public class SearchDictionariesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Dictionary notMatching = new(new LocaleUnit(Faker.Locale), TenantId);
-    Dictionary notInIds = new(new LocaleUnit("fr"), TenantId);
-    Dictionary empty = new(new LocaleUnit("fr-FR"), TenantId);
-    Dictionary notEmpty = new(new LocaleUnit("fr-CA"), TenantId);
+    Dictionary notMatching = new(new Locale(Faker.Locale), TenantId);
+    Dictionary notInIds = new(new Locale("fr"), TenantId);
+    Dictionary empty = new(new Locale("fr-FR"), TenantId);
+    Dictionary notEmpty = new(new Locale("fr-CA"), TenantId);
     notEmpty.SetEntry("Poutine", "Poutine");
     notEmpty.Update();
     await _dictionaryRepository.SaveAsync([notMatching, notInIds, empty, notEmpty]);

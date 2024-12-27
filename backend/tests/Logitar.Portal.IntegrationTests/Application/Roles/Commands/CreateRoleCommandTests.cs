@@ -59,12 +59,12 @@ public class CreateRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateRolePayload payload = new(role.UniqueName.Value);
     CreateRoleCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<Role>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(TenantId, exception.TenantId);
     Assert.Equal(role.UniqueName, exception.UniqueName);
   }

@@ -53,7 +53,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
   public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     SetRealm();
 
@@ -66,7 +66,7 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     UpdateApiKeyPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
@@ -92,12 +92,12 @@ public class UpdateApiKeyCommandTests : IntegrationTests
   public async Task It_should_update_an_existing_Api_key()
   {
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueNameUnit(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
+    Role admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    Role editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    Role reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     apiKey.SetCustomAttribute("UserId", Guid.NewGuid().ToString());
     apiKey.SetCustomAttribute("SubSystem", "tests");
@@ -134,10 +134,10 @@ public class UpdateApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

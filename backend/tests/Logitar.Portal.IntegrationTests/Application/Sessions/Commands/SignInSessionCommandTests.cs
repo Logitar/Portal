@@ -54,8 +54,8 @@ public class SignInSessionCommandTests : IntegrationTests
 
     UserId userId = UserId.NewId();
     ActorId actorId = new(userId.Value);
-    UniqueNameUnit uniqueName = new(Realm.UniqueNameSettings, UsernameString);
-    UserAggregate user = new(uniqueName, TenantId, actorId, userId);
+    UniqueName uniqueName = new(Realm.UniqueNameSettings, UsernameString);
+    User user = new(uniqueName, TenantId, actorId, userId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
     await _userRepository.SaveAsync(user);
 
@@ -78,8 +78,8 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
@@ -125,14 +125,14 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
   public async Task It_should_throw_TooManyResultsException_when_multiple_users_are_found()
   {
-    UserAggregate user = (await _userRepository.LoadAsync()).Single();
-    user.SetEmail(new EmailUnit(Faker.Person.Email, isVerified: true));
-    UserAggregate other = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
+    User user = (await _userRepository.LoadAsync()).Single();
+    user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
+    User other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Person.Email));
     await _userRepository.SaveAsync([user, other]);
 
     SignInSessionPayload payload = new(Faker.Person.Email, PasswordString);
     SignInSessionCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TooManyResultsException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<TooManyResultsException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);
   }
@@ -142,7 +142,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 

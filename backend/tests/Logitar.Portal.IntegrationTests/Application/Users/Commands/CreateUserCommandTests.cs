@@ -25,7 +25,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
     await _roleRepository.SaveAsync(role);
 
     CreateUserPayload payload = new(UsernameString)
@@ -69,14 +69,14 @@ public class CreateUserCommandTests : IntegrationTests
   {
     string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
 
-    UserAggregate user = (await _userRepository.LoadAsync()).Single();
+    User user = (await _userRepository.LoadAsync()).Single();
     user.SetCustomIdentifier("HealthInsuranceNumber", healthInsuranceNumber);
     await _userRepository.SaveAsync(user);
 
     CreateUserPayload payload = new(Faker.Internet.UserName());
     payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", healthInsuranceNumber));
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal("HealthInsuranceNumber", exception.Key);
     Assert.Equal(healthInsuranceNumber, exception.Value);
@@ -111,7 +111,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     CreateUserPayload payload = new(UsernameString);
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }

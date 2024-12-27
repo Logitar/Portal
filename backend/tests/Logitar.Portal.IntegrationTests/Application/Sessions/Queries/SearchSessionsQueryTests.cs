@@ -40,18 +40,18 @@ public class SearchSessionsQueryTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user1 = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
-    UserAggregate user2 = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    User user1 = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user2 = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
     await _userRepository.SaveAsync([user1, user2]);
 
-    SessionAggregate notInIds = user1.SignIn();
-    SessionAggregate otherUser = user2.SignIn();
-    SessionAggregate signedOut = user1.SignIn();
+    Session notInIds = user1.SignIn();
+    Session otherUser = user2.SignIn();
+    Session signedOut = user1.SignIn();
     signedOut.SignOut();
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out _);
-    SessionAggregate persistent = user1.SignIn(secret);
-    SessionAggregate session1 = user1.SignIn();
-    SessionAggregate session2 = user1.SignIn();
+    Session persistent = user1.SignIn(secret);
+    Session session1 = user1.SignIn();
+    Session session2 = user1.SignIn();
     await _sessionRepository.SaveAsync([notInIds, otherUser, signedOut, persistent, session1, session2]);
 
     SearchSessionsPayload payload = new()

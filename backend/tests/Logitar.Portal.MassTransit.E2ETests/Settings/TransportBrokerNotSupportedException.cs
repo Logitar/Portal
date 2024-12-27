@@ -2,7 +2,7 @@
 
 internal class TransportBrokerNotSupportedException : NotSupportedException
 {
-  public const string ErrorMessage = "The specified transport broker is not supported.";
+  private const string ErrorMessage = "The specified transport broker is not supported.";
 
   public TransportBroker TransportBroker
   {

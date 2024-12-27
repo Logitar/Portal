@@ -31,8 +31,8 @@ public class ReadSessionQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the session when it is found.")]
   public async Task It_should_return_the_session_when_it_is_found()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    SessionAggregate aggregate = new(user);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    Session aggregate = new(user);
     await _sessionRepository.SaveAsync(aggregate);
 
     SessionEntity? entity = await IdentityContext.Sessions.AsNoTracking().SingleOrDefaultAsync();

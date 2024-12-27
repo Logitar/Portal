@@ -21,7 +21,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
   {
     string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
     user.SetCustomIdentifier(Key, healthInsuranceNumber);
     await _userRepository.SaveAsync(user);
 
@@ -42,7 +42,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 

@@ -19,7 +19,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   {
     const string newPassword = "Test123!";
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     ResetUserPasswordPayload payload = new(newPassword);
     ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
@@ -40,7 +40,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 

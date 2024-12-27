@@ -45,7 +45,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the One-Time Password is in another tenant.")]
   public async Task It_should_return_null_when_the_One_Time_Password_is_in_another_tenant()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
     SetRealm();
 
@@ -58,7 +58,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw IncorrectOneTimePasswordPasswordException when the password is not correct.")]
   public async Task It_should_throw_IncorrectOneTimePasswordPasswordException_when_the_password_is_not_correct()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
@@ -70,7 +70,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw MaximumAttemptsReachedException when the maximum number of attempts has been reached.")]
   public async Task It_should_throw_MaximumAttemptsReachedException_when_the_maximum_number_of_attempts_has_been_reached()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync(maximumAttempts: 1);
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync(maximumAttempts: 1);
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
     ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
@@ -83,7 +83,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw OneTimePasswordAlreadyUsedException when validation has already succeeded.")]
   public async Task It_should_throw_OneTimePasswordAlreadyUsedException_when_validation_has_already_succeeded()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
     Assert.NotNull(_password);
 
     oneTimePassword.Validate(_password);
@@ -100,7 +100,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   {
     const int millisecondsDelay = 500;
 
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync(expiresOn: DateTime.Now.AddMilliseconds(millisecondsDelay));
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync(expiresOn: DateTime.Now.AddMilliseconds(millisecondsDelay));
     Assert.NotNull(_password);
 
     await Task.Delay(millisecondsDelay);
@@ -123,7 +123,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   [Fact(DisplayName = "It should validate a One-Time Password.")]
   public async Task It_should_validate_a_One_Time_Password()
   {
-    OneTimePasswordAggregate oneTimePassword = await CreateOneTimePasswordAsync();
+    OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
     Assert.NotNull(_password);
 
     ValidateOneTimePasswordPayload payload = new(_password);
@@ -137,10 +137,10 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     Assert.Equal(payload.CustomAttributes, result.CustomAttributes);
   }
 
-  private async Task<OneTimePasswordAggregate> CreateOneTimePasswordAsync(DateTime? expiresOn = null, int? maximumAttempts = null)
+  private async Task<OneTimePassword> CreateOneTimePasswordAsync(DateTime? expiresOn = null, int? maximumAttempts = null)
   {
     Password password = _passwordManager.Generate("0123456789", 6, out _password);
-    OneTimePasswordAggregate oneTimePassword = new(password, tenantId: null, expiresOn, maximumAttempts);
+    OneTimePassword oneTimePassword = new(password, tenantId: null, expiresOn, maximumAttempts);
 
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword);
 

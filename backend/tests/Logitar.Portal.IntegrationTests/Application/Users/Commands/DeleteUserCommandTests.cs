@@ -20,7 +20,7 @@ public class DeleteUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing user.")]
   public async Task It_should_delete_an_existing_user()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     DeleteUserCommand command = new(user.Id.ToGuid());
     UserModel? deleted = await ActivityPipeline.ExecuteAsync(command);
@@ -41,7 +41,7 @@ public class DeleteUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is in another tenant.")]
   public async Task It_should_return_null_when_the_user_is_in_another_tenant()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 

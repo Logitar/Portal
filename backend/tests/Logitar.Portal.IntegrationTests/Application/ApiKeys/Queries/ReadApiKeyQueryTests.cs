@@ -44,7 +44,7 @@ public class ReadApiKeyQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the API key when it is found.")]
   public async Task It_should_return_the_Api_key_when_it_is_found()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     ReadApiKeyQuery query = new(apiKey.Id.ToGuid());
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(query);
@@ -52,10 +52,10 @@ public class ReadApiKeyQueryTests : IntegrationTests
     Assert.Equal(query.Id, result.Id);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

@@ -38,8 +38,8 @@ public class SignOutSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should sign-out the specified session.")]
   public async Task It_should_sign_out_the_specified_session()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    SessionAggregate aggregate = new(user);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    Session aggregate = new(user);
     await _sessionRepository.SaveAsync(aggregate);
 
     SignOutSessionCommand command = new(aggregate.Id.ToGuid());

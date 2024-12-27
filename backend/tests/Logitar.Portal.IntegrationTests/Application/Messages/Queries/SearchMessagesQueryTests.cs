@@ -55,7 +55,7 @@ public class SearchMessagesQueryTests : IntegrationTests
   {
     SetRealm();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     Sender sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);

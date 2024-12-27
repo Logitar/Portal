@@ -27,12 +27,12 @@ public class UpdateSenderCommandTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     _mailgun = new(email, new ReadOnlyMailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName()));
     _sendGrid = new(email, new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()));
     _sendGrid.SetDefault();
 
-    PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
+    Phone phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
     _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()))
     {
       Description = new DescriptionUnit("This is the SMS sender.")

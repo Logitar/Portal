@@ -50,7 +50,7 @@ public class ReadMessageQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the message when it is found.")]
   public async Task It_should_return_the_message_when_it_is_found()
   {
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     Sender sender = new(email, settings, TenantId);
     await _senderRepository.SaveAsync(sender);

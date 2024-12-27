@@ -110,12 +110,12 @@ public abstract class IntegrationTests : IAsyncLifetime
     await publisher.Publish(new InitializeConfigurationCommand(UsernameString, PasswordString));
 
     IUserRepository userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
-    UserAggregate userAggregate = Assert.Single(await userRepository.LoadAsync());
+    User userAggregate = Assert.Single(await userRepository.LoadAsync());
     ActorId actorId = new(userAggregate.Id.Value);
-    userAggregate.FirstName = new PersonNameUnit(Faker.Person.FirstName);
-    userAggregate.LastName = new PersonNameUnit(Faker.Person.LastName);
+    userAggregate.FirstName = new PersonName(Faker.Person.FirstName);
+    userAggregate.LastName = new PersonName(Faker.Person.LastName);
     userAggregate.Update(actorId);
-    EmailUnit email = new(Faker.Person.Email, isVerified: false);
+    Email email = new(Faker.Person.Email, isVerified: false);
     userAggregate.SetEmail(email, actorId);
     await userRepository.SaveAsync(userAggregate);
 

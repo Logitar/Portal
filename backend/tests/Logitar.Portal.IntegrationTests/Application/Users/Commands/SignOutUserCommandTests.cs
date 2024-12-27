@@ -38,7 +38,7 @@ public class SignOutUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should sign-out the specified user.")]
   public async Task It_should_sign_out_the_specified_user()
   {
-    UserAggregate aggregate = (await _userRepository.LoadAsync()).Single();
+    User aggregate = (await _userRepository.LoadAsync()).Single();
     SignOutUserCommand command = new(aggregate.Id.ToGuid());
 
     UserModel? user = await ActivityPipeline.ExecuteAsync(command);

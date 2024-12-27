@@ -37,28 +37,28 @@ public class SearchUsersQueryTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate initialUser = Assert.Single(await _userRepository.LoadAsync());
-    UserAggregate noNickname = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NoNickname"), TenantId);
-    UserAggregate notInIds = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NotInIds"), TenantId);
-    UserAggregate noPassword = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NoPassword"), TenantId);
-    UserAggregate disabled = new(new UniqueNameUnit(Realm.UniqueNameSettings, "Disabled"), TenantId);
-    UserAggregate confirmed = new(new UniqueNameUnit(Realm.UniqueNameSettings, "Confirmed"), TenantId);
+    User initialUser = Assert.Single(await _userRepository.LoadAsync());
+    User noNickname = new(new UniqueName(Realm.UniqueNameSettings, "NoNickname"), TenantId);
+    User notInIds = new(new UniqueName(Realm.UniqueNameSettings, "NotInIds"), TenantId);
+    User noPassword = new(new UniqueName(Realm.UniqueNameSettings, "NoPassword"), TenantId);
+    User disabled = new(new UniqueName(Realm.UniqueNameSettings, "Disabled"), TenantId);
+    User confirmed = new(new UniqueName(Realm.UniqueNameSettings, "Confirmed"), TenantId);
 
     disabled.Disable();
-    confirmed.SetEmail(new EmailUnit(Faker.Internet.Email(), isVerified: true));
+    confirmed.SetEmail(new Email(Faker.Internet.Email(), isVerified: true));
 
-    UserAggregate youngest = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
+    User youngest = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
     {
       Birthdate = DateTime.Now.AddYears(-20)
     };
-    UserAggregate oldest = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
+    User oldest = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
     {
       Birthdate = DateTime.Now.AddYears(-30)
     };
 
-    PersonNameUnit nickname = new(Faker.Name.FirstName());
-    UserAggregate[] users = [initialUser, notInIds, noPassword, disabled, confirmed, youngest, oldest];
-    foreach (UserAggregate user in users)
+    PersonName nickname = new(Faker.Name.FirstName());
+    User[] users = [initialUser, notInIds, noPassword, disabled, confirmed, youngest, oldest];
+    foreach (User user in users)
     {
       user.Nickname = nickname;
       user.Update();
@@ -66,7 +66,7 @@ public class SearchUsersQueryTests : IntegrationTests
 
     Password password = _passwordManager.ValidateAndCreate(PasswordString);
     users = [noNickname, notInIds, disabled, confirmed, youngest, oldest];
-    foreach (UserAggregate user in users)
+    foreach (User user in users)
     {
       user.SetPassword(password);
     }

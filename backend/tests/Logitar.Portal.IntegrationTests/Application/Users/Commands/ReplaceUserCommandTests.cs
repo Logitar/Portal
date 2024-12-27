@@ -45,12 +45,12 @@ public class ReplaceUserCommandTests : IntegrationTests
     const string newPassword = "Test123!";
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueNameUnit(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
+    Role admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    Role editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    Role reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     user.SetCustomAttribute("HourlyRate", "37.50");
     string jobTitle = Faker.Name.JobTitle();
@@ -163,7 +163,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is in another tenant.")]
   public async Task It_should_return_null_when_the_user_is_in_another_tenant()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 
@@ -176,7 +176,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw EmailAddressAlreadyUsedException when the email address is already used.")]
   public async Task It_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    User user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(user.UniqueName.Value)
@@ -192,7 +192,7 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     ReplaceUserPayload payload = new(user.UniqueName.Value);
     payload.Roles.Add("admin");
@@ -205,12 +205,12 @@ public class ReplaceUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    User user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(UsernameString.ToUpperInvariant());
     ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
   }
