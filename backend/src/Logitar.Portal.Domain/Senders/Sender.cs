@@ -137,7 +137,7 @@ public class Sender : AggregateRoot
   }
   protected virtual void Handle(EmailSenderCreated @event)
   {
-    Apply((SenderCreated)@event);
+    Handle((SenderCreated)@event);
   }
   protected virtual void Handle(SenderCreated @event)
   {

@@ -23,7 +23,7 @@ internal class UpdateSenderValidator : AbstractValidator<UpdateSenderPayload>
         break;
       case SenderType.Sms:
         RuleFor(x => x.EmailAddress).Empty();
-        When(x => x.PhoneNumber != null, () => RuleFor(x => x.EmailAddress!).PhoneNumber());
+        When(x => x.PhoneNumber != null, () => RuleFor(x => x.PhoneNumber!).PhoneNumber());
         RuleFor(x => x.DisplayName).Empty();
         break;
       default:
