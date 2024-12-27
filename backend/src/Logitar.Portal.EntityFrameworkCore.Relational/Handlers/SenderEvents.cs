@@ -24,7 +24,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(EmailSenderCreated @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender == null)
     {
       sender = new(@event);
@@ -38,7 +38,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderDeleted @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       _context.Senders.Remove(sender);
@@ -50,7 +50,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderMailgunSettingsChanged @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       sender.SetMailgunSettings(@event);
@@ -62,7 +62,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderSendGridSettingsChanged @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       sender.SetSendGridSettings(@event);
@@ -74,7 +74,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderSetDefault @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       sender.SetDefault(@event);
@@ -86,7 +86,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderTwilioSettingsChanged @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       sender.SetTwilioSettings(@event);
@@ -98,7 +98,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SenderUpdated @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender != null)
     {
       sender.Update(@event);
@@ -110,7 +110,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   public async Task Handle(SmsSenderCreated @event, CancellationToken cancellationToken)
   {
     SenderEntity? sender = await _context.Senders.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (sender == null)
     {
       sender = new(@event);

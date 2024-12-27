@@ -1,53 +1,49 @@
-﻿using Logitar.Data;
-using Logitar.EventSourcing;
-using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.EventSourcing.Infrastructure;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Messages;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
-internal class MessageRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IMessageRepository
+internal class MessageRepository : Repository, IMessageRepository
 {
-  private static readonly string AggregateType = typeof(Message).GetNamespaceQualifiedName();
+  private readonly DbSet<MessageEntity> _messages;
 
-  private readonly ISqlHelper _sqlHelper;
-
-  public MessageRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
-    : base(eventBus, eventContext, eventSerializer)
+  public MessageRepository(IEventStore eventStore, PortalContext context) : base(eventStore)
   {
-    _sqlHelper = sqlHelper;
+    _messages = context.Messages;
   }
 
-  public async Task<Message?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await base.LoadAsync<Message>(new AggregateId(id), cancellationToken);
+  public async Task<Message?> LoadAsync(MessageId id, CancellationToken cancellationToken)
+  {
+    return await LoadAsync<Message>(id.StreamId, cancellationToken);
+  }
 
   public async Task<IReadOnlyCollection<Message>> LoadAsync(CancellationToken cancellationToken)
-    => (await base.LoadAsync<Message>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
+  {
+    return await LoadAsync<Message>(cancellationToken);
+  }
 
   public async Task<IReadOnlyCollection<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Messages.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Messages.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .SelectAll(EventDb.Events.Table)
-      .Build();
+    string? tenantIdValue = tenantId?.Value;
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
+    IEnumerable<StreamId> streamIds = (await _messages.AsNoTracking()
+      .Where(x => x.TenantId == tenantIdValue)
+      .Select(x => x.StreamId)
+      .ToArrayAsync(cancellationToken)).Select(value => new StreamId(value));
 
-    return (Load<Message>(events.Select(EventSerializer.Deserialize))).ToArray(); // ISSUE #528: remove ToArray
+    return await LoadAsync<Message>(streamIds, cancellationToken);
   }
 
   public async Task SaveAsync(Message message, CancellationToken cancellationToken)
-    => await base.SaveAsync(message, cancellationToken);
+  {
+    await base.SaveAsync(message, cancellationToken);
+  }
 
   public async Task SaveAsync(IEnumerable<Message> messages, CancellationToken cancellationToken)
-    => await base.SaveAsync(messages, cancellationToken);
+  {
+    await base.SaveAsync(messages, cancellationToken);
+  }
 }

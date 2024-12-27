@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Actors;
@@ -23,6 +24,7 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational;
 internal class Mapper
 {
   private readonly Dictionary<ActorId, ActorModel> _actors = [];
+  private readonly ActorModel _system = ActorModel.System;
 
   public Mapper()
   {
@@ -39,7 +41,7 @@ internal class Mapper
 
   public static ActorModel ToActor(ActorEntity actor) => new(actor.DisplayName)
   {
-    Id = new ActorId(actor.Id).ToGuid(),
+    //Id = new ActorId(actor.Id).ToGuid(), // TODO(fpion): implement
     Type = Enum.Parse<ActorType>(actor.Type),
     IsDeleted = actor.IsDeleted,
     EmailAddress = actor.EmailAddress,
@@ -50,13 +52,14 @@ internal class Mapper
   {
     ApiKeyModel destination = new(source.DisplayName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       Description = source.Description,
-      ExpiresOn = AsUniversalTime(source.ExpiresOn),
-      AuthenticatedOn = AsUniversalTime(source.AuthenticatedOn),
+      ExpiresOn = source.ExpiresOn?.AsUniversalTime(),
+      AuthenticatedOn = source.AuthenticatedOn?.AsUniversalTime(),
       Realm = realm
     };
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
@@ -91,6 +94,7 @@ internal class Mapper
   {
     DictionaryModel destination = new(new LocaleModel(source.Locale))
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       EntryCount = source.EntryCount,
       Realm = realm
     };
@@ -142,6 +146,7 @@ internal class Mapper
 
     MessageModel destination = new(source.Subject, body, sender, template)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       RecipientCount = source.RecipientCount,
       IgnoreUserLocale = source.IgnoreUserLocale,
       Locale = LocaleModel.TryCreate(source.Locale),
@@ -185,14 +190,15 @@ internal class Mapper
   {
     OneTimePasswordModel destination = new()
     {
-      ExpiresOn = AsUniversalTime(source.ExpiresOn),
+      Id = new EntityId(source.EntityId).ToGuid(),
+      ExpiresOn = source.ExpiresOn?.AsUniversalTime(),
       MaximumAttempts = source.MaximumAttempts,
       AttemptCount = source.AttemptCount,
       HasValidationSucceeded = source.HasValidationSucceeded,
       Realm = realm
     };
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
@@ -206,6 +212,7 @@ internal class Mapper
   {
     RealmModel destination = new(source.UniqueSlug, source.Secret)
     {
+      Id = new StreamId(source.StreamId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       DefaultLocale = LocaleModel.TryCreate(source.DefaultLocale),
@@ -260,12 +267,13 @@ internal class Mapper
   {
     RoleModel destination = new(source.UniqueName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       Realm = realm
     };
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
@@ -285,13 +293,14 @@ internal class Mapper
     UserModel user = ToUser(source.User, realm);
     SessionModel destination = new(user)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       IsPersistent = source.IsPersistent,
       IsActive = source.IsActive,
       SignedOutBy = TryFindActor(source.SignedOutBy),
-      SignedOutOn = AsUniversalTime(source.SignedOutOn)
+      SignedOutOn = source.SignedOutOn?.AsUniversalTime()
     };
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
@@ -305,6 +314,7 @@ internal class Mapper
   {
     SenderModel destination = new()
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       IsDefault = source.IsDefault,
       EmailAddress = source.EmailAddress,
       PhoneNumber = source.PhoneNumber,
@@ -340,6 +350,7 @@ internal class Mapper
     ContentModel content = new(source.ContentType, source.ContentText);
     TemplateModel destination = new(source.UniqueKey, source.Subject, content)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       DisplayName = source.DisplayName,
       Description = source.Description,
       Realm = realm
@@ -354,11 +365,12 @@ internal class Mapper
   {
     UserModel destination = new(source.UniqueName)
     {
+      Id = new EntityId(source.EntityId).ToGuid(),
       HasPassword = source.HasPassword,
       PasswordChangedBy = TryFindActor(source.PasswordChangedBy),
-      PasswordChangedOn = AsUniversalTime(source.PasswordChangedOn),
+      PasswordChangedOn = source.PasswordChangedOn?.AsUniversalTime(),
       DisabledBy = TryFindActor(source.DisabledBy),
-      DisabledOn = AsUniversalTime(source.DisabledOn),
+      DisabledOn = source.DisabledOn?.AsUniversalTime(),
       IsDisabled = source.IsDisabled,
       IsConfirmed = source.IsConfirmed,
       FirstName = source.FirstName,
@@ -366,14 +378,14 @@ internal class Mapper
       LastName = source.LastName,
       FullName = source.FullName,
       Nickname = source.Nickname,
-      Birthdate = AsUniversalTime(source.Birthdate),
+      Birthdate = source.Birthdate?.AsUniversalTime(),
       Gender = source.Gender,
       Locale = LocaleModel.TryCreate(source.Locale),
       TimeZone = source.TimeZone,
       Picture = source.Picture,
       Profile = source.Profile,
       Website = source.Website,
-      AuthenticatedOn = AsUniversalTime(source.AuthenticatedOn),
+      AuthenticatedOn = source.AuthenticatedOn?.AsUniversalTime(),
       Realm = realm
     };
 
@@ -383,7 +395,7 @@ internal class Mapper
       {
         IsVerified = source.IsAddressVerified,
         VerifiedBy = TryFindActor(source.AddressVerifiedBy),
-        VerifiedOn = AsUniversalTime(source.AddressVerifiedOn)
+        VerifiedOn = source.AddressVerifiedOn?.AsUniversalTime()
       };
     }
     if (source.EmailAddress != null)
@@ -392,7 +404,7 @@ internal class Mapper
       {
         IsVerified = source.IsEmailVerified,
         VerifiedBy = TryFindActor(source.EmailVerifiedBy),
-        VerifiedOn = AsUniversalTime(source.EmailVerifiedOn)
+        VerifiedOn = source.EmailVerifiedOn?.AsUniversalTime()
       };
     }
     if (source.PhoneNumber != null && source.PhoneE164Formatted != null)
@@ -401,18 +413,18 @@ internal class Mapper
       {
         IsVerified = source.IsPhoneVerified,
         VerifiedBy = TryFindActor(source.PhoneVerifiedBy),
-        VerifiedOn = AsUniversalTime(source.PhoneVerifiedOn)
+        VerifiedOn = source.PhoneVerifiedOn?.AsUniversalTime()
       };
     }
 
-    foreach (KeyValuePair<string, string> customAttribute in source.CustomAttributes)
+    foreach (KeyValuePair<string, string> customAttribute in source.GetCustomAttributes())
     {
       destination.CustomAttributes.Add(new CustomAttribute(customAttribute));
     }
 
     foreach (IdentifierEntity identifier in source.Identifiers)
     {
-      destination.CustomIdentifiers.Add(new CustomIdentifier(identifier.Key, identifier.Value));
+      destination.CustomIdentifiers.Add(new CustomIdentifierModel(identifier.Key, identifier.Value));
     }
 
     foreach (RoleEntity role in source.Roles)
@@ -427,33 +439,29 @@ internal class Mapper
 
   private void MapAggregate(AggregateRoot source, AggregateModel destination)
   {
-    destination.Id = source.Id.ToGuid();
     destination.Version = source.Version;
-    destination.CreatedBy = FindActor(source.CreatedBy);
-    destination.CreatedOn = AsUniversalTime(source.CreatedOn);
-    destination.UpdatedBy = FindActor(source.UpdatedBy);
-    destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
+    destination.CreatedBy = TryFindActor(source.CreatedBy) ?? _system;
+    destination.CreatedOn = source.CreatedOn.AsUniversalTime();
+    destination.UpdatedBy = TryFindActor(source.UpdatedBy) ?? _system;
+    destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
   private void MapAggregate(AggregateEntity source, AggregateModel destination)
   {
-    destination.Id = new AggregateId(source.AggregateId).ToGuid();
     destination.Version = source.Version;
-    destination.CreatedBy = FindActor(source.CreatedBy);
-    destination.CreatedOn = AsUniversalTime(source.CreatedOn);
-    destination.UpdatedBy = FindActor(source.UpdatedBy);
-    destination.UpdatedOn = AsUniversalTime(source.UpdatedOn);
+    destination.CreatedBy = TryFindActor(source.CreatedBy) ?? _system;
+    destination.CreatedOn = source.CreatedOn.AsUniversalTime();
+    destination.UpdatedBy = TryFindActor(source.UpdatedBy) ?? _system;
+    destination.UpdatedOn = source.UpdatedOn.AsUniversalTime();
   }
 
-  private ActorModel? TryFindActor(string? id) => id == null ? null : FindActor(id);
-  private ActorModel FindActor(string id) => FindActor(new ActorId(id));
-  private ActorModel FindActor(ActorId id) => _actors.TryGetValue(id, out ActorModel? actor) ? actor : ActorModel.System;
-
-  private static DateTime? AsUniversalTime(DateTime? value) => value.HasValue ? AsUniversalTime(value.Value) : null;
-  private static DateTime AsUniversalTime(DateTime value) => value.Kind switch
+  private ActorModel? TryFindActor(string? id) => TryFindActor(id == null ? null : new ActorId(id));
+  private ActorModel? TryFindActor(ActorId? id)
   {
-    DateTimeKind.Local => value.ToUniversalTime(),
-    DateTimeKind.Unspecified => DateTime.SpecifyKind(value, DateTimeKind.Utc),
-    DateTimeKind.Utc => value,
-    _ => throw new NotSupportedException($"The date time kind '{value.Kind}' is not supported."),
-  };
+    if (id.HasValue)
+    {
+      return _actors.TryGetValue(id.Value, out ActorModel? actor) ? actor : null;
+    }
+
+    return null;
+  }
 }

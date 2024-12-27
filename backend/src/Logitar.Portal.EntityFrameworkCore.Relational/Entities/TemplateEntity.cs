@@ -1,5 +1,7 @@
 ﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Contracts.Templates;
+using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.Domain.Templates.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -9,11 +11,12 @@ internal class TemplateEntity : AggregateEntity
   public int TemplateId { get; private set; }
 
   public string? TenantId { get; private set; }
+  public string EntityId { get; private set; } = string.Empty;
 
   public string UniqueKey { get; private set; } = string.Empty;
   public string UniqueKeyNormalized
   {
-    get => UniqueKey.ToUpper(); // ISSUE #528: use Helper
+    get => Helper.Normalize(UniqueKey);
     private set { }
   }
   public string? DisplayName { get; private set; }
@@ -27,7 +30,9 @@ internal class TemplateEntity : AggregateEntity
 
   public TemplateEntity(TemplateCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    TemplateId templateId = new(@event.StreamId);
+    TenantId = templateId.TenantId?.Value;
+    EntityId = templateId.EntityId.Value;
 
     UniqueKey = @event.UniqueKey.Value;
 

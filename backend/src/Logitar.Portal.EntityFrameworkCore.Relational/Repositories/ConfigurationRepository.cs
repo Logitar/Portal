@@ -1,19 +1,16 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.EventSourcing.Infrastructure;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Domain.Configurations;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
-internal class ConfigurationRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, IConfigurationRepository
+internal class ConfigurationRepository : Repository, IConfigurationRepository
 {
   private readonly ICacheService _cacheService;
   private readonly IConfigurationQuerier _configurationQuerier;
 
-  public ConfigurationRepository(ICacheService cacheService, IConfigurationQuerier configurationQuerier, IEventBus eventBus, EventContext eventContext,
-    IEventSerializer eventSerializer) : base(eventBus, eventContext, eventSerializer)
+  public ConfigurationRepository(ICacheService cacheService, IConfigurationQuerier configurationQuerier, IEventStore eventStore) : base(eventStore)
   {
     _cacheService = cacheService;
     _configurationQuerier = configurationQuerier;
@@ -23,8 +20,7 @@ internal class ConfigurationRepository : EventSourcing.EntityFrameworkCore.Relat
     => await LoadAsync(version: null, cancellationToken);
   public async Task<Configuration?> LoadAsync(long? version, CancellationToken cancellationToken)
   {
-    AggregateId id = new ConfigurationId().AggregateId;
-    return await LoadAsync<Configuration>(id, version, cancellationToken);
+    return await LoadAsync<Configuration>(new ConfigurationId().StreamId, version, cancellationToken);
   }
 
   public async Task SaveAsync(Configuration configuration, CancellationToken cancellationToken)

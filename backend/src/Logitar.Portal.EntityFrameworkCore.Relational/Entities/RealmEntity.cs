@@ -1,5 +1,7 @@
 ﻿using Logitar.Identity.Contracts.Settings;
+using Logitar.Identity.Core;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Domain.Realms.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -11,7 +13,7 @@ internal class RealmEntity : AggregateEntity
   public string UniqueSlug { get; private set; } = string.Empty;
   public string UniqueSlugNormalized
   {
-    get => UniqueSlug.ToUpper(); // ISSUE #528: use Helper
+    get => Helper.Normalize(UniqueSlug);
     private set { }
   }
   public string? DisplayName { get; private set; }
@@ -95,15 +97,15 @@ internal class RealmEntity : AggregateEntity
     }
 
     Dictionary<string, string> customAttributes = GetCustomAttributes();
-    foreach (KeyValuePair<string, string?> customAttribute in @event.CustomAttributes)
+    foreach (KeyValuePair<Identifier, string?> customAttribute in @event.CustomAttributes)
     {
       if (customAttribute.Value == null)
       {
-        customAttributes.Remove(customAttribute.Key);
+        customAttributes.Remove(customAttribute.Key.Value);
       }
       else
       {
-        customAttributes[customAttribute.Key] = customAttribute.Value;
+        customAttributes[customAttribute.Key.Value] = customAttribute.Value;
       }
     }
     SetCustomAttributes(customAttributes);

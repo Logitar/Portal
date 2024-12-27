@@ -29,6 +29,6 @@ public static class DependencyInjectionExtensions
       .AddDbContext<PortalContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Logitar.Portal.EntityFrameworkCore.SqlServer")))
       .AddLogitarIdentityWithEntityFrameworkCoreSqlServer(connectionString)
       .AddLogitarPortalWithEntityFrameworkCoreRelational()
-      .AddSingleton<ISearchHelper, SqlServerSearchHelper>();
+      .AddSingleton<IQueryHelper, SqlServerQueryHelper>();
   }
 }

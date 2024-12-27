@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
@@ -23,19 +24,21 @@ internal class OneTimePasswordQuerier : IOneTimePasswordQuerier
     _oneTimePasswords = context.OneTimePasswords;
   }
 
-  public async Task<OneTimePasswordModel> ReadAsync(RealmModel? realm, OneTimePasswordAggregate oneTimePassword, CancellationToken cancellationToken)
+  public async Task<OneTimePasswordModel> ReadAsync(RealmModel? realm, OneTimePassword oneTimePassword, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, oneTimePassword.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The One-Time Password entity 'AggregateId={oneTimePassword.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The One-Time Password entity 'StreamId={oneTimePassword.Id.Value}' could not be found.");
   }
-  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(realm, new OneTimePasswordId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<OneTimePasswordModel?> ReadAsync(RealmModel? realm, OneTimePasswordId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     OneTimePasswordEntity? oneTimePassword = await _oneTimePasswords.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     if (oneTimePassword == null || oneTimePassword.TenantId != realm?.GetTenantId().Value)
     {

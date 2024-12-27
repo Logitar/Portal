@@ -32,7 +32,7 @@ internal class LogEntity
   public TimeSpan? Duration { get; private set; }
 
   public string? TenantId { get; private set; }
-  public string ActorId { get; private set; } = EventSourcing.ActorId.DefaultValue;
+  public string? ActorId { get; private set; }
   public string? ApiKeyId { get; private set; }
   public string? UserId { get; private set; }
   public string? SessionId { get; private set; }
@@ -74,7 +74,7 @@ internal class LogEntity
     Duration = log.Duration;
 
     TenantId = log.TenantId?.Value;
-    ActorId = log.ActorId.Value;
+    ActorId = log.ActorId?.Value;
     ApiKeyId = log.ApiKeyId?.Value;
     UserId = log.UserId?.Value;
     SessionId = log.SessionId?.Value;

@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
+﻿using Logitar.EventSourcing;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +13,8 @@ internal class LogEventConfiguration : IEntityTypeConfiguration<LogEventEntity>
     builder.HasKey(x => x.EventId);
 
     builder.HasIndex(x => x.LogId);
+
+    builder.Property(x => x.EventId).HasMaxLength(EventId.MaximumLength);
 
     builder.HasOne(x => x.Log).WithMany(x => x.Events).OnDelete(DeleteBehavior.Cascade);
   }

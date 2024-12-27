@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational.CustomAttributes;
+﻿using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Domain.Realms.Events;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using MediatR;
@@ -25,7 +25,7 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   public async Task Handle(RealmCreated @event, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (realm == null)
     {
       realm = new(@event);
@@ -39,7 +39,7 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   public async Task Handle(RealmDeleted @event, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (realm != null)
     {
       _context.Realms.Remove(realm);
@@ -52,7 +52,7 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   public async Task Handle(RealmUniqueSlugChanged @event, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (realm != null)
     {
       realm.SetUniqueSlug(@event);
@@ -64,12 +64,12 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   public async Task Handle(RealmUpdated @event, CancellationToken cancellationToken)
   {
     RealmEntity? realm = await _context.Realms
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (realm != null)
     {
       realm.Update(@event);
 
-      await _customAttributes.SynchronizeAsync(EntityType, realm.RealmId, @event.CustomAttributes, cancellationToken);
+      await _customAttributes.UpdateAsync(EntityType, realm.RealmId, @event.CustomAttributes, cancellationToken);
       await _context.SaveChangesAsync(cancellationToken);
     }
   }

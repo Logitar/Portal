@@ -25,32 +25,32 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   public async Task Handle(MessageCreated @event, CancellationToken cancellationToken)
   {
     MessageEntity? message = await _context.Messages.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (message == null)
     {
       SenderEntity sender = await _context.Senders
-        .SingleOrDefaultAsync(x => x.AggregateId == @event.Sender.Id.Value, cancellationToken)
-        ?? throw new InvalidOperationException($"The sender entity 'AggregateId={@event.Sender.Id}' could not be found.");
+        .SingleOrDefaultAsync(x => x.StreamId == @event.Sender.Id.Value, cancellationToken)
+        ?? throw new InvalidOperationException($"The sender entity 'StreamId={@event.Sender.Id}' could not be found.");
       TemplateEntity template = await _context.Templates
-        .SingleOrDefaultAsync(x => x.AggregateId == @event.Template.Id.Value, cancellationToken)
-        ?? throw new InvalidOperationException($"The template entity 'AggregateId={@event.Template.Id}' could not be found.");
+        .SingleOrDefaultAsync(x => x.StreamId == @event.Template.Id.Value, cancellationToken)
+        ?? throw new InvalidOperationException($"The template entity 'StreamId={@event.Template.Id}' could not be found.");
 
       int capacity = @event.Recipients.Count;
       HashSet<string> userIds = new(capacity);
       foreach (Recipient recipient in @event.Recipients)
       {
-        if (recipient.UserId != null)
+        if (recipient.UserId.HasValue)
         {
-          userIds.Add(recipient.UserId.Value);
+          userIds.Add(recipient.UserId.Value.Value);
         }
       }
       Dictionary<string, UserEntity> users = new(capacity);
       if (userIds.Count > 0)
       {
-        UserEntity[] userEntities = await _users.Where(u => userIds.Contains(u.AggregateId)).ToArrayAsync(cancellationToken);
+        UserEntity[] userEntities = await _users.Where(u => userIds.Contains(u.StreamId)).ToArrayAsync(cancellationToken);
         foreach (UserEntity user in userEntities)
         {
-          users[user.AggregateId] = user;
+          users[user.StreamId] = user;
         }
       }
 
@@ -65,7 +65,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   public async Task Handle(MessageDeleted @event, CancellationToken cancellationToken)
   {
     MessageEntity? message = await _context.Messages
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (message != null)
     {
       _context.Messages.Remove(message);
@@ -77,7 +77,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   public async Task Handle(MessageFailed @event, CancellationToken cancellationToken)
   {
     MessageEntity? message = await _context.Messages
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (message != null)
     {
       message.Fail(@event);
@@ -89,7 +89,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   public async Task Handle(MessageSucceeded @event, CancellationToken cancellationToken)
   {
     MessageEntity? message = await _context.Messages
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (message != null)
     {
       message.Succeed(@event);

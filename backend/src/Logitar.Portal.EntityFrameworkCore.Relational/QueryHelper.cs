@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Search;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
 
-public abstract class SearchHelper : ISearchHelper
+public abstract class QueryHelper : IQueryHelper
 {
   public IQueryBuilder ApplyTextSearch(IQueryBuilder builder, TextSearch search, params ColumnId[] columns)
   {
@@ -39,4 +39,6 @@ public abstract class SearchHelper : ISearchHelper
     return builder;
   }
   protected virtual ConditionalOperator CreateOperator(string pattern) => Operators.IsLike(pattern);
+
+  public abstract IQueryBuilder From(TableId table);
 }

@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Configurations;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -19,16 +19,18 @@ internal class SenderConfiguration : AggregateConfiguration<SenderEntity>, IEnti
     builder.ToTable(nameof(PortalContext.Senders));
     builder.HasKey(x => x.SenderId);
 
+    builder.HasIndex(x => new { x.TenantId, x.EntityId }).IsUnique();
+    builder.HasIndex(x => x.EntityId);
     builder.HasIndex(x => new { x.TenantId, x.IsDefault });
     builder.HasIndex(x => x.EmailAddress);
     builder.HasIndex(x => x.PhoneNumber);
     builder.HasIndex(x => x.DisplayName);
     builder.HasIndex(x => x.Provider);
 
-    builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
-    builder.Property(x => x.EmailAddress).HasMaxLength(EmailUnit.MaximumLength);
-    builder.Property(x => x.PhoneNumber).HasMaxLength(PhoneUnit.NumberMaximumLength);
-    builder.Property(x => x.DisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
+    builder.Property(x => x.TenantId).HasMaxLength(StreamId.MaximumLength);
+    builder.Property(x => x.EmailAddress).HasMaxLength(Email.MaximumLength);
+    builder.Property(x => x.PhoneNumber).HasMaxLength(Phone.NumberMaximumLength);
+    builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);
     builder.Property(x => x.Provider).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<SenderProvider>());
   }
 }
