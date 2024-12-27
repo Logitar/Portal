@@ -2,7 +2,7 @@
 
 public class TooManyResultsException : Exception
 {
-  public const string ErrorMessage = "Too many results were found.";
+  private const string ErrorMessage = "Too many results were found.";
 
   public string TypeName
   {
