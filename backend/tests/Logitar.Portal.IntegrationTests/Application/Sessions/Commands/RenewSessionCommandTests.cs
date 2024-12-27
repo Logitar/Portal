@@ -1,9 +1,9 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Sessions;
@@ -36,7 +36,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     ApiKeyModel apiKey = new(apiKeyAggregate.DisplayName.Value)
     {
-      Id = apiKeyAggregate.Id.ToGuid(),
+      Id = apiKeyAggregate.EntityId.ToGuid(),
       Version = apiKeyAggregate.Version,
       CreatedOn = apiKeyAggregate.CreatedOn.ToUniversalTime(),
       UpdatedOn = apiKeyAggregate.UpdatedOn.ToUniversalTime()
@@ -46,7 +46,7 @@ public class RenewSessionCommandTests : IntegrationTests
 
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out string currentSecret);
     ActorId actorId = new(apiKey.Id);
     Session session = user.SignIn(secret, actorId);
@@ -68,8 +68,8 @@ public class RenewSessionCommandTests : IntegrationTests
     Assert.Null(result.SignedOutBy);
     Assert.Null(result.SignedOutOn);
     Assert.Equal(customAttributes, result.CustomAttributes);
-    Assert.Equal(user.Id.ToGuid(), result.User.Id);
-    Assert.Equal(session.Id.ToGuid(), result.Id);
+    Assert.Equal(user.EntityId.ToGuid(), result.User.Id);
+    Assert.Equal(session.EntityId.ToGuid(), result.Id);
     Assert.Equal(apiKey.Id, result.CreatedBy.Id);
     Assert.Equal(apiKey.Id, result.UpdatedBy.Id);
   }
@@ -88,7 +88,7 @@ public class RenewSessionCommandTests : IntegrationTests
     SessionModel result = await ActivityPipeline.ExecuteAsync(command);
 
     Guid actorId = new ActorId(user.Id.Value).ToGuid();
-    Assert.Equal(session.Id.ToGuid(), result.Id);
+    Assert.Equal(session.EntityId.ToGuid(), result.Id);
     Assert.Equal(actorId, result.CreatedBy.Id);
     Assert.Equal(actorId, result.UpdatedBy.Id);
   }
@@ -106,7 +106,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectSessionSecretException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(session.Id, exception.SessionId);
+    Assert.Equal(session.Id.Value, exception.SessionId);
     Assert.Equal(secretString, exception.AttemptedSecret);
   }
 
@@ -134,7 +134,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SessionIsNotActiveException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(session.Id, exception.SessionId);
+    Assert.Equal(session.Id.Value, exception.SessionId);
   }
 
   [Fact(DisplayName = "It should throw SessionIsNotPersistentException when the session is not persistent.")]
@@ -149,7 +149,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionPayload payload = new(RefreshToken.Encode(session.Id, secretString));
     RenewSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SessionIsNotPersistentException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(session.Id, exception.SessionId);
+    Assert.Equal(session.Id.Value, exception.SessionId);
   }
 
   [Fact(DisplayName = "It should throw SessionNotFoundException when the session could not be found.")]
@@ -159,7 +159,8 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionPayload payload = new(refreshToken.Encode());
     RenewSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(refreshToken.Id, exception.Id);
+    Assert.Equal(refreshToken.Id.TenantId?.ToGuid(), exception.TenantId);
+    Assert.Equal(refreshToken.Id.EntityId.ToGuid(), exception.SessionId);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
 
@@ -178,7 +179,8 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionCommand command = new(payload);
 
     var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(session.Id, exception.Id);
+    Assert.Equal(session.TenantId?.ToGuid(), exception.TenantId);
+    Assert.Equal(session.EntityId.ToGuid(), exception.SessionId);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
 

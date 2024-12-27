@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Sessions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -42,12 +42,12 @@ public class SignOutSessionCommandTests : IntegrationTests
     Session aggregate = new(user);
     await _sessionRepository.SaveAsync(aggregate);
 
-    SignOutSessionCommand command = new(aggregate.Id.ToGuid());
+    SignOutSessionCommand command = new(aggregate.EntityId.ToGuid());
 
     SessionModel? session = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(session);
     Assert.False(session.IsActive);
-    Assert.Equal(aggregate.Id.ToGuid(), session.Id);
+    Assert.Equal(aggregate.EntityId.ToGuid(), session.Id);
     Assert.NotNull(session.SignedOutBy);
     Assert.NotNull(session.SignedOutOn);
   }

@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
@@ -42,8 +42,8 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Equal(UsernameString, session.User.UniqueName);
 
     Assert.NotNull(session.RefreshToken);
-    RefreshToken refreshToken = RefreshToken.Decode(session.RefreshToken);
-    Assert.Equal(session.Id, refreshToken.Id.ToGuid());
+    RefreshToken refreshToken = RefreshToken.Decode(TenantId, session.RefreshToken);
+    Assert.Equal(session.Id, refreshToken.Id.EntityId.ToGuid());
     Assert.Equal(RefreshToken.SecretLength, Convert.FromBase64String(refreshToken.Secret).Length);
   }
 
@@ -52,10 +52,10 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    UserId userId = UserId.NewId();
+    UserId userId = UserId.NewId(TenantId);
     ActorId actorId = new(userId.Value);
     UniqueName uniqueName = new(Realm.UniqueNameSettings, UsernameString);
-    User user = new(uniqueName, TenantId, actorId, userId);
+    User user = new(uniqueName, actorId, userId);
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString), actorId);
     await _userRepository.SaveAsync(user);
 
@@ -78,7 +78,7 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), actorId: null, UserId.NewId(TenantId));
     user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
@@ -142,14 +142,14 @@ public class SignInSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
-    SignInSessionPayload payload = new(user.Id.ToGuid().ToString(), PasswordString);
+    SignInSessionPayload payload = new(user.EntityId.ToGuid().ToString(), PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }
@@ -162,7 +162,7 @@ public class SignInSessionCommandTests : IntegrationTests
     SignInSessionPayload payload = new(UsernameString, PasswordString);
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }

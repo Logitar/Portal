@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Sessions;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,7 @@ public class ReadSessionQueryTests : IntegrationTests
 
     SessionEntity? entity = await IdentityContext.Sessions.AsNoTracking().SingleOrDefaultAsync();
     Assert.NotNull(entity);
-    Guid id = new AggregateId(entity.AggregateId).ToGuid();
+    Guid id = new SessionId(new StreamId(entity.StreamId)).EntityId.ToGuid();
 
     ReadSessionQuery query = new(id);
     SessionModel? session = await ActivityPipeline.ExecuteAsync(query);

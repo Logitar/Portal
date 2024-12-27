@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
@@ -37,7 +37,7 @@ public class CreateSessionCommandTests : IntegrationTests
 
     User user = Assert.Single(await _userRepository.LoadAsync());
     Assert.Null(user.TenantId);
-    Assert.Equal(user.Id.ToGuid(), session.User.Id);
+    Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should create a realm session.")]
@@ -45,7 +45,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
     await _userRepository.SaveAsync(user);
 
     CreateSessionPayload payload = new(UsernameString);
@@ -60,7 +60,7 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
-    Assert.Equal(user.Id.ToGuid(), session.User.Id);
+    Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should create a session to an user ID.")]
@@ -68,10 +68,10 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
     await _userRepository.SaveAsync(user);
 
-    CreateSessionPayload payload = new(user.Id.ToGuid().ToString());
+    CreateSessionPayload payload = new(user.EntityId.ToGuid().ToString());
     CreateSessionCommand command = new(payload);
     SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
@@ -81,7 +81,7 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
-    Assert.Equal(user.Id.ToGuid(), session.User.Id);
+    Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should create a session to an user with its email as unique name.")]
@@ -89,7 +89,7 @@ public class CreateSessionCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), actorId: null, UserId.NewId(TenantId));
     user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     await _userRepository.SaveAsync(user);
 
@@ -103,7 +103,7 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutBy);
     Assert.Null(session.SignedOutOn);
     Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
-    Assert.Equal(user.Id.ToGuid(), session.User.Id);
+    Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
@@ -129,7 +129,7 @@ public class CreateSessionCommandTests : IntegrationTests
     CreateSessionPayload payload = new(UsernameString);
     CreateSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(payload.User, exception.User);
     Assert.Equal("User", exception.PropertyName);
   }
