@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Realms.Validators;
 using Logitar.Portal.Contracts;
@@ -31,7 +31,8 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     ReplaceRealmPayload payload = command.Payload;
     new ReplaceRealmValidator().ValidateAndThrow(payload);
 
-    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    RealmId realmId = new(command.Id);
+    Realm? realm = await _realmRepository.LoadAsync(realmId, cancellationToken);
     if (realm == null)
     {
       return null;
@@ -49,18 +50,18 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     {
       realm.SetUniqueSlug(uniqueSlug, actorId);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       realm.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       realm.Description = description;
     }
 
-    LocaleUnit? defaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale);
+    Locale? defaultLocale = Locale.TryCreate(payload.DefaultLocale);
     if (reference == null || defaultLocale != reference.DefaultLocale)
     {
       realm.DefaultLocale = defaultLocale;
@@ -70,7 +71,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     {
       realm.Secret = secret;
     }
-    UrlUnit? url = UrlUnit.TryCreate(payload.Url);
+    Url? url = Url.TryCreate(payload.Url);
     if (reference == null || url != reference.Url)
     {
       realm.Url = url;
@@ -101,17 +102,18 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
 
   private static void ReplaceCustomAttributes(ReplaceRealmPayload payload, Realm role, Realm? reference)
   {
-    HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
+    HashSet<Identifier> payloadKeys = new(capacity: payload.CustomAttributes.Count);
 
-    IEnumerable<string> referenceKeys;
+    IEnumerable<Identifier> referenceKeys;
     if (reference == null)
     {
       referenceKeys = role.CustomAttributes.Keys;
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        payloadKeys.Add(customAttribute.Key.Trim());
-        role.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        Identifier key = new(customAttribute.Key);
+        payloadKeys.Add(key);
+        role.SetCustomAttribute(key, customAttribute.Value);
       }
     }
     else
@@ -120,7 +122,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        string key = customAttribute.Key.Trim();
+        Identifier key = new(customAttribute.Key);
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
@@ -131,7 +133,7 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
       }
     }
 
-    foreach (string key in referenceKeys)
+    foreach (Identifier key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
       {

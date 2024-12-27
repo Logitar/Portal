@@ -21,7 +21,7 @@ internal class RealmManager : IRealmManager
   {
     bool hasBeenDeleted = false;
     bool hasUniqueNameChanged = false;
-    foreach (DomainEvent change in realm.Changes)
+    foreach (IEvent change in realm.Changes)
     {
       if (change is RealmCreated || change is RealmUniqueSlugChanged)
       {
@@ -35,10 +35,10 @@ internal class RealmManager : IRealmManager
 
     if (hasUniqueNameChanged)
     {
-      Realm? other = await _realmRepository.LoadAsync(realm.UniqueSlug, cancellationToken);
-      if (other?.Equals(realm) == false)
+      Realm? conflict = await _realmRepository.LoadAsync(realm.UniqueSlug, cancellationToken);
+      if (conflict != null && !conflict.Equals(realm))
       {
-        throw new UniqueSlugAlreadyUsedException(realm.UniqueSlug);
+        throw new UniqueSlugAlreadyUsedException(realm, conflict.Id);
       }
     }
 

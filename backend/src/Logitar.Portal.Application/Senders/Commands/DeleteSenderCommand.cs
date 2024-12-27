@@ -1,4 +1,5 @@
-﻿using Logitar.Portal.Application.Activities;
+﻿using Logitar.Identity.Core;
+using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using MediatR;
@@ -20,7 +21,8 @@ internal class DeleteSenderCommandHandler : IRequestHandler<DeleteSenderCommand,
 
   public async Task<SenderModel?> Handle(DeleteSenderCommand command, CancellationToken cancellationToken)
   {
-    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    SenderId senderId = new(command.TenantId, new EntityId(command.Id));
+    Sender? sender = await _senderRepository.LoadAsync(senderId, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations.Validators;
@@ -33,7 +33,7 @@ internal class UpdateConfigurationCommandHandler : IRequestHandler<UpdateConfigu
 
     if (payload.DefaultLocale != null)
     {
-      configuration.DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale.Value);
+      configuration.DefaultLocale = Locale.TryCreate(payload.DefaultLocale.Value);
     }
     if (payload.Secret != null)
     {

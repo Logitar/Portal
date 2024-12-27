@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 
 namespace Logitar.Portal.Application.Dictionaries.Validators;
@@ -8,6 +8,6 @@ internal class CreateDictionaryValidator : AbstractValidator<CreateDictionaryPay
 {
   public CreateDictionaryValidator()
   {
-    RuleFor(x => x.Locale).SetValidator(new LocaleValidator());
+    RuleFor(x => x.Locale).Locale();
   }
 }

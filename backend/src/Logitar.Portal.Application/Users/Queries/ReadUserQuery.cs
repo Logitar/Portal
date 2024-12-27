@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Queries;
 
-public record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifier? Identifier) : Activity, IRequest<UserModel?>;
+public record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifierModel? Identifier) : Activity, IRequest<UserModel?>;
 
 internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, UserModel?>
 {

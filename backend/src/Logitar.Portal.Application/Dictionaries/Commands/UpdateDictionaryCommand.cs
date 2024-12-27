@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Dictionaries.Validators;
 using Logitar.Portal.Contracts.Dictionaries;
@@ -29,7 +29,8 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
     UpdateDictionaryPayload payload = command.Payload;
     new UpdateDictionaryValidator().ValidateAndThrow(payload);
 
-    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    DictionaryId dictionaryId = new(command.TenantId, new EntityId(command.Id));
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(dictionaryId, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
@@ -37,7 +38,7 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit? locale = LocaleUnit.TryCreate(payload.Locale);
+    Locale? locale = Locale.TryCreate(payload.Locale);
     if (locale != null)
     {
       dictionary.SetLocale(locale, actorId);
@@ -45,13 +46,14 @@ internal class UpdateDictionaryCommandHandler : IRequestHandler<UpdateDictionary
 
     foreach (DictionaryEntryModification entry in payload.Entries)
     {
+      Identifier key = new(entry.Key);
       if (entry.Value == null)
       {
-        dictionary.RemoveEntry(entry.Key);
+        dictionary.RemoveEntry(key);
       }
       else
       {
-        dictionary.SetEntry(entry.Key, entry.Value);
+        dictionary.SetEntry(key, entry.Value);
       }
     }
     dictionary.Update(actorId);

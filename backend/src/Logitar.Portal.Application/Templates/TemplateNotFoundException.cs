@@ -2,7 +2,7 @@
 
 public class TemplateNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified template could not be found.";
+  private const string ErrorMessage = "The specified template could not be found.";
 
   public string Identifier
   {

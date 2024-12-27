@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Contracts.Senders;
@@ -28,7 +28,8 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
 
   public async Task<SenderModel?> Handle(ReplaceSenderCommand command, CancellationToken cancellationToken)
   {
-    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    SenderId senderId = new(command.TenantId, new EntityId(command.Id));
+    Sender? sender = await _senderRepository.LoadAsync(senderId, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
@@ -52,12 +53,12 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
         {
           throw new InvalidOperationException("The sender email address is required.");
         }
-        EmailUnit email = new(payload.EmailAddress, isVerified: false);
+        Email email = new(payload.EmailAddress, isVerified: false);
         if (reference == null || email != reference.Email)
         {
           sender.Email = email;
         }
-        DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+        DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
         if (reference == null || displayName != reference.DisplayName)
         {
           sender.DisplayName = displayName;
@@ -68,7 +69,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
         {
           throw new InvalidOperationException("The sender phone number is required.");
         }
-        PhoneUnit phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
+        Phone phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
         if (reference == null || phone != reference.Phone)
         {
           sender.Phone = phone;
@@ -78,7 +79,7 @@ internal class ReplaceSenderCommandHandler : IRequestHandler<ReplaceSenderComman
         throw new SenderTypeNotSupportedException(sender.Type);
     }
 
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       sender.Description = description;

@@ -1,30 +1,51 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Portal.Domain.Dictionaries;
 
 namespace Logitar.Portal.Application.Dictionaries;
 
 public class DictionaryAlreadyExistsException : Exception
 {
-  public const string ErrorMessage = "The specified dictionary already exists.";
+  private const string ErrorMessage = "The specified dictionary already exists.";
 
-  public TenantId? TenantId
+  public Guid? TenantId
   {
-    get => TenantId.TryCreate((string)Data[nameof(TenantId)]!);
-    private set => Data[nameof(TenantId)] = value?.Value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
-  public LocaleUnit Locale
+  public Guid DictionaryId
   {
-    get => new((string)Data[nameof(Locale)]!);
-    private set => Data[nameof(Locale)] = value.Code;
+    get => (Guid)Data[nameof(DictionaryId)]!;
+    private set => Data[nameof(DictionaryId)] = value;
+  }
+  public Guid ConflictId
+  {
+    get => (Guid)Data[nameof(ConflictId)]!;
+    private set => Data[nameof(ConflictId)] = value;
+  }
+  public string Locale
+  {
+    get => (string)Data[nameof(Locale)]!;
+    private set => Data[nameof(Locale)] = value;
+  }
+  public string PropertyName
+  {
+    get => (string)Data[nameof(PropertyName)]!;
+    private set => Data[nameof(PropertyName)] = value;
   }
 
-  public DictionaryAlreadyExistsException(TenantId? tenantId, LocaleUnit locale) : base(BuildMessage(tenantId, locale))
+  public DictionaryAlreadyExistsException(Dictionary dictionary, DictionaryId conflictId) : base(BuildMessage(dictionary, conflictId))
   {
-    TenantId = tenantId;
-    Locale = locale;
+    TenantId = dictionary.TenantId?.ToGuid();
+    DictionaryId = dictionary.EntityId.ToGuid();
+    ConflictId = conflictId.EntityId.ToGuid();
+    Locale = dictionary.Locale.ToString();
+    PropertyName = nameof(Dictionary.Locale);
   }
 
-  private static string BuildMessage(TenantId? tenantId, LocaleUnit locale) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
-    .AddData(nameof(Locale), locale.Code)
+  private static string BuildMessage(Dictionary dictionary, DictionaryId conflictId) => new ErrorMessageBuilder(ErrorMessage)
+    .AddData(nameof(TenantId), dictionary.TenantId?.ToGuid(), "<null>")
+    .AddData(nameof(DictionaryId), dictionary.EntityId.ToGuid())
+    .AddData(nameof(ConflictId), conflictId.EntityId.ToGuid())
+    .AddData(nameof(Locale), dictionary.Locale)
+    .AddData(nameof(PropertyName), nameof(Dictionary.Locale))
     .Build();
 }

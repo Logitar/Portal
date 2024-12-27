@@ -2,7 +2,7 @@
 
 public class RolesNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified roles could not be found.";
+  private const string ErrorMessage = "The specified roles could not be found.";
 
   public IEnumerable<string> Roles
   {

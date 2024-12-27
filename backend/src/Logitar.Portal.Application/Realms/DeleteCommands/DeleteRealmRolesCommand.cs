@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -20,9 +20,9 @@ internal class DeleteRealmRolesCommandHandler : INotificationHandler<DeleteRealm
   public async Task Handle(DeleteRealmRolesCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<RoleAggregate> roles = await _roleRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<Role> roles = await _roleRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (RoleAggregate role in roles)
+    foreach (Role role in roles)
     {
       role.Delete(command.ActorId);
     }

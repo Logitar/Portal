@@ -1,8 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Microsoft.Extensions.Logging;
 
@@ -47,24 +44,10 @@ public class Log
   public TimeSpan? Duration => EndedOn.HasValue ? EndedOn.Value - StartedOn : null;
 
   public TenantId? TenantId { get; set; }
-  public ActorId ActorId
-  {
-    get
-    {
-      if (UserId != null)
-      {
-        return new(UserId.Value);
-      }
-      else if (ApiKeyId != null)
-      {
-        return new(ApiKeyId.Value);
-      }
-      return new ActorId();
-    }
-  }
-  public ApiKeyId? ApiKeyId { get; set; }
-  public UserId? UserId { get; set; }
-  public SessionId? SessionId { get; set; }
+  public ActorId ActorId => throw new NotImplementedException(); // TODO(fpion): implement
+  public Guid? ApiKeyId { get; set; }
+  public Guid? UserId { get; set; }
+  public Guid? SessionId { get; set; }
 
   private readonly List<DomainEvent> _events = [];
   public IReadOnlyCollection<DomainEvent> Events => _events.AsReadOnly();

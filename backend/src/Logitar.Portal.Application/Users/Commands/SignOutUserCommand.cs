@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
@@ -24,15 +25,16 @@ internal class SignOutUserCommandHandler : IRequestHandler<SignOutUserCommand, U
 
   public async Task<UserModel?> Handle(SignOutUserCommand command, CancellationToken cancellationToken)
   {
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
 
     ActorId actorId = command.ActorId;
-    IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadActiveAsync(user, cancellationToken);
-    foreach (SessionAggregate session in sessions)
+    IEnumerable<Session> sessions = await _sessionRepository.LoadActiveAsync(user, cancellationToken);
+    foreach (Session session in sessions)
     {
       session.SignOut(actorId);
     }

@@ -2,7 +2,7 @@
 
 public class SenderNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified sender could not be found.";
+  private const string ErrorMessage = "The specified sender could not be found.";
 
   public Guid Id
   {

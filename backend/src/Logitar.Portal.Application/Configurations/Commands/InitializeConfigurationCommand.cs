@@ -1,8 +1,8 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Settings;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Settings;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Domain.Configurations;
 using MediatR;
@@ -45,8 +45,8 @@ internal class InitializeConfigurationCommandHandler : INotificationHandler<Init
         RequireUniqueEmail = configuration.RequireUniqueEmail
       };
 
-      UniqueNameUnit uniqueName = new(userSettings.UniqueName, command.UniqueName);
-      UserAggregate user = new(uniqueName, tenantId: null, actorId, userId);
+      UniqueName uniqueName = new(userSettings.UniqueName, command.UniqueName);
+      User user = new(uniqueName, actorId, userId);
 
       Password password = _passwordManager.ValidateAndCreate(command.Password, userSettings.Password);
       user.SetPassword(password, actorId);

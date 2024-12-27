@@ -2,7 +2,7 @@
 
 public class MissingRecipientContactsException : Exception
 {
-  public const string ErrorMessage = "The specified recipients are missing an email address.";
+  private const string ErrorMessage = "The specified recipients are missing an email address.";
 
   public IEnumerable<Guid> UserIds
   {

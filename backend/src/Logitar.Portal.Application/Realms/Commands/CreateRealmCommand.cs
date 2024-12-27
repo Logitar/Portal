@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Realms.Validators;
 using Logitar.Portal.Contracts;
@@ -34,10 +34,10 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     Slug uniqueSlug = new(payload.UniqueSlug);
     Realm realm = new(uniqueSlug, actorId)
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description),
-      DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale),
-      Url = UrlUnit.TryCreate(payload.Url),
+      DisplayName = DisplayName.TryCreate(payload.DisplayName),
+      Description = Description.TryCreate(payload.Description),
+      DefaultLocale = Locale.TryCreate(payload.DefaultLocale),
+      Url = Url.TryCreate(payload.Url),
       UniqueNameSettings = new ReadOnlyUniqueNameSettings(payload.UniqueNameSettings),
       PasswordSettings = new ReadOnlyPasswordSettings(payload.PasswordSettings),
       RequireUniqueEmail = payload.RequireUniqueEmail
@@ -49,7 +49,8 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      realm.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      realm.SetCustomAttribute(key, customAttribute.Value);
     }
 
     realm.Update(actorId);

@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Roles;
@@ -12,6 +12,7 @@ using Logitar.Portal.Application.Users.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
+using TimeZone = Logitar.Identity.Core.TimeZone;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
@@ -32,13 +33,15 @@ internal record CreateUserCommand(CreateUserPayload Payload) : Activity, IReques
 
 internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserModel>
 {
+  private readonly IAddressHelper _addressHelper;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
 
-  public CreateUserCommandHandler(IMediator mediator, IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier)
+  public CreateUserCommandHandler(IAddressHelper addressHelper, IMediator mediator, IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier)
   {
+    _addressHelper = addressHelper;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -50,24 +53,24 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     IUserSettings userSettings = command.UserSettings;
 
     CreateUserPayload payload = command.Payload;
-    new CreateUserValidator(userSettings).ValidateAndThrow(payload);
+    new CreateUserValidator(userSettings, _addressHelper).ValidateAndThrow(payload);
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
-    UserAggregate user = new(uniqueName, command.TenantId, actorId)
+    UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
+    User user = new(uniqueName, actorId, UserId.NewId(command.TenantId))
     {
-      FirstName = PersonNameUnit.TryCreate(payload.FirstName),
-      MiddleName = PersonNameUnit.TryCreate(payload.MiddleName),
-      LastName = PersonNameUnit.TryCreate(payload.LastName),
-      Nickname = PersonNameUnit.TryCreate(payload.Nickname),
+      FirstName = PersonName.TryCreate(payload.FirstName),
+      MiddleName = PersonName.TryCreate(payload.MiddleName),
+      LastName = PersonName.TryCreate(payload.LastName),
+      Nickname = PersonName.TryCreate(payload.Nickname),
       Birthdate = payload.Birthdate,
-      Gender = GenderUnit.TryCreate(payload.Gender),
-      Locale = LocaleUnit.TryCreate(payload.Locale),
-      TimeZone = TimeZoneUnit.TryCreate(payload.TimeZone),
-      Picture = UrlUnit.TryCreate(payload.Picture),
-      Profile = UrlUnit.TryCreate(payload.Profile),
-      Website = UrlUnit.TryCreate(payload.Website)
+      Gender = Gender.TryCreate(payload.Gender),
+      Locale = Locale.TryCreate(payload.Locale),
+      TimeZone = TimeZone.TryCreate(payload.TimeZone),
+      Picture = Url.TryCreate(payload.Picture),
+      Profile = Url.TryCreate(payload.Profile),
+      Website = Url.TryCreate(payload.Website)
     };
 
     if (payload.Password != null)
@@ -82,28 +85,31 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
 
     if (payload.Address != null)
     {
-      AddressUnit address = payload.Address.ToAddressUnit();
+      Address address = payload.Address.ToAddress(_addressHelper);
       user.SetAddress(address, actorId);
     }
     if (payload.Email != null)
     {
-      EmailUnit email = payload.Email.ToEmailUnit();
+      Email email = payload.Email.ToEmail();
       user.SetEmail(email, actorId);
     }
     if (payload.Phone != null)
     {
-      PhoneUnit phone = payload.Phone.ToPhoneUnit();
+      Phone phone = payload.Phone.ToPhone();
       user.SetPhone(phone, actorId);
     }
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      user.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      user.SetCustomAttribute(key, customAttribute.Value);
     }
 
-    foreach (CustomIdentifier customIdentifier in payload.CustomIdentifiers)
+    foreach (CustomIdentifierModel customIdentifier in payload.CustomIdentifiers)
     {
-      user.SetCustomIdentifier(customIdentifier.Key, customIdentifier.Value, actorId);
+      Identifier key = new(customIdentifier.Key);
+      CustomIdentifier value = new(customIdentifier.Value);
+      user.SetCustomIdentifier(key, value, actorId);
     }
 
     IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);

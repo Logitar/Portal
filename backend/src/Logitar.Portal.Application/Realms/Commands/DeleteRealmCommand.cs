@@ -23,7 +23,8 @@ internal class DeleteRealmCommandHandler : IRequestHandler<DeleteRealmCommand, R
 
   public async Task<RealmModel?> Handle(DeleteRealmCommand command, CancellationToken cancellationToken)
   {
-    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    RealmId realmId = new(command.Id);
+    Realm? realm = await _realmRepository.LoadAsync(realmId, cancellationToken);
     if (realm == null)
     {
       return null;

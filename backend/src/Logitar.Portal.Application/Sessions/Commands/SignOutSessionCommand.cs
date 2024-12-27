@@ -1,5 +1,6 @@
-﻿using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Sessions;
 using MediatR;
@@ -23,13 +24,14 @@ internal class SignOutSessionCommandHandler : IRequestHandler<SignOutSessionComm
 
   public async Task<SessionModel?> Handle(SignOutSessionCommand command, CancellationToken cancellationToken)
   {
-    SessionAggregate? session = await _sessionRepository.LoadAsync(command.Id, cancellationToken);
+    SessionId sessionId = new(command.TenantId, new EntityId(command.Id));
+    Session? session = await _sessionRepository.LoadAsync(sessionId, cancellationToken);
     if (session == null)
     {
       return null;
     }
 
-    UserAggregate user = await _userRepository.LoadAsync(session, cancellationToken);
+    User user = await _userRepository.LoadAsync(session, cancellationToken);
     if (user.TenantId != command.TenantId)
     {
       return null;

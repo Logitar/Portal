@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Roles.Validators;
 using Logitar.Portal.Contracts;
@@ -33,12 +33,13 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     ReplaceRolePayload payload = command.Payload;
     new ReplaceRoleValidator(roleSettings).ValidateAndThrow(payload);
 
-    RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
+    RoleId roleId = new(command.TenantId, new EntityId(command.Id));
+    Role? role = await _roleRepository.LoadAsync(roleId, cancellationToken);
     if (role == null || role.TenantId != command.TenantId)
     {
       return null;
     }
-    RoleAggregate? reference = null;
+    Role? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _roleRepository.LoadAsync(role.Id, command.Version.Value, cancellationToken);
@@ -46,17 +47,17 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
+    UniqueName uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
       role.SetUniqueName(uniqueName, actorId);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       role.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       role.Description = description;
@@ -70,19 +71,20 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     return await _roleQuerier.ReadAsync(command.Realm, role, cancellationToken);
   }
 
-  private static void ReplaceCustomAttributes(ReplaceRolePayload payload, RoleAggregate role, RoleAggregate? reference)
+  private static void ReplaceCustomAttributes(ReplaceRolePayload payload, Role role, Role? reference)
   {
-    HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
+    HashSet<Identifier> payloadKeys = new(capacity: payload.CustomAttributes.Count);
 
-    IEnumerable<string> referenceKeys;
+    IEnumerable<Identifier> referenceKeys;
     if (reference == null)
     {
       referenceKeys = role.CustomAttributes.Keys;
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        payloadKeys.Add(customAttribute.Key.Trim());
-        role.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        Identifier key = new(customAttribute.Key);
+        payloadKeys.Add(key);
+        role.SetCustomAttribute(key, customAttribute.Value);
       }
     }
     else
@@ -91,7 +93,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        string key = customAttribute.Key.Trim();
+        Identifier key = new(customAttribute.Key);
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
@@ -102,7 +104,7 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
       }
     }
 
-    foreach (string key in referenceKeys)
+    foreach (Identifier key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
       {

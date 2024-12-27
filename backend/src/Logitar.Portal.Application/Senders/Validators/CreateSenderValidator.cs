@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Senders;
@@ -23,7 +23,7 @@ internal class CreateSenderValidator : AbstractValidator<CreateSenderPayload>
         RuleFor(x => x.EmailAddress).NotNull();
         When(x => x.EmailAddress != null, () => RuleFor(x => x.EmailAddress!).EmailAddressInput());
         RuleFor(x => x.PhoneNumber).Empty();
-        When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).SetValidator(new DisplayNameValidator()));
+        When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).DisplayName());
 
         When(x => x.Mailgun != null, () => RuleFor(x => x.Mailgun!).SetValidator(new MailgunSettingsValidator()));
         When(x => x.SendGrid != null, () => RuleFor(x => x.SendGrid!).SetValidator(new SendGridSettingsValidator()));
@@ -39,7 +39,7 @@ internal class CreateSenderValidator : AbstractValidator<CreateSenderPayload>
       });
     });
 
-    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).SetValidator(new DescriptionValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).Description());
   }
 
   private static SenderProvider? GetProvider(CreateSenderPayload payload)

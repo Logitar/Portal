@@ -1,10 +1,10 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Application.ApiKeys;
 
 public class InvalidApiKeyException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified value is not a valid API key.";
+  private const string ErrorMessage = "The specified value is not a valid API key.";
 
   public string ApiKey
   {

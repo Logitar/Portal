@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Users.Queries;
@@ -39,7 +39,7 @@ internal class AuthenticateUserCommandHandler : IRequestHandler<AuthenticateUser
     new AuthenticateUserValidator().ValidateAndThrow(payload);
 
     FindUserQuery query = new(command.TenantId, payload.UniqueName, command.UserSettings, nameof(payload.UniqueName));
-    UserAggregate user = await _mediator.Send(query, cancellationToken);
+    User user = await _mediator.Send(query, cancellationToken);
     ActorId actorId = new(user.Id.Value);
 
     user.Authenticate(payload.Password, actorId);

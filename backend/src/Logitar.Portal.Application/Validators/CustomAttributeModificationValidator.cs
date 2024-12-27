@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.Application.Validators;
@@ -8,7 +8,7 @@ internal class CustomAttributeModificationValidator : AbstractValidator<CustomAt
 {
   public CustomAttributeModificationValidator()
   {
-    RuleFor(x => x.Key).SetValidator(new CustomAttributeKeyValidator());
-    When(x => !string.IsNullOrWhiteSpace(x.Value), () => RuleFor(x => x.Value!).SetValidator(new CustomAttributeValueValidator()));
+    RuleFor(x => x.Key).Identifier();
+    When(x => !string.IsNullOrWhiteSpace(x.Value), () => RuleFor(x => x.Value!).NotEmpty());
   }
 }

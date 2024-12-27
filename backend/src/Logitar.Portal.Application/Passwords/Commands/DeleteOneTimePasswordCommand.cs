@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Passwords;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Passwords;
 using MediatR;
@@ -20,7 +21,8 @@ internal class DeleteOneTimePasswordCommandHandler : IRequestHandler<DeleteOneTi
 
   public async Task<OneTimePasswordModel?> Handle(DeleteOneTimePasswordCommand command, CancellationToken cancellationToken)
   {
-    OneTimePasswordAggregate? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(command.Id, cancellationToken);
+    OneTimePasswordId oneTimePasswordId = new(command.TenantId, new EntityId(command.Id));
+    OneTimePassword? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(oneTimePasswordId, cancellationToken);
     if (oneTimePassword == null || oneTimePassword.TenantId != command.TenantId)
     {
       return null;

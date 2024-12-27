@@ -2,7 +2,7 @@
 
 public class ConfigurationAlreadyInitializedException : Exception
 {
-  public const string ErrorMessage = "The configuration has already been initialized.";
+  private const string ErrorMessage = "The configuration has already been initialized.";
 
   public ConfigurationAlreadyInitializedException() : base(ErrorMessage)
   {

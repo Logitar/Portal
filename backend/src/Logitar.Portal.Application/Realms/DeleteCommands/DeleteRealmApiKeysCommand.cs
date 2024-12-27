@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -20,9 +20,9 @@ internal class DeleteRealmApiKeysCommandHandler : INotificationHandler<DeleteRea
   public async Task Handle(DeleteRealmApiKeysCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<ApiKeyAggregate> apiKeys = await _apiKeyRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<ApiKey> apiKeys = await _apiKeyRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (ApiKeyAggregate apiKey in apiKeys)
+    foreach (ApiKey apiKey in apiKeys)
     {
       apiKey.Delete(command.ActorId);
     }

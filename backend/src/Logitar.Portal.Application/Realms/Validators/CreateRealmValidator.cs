@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Validators;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain;
@@ -12,12 +12,12 @@ internal class CreateRealmValidator : AbstractValidator<CreateRealmPayload>
   public CreateRealmValidator()
   {
     RuleFor(x => x.UniqueSlug).Slug();
-    When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).SetValidator(new DisplayNameValidator()));
-    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).SetValidator(new DescriptionValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).DisplayName());
+    When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).Description());
 
-    When(x => !string.IsNullOrWhiteSpace(x.DefaultLocale), () => RuleFor(x => x.DefaultLocale!).SetValidator(new LocaleValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.DefaultLocale), () => RuleFor(x => x.DefaultLocale!).Locale());
     When(x => !string.IsNullOrWhiteSpace(x.Secret), () => RuleFor(x => x.Secret).JwtSecret());
-    When(x => !string.IsNullOrWhiteSpace(x.Url), () => RuleFor(x => x.Url!).SetValidator(new UrlValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.Url), () => RuleFor(x => x.Url!).Url());
 
     RuleFor(x => x.UniqueNameSettings).SetValidator(new UniqueNameSettingsValidator());
     RuleFor(x => x.PasswordSettings).SetValidator(new PasswordSettingsValidator());

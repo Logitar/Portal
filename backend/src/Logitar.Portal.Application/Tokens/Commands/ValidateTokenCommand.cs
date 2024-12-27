@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Tokens;
+using Logitar.Identity.Core.Tokens;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Tokens.Validators;
 using Logitar.Portal.Contracts.Realms;
@@ -43,7 +43,7 @@ internal class ValidateTokenCommandHandler : IRequestHandler<ValidateTokenComman
       parameters.ValidTypes.Add(payload.Type.Trim());
     }
 
-    Identity.Domain.Tokens.ValidatedToken validatedToken = await _tokenManager.ValidateAsync(parameters, cancellationToken);
+    ValidatedToken validatedToken = await _tokenManager.ValidateAsync(parameters, cancellationToken);
     return CreateResult(validatedToken.ClaimsPrincipal);
   }
 

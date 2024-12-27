@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Validators;
 using Logitar.Portal.Contracts;
@@ -26,17 +27,20 @@ internal class SaveUserIdentifierCommandHandler : IRequestHandler<SaveUserIdenti
 
   public async Task<UserModel?> Handle(SaveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
-    CustomIdentifier identifier = new(command.Key, command.Payload.Value);
+    CustomIdentifierModel identifier = new(command.Key, command.Payload.Value);
     new CustomIdentifierContractValidator().ValidateAndThrow(identifier);
 
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
     ActorId actorId = command.ActorId;
 
-    user.SetCustomIdentifier(identifier.Key, identifier.Value, actorId);
+    Identifier key = new(identifier.Key);
+    CustomIdentifier value = new(identifier.Value);
+    user.SetCustomIdentifier(key, value, actorId);
 
     await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 

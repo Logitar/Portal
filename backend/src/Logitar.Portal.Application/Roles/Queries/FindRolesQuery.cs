@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Contracts.Roles;
 using MediatR;
 
@@ -39,13 +39,13 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
     Dictionary<RoleId, FoundRole> foundRoles = new(capacity);
     HashSet<string> missingRoles = new(capacity);
 
-    IEnumerable<RoleAggregate> roles = await _roleRepository.LoadAsync(query.TenantId, cancellationToken);
+    IEnumerable<Role> roles = await _roleRepository.LoadAsync(query.TenantId, cancellationToken);
     capacity = roles.Count();
-    Dictionary<Guid, RoleAggregate> rolesById = new(capacity);
-    Dictionary<string, RoleAggregate> rolesByUniqueName = new(capacity);
-    foreach (RoleAggregate role in roles)
+    Dictionary<Guid, Role> rolesById = new(capacity);
+    Dictionary<string, Role> rolesByUniqueName = new(capacity);
+    foreach (Role role in roles)
     {
-      rolesById[role.Id.ToGuid()] = role;
+      rolesById[role.EntityId.ToGuid()] = role;
       rolesByUniqueName[role.UniqueName.Value.ToUpperInvariant()] = role;
     }
 
@@ -54,7 +54,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
       if (!string.IsNullOrWhiteSpace(modification.Role))
       {
         string trimmed = modification.Role.Trim();
-        if (Guid.TryParse(trimmed, out Guid id) && rolesById.TryGetValue(id, out RoleAggregate? role)
+        if (Guid.TryParse(trimmed, out Guid id) && rolesById.TryGetValue(id, out Role? role)
           || rolesByUniqueName.TryGetValue(trimmed.ToUpperInvariant(), out role))
         {
           foundRoles[role.Id] = new FoundRole(role, modification.Action);

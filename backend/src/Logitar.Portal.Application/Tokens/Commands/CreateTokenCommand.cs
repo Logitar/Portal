@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Tokens;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Tokens;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Tokens.Validators;
 using Logitar.Portal.Application.Users;
@@ -52,7 +52,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
       parameters.Expires = DateTime.UtcNow.AddSeconds(payload.LifetimeSeconds.Value);
     }
 
-    Identity.Domain.Tokens.CreatedToken createdToken = await _tokenManager.CreateAsync(parameters, cancellationToken);
+    CreatedToken createdToken = await _tokenManager.CreateAsync(parameters, cancellationToken);
     return new CreatedTokenModel(createdToken.TokenString);
   }
 
@@ -72,7 +72,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
 
     if (payload.Email != null)
     {
-      EmailUnit email = payload.Email.ToEmailUnit();
+      Email email = payload.Email.ToEmail();
       subject.AddClaim(new(Rfc7519ClaimNames.EmailAddress, email.Address));
       subject.AddClaim(new(Rfc7519ClaimNames.IsEmailVerified, email.IsVerified.ToString()));
     }

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Realms.Validators;
 using Logitar.Portal.Contracts;
@@ -31,7 +31,8 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     UpdateRealmPayload payload = command.Payload;
     new UpdateRealmValidator().ValidateAndThrow(payload);
 
-    Realm? realm = await _realmRepository.LoadAsync(command.Id, cancellationToken);
+    RealmId realmId = new(command.Id);
+    Realm? realm = await _realmRepository.LoadAsync(realmId, cancellationToken);
     if (realm == null)
     {
       return null;
@@ -46,16 +47,16 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     }
     if (payload.DisplayName != null)
     {
-      realm.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      realm.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      realm.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      realm.Description = Description.TryCreate(payload.Description.Value);
     }
 
     if (payload.DefaultLocale != null)
     {
-      realm.DefaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale.Value);
+      realm.DefaultLocale = Locale.TryCreate(payload.DefaultLocale.Value);
     }
     if (payload.Secret != null)
     {
@@ -63,7 +64,7 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
     }
     if (payload.Url != null)
     {
-      realm.Url = UrlUnit.TryCreate(payload.Url.Value);
+      realm.Url = Url.TryCreate(payload.Url.Value);
     }
 
     if (payload.UniqueNameSettings != null)
@@ -81,13 +82,14 @@ internal class UpdateRealmCommandHandler : IRequestHandler<UpdateRealmCommand, R
 
     foreach (CustomAttributeModification customAttribute in payload.CustomAttributes)
     {
+      Identifier key = new(customAttribute.Key);
       if (string.IsNullOrWhiteSpace(customAttribute.Value))
       {
-        realm.RemoveCustomAttribute(customAttribute.Key);
+        realm.RemoveCustomAttribute(key);
       }
       else
       {
-        realm.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        realm.SetCustomAttribute(key, customAttribute.Value);
       }
     }
 

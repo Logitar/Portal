@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
@@ -23,14 +24,16 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
 
   public async Task<UserModel?> Handle(RemoveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
 
+    Identifier key = new(command.Key); // TODO(fpion): will throw!
     ActorId actorId = command.ActorId;
-    user.RemoveCustomIdentifier(command.Key, actorId);
+    user.RemoveCustomIdentifier(key, actorId);
     await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
 
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);

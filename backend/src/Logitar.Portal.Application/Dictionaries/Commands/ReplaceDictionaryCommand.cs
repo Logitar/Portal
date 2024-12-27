@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Dictionaries.Validators;
 using Logitar.Portal.Contracts.Dictionaries;
@@ -29,7 +29,8 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
     ReplaceDictionaryPayload payload = command.Payload;
     new ReplaceDictionaryValidator().ValidateAndThrow(payload);
 
-    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    DictionaryId dictionaryId = new(command.TenantId, new EntityId(command.Id));
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(dictionaryId, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;
@@ -42,7 +43,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit locale = new(payload.Locale);
+    Locale locale = new(payload.Locale);
     if (reference == null || locale != reference.Locale)
     {
       dictionary.SetLocale(locale, actorId);
@@ -58,17 +59,18 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
 
   private static void ReplaceDictionaryEntries(ReplaceDictionaryPayload payload, Dictionary dictionary, Dictionary? reference)
   {
-    HashSet<string> payloadKeys = new(capacity: payload.Entries.Count);
+    HashSet<Identifier> payloadKeys = new(capacity: payload.Entries.Count);
 
-    IEnumerable<string> referenceKeys;
+    IEnumerable<Identifier> referenceKeys;
     if (reference == null)
     {
       referenceKeys = dictionary.Entries.Keys;
 
       foreach (DictionaryEntry customAttribute in payload.Entries)
       {
-        payloadKeys.Add(customAttribute.Key.Trim());
-        dictionary.SetEntry(customAttribute.Key, customAttribute.Value);
+        Identifier key = new(customAttribute.Key);
+        payloadKeys.Add(key);
+        dictionary.SetEntry(key, customAttribute.Value);
       }
     }
     else
@@ -77,7 +79,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
 
       foreach (DictionaryEntry customAttribute in payload.Entries)
       {
-        string key = customAttribute.Key.Trim();
+        Identifier key = new(customAttribute.Key);
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
@@ -88,7 +90,7 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
       }
     }
 
-    foreach (string key in referenceKeys)
+    foreach (Identifier key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
       {

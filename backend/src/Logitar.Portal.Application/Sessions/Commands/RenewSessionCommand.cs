@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Sessions.Validators;
 using Logitar.Portal.Contracts;
@@ -21,8 +22,11 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
-  public RenewSessionCommandHandler(IPasswordManager passwordManager,
-    ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserRepository userRepository)
+  public RenewSessionCommandHandler(
+    IPasswordManager passwordManager,
+    ISessionQuerier sessionQuerier,
+    ISessionRepository sessionRepository,
+    IUserRepository userRepository)
   {
     _passwordManager = passwordManager;
     _sessionQuerier = sessionQuerier;
@@ -38,16 +42,16 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
     RefreshToken refreshToken;
     try
     {
-      refreshToken = RefreshToken.Decode(payload.RefreshToken);
+      refreshToken = RefreshToken.Decode(command.TenantId, payload.RefreshToken);
     }
     catch (Exception innerException)
     {
       throw new InvalidRefreshTokenException(payload.RefreshToken, nameof(payload.RefreshToken), innerException);
     }
 
-    SessionAggregate session = await _sessionRepository.LoadAsync(refreshToken.Id, cancellationToken)
+    Session session = await _sessionRepository.LoadAsync(refreshToken.Id, cancellationToken)
       ?? throw new SessionNotFoundException(refreshToken.Id, nameof(payload.RefreshToken));
-    UserAggregate user = await _userRepository.LoadAsync(session, cancellationToken);
+    User user = await _userRepository.LoadAsync(session, cancellationToken);
     if (user.TenantId != command.TenantId)
     {
       throw new SessionNotFoundException(session.Id, nameof(payload.RefreshToken));
@@ -61,7 +65,8 @@ internal class RenewSessionCommandHandler : IRequestHandler<RenewSessionCommand,
     session.Renew(refreshToken.Secret, newSecret, actorId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      session.SetCustomAttribute(key, customAttribute.Value);
     }
     session.Update(actorId);
 

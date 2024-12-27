@@ -2,7 +2,7 @@
 
 public class UsersNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified users could not be found.";
+  private const string ErrorMessage = "The specified users could not be found.";
 
   public IEnumerable<Guid> Ids
   {

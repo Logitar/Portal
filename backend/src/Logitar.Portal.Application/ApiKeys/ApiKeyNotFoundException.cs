@@ -1,16 +1,21 @@
-﻿using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 
 namespace Logitar.Portal.Application.ApiKeys;
 
 public class ApiKeyNotFoundException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified API key could not be found.";
+  private const string ErrorMessage = "The specified API key could not be found.";
 
-  public ApiKeyId Id
+  public Guid? TenantId
   {
-    get => new((string)Data[nameof(Id)]!);
-    private set => Data[nameof(Id)] = value.Value;
+    get => (Guid?)Data[nameof(TenantId)]!;
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid ApiKeyId
+  {
+    get => (Guid)Data[nameof(ApiKeyId)]!;
+    private set => Data[nameof(ApiKeyId)] = value;
   }
   public string? PropertyName
   {
@@ -20,12 +25,14 @@ public class ApiKeyNotFoundException : InvalidCredentialsException
 
   public ApiKeyNotFoundException(ApiKeyId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id;
+    TenantId = id.TenantId?.ToGuid();
+    ApiKeyId = id.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(ApiKeyId id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(Id), id)
+    .AddData(nameof(TenantId), id.TenantId?.ToGuid(), "<null>")
+    .AddData(nameof(ApiKeyId), id.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

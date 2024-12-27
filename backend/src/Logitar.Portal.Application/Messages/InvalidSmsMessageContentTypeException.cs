@@ -2,7 +2,7 @@
 
 public class InvalidSmsMessageContentTypeException : Exception
 {
-  public const string ErrorMessage = "A SMS message cannot be sent using the specified content type.";
+  private const string ErrorMessage = "A SMS message cannot be sent using the specified content type.";
 
   public string ContentType
   {

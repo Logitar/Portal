@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Dictionaries.Validators;
 using Logitar.Portal.Contracts.Dictionaries;
@@ -29,7 +29,7 @@ internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionary
 
     ActorId actorId = command.ActorId;
 
-    LocaleUnit locale = new(payload.Locale);
+    Locale locale = new(payload.Locale);
     Dictionary dictionary = new(locale, command.TenantId, actorId);
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);

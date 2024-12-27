@@ -4,20 +4,27 @@ namespace Logitar.Portal.Application.Senders;
 
 public class CannotDeleteDefaultSenderException : Exception
 {
-  public const string ErrorMessage = "The default sender cannot be deleted, unless its the only sender in its Realm.";
+  private const string ErrorMessage = "The default sender cannot be deleted, unless its the only sender in its Realm.";
 
-  public SenderId SenderId
+  public Guid? TenantId
   {
-    get => new((string)Data[nameof(SenderId)]!);
-    private set => Data[nameof(SenderId)] = value.Value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid SenderId
+  {
+    get => (Guid)Data[nameof(SenderId)]!;
+    private set => Data[nameof(SenderId)] = value;
   }
 
   public CannotDeleteDefaultSenderException(Sender sender) : base(BuildMessage(sender))
   {
-    SenderId = sender.Id;
+    TenantId = sender.TenantId?.ToGuid();
+    SenderId = sender.EntityId.ToGuid();
   }
 
   private static string BuildMessage(Sender sender) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(SenderId), sender.Id.Value)
+    .AddData(nameof(TenantId), sender.TenantId?.ToGuid(), "<null>")
+    .AddData(nameof(SenderId), sender.EntityId.ToGuid())
     .Build();
 }

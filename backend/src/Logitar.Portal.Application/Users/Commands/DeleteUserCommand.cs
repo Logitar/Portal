@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
@@ -23,7 +24,8 @@ internal class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Use
 
   public async Task<UserModel?> Handle(DeleteUserCommand command, CancellationToken cancellationToken)
   {
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
