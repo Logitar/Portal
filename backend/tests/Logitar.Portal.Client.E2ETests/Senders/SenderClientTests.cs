@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Contracts;
+﻿using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Senders;
 using Microsoft.Extensions.Configuration;
@@ -63,7 +63,7 @@ internal class SenderClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateSenderPayload update = new()
       {
-        Description = new Modification<string>("This is the default sender.")
+        Description = new ChangeModel<string>("This is the default sender.")
       };
       sender = await _client.UpdateAsync(sender.Id, update, context.Request)
         ?? throw new InvalidOperationException("The sender should not be null.");

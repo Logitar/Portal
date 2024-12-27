@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Contracts;
-using Logitar.Portal.Client;
+﻿using Logitar.Portal.Client;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Search;
 using Microsoft.Extensions.Configuration;
@@ -64,8 +64,8 @@ internal class RealmClientTests : IClientTests
       context.SetName(_client.GetType(), nameof(_client.UpdateAsync));
       UpdateRealmPayload update = new()
       {
-        DisplayName = new Modification<string>("Test Realm"),
-        DefaultLocale = new Modification<string>("en")
+        DisplayName = new ChangeModel<string>("Test Realm"),
+        DefaultLocale = new ChangeModel<string>("en")
       };
       realm = await _client.UpdateAsync(realm.Id, update, context.Request)
         ?? throw new InvalidOperationException("The realm should not be null.");
