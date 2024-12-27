@@ -1,25 +1,28 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain;
+using FluentValidation.Validators;
 using Logitar.Identity.Domain.Users;
-using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Domain.Validators;
 
-public class PhoneNumberValidator : AbstractValidator<string>
+internal class PhoneNumberValidator<T> : IPropertyValidator<T, string>
 {
-  public PhoneNumberValidator(string? propertyName = null)
+  public string Name { get; } = "PhoneNumberValidator";
+
+  public string GetDefaultMessageTemplate(string errorCode)
   {
-    RuleFor(x => x).NotEmpty()
-      .MaximumLength(byte.MaxValue)
-      .Must(BeAValidPhoneNumber)
-        .WithErrorCode(nameof(PhoneNumberValidator))
-        .WithMessage("'{PropertyName}' must be a valid phone number.")
-      .WithPropertyName(propertyName);
+    return "'{PropertyName}' must be a valid phone number.";
   }
 
-  private static bool BeAValidPhoneNumber(string phoneNumber)
+  public bool IsValid(ValidationContext<T> context, string value)
   {
-    PhoneModel phone = new(countryCode: null, phoneNumber, extension: null, phoneNumber);
-    return phone.IsValid();
+    try
+    {
+      PhoneUnit phone = new(value, countryCode: null, extension: null, isVerified: false);
+      return true;
+    }
+    catch (Exception)
+    {
+      return false;
+    }
   }
 }

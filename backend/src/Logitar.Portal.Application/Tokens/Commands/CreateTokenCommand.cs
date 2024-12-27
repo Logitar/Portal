@@ -77,7 +77,7 @@ internal class CreateTokenCommandHandler : IRequestHandler<CreateTokenCommand, C
       subject.AddClaim(new(Rfc7519ClaimNames.IsEmailVerified, email.IsVerified.ToString()));
     }
 
-    foreach (TokenClaim claim in payload.Claims)
+    foreach (ClaimModel claim in payload.Claims)
     {
       subject.AddClaim(new(claim.Name, claim.Value, claim.Type));
     }
