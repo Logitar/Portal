@@ -39,13 +39,12 @@ internal class LogEntity
   public TimeSpan? Duration { get; private set; }
 
   public string? TenantId { get; private set; }
-  public string ActorId { get; private set; } = EventSourcing.ActorId.DefaultValue;
+  public string? ActorId { get; private set; }
   public string? ApiKeyId { get; private set; }
   public string? UserId { get; private set; }
   public string? SessionId { get; private set; }
 
-  [BsonRepresentation(BsonType.String)]
-  public List<Guid> EventIds { get; private set; } = [];
+  public List<string> EventIds { get; private set; } = [];
 
   public List<LogExceptionEntity> Exceptions { get; private set; } = [];
 
@@ -83,14 +82,14 @@ internal class LogEntity
     Duration = log.Duration;
 
     TenantId = log.TenantId?.Value;
-    ActorId = log.ActorId.Value;
+    ActorId = log.ActorId?.Value;
     ApiKeyId = log.ApiKeyId?.Value;
     UserId = log.UserId?.Value;
     SessionId = log.SessionId?.Value;
 
     foreach (DomainEvent @event in log.Events)
     {
-      EventIds.Add(@event.Id);
+      EventIds.Add(@event.Id.Value);
     }
     foreach (Exception exception in log.Exceptions)
     {
