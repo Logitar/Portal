@@ -104,7 +104,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyCommand command = new(payload);
 
     var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(apiKey.TenantId?.ToGuid(), exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(apiKey.EntityId.ToGuid(), exception.ApiKeyId);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
