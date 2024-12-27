@@ -1,5 +1,4 @@
-﻿using Logitar.Identity.Contracts;
-using Logitar.Portal.Contracts.Roles;
+﻿using Logitar.Portal.Contracts.Roles;
 
 namespace Logitar.Portal.Contracts.Users;
 
@@ -9,23 +8,23 @@ public record UpdateUserPayload
   public ChangePasswordPayload? Password { get; set; }
   public bool? IsDisabled { get; set; }
 
-  public Modification<AddressPayload>? Address { get; set; }
-  public Modification<EmailPayload>? Email { get; set; }
-  public Modification<PhonePayload>? Phone { get; set; }
+  public ChangeModel<AddressPayload>? Address { get; set; }
+  public ChangeModel<EmailPayload>? Email { get; set; }
+  public ChangeModel<PhonePayload>? Phone { get; set; }
 
-  public Modification<string>? FirstName { get; set; }
-  public Modification<string>? MiddleName { get; set; }
-  public Modification<string>? LastName { get; set; }
-  public Modification<string>? Nickname { get; set; }
+  public ChangeModel<string>? FirstName { get; set; }
+  public ChangeModel<string>? MiddleName { get; set; }
+  public ChangeModel<string>? LastName { get; set; }
+  public ChangeModel<string>? Nickname { get; set; }
 
-  public Modification<DateTime?>? Birthdate { get; set; }
-  public Modification<string>? Gender { get; set; }
-  public Modification<string>? Locale { get; set; }
-  public Modification<string>? TimeZone { get; set; }
+  public ChangeModel<DateTime?>? Birthdate { get; set; }
+  public ChangeModel<string>? Gender { get; set; }
+  public ChangeModel<string>? Locale { get; set; }
+  public ChangeModel<string>? TimeZone { get; set; }
 
-  public Modification<string>? Picture { get; set; }
-  public Modification<string>? Profile { get; set; }
-  public Modification<string>? Website { get; set; }
+  public ChangeModel<string>? Picture { get; set; }
+  public ChangeModel<string>? Profile { get; set; }
+  public ChangeModel<string>? Website { get; set; }
 
   public List<CustomAttributeModification> CustomAttributes { get; set; } = [];
   public List<RoleModification> Roles { get; set; } = [];
