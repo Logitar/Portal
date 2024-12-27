@@ -54,7 +54,7 @@ internal class RoleQuerier : IRoleQuerier
   public async Task<RoleModel?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string uniqueNameNormalized = uniqueName.Trim().ToUpper();
+    string uniqueNameNormalized = uniqueName.Trim().ToUpper(); // ISSUE #528: use Helper
 
     RoleEntity? role = await _roles.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueNameNormalized == uniqueNameNormalized, cancellationToken);

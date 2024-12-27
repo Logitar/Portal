@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Contracts;
 using Logitar.Identity.Domain.Roles;
 using Logitar.Identity.Domain.Shared;

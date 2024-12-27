@@ -9,6 +9,7 @@ using Logitar.Portal.Domain.Senders.Twilio;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Senders.Commands;
 

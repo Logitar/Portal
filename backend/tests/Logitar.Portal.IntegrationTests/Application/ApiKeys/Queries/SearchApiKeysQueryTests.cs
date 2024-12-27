@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.ApiKeys;
 using Logitar.Identity.Domain.Passwords;
 using Logitar.Identity.Domain.Shared;

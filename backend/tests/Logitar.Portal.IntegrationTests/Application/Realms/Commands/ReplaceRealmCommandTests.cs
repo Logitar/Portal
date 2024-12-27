@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 
@@ -87,7 +87,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     Realm realm = new(new Slug("other"));
     await _realmRepository.SaveAsync(realm);
 
-    ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpper(), secret: string.Empty);
+    ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpperInvariant(), secret: string.Empty);
     ReplaceRealmCommand command = new(realm.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug.Value, ignoreCase: true);

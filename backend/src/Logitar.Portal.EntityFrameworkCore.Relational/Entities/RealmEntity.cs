@@ -11,7 +11,7 @@ internal class RealmEntity : AggregateEntity
   public string UniqueSlug { get; private set; } = string.Empty;
   public string UniqueSlugNormalized
   {
-    get => UniqueSlug.ToUpper();
+    get => UniqueSlug.ToUpper(); // ISSUE #528: use Helper
     private set { }
   }
   public string? DisplayName { get; private set; }
@@ -31,22 +31,7 @@ internal class RealmEntity : AggregateEntity
   public string PasswordHashingStrategy { get; private set; } = string.Empty;
   public bool RequireUniqueEmail { get; private set; }
 
-  public Dictionary<string, string> CustomAttributes { get; private set; } = [];
-  public string? CustomAttributesSerialized
-  {
-    get => CustomAttributes.Count == 0 ? null : JsonSerializer.Serialize(CustomAttributes);
-    private set
-    {
-      if (value == null)
-      {
-        CustomAttributes.Clear();
-      }
-      else
-      {
-        CustomAttributes = JsonSerializer.Deserialize<Dictionary<string, string>>(value) ?? [];
-      }
-    }
-  }
+  public string? CustomAttributes { get; private set; }
 
   public RealmEntity(RealmCreated @event) : base(@event)
   {
@@ -109,17 +94,19 @@ internal class RealmEntity : AggregateEntity
       RequireUniqueEmail = @event.RequireUniqueEmail.Value;
     }
 
+    Dictionary<string, string> customAttributes = GetCustomAttributes();
     foreach (KeyValuePair<string, string?> customAttribute in @event.CustomAttributes)
     {
       if (customAttribute.Value == null)
       {
-        CustomAttributes.Remove(customAttribute.Key);
+        customAttributes.Remove(customAttribute.Key);
       }
       else
       {
-        CustomAttributes[customAttribute.Key] = customAttribute.Value;
+        customAttributes[customAttribute.Key] = customAttribute.Value;
       }
     }
+    SetCustomAttributes(customAttributes);
   }
 
   private void SetUniqueNameSettings(IUniqueNameSettings uniqueName)
@@ -135,5 +122,14 @@ internal class RealmEntity : AggregateEntity
     PasswordsRequireUppercase = password.RequireUppercase;
     PasswordsRequireDigit = password.RequireDigit;
     PasswordHashingStrategy = password.HashingStrategy;
+  }
+
+  public Dictionary<string, string> GetCustomAttributes()
+  {
+    return (CustomAttributes == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(CustomAttributes)) ?? [];
+  }
+  private void SetCustomAttributes(Dictionary<string, string> customAttributes)
+  {
+    CustomAttributes = customAttributes.Count < 1 ? null : JsonSerializer.Serialize(customAttributes);
   }
 }

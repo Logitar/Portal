@@ -10,8 +10,8 @@ public static class PersonExtensions
   {
     StringBuilder hin = new();
 
-    hin.Append(person.LastName[..3].ToUpper());
-    hin.Append(person.FirstName[..1].ToUpper());
+    hin.Append(person.LastName[..3].ToUpperInvariant());
+    hin.Append(person.FirstName[..1].ToUpperInvariant());
     hin.Append(person.DateOfBirth.Year % 100);
     hin.Append(person.DateOfBirth.Month.ToString("00"));
     hin.Append(person.DateOfBirth.Day.ToString("00"));

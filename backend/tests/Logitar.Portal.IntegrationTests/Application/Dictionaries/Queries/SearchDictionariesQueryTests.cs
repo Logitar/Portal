@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Search;
@@ -7,6 +6,7 @@ using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Dictionaries.Queries;
 

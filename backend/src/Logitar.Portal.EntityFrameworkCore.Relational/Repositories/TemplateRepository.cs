@@ -57,7 +57,7 @@ internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational
         new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
       .Where(PortalDb.Templates.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .Where(PortalDb.Templates.UniqueKeyNormalized, Operators.IsEqualTo(uniqueKey.Value.ToUpper()))
+      .Where(PortalDb.Templates.UniqueKeyNormalized, Operators.IsEqualTo(uniqueKey.Value.ToUpper())) // ISSUE #528: use Helper
       .SelectAll(EventDb.Events.Table)
       .Build();
 

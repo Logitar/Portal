@@ -37,7 +37,7 @@ internal class RealmRepository : EventSourcing.EntityFrameworkCore.Relational.Ag
       .Join(PortalDb.Realms.AggregateId, EventDb.Events.AggregateId,
         new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
       )
-      .Where(PortalDb.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlug.Value.ToUpper()))
+      .Where(PortalDb.Realms.UniqueSlugNormalized, Operators.IsEqualTo(uniqueSlug.Value.ToUpper())) // ISSUE #528: use Helper
       .SelectAll(EventDb.Events.Table)
       .Build();
 

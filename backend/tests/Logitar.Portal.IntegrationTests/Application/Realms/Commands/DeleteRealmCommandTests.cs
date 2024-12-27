@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Realms;
@@ -8,6 +7,7 @@ using Logitar.Portal.Domain.Settings;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Realms.Commands;
 

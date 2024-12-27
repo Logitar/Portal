@@ -21,8 +21,6 @@ internal class RealmConfiguration : AggregateConfiguration<RealmEntity>, IEntity
     builder.HasIndex(x => x.UniqueSlugNormalized).IsUnique();
     builder.HasIndex(x => x.DisplayName);
 
-    builder.Ignore(x => x.CustomAttributes);
-
     builder.Property(x => x.UniqueSlug).HasMaxLength(Slug.MaximumLength);
     builder.Property(x => x.UniqueSlugNormalized).HasMaxLength(Slug.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
@@ -31,6 +29,5 @@ internal class RealmConfiguration : AggregateConfiguration<RealmEntity>, IEntity
     builder.Property(x => x.Url).HasMaxLength(UrlUnit.MaximumLength);
     builder.Property(x => x.AllowedUniqueNameCharacters).HasMaxLength(byte.MaxValue);
     builder.Property(x => x.PasswordHashingStrategy).HasMaxLength(byte.MaxValue);
-    builder.Property(x => x.CustomAttributesSerialized).HasColumnName(nameof(RealmEntity.CustomAttributes));
   }
 }

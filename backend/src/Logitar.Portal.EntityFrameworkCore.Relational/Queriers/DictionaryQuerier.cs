@@ -54,7 +54,7 @@ internal class DictionaryQuerier : IDictionaryQuerier
   public async Task<DictionaryModel?> ReadAsync(RealmModel? realm, string locale, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string localeNormalized = locale.Trim().ToUpper();
+    string localeNormalized = locale.Trim().ToUpper(); // ISSUE #528: use Helper
 
     DictionaryEntity? dictionary = await _dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.LocaleNormalized == localeNormalized, cancellationToken);

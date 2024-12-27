@@ -27,9 +27,6 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.HasIndex(x => x.IsDemo);
     builder.HasIndex(x => x.Status);
 
-    builder.Ignore(x => x.Variables);
-    builder.Ignore(x => x.ResultData);
-
     builder.Property(x => x.TenantId).HasMaxLength(AggregateId.MaximumLength);
     builder.Property(x => x.Subject).HasMaxLength(Subject.MaximumLength);
     builder.Property(x => x.BodyType).HasMaxLength(TemplateConfiguration.ContentTypeMaximumLength);
@@ -40,9 +37,7 @@ internal class MessageConfiguration : AggregateConfiguration<MessageEntity>, IEn
     builder.Property(x => x.TemplateUniqueKey).HasMaxLength(IdentifierValidator.MaximumLength);
     builder.Property(x => x.TemplateDisplayName).HasMaxLength(DisplayNameUnit.MaximumLength);
     builder.Property(x => x.Locale).HasMaxLength(LocaleUnit.MaximumLength);
-    builder.Property(x => x.VariablesSerialized).HasColumnName(nameof(MessageEntity.Variables));
     builder.Property(x => x.Status).HasMaxLength(byte.MaxValue).HasConversion(new EnumToStringConverter<MessageStatus>());
-    builder.Property(x => x.ResultDataSerialized).HasColumnName(nameof(MessageEntity.ResultData));
 
     builder.HasOne(x => x.Sender).WithMany(x => x.Messages).OnDelete(DeleteBehavior.SetNull);
     builder.HasOne(x => x.Template).WithMany(x => x.Messages).OnDelete(DeleteBehavior.SetNull);

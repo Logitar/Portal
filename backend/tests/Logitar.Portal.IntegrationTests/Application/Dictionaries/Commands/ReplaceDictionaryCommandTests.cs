@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Dictionaries.Commands;
 
@@ -93,7 +93,7 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     Dictionary dictionary = new(new LocaleUnit("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
-    ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpper());
+    ReplaceDictionaryPayload payload = new(Faker.Locale.ToUpperInvariant());
     ReplaceDictionaryCommand command = new(dictionary.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);

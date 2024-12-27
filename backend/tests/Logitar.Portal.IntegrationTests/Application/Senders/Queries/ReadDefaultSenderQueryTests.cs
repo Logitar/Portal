@@ -1,5 +1,4 @@
 ﻿using Logitar.Data;
-using Logitar.Data.SqlServer;
 using Logitar.Identity.Domain.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
@@ -7,6 +6,7 @@ using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PortalDb = Logitar.Portal.EntityFrameworkCore.Relational.PortalDb;
 
 namespace Logitar.Portal.Application.Senders.Queries;
 
