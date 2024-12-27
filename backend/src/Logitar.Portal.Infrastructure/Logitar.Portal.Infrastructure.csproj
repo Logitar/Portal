@@ -51,7 +51,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.Infrastructure" Version="3.0.1" />
+    <PackageReference Include="Logitar.Identity.Infrastructure" Version="3.0.2" />
     <PackageReference Include="Logitar.Net.Mail.Mailgun" Version="7.0.0" />
     <PackageReference Include="Logitar.Net.Mail.SendGrid" Version="7.0.0" />
     <PackageReference Include="Logitar.Net.Sms.Twilio" Version="7.0.0" />
