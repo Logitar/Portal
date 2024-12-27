@@ -2,6 +2,8 @@
 
 public record PortalSettings : IPortalSettings
 {
+  public const string SectionKey = "Portal";
+
   public string? ApiKey { get; set; }
   public BasicCredentials? Basic { get; set; }
 

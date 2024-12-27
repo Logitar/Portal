@@ -12,7 +12,7 @@ public static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalMongoDB(this IServiceCollection services, IConfiguration configuration)
   {
-    MongoDBSettings settings = configuration.GetSection("MongoDB").Get<MongoDBSettings>() ?? new();
+    MongoDBSettings settings = configuration.GetSection(MongoDBSettings.SectionKey).Get<MongoDBSettings>() ?? new();
     return services.AddLogitarPortalMongoDB(settings);
   }
   public static IServiceCollection AddLogitarPortalMongoDB(this IServiceCollection services, MongoDBSettings settings)

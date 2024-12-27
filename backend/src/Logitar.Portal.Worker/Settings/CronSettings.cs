@@ -2,5 +2,7 @@
 
 internal record CronSettings
 {
+  public const string SectionKey = "Cron";
+
   public TimeSpan PurgeTokenBlacklist { get; set; }
 }

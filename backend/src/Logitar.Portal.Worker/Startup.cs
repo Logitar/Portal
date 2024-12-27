@@ -37,7 +37,7 @@ internal class Startup
     services.AddSingleton<IBaseUrl, WorkerBaseUrl>();
     services.AddSingleton<IContextParametersResolver, WorkerContextParametersResolver>();
 
-    services.AddSingleton(_configuration.GetSection("Cron").Get<CronSettings>() ?? new());
+    services.AddSingleton(_configuration.GetSection(CronSettings.SectionKey).Get<CronSettings>() ?? new());
     services.AddHostedService<PurgeTokenBlacklist>();
   }
 }

@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application.Configurations.Commands;
 using Logitar.Portal.Infrastructure.Commands;
 using MediatR;
+using Microsoft.FeatureManagement;
 
 namespace Logitar.Portal;
 
@@ -19,11 +20,16 @@ public class Program
 
     WebApplication application = builder.Build();
 
-    startup.Configure(application);
+    await startup.ConfigureAsync(application);
 
     IServiceScope scope = application.Services.CreateScope();
     IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
-    await publisher.Publish(new InitializeDatabaseCommand());
+
+    IFeatureManager featureManager = application.Services.GetRequiredService<IFeatureManager>();
+    if (await featureManager.IsEnabledAsync(FeatureFlags.MigrateDatabase))
+    {
+      await publisher.Publish(new InitializeDatabaseCommand());
+    }
 
     string uniqueName = configuration.GetValue<string>("PORTAL_USERNAME") ?? DefaultUniqueName;
     string password = configuration.GetValue<string>("PORTAL_PASSWORD") ?? DefaultPassword;

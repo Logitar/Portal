@@ -7,7 +7,7 @@ internal static class DependencyInjectionExtensions
 {
   public static IServiceCollection AddLogitarPortalMassTransit(this IServiceCollection services, IConfiguration configuration)
   {
-    MassTransitSettings settings = configuration.GetSection("MassTransit").Get<MassTransitSettings>() ?? new();
+    MassTransitSettings settings = configuration.GetSection(MassTransitSettings.SectionKey).Get<MassTransitSettings>() ?? new();
     return services.AddLogitarPortalMassTransit(settings);
   }
   public static IServiceCollection AddLogitarPortalMassTransit(this IServiceCollection services, IMassTransitSettings settings)

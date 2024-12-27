@@ -29,7 +29,7 @@ internal class Startup
 
   public virtual void ConfigureServices(IServiceCollection services)
   {
-    PortalSettings settings = _configuration.GetSection("Portal").Get<PortalSettings>() ?? new();
+    PortalSettings settings = _configuration.GetSection(PortalSettings.SectionKey).Get<PortalSettings>() ?? new();
     StaticPortalSettings.Instance.BaseUrl = settings.BaseUrl;
     StaticPortalSettings.Instance.Basic = settings.Basic;
     services.AddLogitarPortalClient(StaticPortalSettings.Instance);

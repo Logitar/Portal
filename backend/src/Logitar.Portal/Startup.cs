@@ -20,6 +20,7 @@ using Logitar.Portal.Web.Constants;
 using Logitar.Portal.Web.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.FeatureManagement;
 
 namespace Logitar.Portal;
 
@@ -27,13 +28,11 @@ internal class Startup : StartupBase
 {
   private readonly IConfiguration _configuration;
   private readonly string[] _authenticationSchemes;
-  private readonly bool _enableOpenApi;
 
   public Startup(IConfiguration configuration)
   {
     _configuration = configuration;
     _authenticationSchemes = Schemes.GetEnabled(configuration);
-    _enableOpenApi = configuration.GetValue<bool>("EnableOpenApi");
   }
 
   public override void ConfigureServices(IServiceCollection services)
@@ -44,7 +43,7 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMassTransit(_configuration);
     services.AddLogitarPortalWeb();
 
-    CorsSettings corsSettings = _configuration.GetSection("Cors").Get<CorsSettings>() ?? new();
+    CorsSettings corsSettings = _configuration.GetSection(CorsSettings.SectionKey).Get<CorsSettings>() ?? new();
     services.AddSingleton(corsSettings);
     services.AddCors(corsSettings);
 
@@ -72,7 +71,7 @@ internal class Startup : StartupBase
     services.AddSingleton<IAuthorizationHandler, PortalActorAuthorizationHandler>();
     services.AddSingleton<IAuthorizationHandler, PortalUserAuthorizationHandler>();
 
-    CookiesSettings cookiesSettings = _configuration.GetSection("Cookies").Get<CookiesSettings>() ?? new();
+    CookiesSettings cookiesSettings = _configuration.GetSection(CookiesSettings.SectionKey).Get<CookiesSettings>() ?? new();
     services.AddSingleton(cookiesSettings);
     services.AddSession(options =>
     {
@@ -83,10 +82,7 @@ internal class Startup : StartupBase
     services.AddApplicationInsightsTelemetry();
     IHealthChecksBuilder healthChecks = services.AddHealthChecks();
 
-    if (_enableOpenApi)
-    {
-      services.AddOpenApi();
-    }
+    services.AddOpenApi();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)
@@ -115,46 +111,42 @@ internal class Startup : StartupBase
 
   public override void Configure(IApplicationBuilder builder)
   {
-    if (_enableOpenApi)
-    {
-      builder.UseOpenApi();
-    }
-
-    if (_configuration.GetValue<bool>("UseGraphQLAltair"))
-    {
-      builder.UseGraphQLAltair();
-    }
-    if (_configuration.GetValue<bool>("UseGraphQLGraphiQL"))
-    {
-      builder.UseGraphQLGraphiQL();
-    }
-#pragma warning disable CS0618
-    if (_configuration.GetValue<bool>("UseGraphQLPlayground"))
-    {
-      builder.UseGraphQLPlayground();
-    }
-#pragma warning restore
-    if (_configuration.GetValue<bool>("UseGraphQLVoyager"))
-    {
-      builder.UseGraphQLVoyager();
-    }
-
-    builder.UseHttpsRedirection();
-    builder.UseCors();
-    builder.UseStaticFiles();
-    builder.UseSession();
-    builder.UseMiddleware<Logging>();
-    builder.UseMiddleware<RenewSession>();
-    builder.UseMiddleware<RedirectNotFound>();
-    builder.UseAuthentication();
-    builder.UseAuthorization();
-
-    builder.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(_authenticationSchemes));
-
     if (builder is WebApplication application)
     {
-      application.MapControllers();
-      application.MapHealthChecks("/health");
+      ConfigureAsync(application).Wait();
     }
+  }
+  public virtual async Task ConfigureAsync(WebApplication application)
+  {
+    IFeatureManager featureManager = application.Services.GetRequiredService<IFeatureManager>();
+
+    if (await featureManager.IsEnabledAsync(FeatureFlags.UseOpenApi))
+    {
+      application.UseOpenApi();
+    }
+
+    if (await featureManager.IsEnabledAsync(FeatureFlags.UseGraphQLGraphiQL))
+    {
+      application.UseGraphQLGraphiQL();
+    }
+    if (await featureManager.IsEnabledAsync(FeatureFlags.UseGraphQLVoyager))
+    {
+      application.UseGraphQLVoyager();
+    }
+
+    application.UseHttpsRedirection();
+    application.UseCors();
+    application.UseStaticFiles();
+    application.UseSession();
+    application.UseMiddleware<Logging>();
+    application.UseMiddleware<RenewSession>();
+    application.UseMiddleware<RedirectNotFound>();
+    application.UseAuthentication();
+    application.UseAuthorization();
+
+    application.UseGraphQL<PortalSchema>("/graphql", options => options.AuthenticationSchemes.AddRange(_authenticationSchemes));
+
+    application.MapControllers();
+    application.MapHealthChecks("/health");
   }
 }

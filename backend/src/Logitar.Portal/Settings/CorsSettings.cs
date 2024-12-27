@@ -2,6 +2,8 @@
 
 internal record CorsSettings
 {
+  public const string SectionKey = "Cors";
+
   public bool AllowAnyOrigin { get; set; }
   public string[] AllowedOrigins { get; set; } = [];
 
