@@ -26,7 +26,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton(InitializeCachingSettings)
       .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IEventSerializer, EventSerializer>()
-      .AddTransient<IEventBus, EventBus>();
+      .AddScoped<IEventBus, EventBus>();
   }
 
   private static IServiceCollection AddSenderProviders(this IServiceCollection services)
