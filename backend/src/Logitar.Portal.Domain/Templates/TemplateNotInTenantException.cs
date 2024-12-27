@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.Templates;
 
 public class TemplateNotInTenantException : Exception
 {
-  public const string ErrorMessage = "The specified template is not in the specified tenant.";
+  private const string ErrorMessage = "The specified template is not in the specified tenant.";
 
   public Guid TemplateId
   {

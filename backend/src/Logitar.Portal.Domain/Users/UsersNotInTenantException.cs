@@ -5,7 +5,7 @@ namespace Logitar.Portal.Domain.Users;
 
 public class UsersNotInTenantException : Exception
 {
-  public const string ErrorMessage = "The specified users are not in the specified tenant.";
+  private const string ErrorMessage = "The specified users are not in the specified tenant.";
 
   public IReadOnlyCollection<Guid> UserIds
   {

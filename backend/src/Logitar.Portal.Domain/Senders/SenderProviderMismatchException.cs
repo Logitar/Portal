@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderProviderMismatchException : Exception
 {
-  public const string ErrorMessage = "The specified sender provider was not expected.";
+  private const string ErrorMessage = "The specified sender provider was not expected.";
 
   public Guid? TenantId
   {

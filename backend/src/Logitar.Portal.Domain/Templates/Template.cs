@@ -92,7 +92,7 @@ public class Template : AggregateRoot
     }
   }
 
-  public void SetIdentifier(Identifier uniqueKey, ActorId? actorId = null)
+  public void SetUniqueKey(Identifier uniqueKey, ActorId? actorId = null)
   {
     if (uniqueKey != _uniqueKey)
     {

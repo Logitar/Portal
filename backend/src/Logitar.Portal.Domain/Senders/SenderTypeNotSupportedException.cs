@@ -2,7 +2,7 @@
 
 public class SenderTypeNotSupportedException : NotSupportedException
 {
-  public const string ErrorMessage = "The specified sender type is not supported.";
+  private const string ErrorMessage = "The specified sender type is not supported.";
 
   public SenderType SenderType
   {

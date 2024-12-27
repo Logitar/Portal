@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderProviderNotSupportedException : NotSupportedException
 {
-  public const string ErrorMessage = "The specified sender provider is not supported.";
+  private const string ErrorMessage = "The specified sender provider is not supported.";
 
   public SenderProvider SenderProvider
   {

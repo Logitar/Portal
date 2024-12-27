@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderNotInTenantException : Exception
 {
-  public const string ErrorMessage = "The specified sender is not in the specified tenant.";
+  private const string ErrorMessage = "The specified sender is not in the specified tenant.";
 
   public Guid SenderId
   {

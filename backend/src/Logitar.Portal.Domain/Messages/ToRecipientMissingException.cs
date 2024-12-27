@@ -4,7 +4,7 @@ namespace Logitar.Portal.Domain.Messages;
 
 public class ToRecipientMissingException : Exception
 {
-  public const string ErrorMessage = $"At least one {nameof(RecipientType.To)} recipient must be provided.";
+  private const string ErrorMessage = $"At least one {nameof(RecipientType.To)} recipient must be provided.";
 
   public Guid? TenantId
   {
