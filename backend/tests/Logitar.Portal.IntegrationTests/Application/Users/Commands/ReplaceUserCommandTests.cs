@@ -1,8 +1,8 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application.Roles;
@@ -10,6 +10,7 @@ using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
@@ -52,17 +53,17 @@ public class ReplaceUserCommandTests : IntegrationTests
 
     User user = Assert.Single(await _userRepository.LoadAsync());
 
-    user.SetCustomAttribute("HourlyRate", "37.50");
+    user.SetCustomAttribute(new Identifier("HourlyRate"), "37.50");
     string jobTitle = Faker.Name.JobTitle();
-    user.SetCustomAttribute("JobTitle", jobTitle);
+    user.SetCustomAttribute(new Identifier("JobTitle"), jobTitle);
     user.Update();
     user.AddRole(admin);
     await _userRepository.SaveAsync(user);
     long version = user.Version;
 
-    user.SetCustomAttribute("HourlyRate", "42.25");
+    user.SetCustomAttribute(new Identifier("HourlyRate"), "42.25");
     string jobDescriptor = Faker.Name.JobDescriptor();
-    user.SetCustomAttribute("JobDescriptor", jobDescriptor);
+    user.SetCustomAttribute(new Identifier("JobDescriptor"), jobDescriptor);
     user.Update();
     user.AddRole(editor);
     user.RemoveRole(admin);
@@ -108,7 +109,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("Department", "Finance"));
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(reviewer.UniqueName.Value);
-    ReplaceUserCommand command = new(user.Id.ToGuid(), payload, version);
+    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, version);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
@@ -141,10 +142,10 @@ public class ReplaceUserCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "Department" && c.Value == "Finance");
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == editor.Id.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == editor.EntityId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.EntityId.ToGuid());
 
-    UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value);
+    UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.StreamId == user.Id.Value);
     Assert.NotNull(entity);
     Assert.NotNull(entity.PasswordHash);
     Password password = _passwordManager.Decode(entity.PasswordHash);
@@ -168,7 +169,7 @@ public class ReplaceUserCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceUserPayload payload = new("admin");
-    ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
+    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, Version: null);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -183,10 +184,10 @@ public class ReplaceUserCommandTests : IntegrationTests
     {
       Email = new EmailPayload(Faker.Person.Email, isVerified: true)
     };
-    ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
+    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Email.Address, exception.Email.Address);
+    Assert.Equal(payload.Email.Address, exception.EmailAddress);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
@@ -196,7 +197,7 @@ public class ReplaceUserCommandTests : IntegrationTests
 
     ReplaceUserPayload payload = new(user.UniqueName.Value);
     payload.Roles.Add("admin");
-    ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
+    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
@@ -209,10 +210,10 @@ public class ReplaceUserCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     ReplaceUserPayload payload = new(UsernameString.ToUpperInvariant());
-    ReplaceUserCommand command = new(user.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, Version: null);
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

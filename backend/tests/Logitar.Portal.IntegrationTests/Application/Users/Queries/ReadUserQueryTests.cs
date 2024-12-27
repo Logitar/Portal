@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
@@ -24,7 +24,7 @@ public class ReadUserQueryTests : IntegrationTests
 
     SetRealm();
 
-    ReadUserQuery query = new(user.Id.ToGuid(), UniqueName: null, Identifier: null);
+    ReadUserQuery query = new(user.EntityId.ToGuid(), UniqueName: null, Identifier: null);
     UserModel? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(found);
   }
@@ -34,10 +34,10 @@ public class ReadUserQueryTests : IntegrationTests
   {
     User user = Assert.Single(await _userRepository.LoadAsync());
 
-    ReadUserQuery query = new(user.Id.ToGuid(), user.UniqueName.Value, Identifier: null);
+    ReadUserQuery query = new(user.EntityId.ToGuid(), user.UniqueName.Value, Identifier: null);
     UserModel? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.ToGuid(), found.Id);
+    Assert.Equal(user.EntityId.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by custom identifier.")]
@@ -47,13 +47,13 @@ public class ReadUserQueryTests : IntegrationTests
     string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
 
     User user = Assert.Single(await _userRepository.LoadAsync());
-    user.SetCustomIdentifier(key, healthInsuranceNumber);
+    user.SetCustomIdentifier(new Identifier(key), new CustomIdentifier(healthInsuranceNumber));
     await _userRepository.SaveAsync(user);
 
     ReadUserQuery query = new(Id: null, UniqueName: null, Identifier: new CustomIdentifierModel($" {key} ", $"  {healthInsuranceNumber}  "));
     UserModel? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.ToGuid(), found.Id);
+    Assert.Equal(user.EntityId.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by email address.")]
@@ -65,7 +65,7 @@ public class ReadUserQueryTests : IntegrationTests
     ReadUserQuery query = new(Id: null, user.Email.Address, Identifier: null);
     UserModel? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.ToGuid(), found.Id);
+    Assert.Equal(user.EntityId.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should return the user found by unique name.")]
@@ -76,7 +76,7 @@ public class ReadUserQueryTests : IntegrationTests
     ReadUserQuery query = new(Id: null, user.UniqueName.Value, Identifier: null);
     UserModel? found = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(found);
-    Assert.Equal(user.Id.ToGuid(), found.Id);
+    Assert.Equal(user.EntityId.ToGuid(), found.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -87,7 +87,7 @@ public class ReadUserQueryTests : IntegrationTests
     User other = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(other);
 
-    ReadUserQuery query = new(user.Id.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);
+    ReadUserQuery query = new(user.EntityId.ToGuid(), $"  {other.UniqueName.Value}  ", Identifier: null);
     var exception = await Assert.ThrowsAsync<TooManyResultsException<UserModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

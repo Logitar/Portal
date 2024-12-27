@@ -1,6 +1,6 @@
-﻿using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Domain.Settings;
@@ -25,7 +25,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.Email), actorId: null, UserId.NewId(TenantId));
     user.SetEmail(new Email(Faker.Person.Email, isVerified: true));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
@@ -34,7 +34,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
     AuthenticateUserCommand command = new(payload);
     UserModel result = await ActivityPipeline.ExecuteAsync(command);
 
-    Assert.Equal(user.Id.ToGuid(), result.Id);
+    Assert.Equal(user.EntityId.ToGuid(), result.Id);
   }
 
   [Fact(DisplayName = "It should authenticate the user.")]
@@ -45,7 +45,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
     UserModel result = await ActivityPipeline.ExecuteAsync(command);
 
     User user = Assert.Single(await _userRepository.LoadAsync());
-    Assert.Equal(user.Id.ToGuid(), result.Id);
+    Assert.Equal(user.EntityId.ToGuid(), result.Id);
   }
 
   [Fact(DisplayName = "It should throw IncorrectUserPasswordException when the password is incorrect.")]
@@ -56,7 +56,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
     AuthenticateUserPayload payload = new(UsernameString, PasswordString[..^1]);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectUserPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(user.Id, exception.UserId);
+    Assert.Equal(user.Id.Value, exception.UserId);
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
 
@@ -81,13 +81,13 @@ public class AuthenticateUserCommandTests : IntegrationTests
     SetRealm();
 
     User user = Assert.Single(await _userRepository.LoadAsync());
-    User other = new(user.UniqueName, TenantId);
+    User other = new(user.UniqueName, actorId: null, UserId.NewId(TenantId));
     await _userRepository.SaveAsync(other);
 
     AuthenticateUserPayload payload = new(other.UniqueName.Value, PasswordString);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserHasNoPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(other.Id, exception.UserId);
+    Assert.Equal(other.Id.Value, exception.UserId);
   }
 
   [Fact(DisplayName = "It should throw UserIsDisabledException when the user is disabled.")]
@@ -96,14 +96,14 @@ public class AuthenticateUserCommandTests : IntegrationTests
     SetRealm();
 
     User user = Assert.Single(await _userRepository.LoadAsync());
-    User disabled = new(user.UniqueName, TenantId);
+    User disabled = new(user.UniqueName, actorId: null, UserId.NewId(TenantId));
     disabled.Disable();
     await _userRepository.SaveAsync(disabled);
 
     AuthenticateUserPayload payload = new(disabled.UniqueName.Value, PasswordString);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserIsDisabledException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(disabled.Id, exception.UserId);
+    Assert.Equal(disabled.Id.Value, exception.UserId);
   }
 
   [Fact(DisplayName = "It should throw UserNotFoundException when authenticating by ID.")]
@@ -111,14 +111,14 @@ public class AuthenticateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), TenantId);
+    User user = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
     user.SetPassword(_passwordManager.ValidateAndCreate(PasswordString));
     await _userRepository.SaveAsync(user);
 
-    AuthenticateUserPayload payload = new(user.Id.ToGuid().ToString(), PasswordString);
+    AuthenticateUserPayload payload = new(user.EntityId.ToGuid().ToString(), PasswordString);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }
@@ -131,7 +131,7 @@ public class AuthenticateUserCommandTests : IntegrationTests
     AuthenticateUserPayload payload = new(UsernameString, PasswordString);
     AuthenticateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UserNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(payload.UniqueName, exception.User);
     Assert.Equal("UniqueName", exception.PropertyName);
   }

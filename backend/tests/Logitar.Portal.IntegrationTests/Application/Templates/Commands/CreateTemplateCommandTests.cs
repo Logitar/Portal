@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Portal.Application.Realms;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -61,14 +61,14 @@ public class CreateTemplateCommandTests : IntegrationTests
     SetRealm();
 
     Content content = Content.PlainText("Hello World!");
-    Template template = new(new UniqueKey("PasswordRecovery"), new Subject("Reset your password"), content, TenantId);
+    Template template = new(new Identifier("PasswordRecovery"), new Subject("Reset your password"), content, actorId: null, TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync(template);
 
     CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new ContentModel(content));
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
-    Assert.Equal(template.UniqueKey, exception.UniqueKey);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
+    Assert.Equal(template.UniqueKey.Value, exception.UniqueKey);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

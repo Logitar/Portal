@@ -44,7 +44,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing sender.")]
   public async Task It_should_delete_an_existing_sender()
   {
-    DeleteSenderCommand command = new(_sender.Id.ToGuid());
+    DeleteSenderCommand command = new(_sender.EntityId.ToGuid());
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
     Assert.Equal(command.Id, sender.Id);

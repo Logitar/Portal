@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Contracts;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -58,7 +58,7 @@ public class UpdateRealmCommandTests : IntegrationTests
     };
     UpdateRealmCommand command = new(realm.Id.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_realm.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(_realm.UniqueSlug.Value, exception.Slug);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -78,10 +78,10 @@ public class UpdateRealmCommandTests : IntegrationTests
   {
     UpdateRealmPayload payload = new()
     {
-      DisplayName = new Modification<string>("Tests"),
-      Description = new Modification<string>("  This is a test realm.  "),
-      DefaultLocale = new Modification<string>("fr"),
-      Url = new Modification<string>($"https://www.{Faker.Internet.DomainName()}/")
+      DisplayName = new ChangeModel<string>("Tests"),
+      Description = new ChangeModel<string>("  This is a test realm.  "),
+      DefaultLocale = new ChangeModel<string>("fr"),
+      Url = new ChangeModel<string>($"https://www.{Faker.Internet.DomainName()}/")
     };
     UpdateRealmCommand command = new(_realm.Id.ToGuid(), payload);
     RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);

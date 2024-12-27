@@ -52,7 +52,7 @@ public class CreateRealmCommandTests : IntegrationTests
     CreateRealmPayload payload = new(realm.UniqueSlug.Value, secret: string.Empty);
     CreateRealmCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(realm.UniqueSlug, exception.UniqueSlug);
+    Assert.Equal(realm.UniqueSlug.Value, exception.Slug);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

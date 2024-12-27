@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,11 +25,11 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   public async Task It_should_save_the_user_identifier()
   {
     User user = Assert.Single(await _userRepository.LoadAsync());
-    user.SetCustomIdentifier(Key, "old_value");
+    user.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier("old_value"));
     await _userRepository.SaveAsync(user);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Contains(result.CustomIdentifiers, id => id.Key == command.Key && id.Value == payload.Value);
@@ -52,7 +52,7 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
     SetRealm();
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -63,12 +63,12 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
     User user = Assert.Single(await _userRepository.LoadAsync());
 
     User other = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()));
-    other.SetCustomIdentifier(Key, _healthInsuranceNumber);
+    other.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier(_healthInsuranceNumber));
     await _userRepository.SaveAsync(other);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<User>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(command.Key, exception.Key);
     Assert.Equal(payload.Value, exception.Value);

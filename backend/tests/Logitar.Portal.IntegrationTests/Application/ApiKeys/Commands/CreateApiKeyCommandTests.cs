@@ -37,7 +37,7 @@ public class CreateApiKeyCommandTests : IntegrationTests
   {
     SetRealm();
 
-    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), actorId: null, RoleId.NewId(TenantId));
     await _roleRepository.SaveAsync(role);
 
     CreateApiKeyPayload payload = new("Default")

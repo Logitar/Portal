@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Contracts;
-using Logitar.Portal.Application.Realms;
+using Logitar.Identity.Core;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -21,7 +21,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKey uniqueKey = new("PasswordRecovery");
+    Identifier uniqueKey = new("PasswordRecovery");
     Subject subject = new("Reset your password");
     Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
@@ -56,7 +56,7 @@ public class UpdateTemplateCommandTests : IntegrationTests
     SetRealm();
 
     UpdateTemplatePayload payload = new();
-    UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
+    UpdateTemplateCommand command = new(_template.EntityId.ToGuid(), payload);
     TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -64,17 +64,17 @@ public class UpdateTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueKeyAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    Template template = new(new UniqueKey("ConfirmAccount"), new Subject("Confirm your account"), _template.Content);
+    Template template = new(new Identifier("ConfirmAccount"), new Subject("Confirm your account"), _template.Content);
     await _templateRepository.SaveAsync(template);
 
     UpdateTemplatePayload payload = new()
     {
       UniqueKey = "PaSSWoRDReCoVeRy"
     };
-    UpdateTemplateCommand command = new(template.Id.ToGuid(), payload);
+    UpdateTemplateCommand command = new(template.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);
+    Assert.Equal(payload.UniqueKey, exception.UniqueKey);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -94,10 +94,10 @@ public class UpdateTemplateCommandTests : IntegrationTests
   {
     UpdateTemplatePayload payload = new()
     {
-      DisplayName = new Modification<string>("  ConfirmAccount  "),
-      Description = new Modification<string>("  ")
+      DisplayName = new ChangeModel<string>("  ConfirmAccount  "),
+      Description = new ChangeModel<string>("  ")
     };
-    UpdateTemplateCommand command = new(_template.Id.ToGuid(), payload);
+    UpdateTemplateCommand command = new(_template.EntityId.ToGuid(), payload);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 

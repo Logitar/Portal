@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,10 +23,10 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
     string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
 
     User user = Assert.Single(await _userRepository.LoadAsync());
-    user.SetCustomIdentifier(Key, healthInsuranceNumber);
+    user.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier(healthInsuranceNumber));
     await _userRepository.SaveAsync(user);
 
-    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.DoesNotContain(result.CustomIdentifiers, id => id.Key == Key);
@@ -46,7 +47,7 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
 
     SetRealm();
 
-    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

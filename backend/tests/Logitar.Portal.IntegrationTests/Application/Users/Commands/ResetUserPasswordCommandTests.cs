@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +22,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
     User user = Assert.Single(await _userRepository.LoadAsync());
 
     ResetUserPasswordPayload payload = new(newPassword);
-    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);
@@ -45,7 +45,7 @@ public class ResetUserPasswordCommandTests : IntegrationTests
     SetRealm();
 
     ResetUserPasswordPayload payload = new(PasswordString);
-    ResetUserPasswordCommand command = new(user.Id.ToGuid(), payload);
+    ResetUserPasswordCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

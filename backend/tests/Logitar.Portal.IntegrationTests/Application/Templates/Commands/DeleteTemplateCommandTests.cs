@@ -1,4 +1,5 @@
 ﻿using Logitar.Data;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -19,7 +20,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKey uniqueKey = new("PasswordRecovery");
+    Identifier uniqueKey = new("PasswordRecovery");
     Subject subject = new("Reset your password");
     Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
@@ -42,7 +43,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing template.")]
   public async Task It_should_delete_an_existing_template()
   {
-    DeleteTemplateCommand command = new(_template.Id.ToGuid());
+    DeleteTemplateCommand command = new(_template.EntityId.ToGuid());
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
     Assert.Equal(command.Id, template.Id);
@@ -61,7 +62,7 @@ public class DeleteTemplateCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteTemplateCommand command = new(_template.Id.ToGuid());
+    DeleteTemplateCommand command = new(_template.EntityId.ToGuid());
     TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
