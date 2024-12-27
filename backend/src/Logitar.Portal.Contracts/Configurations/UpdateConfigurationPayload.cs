@@ -1,11 +1,10 @@
-﻿using Logitar.Identity.Contracts;
-using Logitar.Portal.Contracts.Settings;
+﻿using Logitar.Portal.Contracts.Settings;
 
 namespace Logitar.Portal.Contracts.Configurations;
 
 public record UpdateConfigurationPayload
 {
-  public Modification<string>? DefaultLocale { get; set; }
+  public ChangeModel<string>? DefaultLocale { get; set; }
   public string? Secret { get; set; }
 
   public UniqueNameSettings? UniqueNameSettings { get; set; }

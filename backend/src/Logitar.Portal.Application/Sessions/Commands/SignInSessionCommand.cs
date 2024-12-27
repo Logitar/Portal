@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Sessions.Validators;
@@ -32,8 +33,12 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
   private readonly ISessionRepository _sessionRepository;
   private readonly IUserManager _userManager;
 
-  public SignInSessionCommandHandler(IMediator mediator, IPasswordManager passwordManager,
-    ISessionQuerier sessionQuerier, ISessionRepository sessionRepository, IUserManager userManager)
+  public SignInSessionCommandHandler(
+    IMediator mediator,
+    IPasswordManager passwordManager,
+    ISessionQuerier sessionQuerier,
+    ISessionRepository sessionRepository,
+    IUserManager userManager)
   {
     _mediator = mediator;
     _passwordManager = passwordManager;
@@ -50,7 +55,7 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
     new SignInSessionValidator().ValidateAndThrow(payload);
 
     FindUserQuery query = new(command.TenantId, payload.UniqueName, userSettings, nameof(payload.UniqueName));
-    UserAggregate user = await _mediator.Send(query, cancellationToken);
+    User user = await _mediator.Send(query, cancellationToken);
     ActorId actorId = new(user.Id.Value);
 
     Password? secret = null;
@@ -60,10 +65,11 @@ internal class SignInSessionCommandHandler : IRequestHandler<SignInSessionComman
       secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out secretString);
     }
 
-    SessionAggregate session = user.SignIn(payload.Password, secret, actorId);
+    Session session = user.SignIn(payload.Password, secret, actorId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      session.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      session.SetCustomAttribute(key, customAttribute.Value);
     }
     session.Update(actorId);
 

@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Users.Commands;
@@ -37,7 +37,7 @@ public class AccountController : ControllerBase
 
   [Authorize(Policy = Policies.PortalUser)]
   [HttpPatch("profile")]
-  public async Task<ActionResult<UserModel>> SaveProfileAsync([FromBody] UpdateProfileModel model, CancellationToken cancellationToken)
+  public async Task<ActionResult<UserModel>> SaveProfileAsync([FromBody] UpdateProfilePayload model, CancellationToken cancellationToken)
   {
     UpdateUserPayload payload = model.ToPayload();
     UpdateUserCommand command = new(User.Id, payload);
@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
     }
     catch (InvalidCredentialsException)
     {
-      return BadRequest(new Error("InvalidCredentials", InvalidCredentialsException.ErrorMessage));
+      return BadRequest(new Error("InvalidCredentials", "The specified credentials did not match."));
     }
   }
 

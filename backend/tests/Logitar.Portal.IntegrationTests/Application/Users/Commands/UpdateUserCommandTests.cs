@@ -1,8 +1,7 @@
-﻿using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts;
@@ -40,12 +39,12 @@ public class UpdateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is in another tenant.")]
   public async Task It_should_return_null_when_the_user_is_in_another_tenant()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 
     UpdateUserPayload payload = new();
-    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
+    UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -53,28 +52,28 @@ public class UpdateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw EmailAddressAlreadyUsedException when the email address is already used.")]
   public async Task It_should_throw_EmailAddressAlreadyUsedException_when_the_email_address_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    User user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     UpdateUserPayload payload = new()
     {
-      Email = new Modification<EmailPayload>(new EmailPayload(Faker.Person.Email, isVerified: true))
+      Email = new ChangeModel<EmailPayload>(new EmailPayload(Faker.Person.Email, isVerified: true))
     };
-    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
+    UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.NotNull(payload.Email.Value);
-    Assert.Equal(payload.Email.Value.Address, exception.Email.Address);
+    Assert.Equal(payload.Email.Value.Address, exception.EmailAddress);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     UpdateUserPayload payload = new();
     payload.Roles.Add(new RoleModification("admin"));
-    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
+    UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles.Select(role => role.Role), exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);
@@ -83,17 +82,19 @@ public class UpdateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    UserAggregate user = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
+    User user = new(new UniqueName(new ReadOnlyUniqueNameSettings(), Faker.Internet.UserName()));
     await _userRepository.SaveAsync(user);
 
     UpdateUserPayload payload = new()
     {
       UniqueName = UsernameString
     };
-    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
+    // TODO(fpion): UserId
+    // TODO(fpion): ConflictId
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -114,15 +115,15 @@ public class UpdateUserCommandTests : IntegrationTests
     const string newPassword = "Test123!";
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    RoleAggregate admin = new(new UniqueNameUnit(uniqueNameSettings, "admin"));
-    RoleAggregate editor = new(new UniqueNameUnit(uniqueNameSettings, "editor"));
-    RoleAggregate reviewer = new(new UniqueNameUnit(uniqueNameSettings, "reviewer"));
+    Role admin = new(new UniqueName(uniqueNameSettings, "admin"));
+    Role editor = new(new UniqueName(uniqueNameSettings, "editor"));
+    Role reviewer = new(new UniqueName(uniqueNameSettings, "reviewer"));
     await _roleRepository.SaveAsync([admin, editor, reviewer]);
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
-    user.SetCustomAttribute("HourlyRate", "37.50");
-    user.SetCustomAttribute("JobTitle", Faker.Name.JobTitle());
+    user.SetCustomAttribute(new Identifier("HourlyRate"), "37.50");
+    user.SetCustomAttribute(new Identifier("JobTitle"), Faker.Name.JobTitle());
     user.Update();
     user.AddRole(admin);
     user.AddRole(reviewer);
@@ -135,25 +136,25 @@ public class UpdateUserCommandTests : IntegrationTests
         Current = PasswordString
       },
       IsDisabled = true,
-      Birthdate = new Modification<DateTime?>(Faker.Person.DateOfBirth),
-      Gender = new Modification<string>(Faker.Person.Gender.ToString()),
-      Locale = new Modification<string>("fr-CA"),
-      TimeZone = new Modification<string>("America/Montreal"),
-      Picture = new Modification<string>(Faker.Person.Avatar),
-      Profile = new Modification<string>(value: null),
-      Website = new Modification<string>($"https://www.{Faker.Person.Website}/")
+      Birthdate = new ChangeModel<DateTime?>(Faker.Person.DateOfBirth),
+      Gender = new ChangeModel<string>(Faker.Person.Gender.ToString()),
+      Locale = new ChangeModel<string>("fr-CA"),
+      TimeZone = new ChangeModel<string>("America/Montreal"),
+      Picture = new ChangeModel<string>(Faker.Person.Avatar),
+      Profile = new ChangeModel<string>(value: null),
+      Website = new ChangeModel<string>($"https://www.{Faker.Person.Website}/")
     };
     payload.CustomAttributes.Add(new("BaseSalary", "90000"));
     payload.CustomAttributes.Add(new("JobTitle", "Sales Manager"));
     payload.CustomAttributes.Add(new("HourlyRate", value: null));
     payload.Roles.Add(new(editor.UniqueName.Value, CollectionAction.Add));
     payload.Roles.Add(new(admin.UniqueName.Value, CollectionAction.Remove));
-    UpdateUserCommand command = new(user.Id.ToGuid(), payload);
+    UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
     Assert.NotNull(result.PasswordChangedBy);
-    Assert.Equal(user.Id.ToGuid(), result.PasswordChangedBy.Id);
+    Assert.Equal(user.EntityId.ToGuid(), result.PasswordChangedBy.Id);
     Assert.Equal(payload.IsDisabled.Value, result.IsDisabled);
     Assertions.Equal(payload.Birthdate.Value, result.Birthdate, TimeSpan.FromSeconds(1));
     Assert.Equal(payload.Gender.Value?.ToLower(), result.Gender);
@@ -168,10 +169,10 @@ public class UpdateUserCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "JobTitle" && c.Value == "Sales Manager");
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == editor.Id.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == reviewer.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == editor.EntityId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == reviewer.EntityId.ToGuid());
 
-    UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.AggregateId == user.Id.Value);
+    UserEntity? entity = await IdentityContext.Users.SingleOrDefaultAsync(x => x.StreamId == user.Id.Value);
     Assert.NotNull(entity);
     Assert.NotNull(entity.PasswordHash);
     Password password = _passwordManager.Decode(entity.PasswordHash);

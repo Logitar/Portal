@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 
@@ -9,17 +9,17 @@ public record SenderSummary
 {
   public SenderId Id { get; }
   public bool IsDefault { get; }
-  public EmailUnit? Email { get; }
-  public PhoneUnit? Phone { get; }
-  public DisplayNameUnit? DisplayName { get; }
+  public Email? Email { get; }
+  public Phone? Phone { get; }
+  public DisplayName? DisplayName { get; }
   public SenderProvider Provider { get; }
 
-  public SenderSummary(SenderId id, bool isDefault, EmailUnit email, DisplayNameUnit? displayName, SenderProvider provider)
+  public SenderSummary(SenderId id, bool isDefault, Email email, DisplayName? displayName, SenderProvider provider)
     : this(id, isDefault, email, phone: null, displayName, provider)
   {
   }
   [JsonConstructor]
-  public SenderSummary(SenderId id, bool isDefault, EmailUnit? email, PhoneUnit? phone, DisplayNameUnit? displayName, SenderProvider provider)
+  public SenderSummary(SenderId id, bool isDefault, Email? email, Phone? phone, DisplayName? displayName, SenderProvider provider)
   {
     Id = id;
     IsDefault = isDefault;

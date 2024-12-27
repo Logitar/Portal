@@ -33,7 +33,7 @@ internal class UserClient : BaseClient, IUserClient
     return await DeleteAsync<UserModel>(uri, context);
   }
 
-  public async Task<UserModel?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifier? identifier, IRequestContext? context)
+  public async Task<UserModel?> ReadAsync(Guid? id, string? uniqueName, CustomIdentifierModel? identifier, IRequestContext? context)
   {
     Dictionary<Guid, UserModel> users = new(capacity: 2);
 
@@ -69,7 +69,7 @@ internal class UserClient : BaseClient, IUserClient
 
     if (users.Count > 1)
     {
-      throw new TooManyResultsException<UserModel>(expectedCount: 1, actualCount: users.Count);
+      throw TooManyResultsException<UserModel>.ExpectedSingle(users.Count);
     }
 
     return users.Values.SingleOrDefault();

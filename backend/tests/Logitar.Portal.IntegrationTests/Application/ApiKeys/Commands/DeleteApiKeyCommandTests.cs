@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -36,9 +36,9 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing API key.")]
   public async Task It_should_delete_an_existing_Api_key()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.EntityId.ToGuid());
     ApiKeyModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -55,19 +55,19 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
   public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
     SetRealm();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.EntityId.ToGuid());
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

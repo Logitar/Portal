@@ -1,16 +1,21 @@
-﻿using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 
 namespace Logitar.Portal.Application.Sessions;
 
 public class SessionNotFoundException : InvalidCredentialsException
 {
-  public new const string ErrorMessage = "The specified session could not be found.";
+  private const string ErrorMessage = "The specified session could not be found.";
 
-  public SessionId Id
+  public Guid? TenantId
   {
-    get => new((string)Data[nameof(Id)]!);
-    private set => Data[nameof(Id)] = value.Value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid SessionId
+  {
+    get => (Guid)Data[nameof(SessionId)]!;
+    private set => Data[nameof(SessionId)] = value;
   }
   public string? PropertyName
   {
@@ -20,12 +25,14 @@ public class SessionNotFoundException : InvalidCredentialsException
 
   public SessionNotFoundException(SessionId id, string? propertyName = null) : base(BuildMessage(id, propertyName))
   {
-    Id = id;
+    TenantId = id.TenantId?.ToGuid();
+    SessionId = id.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(SessionId id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(Id), id)
+    .AddData(nameof(TenantId), id.TenantId?.ToGuid(), "<null>")
+    .AddData(nameof(SessionId), id.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

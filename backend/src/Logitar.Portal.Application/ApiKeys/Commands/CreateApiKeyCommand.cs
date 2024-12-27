@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys.Validators;
 using Logitar.Portal.Application.Roles;
@@ -38,20 +38,21 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
 
     ActorId actorId = command.ActorId;
 
-    DisplayNameUnit displayName = new(payload.DisplayName);
+    DisplayName displayName = new(payload.DisplayName);
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secretString);
-    ApiKeyAggregate apiKey = new(displayName, secret, command.TenantId, actorId)
+    ApiKey apiKey = new(displayName, secret, actorId, ApiKeyId.NewId(command.TenantId))
     {
-      Description = DescriptionUnit.TryCreate(payload.Description)
+      Description = Description.TryCreate(payload.Description)
     };
     if (payload.ExpiresOn.HasValue)
     {
-      apiKey.SetExpiration(payload.ExpiresOn.Value);
+      apiKey.ExpiresOn = payload.ExpiresOn.Value;
     }
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      apiKey.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      apiKey.SetCustomAttribute(key, customAttribute.Value);
     }
 
     IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);

@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Dictionaries;
 
 namespace Logitar.Portal.Application.Messages;
@@ -13,7 +13,7 @@ public record Dictionaries
   {
   }
 
-  public Dictionaries(IReadOnlyDictionary<LocaleUnit, Dictionary> dictionaries, LocaleUnit? targetLocale = null, LocaleUnit? defaultLocale = null) : this()
+  public Dictionaries(IReadOnlyDictionary<Locale, Dictionary> dictionaries, Locale? targetLocale = null, Locale? defaultLocale = null) : this()
   {
     if (targetLocale != null)
     {
@@ -24,7 +24,7 @@ public record Dictionaries
 
       if (!string.IsNullOrEmpty(targetLocale.Culture.Parent?.Name))
       {
-        LocaleUnit fallbackLocale = new(targetLocale.Culture.Parent.Name);
+        Locale fallbackLocale = new(targetLocale.Culture.Parent.Name);
         if (dictionaries.TryGetValue(fallbackLocale, out Dictionary? fallback))
         {
           Fallback = fallback;
@@ -38,5 +38,6 @@ public record Dictionaries
     }
   }
 
-  public string Translate(string key) => Target?.Translate(key) ?? Fallback?.Translate(key) ?? Default?.Translate(key) ?? key;
+  public string Translate(string key) => Translate(new Identifier(key));
+  public string Translate(Identifier key) => Target?.Translate(key) ?? Fallback?.Translate(key) ?? Default?.Translate(key) ?? key.Value;
 }

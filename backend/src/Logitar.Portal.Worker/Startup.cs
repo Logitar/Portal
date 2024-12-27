@@ -1,6 +1,7 @@
 ﻿using Logitar.Portal.Application;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.EntityFrameworkCore.PostgreSQL;
+using Logitar.Portal.EntityFrameworkCore.Relational;
 using Logitar.Portal.EntityFrameworkCore.SqlServer;
 using Logitar.Portal.Infrastructure;
 using Logitar.Portal.Worker.Settings;
@@ -20,6 +21,10 @@ internal class Startup
   public virtual void ConfigureServices(IServiceCollection services)
   {
     services.AddApplicationInsightsTelemetryWorkerService();
+
+    services.AddLogitarPortalApplication();
+    services.AddLogitarPortalInfrastructure();
+    services.AddLogitarPortalWithEntityFrameworkCoreRelational();
 
     DatabaseProvider databaseProvider = _configuration.GetValue<DatabaseProvider?>("DatabaseProvider") ?? DatabaseProvider.EntityFrameworkCoreSqlServer;
     switch (databaseProvider)

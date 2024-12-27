@@ -1,6 +1,6 @@
-﻿using Logitar.Identity.Domain.Roles;
+﻿using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.Application.Roles;
 
-internal record FoundRole(RoleAggregate Role, CollectionAction Action);
+internal record FoundRole(Role Role, CollectionAction Action);

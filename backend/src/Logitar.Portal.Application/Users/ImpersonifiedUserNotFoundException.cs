@@ -1,16 +1,16 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Constants;
 
 namespace Logitar.Portal.Application.Users;
 
 public class ImpersonifiedUserNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified user could not be found.";
+  private const string ErrorMessage = "The specified user could not be found.";
 
-  public TenantId? TenantId
+  public Guid? TenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(TenantId)]);
-    private set => Data[nameof(TenantId)] = value?.Value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
   }
   public string User
   {
@@ -25,13 +25,13 @@ public class ImpersonifiedUserNotFoundException : Exception
 
   public ImpersonifiedUserNotFoundException(TenantId? tenantId, string user) : base(BuildMessage(tenantId, user))
   {
-    TenantId = tenantId;
+    TenantId = tenantId?.ToGuid();
     User = user;
     Header = Headers.User;
   }
 
   private static string BuildMessage(TenantId? tenantId, string user) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(TenantId), tenantId?.Value, "<null>")
+    .AddData(nameof(TenantId), tenantId?.ToGuid(), "<null>")
     .AddData(nameof(User), user)
     .AddData(nameof(Header), Headers.User)
     .Build();

@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
@@ -26,12 +26,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     _mailgun = new(email, new ReadOnlyMailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName()));
     _sendGrid = new(email, new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()));
     _sendGrid.SetDefault();
 
-    PhoneUnit phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
+    Phone phone = new("+15148454636", countryCode: null, extension: null, isVerified: false);
     _twilio = new(phone, new ReadOnlyTwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken()));
   }
 
@@ -52,12 +52,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace a Mailgun sender.")]
   public async Task It_should_replace_a_Mailgun_sender()
   {
-    _mailgun.DisplayName = new DisplayNameUnit("Logitar");
+    _mailgun.DisplayName = new DisplayName("Logitar");
     _mailgun.Update();
     await _senderRepository.SaveAsync(_mailgun);
     long version = _mailgun.Version;
 
-    DisplayNameUnit displayName = new("Logitar Portal");
+    DisplayName displayName = new("Logitar Portal");
     _mailgun.DisplayName = displayName;
     _mailgun.Update();
     await _senderRepository.SaveAsync(_mailgun);
@@ -68,7 +68,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
     };
-    ReplaceSenderCommand command = new(_mailgun.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_mailgun.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -81,12 +81,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace a SendGrid sender.")]
   public async Task It_should_replace_a_SendGrid_sender()
   {
-    _sendGrid.DisplayName = new DisplayNameUnit("Logitar");
+    _sendGrid.DisplayName = new DisplayName("Logitar");
     _sendGrid.Update();
     await _senderRepository.SaveAsync(_sendGrid);
     long version = _sendGrid.Version;
 
-    DisplayNameUnit displayName = new("Logitar Portal");
+    DisplayName displayName = new("Logitar Portal");
     _sendGrid.DisplayName = displayName;
     _sendGrid.Update();
     await _senderRepository.SaveAsync(_sendGrid);
@@ -97,7 +97,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -110,12 +110,12 @@ public class ReplaceSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace a Twilio sender.")]
   public async Task It_should_replace_a_Twilio_sender()
   {
-    _twilio.Phone = new PhoneUnit("+15149873651", countryCode: null, extension: null, isVerified: false);
+    _twilio.Phone = new Phone("+15149873651", countryCode: null, extension: null, isVerified: false);
     _twilio.Update();
     await _senderRepository.SaveAsync(_twilio);
     long version = _twilio.Version;
 
-    PhoneUnit phone = new("+15148422112", countryCode: null, extension: null, isVerified: false);
+    Phone phone = new("+15148422112", countryCode: null, extension: null, isVerified: false);
     _twilio.Phone = phone;
     _twilio.Update();
     await _senderRepository.SaveAsync(_twilio);
@@ -126,7 +126,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
     };
-    ReplaceSenderCommand command = new(_twilio.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_twilio.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -156,7 +156,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, Version: null);
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -168,7 +168,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }

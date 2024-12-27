@@ -1,14 +1,14 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts;
 
 namespace Logitar.Portal.Application.Validators;
 
-internal class CustomIdentifierContractValidator : AbstractValidator<CustomIdentifier>
+internal class CustomIdentifierContractValidator : AbstractValidator<CustomIdentifierModel>
 {
   public CustomIdentifierContractValidator()
   {
-    RuleFor(x => x.Key).SetValidator(new CustomIdentifierKeyValidator());
-    RuleFor(x => x.Value).SetValidator(new CustomIdentifierValueValidator());
+    RuleFor(x => x.Key).Identifier();
+    RuleFor(x => x.Value).CustomIdentifier();
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
@@ -23,7 +24,8 @@ internal class DeleteTemplateCommandHandler : IRequestHandler<DeleteTemplateComm
 
   public async Task<TemplateModel?> Handle(DeleteTemplateCommand command, CancellationToken cancellationToken)
   {
-    Template? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
+    TemplateId templateId = new(command.TenantId, new EntityId(command.Id));
+    Template? template = await _templateRepository.LoadAsync(templateId, cancellationToken);
     if (template == null || template.TenantId != command.TenantId)
     {
       return null;

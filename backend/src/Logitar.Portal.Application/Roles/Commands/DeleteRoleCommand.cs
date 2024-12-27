@@ -1,5 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Roles;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Roles;
 using MediatR;
@@ -23,7 +24,8 @@ internal class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Rol
 
   public async Task<RoleModel?> Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
   {
-    RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
+    RoleId roleId = new(command.TenantId, new EntityId(command.Id));
+    Role? role = await _roleRepository.LoadAsync(roleId, cancellationToken);
     if (role == null || role.TenantId != command.TenantId)
     {
       return null;

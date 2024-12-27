@@ -5,16 +5,8 @@ namespace Logitar.Portal.Web.Models.Users;
 
 public record EmailModel : IEmail
 {
-  public string Address { get; set; }
-
-  public EmailModel() : this(string.Empty)
-  {
-  }
-
-  public EmailModel(string address)
-  {
-    Address = address;
-  }
+  public string Address { get; set; } = string.Empty;
+  public bool IsVerified { get; set; }
 
   public EmailPayload ToPayload() => new(Address, isVerified: false);
 }

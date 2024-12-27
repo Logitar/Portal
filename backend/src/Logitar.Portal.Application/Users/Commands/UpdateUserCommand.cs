@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Roles;
@@ -12,6 +12,7 @@ using Logitar.Portal.Application.Users.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
+using TimeZone = Logitar.Identity.Core.TimeZone;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
@@ -39,15 +40,22 @@ public record UpdateUserCommand(Guid Id, UpdateUserPayload Payload) : Activity, 
 
 internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserModel?>
 {
+  private readonly IAddressHelper _addressHelper;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public UpdateUserCommandHandler(IMediator mediator,
-    IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public UpdateUserCommandHandler(
+    IAddressHelper addressHelper,
+    IMediator mediator,
+    IPasswordManager passwordManager,
+    IUserManager userManager,
+    IUserQuerier userQuerier,
+    IUserRepository userRepository)
   {
+    _addressHelper = addressHelper;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -60,9 +68,10 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     IUserSettings userSettings = command.UserSettings;
 
     UpdateUserPayload payload = command.Payload;
-    new UpdateUserValidator(userSettings).ValidateAndThrow(payload);
+    new UpdateUserValidator(userSettings, _addressHelper).ValidateAndThrow(payload);
 
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
@@ -76,13 +85,14 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
 
     foreach (CustomAttributeModification customAttribute in payload.CustomAttributes)
     {
+      Identifier key = new(customAttribute.Key);
       if (string.IsNullOrWhiteSpace(customAttribute.Value))
       {
-        user.RemoveCustomAttribute(customAttribute.Key);
+        user.RemoveCustomAttribute(key);
       }
       else
       {
-        user.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        user.SetCustomAttribute(key, customAttribute.Value);
       }
     }
 
@@ -106,9 +116,9 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 
-  private void UpdateAuthenticationInformation(IUserSettings userSettings, UpdateUserPayload payload, UserAggregate user, ActorId actorId)
+  private void UpdateAuthenticationInformation(IUserSettings userSettings, UpdateUserPayload payload, User user, ActorId actorId)
   {
-    UniqueNameUnit? uniqueName = UniqueNameUnit.TryCreate(userSettings.UniqueName, payload.UniqueName);
+    UniqueName? uniqueName = UniqueName.TryCreate(payload.UniqueName, userSettings.UniqueName);
     if (uniqueName != null)
     {
       user.SetUniqueName(uniqueName, actorId);
@@ -140,44 +150,44 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
   }
 
-  private static void UpdateContactInformation(UpdateUserPayload payload, UserAggregate user, ActorId actorId)
+  private void UpdateContactInformation(UpdateUserPayload payload, User user, ActorId actorId)
   {
     if (payload.Address != null)
     {
-      AddressUnit? address = payload.Address.Value?.ToAddressUnit();
+      Address? address = payload.Address.Value?.ToAddress(_addressHelper);
       user.SetAddress(address, actorId);
     }
 
     if (payload.Email != null)
     {
-      EmailUnit? email = payload.Email.Value?.ToEmailUnit();
+      Email? email = payload.Email.Value?.ToEmail();
       user.SetEmail(email, actorId);
     }
 
     if (payload.Phone != null)
     {
-      PhoneUnit? phone = payload.Phone.Value?.ToPhoneUnit();
+      Phone? phone = payload.Phone.Value?.ToPhone();
       user.SetPhone(phone, actorId);
     }
   }
 
-  private static void UpdatePersonalInformation(UpdateUserPayload payload, UserAggregate user)
+  private static void UpdatePersonalInformation(UpdateUserPayload payload, User user)
   {
     if (payload.FirstName != null)
     {
-      user.FirstName = PersonNameUnit.TryCreate(payload.FirstName.Value);
+      user.FirstName = PersonName.TryCreate(payload.FirstName.Value);
     }
     if (payload.MiddleName != null)
     {
-      user.MiddleName = PersonNameUnit.TryCreate(payload.MiddleName.Value);
+      user.MiddleName = PersonName.TryCreate(payload.MiddleName.Value);
     }
     if (payload.LastName != null)
     {
-      user.LastName = PersonNameUnit.TryCreate(payload.LastName.Value);
+      user.LastName = PersonName.TryCreate(payload.LastName.Value);
     }
     if (payload.Nickname != null)
     {
-      user.Nickname = PersonNameUnit.TryCreate(payload.Nickname.Value);
+      user.Nickname = PersonName.TryCreate(payload.Nickname.Value);
     }
 
     if (payload.Birthdate != null)
@@ -186,28 +196,28 @@ internal class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Use
     }
     if (payload.Gender != null)
     {
-      user.Gender = GenderUnit.TryCreate(payload.Gender.Value);
+      user.Gender = Gender.TryCreate(payload.Gender.Value);
     }
     if (payload.Locale != null)
     {
-      user.Locale = LocaleUnit.TryCreate(payload.Locale.Value);
+      user.Locale = Locale.TryCreate(payload.Locale.Value);
     }
     if (payload.TimeZone != null)
     {
-      user.TimeZone = TimeZoneUnit.TryCreate(payload.TimeZone.Value);
+      user.TimeZone = TimeZone.TryCreate(payload.TimeZone.Value);
     }
 
     if (payload.Picture != null)
     {
-      user.Picture = UrlUnit.TryCreate(payload.Picture.Value);
+      user.Picture = Url.TryCreate(payload.Picture.Value);
     }
     if (payload.Profile != null)
     {
-      user.Profile = UrlUnit.TryCreate(payload.Profile.Value);
+      user.Profile = Url.TryCreate(payload.Profile.Value);
     }
     if (payload.Website != null)
     {
-      user.Website = UrlUnit.TryCreate(payload.Website.Value);
+      user.Website = Url.TryCreate(payload.Website.Value);
     }
   }
 }

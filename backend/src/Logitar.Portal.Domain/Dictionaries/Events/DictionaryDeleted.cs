@@ -3,10 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Dictionaries.Events;
 
-public record DictionaryDeleted : DomainEvent, INotification
-{
-  public DictionaryDeleted()
-  {
-    IsDeleted = true;
-  }
-}
+public record DictionaryDeleted : DomainEvent, IDeleteEvent, INotification;

@@ -1,7 +1,8 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
@@ -12,39 +13,40 @@ using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Microsoft.EntityFrameworkCore;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 
 internal class SessionQuerier : ISessionQuerier
 {
   private readonly IActorService _actorService;
-  private readonly ISearchHelper _searchHelper;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<SessionEntity> _sessions;
-  private readonly ISqlHelper _sqlHelper;
 
-  public SessionQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public SessionQuerier(IActorService actorService, IdentityContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
     _sessions = context.Sessions;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
   }
 
-  public async Task<SessionModel> ReadAsync(RealmModel? realm, SessionAggregate session, CancellationToken cancellationToken)
+  public async Task<SessionModel> ReadAsync(RealmModel? realm, Session session, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, session.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The session entity 'AggregateId={session.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The session entity 'StreamId={session.Id.Value}' could not be found.");
   }
-  public async Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<SessionModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(realm, new SessionId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<SessionModel?> ReadAsync(RealmModel? realm, SessionId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     SessionEntity? session = await _sessions.AsNoTracking()
       .Include(x => x.User).ThenInclude(x => x!.Identifiers)
       .Include(x => x.User).ThenInclude(x => x!.Roles)
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     if (session == null || session.User == null || session.User.TenantId != realm?.GetTenantId().Value)
     {
@@ -56,16 +58,16 @@ internal class SessionQuerier : ISessionQuerier
 
   public async Task<SearchResults<SessionModel>> SearchAsync(RealmModel? realm, SearchSessionsPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Sessions.Table).SelectAll(IdentityDb.Sessions.Table)
+    IQueryBuilder builder = _queryHelper.From(IdentityDb.Sessions.Table).SelectAll(IdentityDb.Sessions.Table)
       .Join(IdentityDb.Users.UserId, IdentityDb.Sessions.UserId)
       .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)
-      .ApplyIdFilter(IdentityDb.Sessions.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search);
+      .ApplyIdFilter(IdentityDb.Sessions.EntityId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search);
 
     if (payload.UserId.HasValue)
     {
-      UserId userId = new(new AggregateId(payload.UserId.Value).Value);
-      builder.Where(IdentityDb.Users.AggregateId, Operators.IsEqualTo(userId.Value));
+      UserId userId = new(realm?.GetTenantId(), new EntityId(payload.UserId.Value));
+      builder.Where(IdentityDb.Users.StreamId, Operators.IsEqualTo(userId.Value));
     }
     if (payload.IsActive.HasValue)
     {

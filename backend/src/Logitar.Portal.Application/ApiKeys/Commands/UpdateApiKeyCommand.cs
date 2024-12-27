@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys.Validators;
 using Logitar.Portal.Application.Roles;
@@ -32,7 +32,8 @@ internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand,
     UpdateApiKeyPayload payload = command.Payload;
     new UpdateApiKeyValidator().ValidateAndThrow(payload);
 
-    ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
+    ApiKeyId apiKeyId = new(command.TenantId, new EntityId(command.Id));
+    ApiKey? apiKey = await _apiKeyRepository.LoadAsync(apiKeyId, cancellationToken);
     if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;
@@ -40,29 +41,30 @@ internal class UpdateApiKeyCommandHandler : IRequestHandler<UpdateApiKeyCommand,
 
     ActorId actorId = command.ActorId;
 
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (displayName != null)
     {
       apiKey.DisplayName = displayName;
     }
     if (payload.Description != null)
     {
-      apiKey.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      apiKey.Description = Description.TryCreate(payload.Description.Value);
     }
     if (payload.ExpiresOn.HasValue)
     {
-      apiKey.SetExpiration(payload.ExpiresOn.Value);
+      apiKey.ExpiresOn = payload.ExpiresOn.Value;
     }
 
     foreach (CustomAttributeModification customAttribute in payload.CustomAttributes)
     {
+      Identifier key = new(customAttribute.Key);
       if (string.IsNullOrWhiteSpace(customAttribute.Value))
       {
-        apiKey.RemoveCustomAttribute(customAttribute.Key);
+        apiKey.RemoveCustomAttribute(key);
       }
       else
       {
-        apiKey.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        apiKey.SetCustomAttribute(key, customAttribute.Value);
       }
     }
 

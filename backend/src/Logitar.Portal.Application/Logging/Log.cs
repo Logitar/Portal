@@ -1,8 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Microsoft.Extensions.Logging;
 
@@ -47,24 +46,27 @@ public class Log
   public TimeSpan? Duration => EndedOn.HasValue ? EndedOn.Value - StartedOn : null;
 
   public TenantId? TenantId { get; set; }
-  public ActorId ActorId
+  public ActorId? ActorId
   {
     get
     {
-      if (UserId != null)
+      if (ApiKeyId.HasValue)
       {
-        return new(UserId.Value);
+        ApiKeyId apiKeyId = new(TenantId, ApiKeyId.Value);
+        return new ActorId(apiKeyId.Value);
       }
-      else if (ApiKeyId != null)
+      if (UserId.HasValue)
       {
-        return new(ApiKeyId.Value);
+        UserId userId = new(TenantId, UserId.Value);
+        return new ActorId(userId.Value);
       }
-      return new ActorId();
+
+      return null;
     }
   }
-  public ApiKeyId? ApiKeyId { get; set; }
-  public UserId? UserId { get; set; }
-  public SessionId? SessionId { get; set; }
+  public EntityId? ApiKeyId { get; set; }
+  public EntityId? UserId { get; set; }
+  public EntityId? SessionId { get; set; }
 
   private readonly List<DomainEvent> _events = [];
   public IReadOnlyCollection<DomainEvent> Events => _events.AsReadOnly();

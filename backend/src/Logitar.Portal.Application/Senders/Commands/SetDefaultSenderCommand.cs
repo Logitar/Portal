@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
@@ -21,7 +22,8 @@ internal class SetDefaultSenderCommandHandler : IRequestHandler<SetDefaultSender
 
   public async Task<SenderModel?> Handle(SetDefaultSenderCommand command, CancellationToken cancellationToken)
   {
-    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    SenderId senderId = new(command.TenantId, new EntityId(command.Id));
+    Sender? sender = await _senderRepository.LoadAsync(senderId, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;

@@ -21,7 +21,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   public async Task Handle(DictionaryCreated @event, CancellationToken cancellationToken)
   {
     DictionaryEntity? dictionary = await _context.Dictionaries.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (dictionary == null)
     {
       dictionary = new(@event);
@@ -35,7 +35,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   public async Task Handle(DictionaryDeleted @event, CancellationToken cancellationToken)
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (dictionary != null)
     {
       _context.Dictionaries.Remove(dictionary);
@@ -47,7 +47,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   public async Task Handle(DictionaryLocaleChanged @event, CancellationToken cancellationToken)
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (dictionary != null)
     {
       dictionary.SetLocale(@event);
@@ -59,7 +59,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   public async Task Handle(DictionaryUpdated @event, CancellationToken cancellationToken)
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
-      .SingleOrDefaultAsync(x => x.AggregateId == @event.AggregateId.Value, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
     if (dictionary != null)
     {
       dictionary.Update(@event);

@@ -1,26 +1,26 @@
 ﻿using Logitar.Identity.Contracts.Users;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Application.Users;
 
 internal static class ContactExtensions
 {
-  public static AddressUnit ToAddressUnit(this AddressPayload address) => address.ToAddressUnit(address.IsVerified);
-  public static AddressUnit ToAddressUnit(this IAddress address, bool isVerified = false)
+  public static Address ToAddress(this AddressPayload address, IAddressHelper helper) => address.ToAddress(helper, address.IsVerified);
+  public static Address ToAddress(this IAddress address, IAddressHelper helper, bool isVerified = false)
   {
-    return new AddressUnit(address.Street, address.Locality, address.Country, address.Region, address.PostalCode, isVerified);
+    return new Address(helper, address.Street, address.Locality, address.Country, address.Region, address.PostalCode, isVerified);
   }
 
-  public static EmailUnit ToEmailUnit(this EmailPayload email) => email.ToEmailUnit(email.IsVerified);
-  public static EmailUnit ToEmailUnit(this IEmail email, bool isVerified = false)
+  public static Email ToEmail(this EmailPayload email) => email.ToEmail(email.IsVerified);
+  public static Email ToEmail(this IEmail email, bool isVerified = false)
   {
-    return new EmailUnit(email.Address, isVerified);
+    return new Email(email.Address, isVerified);
   }
 
-  public static PhoneUnit ToPhoneUnit(this PhonePayload phone) => phone.ToPhoneUnit(phone.IsVerified);
-  public static PhoneUnit ToPhoneUnit(this IPhone phone, bool isVerified = false)
+  public static Phone ToPhone(this PhonePayload phone) => phone.ToPhone(phone.IsVerified);
+  public static Phone ToPhone(this IPhone phone, bool isVerified = false)
   {
-    return new PhoneUnit(phone.Number, phone.CountryCode, phone.Extension, isVerified);
+    return new Phone(phone.Number, phone.CountryCode, phone.Extension, isVerified);
   }
 }

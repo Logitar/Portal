@@ -1,7 +1,7 @@
-﻿using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Sessions;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Sessions;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,32 +40,32 @@ public class SearchSessionsQueryTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate user1 = new(new UniqueNameUnit(Realm.UniqueNameSettings, UsernameString), TenantId);
-    UserAggregate user2 = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Person.UserName), TenantId);
+    User user1 = new(new UniqueName(Realm.UniqueNameSettings, UsernameString), actorId: null, UserId.NewId(TenantId));
+    User user2 = new(new UniqueName(Realm.UniqueNameSettings, Faker.Person.UserName), actorId: null, UserId.NewId(TenantId));
     await _userRepository.SaveAsync([user1, user2]);
 
-    SessionAggregate notInIds = user1.SignIn();
-    SessionAggregate otherUser = user2.SignIn();
-    SessionAggregate signedOut = user1.SignIn();
+    Session notInIds = user1.SignIn();
+    Session otherUser = user2.SignIn();
+    Session signedOut = user1.SignIn();
     signedOut.SignOut();
     Password secret = _passwordManager.GenerateBase64(RefreshToken.SecretLength, out _);
-    SessionAggregate persistent = user1.SignIn(secret);
-    SessionAggregate session1 = user1.SignIn();
-    SessionAggregate session2 = user1.SignIn();
+    Session persistent = user1.SignIn(secret);
+    Session session1 = user1.SignIn();
+    Session session2 = user1.SignIn();
     await _sessionRepository.SaveAsync([notInIds, otherUser, signedOut, persistent, session1, session2]);
 
     SearchSessionsPayload payload = new()
     {
-      UserId = user1.Id.ToGuid(),
+      UserId = user1.EntityId.ToGuid(),
       IsActive = true,
       IsPersistent = false,
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> sessionIds = (await _sessionRepository.LoadAsync()).Select(session => session.Id.ToGuid());
+    IEnumerable<Guid> sessionIds = (await _sessionRepository.LoadAsync()).Select(session => session.EntityId.ToGuid());
     payload.Ids.AddRange(sessionIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("Hello World!"));
     payload.Sort.Add(new SessionSortOption(SessionSort.UpdatedOn, isDescending: true));
     SearchSessionsQuery query = new(payload);
@@ -73,6 +73,6 @@ public class SearchSessionsQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     SessionModel session = Assert.Single(results.Items);
-    Assert.Equal(session1.Id.ToGuid(), session.Id);
+    Assert.Equal(session1.EntityId.ToGuid(), session.Id);
   }
 }

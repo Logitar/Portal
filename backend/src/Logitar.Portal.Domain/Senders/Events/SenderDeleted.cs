@@ -3,10 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
-public record SenderDeleted : DomainEvent, INotification
-{
-  public SenderDeleted()
-  {
-    IsDeleted = true;
-  }
-}
+public record SenderDeleted : DomainEvent, IDeleteEvent, INotification;

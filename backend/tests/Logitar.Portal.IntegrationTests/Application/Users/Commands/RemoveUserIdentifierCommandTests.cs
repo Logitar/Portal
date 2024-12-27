@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,11 +22,11 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
   {
     string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
 
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    user.SetCustomIdentifier(Key, healthInsuranceNumber);
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    user.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier(healthInsuranceNumber));
     await _userRepository.SaveAsync(user);
 
-    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.DoesNotContain(result.CustomIdentifiers, id => id.Key == Key);
@@ -42,11 +43,11 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 
-    RemoveUserIdentifierCommand command = new(user.Id.ToGuid(), Key);
+    RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

@@ -11,6 +11,7 @@ internal class MessageEntity : AggregateEntity
   public int MessageId { get; private set; }
 
   public string? TenantId { get; private set; }
+  public string EntityId { get; private set; } = string.Empty;
 
   public string Subject { get; private set; } = string.Empty;
   public string BodyType { get; private set; } = string.Empty;
@@ -44,7 +45,9 @@ internal class MessageEntity : AggregateEntity
 
   public MessageEntity(SenderEntity sender, TemplateEntity template, Dictionary<string, UserEntity> users, MessageCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    MessageId messageId = new(@event.StreamId);
+    TenantId = messageId.TenantId?.Value;
+    EntityId = messageId.EntityId.Value;
 
     Subject = @event.Subject.Value;
     BodyType = @event.Body.Type;
@@ -53,9 +56,9 @@ internal class MessageEntity : AggregateEntity
     foreach (Recipient recipient in @event.Recipients)
     {
       UserEntity? user = null;
-      if (recipient.UserId != null && !users.TryGetValue(recipient.UserId.Value, out user))
+      if (recipient.UserId.HasValue && !users.TryGetValue(recipient.UserId.Value.Value, out user))
       {
-        throw new InvalidOperationException($"The user entity 'AggregateId={recipient.UserId.Value}' could not be found.");
+        throw new InvalidOperationException($"The user entity 'StreamId={recipient.UserId.Value}' could not be found.");
       }
 
       Recipients.Add(new RecipientEntity(this, user, recipient));

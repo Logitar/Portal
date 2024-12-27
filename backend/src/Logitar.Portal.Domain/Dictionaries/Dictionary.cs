@@ -1,5 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Dictionaries.Events;
 
 namespace Logitar.Portal.Domain.Dictionaries;
@@ -9,32 +9,29 @@ public class Dictionary : AggregateRoot
   private DictionaryUpdated _updated = new();
 
   public new DictionaryId Id => new(base.Id);
+  public TenantId? TenantId => Id.TenantId;
+  public EntityId EntityId => Id.EntityId;
 
-  public TenantId? TenantId { get; private set; }
+  private Locale? _locale = null;
+  public Locale Locale => _locale ?? throw new InvalidOperationException($"The {nameof(Locale)} has not been initialized yet.");
 
-  private LocaleUnit? _locale = null;
-  public LocaleUnit Locale => _locale ?? throw new InvalidOperationException($"The {nameof(Locale)} has not been initialized yet.");
+  private readonly Dictionary<Identifier, string> _entries = [];
+  public IReadOnlyDictionary<Identifier, string> Entries => _entries.AsReadOnly();
 
-  private readonly Dictionary<string, string> _entries = [];
-  public IReadOnlyDictionary<string, string> Entries => _entries.AsReadOnly();
-
-  public Dictionary(AggregateId id) : base(id)
+  public Dictionary() : base()
   {
   }
 
-  public Dictionary(LocaleUnit locale, TenantId? tenantId = null, ActorId actorId = default, DictionaryId? id = null)
-    : base((id ?? DictionaryId.NewId()).AggregateId)
+  public Dictionary(Locale locale, ActorId? actorId = null, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
   {
-    Raise(new DictionaryCreated(tenantId, locale), actorId);
+    Raise(new DictionaryCreated(locale), actorId);
   }
-  protected virtual void Apply(DictionaryCreated @event)
+  protected virtual void Handle(DictionaryCreated @event)
   {
-    TenantId = @event.TenantId;
-
     _locale = @event.Locale;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -42,19 +39,20 @@ public class Dictionary : AggregateRoot
     }
   }
 
-  public void RemoveEntry(string key)
+  public void RemoveEntry(Identifier key)
   {
-    key = key.Trim();
-    if (_entries.ContainsKey(key))
+    if (_entries.Remove(key))
     {
       _updated.Entries[key] = null;
-      _entries.Remove(key);
     }
   }
 
-  public void SetEntry(string key, string value)
+  public void SetEntry(Identifier key, string value)
   {
-    key = key.Trim();
+    if (string.IsNullOrWhiteSpace(value))
+    {
+      RemoveEntry(key);
+    }
     value = value.Trim();
 
     if (!_entries.TryGetValue(key, out string? existingValue) || existingValue != value)
@@ -64,21 +62,21 @@ public class Dictionary : AggregateRoot
     }
   }
 
-  public void SetLocale(LocaleUnit locale, ActorId actorId = default)
+  public void SetLocale(Locale locale, ActorId? actorId = null)
   {
     if (locale != _locale)
     {
       Raise(new DictionaryLocaleChanged(locale), actorId);
     }
   }
-  protected virtual void Apply(DictionaryLocaleChanged @event)
+  protected virtual void Handle(DictionaryLocaleChanged @event)
   {
     _locale = @event.Locale;
   }
 
-  public string? Translate(string key) => _entries.TryGetValue(key.Trim(), out string? value) ? value : null;
+  public string? Translate(Identifier key) => _entries.TryGetValue(key, out string? value) ? value : null;
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {
@@ -86,9 +84,9 @@ public class Dictionary : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(DictionaryUpdated @event)
+  protected virtual void Handle(DictionaryUpdated @event)
   {
-    foreach (KeyValuePair<string, string?> entry in @event.Entries)
+    foreach (KeyValuePair<Identifier, string?> entry in @event.Entries)
     {
       if (entry.Value == null)
       {

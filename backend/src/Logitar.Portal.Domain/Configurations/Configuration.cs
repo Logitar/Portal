@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Configurations.Events;
 using Logitar.Portal.Domain.Settings;
 
@@ -10,10 +9,10 @@ public class Configuration : AggregateRoot
 {
   private ConfigurationUpdated _updated = new();
 
-  public new ConfigurationId Id => new();
+  public new ConfigurationId Id => new(base.Id);
 
-  private LocaleUnit? _defaultLocale = null;
-  public LocaleUnit? DefaultLocale
+  private Locale? _defaultLocale = null;
+  public Locale? DefaultLocale
   {
     get => _defaultLocale;
     set
@@ -21,7 +20,7 @@ public class Configuration : AggregateRoot
       if (_defaultLocale != value)
       {
         _defaultLocale = value;
-        _updated.DefaultLocale = new Modification<LocaleUnit>(value);
+        _updated.DefaultLocale = new Change<Locale>(value);
       }
     }
   }
@@ -93,16 +92,20 @@ public class Configuration : AggregateRoot
     }
   }
 
-  public Configuration(AggregateId id) : base(id)
+  public Configuration() : base()
   {
   }
 
-  public static Configuration Initialize(ActorId actorId)
+  private Configuration(ConfigurationId id) : base(id.StreamId)
+  {
+  }
+
+  public static Configuration Initialize(ActorId? actorId = null)
   {
     ConfigurationId id = new();
-    Configuration configuration = new(id.AggregateId);
+    Configuration configuration = new(id);
 
-    LocaleUnit? defaultLocale = null;
+    Locale? defaultLocale = null;
     JwtSecret secret = JwtSecret.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
     ReadOnlyPasswordSettings passordSettings = new();
@@ -112,7 +115,7 @@ public class Configuration : AggregateRoot
 
     return configuration;
   }
-  protected virtual void Apply(ConfigurationInitialized @event)
+  protected virtual void Handle(ConfigurationInitialized @event)
   {
     _defaultLocale = @event.DefaultLocale;
     _secret = @event.Secret;
@@ -124,7 +127,7 @@ public class Configuration : AggregateRoot
     _loggingSettings = @event.LoggingSettings;
   }
 
-  public void Update(ActorId actorId)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {
@@ -132,7 +135,7 @@ public class Configuration : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(ConfigurationUpdated @event)
+  protected virtual void Handle(ConfigurationUpdated @event)
   {
     if (@event.DefaultLocale != null)
     {

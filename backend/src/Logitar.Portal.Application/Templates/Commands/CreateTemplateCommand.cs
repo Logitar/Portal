@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Templates.Validators;
 using Logitar.Portal.Contracts.Templates;
@@ -29,13 +29,13 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
 
     ActorId actorId = command.ActorId;
 
-    UniqueKey uniqueKey = new(payload.UniqueKey);
+    Identifier uniqueKey = new(payload.UniqueKey);
     Subject subject = new(payload.Subject);
     Content content = new(payload.Content);
-    Template template = new(uniqueKey, subject, content, command.TenantId, actorId)
+    Template template = new(uniqueKey, subject, content, actorId, TemplateId.NewId(command.TenantId))
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description)
+      DisplayName = DisplayName.TryCreate(payload.DisplayName),
+      Description = Description.TryCreate(payload.Description)
     };
     template.Update(actorId);
 

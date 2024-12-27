@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Configurations;
 using Logitar.Portal.Domain.Configurations.Validators;
 using Logitar.Portal.Domain.Settings.Validators;
@@ -10,7 +10,7 @@ internal class UpdateConfigurationValidator : AbstractValidator<UpdateConfigurat
 {
   public UpdateConfigurationValidator()
   {
-    When(x => !string.IsNullOrWhiteSpace(x.DefaultLocale?.Value), () => RuleFor(x => x.DefaultLocale!.Value!).SetValidator(new LocaleValidator()));
+    When(x => !string.IsNullOrWhiteSpace(x.DefaultLocale?.Value), () => RuleFor(x => x.DefaultLocale!.Value!).Locale());
 
     When(x => x.UniqueNameSettings != null, () => RuleFor(x => x.UniqueNameSettings!).SetValidator(new UniqueNameSettingsValidator()));
     When(x => x.PasswordSettings != null, () => RuleFor(x => x.PasswordSettings!).SetValidator(new PasswordSettingsValidator()));

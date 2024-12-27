@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -42,12 +42,12 @@ public class ReplaceRealmCommandTests : IntegrationTests
   {
     string oldSecret = _realm.Secret.Value;
 
-    _realm.DefaultLocale = new LocaleUnit("fr");
+    _realm.DefaultLocale = new Locale("fr");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
     long version = _realm.Version;
 
-    _realm.DefaultLocale = new LocaleUnit("fr-CA");
+    _realm.DefaultLocale = new Locale("fr-CA");
     _realm.Update();
     await _realmRepository.SaveAsync(_realm);
 
@@ -90,7 +90,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
     ReplaceRealmPayload payload = new(_realm.UniqueSlug.Value.ToUpperInvariant(), secret: string.Empty);
     ReplaceRealmCommand command = new(realm.Id.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueSlugAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_realm.UniqueSlug.Value, exception.UniqueSlug.Value, ignoreCase: true);
+    Assert.Equal(_realm.UniqueSlug.Value, exception.Slug, ignoreCase: true);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

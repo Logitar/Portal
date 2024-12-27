@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Domain.Messages.Validators;
 
@@ -16,7 +16,7 @@ public record Recipient
 
   public UserId? UserId { get; }
   [JsonIgnore]
-  public UserAggregate? User { get; }
+  public User? User { get; }
 
   [JsonConstructor]
   public Recipient(RecipientType type = RecipientType.To, string? address = null, string? displayName = null, string? phoneNumber = null, UserId? userId = null)
@@ -29,7 +29,7 @@ public record Recipient
     new RecipientValidator().ValidateAndThrow(this);
   }
 
-  public Recipient(UserAggregate user, RecipientType type = RecipientType.To)
+  public Recipient(User user, RecipientType type = RecipientType.To)
     : this(type, user.Email?.Address, user.FullName, user.Phone?.FormatToE164(), user.Id)
   {
     User = user;

@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
+namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class LogitarPortal_4_0_0 : Migration
+    public partial class Release_5_0_0 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,19 +14,20 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Dictionaries",
                 columns: table => new
                 {
-                    DictionaryId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TenantId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    LocaleNormalized = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    EntryCount = table.Column<int>(type: "integer", nullable: false),
-                    Entries = table.Column<string>(type: "text", nullable: true),
-                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    DictionaryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TenantId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Locale = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    LocaleNormalized = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    EntryCount = table.Column<int>(type: "int", nullable: false),
+                    Entries = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StreamId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,29 +39,29 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 columns: table => new
                 {
                     LogId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UniqueId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CorrelationId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Method = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Destination = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    Source = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    AdditionalInformation = table.Column<string>(type: "text", nullable: true),
-                    OperationType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    OperationName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    ActivityType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    ActivityData = table.Column<string>(type: "text", nullable: true),
-                    StatusCode = table.Column<int>(type: "integer", nullable: true),
-                    IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
-                    Level = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    HasErrors = table.Column<bool>(type: "boolean", nullable: false),
-                    StartedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Duration = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    ActorId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ApiKeyId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    UserId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    SessionId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UniqueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CorrelationId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Method = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Destination = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
+                    Source = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
+                    AdditionalInformation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OperationType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    OperationName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ActivityType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ActivityData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StatusCode = table.Column<int>(type: "int", nullable: true),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    Level = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    HasErrors = table.Column<bool>(type: "bit", nullable: false),
+                    StartedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ActorId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ApiKeyId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    SessionId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,31 +72,31 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Realms",
                 columns: table => new
                 {
-                    RealmId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UniqueSlug = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UniqueSlugNormalized = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    DefaultLocale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
-                    Secret = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    AllowedUniqueNameCharacters = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    RequiredPasswordLength = table.Column<int>(type: "integer", nullable: false),
-                    RequiredPasswordUniqueChars = table.Column<int>(type: "integer", nullable: false),
-                    PasswordsRequireNonAlphanumeric = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordsRequireLowercase = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordsRequireUppercase = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordsRequireDigit = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHashingStrategy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    RequireUniqueEmail = table.Column<bool>(type: "boolean", nullable: false),
-                    CustomAttributes = table.Column<string>(type: "text", nullable: true),
-                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    RealmId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UniqueSlug = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    UniqueSlugNormalized = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DefaultLocale = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),
+                    Secret = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
+                    AllowedUniqueNameCharacters = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    RequiredPasswordLength = table.Column<int>(type: "int", nullable: false),
+                    RequiredPasswordUniqueChars = table.Column<int>(type: "int", nullable: false),
+                    PasswordsRequireNonAlphanumeric = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordsRequireLowercase = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordsRequireUppercase = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordsRequireDigit = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHashingStrategy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    RequireUniqueEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CustomAttributes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StreamId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -107,21 +107,23 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Senders",
                 columns: table => new
                 {
-                    SenderId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TenantId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    IsDefault = table.Column<bool>(type: "boolean", nullable: false),
-                    EmailAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Provider = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Settings = table.Column<string>(type: "text", nullable: true),
-                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    SenderId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TenantId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false),
+                    EmailAddress = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    DisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Provider = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Settings = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StreamId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -132,22 +134,23 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Templates",
                 columns: table => new
                 {
-                    TemplateId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TenantId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    UniqueKey = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UniqueKeyNormalized = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Subject = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ContentType = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    ContentText = table.Column<string>(type: "text", nullable: false),
-                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TenantId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UniqueKey = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    UniqueKeyNormalized = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Subject = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    ContentText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StreamId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -158,7 +161,7 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "LogEvents",
                 columns: table => new
                 {
-                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LogId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -177,16 +180,16 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 columns: table => new
                 {
                     LogExceptionId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     LogId = table.Column<long>(type: "bigint", nullable: false),
-                    Type = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: false),
-                    HResult = table.Column<int>(type: "integer", nullable: false),
-                    HelpLink = table.Column<string>(type: "text", nullable: true),
-                    Source = table.Column<string>(type: "text", nullable: true),
-                    StackTrace = table.Column<string>(type: "text", nullable: true),
-                    TargetSite = table.Column<string>(type: "text", nullable: true),
-                    Data = table.Column<string>(type: "text", nullable: true)
+                    Type = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HResult = table.Column<int>(type: "int", nullable: false),
+                    HelpLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StackTrace = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetSite = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Data = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,33 +206,35 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    MessageId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TenantId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Subject = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    BodyType = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    BodyText = table.Column<string>(type: "text", nullable: false),
-                    RecipientCount = table.Column<int>(type: "integer", nullable: false),
-                    SenderId = table.Column<int>(type: "integer", nullable: true),
-                    SenderIsDefault = table.Column<bool>(type: "boolean", nullable: false),
-                    SenderAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    SenderDisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    SenderProvider = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    TemplateId = table.Column<int>(type: "integer", nullable: true),
-                    TemplateUniqueKey = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    TemplateDisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    IgnoreUserLocale = table.Column<bool>(type: "boolean", nullable: false),
-                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
-                    Variables = table.Column<string>(type: "text", nullable: true),
-                    IsDemo = table.Column<bool>(type: "boolean", nullable: false),
-                    Status = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ResultData = table.Column<string>(type: "text", nullable: true),
-                    AggregateId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    MessageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TenantId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    EntityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    BodyType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    BodyText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RecipientCount = table.Column<int>(type: "int", nullable: false),
+                    SenderId = table.Column<int>(type: "int", nullable: true),
+                    SenderIsDefault = table.Column<bool>(type: "bit", nullable: false),
+                    SenderAddress = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    SenderPhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    SenderDisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    SenderProvider = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: true),
+                    TemplateUniqueKey = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    TemplateDisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    IgnoreUserLocale = table.Column<bool>(type: "bit", nullable: false),
+                    Locale = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),
+                    Variables = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDemo = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ResultData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StreamId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -252,17 +257,18 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "Recipients",
                 columns: table => new
                 {
-                    RecipientId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    MessageId = table.Column<int>(type: "integer", nullable: false),
-                    Type = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
-                    Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
-                    UserUniqueName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    UserEmailAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    UserFullName = table.Column<string>(type: "character varying(767)", maxLength: 767, nullable: true),
-                    UserPicture = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true)
+                    RecipientId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MessageId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    DisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    UserUniqueName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserEmailAddress = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserFullName = table.Column<string>(type: "nvarchar(767)", maxLength: 767, nullable: true),
+                    UserPicture = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -276,12 +282,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Dictionaries_AggregateId",
-                table: "Dictionaries",
-                column: "AggregateId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_CreatedBy",
                 table: "Dictionaries",
                 column: "CreatedBy");
@@ -290,6 +290,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Dictionaries_CreatedOn",
                 table: "Dictionaries",
                 column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_EntityId",
+                table: "Dictionaries",
+                column: "EntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_EntryCount",
@@ -302,10 +307,24 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "Locale");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_StreamId",
+                table: "Dictionaries",
+                column: "StreamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dictionaries_TenantId_EntityId",
+                table: "Dictionaries",
+                columns: new[] { "TenantId", "EntityId" },
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_TenantId_LocaleNormalized",
                 table: "Dictionaries",
                 columns: new[] { "TenantId", "LocaleNormalized" },
-                unique: true);
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Dictionaries_UpdatedBy",
@@ -424,12 +443,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_AggregateId",
-                table: "Messages",
-                column: "AggregateId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Messages_CreatedBy",
                 table: "Messages",
                 column: "CreatedBy");
@@ -438,6 +451,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Messages_CreatedOn",
                 table: "Messages",
                 column: "CreatedOn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_EntityId",
+                table: "Messages",
+                column: "EntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_IsDemo",
@@ -460,6 +478,12 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "Status");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messages_StreamId",
+                table: "Messages",
+                column: "StreamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_Subject",
                 table: "Messages",
                 column: "Subject");
@@ -473,6 +497,13 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Messages_TenantId",
                 table: "Messages",
                 column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_TenantId_EntityId",
+                table: "Messages",
+                columns: new[] { "TenantId", "EntityId" },
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_UpdatedBy",
@@ -490,12 +521,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "Version");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Realms_AggregateId",
-                table: "Realms",
-                column: "AggregateId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Realms_CreatedBy",
                 table: "Realms",
                 column: "CreatedBy");
@@ -509,6 +534,12 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Realms_DisplayName",
                 table: "Realms",
                 column: "DisplayName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_StreamId",
+                table: "Realms",
+                column: "StreamId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Realms_UniqueSlug",
@@ -552,6 +583,11 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "MessageId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Recipients_PhoneNumber",
+                table: "Recipients",
+                column: "PhoneNumber");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Recipients_Type",
                 table: "Recipients",
                 column: "Type");
@@ -560,12 +596,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 name: "IX_Recipients_UserId",
                 table: "Recipients",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Senders_AggregateId",
-                table: "Senders",
-                column: "AggregateId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Senders_CreatedBy",
@@ -588,9 +618,32 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "EmailAddress");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Senders_EntityId",
+                table: "Senders",
+                column: "EntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Senders_PhoneNumber",
+                table: "Senders",
+                column: "PhoneNumber");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Senders_Provider",
                 table: "Senders",
                 column: "Provider");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Senders_StreamId",
+                table: "Senders",
+                column: "StreamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Senders_TenantId_EntityId",
+                table: "Senders",
+                columns: new[] { "TenantId", "EntityId" },
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Senders_TenantId_IsDefault",
@@ -613,12 +666,6 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "Version");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Templates_AggregateId",
-                table: "Templates",
-                column: "AggregateId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Templates_ContentType",
                 table: "Templates",
                 column: "ContentType");
@@ -639,15 +686,34 @@ namespace Logitar.Portal.EntityFrameworkCore.PostgreSQL.Migrations
                 column: "DisplayName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Templates_EntityId",
+                table: "Templates",
+                column: "EntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Templates_StreamId",
+                table: "Templates",
+                column: "StreamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Templates_Subject",
                 table: "Templates",
                 column: "Subject");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Templates_TenantId_EntityId",
+                table: "Templates",
+                columns: new[] { "TenantId", "EntityId" },
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Templates_TenantId_UniqueKeyNormalized",
                 table: "Templates",
                 columns: new[] { "TenantId", "UniqueKeyNormalized" },
-                unique: true);
+                unique: true,
+                filter: "[TenantId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Templates_UniqueKey",

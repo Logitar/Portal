@@ -51,7 +51,7 @@ public class UserController : ControllerBase
   [HttpGet("identifier/key:{key}/value:{value}")]
   public async Task<ActionResult<UserModel>> ReadAsync(string key, string value, CancellationToken cancellationToken)
   {
-    CustomIdentifier identifier = new(key, value);
+    CustomIdentifierModel identifier = new(key, value);
     UserModel? user = await _userService.ReadAsync(identifier: identifier, cancellationToken: cancellationToken);
     return user == null ? NotFound() : Ok(user);
   }

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Domain;
@@ -13,7 +13,7 @@ public static class ValidationExtensions
 
   public static IRuleBuilderOptions<T, string> EmailAddressInput<T>(this IRuleBuilder<T, string> ruleBuilder)
   {
-    return ruleBuilder.NotEmpty().MaximumLength(EmailUnit.MaximumLength).EmailAddress();
+    return ruleBuilder.NotEmpty().MaximumLength(Email.MaximumLength).EmailAddress();
   }
 
   public static IRuleBuilderOptions<T, string> JwtSecret<T>(this IRuleBuilder<T, string> ruleBuilder)

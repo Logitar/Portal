@@ -1,12 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
@@ -16,7 +16,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   private readonly IRoleRepository _roleRepository;
   private readonly IUserRepository _userRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public DeleteRoleCommandTests() : base()
   {
@@ -24,7 +24,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 
@@ -45,11 +45,11 @@ public class DeleteRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing role.")]
   public async Task It_should_delete_an_existing_role()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
     user.AddRole(_role);
     await _userRepository.SaveAsync(user);
 
-    DeleteRoleCommand command = new(_role.Id.ToGuid());
+    DeleteRoleCommand command = new(_role.EntityId.ToGuid());
     RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
     Assert.Equal(command.Id, role.Id);
@@ -71,7 +71,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteRoleCommand command = new(_role.Id.ToGuid());
+    DeleteRoleCommand command = new(_role.EntityId.ToGuid());
     RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

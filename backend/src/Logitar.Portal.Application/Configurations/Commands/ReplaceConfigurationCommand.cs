@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Caching;
 using Logitar.Portal.Application.Configurations.Validators;
@@ -36,7 +36,7 @@ internal class ReplaceConfigurationCommandHandler : IRequestHandler<ReplaceConfi
       reference = await _configurationRepository.LoadAsync(command.Version.Value, cancellationToken);
     }
 
-    LocaleUnit? defaultLocale = LocaleUnit.TryCreate(payload.DefaultLocale);
+    Locale? defaultLocale = Locale.TryCreate(payload.DefaultLocale);
     if (reference == null || defaultLocale != reference.DefaultLocale)
     {
       configuration.DefaultLocale = defaultLocale;

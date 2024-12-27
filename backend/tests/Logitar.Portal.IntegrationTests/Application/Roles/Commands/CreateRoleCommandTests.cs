@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
@@ -59,14 +59,14 @@ public class CreateRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "admin"), TenantId);
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "admin"), actorId: null, RoleId.NewId(TenantId));
     await _roleRepository.SaveAsync(role);
 
     CreateRolePayload payload = new(role.UniqueName.Value);
     CreateRoleCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(TenantId, exception.TenantId);
-    Assert.Equal(role.UniqueName, exception.UniqueName);
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(TenantId.Value, exception.TenantId);
+    Assert.Equal(role.UniqueName.Value, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Templates.Validators;
 using Logitar.Portal.Contracts.Templates;
@@ -29,7 +29,8 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     ReplaceTemplatePayload payload = command.Payload;
     new ReplaceTemplateValidator().ValidateAndThrow(payload);
 
-    Template? template = await _templateRepository.LoadAsync(command.Id, cancellationToken);
+    TemplateId templateId = new(command.TenantId, new EntityId(command.Id));
+    Template? template = await _templateRepository.LoadAsync(templateId, cancellationToken);
     if (template == null || template.TenantId != command.TenantId)
     {
       return null;
@@ -42,17 +43,17 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
 
     ActorId actorId = command.ActorId;
 
-    UniqueKey uniqueKey = new(payload.UniqueKey);
+    Identifier uniqueKey = new(payload.UniqueKey);
     if (reference == null || uniqueKey != reference.UniqueKey)
     {
       template.SetUniqueKey(uniqueKey, actorId);
     }
-    DisplayNameUnit? displayName = DisplayNameUnit.TryCreate(payload.DisplayName);
+    DisplayName? displayName = DisplayName.TryCreate(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       template.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       template.Description = description;

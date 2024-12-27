@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using MediatR;
 
 namespace Logitar.Portal.Domain.Templates.Events;
 
-public record TemplateUniqueKeyChanged(UniqueKey UniqueKey) : DomainEvent, INotification;
+public record TemplateUniqueKeyChanged(Identifier UniqueKey) : DomainEvent, INotification;

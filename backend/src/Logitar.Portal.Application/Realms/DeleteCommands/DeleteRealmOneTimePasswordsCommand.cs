@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -20,9 +20,9 @@ internal class DeleteRealmOneTimePasswordsCommandHandler : INotificationHandler<
   public async Task Handle(DeleteRealmOneTimePasswordsCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<OneTimePasswordAggregate> oneTimePasswords = await _oneTimePasswordRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<OneTimePassword> oneTimePasswords = await _oneTimePasswordRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (OneTimePasswordAggregate oneTimePassword in oneTimePasswords)
+    foreach (OneTimePassword oneTimePassword in oneTimePasswords)
     {
       oneTimePassword.Delete(command.ActorId);
     }

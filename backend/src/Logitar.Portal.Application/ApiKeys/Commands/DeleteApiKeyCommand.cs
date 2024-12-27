@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Domain.ApiKeys;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.ApiKeys;
 using MediatR;
@@ -20,7 +21,8 @@ internal class DeleteApiKeyCommandHandler : IRequestHandler<DeleteApiKeyCommand,
 
   public async Task<ApiKeyModel?> Handle(DeleteApiKeyCommand command, CancellationToken cancellationToken)
   {
-    ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
+    ApiKeyId apiKeyId = new(command.TenantId, new EntityId(command.Id));
+    ApiKey? apiKey = await _apiKeyRepository.LoadAsync(apiKeyId, cancellationToken);
     if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;

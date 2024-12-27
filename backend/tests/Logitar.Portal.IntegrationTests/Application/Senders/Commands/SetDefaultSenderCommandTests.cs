@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
@@ -22,7 +22,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     _sender = new(email, settings);
     _sender.SetDefault();
@@ -55,7 +55,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
   {
     SetRealm();
 
-    SetDefaultSenderCommand command = new(_sender.Id.ToGuid());
+    SetDefaultSenderCommand command = new(_sender.EntityId.ToGuid());
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -67,7 +67,7 @@ public class SetDefaultSenderCommandTests : IntegrationTests
     Sender sender = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(sender);
 
-    SetDefaultSenderCommand command = new(sender.Id.ToGuid());
+    SetDefaultSenderCommand command = new(sender.EntityId.ToGuid());
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(command.Id, result.Id);

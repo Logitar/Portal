@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Logitar.Portal.Application.Users.Queries;
 
-public record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifier? Identifier) : Activity, IRequest<UserModel?>;
+public record ReadUserQuery(Guid? Id, string? UniqueName, CustomIdentifierModel? Identifier) : Activity, IRequest<UserModel?>;
 
 internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, UserModel?>
 {
@@ -62,7 +62,7 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, UserModel?>
 
     if (users.Count > 1)
     {
-      throw new TooManyResultsException<UserModel>(expectedCount: 1, actualCount: users.Count);
+      throw TooManyResultsException<UserModel>.ExpectedSingle(users.Count);
     }
 
     return users.Values.SingleOrDefault();

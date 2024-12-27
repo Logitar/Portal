@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Settings;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys.Validators;
 using Logitar.Portal.Application.Roles;
@@ -33,12 +34,13 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     ReplaceApiKeyPayload payload = command.Payload;
     new ReplaceApiKeyValidator().ValidateAndThrow(payload);
 
-    ApiKeyAggregate? apiKey = await _apiKeyRepository.LoadAsync(command.Id, cancellationToken);
+    ApiKeyId apiKeyId = new(command.TenantId, new EntityId(command.Id));
+    ApiKey? apiKey = await _apiKeyRepository.LoadAsync(apiKeyId, cancellationToken);
     if (apiKey == null || apiKey.TenantId != command.TenantId)
     {
       return null;
     }
-    ApiKeyAggregate? reference = null;
+    ApiKey? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _apiKeyRepository.LoadAsync(apiKey.Id, command.Version.Value, cancellationToken);
@@ -46,19 +48,19 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
 
     ActorId actorId = command.ActorId;
 
-    DisplayNameUnit displayName = new(payload.DisplayName);
+    DisplayName displayName = new(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       apiKey.DisplayName = displayName;
     }
-    DescriptionUnit? description = DescriptionUnit.TryCreate(payload.Description);
+    Description? description = Description.TryCreate(payload.Description);
     if (reference == null || description != reference.Description)
     {
       apiKey.Description = description;
     }
     if (payload.ExpiresOn.HasValue && (reference == null || payload.ExpiresOn != reference.ExpiresOn))
     {
-      apiKey.SetExpiration(payload.ExpiresOn.Value);
+      apiKey.ExpiresOn = payload.ExpiresOn.Value;
     }
 
     ReplaceCustomAttributes(payload, apiKey, reference);
@@ -70,19 +72,20 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     return await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
   }
 
-  private static void ReplaceCustomAttributes(ReplaceApiKeyPayload payload, ApiKeyAggregate apiKey, ApiKeyAggregate? reference)
+  private static void ReplaceCustomAttributes(ReplaceApiKeyPayload payload, ApiKey apiKey, ApiKey? reference)
   {
-    HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
+    HashSet<Identifier> payloadKeys = new(capacity: payload.CustomAttributes.Count);
 
-    IEnumerable<string> referenceKeys;
+    IEnumerable<Identifier> referenceKeys;
     if (reference == null)
     {
       referenceKeys = apiKey.CustomAttributes.Keys;
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        payloadKeys.Add(customAttribute.Key.Trim());
-        apiKey.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        Identifier key = new(customAttribute.Key);
+        payloadKeys.Add(key);
+        apiKey.SetCustomAttribute(key, customAttribute.Value);
       }
     }
     else
@@ -91,7 +94,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        string key = customAttribute.Key.Trim();
+        Identifier key = new(customAttribute.Key);
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
@@ -102,7 +105,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
       }
     }
 
-    foreach (string key in referenceKeys)
+    foreach (Identifier key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
       {
@@ -111,7 +114,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     }
   }
 
-  private async Task ReplaceRolesAsync(ReplaceApiKeyPayload payload, ApiKeyAggregate apiKey, ApiKeyAggregate? reference, ActorId actorId, CancellationToken cancellationToken)
+  private async Task ReplaceRolesAsync(ReplaceApiKeyPayload payload, ApiKey apiKey, ApiKey? reference, ActorId actorId, CancellationToken cancellationToken)
   {
     IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(apiKey.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
     HashSet<RoleId> roleIds = new(capacity: roles.Count);
@@ -145,7 +148,7 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     {
       if (!roleIds.Contains(roleId))
       {
-        RoleAggregate role = new(roleId.AggregateId);
+        Role role = new(new UniqueName(new UniqueNameSettings(), "Temporary"), actorId: null, roleId);
         apiKey.RemoveRole(role, actorId);
       }
     }

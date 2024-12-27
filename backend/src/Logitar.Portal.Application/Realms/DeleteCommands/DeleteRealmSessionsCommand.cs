@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Sessions;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -20,9 +20,9 @@ internal class DeleteRealmSessionsCommandHandler : INotificationHandler<DeleteRe
   public async Task Handle(DeleteRealmSessionsCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<SessionAggregate> sessions = await _sessionRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<Session> sessions = await _sessionRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (SessionAggregate session in sessions)
+    foreach (Session session in sessions)
     {
       session.Delete(command.ActorId);
     }

@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Users.Validators;
@@ -43,7 +44,8 @@ internal class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswo
     ResetUserPasswordPayload payload = command.Payload;
     new ResetUserPasswordValidator(command.UserSettings).ValidateAndThrow(payload);
 
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;

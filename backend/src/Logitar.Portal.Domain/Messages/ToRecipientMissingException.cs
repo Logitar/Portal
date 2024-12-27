@@ -4,12 +4,17 @@ namespace Logitar.Portal.Domain.Messages;
 
 public class ToRecipientMissingException : Exception
 {
-  public const string ErrorMessage = $"At least one {nameof(RecipientType.To)} recipient must be provided.";
+  private const string ErrorMessage = $"At least one {nameof(RecipientType.To)} recipient must be provided.";
 
-  public MessageId MessageId
+  public Guid? TenantId
   {
-    get => new((string)Data[nameof(MessageId)]!);
-    private set => Data[nameof(MessageId)] = value.Value;
+    get => (Guid?)Data[nameof(TenantId)];
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid MessageId
+  {
+    get => (Guid)Data[nameof(MessageId)]!;
+    private set => Data[nameof(MessageId)] = value;
   }
   public string? PropertyName
   {
@@ -19,12 +24,14 @@ public class ToRecipientMissingException : Exception
 
   public ToRecipientMissingException(Message message, string? propertyName = null) : base(BuildMessage(message, propertyName))
   {
-    MessageId = message.Id;
+    TenantId = message.TenantId?.ToGuid();
+    MessageId = message.EntityId.ToGuid();
     PropertyName = propertyName;
   }
 
   private static string BuildMessage(Message message, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(MessageId), message.Id.Value)
+    .AddData(nameof(TenantId), message.TenantId?.ToGuid())
+    .AddData(nameof(MessageId), message.EntityId.ToGuid())
     .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }

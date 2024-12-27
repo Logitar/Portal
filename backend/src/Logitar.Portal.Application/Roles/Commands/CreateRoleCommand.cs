@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Roles.Validators;
 using Logitar.Portal.Contracts;
@@ -33,15 +33,16 @@ internal class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Rol
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
-    RoleAggregate role = new(uniqueName, command.TenantId, actorId)
+    UniqueName uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
+    Role role = new(uniqueName, actorId, RoleId.NewId(command.TenantId))
     {
-      DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName),
-      Description = DescriptionUnit.TryCreate(payload.Description)
+      DisplayName = DisplayName.TryCreate(payload.DisplayName),
+      Description = Description.TryCreate(payload.Description)
     };
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      role.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      role.SetCustomAttribute(key, customAttribute.Value);
     }
     role.Update(actorId);
 

@@ -57,6 +57,7 @@
   <ItemGroup>
     <Using Include="System.Reflection" />
     <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="1.0.0" />
+    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="3.0.4" />
   </ItemGroup>
 
 </Project>

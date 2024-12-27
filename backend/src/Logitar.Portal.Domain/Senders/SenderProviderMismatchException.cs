@@ -4,12 +4,17 @@ namespace Logitar.Portal.Domain.Senders;
 
 public class SenderProviderMismatchException : Exception
 {
-  public const string ErrorMessage = "The specified sender provider was not expected.";
+  private const string ErrorMessage = "The specified sender provider was not expected.";
 
-  public SenderId SenderId
+  public Guid? TenantId
   {
-    get => new((string)Data[nameof(SenderId)]!);
-    private set => Data[nameof(SenderId)] = value.Value;
+    get => (Guid)Data[nameof(TenantId)]!;
+    private set => Data[nameof(TenantId)] = value;
+  }
+  public Guid SenderId
+  {
+    get => (Guid)Data[nameof(SenderId)]!;
+    private set => Data[nameof(SenderId)] = value;
   }
   public SenderProvider ExpectedProvider
   {
@@ -24,13 +29,15 @@ public class SenderProviderMismatchException : Exception
 
   public SenderProviderMismatchException(Sender sender, SenderProvider actualProvider) : base(BuildMessage(sender, actualProvider))
   {
-    SenderId = sender.Id;
+    TenantId = sender.TenantId?.ToGuid();
+    SenderId = sender.EntityId.ToGuid();
     ExpectedProvider = sender.Provider;
     ActualProvider = actualProvider;
   }
 
   private static string BuildMessage(Sender sender, SenderProvider actualProvider) => new ErrorMessageBuilder(ErrorMessage)
-    .AddData(nameof(SenderId), sender.Id.Value)
+    .AddData(nameof(TenantId), sender.TenantId?.ToGuid())
+    .AddData(nameof(SenderId), sender.EntityId.ToGuid())
     .AddData(nameof(ExpectedProvider), sender.Provider)
     .AddData(nameof(ActualProvider), actualProvider)
     .Build();

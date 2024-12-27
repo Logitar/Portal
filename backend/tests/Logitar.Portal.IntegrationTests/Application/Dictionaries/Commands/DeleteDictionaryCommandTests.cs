@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -20,7 +20,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   {
     _dictionaryRepository = ServiceProvider.GetRequiredService<IDictionaryRepository>();
 
-    _dictionary = new(new LocaleUnit(Faker.Locale));
+    _dictionary = new(new Locale(Faker.Locale));
   }
 
   public override async Task InitializeAsync()
@@ -40,7 +40,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing dictionary.")]
   public async Task It_should_delete_an_existing_dictionary()
   {
-    DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
+    DeleteDictionaryCommand command = new(_dictionary.EntityId.ToGuid());
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
     Assert.Equal(command.Id, dictionary.Id);
@@ -59,7 +59,7 @@ public class DeleteDictionaryCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteDictionaryCommand command = new(_dictionary.Id.ToGuid());
+    DeleteDictionaryCommand command = new(_dictionary.EntityId.ToGuid());
     DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

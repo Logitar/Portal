@@ -1,4 +1,4 @@
-﻿using Logitar.Identity.Domain.Tokens;
+﻿using Logitar.Identity.Core.Tokens;
 using Logitar.Portal.Worker.Settings;
 
 namespace Logitar.Portal.Worker.Tasks;

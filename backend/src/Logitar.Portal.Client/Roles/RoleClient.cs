@@ -52,7 +52,7 @@ internal class RoleClient : BaseClient, IRoleClient
 
     if (roles.Count > 1)
     {
-      throw new TooManyResultsException<RoleModel>(expectedCount: 1, actualCount: roles.Count);
+      throw TooManyResultsException<RoleModel>.ExpectedSingle(roles.Count);
     }
 
     return roles.Values.SingleOrDefault();

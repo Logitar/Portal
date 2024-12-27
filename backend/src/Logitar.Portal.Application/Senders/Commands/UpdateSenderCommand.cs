@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Contracts.Senders;
@@ -28,7 +28,8 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
 
   public async Task<SenderModel?> Handle(UpdateSenderCommand command, CancellationToken cancellationToken)
   {
-    Sender? sender = await _senderRepository.LoadAsync(command.Id, cancellationToken);
+    SenderId senderId = new(command.TenantId, new EntityId(command.Id));
+    Sender? sender = await _senderRepository.LoadAsync(senderId, cancellationToken);
     if (sender == null || sender.TenantId != command.TenantId)
     {
       return null;
@@ -41,19 +42,19 @@ internal class UpdateSenderCommandHandler : IRequestHandler<UpdateSenderCommand,
 
     if (!string.IsNullOrWhiteSpace(payload.EmailAddress))
     {
-      sender.Email = new EmailUnit(payload.EmailAddress);
+      sender.Email = new Email(payload.EmailAddress);
     }
     if (!string.IsNullOrWhiteSpace(payload.PhoneNumber))
     {
-      sender.Phone = new PhoneUnit(payload.PhoneNumber);
+      sender.Phone = new Phone(payload.PhoneNumber);
     }
     if (payload.DisplayName != null)
     {
-      sender.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      sender.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      sender.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      sender.Description = Description.TryCreate(payload.Description.Value);
     }
 
     SetSettings(payload, sender, actorId);

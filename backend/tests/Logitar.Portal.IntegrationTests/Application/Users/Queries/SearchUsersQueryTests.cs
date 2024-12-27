@@ -1,6 +1,6 @@
-﻿using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,28 +37,28 @@ public class SearchUsersQueryTests : IntegrationTests
   {
     SetRealm();
 
-    UserAggregate initialUser = Assert.Single(await _userRepository.LoadAsync());
-    UserAggregate noNickname = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NoNickname"), TenantId);
-    UserAggregate notInIds = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NotInIds"), TenantId);
-    UserAggregate noPassword = new(new UniqueNameUnit(Realm.UniqueNameSettings, "NoPassword"), TenantId);
-    UserAggregate disabled = new(new UniqueNameUnit(Realm.UniqueNameSettings, "Disabled"), TenantId);
-    UserAggregate confirmed = new(new UniqueNameUnit(Realm.UniqueNameSettings, "Confirmed"), TenantId);
+    User initialUser = Assert.Single(await _userRepository.LoadAsync());
+    User noNickname = new(new UniqueName(Realm.UniqueNameSettings, "NoNickname"), actorId: null, UserId.NewId(TenantId));
+    User notInIds = new(new UniqueName(Realm.UniqueNameSettings, "NotInIds"), actorId: null, UserId.NewId(TenantId));
+    User noPassword = new(new UniqueName(Realm.UniqueNameSettings, "NoPassword"), actorId: null, UserId.NewId(TenantId));
+    User disabled = new(new UniqueName(Realm.UniqueNameSettings, "Disabled"), actorId: null, UserId.NewId(TenantId));
+    User confirmed = new(new UniqueName(Realm.UniqueNameSettings, "Confirmed"), actorId: null, UserId.NewId(TenantId));
 
     disabled.Disable();
-    confirmed.SetEmail(new EmailUnit(Faker.Internet.Email(), isVerified: true));
+    confirmed.SetEmail(new Email(Faker.Internet.Email(), isVerified: true));
 
-    UserAggregate youngest = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
+    User youngest = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()), actorId: null, UserId.NewId(TenantId))
     {
       Birthdate = DateTime.Now.AddYears(-20)
     };
-    UserAggregate oldest = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()), TenantId)
+    User oldest = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()), actorId: null, UserId.NewId(TenantId))
     {
       Birthdate = DateTime.Now.AddYears(-30)
     };
 
-    PersonNameUnit nickname = new(Faker.Name.FirstName());
-    UserAggregate[] users = [initialUser, notInIds, noPassword, disabled, confirmed, youngest, oldest];
-    foreach (UserAggregate user in users)
+    PersonName nickname = new(Faker.Name.FirstName());
+    User[] users = [initialUser, notInIds, noPassword, disabled, confirmed, youngest, oldest];
+    foreach (User user in users)
     {
       user.Nickname = nickname;
       user.Update();
@@ -66,7 +66,7 @@ public class SearchUsersQueryTests : IntegrationTests
 
     Password password = _passwordManager.ValidateAndCreate(PasswordString);
     users = [noNickname, notInIds, disabled, confirmed, youngest, oldest];
-    foreach (UserAggregate user in users)
+    foreach (User user in users)
     {
       user.SetPassword(password);
     }
@@ -81,10 +81,10 @@ public class SearchUsersQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> userIds = (await _userRepository.LoadAsync()).Select(user => user.Id.ToGuid());
+    IEnumerable<Guid> userIds = (await _userRepository.LoadAsync()).Select(user => user.EntityId.ToGuid());
     payload.Ids.AddRange(userIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm(nickname.Value));
     payload.Sort.Add(new UserSortOption(UserSort.Birthdate, isDescending: false));
     SearchUsersQuery query = new(payload);
@@ -92,6 +92,6 @@ public class SearchUsersQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     UserModel result = Assert.Single(results.Items);
-    Assert.Equal(youngest.Id.ToGuid(), result.Id);
+    Assert.Equal(youngest.EntityId.ToGuid(), result.Id);
   }
 }

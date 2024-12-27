@@ -40,7 +40,7 @@ internal class ReadRoleQueryHandler : IRequestHandler<ReadRoleQuery, RoleModel?>
 
     if (roles.Count > 1)
     {
-      throw new TooManyResultsException<RoleModel>(expectedCount: 1, actualCount: roles.Count);
+      throw TooManyResultsException<RoleModel>.ExpectedSingle(roles.Count);
     }
 
     return roles.Values.SingleOrDefault();

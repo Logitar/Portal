@@ -1,5 +1,7 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -9,6 +11,7 @@ internal class SenderEntity : AggregateEntity
   public int SenderId { get; private set; }
 
   public string? TenantId { get; private set; }
+  public string EntityId { get; private set; } = string.Empty;
 
   public bool IsDefault { get; private set; }
 
@@ -25,22 +28,25 @@ internal class SenderEntity : AggregateEntity
   public SenderEntity(EmailSenderCreated @event) : this((SenderCreated)@event)
   {
   }
-  public SenderEntity(SenderCreated @event) : base(@event)
+  public SenderEntity(SenderCreated @event) : this((DomainEvent)@event)
   {
-    TenantId = @event.TenantId?.Value;
-
     EmailAddress = @event.Email.Address;
 
     Provider = @event.Provider;
   }
 
-  public SenderEntity(SmsSenderCreated @event) : base(@event)
+  public SenderEntity(SmsSenderCreated @event) : this((DomainEvent)@event)
   {
-    TenantId = @event.TenantId?.Value;
-
     PhoneNumber = @event.Phone.Number;
 
     Provider = @event.Provider;
+  }
+
+  private SenderEntity(DomainEvent @event) : base(@event)
+  {
+    SenderId senderId = new(@event.StreamId);
+    TenantId = senderId.TenantId?.Value;
+    EntityId = senderId.EntityId.Value;
   }
 
   private SenderEntity() : base()

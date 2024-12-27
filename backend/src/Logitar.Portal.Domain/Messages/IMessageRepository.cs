@@ -1,10 +1,10 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Messages;
 
 public interface IMessageRepository
 {
-  Task<Message?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Message?> LoadAsync(MessageId id, CancellationToken cancellationToken = default);
   Task<IReadOnlyCollection<Message>> LoadAsync(CancellationToken cancellationToken = default);
   Task<IReadOnlyCollection<Message>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);
 

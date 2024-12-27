@@ -1,12 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -41,20 +41,20 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     SetUser(user: null);
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
-    apiKey.SetExpiration(DateTime.Now.AddDays(1));
+    apiKey.ExpiresOn = DateTime.Now.AddDays(1);
     apiKey.Update();
     await _apiKeyRepository.SaveAsync(apiKey);
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, _secret));
     AuthenticateApiKeyCommand command = new(payload);
     ApiKeyModel result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Equal(apiKey.Id.ToGuid(), result.Id);
+    Assert.Equal(apiKey.EntityId.ToGuid(), result.Id);
 
     apiKey = Assert.Single(await _apiKeyRepository.LoadAsync());
-    Assert.Equal(apiKey.Id.Value, apiKey.UpdatedBy.Value);
+    Assert.Equal(apiKey.Id.Value, apiKey.UpdatedBy?.Value);
     Assert.NotNull(apiKey.AuthenticatedOn);
     Assert.Equal(DateTime.Now, apiKey.AuthenticatedOn.Value, TimeSpan.FromSeconds(15));
   }
@@ -64,10 +64,10 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     const int millisecondsDelay = 50;
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
-    apiKey.SetExpiration(DateTime.Now.AddMilliseconds(millisecondsDelay));
+    apiKey.ExpiresOn = DateTime.Now.AddMilliseconds(millisecondsDelay);
     apiKey.Update();
     await _apiKeyRepository.SaveAsync(apiKey);
 
@@ -76,7 +76,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, _secret));
     AuthenticateApiKeyCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<ApiKeyIsExpiredException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(apiKey.Id, exception.ApiKeyId);
+    Assert.Equal(apiKey.Id.Value, exception.ApiKeyId);
   }
 
   [Fact(DisplayName = "It should throw ApiKeyNotFoundException when the API key could not be found.")]
@@ -86,7 +86,8 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyPayload payload = new(xApiKey.Encode());
     AuthenticateApiKeyCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(xApiKey.Id, exception.Id);
+    Assert.Equal(xApiKey.Id.TenantId?.ToGuid(), exception.TenantId);
+    Assert.Equal(xApiKey.Id.EntityId.ToGuid(), exception.ApiKeyId);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
 
@@ -95,7 +96,7 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
   {
     SetRealm();
 
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     Assert.NotNull(_secret);
 
     string xApiKey = XApiKey.Encode(apiKey.Id, _secret);
@@ -103,21 +104,22 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     AuthenticateApiKeyCommand command = new(payload);
 
     var exception = await Assert.ThrowsAsync<ApiKeyNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(apiKey.Id, exception.Id);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
+    Assert.Equal(apiKey.EntityId.ToGuid(), exception.ApiKeyId);
     Assert.Equal("XApiKey", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw IncorrectApiKeySecretException when the secret is incorrect.")]
   public async Task It_should_throw_IncorrectApiKeySecretException_when_the_secret_is_incorrect()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
     _ = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secret);
     Assert.NotEqual(_secret, secret);
 
     AuthenticateApiKeyPayload payload = new(XApiKey.Encode(apiKey.Id, secret));
     AuthenticateApiKeyCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IncorrectApiKeySecretException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(apiKey.Id, exception.ApiKeyId);
+    Assert.Equal(apiKey.Id.Value, exception.ApiKeyId);
     Assert.Equal(secret, exception.AttemptedSecret);
   }
 
@@ -141,10 +143,10 @@ public class AuthenticateApiKeyCommandTests : IntegrationTests
     Assert.Equal("XApiKey", exception.Errors.Single().PropertyName);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _secret);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Settings;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Logging;
 using Logitar.Portal.Application.Roles;
@@ -13,6 +14,7 @@ using Logitar.Portal.Application.Users.Validators;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
+using TimeZone = Logitar.Identity.Core.TimeZone;
 
 namespace Logitar.Portal.Application.Users.Commands;
 
@@ -33,15 +35,22 @@ internal record ReplaceUserCommand(Guid Id, ReplaceUserPayload Payload, long? Ve
 
 internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, UserModel?>
 {
+  private readonly IAddressHelper _addressHelper;
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
   private readonly IUserRepository _userRepository;
 
-  public ReplaceUserCommandHandler(IMediator mediator, IPasswordManager passwordManager,
-    IUserManager userManager, IUserQuerier userQuerier, IUserRepository userRepository)
+  public ReplaceUserCommandHandler(
+    IAddressHelper addressHelper,
+    IMediator mediator,
+    IPasswordManager passwordManager,
+    IUserManager userManager,
+    IUserQuerier userQuerier,
+    IUserRepository userRepository)
   {
+    _addressHelper = addressHelper;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
@@ -54,14 +63,15 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     IUserSettings userSettings = command.UserSettings;
 
     ReplaceUserPayload payload = command.Payload;
-    new ReplaceUserValidator(userSettings).ValidateAndThrow(payload);
+    new ReplaceUserValidator(userSettings, _addressHelper).ValidateAndThrow(payload);
 
-    UserAggregate? user = await _userRepository.LoadAsync(command.Id, cancellationToken);
+    UserId userId = new(command.TenantId, new EntityId(command.Id));
+    User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
     {
       return null;
     }
-    UserAggregate? reference = null;
+    User? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _userRepository.LoadAsync(user.Id, command.Version.Value, cancellationToken);
@@ -81,9 +91,9 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     return await _userQuerier.ReadAsync(command.Realm, user, cancellationToken);
   }
 
-  private void ReplaceAuthenticationInformation(IUserSettings userSettings, ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId)
+  private void ReplaceAuthenticationInformation(IUserSettings userSettings, ReplaceUserPayload payload, User user, User? reference, ActorId actorId)
   {
-    UniqueNameUnit uniqueName = new(userSettings.UniqueName, payload.UniqueName);
+    UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
       user.SetUniqueName(uniqueName, actorId);
@@ -108,45 +118,45 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     }
   }
 
-  private static void ReplaceContactInformation(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId)
+  private void ReplaceContactInformation(ReplaceUserPayload payload, User user, User? reference, ActorId actorId)
   {
-    AddressUnit? address = payload.Address?.ToAddressUnit();
+    Address? address = payload.Address?.ToAddress(_addressHelper);
     if (reference == null || address != reference.Address)
     {
       user.SetAddress(address, actorId);
     }
 
-    EmailUnit? email = payload.Email?.ToEmailUnit();
+    Email? email = payload.Email?.ToEmail();
     if (reference == null || email != reference.Email)
     {
       user.SetEmail(email, actorId);
     }
 
-    PhoneUnit? phone = payload.Phone?.ToPhoneUnit();
+    Phone? phone = payload.Phone?.ToPhone();
     if (reference == null || phone != reference.Phone)
     {
       user.SetPhone(phone, actorId);
     }
   }
 
-  private static void ReplacePersonalInformation(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference)
+  private static void ReplacePersonalInformation(ReplaceUserPayload payload, User user, User? reference)
   {
-    PersonNameUnit? firstName = PersonNameUnit.TryCreate(payload.FirstName);
+    PersonName? firstName = PersonName.TryCreate(payload.FirstName);
     if (reference == null || firstName != reference.FirstName)
     {
       user.FirstName = firstName;
     }
-    PersonNameUnit? middleName = PersonNameUnit.TryCreate(payload.MiddleName);
+    PersonName? middleName = PersonName.TryCreate(payload.MiddleName);
     if (reference == null || middleName != reference.MiddleName)
     {
       user.MiddleName = middleName;
     }
-    PersonNameUnit? lastName = PersonNameUnit.TryCreate(payload.LastName);
+    PersonName? lastName = PersonName.TryCreate(payload.LastName);
     if (reference == null || lastName != reference.LastName)
     {
       user.LastName = lastName;
     }
-    PersonNameUnit? nickname = PersonNameUnit.TryCreate(payload.Nickname);
+    PersonName? nickname = PersonName.TryCreate(payload.Nickname);
     if (reference == null || nickname != reference.Nickname)
     {
       user.Nickname = nickname;
@@ -156,52 +166,53 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       user.Birthdate = payload.Birthdate;
     }
-    GenderUnit? gender = GenderUnit.TryCreate(payload.Gender);
+    Gender? gender = Gender.TryCreate(payload.Gender);
     if (reference == null || gender != reference.Gender)
     {
       user.Gender = gender;
     }
-    LocaleUnit? locale = LocaleUnit.TryCreate(payload.Locale);
+    Locale? locale = Locale.TryCreate(payload.Locale);
     if (reference == null || locale != reference.Locale)
     {
       user.Locale = locale;
     }
-    TimeZoneUnit? timeZone = TimeZoneUnit.TryCreate(payload.TimeZone);
+    TimeZone? timeZone = TimeZone.TryCreate(payload.TimeZone);
     if (reference == null || timeZone != reference.TimeZone)
     {
       user.TimeZone = timeZone;
     }
 
-    UrlUnit? picture = UrlUnit.TryCreate(payload.Picture);
+    Url? picture = Url.TryCreate(payload.Picture);
     if (reference == null || picture != reference.Picture)
     {
       user.Picture = picture;
     }
-    UrlUnit? profile = UrlUnit.TryCreate(payload.Profile);
+    Url? profile = Url.TryCreate(payload.Profile);
     if (reference == null || profile != reference.Profile)
     {
       user.Profile = profile;
     }
-    UrlUnit? website = UrlUnit.TryCreate(payload.Website);
+    Url? website = Url.TryCreate(payload.Website);
     if (reference == null || website != reference.Website)
     {
       user.Website = website;
     }
   }
 
-  private static void ReplaceCustomAttributes(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference)
+  private static void ReplaceCustomAttributes(ReplaceUserPayload payload, User user, User? reference)
   {
-    HashSet<string> payloadKeys = new(capacity: payload.CustomAttributes.Count);
+    HashSet<Identifier> payloadKeys = new(capacity: payload.CustomAttributes.Count);
 
-    IEnumerable<string> referenceKeys;
+    IEnumerable<Identifier> referenceKeys;
     if (reference == null)
     {
       referenceKeys = user.CustomAttributes.Keys;
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        payloadKeys.Add(customAttribute.Key.Trim());
-        user.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        Identifier key = new(customAttribute.Key);
+        payloadKeys.Add(key);
+        user.SetCustomAttribute(key, customAttribute.Value);
       }
     }
     else
@@ -210,7 +221,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
 
       foreach (CustomAttribute customAttribute in payload.CustomAttributes)
       {
-        string key = customAttribute.Key.Trim();
+        Identifier key = new(customAttribute.Key);
         payloadKeys.Add(key);
 
         string value = customAttribute.Value.Trim();
@@ -221,7 +232,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
       }
     }
 
-    foreach (string key in referenceKeys)
+    foreach (Identifier key in referenceKeys)
     {
       if (!payloadKeys.Contains(key))
       {
@@ -230,7 +241,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     }
   }
 
-  private async Task ReplaceRolesAsync(ReplaceUserPayload payload, UserAggregate user, UserAggregate? reference, ActorId actorId, CancellationToken cancellationToken)
+  private async Task ReplaceRolesAsync(ReplaceUserPayload payload, User user, User? reference, ActorId actorId, CancellationToken cancellationToken)
   {
     IReadOnlyCollection<FoundRole> roles = await _mediator.Send(new FindRolesQuery(user.TenantId, payload.Roles, nameof(payload.Roles)), cancellationToken);
     HashSet<RoleId> roleIds = new(capacity: roles.Count);
@@ -264,7 +275,7 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     {
       if (!roleIds.Contains(roleId))
       {
-        RoleAggregate role = new(roleId.AggregateId);
+        Role role = new(new UniqueName(new UniqueNameSettings(), "Temporary"), actorId: null, roleId);
         user.RemoveRole(role, actorId);
       }
     }

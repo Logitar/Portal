@@ -1,5 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Senders;
 using MediatR;

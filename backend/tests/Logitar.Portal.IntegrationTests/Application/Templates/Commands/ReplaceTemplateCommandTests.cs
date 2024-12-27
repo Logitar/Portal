@@ -1,6 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Portal.Application.Realms;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Templates;
 using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -21,7 +20,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   {
     _templateRepository = ServiceProvider.GetRequiredService<ITemplateRepository>();
 
-    UniqueKey uniqueKey = new("PasswordRecovery");
+    Identifier uniqueKey = new("PasswordRecovery");
     Subject subject = new("Reset your password");
     Content content = Content.PlainText("Hello World!");
     _template = new(uniqueKey, subject, content);
@@ -44,12 +43,12 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace an existing template.")]
   public async Task It_should_replace_an_existing_template()
   {
-    _template.DisplayName = new DisplayNameUnit("Reset Password");
+    _template.DisplayName = new DisplayName("Reset Password");
     _template.Update();
     await _templateRepository.SaveAsync(_template);
     long version = _template.Version;
 
-    DisplayNameUnit displayName = new("Password Recovery");
+    DisplayName displayName = new("Password Recovery");
     _template.DisplayName = displayName;
     _template.Update();
     await _templateRepository.SaveAsync(_template);
@@ -59,7 +58,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
       DisplayName = "  Reset Password  ",
       Description = " This is the password recovery message template. "
     };
-    ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, version);
+    ReplaceTemplateCommand command = new(_template.EntityId.ToGuid(), payload, version);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(template);
 
@@ -85,7 +84,7 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new ContentModel(_template.Content));
-    ReplaceTemplateCommand command = new(_template.Id.ToGuid(), payload, Version: null);
+    ReplaceTemplateCommand command = new(_template.EntityId.ToGuid(), payload, Version: null);
     TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -93,14 +92,14 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueKeyAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    Template template = new(new UniqueKey("PasswordRecovery_OLD"), _template.Subject, _template.Content);
+    Template template = new(new Identifier("PasswordRecovery_OLD"), _template.Subject, _template.Content);
     await _templateRepository.SaveAsync(template);
 
     ReplaceTemplatePayload payload = new("PaSSWoRDReCoVeRy", _template.Subject.Value, new ContentModel(_template.Content));
-    ReplaceTemplateCommand command = new(template.Id.ToGuid(), payload, Version: null);
+    ReplaceTemplateCommand command = new(template.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<UniqueKeyAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueKey, exception.UniqueKey.Value);
+    Assert.Equal(payload.UniqueKey, exception.UniqueKey);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

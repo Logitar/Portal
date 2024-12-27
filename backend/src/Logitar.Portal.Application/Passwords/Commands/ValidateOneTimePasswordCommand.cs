@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Passwords;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Passwords.Validators;
 using Logitar.Portal.Contracts;
@@ -27,7 +28,8 @@ internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateO
     ValidateOneTimePasswordPayload payload = command.Payload;
     new ValidateOneTimePasswordValidator().ValidateAndThrow(payload);
 
-    OneTimePasswordAggregate? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(command.Id, cancellationToken);
+    OneTimePasswordId oneTimePasswordId = new(command.TenantId, new EntityId(command.Id));
+    OneTimePassword? oneTimePassword = await _oneTimePasswordRepository.LoadAsync(oneTimePasswordId, cancellationToken);
     if (oneTimePassword == null || oneTimePassword.TenantId != command.TenantId)
     {
       return null;
@@ -47,7 +49,8 @@ internal class ValidateOneTimePasswordCommandHandler : IRequestHandler<ValidateO
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
-      oneTimePassword.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+      Identifier key = new(customAttribute.Key);
+      oneTimePassword.SetCustomAttribute(key, customAttribute.Value);
     }
     oneTimePassword.Update(actorId);
 

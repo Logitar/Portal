@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.ApiKeys.Validators;
 using Logitar.Portal.Application.Logging;
@@ -39,14 +39,14 @@ internal class AuthenticateApiKeyCommandHandler : IRequestHandler<AuthenticateAp
     XApiKey xApiKey;
     try
     {
-      xApiKey = XApiKey.Decode(payload.XApiKey);
+      xApiKey = XApiKey.Decode(command.TenantId, payload.XApiKey);
     }
     catch (Exception innerException)
     {
       throw new InvalidApiKeyException(payload.XApiKey, nameof(payload.XApiKey), innerException);
     }
 
-    ApiKeyAggregate apiKey = await _apiKeyRepository.LoadAsync(xApiKey.Id, cancellationToken)
+    ApiKey apiKey = await _apiKeyRepository.LoadAsync(xApiKey.Id, cancellationToken)
       ?? throw new ApiKeyNotFoundException(xApiKey.Id, nameof(payload.XApiKey));
     if (apiKey.TenantId != command.TenantId)
     {

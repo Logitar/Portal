@@ -1,7 +1,8 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Users;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
@@ -13,39 +14,40 @@ using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Microsoft.EntityFrameworkCore;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 
 internal class UserQuerier : IUserQuerier
 {
   private readonly IActorService _actorService;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<UserEntity> _users;
 
-  public UserQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public UserQuerier(IActorService actorService, IdentityContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
     _users = context.Users;
   }
 
-  public async Task<UserModel> ReadAsync(RealmModel? realm, UserAggregate user, CancellationToken cancellationToken)
+  public async Task<UserModel> ReadAsync(RealmModel? realm, User user, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, user.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The user entity 'AggregateId={user.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The user entity 'StreamId={user.Id.Value}' could not be found.");
   }
-  public async Task<UserModel?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<UserModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(realm, new UserId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<UserModel?> ReadAsync(RealmModel? realm, UserId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
       .Include(x => x.Roles)
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     string? tenantId = realm?.GetTenantId().Value;
     if (user == null || user.TenantId != tenantId)
@@ -59,7 +61,7 @@ internal class UserQuerier : IUserQuerier
   public async Task<UserModel?> ReadAsync(RealmModel? realm, string uniqueName, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string uniqueNameNormalized = uniqueName.Trim().ToUpper(); // ISSUE #528: use Helper
+    string uniqueNameNormalized = IdentityDb.Helper.Normalize(uniqueName);
 
     UserEntity? user = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
@@ -77,7 +79,7 @@ internal class UserQuerier : IUserQuerier
   public async Task<IReadOnlyCollection<UserModel>> ReadAsync(RealmModel? realm, IEmail email, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string emailAddressNormalized = email.Address.Trim().ToUpper(); // ISSUE #528: use Helper
+    string emailAddressNormalized = IdentityDb.Helper.Normalize(email.Address);
 
     UserEntity[] users = await _users.AsNoTracking()
       .Include(x => x.Identifiers)
@@ -88,7 +90,7 @@ internal class UserQuerier : IUserQuerier
     return await MapAsync(users, realm, cancellationToken);
   }
 
-  public async Task<UserModel?> ReadAsync(RealmModel? realm, CustomIdentifier identifier, CancellationToken cancellationToken)
+  public async Task<UserModel?> ReadAsync(RealmModel? realm, CustomIdentifierModel identifier, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
     string key = identifier.Key.Trim();
@@ -109,10 +111,10 @@ internal class UserQuerier : IUserQuerier
 
   public async Task<SearchResults<UserModel>> SearchAsync(RealmModel? realm, SearchUsersPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.Users.Table).SelectAll(IdentityDb.Users.Table)
+    IQueryBuilder builder = _queryHelper.From(IdentityDb.Users.Table).SelectAll(IdentityDb.Users.Table)
       .ApplyRealmFilter(IdentityDb.Users.TenantId, realm)
-      .ApplyIdFilter(IdentityDb.Users.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.Users.UniqueName, IdentityDb.Users.AddressFormatted, IdentityDb.Users.EmailAddress,
+      .ApplyIdFilter(IdentityDb.Users.EntityId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.Users.UniqueName, IdentityDb.Users.AddressFormatted, IdentityDb.Users.EmailAddress,
       IdentityDb.Users.PhoneE164Formatted, IdentityDb.Users.FirstName, IdentityDb.Users.MiddleName, IdentityDb.Users.LastName, IdentityDb.Users.Nickname);
 
     if (payload.HasAuthenticated.HasValue)

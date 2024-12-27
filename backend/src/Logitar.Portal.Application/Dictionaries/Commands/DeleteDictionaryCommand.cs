@@ -1,4 +1,5 @@
 ﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
@@ -23,7 +24,8 @@ internal class DeleteDictionaryCommandHandler : IRequestHandler<DeleteDictionary
 
   public async Task<DictionaryModel?> Handle(DeleteDictionaryCommand command, CancellationToken cancellationToken)
   {
-    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(command.Id, cancellationToken);
+    DictionaryId dictionaryId = new(command.TenantId, new EntityId(command.Id));
+    Dictionary? dictionary = await _dictionaryRepository.LoadAsync(dictionaryId, cancellationToken);
     if (dictionary == null || dictionary.TenantId != command.TenantId)
     {
       return null;

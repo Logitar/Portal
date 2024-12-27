@@ -1,76 +1,66 @@
-﻿using Logitar.Data;
-using Logitar.EventSourcing;
-using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.EventSourcing.Infrastructure;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Domain.Templates;
+using Logitar.Portal.EntityFrameworkCore.Relational.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
 
-internal class TemplateRepository : EventSourcing.EntityFrameworkCore.Relational.AggregateRepository, ITemplateRepository
+internal class TemplateRepository : Repository, ITemplateRepository
 {
-  private static readonly string AggregateType = typeof(Template).GetNamespaceQualifiedName();
+  private readonly DbSet<TemplateEntity> _templates;
 
-  private readonly ISqlHelper _sqlHelper;
-
-  public TemplateRepository(IEventBus eventBus, EventContext eventContext, IEventSerializer eventSerializer, ISqlHelper sqlHelper)
-    : base(eventBus, eventContext, eventSerializer)
+  public TemplateRepository(IEventStore eventStore, PortalContext context) : base(eventStore)
   {
-    _sqlHelper = sqlHelper;
+    _templates = context.Templates;
   }
 
-  public async Task<Template?> LoadAsync(Guid id, CancellationToken cancellationToken)
-    => await LoadAsync<Template>(new AggregateId(id), cancellationToken);
-
   public async Task<Template?> LoadAsync(TemplateId id, CancellationToken cancellationToken)
-    => await LoadAsync(id, version: null, cancellationToken);
+  {
+    return await LoadAsync(id, version: null, cancellationToken);
+  }
   public async Task<Template?> LoadAsync(TemplateId id, long? version, CancellationToken cancellationToken)
-    => await LoadAsync<Template>(id.AggregateId, version, cancellationToken);
+  {
+    return await LoadAsync<Template>(id.StreamId, version, cancellationToken);
+  }
 
   public async Task<IReadOnlyCollection<Template>> LoadAsync(CancellationToken cancellationToken)
-    => (await LoadAsync<Template>(cancellationToken)).ToArray(); // ISSUE #528: remove ToArray
+  {
+    return await LoadAsync<Template>(cancellationToken);
+  }
 
   public async Task<IReadOnlyCollection<Template>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Templates.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .SelectAll(EventDb.Events.Table)
-      .Build();
+    string? tenantIdValue = tenantId?.Value;
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
+    IEnumerable<StreamId> streamIds = (await _templates.AsNoTracking()
+      .Where(x => x.TenantId == tenantIdValue)
+      .Select(x => x.StreamId)
+      .ToArrayAsync(cancellationToken)).Select(value => new StreamId(value));
 
-    return Load<Template>(events.Select(EventSerializer.Deserialize)).ToArray(); // ISSUE #528: remove ToArray
+    return await LoadAsync<Template>(streamIds, cancellationToken);
   }
 
-  public async Task<Template?> LoadAsync(TenantId? tenantId, UniqueKey uniqueKey, CancellationToken cancellationToken)
+  public async Task<Template?> LoadAsync(TenantId? tenantId, Identifier uniqueKey, CancellationToken cancellationToken)
   {
-    IQuery query = _sqlHelper.QueryFrom(EventDb.Events.Table)
-      .Join(PortalDb.Templates.AggregateId, EventDb.Events.AggregateId,
-        new OperatorCondition(EventDb.Events.AggregateType, Operators.IsEqualTo(AggregateType))
-      )
-      .Where(PortalDb.Templates.TenantId, tenantId == null ? Operators.IsNull() : Operators.IsEqualTo(tenantId.Value))
-      .Where(PortalDb.Templates.UniqueKeyNormalized, Operators.IsEqualTo(uniqueKey.Value.ToUpper())) // ISSUE #528: use Helper
-      .SelectAll(EventDb.Events.Table)
-      .Build();
+    string? tenantIdValue = tenantId?.Value;
+    string uniqueKeyNormalized = Helper.Normalize(uniqueKey.Value);
 
-    EventEntity[] events = await EventContext.Events.FromQuery(query)
-      .AsNoTracking()
-      .OrderBy(e => e.Version)
-      .ToArrayAsync(cancellationToken);
+    string? streamId = await _templates.AsNoTracking()
+      .Where(x => x.TenantId == tenantIdValue && x.UniqueKeyNormalized == uniqueKeyNormalized)
+      .Select(x => x.StreamId)
+      .SingleOrDefaultAsync(cancellationToken);
 
-    return Load<Template>(events.Select(EventSerializer.Deserialize)).SingleOrDefault();
+    return streamId == null ? null : await LoadAsync<Template>(new StreamId(streamId), cancellationToken);
   }
 
   public async Task SaveAsync(Template template, CancellationToken cancellationToken)
-    => await base.SaveAsync(template, cancellationToken);
+  {
+    await base.SaveAsync(template, cancellationToken);
+  }
   public async Task SaveAsync(IEnumerable<Template> templates, CancellationToken cancellationToken)
-    => await base.SaveAsync(templates, cancellationToken);
+  {
+    await base.SaveAsync(templates, cancellationToken);
+  }
 }

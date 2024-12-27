@@ -40,7 +40,7 @@ internal class ReadTemplateQueryHandler : IRequestHandler<ReadTemplateQuery, Tem
 
     if (templates.Count > 1)
     {
-      throw new TooManyResultsException<TemplateModel>(expectedCount: 1, actualCount: templates.Count);
+      throw TooManyResultsException<TemplateModel>.ExpectedSingle(templates.Count);
     }
 
     return templates.Values.SingleOrDefault();

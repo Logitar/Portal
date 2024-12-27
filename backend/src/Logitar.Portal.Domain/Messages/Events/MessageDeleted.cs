@@ -3,10 +3,4 @@ using MediatR;
 
 namespace Logitar.Portal.Domain.Messages.Events;
 
-public record MessageDeleted : DomainEvent, INotification
-{
-  public MessageDeleted()
-  {
-    IsDeleted = true;
-  }
-}
+public record MessageDeleted : DomainEvent, IDeleteEvent, INotification;

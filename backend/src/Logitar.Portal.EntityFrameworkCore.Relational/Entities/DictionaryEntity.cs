@@ -1,4 +1,7 @@
-﻿using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
+using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries.Events;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Entities;
@@ -8,11 +11,12 @@ internal class DictionaryEntity : AggregateEntity
   public int DictionaryId { get; private set; }
 
   public string? TenantId { get; private set; }
+  public string EntityId { get; private set; } = string.Empty;
 
   public string Locale { get; private set; } = string.Empty;
   public string LocaleNormalized
   {
-    get => Locale.ToUpper(); // ISSUE #528: use Helper
+    get => Helper.Normalize(Locale);
     private set { }
   }
 
@@ -21,7 +25,9 @@ internal class DictionaryEntity : AggregateEntity
 
   public DictionaryEntity(DictionaryCreated @event) : base(@event)
   {
-    TenantId = @event.TenantId?.Value;
+    DictionaryId dictionaryId = new(@event.StreamId);
+    TenantId = dictionaryId.TenantId?.Value;
+    EntityId = dictionaryId.EntityId.Value;
 
     Locale = @event.Locale.Code;
   }
@@ -42,15 +48,15 @@ internal class DictionaryEntity : AggregateEntity
     base.Update(@event);
 
     Dictionary<string, string> entries = GetEntries();
-    foreach (KeyValuePair<string, string?> entry in @event.Entries)
+    foreach (KeyValuePair<Identifier, string?> entry in @event.Entries)
     {
       if (entry.Value == null)
       {
-        entries.Remove(entry.Key);
+        entries.Remove(entry.Key.Value);
       }
       else
       {
-        entries[entry.Key] = entry.Value;
+        entries[entry.Key.Value] = entry.Value;
       }
     }
     SetEntries(entries);

@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
@@ -21,7 +21,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   {
     _senderRepository = ServiceProvider.GetRequiredService<ISenderRepository>();
 
-    EmailUnit email = new(Faker.Internet.Email(), isVerified: false);
+    Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
     _sender = new(email, settings);
     _sender.SetDefault();
@@ -44,7 +44,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   [Fact(DisplayName = "It should delete an existing sender.")]
   public async Task It_should_delete_an_existing_sender()
   {
-    DeleteSenderCommand command = new(_sender.Id.ToGuid());
+    DeleteSenderCommand command = new(_sender.EntityId.ToGuid());
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
     Assert.Equal(command.Id, sender.Id);
@@ -63,7 +63,7 @@ public class DeleteSenderCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteSenderCommand command = new(_sender.Id.ToGuid());
+    DeleteSenderCommand command = new(_sender.EntityId.ToGuid());
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -75,8 +75,8 @@ public class DeleteSenderCommandTests : IntegrationTests
     Sender other = new(_sender.Email, _sender.Settings);
     await _senderRepository.SaveAsync(other);
 
-    DeleteSenderCommand command = new(_sender.Id.ToGuid());
+    DeleteSenderCommand command = new(_sender.EntityId.ToGuid());
     var exception = await Assert.ThrowsAsync<CannotDeleteDefaultSenderException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_sender.Id, exception.SenderId);
+    Assert.Equal(_sender.EntityId.ToGuid(), exception.SenderId);
   }
 }

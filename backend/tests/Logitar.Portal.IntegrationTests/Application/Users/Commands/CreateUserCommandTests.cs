@@ -1,6 +1,6 @@
-﻿using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Contracts.Users;
@@ -25,7 +25,7 @@ public class CreateUserCommandTests : IntegrationTests
   {
     SetRealm();
 
-    RoleAggregate role = new(new UniqueNameUnit(Realm.UniqueNameSettings, "manage_sales"), TenantId);
+    Role role = new(new UniqueName(Realm.UniqueNameSettings, "manage_sales"), actorId: null, RoleId.NewId(TenantId));
     await _roleRepository.SaveAsync(role);
 
     CreateUserPayload payload = new(UsernameString)
@@ -61,25 +61,25 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.Same(Realm, user.Realm);
 
     RoleModel userRole = Assert.Single(user.Roles);
-    Assert.Equal(role.Id.ToGuid(), userRole.Id);
+    Assert.Equal(role.EntityId.ToGuid(), userRole.Id);
   }
 
   [Fact(DisplayName = "It should throw CustomIdentifierAlreadyUsedException when a custom identifier is already used.")]
   public async Task It_should_throw_CustomIdentifierAlreadyUsedException_when_a_custom_identifier_is_already_used()
   {
-    string healthInsuranceNumber = Faker.Person.BuildHealthInsuranceNumber();
+    CustomIdentifier healthInsuranceNumber = new(Faker.Person.BuildHealthInsuranceNumber());
 
-    UserAggregate user = (await _userRepository.LoadAsync()).Single();
-    user.SetCustomIdentifier("HealthInsuranceNumber", healthInsuranceNumber);
+    User user = (await _userRepository.LoadAsync()).Single();
+    user.SetCustomIdentifier(new Identifier("HealthInsuranceNumber"), healthInsuranceNumber);
     await _userRepository.SaveAsync(user);
 
     CreateUserPayload payload = new(Faker.Internet.UserName());
-    payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", healthInsuranceNumber));
+    payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", healthInsuranceNumber.Value));
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal("HealthInsuranceNumber", exception.Key);
-    Assert.Equal(healthInsuranceNumber, exception.Value);
+    Assert.Equal(healthInsuranceNumber.Value, exception.Value);
   }
 
   [Fact(DisplayName = "It should throw EmailAddressAlreadyUsedException when the email address is already used.")]
@@ -92,7 +92,7 @@ public class CreateUserCommandTests : IntegrationTests
     CreateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<EmailAddressAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Email.Address, exception.Email.Address);
+    Assert.Equal(payload.Email.Address, exception.EmailAddress);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
@@ -111,9 +111,9 @@ public class CreateUserCommandTests : IntegrationTests
   {
     CreateUserPayload payload = new(UsernameString);
     CreateUserCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

@@ -4,7 +4,7 @@ namespace Logitar.Portal.Application.Realms;
 
 public class RealmNotFoundException : Exception
 {
-  public const string ErrorMessage = "The specified realm could not be found.";
+  private const string ErrorMessage = "The specified realm could not be found.";
 
   public string Realm
   {

@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,12 +24,12 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   [Fact(DisplayName = "It should save the user identifier.")]
   public async Task It_should_save_the_user_identifier()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
-    user.SetCustomIdentifier(Key, "old_value");
+    User user = Assert.Single(await _userRepository.LoadAsync());
+    user.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier("old_value"));
     await _userRepository.SaveAsync(user);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Contains(result.CustomIdentifiers, id => id.Key == command.Key && id.Value == payload.Value);
@@ -47,12 +47,12 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   [Fact(DisplayName = "It should return null when the user is not in the realm.")]
   public async Task It_should_return_null_when_the_user_is_not_in_the_realm()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
     SetRealm();
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -60,15 +60,15 @@ public class SaveUserIdentifierCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw CustomIdentifierAlreadyUsedException when the identifier is already used.")]
   public async Task It_should_throw_CustomIdentifierAlreadyUsedException_when_the_identifier_is_already_used()
   {
-    UserAggregate user = Assert.Single(await _userRepository.LoadAsync());
+    User user = Assert.Single(await _userRepository.LoadAsync());
 
-    UserAggregate other = new(new UniqueNameUnit(Realm.UniqueNameSettings, Faker.Internet.UserName()));
-    other.SetCustomIdentifier(Key, _healthInsuranceNumber);
+    User other = new(new UniqueName(Realm.UniqueNameSettings, Faker.Internet.UserName()));
+    other.SetCustomIdentifier(new Identifier(Key), new CustomIdentifier(_healthInsuranceNumber));
     await _userRepository.SaveAsync(other);
 
     SaveUserIdentifierPayload payload = new(_healthInsuranceNumber);
-    SaveUserIdentifierCommand command = new(user.Id.ToGuid(), Key, payload);
-    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException<UserAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    SaveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key, payload);
+    var exception = await Assert.ThrowsAsync<CustomIdentifierAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
     Assert.Equal(command.Key, exception.Key);
     Assert.Equal(payload.Value, exception.Value);

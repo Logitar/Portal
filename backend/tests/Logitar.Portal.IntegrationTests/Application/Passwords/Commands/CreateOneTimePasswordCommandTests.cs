@@ -1,7 +1,7 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Passwords.Commands;
 

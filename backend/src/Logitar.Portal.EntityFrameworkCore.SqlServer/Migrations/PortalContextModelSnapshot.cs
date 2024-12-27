@@ -16,7 +16,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -29,22 +29,19 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DictionaryId"));
 
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EntriesSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Entries");
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Entries")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EntryCount")
                         .HasColumnType("int");
@@ -59,12 +56,16 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<string>("StreamId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -76,22 +77,28 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasKey("DictionaryId");
 
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("CreatedOn");
 
+                    b.HasIndex("EntityId");
+
                     b.HasIndex("EntryCount");
 
                     b.HasIndex("Locale");
+
+                    b.HasIndex("StreamId")
+                        .IsUnique();
 
                     b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UpdatedOn");
 
                     b.HasIndex("Version");
+
+                    b.HasIndex("TenantId", "EntityId")
+                        .IsUnique()
+                        .HasFilter("[TenantId] IS NOT NULL");
 
                     b.HasIndex("TenantId", "LocaleNormalized")
                         .IsUnique()
@@ -116,7 +123,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ActorId")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -231,9 +237,9 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
             modelBuilder.Entity("Logitar.Portal.EntityFrameworkCore.Relational.Entities.LogEventEntity", b =>
                 {
-                    b.Property<Guid>("EventId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EventId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<long>("LogId")
                         .HasColumnType("bigint");
@@ -253,9 +259,8 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("LogExceptionId"));
 
-                    b.Property<string>("DataSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Data");
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("HResult")
                         .HasColumnType("int");
@@ -301,11 +306,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
 
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("BodyText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -316,12 +316,15 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IgnoreUserLocale")
                         .HasColumnType("bit");
@@ -336,9 +339,8 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.Property<int>("RecipientCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ResultDataSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("ResultData");
+                    b.Property<string>("ResultData")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SenderAddress")
                         .HasMaxLength(255)
@@ -368,6 +370,11 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("StreamId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -390,28 +397,25 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("VariablesSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Variables");
+                    b.Property<string>("Variables")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Version")
                         .HasColumnType("bigint");
 
                     b.HasKey("MessageId");
 
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("CreatedOn");
+
+                    b.HasIndex("EntityId");
 
                     b.HasIndex("IsDemo");
 
@@ -420,6 +424,9 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.HasIndex("SenderId");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("StreamId")
+                        .IsUnique();
 
                     b.HasIndex("Subject");
 
@@ -433,6 +440,10 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("Version");
 
+                    b.HasIndex("TenantId", "EntityId")
+                        .IsUnique()
+                        .HasFilter("[TenantId] IS NOT NULL");
+
                     b.ToTable("Messages", (string)null);
                 });
 
@@ -444,26 +455,19 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RealmId"));
 
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("AllowedUniqueNameCharacters")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomAttributesSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("CustomAttributes");
+                    b.Property<string>("CustomAttributes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DefaultLocale")
                         .HasMaxLength(16)
@@ -507,6 +511,11 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
+                    b.Property<string>("StreamId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("UniqueSlug")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -518,7 +527,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -534,14 +542,14 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasKey("RealmId");
 
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
+
+                    b.HasIndex("StreamId")
+                        .IsUnique();
 
                     b.HasIndex("UniqueSlug");
 
@@ -629,13 +637,7 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SenderId"));
 
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -653,6 +655,10 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
@@ -665,16 +671,19 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("SettingsSerialized")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Settings");
+                    b.Property<string>("Settings")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreamId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("TenantId")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -686,9 +695,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasKey("SenderId");
 
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("CreatedOn");
@@ -697,15 +703,24 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasIndex("EmailAddress");
 
+                    b.HasIndex("EntityId");
+
                     b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Provider");
+
+                    b.HasIndex("StreamId")
+                        .IsUnique();
 
                     b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UpdatedOn");
 
                     b.HasIndex("Version");
+
+                    b.HasIndex("TenantId", "EntityId")
+                        .IsUnique()
+                        .HasFilter("[TenantId] IS NOT NULL");
 
                     b.HasIndex("TenantId", "IsDefault");
 
@@ -720,11 +735,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TemplateId"));
 
-                    b.Property<string>("AggregateId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("ContentText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -735,7 +745,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -746,6 +755,15 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("StreamId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -769,7 +787,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -781,9 +798,6 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
 
                     b.HasKey("TemplateId");
 
-                    b.HasIndex("AggregateId")
-                        .IsUnique();
-
                     b.HasIndex("ContentType");
 
                     b.HasIndex("CreatedBy");
@@ -791,6 +805,11 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.HasIndex("CreatedOn");
 
                     b.HasIndex("DisplayName");
+
+                    b.HasIndex("EntityId");
+
+                    b.HasIndex("StreamId")
+                        .IsUnique();
 
                     b.HasIndex("Subject");
 
@@ -801,6 +820,10 @@ namespace Logitar.Portal.EntityFrameworkCore.SqlServer.Migrations
                     b.HasIndex("UpdatedOn");
 
                     b.HasIndex("Version");
+
+                    b.HasIndex("TenantId", "EntityId")
+                        .IsUnique()
+                        .HasFilter("[TenantId] IS NOT NULL");
 
                     b.HasIndex("TenantId", "UniqueKeyNormalized")
                         .IsUnique()

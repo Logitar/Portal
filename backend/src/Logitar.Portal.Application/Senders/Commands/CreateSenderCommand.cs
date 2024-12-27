@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Senders.Validators;
 using Logitar.Portal.Contracts.Senders;
@@ -43,10 +43,10 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
         {
           throw new InvalidOperationException("The sender email address is required.");
         }
-        EmailUnit email = new(payload.EmailAddress, isVerified: false);
-        sender = new(email, settings, command.TenantId, actorId)
+        Email email = new(payload.EmailAddress, isVerified: false);
+        sender = new(email, settings, actorId, SenderId.NewId(command.TenantId))
         {
-          DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName)
+          DisplayName = DisplayName.TryCreate(payload.DisplayName)
         };
         break;
       case SenderType.Sms:
@@ -54,14 +54,14 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
         {
           throw new InvalidOperationException("The sender phone number is required.");
         }
-        PhoneUnit phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
-        sender = new(phone, settings, command.TenantId, actorId);
+        Phone phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
+        sender = new(phone, settings, actorId, SenderId.NewId(command.TenantId));
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
     }
 
-    sender.Description = DescriptionUnit.TryCreate(payload.Description);
+    sender.Description = Description.TryCreate(payload.Description);
     sender.Update(actorId);
 
     IEnumerable<Sender> senders = await _senderRepository.LoadAsync(sender.TenantId, cancellationToken);

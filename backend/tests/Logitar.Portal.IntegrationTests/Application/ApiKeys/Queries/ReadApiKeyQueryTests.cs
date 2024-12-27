@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Queries;
 
@@ -44,18 +44,18 @@ public class ReadApiKeyQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the API key when it is found.")]
   public async Task It_should_return_the_Api_key_when_it_is_found()
   {
-    ApiKeyAggregate apiKey = await CreateApiKeyAsync();
+    ApiKey apiKey = await CreateApiKeyAsync();
 
-    ReadApiKeyQuery query = new(apiKey.Id.ToGuid());
+    ReadApiKeyQuery query = new(apiKey.EntityId.ToGuid());
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);
   }
 
-  private async Task<ApiKeyAggregate> CreateApiKeyAsync()
+  private async Task<ApiKey> CreateApiKeyAsync()
   {
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKeyAggregate apiKey = new(new DisplayNameUnit("Default"), secret);
+    ApiKey apiKey = new(new DisplayName("Default"), secret);
 
     await _apiKeyRepository.SaveAsync(apiKey);
 

@@ -20,7 +20,6 @@ using Logitar.Portal.Domain.Templates;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 using Logitar.Portal.EntityFrameworkCore.Relational.Repositories;
-using Logitar.Portal.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational;
@@ -31,7 +30,6 @@ public static class DependencyInjectionExtensions
   {
     return services
       .AddLogitarIdentityWithEntityFrameworkCoreRelational()
-      .AddLogitarPortalInfrastructure()
       .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddQueriers()
       .AddRepositories()

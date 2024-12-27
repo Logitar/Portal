@@ -1,6 +1,6 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Domain.Realms;
 using MediatR;
 
@@ -20,9 +20,9 @@ internal class DeleteRealmUsersCommandHandler : INotificationHandler<DeleteRealm
   public async Task Handle(DeleteRealmUsersCommand command, CancellationToken cancellationToken)
   {
     TenantId tenantId = new(command.Realm.Id.Value);
-    IEnumerable<UserAggregate> users = await _userRepository.LoadAsync(tenantId, cancellationToken);
+    IEnumerable<User> users = await _userRepository.LoadAsync(tenantId, cancellationToken);
 
-    foreach (UserAggregate user in users)
+    foreach (User user in users)
     {
       user.Delete(command.ActorId);
     }

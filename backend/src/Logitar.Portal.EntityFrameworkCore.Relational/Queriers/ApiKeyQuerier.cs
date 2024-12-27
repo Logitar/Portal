@@ -1,6 +1,7 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.Domain.ApiKeys;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Identity.EntityFrameworkCore.Relational.Entities;
 using Logitar.Portal.Application;
@@ -11,6 +12,7 @@ using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.EntityFrameworkCore.Relational.Actors;
 using Microsoft.EntityFrameworkCore;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 
@@ -18,33 +20,33 @@ internal class ApiKeyQuerier : IApiKeyQuerier
 {
   private readonly IActorService _actorService;
   private readonly DbSet<ApiKeyEntity> _apiKeys;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
 
-  public ApiKeyQuerier(IActorService actorService, IdentityContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public ApiKeyQuerier(IActorService actorService, IdentityContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
     _apiKeys = context.ApiKeys;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
   }
 
-  public async Task<ApiKeyModel> ReadAsync(RealmModel? realm, ApiKeyAggregate apiKey, CancellationToken cancellationToken)
+  public async Task<ApiKeyModel> ReadAsync(RealmModel? realm, ApiKey apiKey, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, apiKey.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The API key entity 'AggregateId={apiKey.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The API key entity 'StreamId={apiKey.Id.Value}' could not be found.");
   }
-  public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, ApiKeyId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(realm, new ApiKeyId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<ApiKeyModel?> ReadAsync(RealmModel? realm, ApiKeyId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     ApiKeyEntity? apiKey = await _apiKeys.AsNoTracking()
       .Include(x => x.Roles)
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
-    if (apiKey == null || apiKey.TenantId != realm?.GetTenantId()?.Value)
+    if (apiKey == null || apiKey.TenantId != realm?.GetTenantId().Value)
     {
       return null;
     }
@@ -54,10 +56,10 @@ internal class ApiKeyQuerier : IApiKeyQuerier
 
   public async Task<SearchResults<ApiKeyModel>> SearchAsync(RealmModel? realm, SearchApiKeysPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(IdentityDb.ApiKeys.Table).SelectAll(IdentityDb.ApiKeys.Table)
+    IQueryBuilder builder = _queryHelper.From(IdentityDb.ApiKeys.Table).SelectAll(IdentityDb.ApiKeys.Table)
       .ApplyRealmFilter(IdentityDb.ApiKeys.TenantId, realm)
-      .ApplyIdFilter(IdentityDb.ApiKeys.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.ApiKeys.DisplayName);
+      .ApplyIdFilter(IdentityDb.ApiKeys.EntityId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, IdentityDb.ApiKeys.DisplayName);
 
     if (payload.HasAuthenticated.HasValue)
     {

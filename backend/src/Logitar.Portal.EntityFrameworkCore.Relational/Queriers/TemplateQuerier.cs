@@ -1,6 +1,7 @@
 ﻿using Logitar.Data;
 using Logitar.EventSourcing;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Templates;
 using Logitar.Portal.Contracts.Actors;
@@ -17,31 +18,31 @@ namespace Logitar.Portal.EntityFrameworkCore.Relational.Queriers;
 internal class TemplateQuerier : ITemplateQuerier
 {
   private readonly IActorService _actorService;
-  private readonly ISearchHelper _searchHelper;
-  private readonly ISqlHelper _sqlHelper;
+  private readonly IQueryHelper _queryHelper;
   private readonly DbSet<TemplateEntity> _templates;
 
-  public TemplateQuerier(IActorService actorService, PortalContext context, ISearchHelper searchHelper, ISqlHelper sqlHelper)
+  public TemplateQuerier(IActorService actorService, PortalContext context, IQueryHelper queryHelper)
   {
     _actorService = actorService;
-    _searchHelper = searchHelper;
-    _sqlHelper = sqlHelper;
+    _queryHelper = queryHelper;
     _templates = context.Templates;
   }
 
   public async Task<TemplateModel> ReadAsync(RealmModel? realm, Template template, CancellationToken cancellationToken)
   {
     return await ReadAsync(realm, template.Id, cancellationToken)
-      ?? throw new InvalidOperationException($"The template entity 'AggregateId={template.Id.Value}' could not be found.");
+      ?? throw new InvalidOperationException($"The template entity 'StreamId={template.Id.Value}' could not be found.");
   }
-  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
-    => await ReadAsync(realm, id.ToGuid(), cancellationToken);
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, Guid id, CancellationToken cancellationToken)
   {
-    string aggregateId = new AggregateId(id).Value;
+    return await ReadAsync(realm, new TemplateId(realm?.GetTenantId(), new EntityId(id)), cancellationToken);
+  }
+  public async Task<TemplateModel?> ReadAsync(RealmModel? realm, TemplateId id, CancellationToken cancellationToken)
+  {
+    string streamId = id.Value;
 
     TemplateEntity? template = await _templates.AsNoTracking()
-      .SingleOrDefaultAsync(x => x.AggregateId == aggregateId, cancellationToken);
+      .SingleOrDefaultAsync(x => x.StreamId == streamId, cancellationToken);
 
     if (template == null || template.TenantId != realm?.GetTenantId().Value)
     {
@@ -54,7 +55,7 @@ internal class TemplateQuerier : ITemplateQuerier
   public async Task<TemplateModel?> ReadAsync(RealmModel? realm, string uniqueKey, CancellationToken cancellationToken)
   {
     string? tenantId = realm?.GetTenantId().Value;
-    string uniqueKeyNormalized = uniqueKey.Trim().ToUpper(); // ISSUE #528: use Helper
+    string uniqueKeyNormalized = Helper.Normalize(uniqueKey);
 
     TemplateEntity? template = await _templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.TenantId == tenantId && x.UniqueKeyNormalized == uniqueKeyNormalized, cancellationToken);
@@ -69,10 +70,10 @@ internal class TemplateQuerier : ITemplateQuerier
 
   public async Task<SearchResults<TemplateModel>> SearchAsync(RealmModel? realm, SearchTemplatesPayload payload, CancellationToken cancellationToken)
   {
-    IQueryBuilder builder = _sqlHelper.QueryFrom(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
+    IQueryBuilder builder = _queryHelper.From(PortalDb.Templates.Table).SelectAll(PortalDb.Templates.Table)
       .ApplyRealmFilter(PortalDb.Templates.TenantId, realm)
-      .ApplyIdFilter(PortalDb.Templates.AggregateId, payload.Ids);
-    _searchHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Templates.UniqueKey, PortalDb.Templates.DisplayName, PortalDb.Templates.Subject);
+      .ApplyIdFilter(PortalDb.Templates.EntityId, payload.Ids);
+    _queryHelper.ApplyTextSearch(builder, payload.Search, PortalDb.Templates.UniqueKey, PortalDb.Templates.DisplayName, PortalDb.Templates.Subject);
 
     if (!string.IsNullOrWhiteSpace(payload.ContentType))
     {

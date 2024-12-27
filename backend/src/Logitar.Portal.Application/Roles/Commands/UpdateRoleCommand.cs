@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.EventSourcing;
 using Logitar.Identity.Contracts.Settings;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Roles.Validators;
 using Logitar.Portal.Contracts;
@@ -33,7 +33,8 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
     UpdateRolePayload payload = command.Payload;
     new UpdateRoleValidator(roleSettings).ValidateAndThrow(payload);
 
-    RoleAggregate? role = await _roleRepository.LoadAsync(command.Id, cancellationToken);
+    RoleId roleId = new(command.TenantId, new EntityId(command.Id));
+    Role? role = await _roleRepository.LoadAsync(roleId, cancellationToken);
     if (role == null || role.TenantId != command.TenantId)
     {
       return null;
@@ -41,29 +42,30 @@ internal class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Rol
 
     ActorId actorId = command.ActorId;
 
-    UniqueNameUnit? uniqueName = UniqueNameUnit.TryCreate(roleSettings.UniqueName, payload.UniqueName);
+    UniqueName? uniqueName = UniqueName.TryCreate(payload.UniqueName, roleSettings.UniqueName);
     if (uniqueName != null)
     {
       role.SetUniqueName(uniqueName, actorId);
     }
     if (payload.DisplayName != null)
     {
-      role.DisplayName = DisplayNameUnit.TryCreate(payload.DisplayName.Value);
+      role.DisplayName = DisplayName.TryCreate(payload.DisplayName.Value);
     }
     if (payload.Description != null)
     {
-      role.Description = DescriptionUnit.TryCreate(payload.Description.Value);
+      role.Description = Description.TryCreate(payload.Description.Value);
     }
 
     foreach (CustomAttributeModification customAttribute in payload.CustomAttributes)
     {
+      Identifier key = new(customAttribute.Key);
       if (string.IsNullOrWhiteSpace(customAttribute.Value))
       {
-        role.RemoveCustomAttribute(customAttribute.Key);
+        role.RemoveCustomAttribute(key);
       }
       else
       {
-        role.SetCustomAttribute(customAttribute.Key, customAttribute.Value);
+        role.SetCustomAttribute(key, customAttribute.Value);
       }
     }
 

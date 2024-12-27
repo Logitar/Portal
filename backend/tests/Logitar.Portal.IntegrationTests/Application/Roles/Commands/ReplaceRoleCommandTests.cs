@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
@@ -14,14 +14,14 @@ public class ReplaceRoleCommandTests : IntegrationTests
 {
   private readonly IRoleRepository _roleRepository;
 
-  private readonly RoleAggregate _role;
+  private readonly Role _role;
 
   public ReplaceRoleCommandTests() : base()
   {
     _roleRepository = ServiceProvider.GetRequiredService<IRoleRepository>();
 
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
-    UniqueNameUnit uniqueName = new(uniqueNameSettings, "admin");
+    UniqueName uniqueName = new(uniqueNameSettings, "admin");
     _role = new(uniqueName);
   }
 
@@ -42,14 +42,14 @@ public class ReplaceRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should replace an existing role.")]
   public async Task It_should_replace_an_existing_role()
   {
-    _role.SetCustomAttribute("manage_users", bool.TrueString);
-    _role.SetCustomAttribute("configuration", bool.FalseString);
+    _role.SetCustomAttribute(new Identifier("manage_users"), bool.TrueString);
+    _role.SetCustomAttribute(new Identifier("configuration"), bool.FalseString);
     _role.Update();
     await _roleRepository.SaveAsync(_role);
     long version = _role.Version;
 
-    _role.SetCustomAttribute("manage_roles", bool.FalseString);
-    _role.SetCustomAttribute("manage_realms", bool.FalseString);
+    _role.SetCustomAttribute(new Identifier("manage_roles"), bool.FalseString);
+    _role.SetCustomAttribute(new Identifier("manage_realms"), bool.FalseString);
     _role.Update();
     await _roleRepository.SaveAsync(_role);
 
@@ -60,7 +60,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     };
     payload.CustomAttributes.Add(new("manage_users", bool.FalseString));
     payload.CustomAttributes.Add(new("manage_roles", bool.TrueString));
-    ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, version);
+    ReplaceRoleCommand command = new(_role.EntityId.ToGuid(), payload, version);
     RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
 
@@ -89,7 +89,7 @@ public class ReplaceRoleCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceRolePayload payload = new("admin");
-    ReplaceRoleCommand command = new(_role.Id.ToGuid(), payload, Version: null);
+    ReplaceRoleCommand command = new(_role.EntityId.ToGuid(), payload, Version: null);
     RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -97,14 +97,14 @@ public class ReplaceRoleCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]
   public async Task It_should_throw_UniqueNameAlreadyUsedException_when_the_unique_name_is_already_used()
   {
-    RoleAggregate role = new(new UniqueNameUnit(new ReadOnlyUniqueNameSettings(), "guest"));
+    Role role = new(new UniqueName(new ReadOnlyUniqueNameSettings(), "guest"));
     await _roleRepository.SaveAsync(role);
 
     ReplaceRolePayload payload = new("AdmIn");
-    ReplaceRoleCommand command = new(role.Id.ToGuid(), payload, Version: null);
-    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException<RoleAggregate>>(async () => await ActivityPipeline.ExecuteAsync(command));
+    ReplaceRoleCommand command = new(role.EntityId.ToGuid(), payload, Version: null);
+    var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.UniqueName, exception.UniqueName.Value);
+    Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

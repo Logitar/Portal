@@ -2,7 +2,7 @@
 
 public class TooManyResultsException : Exception
 {
-  public const string ErrorMessage = "Too many results were found.";
+  private const string ErrorMessage = "Too many results were found.";
 
   public string TypeName
   {
@@ -39,4 +39,6 @@ public class TooManyResultsException<T> : TooManyResultsException
   public TooManyResultsException(int expectedCount, int actualCount) : base(typeof(T), expectedCount, actualCount)
   {
   }
+
+  public static TooManyResultsException<T> ExpectedSingle(int actualCount) => new(expectedCount: 1, actualCount);
 }

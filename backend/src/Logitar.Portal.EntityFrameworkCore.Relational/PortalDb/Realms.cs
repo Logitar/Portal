@@ -7,10 +7,14 @@ public static class Realms
 {
   public static readonly TableId Table = new(nameof(PortalContext.Realms));
 
-  public static readonly ColumnId AggregateId = new(nameof(RealmEntity.AggregateId), Table);
-  public static readonly ColumnId AllowedUniqueNameCharacters = new(nameof(RealmEntity.AllowedUniqueNameCharacters), Table);
   public static readonly ColumnId CreatedBy = new(nameof(RealmEntity.CreatedBy), Table);
   public static readonly ColumnId CreatedOn = new(nameof(RealmEntity.CreatedOn), Table);
+  public static readonly ColumnId StreamId = new(nameof(RealmEntity.StreamId), Table);
+  public static readonly ColumnId UpdatedBy = new(nameof(RealmEntity.UpdatedBy), Table);
+  public static readonly ColumnId UpdatedOn = new(nameof(RealmEntity.UpdatedOn), Table);
+  public static readonly ColumnId Version = new(nameof(RealmEntity.Version), Table);
+
+  public static readonly ColumnId AllowedUniqueNameCharacters = new(nameof(RealmEntity.AllowedUniqueNameCharacters), Table);
   public static readonly ColumnId CustomAttributes = new(nameof(RealmEntity.CustomAttributes), Table);
   public static readonly ColumnId DefaultLocale = new(nameof(RealmEntity.DefaultLocale), Table);
   public static readonly ColumnId Description = new(nameof(RealmEntity.Description), Table);
@@ -27,8 +31,5 @@ public static class Realms
   public static readonly ColumnId Secret = new(nameof(RealmEntity.Secret), Table);
   public static readonly ColumnId UniqueSlug = new(nameof(RealmEntity.UniqueSlug), Table);
   public static readonly ColumnId UniqueSlugNormalized = new(nameof(RealmEntity.UniqueSlugNormalized), Table);
-  public static readonly ColumnId UpdatedBy = new(nameof(RealmEntity.UpdatedBy), Table);
-  public static readonly ColumnId UpdatedOn = new(nameof(RealmEntity.UpdatedOn), Table);
   public static readonly ColumnId Url = new(nameof(RealmEntity.Url), Table);
-  public static readonly ColumnId Version = new(nameof(RealmEntity.Version), Table);
 }
