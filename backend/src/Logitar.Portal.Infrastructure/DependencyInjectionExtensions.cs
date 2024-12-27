@@ -10,6 +10,7 @@ using Logitar.Portal.Infrastructure.Messages.Providers.Twilio;
 using Logitar.Portal.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Logitar.Portal.Infrastructure;
 
@@ -26,7 +27,7 @@ public static class DependencyInjectionExtensions
       .AddSingleton(InitializeCachingSettings)
       .AddSingleton<ICacheService, CacheService>()
       .AddSingleton<IEventSerializer, EventSerializer>()
-      .AddScoped<IEventBus, EventBus>();
+      .RemoveAll<IEventBus>().AddScoped<IEventBus, EventBus>();
   }
 
   private static IServiceCollection AddSenderProviders(this IServiceCollection services)

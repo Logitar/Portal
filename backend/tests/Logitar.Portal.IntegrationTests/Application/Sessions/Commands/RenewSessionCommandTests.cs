@@ -179,7 +179,7 @@ public class RenewSessionCommandTests : IntegrationTests
     RenewSessionCommand command = new(payload);
 
     var exception = await Assert.ThrowsAsync<SessionNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(session.TenantId?.ToGuid(), exception.TenantId);
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(session.EntityId.ToGuid(), exception.SessionId);
     Assert.Equal("RefreshToken", exception.PropertyName);
   }
