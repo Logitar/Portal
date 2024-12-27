@@ -22,7 +22,7 @@ public class Dictionary : AggregateRoot
   {
   }
 
-  public Dictionary(Locale locale, TenantId? tenantId = null, ActorId? actorId = null, DictionaryId? id = null) : base((id ?? DictionaryId.NewId(tenantId)).StreamId)
+  public Dictionary(Locale locale, ActorId? actorId = null, DictionaryId? id = null) : base((id ?? DictionaryId.NewId()).StreamId)
   {
     Raise(new DictionaryCreated(locale), actorId);
   }

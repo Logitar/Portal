@@ -93,16 +93,16 @@ public class Sender : AggregateRoot
   {
   }
 
-  public Sender(Email email, SenderSettings settings, TenantId? tenantId = null, ActorId? actorId = null, SenderId? id = null)
-    : this(email, phone: null, settings, tenantId, actorId, id)
+  public Sender(Email email, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
+    : this(email, phone: null, settings, actorId, id)
   {
   }
-  public Sender(Phone phone, SenderSettings settings, TenantId? tenantId = null, ActorId? actorId = null, SenderId? id = null)
-    : this(email: null, phone, settings, tenantId, actorId, id)
+  public Sender(Phone phone, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
+    : this(email: null, phone, settings, actorId, id)
   {
   }
-  private Sender(Email? email, Phone? phone, SenderSettings settings, TenantId? tenantId = null, ActorId? actorId = null, SenderId? id = null)
-    : base((id ?? SenderId.NewId(tenantId)).StreamId)
+  private Sender(Email? email, Phone? phone, SenderSettings settings, ActorId? actorId = null, SenderId? id = null)
+    : base((id ?? SenderId.NewId()).StreamId)
   {
     SenderProvider provider = settings.Provider;
     SenderType type = provider.GetSenderType();

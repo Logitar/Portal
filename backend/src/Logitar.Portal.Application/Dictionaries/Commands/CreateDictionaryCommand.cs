@@ -30,7 +30,7 @@ internal class CreateDictionaryCommandHandler : IRequestHandler<CreateDictionary
     ActorId actorId = command.ActorId;
 
     Locale locale = new(payload.Locale);
-    Dictionary dictionary = new(locale, command.TenantId, actorId);
+    Dictionary dictionary = new(locale, actorId, DictionaryId.NewId(command.TenantId));
 
     await _dictionaryManager.SaveAsync(dictionary, actorId, cancellationToken);
 

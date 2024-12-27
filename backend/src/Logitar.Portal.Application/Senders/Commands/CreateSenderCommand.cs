@@ -44,7 +44,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
           throw new InvalidOperationException("The sender email address is required.");
         }
         Email email = new(payload.EmailAddress, isVerified: false);
-        sender = new(email, settings, command.TenantId, actorId)
+        sender = new(email, settings, actorId, SenderId.NewId(command.TenantId))
         {
           DisplayName = DisplayName.TryCreate(payload.DisplayName)
         };
@@ -55,7 +55,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
           throw new InvalidOperationException("The sender phone number is required.");
         }
         Phone phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
-        sender = new(phone, settings, command.TenantId, actorId);
+        sender = new(phone, settings, actorId, SenderId.NewId(command.TenantId));
         break;
       default:
         throw new SenderTypeNotSupportedException(type);
