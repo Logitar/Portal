@@ -1,39 +1,47 @@
-﻿using FluentValidation;
-using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Senders;
 
-public record SenderId
+public readonly struct SenderId
 {
-  public AggregateId AggregateId { get; }
-  public string Value => AggregateId.Value;
+  private const char Separator = ':';
 
-  public SenderId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  public StreamId StreamId { get; }
+  public string Value => StreamId.Value;
+
+  public TenantId? TenantId { get; }
+  public EntityId EntityId { get; }
+
+  public SenderId(TenantId? tenantId, EntityId entityId)
   {
+    StreamId = new(tenantId.HasValue ? string.Join(Separator, tenantId, entityId) : entityId.Value);
+    TenantId = tenantId;
+    EntityId = entityId;
   }
 
-  public SenderId(AggregateId aggregateId, string? propertyName = null)
+  public SenderId(StreamId streamId)
   {
-    new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
+    StreamId = streamId;
 
-    AggregateId = aggregateId;
+    string[] values = streamId.Value.Split(':');
+    if (values.Length > 2)
+    {
+      throw new ArgumentException($"The value '{streamId}' is not a valid user ID.", nameof(streamId));
+    }
+    if (values.Length == 2)
+    {
+      TenantId = new TenantId(values.First());
+    }
+    EntityId = new EntityId(values.Last());
   }
 
-  public SenderId(string value, string? propertyName = null)
-  {
-    value = value.Trim();
-    new IdValidator(propertyName).ValidateAndThrow(value);
+  public static SenderId NewId(TenantId? tenantId = null) => new(tenantId, EntityId.NewId());
 
-    AggregateId = new(value);
-  }
+  public static bool operator ==(SenderId left, SenderId right) => left.Equals(right);
+  public static bool operator !=(SenderId left, SenderId right) => !left.Equals(right);
 
-  public static SenderId NewId() => new(AggregateId.NewId());
-
-  public static SenderId? TryCreate(string? value, string? propertyName = null)
-  {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
-  }
-
-  public Guid ToGuid() => AggregateId.ToGuid();
+  public override bool Equals([NotNullWhen(true)] object? obj) => obj is SenderId id && id.Value == Value;
+  public override int GetHashCode() => Value.GetHashCode();
+  public override string ToString() => Value;
 }

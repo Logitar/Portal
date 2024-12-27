@@ -1,39 +1,47 @@
-﻿using FluentValidation;
-using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+﻿using Logitar.EventSourcing;
+using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Templates;
 
-public record TemplateId
+public readonly struct TemplateId
 {
-  public AggregateId AggregateId { get; }
-  public string Value => AggregateId.Value;
+  private const char Separator = ':';
 
-  public TemplateId(Guid id, string? propertyName = null) : this(new AggregateId(id), propertyName)
+  public StreamId StreamId { get; }
+  public string Value => StreamId.Value;
+
+  public TenantId? TenantId { get; }
+  public EntityId EntityId { get; }
+
+  public TemplateId(TenantId? tenantId, EntityId entityId)
   {
+    StreamId = new(tenantId.HasValue ? string.Join(Separator, tenantId, entityId) : entityId.Value);
+    TenantId = tenantId;
+    EntityId = entityId;
   }
 
-  public TemplateId(AggregateId aggregateId, string? propertyName = null)
+  public TemplateId(StreamId streamId)
   {
-    new IdValidator(propertyName).ValidateAndThrow(aggregateId.Value);
+    StreamId = streamId;
 
-    AggregateId = aggregateId;
+    string[] values = streamId.Value.Split(':');
+    if (values.Length > 2)
+    {
+      throw new ArgumentException($"The value '{streamId}' is not a valid user ID.", nameof(streamId));
+    }
+    if (values.Length == 2)
+    {
+      TenantId = new TenantId(values.First());
+    }
+    EntityId = new EntityId(values.Last());
   }
 
-  public TemplateId(string value, string? propertyName = null)
-  {
-    value = value.Trim();
-    new IdValidator(propertyName).ValidateAndThrow(value);
+  public static TemplateId NewId(TenantId? tenantId = null) => new(tenantId, EntityId.NewId());
 
-    AggregateId = new(value);
-  }
+  public static bool operator ==(TemplateId left, TemplateId right) => left.Equals(right);
+  public static bool operator !=(TemplateId left, TemplateId right) => !left.Equals(right);
 
-  public static TemplateId NewId() => new(AggregateId.NewId());
-
-  public static TemplateId? TryCreate(string? value, string? propertyName = null)
-  {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
-  }
-
-  public Guid ToGuid() => AggregateId.ToGuid();
+  public override bool Equals([NotNullWhen(true)] object? obj) => obj is TemplateId id && id.Value == Value;
+  public override int GetHashCode() => Value.GetHashCode();
+  public override string ToString() => Value;
 }

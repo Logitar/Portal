@@ -1,5 +1,5 @@
-﻿using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 
 namespace Logitar.Portal.Domain.Users;
 
@@ -7,28 +7,28 @@ public class UsersNotInTenantException : Exception
 {
   public const string ErrorMessage = "The specified users are not in the specified tenant.";
 
-  public IEnumerable<UserId> UserIds
+  public IReadOnlyCollection<Guid> UserIds
   {
-    get => ((IEnumerable<string>)Data[nameof(UserIds)]!).Select(value => new UserId(value));
-    private set => Data[nameof(UserIds)] = value.Select(id => id.Value);
+    get => (IReadOnlyCollection<Guid>)Data[nameof(UserIds)]!;
+    private set => Data[nameof(UserIds)] = value;
   }
-  public TenantId? ExpectedTenantId
+  public Guid? ExpectedTenantId
   {
-    get => TenantId.TryCreate((string?)Data[nameof(ExpectedTenantId)]);
-    private set => Data[nameof(ExpectedTenantId)] = value?.Value;
+    get => (Guid?)Data[nameof(ExpectedTenantId)];
+    private set => Data[nameof(ExpectedTenantId)] = value;
   }
 
   public UsersNotInTenantException(IEnumerable<UserId> userIds, TenantId? expectedTenant) : base(BuildMessage(userIds, expectedTenant))
   {
-    UserIds = userIds;
-    ExpectedTenantId = expectedTenant;
+    UserIds = userIds.Select(id => id.EntityId.ToGuid()).ToArray();
+    ExpectedTenantId = expectedTenant?.ToGuid();
   }
 
   private static string BuildMessage(IEnumerable<UserId> userIds, TenantId? expectedTenant)
   {
     StringBuilder message = new();
     message.AppendLine(ErrorMessage);
-    message.AppendLine(nameof(ExpectedTenantId)).Append(": ").AppendLine(expectedTenant?.Value ?? "<null>");
+    message.AppendLine(nameof(ExpectedTenantId)).Append(": ").AppendLine(expectedTenant?.ToGuid().ToString() ?? "<null>");
     message.Append(nameof(UserIds)).AppendLine(":");
     foreach (UserId userId in userIds)
     {

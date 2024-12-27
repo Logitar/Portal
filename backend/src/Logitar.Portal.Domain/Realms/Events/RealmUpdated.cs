@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Settings;
 using MediatR;
 
@@ -8,18 +7,18 @@ namespace Logitar.Portal.Domain.Realms.Events;
 
 public record RealmUpdated : DomainEvent, INotification
 {
-  public Modification<DisplayNameUnit>? DisplayName { get; set; }
-  public Modification<DescriptionUnit>? Description { get; set; }
+  public Change<DisplayName>? DisplayName { get; set; }
+  public Change<Description>? Description { get; set; }
 
-  public Modification<LocaleUnit>? DefaultLocale { get; set; }
+  public Change<Locale>? DefaultLocale { get; set; }
   public JwtSecret? Secret { get; set; }
-  public Modification<UrlUnit>? Url { get; set; }
+  public Change<Url>? Url { get; set; }
 
   public ReadOnlyUniqueNameSettings? UniqueNameSettings { get; set; }
   public ReadOnlyPasswordSettings? PasswordSettings { get; set; }
   public bool? RequireUniqueEmail { get; set; }
 
-  public Dictionary<string, string?> CustomAttributes { get; init; } = [];
+  public Dictionary<Identifier, string?> CustomAttributes { get; init; } = [];
 
   [JsonIgnore]
   public bool HasChanges => DisplayName != null || Description != null

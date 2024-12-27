@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 
 namespace Logitar.Portal.Domain.Validators;
 
@@ -17,7 +17,7 @@ internal class PhoneNumberValidator<T> : IPropertyValidator<T, string>
   {
     try
     {
-      PhoneUnit phone = new(value, countryCode: null, extension: null, isVerified: false);
+      Phone phone = new(value, countryCode: null, extension: null, isVerified: false);
       return true;
     }
     catch (Exception)

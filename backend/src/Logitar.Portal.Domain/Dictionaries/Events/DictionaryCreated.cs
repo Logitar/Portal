@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using MediatR;
 
 namespace Logitar.Portal.Domain.Dictionaries.Events;
 
-public record DictionaryCreated(TenantId? TenantId, LocaleUnit Locale) : DomainEvent, INotification;
+public record DictionaryCreated(Locale Locale) : DomainEvent, INotification;

@@ -1,10 +1,10 @@
-﻿using Logitar.Identity.Domain.Shared;
+﻿using Logitar.Identity.Core;
 
 namespace Logitar.Portal.Domain.Senders;
 
 public interface ISenderRepository
 {
-  Task<Sender?> LoadAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<Sender?> LoadAsync(SenderId id, CancellationToken cancellationToken = default);
   Task<Sender?> LoadAsync(SenderId id, long? version, CancellationToken cancellationToken = default);
   Task<IReadOnlyCollection<Sender>> LoadAsync(CancellationToken cancellationToken = default);
   Task<IReadOnlyCollection<Sender>> LoadAsync(TenantId? tenantId, CancellationToken cancellationToken = default);

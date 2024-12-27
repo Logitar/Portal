@@ -1,7 +1,7 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using MediatR;
 
 namespace Logitar.Portal.Domain.Templates.Events;
 
-public record TemplateCreated(TenantId? TenantId, UniqueKey UniqueKey, Subject Subject, Content Content) : DomainEvent, INotification;
+public record TemplateCreated(Identifier UniqueKey, Subject Subject, Content Content) : DomainEvent, INotification;

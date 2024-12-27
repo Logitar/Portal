@@ -1,17 +1,16 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using MediatR;
 
 namespace Logitar.Portal.Domain.Senders.Events;
 
 public record SenderUpdated : DomainEvent, INotification
 {
-  public EmailUnit? Email { get; set; }
-  public PhoneUnit? Phone { get; set; }
-  public Modification<DisplayNameUnit>? DisplayName { get; set; }
-  public Modification<DescriptionUnit>? Description { get; set; }
+  public Email? Email { get; set; }
+  public Phone? Phone { get; set; }
+  public Change<DisplayName>? DisplayName { get; set; }
+  public Change<Description>? Description { get; set; }
 
   [JsonIgnore]
   public bool HasChanges => Email != null || Phone != null || DisplayName != null || Description != null;

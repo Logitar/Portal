@@ -62,7 +62,7 @@ internal class ReadUserQueryHandler : IRequestHandler<ReadUserQuery, UserModel?>
 
     if (users.Count > 1)
     {
-      throw new TooManyResultsException<UserModel>(expectedCount: 1, actualCount: users.Count);
+      throw TooManyResultsException<UserModel>.ExpectedSingle(users.Count);
     }
 
     return users.Values.SingleOrDefault();

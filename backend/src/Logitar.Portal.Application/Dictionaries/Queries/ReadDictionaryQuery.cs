@@ -40,7 +40,7 @@ internal class ReadDictionaryQueryHandler : IRequestHandler<ReadDictionaryQuery,
 
     if (dictionaries.Count > 1)
     {
-      throw new TooManyResultsException<DictionaryModel>(expectedCount: 1, actualCount: dictionaries.Count);
+      throw TooManyResultsException<DictionaryModel>.ExpectedSingle(dictionaries.Count);
     }
 
     return dictionaries.Values.SingleOrDefault();

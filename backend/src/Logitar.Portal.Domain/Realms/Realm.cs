@@ -1,6 +1,5 @@
 ﻿using Logitar.EventSourcing;
-using Logitar.Identity.Contracts;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Domain.Realms.Events;
 using Logitar.Portal.Domain.Settings;
 
@@ -14,8 +13,8 @@ public class Realm : AggregateRoot
 
   private Slug? _uniqueSlug = null;
   public Slug UniqueSlug => _uniqueSlug ?? throw new InvalidOperationException($"The {nameof(UniqueSlug)} has not been initialized yet.");
-  private DisplayNameUnit? _displayName = null;
-  public DisplayNameUnit? DisplayName
+  private DisplayName? _displayName = null;
+  public DisplayName? DisplayName
   {
     get => _displayName;
     set
@@ -23,12 +22,12 @@ public class Realm : AggregateRoot
       if (_displayName != value)
       {
         _displayName = value;
-        _updated.DisplayName = new Modification<DisplayNameUnit>(value);
+        _updated.DisplayName = new Change<DisplayName>(value);
       }
     }
   }
-  private DescriptionUnit? _description = null;
-  public DescriptionUnit? Description
+  private Description? _description = null;
+  public Description? Description
   {
     get => _description;
     set
@@ -36,13 +35,13 @@ public class Realm : AggregateRoot
       if (_description != value)
       {
         _description = value;
-        _updated.Description = new Modification<DescriptionUnit>(value);
+        _updated.Description = new Change<Description>(value);
       }
     }
   }
 
-  private LocaleUnit? _defaultLocale = null;
-  public LocaleUnit? DefaultLocale
+  private Locale? _defaultLocale = null;
+  public Locale? DefaultLocale
   {
     get => _defaultLocale;
     set
@@ -50,7 +49,7 @@ public class Realm : AggregateRoot
       if (_defaultLocale != value)
       {
         _defaultLocale = value;
-        _updated.DefaultLocale = new Modification<LocaleUnit>(value);
+        _updated.DefaultLocale = new Change<Locale>(value);
       }
     }
   }
@@ -67,8 +66,8 @@ public class Realm : AggregateRoot
       }
     }
   }
-  private UrlUnit? _url = null;
-  public UrlUnit? Url
+  private Url? _url = null;
+  public Url? Url
   {
     get => _url;
     set
@@ -76,7 +75,7 @@ public class Realm : AggregateRoot
       if (_url != value)
       {
         _url = value;
-        _updated.Url = new Modification<UrlUnit>(value);
+        _updated.Url = new Change<Url>(value);
       }
     }
   }
@@ -121,14 +120,14 @@ public class Realm : AggregateRoot
     }
   }
 
-  private readonly Dictionary<string, string> _customAttributes = [];
-  public IReadOnlyDictionary<string, string> CustomAttributes => _customAttributes.AsReadOnly();
+  private readonly Dictionary<Identifier, string> _customAttributes = [];
+  public IReadOnlyDictionary<Identifier, string> CustomAttributes => _customAttributes.AsReadOnly();
 
-  public Realm(AggregateId id) : base(id)
+  public Realm() : base()
   {
   }
 
-  public Realm(Slug uniqueSlug, ActorId actorId = default, RealmId? id = null) : base((id ?? RealmId.NewId()).AggregateId)
+  public Realm(Slug uniqueSlug, ActorId? actorId = null, RealmId? id = null) : base((id ?? RealmId.NewId()).StreamId)
   {
     JwtSecret secret = JwtSecret.Generate();
     ReadOnlyUniqueNameSettings uniqueNameSettings = new();
@@ -136,7 +135,7 @@ public class Realm : AggregateRoot
     bool requireUniqueEmail = true;
     Raise(new RealmCreated(uniqueSlug, secret, uniqueNameSettings, passwordSettings, requireUniqueEmail), actorId);
   }
-  protected virtual void Apply(RealmCreated @event)
+  protected virtual void Handle(RealmCreated @event)
   {
     _uniqueSlug = @event.UniqueSlug;
     _secret = @event.Secret;
@@ -145,7 +144,7 @@ public class Realm : AggregateRoot
     _requireUniqueEmail = @event.RequireUniqueEmail;
   }
 
-  public void Delete(ActorId actorId = default)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -153,23 +152,21 @@ public class Realm : AggregateRoot
     }
   }
 
-  public void RemoveCustomAttribute(string key)
+  public void RemoveCustomAttribute(Identifier key)
   {
-    key = key.Trim();
-
-    if (_customAttributes.ContainsKey(key))
+    if (_customAttributes.Remove(key))
     {
       _updated.CustomAttributes[key] = null;
-      _customAttributes.Remove(key);
     }
   }
 
-  private readonly CustomAttributeValidator _customAttributeValidator = new();
-  public void SetCustomAttribute(string key, string value)
+  public void SetCustomAttribute(Identifier key, string value)
   {
-    key = key.Trim();
+    if (string.IsNullOrWhiteSpace(value))
+    {
+      RemoveCustomAttribute(key);
+    }
     value = value.Trim();
-    _customAttributeValidator.ValidateAndThrow(key, value);
 
     if (!_customAttributes.TryGetValue(key, out string? existingValue) || existingValue != value)
     {
@@ -178,16 +175,16 @@ public class Realm : AggregateRoot
     }
   }
 
-  public void SetUniqueSlug(Slug uniqueSlug, ActorId actorId = default)
+  public void SetUniqueSlug(Slug uniqueSlug, ActorId? actorId = null)
   {
     Raise(new RealmUniqueSlugChanged(uniqueSlug), actorId);
   }
-  protected virtual void Apply(RealmUniqueSlugChanged @event)
+  protected virtual void Handle(RealmUniqueSlugChanged @event)
   {
     _uniqueSlug = @event.UniqueSlug;
   }
 
-  public void Update(ActorId actorId = default)
+  public void Update(ActorId? actorId = null)
   {
     if (_updated.HasChanges)
     {
@@ -195,7 +192,7 @@ public class Realm : AggregateRoot
       _updated = new();
     }
   }
-  protected virtual void Apply(RealmUpdated @event)
+  protected virtual void Handle(RealmUpdated @event)
   {
     if (@event.DisplayName != null)
     {
@@ -232,7 +229,7 @@ public class Realm : AggregateRoot
       _requireUniqueEmail = @event.RequireUniqueEmail.Value;
     }
 
-    foreach (KeyValuePair<string, string?> customAttribute in @event.CustomAttributes)
+    foreach (KeyValuePair<Identifier, string?> customAttribute in @event.CustomAttributes)
     {
       if (customAttribute.Value == null)
       {

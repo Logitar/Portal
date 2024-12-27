@@ -52,7 +52,7 @@ internal class RealmClient : BaseClient, IRealmClient
 
     if (realms.Count > 1)
     {
-      throw new TooManyResultsException<RealmModel>(expectedCount: 1, actualCount: realms.Count);
+      throw TooManyResultsException<RealmModel>.ExpectedSingle(realms.Count);
     }
 
     return realms.Values.SingleOrDefault();
