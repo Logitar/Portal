@@ -4,9 +4,9 @@ using Logitar.Portal.Contracts.Tokens;
 
 namespace Logitar.Portal.Application.Tokens.Validators;
 
-internal class TokenClaimValidator : AbstractValidator<TokenClaim>
+internal class ClaimValidator : AbstractValidator<ClaimModel>
 {
-  public TokenClaimValidator()
+  public ClaimValidator()
   {
     RuleFor(x => x.Name).SetValidator(new IdentifierValidator());
     RuleFor(x => x.Value).NotEmpty();

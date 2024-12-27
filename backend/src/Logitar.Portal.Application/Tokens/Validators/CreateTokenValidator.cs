@@ -13,6 +13,6 @@ internal class CreateTokenValidator : AbstractValidator<CreateTokenPayload>
     When(x => !string.IsNullOrWhiteSpace(x.Secret), () => RuleFor(x => x.Secret!).SetValidator(new JwtSecretValidator()));
 
     When(x => x.Email != null, () => RuleFor(x => x.Email!).SetValidator(new EmailValidator()));
-    RuleForEach(x => x.Claims).SetValidator(new TokenClaimValidator());
+    RuleForEach(x => x.Claims).SetValidator(new ClaimValidator());
   }
 }
