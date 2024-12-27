@@ -1,12 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Queries;
 
@@ -51,17 +51,23 @@ public class SearchApiKeysQueryTests : IntegrationTests
     const int millisecondsDelay = 50;
 
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out _);
-    ApiKey notInRealm = new(new DisplayName("Portal API Key"), secret, tenantId: null);
-    ApiKey notInSearch = new(new DisplayName("Default"), secret, TenantId);
-    ApiKey notInIds = new(new DisplayName("Other API Key"), secret, TenantId);
-    ApiKey expired = new(new DisplayName("Expired API Key"), secret, TenantId);
-    expired.SetExpiration(DateTime.Now.AddMilliseconds(millisecondsDelay));
+    ApiKey notInRealm = new(new DisplayName("Portal API Key"), secret);
+    ApiKey notInSearch = new(new DisplayName("Default"), secret, actorId: null, ApiKeyId.NewId(TenantId));
+    ApiKey notInIds = new(new DisplayName("Other API Key"), secret, actorId: null, ApiKeyId.NewId(TenantId));
+    ApiKey expired = new(new DisplayName("Expired API Key"), secret, actorId: null, ApiKeyId.NewId(TenantId))
+    {
+      ExpiresOn = DateTime.Now.AddMilliseconds(millisecondsDelay)
+    };
     expired.Update();
-    ApiKey apiKey1 = new(new DisplayName("First API Key"), secret, TenantId);
-    apiKey1.SetExpiration(DateTime.Now.AddDays(90));
+    ApiKey apiKey1 = new(new DisplayName("First API Key"), secret, actorId: null, ApiKeyId.NewId(TenantId))
+    {
+      ExpiresOn = DateTime.Now.AddDays(90)
+    };
     apiKey1.Update();
-    ApiKey apiKey2 = new(new DisplayName("Second API Key"), secret, TenantId);
-    apiKey2.SetExpiration(DateTime.Now.AddYears(1));
+    ApiKey apiKey2 = new(new DisplayName("Second API Key"), secret, actorId: null, ApiKeyId.NewId(TenantId))
+    {
+      ExpiresOn = DateTime.Now.AddYears(1)
+    };
     apiKey2.Update();
     await _apiKeyRepository.SaveAsync([notInRealm, notInSearch, notInIds, expired, apiKey1, apiKey2]);
 
@@ -75,10 +81,10 @@ public class SearchApiKeysQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> apiKeyIds = (await _apiKeyRepository.LoadAsync()).Select(apiKey => apiKey.Id.ToGuid());
+    IEnumerable<Guid> apiKeyIds = (await _apiKeyRepository.LoadAsync()).Select(apiKey => apiKey.EntityId.ToGuid());
     payload.Ids.AddRange(apiKeyIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%key"));
     payload.Sort.Add(new ApiKeySortOption(ApiKeySort.ExpiresOn, isDescending: false));
     SearchApiKeysQuery query = new(payload);
@@ -86,6 +92,6 @@ public class SearchApiKeysQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     ApiKeyModel apiKey = Assert.Single(results.Items);
-    Assert.Equal(apiKey2.Id.ToGuid(), apiKey.Id);
+    Assert.Equal(apiKey2.EntityId.ToGuid(), apiKey.Id);
   }
 }

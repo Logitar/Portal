@@ -1,14 +1,14 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -49,16 +49,16 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
 
     ApiKey apiKey = await CreateApiKeyAsync();
 
-    apiKey.SetCustomAttribute("Confidentiality", "Private");
-    apiKey.SetCustomAttribute("SubSystem", "tests");
+    apiKey.SetCustomAttribute(new Identifier("Confidentiality"), "Private");
+    apiKey.SetCustomAttribute(new Identifier("SubSystem"), "tests");
     apiKey.Update();
     apiKey.AddRole(admin);
     await _apiKeyRepository.SaveAsync(apiKey);
     long version = apiKey.Version;
 
-    apiKey.SetCustomAttribute("Confidentiality", "Public");
+    apiKey.SetCustomAttribute(new Identifier("Confidentiality"), "Public");
     string userId = Guid.NewGuid().ToString();
-    apiKey.SetCustomAttribute("UserId", userId);
+    apiKey.SetCustomAttribute(new Identifier("UserId"), userId);
     apiKey.Update();
     apiKey.AddRole(manageUsers);
     apiKey.RemoveRole(admin);
@@ -73,7 +73,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     payload.CustomAttributes.Add(new("AccessControl", bool.FalseString));
     payload.Roles.Add(admin.UniqueName.Value);
     payload.Roles.Add(sendMessages.UniqueName.Value);
-    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, version);
+    ReplaceApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload, version);
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
 
@@ -87,8 +87,8 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     Assert.Contains(result.CustomAttributes, c => c.Key == "UserId" && c.Value == userId);
 
     Assert.Equal(2, result.Roles.Count);
-    Assert.Contains(result.Roles, r => r.Id == manageUsers.Id.ToGuid());
-    Assert.Contains(result.Roles, r => r.Id == sendMessages.Id.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == manageUsers.EntityId.ToGuid());
+    Assert.Contains(result.Roles, r => r.Id == sendMessages.EntityId.ToGuid());
   }
 
   [Fact(DisplayName = "It should return null when the API key cannot be found.")]
@@ -108,7 +108,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     SetRealm();
 
     ReplaceApiKeyPayload payload = new("admin");
-    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
+    ReplaceApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload, Version: null);
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -120,7 +120,7 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
 
     ReplaceApiKeyPayload payload = new(apiKey.DisplayName.Value);
     payload.Roles.Add("admin");
-    ReplaceApiKeyCommand command = new(apiKey.Id.ToGuid(), payload, Version: null);
+    ReplaceApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<RolesNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Roles, exception.Roles);
     Assert.Equal("Roles", exception.PropertyName);

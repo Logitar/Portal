@@ -1,12 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.ApiKeys;
 using Logitar.Portal.Contracts.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -57,11 +57,11 @@ public class CreateApiKeyCommandTests : IntegrationTests
     Assert.Same(Realm, apiKey.Realm);
 
     RoleModel apiKeyRole = Assert.Single(apiKey.Roles);
-    Assert.Equal(role.Id.ToGuid(), apiKeyRole.Id);
+    Assert.Equal(role.EntityId.ToGuid(), apiKeyRole.Id);
 
     Assert.NotNull(apiKey.XApiKey);
-    XApiKey xApiKey = XApiKey.Decode(apiKey.XApiKey);
-    Assert.Equal(apiKey.Id, xApiKey.Id.ToGuid());
+    XApiKey xApiKey = XApiKey.Decode(TenantId, apiKey.XApiKey);
+    Assert.Equal(apiKey.Id, xApiKey.Id.EntityId.ToGuid());
     Assert.Equal(XApiKey.SecretLength, Convert.FromBase64String(xApiKey.Secret).Length);
   }
 

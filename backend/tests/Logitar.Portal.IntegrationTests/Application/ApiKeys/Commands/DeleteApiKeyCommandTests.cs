@@ -1,11 +1,11 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.ApiKeys;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.ApiKeys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.ApiKeys.Commands;
 
@@ -38,7 +38,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
   {
     ApiKey apiKey = await CreateApiKeyAsync();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.EntityId.ToGuid());
     ApiKeyModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -59,7 +59,7 @@ public class DeleteApiKeyCommandTests : IntegrationTests
 
     SetRealm();
 
-    DeleteApiKeyCommand command = new(apiKey.Id.ToGuid());
+    DeleteApiKeyCommand command = new(apiKey.EntityId.ToGuid());
     ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

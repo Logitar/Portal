@@ -4,8 +4,8 @@ using Logitar.Data.PostgreSQL;
 using Logitar.Data.SqlServer;
 using Logitar.EventSourcing;
 using Logitar.EventSourcing.EntityFrameworkCore.Relational;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Identity.EntityFrameworkCore.Relational;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Activities;
@@ -26,6 +26,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal;
 
@@ -120,7 +121,7 @@ public abstract class IntegrationTests : IAsyncLifetime
     await userRepository.SaveAsync(userAggregate);
 
     IUserQuerier userQuerier = ServiceProvider.GetRequiredService<IUserQuerier>();
-    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.Id.ToGuid());
+    UserModel? user = await userQuerier.ReadAsync(realm: null, userAggregate.EntityId.ToGuid());
     SetUser(user);
   }
   protected IDeleteBuilder CreateDeleteBuilder(TableId table) => _databaseProvider switch
