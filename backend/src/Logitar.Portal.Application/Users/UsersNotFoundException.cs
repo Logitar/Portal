@@ -11,10 +11,10 @@ public class UsersNotFoundException : Exception
     get => (Guid?)Data[nameof(TenantId)];
     private set => Data[nameof(TenantId)] = value;
   }
-  public IReadOnlyCollection<Guid> Ids
+  public IReadOnlyCollection<Guid> UserIds
   {
-    get => (IReadOnlyCollection<Guid>)Data[nameof(Ids)]!;
-    private set => Data[nameof(Ids)] = value;
+    get => (IReadOnlyCollection<Guid>)Data[nameof(UserIds)]!;
+    private set => Data[nameof(UserIds)] = value;
   }
   public string? PropertyName
   {
@@ -25,7 +25,7 @@ public class UsersNotFoundException : Exception
   public UsersNotFoundException(TenantId? tenantId, IEnumerable<Guid> ids, string? propertyName = null) : base(BuildMessage(tenantId, ids, propertyName))
   {
     TenantId = tenantId?.ToGuid();
-    Ids = ids.ToArray();
+    UserIds = ids.ToArray();
     PropertyName = propertyName;
   }
 
@@ -35,7 +35,7 @@ public class UsersNotFoundException : Exception
     message.AppendLine(ErrorMessage);
     message.Append(nameof(TenantId)).Append(": ").AppendLine(tenantId?.ToGuid().ToString() ?? "<null>");
     message.Append(nameof(PropertyName)).Append(": ").AppendLine(propertyName ?? "<null>");
-    message.Append(nameof(Ids)).AppendLine(":");
+    message.Append(nameof(UserIds)).AppendLine(":");
     foreach (Guid id in ids)
     {
       message.Append(" - ").Append(id).AppendLine();

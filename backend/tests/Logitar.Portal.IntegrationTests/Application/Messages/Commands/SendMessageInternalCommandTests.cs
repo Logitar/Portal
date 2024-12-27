@@ -19,7 +19,6 @@ using Logitar.Portal.Domain.Senders.Mailgun;
 using Logitar.Portal.Domain.Senders.SendGrid;
 using Logitar.Portal.Domain.Senders.Twilio;
 using Logitar.Portal.Domain.Templates;
-using Logitar.Portal.Domain.Users;
 using Logitar.Portal.EntityFrameworkCore.Relational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -157,7 +156,6 @@ public class SendMessageInternalCommandTests : IntegrationTests
       default:
         throw new SenderTypeNotSupportedException(type);
     }
-
 
     SendMessageInternalCommand command = new(payload);
     SentMessages sentMessages = await ActivityPipeline.ExecuteAsync(command);
@@ -300,12 +298,13 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(payload.SenderId, exception.Id);
+    Assert.Null(exception.TenantId);
+    Assert.Equal(payload.SenderId, exception.SenderId);
     Assert.Equal("SenderId", exception.PropertyName);
   }
 
-  [Fact(DisplayName = "It should throw SenderNotInTenantException when the sender is in another realm.")]
-  public async Task It_should_throw_SenderNotInTenantException_when_the_sender_is_in_another_realm()
+  [Fact(DisplayName = "It should throw SenderNotFoundException when the sender is in another realm.")]
+  public async Task It_should_throw_SenderNotFoundException_when_the_sender_is_in_another_realm()
   {
     await CreateSenderAsync();
     Assert.NotNull(_sender);
@@ -324,10 +323,9 @@ public class SendMessageInternalCommandTests : IntegrationTests
       DisplayName = Faker.Person.FullName
     });
     SendMessageInternalCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<SenderNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_sender.EntityId.ToGuid(), exception.SenderId);
-    Assert.Equal(TenantId.ToGuid(), exception.ExpectedTenantId);
-    Assert.Equal(_sender.TenantId?.ToGuid(), exception.ActualTenantId);
+    var exception = await Assert.ThrowsAsync<SenderNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(TenantId.ToGuid(), exception.TenantId);
+    Assert.Equal(payload.SenderId, exception.SenderId);
   }
 
   [Fact(DisplayName = "It should throw TemplateNotFoundException when the template could not be found.")]
@@ -344,12 +342,13 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<TemplateNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Null(exception.TenantId);
     Assert.Equal(payload.Template, exception.Identifier);
     Assert.Equal("Template", exception.PropertyName);
   }
 
-  [Fact(DisplayName = "It should throw TemplateNotInTenantException when the template is in another realm.")]
-  public async Task It_should_throw_TemplateNotInTenantException_when_the_template_is_in_another_realm()
+  [Fact(DisplayName = "It should throw TemplateNotFoundException when the template is in another realm.")]
+  public async Task It_should_throw_TemplateNotFoundException_when_the_template_is_in_another_realm()
   {
     await CreateSenderAsync();
     Assert.NotNull(_sender);
@@ -365,10 +364,10 @@ public class SendMessageInternalCommandTests : IntegrationTests
       DisplayName = Faker.Person.FullName
     });
     SendMessageInternalCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<TemplateNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(_template.EntityId.ToGuid(), exception.TemplateId);
-    Assert.Null(exception.ExpectedTenantId);
-    Assert.Equal(_template.TenantId?.ToGuid(), exception.ActualTenantId);
+    var exception = await Assert.ThrowsAsync<TemplateNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Null(exception.TenantId);
+    Assert.Equal(payload.Template, exception.Identifier);
+    Assert.Equal("Template", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw UsersNotFoundException when some users could not be found.")]
@@ -395,12 +394,13 @@ public class SendMessageInternalCommandTests : IntegrationTests
     });
     SendMessageInternalCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(userIds, exception.Ids);
+    Assert.Null(exception.TenantId);
+    Assert.Equal(userIds, exception.UserIds);
     Assert.Equal("Recipients", exception.PropertyName);
   }
 
-  [Fact(DisplayName = "It should throw UsersNotInTenantException when some users are in another realm.")]
-  public async Task It_should_throw_UsersNotInTenantException_when_some_users_are_in_another_realm()
+  [Fact(DisplayName = "It should throw UsersNotFoundException when some users are in another realm.")]
+  public async Task It_should_throw_UsersNotFoundException_when_some_users_are_in_another_realm()
   {
     await CreateSenderAsync(TenantId);
     Assert.NotNull(_sender);
@@ -419,9 +419,10 @@ public class SendMessageInternalCommandTests : IntegrationTests
       UserId = userId.EntityId.ToGuid()
     });
     SendMessageInternalCommand command = new(payload);
-    var exception = await Assert.ThrowsAsync<UsersNotInTenantException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    var exception = await Assert.ThrowsAsync<UsersNotFoundException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equivalent(TenantId.ToGuid(), exception.TenantId);
     Assert.Equal(userId.EntityId.ToGuid(), exception.UserIds.Single());
-    Assert.Equal(TenantId.ToGuid(), exception.ExpectedTenantId);
+    Assert.Equal("Recipients", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

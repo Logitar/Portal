@@ -68,7 +68,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     List<Message> messages = new(capacity: allRecipients.To.Count);
     foreach (Recipient recipient in allRecipients.To)
     {
-      MessageId id = MessageId.NewId();
+      MessageId id = MessageId.NewId(tenantId);
 
       Dictionaries dictionaries = (payload.IgnoreUserLocale || recipient.User?.Locale == null)
         ? defaultDictionaries : new(allDictionaries, recipient.User.Locale, defaultLocale);
@@ -169,7 +169,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     {
       SenderId senderId = new(tenantId, new EntityId(payload.SenderId.Value));
       return await _senderRepository.LoadAsync(senderId, cancellationToken)
-        ?? throw new SenderNotFoundException(payload.SenderId.Value, nameof(payload.SenderId));
+        ?? throw new SenderNotFoundException(senderId, nameof(payload.SenderId));
     }
 
     return await _senderRepository.LoadDefaultAsync(tenantId, cancellationToken)
@@ -199,7 +199,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
 
     if (template == null)
     {
-      throw new TemplateNotFoundException(payload.Template, nameof(payload.Template));
+      throw new TemplateNotFoundException(tenantId, payload.Template, nameof(payload.Template));
     }
     else if (senderType == SenderType.Sms && template.Content.Type != MediaTypeNames.Text.Plain)
     {
