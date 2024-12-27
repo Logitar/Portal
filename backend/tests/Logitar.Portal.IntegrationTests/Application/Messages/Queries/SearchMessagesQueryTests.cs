@@ -1,5 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Senders;
 using Logitar.Portal.Contracts.Messages;
 using Logitar.Portal.Contracts.Search;
@@ -57,14 +58,14 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     Email email = new(Faker.Internet.Email(), isVerified: false);
     ReadOnlySendGridSettings settings = new(SendGridHelper.GenerateApiKey());
-    Sender sender = new(email, settings, TenantId);
+    Sender sender = new(email, settings, actorId: null, SenderId.NewId(TenantId));
     await _senderRepository.SaveAsync(sender);
 
     Subject subject = new("Reset your password");
     Content content = Content.PlainText("Hello World!");
-    Template template = new(new UniqueKey("PasswordRecovery"), subject, content, TenantId);
+    Template template = new(new Identifier("PasswordRecovery"), subject, content, actorId: null, TemplateId.NewId(TenantId));
     Subject otherSubject = new("Confirm your account");
-    Template otherTemplate = new(new UniqueKey("AccountConfirmation"), otherSubject, content, TenantId);
+    Template otherTemplate = new(new Identifier("AccountConfirmation"), otherSubject, content, actorId: null, TemplateId.NewId(TenantId));
     await _templateRepository.SaveAsync([template, otherTemplate]);
 
     Recipient[] recipients = [new Recipient(RecipientType.To, Faker.Person.Email, Faker.Person.FullName)];
@@ -89,16 +90,16 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     SearchMessagesPayload payload = new()
     {
-      TemplateId = template.Id.ToGuid(),
+      TemplateId = template.EntityId.ToGuid(),
       IsDemo = false,
       Status = MessageStatus.Unsent,
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> messageIds = (await _messageRepository.LoadAsync()).Select(message => message.Id.ToGuid());
+    IEnumerable<Guid> messageIds = (await _messageRepository.LoadAsync()).Select(message => message.EntityId.ToGuid());
     payload.Ids.AddRange(messageIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("Reset%"));
     payload.Sort.Add(new MessageSortOption(MessageSort.RecipientCount, isDescending: false));
     SearchMessagesQuery query = new(payload);
@@ -106,6 +107,6 @@ public class SearchMessagesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     MessageModel message = Assert.Single(results.Items);
-    Assert.Equal(message2.Id.ToGuid(), message.Id);
+    Assert.Equal(message2.EntityId.ToGuid(), message.Id);
   }
 }

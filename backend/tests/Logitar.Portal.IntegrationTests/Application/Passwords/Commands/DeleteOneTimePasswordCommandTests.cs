@@ -1,9 +1,9 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Passwords.Commands;
 
@@ -36,7 +36,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
   {
     OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
-    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
+    DeleteOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid());
     OneTimePasswordModel? deleted = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(deleted);
     Assert.Equal(command.Id, deleted.Id);
@@ -57,7 +57,7 @@ public class DeleteOneTimePasswordCommandTests : IntegrationTests
 
     SetRealm();
 
-    DeleteOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid());
+    DeleteOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid());
     OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

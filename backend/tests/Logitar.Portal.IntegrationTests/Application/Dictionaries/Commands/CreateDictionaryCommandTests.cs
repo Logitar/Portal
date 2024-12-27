@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -59,7 +59,7 @@ public class CreateDictionaryCommandTests : IntegrationTests
     CreateDictionaryCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Locale, exception.Locale.Code);
+    Assert.Equal(payload.Locale, exception.Locale);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]

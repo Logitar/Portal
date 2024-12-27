@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.Mailgun;
@@ -68,7 +68,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       Mailgun = new MailgunSettings(MailgunHelper.GenerateApiKey(), Faker.Internet.DomainName())
     };
-    ReplaceSenderCommand command = new(_mailgun.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_mailgun.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -97,7 +97,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -126,7 +126,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
       Description = "                ",
       Twilio = new TwilioSettings(TwilioHelper.GenerateAccountSid(), TwilioHelper.GenerateAuthenticationToken())
     };
-    ReplaceSenderCommand command = new(_twilio.Id.ToGuid(), payload, version);
+    ReplaceSenderCommand command = new(_twilio.EntityId.ToGuid(), payload, version);
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(sender);
 
@@ -156,7 +156,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, Version: null);
     SenderModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -168,7 +168,7 @@ public class ReplaceSenderCommandTests : IntegrationTests
     {
       SendGrid = new SendGridSettings(SendGridHelper.GenerateApiKey())
     };
-    ReplaceSenderCommand command = new(_sendGrid.Id.ToGuid(), payload, Version: null);
+    ReplaceSenderCommand command = new(_sendGrid.EntityId.ToGuid(), payload, Version: null);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal("EmailAddress", exception.Errors.Single().PropertyName);
   }

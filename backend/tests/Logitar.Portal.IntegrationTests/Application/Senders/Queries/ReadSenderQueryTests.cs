@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
@@ -46,7 +46,7 @@ public class ReadSenderQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadSenderQuery query = new(_sender.Id.ToGuid());
+    ReadSenderQuery query = new(_sender.EntityId.ToGuid());
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(sender);
   }
@@ -54,9 +54,9 @@ public class ReadSenderQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the sender found by ID.")]
   public async Task It_should_return_the_sender_found_by_Id()
   {
-    ReadSenderQuery query = new(_sender.Id.ToGuid());
+    ReadSenderQuery query = new(_sender.EntityId.ToGuid());
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(sender);
-    Assert.Equal(_sender.Id.ToGuid(), sender.Id);
+    Assert.Equal(_sender.EntityId.ToGuid(), sender.Id);
   }
 }

@@ -1,12 +1,12 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Roles;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Roles;
 using Logitar.Portal.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Roles.Commands;
 
@@ -49,7 +49,7 @@ public class DeleteRoleCommandTests : IntegrationTests
     user.AddRole(_role);
     await _userRepository.SaveAsync(user);
 
-    DeleteRoleCommand command = new(_role.Id.ToGuid());
+    DeleteRoleCommand command = new(_role.EntityId.ToGuid());
     RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(role);
     Assert.Equal(command.Id, role.Id);
@@ -71,7 +71,7 @@ public class DeleteRoleCommandTests : IntegrationTests
   {
     SetRealm();
 
-    DeleteRoleCommand command = new(_role.Id.ToGuid());
+    DeleteRoleCommand command = new(_role.EntityId.ToGuid());
     RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }

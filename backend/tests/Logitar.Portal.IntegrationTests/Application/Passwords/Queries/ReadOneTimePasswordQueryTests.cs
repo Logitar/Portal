@@ -1,9 +1,9 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Passwords.Queries;
 
@@ -44,7 +44,7 @@ public class ReadOneTimePasswordQueryTests : IntegrationTests
   {
     OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
-    ReadOneTimePasswordQuery query = new(oneTimePassword.Id.ToGuid());
+    ReadOneTimePasswordQuery query = new(oneTimePassword.EntityId.ToGuid());
     OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(result);
     Assert.Equal(query.Id, result.Id);

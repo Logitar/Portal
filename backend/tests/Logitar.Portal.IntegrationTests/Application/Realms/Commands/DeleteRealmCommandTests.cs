@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Realms;
 using Logitar.Portal.Domain.Realms;
 using Logitar.Portal.Domain.Settings;
@@ -46,7 +46,7 @@ public class DeleteRealmCommandTests : IntegrationTests
   {
     UniqueName uniqueName = new(new ReadOnlyUniqueNameSettings(), UsernameString);
     TenantId tenantId = new(_realm.Id.Value);
-    User user = new(uniqueName, tenantId);
+    User user = new(uniqueName, actorId: null, UserId.NewId(tenantId));
     await _userRepository.SaveAsync(user);
 
     DeleteRealmCommand command = new(_realm.Id.ToGuid());

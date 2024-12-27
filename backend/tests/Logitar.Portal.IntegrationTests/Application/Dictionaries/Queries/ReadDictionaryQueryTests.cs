@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
@@ -43,7 +43,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
   {
     SetRealm();
 
-    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), Locale: null);
+    ReadDictionaryQuery query = new(_dictionary.EntityId.ToGuid(), Locale: null);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.Null(dictionary);
   }
@@ -51,10 +51,10 @@ public class ReadDictionaryQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the dictionary found by ID.")]
   public async Task It_should_return_the_dictionary_found_by_Id()
   {
-    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), _dictionary.Locale.Code);
+    ReadDictionaryQuery query = new(_dictionary.EntityId.ToGuid(), _dictionary.Locale.Code);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(dictionary);
-    Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
+    Assert.Equal(_dictionary.EntityId.ToGuid(), dictionary.Id);
   }
 
   [Fact(DisplayName = "It should return the dictionary found by locale.")]
@@ -63,7 +63,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     ReadDictionaryQuery query = new(Id: null, _dictionary.Locale.Code);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(dictionary);
-    Assert.Equal(_dictionary.Id.ToGuid(), dictionary.Id);
+    Assert.Equal(_dictionary.EntityId.ToGuid(), dictionary.Id);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when there are too many results.")]
@@ -72,7 +72,7 @@ public class ReadDictionaryQueryTests : IntegrationTests
     Dictionary dictionary = new(new Locale("fr"));
     await _dictionaryRepository.SaveAsync(dictionary);
 
-    ReadDictionaryQuery query = new(_dictionary.Id.ToGuid(), "  FR  ");
+    ReadDictionaryQuery query = new(_dictionary.EntityId.ToGuid(), "  FR  ");
     var exception = await Assert.ThrowsAsync<TooManyResultsException<DictionaryModel>>(async () => await ActivityPipeline.ExecuteAsync(query));
     Assert.Equal(1, exception.ExpectedCount);
     Assert.Equal(2, exception.ActualCount);

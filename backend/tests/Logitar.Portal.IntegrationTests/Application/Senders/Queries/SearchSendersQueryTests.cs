@@ -1,6 +1,6 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
@@ -57,22 +57,22 @@ public class SearchSendersQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Sender notInSearch = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInSearch = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), actorId: null, SenderId.NewId(TenantId))
     {
       DisplayName = new DisplayName(Faker.Name.FullName())
     };
     notInSearch.Update();
-    Sender notInIds = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender notInIds = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), actorId: null, SenderId.NewId(TenantId))
     {
       DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     notInIds.Update();
-    Sender sender1 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender1 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), actorId: null, SenderId.NewId(TenantId))
     {
       DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
     sender1.Update();
-    Sender sender2 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), TenantId)
+    Sender sender2 = new(new Email(Faker.Internet.Email()), new ReadOnlySendGridSettings(SendGridHelper.GenerateApiKey()), actorId: null, SenderId.NewId(TenantId))
     {
       DisplayName = new DisplayName(string.Join(' ', Faker.Name.FirstName(), "Sender", Faker.Name.LastName()))
     };
@@ -87,10 +87,10 @@ public class SearchSendersQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> senderIds = (await _senderRepository.LoadAsync()).Select(sender => sender.Id.ToGuid());
+    IEnumerable<Guid> senderIds = (await _senderRepository.LoadAsync()).Select(sender => sender.EntityId.ToGuid());
     payload.Ids.AddRange(senderIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("%sender%"));
     payload.Sort.Add(new SenderSortOption(SenderSort.EmailAddress, isDescending: false));
     SearchSendersQuery query = new(payload);
@@ -99,6 +99,6 @@ public class SearchSendersQueryTests : IntegrationTests
     Assert.Equal(2, results.Total);
     SenderModel sender = Assert.Single(results.Items);
     Sender expected = new[] { sender1, sender2 }.OrderBy(s => s.Email?.Address).Skip(1).Single();
-    Assert.Equal(expected.Id.ToGuid(), sender.Id);
+    Assert.Equal(expected.EntityId.ToGuid(), sender.Id);
   }
 }

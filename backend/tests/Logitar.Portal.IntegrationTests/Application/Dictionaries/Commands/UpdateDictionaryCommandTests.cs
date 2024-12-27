@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Domain.Dictionaries;
 using Logitar.Portal.EntityFrameworkCore.Relational;
@@ -52,7 +52,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     SetRealm();
 
     UpdateDictionaryPayload payload = new();
-    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload);
     DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -67,10 +67,10 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     {
       Locale = Faker.Locale
     };
-    UpdateDictionaryCommand command = new(dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(dictionary.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<DictionaryAlreadyExistsException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    Assert.Equal(payload.Locale, exception.Locale.Code);
+    Assert.Equal(payload.Locale, exception.Locale);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -88,9 +88,9 @@ public class UpdateDictionaryCommandTests : IntegrationTests
   [Fact(DisplayName = "It should update an existing dictionary.")]
   public async Task It_should_update_an_existing_dictionary()
   {
-    _dictionary.SetEntry("bleu", "blue");
-    _dictionary.SetEntry("rouge", "red");
-    _dictionary.SetEntry("vert", "green");
+    _dictionary.SetEntry(new Identifier("bleu"), "blue");
+    _dictionary.SetEntry(new Identifier("rouge"), "red");
+    _dictionary.SetEntry(new Identifier("vert"), "green");
     _dictionary.Update();
     await _dictionaryRepository.SaveAsync(_dictionary);
 
@@ -101,7 +101,7 @@ public class UpdateDictionaryCommandTests : IntegrationTests
     payload.Entries.Add(new("jaune", "yellow"));
     payload.Entries.Add(new("rouge", "scarlet"));
     payload.Entries.Add(new("vert", value: null));
-    UpdateDictionaryCommand command = new(_dictionary.Id.ToGuid(), payload);
+    UpdateDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(dictionary);
 

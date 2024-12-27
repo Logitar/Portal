@@ -1,9 +1,9 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Passwords;
-using Logitar.Identity.EntityFrameworkCore.Relational;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Portal.Contracts.Passwords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityDb = Logitar.Identity.EntityFrameworkCore.Relational.IdentityDb;
 
 namespace Logitar.Portal.Application.Passwords.Commands;
 
@@ -50,7 +50,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     SetRealm();
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
   }
@@ -61,9 +61,9 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync();
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
+    Assert.Equal(oneTimePassword.Id.Value, exception.OneTimePasswordId);
     Assert.Equal(payload.Password, exception.AttemptedPassword);
   }
 
@@ -73,10 +73,10 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     OneTimePassword oneTimePassword = await CreateOneTimePasswordAsync(maximumAttempts: 1);
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     _ = await Assert.ThrowsAsync<IncorrectOneTimePasswordPasswordException>(async () => await ActivityPipeline.ExecuteAsync(command));
     var exception = await Assert.ThrowsAsync<MaximumAttemptsReachedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
+    Assert.Equal(oneTimePassword.Id.Value, exception.OneTimePasswordId);
     Assert.Equal(1, exception.AttemptCount);
   }
 
@@ -90,9 +90,9 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword);
 
     ValidateOneTimePasswordPayload payload = new("P@s$W0rD");
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<OneTimePasswordAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
+    Assert.Equal(oneTimePassword.Id.Value, exception.OneTimePasswordId);
   }
 
   [Fact(DisplayName = "It should throw OneTimePasswordIsExpiredException when the One-Time Password is expired.")]
@@ -106,9 +106,9 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     await Task.Delay(millisecondsDelay);
 
     ValidateOneTimePasswordPayload payload = new(_password);
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<OneTimePasswordIsExpiredException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal(oneTimePassword.Id, exception.OneTimePasswordId);
+    Assert.Equal(oneTimePassword.Id.Value, exception.OneTimePasswordId);
   }
 
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
@@ -129,7 +129,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
     ValidateOneTimePasswordPayload payload = new(_password);
     payload.CustomAttributes.Add(new("ValidatedBy", UsernameString));
     payload.CustomAttributes.Add(new("ValidatedOn", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
-    ValidateOneTimePasswordCommand command = new(oneTimePassword.Id.ToGuid(), payload);
+    ValidateOneTimePasswordCommand command = new(oneTimePassword.EntityId.ToGuid(), payload);
     OneTimePasswordModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.NotNull(result);
     Assert.Equal(1, result.AttemptCount);
@@ -140,7 +140,7 @@ public class ValidateOneTimePasswordCommandTests : IntegrationTests
   private async Task<OneTimePassword> CreateOneTimePasswordAsync(DateTime? expiresOn = null, int? maximumAttempts = null)
   {
     Password password = _passwordManager.Generate("0123456789", 6, out _password);
-    OneTimePassword oneTimePassword = new(password, tenantId: null, expiresOn, maximumAttempts);
+    OneTimePassword oneTimePassword = new(password, expiresOn, maximumAttempts);
 
     await _oneTimePasswordRepository.SaveAsync(oneTimePassword);
 

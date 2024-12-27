@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Users;
+using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Senders;
 using Logitar.Portal.Domain.Senders;
 using Logitar.Portal.Domain.Senders.SendGrid;
@@ -57,6 +57,6 @@ public class ReadDefaultSenderQueryTests : IntegrationTests
     ReadDefaultSenderQuery query = new();
     SenderModel? sender = await ActivityPipeline.ExecuteAsync(query);
     Assert.NotNull(sender);
-    Assert.Equal(_sender.Id.ToGuid(), sender.Id);
+    Assert.Equal(_sender.EntityId.ToGuid(), sender.Id);
   }
 }

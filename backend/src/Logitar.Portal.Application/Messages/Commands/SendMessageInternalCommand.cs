@@ -157,7 +157,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     }
     else if (missingContacts.Count > 0)
     {
-      throw new MissingRecipientContactsException(missingContacts, nameof(payload.Recipients));
+      throw new MissingRecipientContactsException(tenantId, missingContacts, nameof(payload.Recipients));
     }
 
     return new Recipients(recipients);

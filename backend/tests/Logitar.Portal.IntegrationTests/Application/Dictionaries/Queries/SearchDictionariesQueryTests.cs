@@ -1,5 +1,5 @@
 ﻿using Logitar.Data;
-using Logitar.Identity.Domain.Shared;
+using Logitar.Identity.Core;
 using Logitar.Portal.Contracts.Dictionaries;
 using Logitar.Portal.Contracts.Search;
 using Logitar.Portal.Domain.Dictionaries;
@@ -52,11 +52,11 @@ public class SearchDictionariesQueryTests : IntegrationTests
   [Fact(DisplayName = "It should return the correct search results.")]
   public async Task It_should_return_the_correct_search_results()
   {
-    Dictionary notMatching = new(new Locale(Faker.Locale), TenantId);
-    Dictionary notInIds = new(new Locale("fr"), TenantId);
-    Dictionary empty = new(new Locale("fr-FR"), TenantId);
-    Dictionary notEmpty = new(new Locale("fr-CA"), TenantId);
-    notEmpty.SetEntry("Poutine", "Poutine");
+    Dictionary notMatching = new(new Locale(Faker.Locale), actorId: null, DictionaryId.NewId(TenantId));
+    Dictionary notInIds = new(new Locale("fr"), actorId: null, DictionaryId.NewId(TenantId));
+    Dictionary empty = new(new Locale("fr-FR"), actorId: null, DictionaryId.NewId(TenantId));
+    Dictionary notEmpty = new(new Locale("fr-CA"), actorId: null, DictionaryId.NewId(TenantId));
+    notEmpty.SetEntry(new Identifier("Poutine"), "Poutine");
     notEmpty.Update();
     await _dictionaryRepository.SaveAsync([notMatching, notInIds, empty, notEmpty]);
 
@@ -67,10 +67,10 @@ public class SearchDictionariesQueryTests : IntegrationTests
       Skip = 1,
       Limit = 1
     };
-    IEnumerable<Guid> dictionaryIds = (await _dictionaryRepository.LoadAsync()).Select(dictionary => dictionary.Id.ToGuid());
+    IEnumerable<Guid> dictionaryIds = (await _dictionaryRepository.LoadAsync()).Select(dictionary => dictionary.EntityId.ToGuid());
     payload.Ids.AddRange(dictionaryIds);
     payload.Ids.Add(Guid.NewGuid());
-    payload.Ids.Remove(notInIds.Id.ToGuid());
+    payload.Ids.Remove(notInIds.EntityId.ToGuid());
     payload.Search.Terms.Add(new SearchTerm("fr"));
     payload.Search.Terms.Add(new SearchTerm("fr___"));
     payload.Search.Operator = SearchOperator.Or;
@@ -80,6 +80,6 @@ public class SearchDictionariesQueryTests : IntegrationTests
 
     Assert.Equal(2, results.Total);
     DictionaryModel dictionary = Assert.Single(results.Items);
-    Assert.Equal(notEmpty.Id.ToGuid(), dictionary.Id);
+    Assert.Equal(notEmpty.EntityId.ToGuid(), dictionary.Id);
   }
 }
