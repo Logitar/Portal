@@ -20,7 +20,7 @@ public class Program
 
     WebApplication application = builder.Build();
 
-    startup.Configure(application);
+    await startup.ConfigureAsync(application);
 
     IServiceScope scope = application.Services.CreateScope();
     IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
