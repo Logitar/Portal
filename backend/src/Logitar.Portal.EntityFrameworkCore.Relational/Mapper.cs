@@ -39,14 +39,23 @@ internal class Mapper
     }
   }
 
-  public static ActorModel ToActor(ActorEntity actor) => new(actor.DisplayName)
+  public static ActorModel ToActor(ActorEntity actor)
   {
-    //Id = new ActorId(actor.Id).ToGuid(), // TODO(fpion): implement
-    Type = Enum.Parse<ActorType>(actor.Type),
-    IsDeleted = actor.IsDeleted,
-    EmailAddress = actor.EmailAddress,
-    PictureUrl = actor.PictureUrl
-  };
+    string[] values = actor.Id.Split(':');
+    if (values.Length > 2)
+    {
+      throw new ArgumentException($"The value '{actor.Id}' is not a valid actor identifier.", nameof(actor));
+    }
+
+    return new(actor.DisplayName)
+    {
+      Id = new EntityId(values.Last()).ToGuid(),
+      Type = Enum.Parse<ActorType>(actor.Type),
+      IsDeleted = actor.IsDeleted,
+      EmailAddress = actor.EmailAddress,
+      PictureUrl = actor.PictureUrl
+    };
+  }
 
   public ApiKeyModel ToApiKey(ApiKeyEntity source, RealmModel? realm)
   {

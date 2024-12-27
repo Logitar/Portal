@@ -31,7 +31,7 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
       return null;
     }
 
-    Identifier key = new(command.Key); // TODO(fpion): will throw!
+    Identifier key = new(command.Key); // ISSUE #537
     ActorId actorId = command.ActorId;
     user.RemoveCustomIdentifier(key, actorId);
     await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
