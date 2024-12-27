@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Domain.Settings.Validators;
 using Logitar.Security.Cryptography;
 
 namespace Logitar.Portal.Domain.Settings;
@@ -11,17 +10,24 @@ public record JwtSecret
 
   public string Value { get; }
 
-  public JwtSecret(string value, string? propertyName = null)
+  public JwtSecret(string value)
   {
     Value = value.Trim();
-    new JwtSecretValidator(propertyName).ValidateAndThrow(Value);
+
   }
 
-  public static JwtSecret CreateOrGenerate(string? value, string? propertyName = null)
-  {
-    return string.IsNullOrWhiteSpace(value) ? Generate() : new(value, propertyName);
-  }
+  public static JwtSecret CreateOrGenerate(string? value) => string.IsNullOrWhiteSpace(value) ? Generate() : new(value);
 
   public static JwtSecret Generate() => new(RandomStringGenerator.GetString());
   public static JwtSecret Generate(int length) => new(RandomStringGenerator.GetString(length));
+
+  public override string ToString() => Value;
+
+  private class Validator : AbstractValidator<JwtSecret>
+  {
+    public Validator()
+    {
+      RuleFor(x => x.Value).JwtSecret();
+    }
+  }
 }

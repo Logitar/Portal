@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Contracts.Senders;
+using Logitar.Portal.Domain;
 using Logitar.Portal.Domain.Senders;
-using Logitar.Portal.Domain.Validators;
 
 namespace Logitar.Portal.Application.Senders.Validators;
 
@@ -17,13 +17,13 @@ internal class UpdateSenderValidator : AbstractValidator<UpdateSenderPayload>
     switch (type)
     {
       case SenderType.Email:
-        When(x => x.EmailAddress != null, () => RuleFor(x => x.EmailAddress!).SetValidator(new EmailAddressValidator()));
+        When(x => x.EmailAddress != null, () => RuleFor(x => x.EmailAddress!).EmailAddressInput());
         RuleFor(x => x.PhoneNumber).Empty();
         When(x => !string.IsNullOrWhiteSpace(x.DisplayName?.Value), () => RuleFor(x => x.DisplayName!.Value!).SetValidator(new DisplayNameValidator()));
         break;
       case SenderType.Sms:
         RuleFor(x => x.EmailAddress).Empty();
-        When(x => x.PhoneNumber != null, () => RuleFor(x => x.EmailAddress!).SetValidator(new PhoneNumberValidator()));
+        When(x => x.PhoneNumber != null, () => RuleFor(x => x.EmailAddress!).PhoneNumber());
         RuleFor(x => x.DisplayName).Empty();
         break;
       default:

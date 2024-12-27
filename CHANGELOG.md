@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronized One-Time Password (OTP) namespaces.
 - Join Commands/Queries and their Handler.
 - Replace `IEnumerable<T>` by `IReadOnlyCollection<T>`.
+- Refactored validators.
 
 ### Removed
 

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
+using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Contracts.Dictionaries;
-using Logitar.Portal.Domain.Dictionaries.Validators;
 
 namespace Logitar.Portal.Application.Dictionaries.Validators;
 
@@ -8,7 +8,7 @@ internal class DictionaryEntryContractValidator : AbstractValidator<DictionaryEn
 {
   public DictionaryEntryContractValidator()
   {
-    RuleFor(x => x.Key).SetValidator(new DictionaryEntryKeyValidator());
-    RuleFor(x => x.Value).SetValidator(new DictionaryEntryValueValidator());
+    RuleFor(x => x.Key).SetValidator(new IdentifierValidator());
+    RuleFor(x => x.Value).NotEmpty();
   }
 }

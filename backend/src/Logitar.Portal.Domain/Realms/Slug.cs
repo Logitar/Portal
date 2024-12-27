@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Domain.Realms.Validators;
 
 namespace Logitar.Portal.Domain.Realms;
 
@@ -9,14 +8,21 @@ public record Slug
 
   public string Value { get; }
 
-  public Slug(string value, string? propertyName = null)
+  public Slug(string value)
   {
     Value = value.Trim();
-    new UniqueSlugValidator(propertyName).ValidateAndThrow(value);
+    new Validator().ValidateAndThrow(this);
   }
 
-  public static Slug? TryCreate(string? value, string? propertyName = null)
+  public static Slug? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
+  public override string ToString() => Value;
+
+  private class Validator : AbstractValidator<Slug>
   {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
+    public Validator()
+    {
+      RuleFor(x => x.Value).Slug();
+    }
   }
 }

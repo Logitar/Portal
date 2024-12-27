@@ -1,7 +1,6 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Domain.Shared;
 using Logitar.Portal.Domain.Dictionaries.Events;
-using Logitar.Portal.Domain.Dictionaries.Validators;
 
 namespace Logitar.Portal.Domain.Dictionaries;
 
@@ -53,12 +52,10 @@ public class Dictionary : AggregateRoot
     }
   }
 
-  private readonly DictionaryEntryValidator _dictionaryEntryValidator = new();
   public void SetEntry(string key, string value)
   {
     key = key.Trim();
     value = value.Trim();
-    _dictionaryEntryValidator.ValidateAndThrow(key, value);
 
     if (!_entries.TryGetValue(key, out string? existingValue) || existingValue != value)
     {

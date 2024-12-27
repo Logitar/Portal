@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Logitar.Portal.Domain.Templates.Validators;
 
 namespace Logitar.Portal.Domain.Templates;
 
@@ -9,14 +8,21 @@ public record Subject
 
   public string Value { get; }
 
-  public Subject(string value, string? propertyName = null)
+  public Subject(string value)
   {
     Value = value.Trim();
-    new SubjectValidator(propertyName).ValidateAndThrow(Value);
+
   }
 
-  public static Subject? TryCreate(string? value, string? propertyName = null)
+  public static Subject? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
+  public override string ToString() => Value;
+
+  private class Validator : AbstractValidator<Subject>
   {
-    return string.IsNullOrWhiteSpace(value) ? null : new(value, propertyName);
+    public Validator()
+    {
+      RuleFor(x => x.Value).Subject();
+    }
   }
 }
