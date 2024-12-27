@@ -153,7 +153,7 @@ internal class SendMessageInternalCommandHandler : IRequestHandler<SendMessageIn
     }
     if (missingUsers.Count > 0)
     {
-      throw new UsersNotFoundException(missingUsers, nameof(payload.Recipients));
+      throw new UsersNotFoundException(tenantId, missingUsers, nameof(payload.Recipients));
     }
     else if (missingContacts.Count > 0)
     {

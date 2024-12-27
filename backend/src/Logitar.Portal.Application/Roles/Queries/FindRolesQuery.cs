@@ -35,11 +35,12 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
 
   public async Task<IReadOnlyCollection<FoundRole>> Handle(FindRolesQuery query, CancellationToken cancellationToken)
   {
+    TenantId? tenantId = query.TenantId;
     int capacity = query.Roles.Count();
     Dictionary<RoleId, FoundRole> foundRoles = new(capacity);
     HashSet<string> missingRoles = new(capacity);
 
-    IEnumerable<Role> roles = await _roleRepository.LoadAsync(query.TenantId, cancellationToken);
+    IEnumerable<Role> roles = await _roleRepository.LoadAsync(tenantId, cancellationToken);
     capacity = roles.Count();
     Dictionary<Guid, Role> rolesById = new(capacity);
     Dictionary<string, Role> rolesByUniqueName = new(capacity);
@@ -68,7 +69,7 @@ internal class FindRolesQueryHandler : IRequestHandler<FindRolesQuery, IReadOnly
 
     if (missingRoles.Count > 0)
     {
-      throw new RolesNotFoundException(missingRoles, query.PropertyName);
+      throw new RolesNotFoundException(tenantId, missingRoles, query.PropertyName);
     }
 
     return foundRoles.Values;
