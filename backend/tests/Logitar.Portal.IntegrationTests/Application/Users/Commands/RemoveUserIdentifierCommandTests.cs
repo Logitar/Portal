@@ -1,4 +1,6 @@
-﻿using Logitar.Identity.Core;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Contracts.Users;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,5 +52,20 @@ public class RemoveUserIdentifierCommandTests : IntegrationTests
     RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key);
     UserModel? result = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(result);
+  }
+
+  [Fact(DisplayName = "It should throw ValidationException when the key is not valid.")]
+  public async Task It_should_throw_ValidationException_when_the_key_is_not_valid()
+  {
+    User user = Assert.Single(await _userRepository.LoadAsync());
+
+    SetRealm();
+
+    RemoveUserIdentifierCommand command = new(user.EntityId.ToGuid(), Key: "123_InvalidKey");
+    var exception = await Assert.ThrowsAsync<ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
+
+    ValidationFailure error = Assert.Single(exception.Errors);
+    Assert.Equal("IdentifierValidator", error.ErrorCode);
+    Assert.Equal("Key", error.PropertyName);
   }
 }
