@@ -29,11 +29,19 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
     ReplaceDictionaryPayload payload = command.Payload;
     new ReplaceDictionaryValidator().ValidateAndThrow(payload);
 
+    Locale locale = new(payload.Locale);
+    ActorId actorId = command.ActorId;
+
     DictionaryId dictionaryId = new(command.TenantId, new EntityId(command.Id));
     Dictionary? dictionary = await _dictionaryRepository.LoadAsync(dictionaryId, cancellationToken);
-    if (dictionary == null || dictionary.TenantId != command.TenantId)
+    if (dictionary == null)
     {
-      return null;
+      if (command.Version.HasValue)
+      {
+        return null;
+      }
+
+      dictionary = new(locale, actorId, dictionaryId);
     }
     Dictionary? reference = null;
     if (command.Version.HasValue)
@@ -41,9 +49,6 @@ internal class ReplaceDictionaryCommandHandler : IRequestHandler<ReplaceDictiona
       reference = await _dictionaryRepository.LoadAsync(dictionary.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = command.ActorId;
-
-    Locale locale = new(payload.Locale);
     if (reference == null || locale != reference.Locale)
     {
       dictionary.SetLocale(locale, actorId);

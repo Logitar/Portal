@@ -37,6 +37,16 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
     await _dictionaryRepository.SaveAsync(_dictionary);
   }
 
+  [Fact(DisplayName = "It should create a new dictionary.")]
+  public async Task It_should_create_a_new_dictionary()
+  {
+    ReplaceDictionaryPayload payload = new("fr-CA");
+    ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: null);
+    DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(dictionary);
+    Assert.Equal(command.Id, dictionary.Id);
+  }
+
   [Fact(DisplayName = "It should replace an existing dictionary.")]
   public async Task It_should_replace_an_existing_dictionary()
   {
@@ -71,20 +81,9 @@ public class ReplaceDictionaryCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_dictionary_cannot_be_found()
   {
     ReplaceDictionaryPayload payload = new(Faker.Locale);
-    ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceDictionaryCommand command = new(Guid.NewGuid(), payload, Version: -1);
     DictionaryModel? dictionary = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(dictionary);
-  }
-
-  [Fact(DisplayName = "It should return null when the dictionary is in another tenant.")]
-  public async Task It_should_return_null_when_the_dictionary_is_in_another_tenant()
-  {
-    SetRealm();
-
-    ReplaceDictionaryPayload payload = new(Faker.Locale);
-    ReplaceDictionaryCommand command = new(_dictionary.EntityId.ToGuid(), payload, Version: null);
-    DictionaryModel? result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw DictionaryAlreadyExistsException when the dictionary already exists.")]
