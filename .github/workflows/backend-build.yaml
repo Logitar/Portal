@@ -3,13 +3,11 @@ name: Build & Test Portal Backend
 on:
   push:
     branches:
-      - dev
       - main
     paths:
       - 'backend/**'
   pull_request:
     branches:
-      - dev
       - main
     paths:
       - 'backend/**'
