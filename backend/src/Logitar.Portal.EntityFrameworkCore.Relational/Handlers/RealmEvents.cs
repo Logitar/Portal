@@ -26,6 +26,7 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   {
     RealmEntity? realm = await _context.Realms.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (realm == null)
     {
       realm = new(@event);
@@ -40,6 +41,7 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   {
     RealmEntity? realm = await _context.Realms
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (realm != null)
     {
       _context.Realms.Remove(realm);
@@ -53,7 +55,8 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   {
     RealmEntity? realm = await _context.Realms
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (realm != null)
+
+    if (realm != null && realm.Version == (@event.Version - 1))
     {
       realm.SetUniqueSlug(@event);
 
@@ -65,7 +68,8 @@ internal class RealmEvents : INotificationHandler<RealmCreated>,
   {
     RealmEntity? realm = await _context.Realms
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (realm != null)
+
+    if (realm != null && realm.Version == (@event.Version - 1))
     {
       realm.Update(@event);
 

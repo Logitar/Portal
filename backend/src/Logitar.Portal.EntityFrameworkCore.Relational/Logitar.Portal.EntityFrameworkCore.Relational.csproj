@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="3.0.4" />
+    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.Relational" Version="3.0.5" />
   </ItemGroup>
 
 </Project>

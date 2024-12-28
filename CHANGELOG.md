@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored database entities & `PortalDb`.
 - Upgraded Identity NuGet packages.
 
+### Fixed
+
+- Event handlers should be idempotent.
+
 ### Removed
 
 - Obsolete code.

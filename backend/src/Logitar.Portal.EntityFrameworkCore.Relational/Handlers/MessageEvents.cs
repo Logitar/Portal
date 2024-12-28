@@ -26,6 +26,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   {
     MessageEntity? message = await _context.Messages.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (message == null)
     {
       SenderEntity sender = await _context.Senders
@@ -66,6 +67,7 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   {
     MessageEntity? message = await _context.Messages
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (message != null)
     {
       _context.Messages.Remove(message);
@@ -78,7 +80,8 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   {
     MessageEntity? message = await _context.Messages
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (message != null)
+
+    if (message != null && message.Version == (@event.Version - 1))
     {
       message.Fail(@event);
 
@@ -90,7 +93,8 @@ internal class MessageEvents : INotificationHandler<MessageCreated>,
   {
     MessageEntity? message = await _context.Messages
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (message != null)
+
+    if (message != null && message.Version == (@event.Version - 1))
     {
       message.Succeed(@event);
 

@@ -22,6 +22,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   {
     DictionaryEntity? dictionary = await _context.Dictionaries.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (dictionary == null)
     {
       dictionary = new(@event);
@@ -36,6 +37,7 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (dictionary != null)
     {
       _context.Dictionaries.Remove(dictionary);
@@ -48,7 +50,8 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (dictionary != null)
+
+    if (dictionary != null && dictionary.Version == (@event.Version - 1))
     {
       dictionary.SetLocale(@event);
 
@@ -60,7 +63,8 @@ internal class DictionaryEvents : INotificationHandler<DictionaryCreated>,
   {
     DictionaryEntity? dictionary = await _context.Dictionaries
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (dictionary != null)
+
+    if (dictionary != null && dictionary.Version == (@event.Version - 1))
     {
       dictionary.Update(@event);
 
