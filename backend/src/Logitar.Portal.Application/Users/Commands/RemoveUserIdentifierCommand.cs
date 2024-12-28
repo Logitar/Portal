@@ -1,7 +1,10 @@
-﻿using Logitar.EventSourcing;
+﻿using FluentValidation;
+using Logitar.EventSourcing;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Activities;
+using Logitar.Portal.Application.Validators;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Users;
 using MediatR;
 
@@ -24,6 +27,9 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
 
   public async Task<UserModel?> Handle(RemoveUserIdentifierCommand command, CancellationToken cancellationToken)
   {
+    CustomIdentifierModel identifier = new(command.Key, value: "Temporary");
+    new CustomIdentifierContractValidator().ValidateAndThrow(identifier);
+
     UserId userId = new(command.TenantId, new EntityId(command.Id));
     User? user = await _userRepository.LoadAsync(userId, cancellationToken);
     if (user == null || user.TenantId != command.TenantId)
@@ -31,7 +37,7 @@ internal class RemoveUserIdentifierCommandHandler : IRequestHandler<RemoveUserId
       return null;
     }
 
-    Identifier key = new(command.Key); // ISSUE #537
+    Identifier key = new(command.Key);
     ActorId actorId = command.ActorId;
     user.RemoveCustomIdentifier(key, actorId);
     await _userManager.SaveAsync(user, command.UserSettings, actorId, cancellationToken);
