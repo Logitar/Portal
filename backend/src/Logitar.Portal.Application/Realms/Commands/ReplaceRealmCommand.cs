@@ -31,11 +31,19 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
     ReplaceRealmPayload payload = command.Payload;
     new ReplaceRealmValidator().ValidateAndThrow(payload);
 
+    Slug uniqueSlug = new(payload.UniqueSlug);
+    ActorId actorId = command.ActorId;
+
     RealmId realmId = new(command.Id);
     Realm? realm = await _realmRepository.LoadAsync(realmId, cancellationToken);
     if (realm == null)
     {
-      return null;
+      if (command.Version != null)
+      {
+        return null;
+      }
+
+      realm = new(uniqueSlug, actorId, realmId);
     }
     Realm? reference = null;
     if (command.Version.HasValue)
@@ -43,9 +51,6 @@ internal class ReplaceRealmCommandHandler : IRequestHandler<ReplaceRealmCommand,
       reference = await _realmRepository.LoadAsync(realm.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = command.ActorId;
-
-    Slug uniqueSlug = new(payload.UniqueSlug);
     if (reference == null || uniqueSlug != reference.UniqueSlug)
     {
       realm.SetUniqueSlug(uniqueSlug, actorId);

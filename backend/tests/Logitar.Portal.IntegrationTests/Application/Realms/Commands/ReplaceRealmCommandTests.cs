@@ -37,6 +37,16 @@ public class ReplaceRealmCommandTests : IntegrationTests
     await _realmRepository.SaveAsync(_realm);
   }
 
+  [Fact(DisplayName = "It should create a new realm.")]
+  public async Task It_should_create_a_new_realm()
+  {
+    ReplaceRealmPayload payload = new("new-realm", secret: "");
+    ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: null);
+    RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(realm);
+    Assert.Equal(command.Id, realm.Id);
+  }
+
   [Fact(DisplayName = "It should replace an existing realm.")]
   public async Task It_should_replace_an_existing_realm()
   {
@@ -76,7 +86,7 @@ public class ReplaceRealmCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_realm_cannot_be_found()
   {
     ReplaceRealmPayload payload = new("tests", secret: string.Empty);
-    ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceRealmCommand command = new(Guid.NewGuid(), payload, Version: -1);
     RealmModel? realm = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(realm);
   }
