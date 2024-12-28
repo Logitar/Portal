@@ -40,6 +40,16 @@ public class ReplaceUserCommandTests : IntegrationTests
     }
   }
 
+  [Fact(DisplayName = "It should create a new user.")]
+  public async Task It_should_create_a_new_user()
+  {
+    ReplaceUserPayload payload = new(Faker.Internet.UserName());
+    ReplaceUserCommand command = new(Guid.NewGuid(), payload, Version: null);
+    UserModel? user = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(user);
+    Assert.Equal(command.Id, user.Id);
+  }
+
   [Fact(DisplayName = "It should replace an existing user.")]
   public async Task It_should_replace_an_existing_user()
   {
@@ -156,22 +166,9 @@ public class ReplaceUserCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_user_cannot_be_found()
   {
     ReplaceUserPayload payload = new("admin");
-    ReplaceUserCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceUserCommand command = new(Guid.NewGuid(), payload, Version: -1);
     UserModel? user = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(user);
-  }
-
-  [Fact(DisplayName = "It should return null when the user is in another tenant.")]
-  public async Task It_should_return_null_when_the_user_is_in_another_tenant()
-  {
-    User user = Assert.Single(await _userRepository.LoadAsync());
-
-    SetRealm();
-
-    ReplaceUserPayload payload = new("admin");
-    ReplaceUserCommand command = new(user.EntityId.ToGuid(), payload, Version: null);
-    UserModel? result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw EmailAddressAlreadyUsedException when the email address is already used.")]

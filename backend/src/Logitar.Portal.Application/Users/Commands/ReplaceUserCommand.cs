@@ -65,19 +65,25 @@ internal class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, U
     ReplaceUserPayload payload = command.Payload;
     new ReplaceUserValidator(userSettings, _addressHelper).ValidateAndThrow(payload);
 
+    ActorId actorId = command.ActorId;
+
     UserId userId = new(command.TenantId, new EntityId(command.Id));
     User? user = await _userRepository.LoadAsync(userId, cancellationToken);
-    if (user == null || user.TenantId != command.TenantId)
+    if (user == null)
     {
-      return null;
+      if (command.Version.HasValue)
+      {
+        return null;
+      }
+
+      UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
+      user = new(uniqueName, actorId, userId);
     }
     User? reference = null;
     if (command.Version.HasValue)
     {
       reference = await _userRepository.LoadAsync(user.Id, command.Version.Value, cancellationToken);
     }
-
-    ActorId actorId = command.ActorId;
 
     ReplaceAuthenticationInformation(userSettings, payload, user, reference, actorId);
     ReplaceContactInformation(payload, user, reference, actorId);
