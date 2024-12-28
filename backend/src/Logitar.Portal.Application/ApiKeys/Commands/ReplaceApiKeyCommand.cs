@@ -2,6 +2,7 @@
 using Logitar.EventSourcing;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.ApiKeys;
+using Logitar.Identity.Core.Passwords;
 using Logitar.Identity.Core.Roles;
 using Logitar.Identity.Core.Settings;
 using Logitar.Portal.Application.Activities;
@@ -21,12 +22,14 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
   private readonly IApiKeyQuerier _apiKeyQuerier;
   private readonly IApiKeyRepository _apiKeyRepository;
   private readonly IMediator _mediator;
+  private readonly IPasswordManager _passwordManager;
 
-  public ReplaceApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator)
+  public ReplaceApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier, IApiKeyRepository apiKeyRepository, IMediator mediator, IPasswordManager passwordManager)
   {
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
     _mediator = mediator;
+    _passwordManager = passwordManager;
   }
 
   public async Task<ApiKeyModel?> Handle(ReplaceApiKeyCommand command, CancellationToken cancellationToken)
@@ -34,11 +37,21 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     ReplaceApiKeyPayload payload = command.Payload;
     new ReplaceApiKeyValidator().ValidateAndThrow(payload);
 
+    DisplayName displayName = new(payload.DisplayName);
+    ActorId actorId = command.ActorId;
+
     ApiKeyId apiKeyId = new(command.TenantId, new EntityId(command.Id));
     ApiKey? apiKey = await _apiKeyRepository.LoadAsync(apiKeyId, cancellationToken);
-    if (apiKey == null || apiKey.TenantId != command.TenantId)
+    string? secretString = null;
+    if (apiKey == null)
     {
-      return null;
+      if (command.Version.HasValue)
+      {
+        return null;
+      }
+
+      Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out secretString);
+      apiKey = new(displayName, secret, actorId, apiKeyId);
     }
     ApiKey? reference = null;
     if (command.Version.HasValue)
@@ -46,9 +59,6 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
       reference = await _apiKeyRepository.LoadAsync(apiKey.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = command.ActorId;
-
-    DisplayName displayName = new(payload.DisplayName);
     if (reference == null || displayName != reference.DisplayName)
     {
       apiKey.DisplayName = displayName;
@@ -69,7 +79,12 @@ internal class ReplaceApiKeyCommandHandler : IRequestHandler<ReplaceApiKeyComman
     apiKey.Update(actorId);
     await _apiKeyRepository.SaveAsync(apiKey, cancellationToken);
 
-    return await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
+    ApiKeyModel result = await _apiKeyQuerier.ReadAsync(command.Realm, apiKey, cancellationToken);
+    if (secretString != null)
+    {
+      result.XApiKey = XApiKey.Encode(apiKey.Id, secretString);
+    }
+    return result;
   }
 
   private static void ReplaceCustomAttributes(ReplaceApiKeyPayload payload, ApiKey apiKey, ApiKey? reference)

@@ -38,6 +38,17 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
     }
   }
 
+  [Fact(DisplayName = "It should create a new API key.")]
+  public async Task It_should_create_a_new_Api_key()
+  {
+    ReplaceApiKeyPayload payload = new("Test");
+    ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(apiKey);
+    Assert.Equal(command.Id, apiKey.Id);
+    Assert.NotNull(apiKey.XApiKey);
+  }
+
   [Fact(DisplayName = "It should replace an existing API key.")]
   public async Task It_should_replace_an_existing_Api_key()
   {
@@ -95,22 +106,9 @@ public class ReplaceApiKeyCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_Api_key_cannot_be_found()
   {
     ReplaceApiKeyPayload payload = new("admin");
-    ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceApiKeyCommand command = new(Guid.NewGuid(), payload, Version: -1);
     ApiKeyModel? apiKey = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(apiKey);
-  }
-
-  [Fact(DisplayName = "It should return null when the API key is in another tenant.")]
-  public async Task It_should_return_null_when_the_Api_key_is_in_another_tenant()
-  {
-    ApiKey apiKey = await CreateApiKeyAsync();
-
-    SetRealm();
-
-    ReplaceApiKeyPayload payload = new("admin");
-    ReplaceApiKeyCommand command = new(apiKey.EntityId.ToGuid(), payload, Version: null);
-    ApiKeyModel? result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
