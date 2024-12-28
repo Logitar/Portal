@@ -44,7 +44,7 @@ public static class HttpContextExtensions
     return builder.BuildUri();
   }
 
-  public static IEnumerable<CustomAttribute> GetSessionCustomAttributes(this HttpContext context)
+  public static IReadOnlyCollection<CustomAttribute> GetSessionCustomAttributes(this HttpContext context)
   {
     List<CustomAttribute> customAttributes = new(capacity: 2)
     {
@@ -57,7 +57,7 @@ public static class HttpContextExtensions
       customAttributes.Add(new("IpAddress", ipAddress));
     }
 
-    return customAttributes;
+    return customAttributes.AsReadOnly();
   }
   public static string GetAdditionalInformation(this HttpContext context)
   {
@@ -142,19 +142,5 @@ public static class HttpContextExtensions
     context.Session.Clear();
 
     context.Response.Cookies.Delete(Cookies.RefreshToken);
-  }
-
-  public static void SetResponse(this HttpContext context, int statusCode)
-  {
-    context.Response.StatusCode = statusCode;
-  }
-  public static async Task SetResponseAsync<T>(this HttpContext context, int statusCode, T? value = default, CancellationToken cancellationToken = default)
-  {
-    context.SetResponse(statusCode);
-
-    if (value != null)
-    {
-      await context.Response.WriteAsJsonAsync(value, cancellationToken);
-    }
   }
 }

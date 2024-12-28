@@ -8,6 +8,8 @@ using Microsoft.Extensions.Options;
 
 namespace Logitar.Portal.Authentication;
 
+internal class SessionAuthenticationOptions : AuthenticationSchemeOptions;
+
 internal class SessionAuthenticationHandler : AuthenticationHandler<SessionAuthenticationOptions>
 {
   private readonly IActivityPipeline _activityPipeline;

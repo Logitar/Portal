@@ -10,6 +10,8 @@ using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Authentication;
 
+internal class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions;
+
 internal class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
 {
   private readonly IActivityPipeline _activityPipeline;

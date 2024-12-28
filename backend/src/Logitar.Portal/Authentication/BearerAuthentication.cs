@@ -13,6 +13,8 @@ using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Authentication;
 
+internal class BearerAuthenticationOptions : AuthenticationSchemeOptions;
+
 internal class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthenticationOptions>
 {
   private readonly IActivityPipeline _activityPipeline;

@@ -8,5 +8,5 @@ namespace Logitar.Portal.Controllers;
 public class IndexController : ControllerBase
 {
   [HttpGet]
-  public ActionResult<ApiVersion> Get() => Ok(new ApiVersion());
+  public ActionResult<ApiVersion> Get() => Ok(ApiVersion.Current);
 }

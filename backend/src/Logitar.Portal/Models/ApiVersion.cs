@@ -4,10 +4,12 @@ namespace Logitar.Portal.Models;
 
 public record ApiVersion
 {
+  public static ApiVersion Current => new(Api.Title, Api.Version);
+
   public string Title { get; set; }
   public string Version { get; set; }
 
-  public ApiVersion() : this(Api.Title, Api.Version)
+  public ApiVersion() : this(string.Empty, string.Empty)
   {
   }
 
