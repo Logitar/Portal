@@ -9,6 +9,8 @@ internal class CreateApiKeyValidator : AbstractValidator<CreateApiKeyPayload>
 {
   public CreateApiKeyValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.DisplayName).DisplayName();
     When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).Description());
     When(x => x.ExpiresOn.HasValue, () => RuleFor(x => x.ExpiresOn!.Value).Future());
