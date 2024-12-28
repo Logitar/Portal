@@ -1,5 +1,6 @@
 ﻿using Logitar.Identity.Core;
 using Logitar.Identity.Core.Roles;
+using Logitar.Identity.Core.Settings;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Roles;
 using Logitar.Portal.Contracts.Roles;
@@ -20,8 +21,10 @@ public class CreateUserCommandTests : IntegrationTests
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
-  [Fact(DisplayName = "It should create a new user.")]
-  public async Task It_should_create_a_new_user()
+  [Theory(DisplayName = "It should create a new user.")]
+  [InlineData(null)]
+  [InlineData("53266546-c722-488a-becc-55387a7b9b8d")]
+  public async Task It_should_create_a_new_user(string? idValue)
   {
     SetRealm();
 
@@ -39,12 +42,20 @@ public class CreateUserCommandTests : IntegrationTests
       Gender = Faker.Person.Gender.ToString(),
       Picture = Faker.Person.Avatar
     };
+    if (idValue != null)
+    {
+      payload.Id = Guid.Parse(idValue);
+    }
     payload.CustomAttributes.Add(new("JobTitle", "Sales Manager"));
     payload.CustomIdentifiers.Add(new("HealthInsuranceNumber", Faker.Person.BuildHealthInsuranceNumber()));
     payload.Roles.Add("  Manage_Sales  ");
     CreateUserCommand command = new(payload);
     UserModel user = await ActivityPipeline.ExecuteAsync(command);
 
+    if (payload.Id.HasValue)
+    {
+      Assert.Equal(payload.Id.Value, user.Id);
+    }
     Assert.Equal(payload.UniqueName, user.UniqueName);
     Assert.True(user.HasPassword);
     Assert.True(user.IsDisabled);
@@ -95,6 +106,22 @@ public class CreateUserCommandTests : IntegrationTests
     Assert.Equal(payload.Email.Address, exception.EmailAddress);
   }
 
+  [Fact(DisplayName = "It should throw IdAlreadyUsedException when the ID is already taken.")]
+  public async Task It_should_throw_IdAlreadyUsedException_when_the_Id_is_already_taken()
+  {
+    User user = new(new UniqueName(new UniqueNameSettings(), Faker.Internet.UserName()));
+    await _userRepository.SaveAsync(user);
+
+    CreateUserPayload payload = new(user.UniqueName.Value)
+    {
+      Id = user.EntityId.ToGuid()
+    };
+    CreateUserCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
+  }
+
   [Fact(DisplayName = "It should throw RolesNotFoundException when some roles cannot be found.")]
   public async Task It_should_throw_RolesNotFoundException_when_some_roles_cannot_be_found()
   {
@@ -119,9 +146,15 @@ public class CreateUserCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    CreateUserPayload payload = new($"get_rekt_{Guid.NewGuid()};DROP TABLE users");
+    CreateUserPayload payload = new($"get_rekt_{Guid.NewGuid()};DROP TABLE users")
+    {
+      Id = Guid.Empty
+    };
     CreateUserCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal("UniqueName", exception.Errors.Single().PropertyName);
+
+    Assert.Equal(2, exception.Errors.Count());
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Id.Value");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "AllowedCharactersValidator" && e.PropertyName == "UniqueName");
   }
 }

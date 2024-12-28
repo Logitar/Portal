@@ -38,14 +38,22 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
   private readonly IPasswordManager _passwordManager;
   private readonly IUserManager _userManager;
   private readonly IUserQuerier _userQuerier;
+  private readonly IUserRepository _userRepository;
 
-  public CreateUserCommandHandler(IAddressHelper addressHelper, IMediator mediator, IPasswordManager passwordManager, IUserManager userManager, IUserQuerier userQuerier)
+  public CreateUserCommandHandler(
+    IAddressHelper addressHelper,
+    IMediator mediator,
+    IPasswordManager passwordManager,
+    IUserManager userManager,
+    IUserQuerier userQuerier,
+    IUserRepository userRepository)
   {
     _addressHelper = addressHelper;
     _mediator = mediator;
     _passwordManager = passwordManager;
     _userManager = userManager;
     _userQuerier = userQuerier;
+    _userRepository = userRepository;
   }
 
   public async Task<UserModel> Handle(CreateUserCommand command, CancellationToken cancellationToken)
@@ -55,10 +63,22 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Use
     CreateUserPayload payload = command.Payload;
     new CreateUserValidator(userSettings, _addressHelper).ValidateAndThrow(payload);
 
+    UserId userId = UserId.NewId(command.TenantId);
+    User? user;
+    if (payload.Id.HasValue)
+    {
+      userId = new(command.TenantId, new EntityId(payload.Id.Value));
+      user = await _userRepository.LoadAsync(userId, cancellationToken);
+      if (user != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
     UniqueName uniqueName = new(userSettings.UniqueName, payload.UniqueName);
-    User user = new(uniqueName, actorId, UserId.NewId(command.TenantId))
+    user = new(uniqueName, actorId, userId)
     {
       FirstName = PersonName.TryCreate(payload.FirstName),
       MiddleName = PersonName.TryCreate(payload.MiddleName),

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
+using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
 using Logitar.Portal.Application.Dictionaries;
 using Logitar.Portal.Application.Messages;
@@ -99,6 +100,7 @@ internal class ExceptionHandling : ExceptionFilterAttribute
     typeof(ConfigurationAlreadyInitializedException),
     typeof(DictionaryAlreadyExistsException),
     typeof(EmailAddressAlreadyUsedException),
+    typeof(IdAlreadyUsedException),
     typeof(UniqueKeyAlreadyUsedException),
     typeof(UniqueSlugAlreadyUsedException)
   ]);

@@ -22,8 +22,11 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
   private readonly IMediator _mediator;
   private readonly IPasswordManager _passwordManager;
 
-  public CreateApiKeyCommandHandler(IApiKeyQuerier apiKeyQuerier,
-    IApiKeyRepository apiKeyRepository, IMediator mediator, IPasswordManager passwordManager)
+  public CreateApiKeyCommandHandler(
+    IApiKeyQuerier apiKeyQuerier,
+    IApiKeyRepository apiKeyRepository,
+    IMediator mediator,
+    IPasswordManager passwordManager)
   {
     _apiKeyQuerier = apiKeyQuerier;
     _apiKeyRepository = apiKeyRepository;
@@ -36,11 +39,23 @@ internal class CreateApiKeyCommandHandler : IRequestHandler<CreateApiKeyCommand,
     CreateApiKeyPayload payload = command.Payload;
     new CreateApiKeyValidator().ValidateAndThrow(payload);
 
+    ApiKeyId apiKeyId = ApiKeyId.NewId(command.TenantId);
+    ApiKey? apiKey;
+    if (payload.Id.HasValue)
+    {
+      apiKeyId = new(command.TenantId, new EntityId(payload.Id.Value));
+      apiKey = await _apiKeyRepository.LoadAsync(apiKeyId, cancellationToken);
+      if (apiKey != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
     DisplayName displayName = new(payload.DisplayName);
     Password secret = _passwordManager.GenerateBase64(XApiKey.SecretLength, out string secretString);
-    ApiKey apiKey = new(displayName, secret, actorId, ApiKeyId.NewId(command.TenantId))
+    apiKey = new(displayName, secret, actorId, apiKeyId)
     {
       Description = Description.TryCreate(payload.Description)
     };

@@ -31,10 +31,22 @@ internal class CreateOneTimePasswordCommandHandler : IRequestHandler<CreateOneTi
     CreateOneTimePasswordPayload payload = command.Payload;
     new CreateOneTimePasswordValidator().ValidateAndThrow(payload);
 
+    OneTimePasswordId oneTimePasswordId = OneTimePasswordId.NewId(command.TenantId);
+    OneTimePassword? oneTimePassword;
+    if (payload.Id.HasValue)
+    {
+      oneTimePasswordId = new(command.TenantId, new EntityId(payload.Id.Value));
+      oneTimePassword = await _oneTimePasswordRepository.LoadAsync(oneTimePasswordId, cancellationToken);
+      if (oneTimePassword != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
     Password password = _passwordManager.Generate(payload.Characters, payload.Length, out string passwordString);
-    OneTimePassword oneTimePassword = new(password, payload.ExpiresOn, payload.MaximumAttempts, actorId, OneTimePasswordId.NewId(command.TenantId));
+    oneTimePassword = new(password, payload.ExpiresOn, payload.MaximumAttempts, actorId, oneTimePasswordId);
 
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {

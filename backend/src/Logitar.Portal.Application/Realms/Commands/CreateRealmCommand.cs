@@ -17,11 +17,13 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
 {
   private readonly IRealmManager _realmManager;
   private readonly IRealmQuerier _realmQuerier;
+  private readonly IRealmRepository _realmRepository;
 
-  public CreateRealmCommandHandler(IRealmManager realmManager, IRealmQuerier realmQuerier)
+  public CreateRealmCommandHandler(IRealmManager realmManager, IRealmQuerier realmQuerier, IRealmRepository realmRepository)
   {
     _realmManager = realmManager;
     _realmQuerier = realmQuerier;
+    _realmRepository = realmRepository;
   }
 
   public async Task<RealmModel> Handle(CreateRealmCommand command, CancellationToken cancellationToken)
@@ -29,10 +31,22 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
     CreateRealmPayload payload = command.Payload;
     new CreateRealmValidator().ValidateAndThrow(payload);
 
+    Realm? realm;
+    RealmId? realmId = null;
+    if (payload.Id.HasValue)
+    {
+      realmId = new(payload.Id.Value);
+      realm = await _realmRepository.LoadAsync(realmId.Value, cancellationToken);
+      if (realm != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
     Slug uniqueSlug = new(payload.UniqueSlug);
-    Realm realm = new(uniqueSlug, actorId)
+    realm = new(uniqueSlug, actorId, realmId)
     {
       DisplayName = DisplayName.TryCreate(payload.DisplayName),
       Description = Description.TryCreate(payload.Description),

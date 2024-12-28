@@ -2,6 +2,8 @@
 
 public record CreateTemplatePayload
 {
+  public Guid? Id { get; set; }
+
   public string UniqueKey { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }

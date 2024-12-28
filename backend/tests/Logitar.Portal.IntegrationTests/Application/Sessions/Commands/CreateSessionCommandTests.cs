@@ -1,4 +1,5 @@
 ﻿using Logitar.Identity.Core;
+using Logitar.Identity.Core.Sessions;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
@@ -11,10 +12,12 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 [Trait(Traits.Category, Categories.Integration)]
 public class CreateSessionCommandTests : IntegrationTests
 {
+  private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
   public CreateSessionCommandTests() : base()
   {
+    _sessionRepository = ServiceProvider.GetRequiredService<ISessionRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
@@ -63,8 +66,10 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
   }
 
-  [Fact(DisplayName = "It should create a session to an user ID.")]
-  public async Task It_should_create_a_session_to_an_user_Id()
+  [Theory(DisplayName = "It should create a session to an user ID.")]
+  [InlineData(null)]
+  [InlineData("24122d4c-5dcf-4b85-b1fe-b9f7d5052726")]
+  public async Task It_should_create_a_session_to_an_user_Id(string? idValue)
   {
     SetRealm();
 
@@ -72,9 +77,17 @@ public class CreateSessionCommandTests : IntegrationTests
     await _userRepository.SaveAsync(user);
 
     CreateSessionPayload payload = new(user.EntityId.ToGuid().ToString());
+    if (idValue != null)
+    {
+      payload.Id = Guid.Parse(idValue);
+    }
     CreateSessionCommand command = new(payload);
     SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
+    if (payload.Id.HasValue)
+    {
+      Assert.Equal(payload.Id.Value, session.Id);
+    }
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
     Assert.True(session.IsActive);
@@ -104,6 +117,24 @@ public class CreateSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutOn);
     Assert.Equal(payload.CustomAttributes, session.CustomAttributes);
     Assert.Equal(user.EntityId.ToGuid(), session.User.Id);
+  }
+
+  [Fact(DisplayName = "It should throw IdAlreadyUsedException when the ID is already taken.")]
+  public async Task It_should_throw_IdAlreadyUsedException_when_the_Id_is_already_taken()
+  {
+    User user = Assert.Single(await _userRepository.LoadAsync());
+
+    Session session = new(user);
+    await _sessionRepository.SaveAsync(session);
+
+    CreateSessionPayload payload = new(user.EntityId.ToGuid().ToString())
+    {
+      Id = user.EntityId.ToGuid()
+    };
+    CreateSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw TooManyResultsException when multiple users are found.")]
@@ -137,9 +168,15 @@ public class CreateSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    CreateSessionPayload payload = new(user: string.Empty);
+    CreateSessionPayload payload = new(user: string.Empty)
+    {
+      Id = Guid.Empty
+    };
     CreateSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal("User", exception.Errors.Single().PropertyName);
+
+    Assert.Equal(2, exception.Errors.Count());
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Id.Value");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "User");
   }
 }

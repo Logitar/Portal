@@ -2,6 +2,8 @@
 
 public record CreateSessionPayload
 {
+  public Guid? Id { get; set; }
+
   public string User { get; set; }
   public bool IsPersistent { get; set; }
 

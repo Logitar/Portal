@@ -2,6 +2,8 @@
 
 public record CreateDictionaryPayload
 {
+  public Guid? Id { get; set; }
+
   public string Locale { get; set; }
 
   public CreateDictionaryPayload() : this(string.Empty)

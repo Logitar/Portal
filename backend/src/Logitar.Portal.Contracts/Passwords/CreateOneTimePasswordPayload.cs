@@ -2,6 +2,8 @@
 
 public class CreateOneTimePasswordPayload
 {
+  public Guid? Id { get; set; }
+
   public string Characters { get; set; }
   public int Length { get; set; }
 

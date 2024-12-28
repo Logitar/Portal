@@ -15,11 +15,13 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
 {
   private readonly ITemplateManager _templateManager;
   private readonly ITemplateQuerier _templateQuerier;
+  private readonly ITemplateRepository _templateRepository;
 
-  public CreateTemplateCommandHandler(ITemplateManager templateManager, ITemplateQuerier templateQuerier)
+  public CreateTemplateCommandHandler(ITemplateManager templateManager, ITemplateQuerier templateQuerier, ITemplateRepository templateRepository)
   {
     _templateManager = templateManager;
     _templateQuerier = templateQuerier;
+    _templateRepository = templateRepository;
   }
 
   public async Task<TemplateModel> Handle(CreateTemplateCommand command, CancellationToken cancellationToken)
@@ -27,12 +29,24 @@ internal class CreateTemplateCommandHandler : IRequestHandler<CreateTemplateComm
     CreateTemplatePayload payload = command.Payload;
     new CreateTemplateValidator().ValidateAndThrow(payload);
 
+    TemplateId templateId = TemplateId.NewId(command.TenantId);
+    Template? template;
+    if (payload.Id.HasValue)
+    {
+      templateId = new(command.TenantId, new EntityId(payload.Id.Value));
+      template = await _templateRepository.LoadAsync(templateId, cancellationToken);
+      if (template != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
     Identifier uniqueKey = new(payload.UniqueKey);
     Subject subject = new(payload.Subject);
     Content content = new(payload.Content);
-    Template template = new(uniqueKey, subject, content, actorId, TemplateId.NewId(command.TenantId))
+    template = new(uniqueKey, subject, content, actorId, templateId)
     {
       DisplayName = DisplayName.TryCreate(payload.DisplayName),
       Description = Description.TryCreate(payload.Description)
