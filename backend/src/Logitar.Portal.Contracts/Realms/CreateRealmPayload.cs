@@ -4,6 +4,8 @@ namespace Logitar.Portal.Contracts.Realms;
 
 public record CreateRealmPayload
 {
+  public Guid? Id { get; set; }
+
   public string UniqueSlug { get; set; }
   public string? DisplayName { get; set; }
   public string? Description { get; set; }

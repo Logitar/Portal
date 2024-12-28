@@ -11,6 +11,8 @@ internal class CreateRealmValidator : AbstractValidator<CreateRealmPayload>
 {
   public CreateRealmValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.UniqueSlug).Slug();
     When(x => !string.IsNullOrWhiteSpace(x.DisplayName), () => RuleFor(x => x.DisplayName!).DisplayName());
     When(x => !string.IsNullOrWhiteSpace(x.Description), () => RuleFor(x => x.Description!).Description());
