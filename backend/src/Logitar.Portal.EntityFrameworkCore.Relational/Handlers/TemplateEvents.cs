@@ -21,6 +21,7 @@ internal class TemplateEvents : INotificationHandler<TemplateCreated>,
   {
     TemplateEntity? template = await _context.Templates.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (template == null)
     {
       template = new(@event);
@@ -35,6 +36,7 @@ internal class TemplateEvents : INotificationHandler<TemplateCreated>,
   {
     TemplateEntity? template = await _context.Templates
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (template != null)
     {
       _context.Templates.Remove(template);
@@ -47,7 +49,8 @@ internal class TemplateEvents : INotificationHandler<TemplateCreated>,
   {
     TemplateEntity? template = await _context.Templates
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (template != null)
+
+    if (template != null && template.Version == (@event.Version - 1))
     {
       template.SetUniqueKey(@event);
 
@@ -59,7 +62,8 @@ internal class TemplateEvents : INotificationHandler<TemplateCreated>,
   {
     TemplateEntity? template = await _context.Templates
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (template != null)
+
+    if (template != null && template.Version == (@event.Version - 1))
     {
       template.Update(@event);
 

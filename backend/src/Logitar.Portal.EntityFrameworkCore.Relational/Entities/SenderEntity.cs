@@ -62,6 +62,8 @@ internal class SenderEntity : AggregateEntity
 
   public void SetMailgunSettings(SenderMailgunSettingsChanged @event)
   {
+    Update(@event);
+
     SetSettings(new Dictionary<string, string>
     {
       [nameof(IMailgunSettings.ApiKey)] = @event.Settings.ApiKey,
@@ -70,6 +72,8 @@ internal class SenderEntity : AggregateEntity
   }
   public void SetSendGridSettings(SenderSendGridSettingsChanged @event)
   {
+    Update(@event);
+
     SetSettings(new Dictionary<string, string>
     {
       [nameof(ISendGridSettings.ApiKey)] = @event.Settings.ApiKey
@@ -77,6 +81,8 @@ internal class SenderEntity : AggregateEntity
   }
   public void SetTwilioSettings(SenderTwilioSettingsChanged @event)
   {
+    Update(@event);
+
     SetSettings(new Dictionary<string, string>
     {
       [nameof(ITwilioSettings.AccountSid)] = @event.Settings.AccountSid,

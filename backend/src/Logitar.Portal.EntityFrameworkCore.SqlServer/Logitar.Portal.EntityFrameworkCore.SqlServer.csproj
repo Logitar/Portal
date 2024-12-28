@@ -51,7 +51,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.SqlServer" Version="3.0.4" />
+    <PackageReference Include="Logitar.Identity.EntityFrameworkCore.SqlServer" Version="3.0.5" />
   </ItemGroup>
 
   <ItemGroup>

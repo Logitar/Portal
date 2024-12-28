@@ -25,6 +25,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (sender == null)
     {
       sender = new(@event);
@@ -39,6 +40,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (sender != null)
     {
       _context.Senders.Remove(sender);
@@ -51,7 +53,8 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (sender != null)
+
+    if (sender != null && sender.Version == (@event.Version - 1))
     {
       sender.SetMailgunSettings(@event);
 
@@ -63,7 +66,8 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (sender != null)
+
+    if (sender != null && sender.Version == (@event.Version - 1))
     {
       sender.SetSendGridSettings(@event);
 
@@ -75,7 +79,8 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (sender != null)
+
+    if (sender != null && sender.Version == (@event.Version - 1))
     {
       sender.SetDefault(@event);
 
@@ -87,7 +92,8 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (sender != null)
+
+    if (sender != null && sender.Version == (@event.Version - 1))
     {
       sender.SetTwilioSettings(@event);
 
@@ -99,7 +105,8 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
-    if (sender != null)
+
+    if (sender != null && sender.Version == (@event.Version - 1))
     {
       sender.Update(@event);
 
@@ -111,6 +118,7 @@ internal class SenderEvents : INotificationHandler<EmailSenderCreated>,
   {
     SenderEntity? sender = await _context.Senders.AsNoTracking()
       .SingleOrDefaultAsync(x => x.StreamId == @event.StreamId.Value, cancellationToken);
+
     if (sender == null)
     {
       sender = new(@event);
