@@ -8,6 +8,8 @@ internal class SignInSessionValidator : AbstractValidator<SignInSessionPayload>
 {
   public SignInSessionValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.UniqueName).NotEmpty();
     RuleFor(x => x.Password).NotEmpty();
 

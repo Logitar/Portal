@@ -8,6 +8,8 @@ internal class CreateSessionValidator : AbstractValidator<CreateSessionPayload>
 {
   public CreateSessionValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.User).NotEmpty();
 
     RuleForEach(x => x.CustomAttributes).SetValidator(new CustomAttributeContractValidator());

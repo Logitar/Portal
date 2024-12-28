@@ -1,6 +1,7 @@
 ﻿using Logitar.EventSourcing;
 using Logitar.Identity.Core;
 using Logitar.Identity.Core.Passwords;
+using Logitar.Identity.Core.Sessions;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application.Users;
 using Logitar.Portal.Contracts;
@@ -14,11 +15,13 @@ namespace Logitar.Portal.Application.Sessions.Commands;
 public class SignInSessionCommandTests : IntegrationTests
 {
   private readonly IPasswordManager _passwordManager;
+  private readonly ISessionRepository _sessionRepository;
   private readonly IUserRepository _userRepository;
 
   public SignInSessionCommandTests() : base()
   {
     _passwordManager = ServiceProvider.GetRequiredService<IPasswordManager>();
+    _sessionRepository = ServiceProvider.GetRequiredService<ISessionRepository>();
     _userRepository = ServiceProvider.GetRequiredService<IUserRepository>();
   }
 
@@ -97,13 +100,23 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Same(Realm, session.User.Realm);
   }
 
-  [Fact(DisplayName = "It should create an ephemereal session.")]
-  public async Task It_should_create_an_ephemereal_session()
+  [Theory(DisplayName = "It should create an ephemereal session.")]
+  [InlineData(null)]
+  [InlineData("bd06892e-856c-4372-a4ac-7c39917488ea")]
+  public async Task It_should_create_an_ephemereal_session(string? idValue)
   {
     SignInSessionPayload payload = new(UsernameString, PasswordString);
+    if (idValue != null)
+    {
+      payload.Id = Guid.Parse(idValue);
+    }
     SignInSessionCommand command = new(payload);
     SessionModel session = await ActivityPipeline.ExecuteAsync(command);
 
+    if (payload.Id.HasValue)
+    {
+      Assert.Equal(payload.Id.Value, session.Id);
+    }
     Assert.False(session.IsPersistent);
     Assert.Null(session.RefreshToken);
     Assert.True(session.IsActive);
@@ -111,6 +124,24 @@ public class SignInSessionCommandTests : IntegrationTests
     Assert.Null(session.SignedOutOn);
     Assert.Empty(session.CustomAttributes);
     Assert.Equal(UsernameString, session.User.UniqueName);
+  }
+
+  [Fact(DisplayName = "It should throw IdAlreadyUsedException when the ID is already taken.")]
+  public async Task It_should_throw_IdAlreadyUsedException_when_the_Id_is_already_taken()
+  {
+    User user = Assert.Single(await _userRepository.LoadAsync());
+
+    Session session = new(user);
+    await _sessionRepository.SaveAsync(session);
+
+    SignInSessionPayload payload = new(UsernameString, PasswordString)
+    {
+      Id = user.EntityId.ToGuid()
+    };
+    SignInSessionCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw IncorrectUserPasswordException when the password is incorrect.")]
@@ -170,9 +201,15 @@ public class SignInSessionCommandTests : IntegrationTests
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    SignInSessionPayload payload = new(UsernameString, password: string.Empty);
+    SignInSessionPayload payload = new(UsernameString, password: string.Empty)
+    {
+      Id = Guid.Empty
+    };
     SignInSessionCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal("Password", exception.Errors.Single().PropertyName);
+
+    Assert.Equal(2, exception.Errors.Count());
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Id.Value");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Password");
   }
 }

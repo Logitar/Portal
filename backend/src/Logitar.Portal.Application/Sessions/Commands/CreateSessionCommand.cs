@@ -45,6 +45,18 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     CreateSessionPayload payload = command.Payload;
     new CreateSessionValidator().ValidateAndThrow(payload);
 
+    SessionId sessionId = SessionId.NewId(command.TenantId);
+    Session? session;
+    if (payload.Id.HasValue)
+    {
+      sessionId = new(command.TenantId, new EntityId(payload.Id.Value));
+      session = await _sessionRepository.LoadAsync(sessionId, cancellationToken);
+      if (session != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     FindUserQuery query = new(command.TenantId, payload.User, command.UserSettings, nameof(payload.User), IncludeId: true);
     User user = await _mediator.Send(query, cancellationToken);
 
@@ -56,7 +68,7 @@ internal class CreateSessionCommandHandler : IRequestHandler<CreateSessionComman
     }
 
     ActorId actorId = command.ActorId;
-    Session session = user.SignIn(secret, actorId);
+    session = user.SignIn(secret, actorId, sessionId.EntityId);
     foreach (CustomAttribute customAttribute in payload.CustomAttributes)
     {
       Identifier key = new(customAttribute.Key);
