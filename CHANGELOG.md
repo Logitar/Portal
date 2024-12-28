@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored validators.
 - Refactored database entities & `PortalDb`.
 - Upgraded Identity NuGet packages.
+- Refactored Web layer.
 
 ### Fixed
 

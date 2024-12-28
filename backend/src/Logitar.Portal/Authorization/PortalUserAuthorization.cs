@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Logitar.Portal.Authorization;
 
+internal class PortalUserAuthorizationRequirement : IAuthorizationRequirement;
+
 internal class PortalUserAuthorizationHandler : AuthorizationHandler<PortalUserAuthorizationRequirement>
 {
   private readonly IHttpContextAccessor _httpContextAccessor;

@@ -11,6 +11,8 @@ using Microsoft.Extensions.Primitives;
 
 namespace Logitar.Portal.Authentication;
 
+internal class BasicAuthenticationOptions : AuthenticationSchemeOptions;
+
 internal class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
 {
   private readonly IActivityPipeline _activityPipeline;
