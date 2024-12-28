@@ -9,6 +9,8 @@ internal class CreateOneTimePasswordValidator : AbstractValidator<CreateOneTimeP
 {
   public CreateOneTimePasswordValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.Characters).NotEmpty();
     RuleFor(x => x.Length).GreaterThan(0);
 
