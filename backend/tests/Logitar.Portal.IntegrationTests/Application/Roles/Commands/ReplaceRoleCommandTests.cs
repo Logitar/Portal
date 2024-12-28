@@ -39,6 +39,16 @@ public class ReplaceRoleCommandTests : IntegrationTests
     await _roleRepository.SaveAsync(_role);
   }
 
+  [Fact(DisplayName = "It should create a new role.")]
+  public async Task It_should_create_a_new_role()
+  {
+    ReplaceRolePayload payload = new("guest");
+    ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
+    RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(role);
+    Assert.Equal(command.Id, role.Id);
+  }
+
   [Fact(DisplayName = "It should replace an existing role.")]
   public async Task It_should_replace_an_existing_role()
   {
@@ -78,20 +88,9 @@ public class ReplaceRoleCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_role_cannot_be_found()
   {
     ReplaceRolePayload payload = new("admin");
-    ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceRoleCommand command = new(Guid.NewGuid(), payload, Version: -1);
     RoleModel? role = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(role);
-  }
-
-  [Fact(DisplayName = "It should return null when the role is in another tenant.")]
-  public async Task It_should_return_null_when_the_role_is_in_another_tenant()
-  {
-    SetRealm();
-
-    ReplaceRolePayload payload = new("admin");
-    ReplaceRoleCommand command = new(_role.EntityId.ToGuid(), payload, Version: null);
-    RoleModel? result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueNameAlreadyUsedException when the unique name is already used.")]

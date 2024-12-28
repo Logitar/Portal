@@ -33,11 +33,19 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
     ReplaceRolePayload payload = command.Payload;
     new ReplaceRoleValidator(roleSettings).ValidateAndThrow(payload);
 
+    UniqueName uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
+    ActorId actorId = command.ActorId;
+
     RoleId roleId = new(command.TenantId, new EntityId(command.Id));
     Role? role = await _roleRepository.LoadAsync(roleId, cancellationToken);
-    if (role == null || role.TenantId != command.TenantId)
+    if (role == null)
     {
-      return null;
+      if (command.Version.HasValue)
+      {
+        return null;
+      }
+
+      role = new(uniqueName, actorId, roleId);
     }
     Role? reference = null;
     if (command.Version.HasValue)
@@ -45,9 +53,6 @@ internal class ReplaceRoleCommandHandler : IRequestHandler<ReplaceRoleCommand, R
       reference = await _roleRepository.LoadAsync(role.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = command.ActorId;
-
-    UniqueName uniqueName = new(roleSettings.UniqueName, payload.UniqueName);
     if (reference == null || uniqueName != reference.UniqueName)
     {
       role.SetUniqueName(uniqueName, actorId);
