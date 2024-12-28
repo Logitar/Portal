@@ -29,11 +29,21 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
     ReplaceTemplatePayload payload = command.Payload;
     new ReplaceTemplateValidator().ValidateAndThrow(payload);
 
+    Identifier uniqueKey = new(payload.UniqueKey);
+    Subject subject = new(payload.Subject);
+    Content content = new(payload.Content);
+    ActorId actorId = command.ActorId;
+
     TemplateId templateId = new(command.TenantId, new EntityId(command.Id));
     Template? template = await _templateRepository.LoadAsync(templateId, cancellationToken);
-    if (template == null || template.TenantId != command.TenantId)
+    if (template == null)
     {
-      return null;
+      if (command.Version.HasValue)
+      {
+        return null;
+      }
+
+      template = new(uniqueKey, subject, content, actorId, templateId);
     }
     Template? reference = null;
     if (command.Version.HasValue)
@@ -41,9 +51,6 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
       reference = await _templateRepository.LoadAsync(template.Id, command.Version.Value, cancellationToken);
     }
 
-    ActorId actorId = command.ActorId;
-
-    Identifier uniqueKey = new(payload.UniqueKey);
     if (reference == null || uniqueKey != reference.UniqueKey)
     {
       template.SetUniqueKey(uniqueKey, actorId);
@@ -59,12 +66,10 @@ internal class ReplaceTemplateCommandHandler : IRequestHandler<ReplaceTemplateCo
       template.Description = description;
     }
 
-    Subject subject = new(payload.Subject);
     if (reference == null || subject != reference.Subject)
     {
       template.Subject = subject;
     }
-    Content content = new(payload.Content);
     if (reference == null || content != reference.Content)
     {
       template.Content = content;

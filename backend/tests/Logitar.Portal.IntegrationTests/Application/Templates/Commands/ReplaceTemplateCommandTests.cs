@@ -40,6 +40,17 @@ public class ReplaceTemplateCommandTests : IntegrationTests
     await _templateRepository.SaveAsync(_template);
   }
 
+  [Fact(DisplayName = "It should create a new template.")]
+  public async Task It_should_create_a_new_template()
+  {
+    ContentModel content = ContentModel.PlainText("Hello World!");
+    ReplaceTemplatePayload payload = new("AccountActivation", "Activate your account", content);
+    ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: null);
+    TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
+    Assert.NotNull(template);
+    Assert.Equal(command.Id, template.Id);
+  }
+
   [Fact(DisplayName = "It should replace an existing template.")]
   public async Task It_should_replace_an_existing_template()
   {
@@ -73,20 +84,9 @@ public class ReplaceTemplateCommandTests : IntegrationTests
   public async Task It_should_return_null_when_the_template_cannot_be_found()
   {
     ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new ContentModel(_template.Content));
-    ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: null);
+    ReplaceTemplateCommand command = new(Guid.NewGuid(), payload, Version: -1);
     TemplateModel? template = await ActivityPipeline.ExecuteAsync(command);
     Assert.Null(template);
-  }
-
-  [Fact(DisplayName = "It should return null when the template is in another tenant.")]
-  public async Task It_should_return_null_when_the_template_is_in_another_tenant()
-  {
-    SetRealm();
-
-    ReplaceTemplatePayload payload = new("PasswordRecovery", "Reset your password", new ContentModel(_template.Content));
-    ReplaceTemplateCommand command = new(_template.EntityId.ToGuid(), payload, Version: null);
-    TemplateModel? result = await ActivityPipeline.ExecuteAsync(command);
-    Assert.Null(result);
   }
 
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
