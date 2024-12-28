@@ -8,6 +8,8 @@ internal class CreateDictionaryValidator : AbstractValidator<CreateDictionaryPay
 {
   public CreateDictionaryValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.Locale).Locale();
   }
 }

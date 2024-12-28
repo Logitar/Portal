@@ -37,16 +37,26 @@ public class CreateDictionaryCommandTests : IntegrationTests
     await _dictionaryRepository.SaveAsync(_dictionary);
   }
 
-  [Fact(DisplayName = "It should create a new dictionary.")]
-  public async Task It_should_create_a_new_dictionary()
+  [Theory(DisplayName = "It should create a new dictionary.")]
+  [InlineData(null)]
+  [InlineData("fcc06e6b-8a37-4410-998f-fe8fa20a84ec")]
+  public async Task It_should_create_a_new_dictionary(string? idValue)
   {
     SetRealm();
 
     CreateDictionaryPayload payload = new(Faker.Locale);
+    if (idValue != null)
+    {
+      payload.Id = Guid.Parse(idValue);
+    }
     CreateDictionaryCommand command = new(payload);
     DictionaryModel dictionary = await ActivityPipeline.ExecuteAsync(command);
 
     Assert.Equal(payload.Locale, dictionary.Locale.Code);
+    if (payload.Id.HasValue)
+    {
+      Assert.Equal(payload.Id.Value, dictionary.Id);
+    }
     Assert.Equal(0, dictionary.EntryCount);
     Assert.Empty(dictionary.Entries);
     Assert.Same(Realm, dictionary.Realm);
@@ -62,12 +72,35 @@ public class CreateDictionaryCommandTests : IntegrationTests
     Assert.Equal(payload.Locale, exception.Locale);
   }
 
+  [Fact(DisplayName = "It should throw IdAlreadyUsedException when the ID is already taken.")]
+  public async Task It_should_throw_IdAlreadyUsedException_when_the_Id_is_already_taken()
+  {
+    Dictionary dictionary = new(new Locale("fr"));
+    await _dictionaryRepository.SaveAsync(dictionary);
+
+    CreateDictionaryPayload payload = new(dictionary.Locale.Code)
+    {
+      Id = dictionary.EntityId.ToGuid()
+    };
+    CreateDictionaryCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
+  }
+
   [Fact(DisplayName = "It should throw ValidationException when the payload is not valid.")]
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
-    CreateDictionaryPayload payload = new(locale: string.Empty);
+    CreateDictionaryPayload payload = new(locale: string.Empty)
+    {
+      Id = Guid.Empty
+    };
     CreateDictionaryCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.All(exception.Errors, e => Assert.Equal("Locale", e.PropertyName));
+
+    Assert.Equal(3, exception.Errors.Count());
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Id.Value");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Locale");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "LocaleValidator" && e.PropertyName == "Locale");
   }
 }

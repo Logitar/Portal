@@ -39,7 +39,7 @@ internal class CreateRealmCommandHandler : IRequestHandler<CreateRealmCommand, R
       realm = await _realmRepository.LoadAsync(realmId.Value, cancellationToken);
       if (realm != null)
       {
-        throw new IdAlreadyUsedException(payload.Id.Value);
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
       }
     }
 

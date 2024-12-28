@@ -31,9 +31,20 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
     CreateSenderPayload payload = command.Payload;
     new CreateSenderValidator().ValidateAndThrow(payload);
 
+    SenderId senderId = SenderId.NewId(command.TenantId);
+    Sender? sender;
+    if (payload.Id.HasValue)
+    {
+      senderId = new(command.TenantId, new EntityId(payload.Id.Value));
+      sender = await _senderRepository.LoadAsync(senderId, cancellationToken);
+      if (sender != null)
+      {
+        throw new IdAlreadyUsedException(payload.Id.Value, nameof(payload.Id));
+      }
+    }
+
     ActorId actorId = command.ActorId;
 
-    Sender sender;
     SenderSettings settings = GetSettings(payload);
     SenderType type = settings.Provider.GetSenderType();
     switch (type)
@@ -44,7 +55,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
           throw new InvalidOperationException("The sender email address is required.");
         }
         Email email = new(payload.EmailAddress, isVerified: false);
-        sender = new(email, settings, actorId, SenderId.NewId(command.TenantId))
+        sender = new(email, settings, actorId, senderId)
         {
           DisplayName = DisplayName.TryCreate(payload.DisplayName)
         };
@@ -55,7 +66,7 @@ internal class CreateSenderCommandHandler : IRequestHandler<CreateSenderCommand,
           throw new InvalidOperationException("The sender phone number is required.");
         }
         Phone phone = new(payload.PhoneNumber, countryCode: null, extension: null, isVerified: false);
-        sender = new(phone, settings, actorId, SenderId.NewId(command.TenantId));
+        sender = new(phone, settings, actorId, senderId);
         break;
       default:
         throw new SenderTypeNotSupportedException(type);

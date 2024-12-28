@@ -13,6 +13,8 @@ internal class CreateSenderValidator : AbstractValidator<CreateSenderPayload>
 {
   public CreateSenderValidator()
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     When(x => GetProvider(x) == null, () => RuleFor(x => x).Must(x => GetProvider(x) != null)
       .WithErrorCode(nameof(CreateSenderValidator))
       .WithMessage(x => $"Only one of the following must be provided: {nameof(x.Mailgun)}, {nameof(x.SendGrid)}, {nameof(x.Twilio)}.")

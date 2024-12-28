@@ -31,8 +31,10 @@ public class CreateTemplateCommandTests : IntegrationTests
     }
   }
 
-  [Fact(DisplayName = "It should create a new template.")]
-  public async Task It_should_create_a_new_template()
+  [Theory(DisplayName = "It should create a new template.")]
+  [InlineData(null)]
+  [InlineData("b3e12957-9548-4ac6-8cc6-e4a73e78fc98")]
+  public async Task It_should_create_a_new_template(string? idValue)
   {
     ContentModel content = ContentModel.PlainText("Hello World!");
     CreateTemplatePayload payload = new("PasswordRecovery", "Reset your password", content)
@@ -40,9 +42,17 @@ public class CreateTemplateCommandTests : IntegrationTests
       DisplayName = " Reset Password ",
       Description = "This is the password recovery message template."
     };
+    if (idValue != null)
+    {
+      payload.Id = Guid.Parse(idValue);
+    }
     CreateTemplateCommand command = new(payload);
     TemplateModel template = await ActivityPipeline.ExecuteAsync(command);
 
+    if (payload.Id.HasValue)
+    {
+      Assert.Equal(payload.Id.Value, template.Id);
+    }
     Assert.Equal(payload.UniqueKey, template.UniqueKey);
     Assert.Equal(payload.DisplayName.Trim(), template.DisplayName);
     Assert.Equal(payload.Description, template.Description);
@@ -53,6 +63,22 @@ public class CreateTemplateCommandTests : IntegrationTests
     SetRealm();
     TemplateModel other = await ActivityPipeline.ExecuteAsync(command);
     Assert.Same(Realm, other.Realm);
+  }
+
+  [Fact(DisplayName = "It should throw IdAlreadyUsedException when the ID is already taken.")]
+  public async Task It_should_throw_IdAlreadyUsedException_when_the_Id_is_already_taken()
+  {
+    Template template = new(new Identifier("PasswordRecovery"), new Subject("Password Recovery"), Content.PlainText("Hello World!"));
+    await _templateRepository.SaveAsync(template);
+
+    CreateTemplatePayload payload = new(template.UniqueKey.Value, template.Subject.Value, new ContentModel(template.Content))
+    {
+      Id = template.EntityId.ToGuid()
+    };
+    CreateTemplateCommand command = new(payload);
+    var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
+    Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw UniqueKeyAlreadyUsedException when the unique name is already used.")]
@@ -75,9 +101,15 @@ public class CreateTemplateCommandTests : IntegrationTests
   public async Task It_should_throw_ValidationException_when_the_payload_is_not_valid()
   {
     ContentModel content = ContentModel.PlainText("Hello World!");
-    CreateTemplatePayload payload = new(uniqueKey: "", "Reset your password", content);
+    CreateTemplatePayload payload = new(uniqueKey: "", "Reset your password", content)
+    {
+      Id = Guid.Empty
+    };
     CreateTemplateCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await ActivityPipeline.ExecuteAsync(command));
-    Assert.Equal("UniqueKey", exception.Errors.Single().PropertyName);
+
+    Assert.Equal(2, exception.Errors.Count());
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "Id.Value");
+    Assert.Contains(exception.Errors, e => e.ErrorCode == "NotEmptyValidator" && e.PropertyName == "UniqueKey");
   }
 }

@@ -66,6 +66,7 @@ public class CreateRealmCommandTests : IntegrationTests
     CreateRealmCommand command = new(payload);
     var exception = await Assert.ThrowsAsync<IdAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Equal(payload.Id.Value, exception.Id);
+    Assert.Equal("Id", exception.PropertyName);
   }
 
   [Fact(DisplayName = "It should throw UniqueSlugAlreadyUsedException when the unique slug is already used.")]

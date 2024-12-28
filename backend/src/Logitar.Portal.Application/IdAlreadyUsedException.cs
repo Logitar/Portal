@@ -9,13 +9,20 @@ public class IdAlreadyUsedException : Exception
     get => (Guid)Data[nameof(Id)]!;
     private set => Data[nameof(Id)] = value;
   }
-
-  public IdAlreadyUsedException(Guid id) : base(BuildMessage(id))
+  public string? PropertyName
   {
-    Id = id;
+    get => (string?)Data[nameof(PropertyName)];
+    private set => Data[nameof(PropertyName)] = value;
   }
 
-  private static string BuildMessage(Guid id) => new ErrorMessageBuilder(ErrorMessage)
+  public IdAlreadyUsedException(Guid id, string? propertyName = null) : base(BuildMessage(id, propertyName))
+  {
+    Id = id;
+    PropertyName = propertyName;
+  }
+
+  private static string BuildMessage(Guid id, string? propertyName) => new ErrorMessageBuilder(ErrorMessage)
     .AddData(nameof(Id), id)
+    .AddData(nameof(PropertyName), propertyName, "<null>")
     .Build();
 }
