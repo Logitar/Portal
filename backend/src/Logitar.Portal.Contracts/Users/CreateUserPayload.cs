@@ -2,6 +2,8 @@
 
 public record CreateUserPayload
 {
+  public Guid? Id { get; set; }
+
   public string UniqueName { get; set; }
   public string? Password { get; set; }
   public bool IsDisabled { get; set; }

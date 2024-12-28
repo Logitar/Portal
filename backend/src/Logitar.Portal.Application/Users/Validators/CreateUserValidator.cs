@@ -12,6 +12,8 @@ internal class CreateUserValidator : AbstractValidator<CreateUserPayload>
 {
   public CreateUserValidator(IUserSettings userSettings, IAddressHelper addressHelper)
   {
+    When(x => x.Id.HasValue, () => RuleFor(x => x.Id!.Value).NotEmpty());
+
     RuleFor(x => x.UniqueName).UniqueName(userSettings.UniqueName);
     When(x => x.Password != null, () => RuleFor(x => x.Password!).Password(userSettings.Password));
 
