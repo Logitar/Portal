@@ -108,6 +108,7 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMongoDB(_configuration); // NOTE(fpion): needs to be placed after the relational database to override the LogRepository if MongoDB settings are provided.
 
     services.AddDistributedMemoryCache();
+    services.AddFeatureManagement();
     services.AddSingleton<IBaseUrl, HttpBaseUrl>();
     services.AddSingleton<IContextParametersResolver, HttpContextParametersResolver>();
   }
