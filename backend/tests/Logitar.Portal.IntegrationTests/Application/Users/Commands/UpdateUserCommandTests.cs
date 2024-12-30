@@ -92,8 +92,8 @@ public class UpdateUserCommandTests : IntegrationTests
     UpdateUserCommand command = new(user.EntityId.ToGuid(), payload);
     var exception = await Assert.ThrowsAsync<UniqueNameAlreadyUsedException>(async () => await ActivityPipeline.ExecuteAsync(command));
     Assert.Null(exception.TenantId);
-    // TODO(fpion): UserId
-    // TODO(fpion): ConflictId
+    Assert.Equal(user.EntityId.Value, exception.EntityId);
+    Assert.NotEqual(string.Empty, exception.ConflictId);
     Assert.Equal(payload.UniqueName, exception.UniqueName);
   }
 

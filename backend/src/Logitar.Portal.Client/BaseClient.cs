@@ -1,7 +1,6 @@
 ﻿using Logitar.Net.Http;
 using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Constants;
-using Logitar.Portal.Contracts.Errors;
 
 namespace Logitar.Portal.Client;
 
