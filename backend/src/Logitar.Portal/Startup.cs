@@ -113,6 +113,7 @@ internal class Startup : StartupBase
     services.AddProblemDetails();
     services.AddSingleton<IBaseUrl, HttpBaseUrl>();
     services.AddSingleton<IContextParametersResolver, HttpContextParametersResolver>();
+    services.AddTransient<IProblemDetailsWriter, PlainTextProblemDetailsWriter>();
   }
 
   public override void Configure(IApplicationBuilder builder)

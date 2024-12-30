@@ -21,8 +21,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections;
-using System.Text.Json.Serialization;
 
 namespace Logitar.Portal;
 
@@ -60,13 +58,15 @@ internal class ExceptionHandler : IExceptionHandler
       return false;
     }
 
-    Error error = new(exception.GetErrorCode(), exception.Message.Remove("\r").Split('\n').First());
-    foreach (DictionaryEntry data in exception.Data)
+    string code = exception.GetErrorCode();
+    string message = exception is ValidationException ? "Validation failed." : exception.Message.Remove("\r").Split('\n').First();
+    Dictionary<string, object?> data = new(capacity: exception.Data.Count);
+    foreach (DictionaryEntry item in exception.Data)
     {
       try
       {
-        string? key = data.Key is string keyString ? keyString : JsonSerializer.Serialize(data.Key, data.Key.GetType(), _serializerOptions);
-        error.Data[key] = data.Value;
+        string? key = item.Key is string keyString ? keyString : JsonSerializer.Serialize(item.Key, item.Key.GetType(), _serializerOptions);
+        data[key] = item.Value;
       }
       catch (Exception)
       {
@@ -78,18 +78,21 @@ internal class ExceptionHandler : IExceptionHandler
       statusCode,
       title: FormatToTitle(exception.GetErrorCode()),
       type: null,
-      detail: error.Message,
+      detail: message,
       instance: httpContext.Request.GetDisplayUrl());
 
-    problemDetails.Extensions.TryAdd("code", error.Code);
-    problemDetails.Extensions.TryAdd("message", error.Message);
-    problemDetails.Extensions.TryAdd("data", error.Data);
-
+    problemDetails.Extensions.TryAdd("code", code);
+    problemDetails.Extensions.TryAdd("message", message);
+    if (data.Count > 0)
+    {
+      problemDetails.Extensions.TryAdd("data", data);
+    }
     if (exception is ValidationException validation)
     {
       problemDetails.Extensions.TryAdd("errors", validation.Errors);
     }
 
+    httpContext.Response.StatusCode = statusCode.Value;
     ProblemDetailsContext context = new()
     {
       HttpContext = httpContext,
