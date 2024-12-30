@@ -43,6 +43,17 @@ internal class UserClientTests : IClientTests
       UserModel user = await _client.CreateAsync(create, context.Request);
       context.Succeed();
 
+      context.SetName(_client.GetType(), nameof(ErrorException));
+      try
+      {
+        await _client.CreateAsync(create, context.Request);
+      }
+      catch (ErrorException exception)
+      {
+        Error error = exception.Error;
+      }
+      context.Succeed();
+
       context.SetName(_client.GetType(), nameof(_client.DeleteAsync));
       user = await _client.DeleteAsync(user.Id, context.Request)
         ?? throw new InvalidOperationException("The user should not be null.");
