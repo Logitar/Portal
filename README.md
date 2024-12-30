@@ -10,7 +10,7 @@ You can start the Portal on your computed by following these simple steps:
 
 ```sh
 npm install
-npm run build:staging
+npm run build:dev
 ```
 
 The built files will be into the `backend/src/Logitar.Portal.Web/wwwroot`, allowing the backend to serve the frontend under the `/app` route.
@@ -41,11 +41,11 @@ And voilà! Your Portal should be available at the `http://localhost:8087` endpo
 - Node.js 20.10.0
 - Docker Desktop v4.28.0
 
-Other stacks may be working fine, but we will not supported them.
+Other stacks may be working fine, but we will not support them.
 
 ### Backend Debug Only
 
-You may debug the Portal Backend by launching it with Visual Studio. Without modifying the application settings, you'll still need the following dependencies in the `docker-compose.yml` file in order to run the Portal Backend:
+You may debug the Portal Backend by launching it with Visual Studio. Without modifying the application settings, you'll still need the following dependencies in the `docker-compose.yaml` file in order to run the Portal Backend:
 
 - Logitar.Portal_mongo
 - Logitar.Portal_rabbitmq
@@ -61,7 +61,7 @@ npm install
 npm run dev
 ```
 
-The frontend should be available at `http://localhost:7787`. It is configured to communicate with the backend located at `http://localhost:8087`, which is the backend configured in the `docker-compose.yml` file. This means you won't be able to debug the Backend through your favorite IDE with this setup.
+The frontend should be available at `http://localhost:7787`. It is configured to communicate with the backend located at `http://localhost:8087`, which is the backend configured in the `docker-compose.yaml` file. This means you won't be able to debug the Backend through your favorite IDE with this setup.
 
 ### Backend & Frontend Debug
 
