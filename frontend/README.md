@@ -39,6 +39,12 @@ npm run dev
 npm run build
 ```
 
+### Type-Check, Compile and Minify for Development
+
+```sh
+npm run build:dev
+```
+
 ### Type-Check, Compile and Minify for Staging
 
 ```sh
@@ -67,6 +73,12 @@ npm run test:dev
 
 ```sh
 npm run build-only
+```
+
+### Build the Application Without Type Checking for Development
+
+```sh
+npm run build-only:dev
 ```
 
 ### Build the Application Without Type Checking for Staging
