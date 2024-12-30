@@ -31,6 +31,7 @@ Nothing yet.
 - Upgraded Identity NuGet packages.
 - Refactored Web layer.
 - Throw ErrorException in `BaseClient`.
+- Updated README documentation.
 
 ### Fixed
 
