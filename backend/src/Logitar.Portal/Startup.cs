@@ -108,8 +108,12 @@ internal class Startup : StartupBase
     services.AddLogitarPortalMongoDB(_configuration); // NOTE(fpion): needs to be placed after the relational database to override the LogRepository if MongoDB settings are provided.
 
     services.AddDistributedMemoryCache();
+    services.AddExceptionHandler<ExceptionHandler>();
+    services.AddFeatureManagement();
+    services.AddProblemDetails();
     services.AddSingleton<IBaseUrl, HttpBaseUrl>();
     services.AddSingleton<IContextParametersResolver, HttpContextParametersResolver>();
+    services.AddTransient<IProblemDetailsWriter, PlainTextProblemDetailsWriter>();
   }
 
   public override void Configure(IApplicationBuilder builder)
@@ -140,6 +144,7 @@ internal class Startup : StartupBase
     application.UseHttpsRedirection();
     application.UseCors();
     application.UseStaticFiles();
+    application.UseExceptionHandler();
     application.UseSession();
     application.UseMiddleware<Logging>();
     application.UseMiddleware<RenewSession>();

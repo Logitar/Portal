@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Web.Models.Users;
 
-public record EmailModel : IEmail
+public record UpdateProfileEmail : IEmail
 {
   public string Address { get; set; } = string.Empty;
   public bool IsVerified { get; set; }

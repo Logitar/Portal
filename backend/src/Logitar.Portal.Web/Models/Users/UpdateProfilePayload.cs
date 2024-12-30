@@ -8,8 +8,8 @@ public record UpdateProfilePayload
   public ChangePasswordModel? Password { get; set; }
 
   public ChangeModel<UpdateProfileAddress>? Address { get; set; }
-  public ChangeModel<EmailModel>? Email { get; set; }
-  public ChangeModel<PhoneModel>? Phone { get; set; }
+  public ChangeModel<UpdateProfileEmail>? Email { get; set; }
+  public ChangeModel<UpdateProfilePhone>? Phone { get; set; }
 
   public ChangeModel<string>? FirstName { get; set; }
   public ChangeModel<string>? MiddleName { get; set; }

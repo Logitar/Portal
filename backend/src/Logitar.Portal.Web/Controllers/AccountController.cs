@@ -2,7 +2,7 @@
 using Logitar.Portal.Application.Activities;
 using Logitar.Portal.Application.Sessions.Commands;
 using Logitar.Portal.Application.Users.Commands;
-using Logitar.Portal.Contracts.Errors;
+using Logitar.Portal.Contracts;
 using Logitar.Portal.Contracts.Sessions;
 using Logitar.Portal.Contracts.Users;
 using Logitar.Portal.Web.Constants;
@@ -10,6 +10,7 @@ using Logitar.Portal.Web.Extensions;
 using Logitar.Portal.Web.Models.Account;
 using Logitar.Portal.Web.Models.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Logitar.Portal.Web.Controllers;
@@ -58,7 +59,19 @@ public class AccountController : ControllerBase
     }
     catch (InvalidCredentialsException)
     {
-      return BadRequest(new Error("InvalidCredentials", "The specified credentials did not match."));
+      Error error = new(code: "InvalidCredentials", message: "The specified credentials did not match.");
+      return Problem(
+        detail: error.Message,
+        instance: Request.GetDisplayUrl(),
+        statusCode: StatusCodes.Status400BadRequest,
+        title: "Invalid Credentials",
+        type: null,
+        extensions: new Dictionary<string, object?>
+        {
+          ["code"] = error.Code,
+          ["message"] = error.Message,
+          ["data"] = error.Data
+        });
     }
   }
 

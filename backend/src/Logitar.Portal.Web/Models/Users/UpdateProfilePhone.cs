@@ -3,7 +3,7 @@ using Logitar.Portal.Contracts.Users;
 
 namespace Logitar.Portal.Web.Models.Users;
 
-public record PhoneModel : IPhone
+public record UpdateProfilePhone : IPhone
 {
   public string? CountryCode { get; set; }
   public string Number { get; set; } = string.Empty;
