@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [5.0.0] - 2024-12-30
+
 ### Added
 
 - Feature Management.
 - ID property in creation payloads.
+- Problem Details.
 
 ### Changed
 
@@ -25,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored database entities & `PortalDb`.
 - Upgraded Identity NuGet packages.
 - Refactored Web layer.
+- Throw ErrorException in `BaseClient`.
 
 ### Fixed
 
