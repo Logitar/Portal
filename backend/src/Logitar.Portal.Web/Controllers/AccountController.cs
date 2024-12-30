@@ -57,9 +57,9 @@ public class AccountController : ControllerBase
 
       return Ok(session);
     }
-    catch (InvalidCredentialsException exception)
+    catch (InvalidCredentialsException)
     {
-      Error error = new(exception.GetErrorCode(), message: "The specified credentials did not match.");
+      Error error = new(code: "InvalidCredentials", message: "The specified credentials did not match.");
       return Problem(
         detail: error.Message,
         instance: Request.GetDisplayUrl(),
