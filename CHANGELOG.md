@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- Edited README documentation.
+Nothing yet.
 
 ## [5.0.0] - 2024-12-30
 
@@ -33,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded Identity NuGet packages.
 - Refactored Web layer.
 - Throw ErrorException in `BaseClient`.
+- Updated README documentation.
 
 ### Fixed
 
