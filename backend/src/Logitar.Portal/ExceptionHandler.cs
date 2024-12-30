@@ -1,4 +1,5 @@
-﻿using Logitar.Identity.Core;
+﻿using FluentValidation;
+using Logitar.Identity.Core;
 using Logitar.Identity.Core.Users;
 using Logitar.Portal.Application;
 using Logitar.Portal.Application.Configurations;
@@ -40,8 +41,6 @@ internal class ExceptionHandler : IExceptionHandler
 
   public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
   {
-    // TODO(fpion): ValidationException
-
     int? statusCode = null;
     if (IsBadRequestException(exception))
     {
@@ -86,6 +85,11 @@ internal class ExceptionHandler : IExceptionHandler
     problemDetails.Extensions.TryAdd("message", error.Message);
     problemDetails.Extensions.TryAdd("data", error.Data);
 
+    if (exception is ValidationException validation)
+    {
+      problemDetails.Extensions.TryAdd("errors", validation.Errors);
+    }
+
     ProblemDetailsContext context = new()
     {
       HttpContext = httpContext,
@@ -108,7 +112,8 @@ internal class ExceptionHandler : IExceptionHandler
     typeof(TenantMismatchException),
     typeof(ToRecipientMissingException),
     typeof(TooManyHeaderValuesException),
-    typeof(UsersNotInTenantException)
+    typeof(UsersNotInTenantException),
+    typeof(ValidationException)
   ]);
   private static bool IsBadRequestException(Exception exception) => _badRequestExceptions.Contains(exception.GetType())
     || exception is InvalidCredentialsException || exception is SecurityTokenException || exception is TooManyResultsException;
