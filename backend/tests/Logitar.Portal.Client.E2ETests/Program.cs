@@ -31,7 +31,7 @@ internal class Program
     Console.WriteLine();
     Console.WriteLine();
 
-    TestContext context = TestContext.Start(count: 3 + 1 + 6 + 6 + 7 + 11 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
+    TestContext context = TestContext.Start(count: 3 + 1 + 6 + 6 + 7 + 12 + 6 + 4 + 2 + 6 + 8 + 6 + 3 + 1 + 1);
 
     ConfigurationClientTests configurationTests = serviceProvider.GetRequiredService<ConfigurationClientTests>();
     if (!await configurationTests.ExecuteAsync(context)) // 3 tests
@@ -69,7 +69,7 @@ internal class Program
     }
 
     UserClientTests userTests = serviceProvider.GetRequiredService<UserClientTests>();
-    if (!await userTests.ExecuteAsync(context)) // 11 tests
+    if (!await userTests.ExecuteAsync(context)) // 12 tests
     {
       context.End();
       return;

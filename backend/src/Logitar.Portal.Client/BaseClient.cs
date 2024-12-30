@@ -51,13 +51,14 @@ internal abstract class BaseClient
     catch (HttpFailureException<JsonApiResult> exception)
     {
       result = exception.Result;
-      if (result.Status.Code == (int)HttpStatusCode.NotFound)
+      Error? error = result.Deserialize<Error>(SerializerOptions);
+      if (error != null && !string.IsNullOrWhiteSpace(error.Code) && !string.IsNullOrWhiteSpace(error.Message))
       {
-        Error? error = result.Deserialize<Error>(SerializerOptions);
-        if (IsNullOrEmpty(error))
-        {
-          return default;
-        }
+        throw new ErrorException(error);
+      }
+      else if (result.Status.Code == (int)HttpStatusCode.NotFound)
+      {
+        return default;
       }
 
       throw;
@@ -65,8 +66,6 @@ internal abstract class BaseClient
 
     return result.Deserialize<T>(SerializerOptions);
   }
-  protected virtual bool IsNullOrEmpty(Error? error) => error == null
-    || (string.IsNullOrWhiteSpace(error.Code) && string.IsNullOrWhiteSpace(error.Message) && error.Data.Count == 0);
 
   protected virtual InvalidApiResponseException CreateInvalidApiResponseException(string methodName, HttpMethod httpMethod, Uri uri, object? content, IRequestContext? context)
   {
